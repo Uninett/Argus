@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    'social_django',
 ]
 
 MIDDLEWARE = [
@@ -49,6 +51,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
 ]
 
 ROOT_URLCONF = 'aas.site.urls'
@@ -120,3 +123,36 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
+
+
+AUTHENTICATION_BACKENDS = (
+    'dataporten.social.DataportenFeideOAuth2',
+    'dataporten.social.DataportenEmailOAuth2',
+    'dataporten.social.DataportenOAuth2',
+    'django.contrib.auth.backends.ModelBackend',
+)
+
+
+def read_file(path):
+    f = open(path, 'r')
+    content = f.read()
+    f.close()
+    return content
+
+
+SOCIAL_AUTH_ADMIN_USER_SEARCH_FIELDS = ['username', 'first_name', 'email']
+SOCIAL_AUTH_DATAPORTEN_KEY = "c816b0dd-6a80-431e-84e2-e814e999b460"
+
+SOCIAL_AUTH_DATAPORTEN_SECRET = read_file('src/aas/site/settings/dataporten_secret.txt')
+SOCIAL_AUTH_DATAPORTEN_EMAIL_KEY = SOCIAL_AUTH_DATAPORTEN_KEY
+
+SOCIAL_AUTH_DATAPORTEN_EMAIL_SECRET = SOCIAL_AUTH_DATAPORTEN_SECRET
+SOCIAL_AUTH_DATAPORTEN_FEIDE_KEY = SOCIAL_AUTH_DATAPORTEN_KEY
+
+SOCIAL_AUTH_DATAPORTEN_FEIDE_SECRET = SOCIAL_AUTH_DATAPORTEN_SECRET
+SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/'
+
+SOCIAL_AUTH_NEW_USER_REDIRECT_URL = SOCIAL_AUTH_LOGIN_REDIRECT_URL
+
+
+assert SOCIAL_AUTH_DATAPORTEN_KEY and SOCIAL_AUTH_DATAPORTEN_SECRET, 'Client id/secret not set'
