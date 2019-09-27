@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'aas.site.auth',
+    'aas.site.alert',
 ]
 
 MIDDLEWARE = [
