@@ -118,7 +118,14 @@ LOGOUT_REDIRECT_URL = "/"
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+# Date formatting
+DATE_FORMAT = 'Y-m-d'
+TIME_FORMAT = 'H:i:s'
+SHORT_TIME_FORMAT = 'H:i'  # Not a Django setting
+DATETIME_FORMAT = '%s %s' % (DATE_FORMAT, TIME_FORMAT)
+SHORT_DATETIME_FORMAT = '%s %s' % (DATE_FORMAT, SHORT_TIME_FORMAT)
+
+TIME_ZONE = 'Europe/Oslo'
 
 USE_I18N = True
 
