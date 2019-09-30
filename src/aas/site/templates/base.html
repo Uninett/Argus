@@ -16,11 +16,18 @@
 			<form action="{% url 'alert:create' %}">
 				<input type="submit" value="Create alert"/>
 			</form>
+			<form action="{% url 'alert:all' %}">
+				<input type="submit" value="Get all alerts as JSON"/>
+			</form>
 		{% else %}
 			<form action="{% url 'auth:login' %}">
-				<input type="submit" value="Login"/>
+				<input type="submit" value="Login locally"/>
 			</form>
 		{% endif %}
+		<br>
+		<form action="{% url 'dataporten' %}">
+			<input type="submit" value="Dataporten"/>
+		</form>
 	{% endblock content %}
 </body>
 </html>

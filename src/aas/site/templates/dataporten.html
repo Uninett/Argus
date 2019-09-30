@@ -1,5 +1,7 @@
-<html lang="en">
-<body>
+{% extends "base.html" %}
+
+{% block content %}
+
     {% if request.user.is_authenticated %}
         <p>You are logged in as: {{ request.user.username }}</p>
         <p>Your associations:</p>
@@ -18,5 +20,5 @@
             <p><a href="/login/{{ backend }}/">Log in with {{ backend }}</a></p>
         {% endfor %}
     {% endif %}
-</body>
-</html>
+
+{% endblock content %}

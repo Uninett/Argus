@@ -23,7 +23,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     path('', aas_views.index, name='index'),  # temporary URL
-    path('', TemplateView.as_view(template_name='index.html')),
+    path('dataporten/', TemplateView.as_view(template_name='dataporten.html'), name='dataporten'),
     path('', include('aas.site.auth.urls')),
     path('alert/', include('aas.site.alert.urls')),
 ]
