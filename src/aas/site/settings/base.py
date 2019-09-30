@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    'social_django',
 ]
 
 MIDDLEWARE = [
@@ -49,6 +51,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'social_django.middleware.SocialAuthExceptionMiddleware',
 ]
 
 ROOT_URLCONF = 'aas.site.urls'
@@ -64,6 +67,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'social_django.context_processors.backends',
+                'social_django.context_processors.login_redirect',
             ],
         },
     },
@@ -120,3 +125,34 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
+
+
+AUTHENTICATION_BACKENDS = (
+    'dataporten.social.DataportenFeideOAuth2',
+    'dataporten.social.DataportenEmailOAuth2',
+    'dataporten.social.DataportenOAuth2',
+    'django.contrib.auth.backends.ModelBackend',
+)
+
+
+def get_dataporten_secret():
+    dataporten_secret_file = SETTINGS_DIR / 'dataporten_secret.txt'
+    try:
+        return dataporten_secret_file.read_text().strip()
+    except IOError:
+        raise FileNotFoundError(f"Please create the file \"{dataporten_secret_file}\" containing the client key to the Dataporten app")
+
+
+SOCIAL_AUTH_ADMIN_USER_SEARCH_FIELDS = ['username', 'first_name', 'email']
+SOCIAL_AUTH_DATAPORTEN_KEY = "c816b0dd-6a80-431e-84e2-e814e999b460"
+
+SOCIAL_AUTH_DATAPORTEN_SECRET = get_dataporten_secret()
+SOCIAL_AUTH_DATAPORTEN_EMAIL_KEY = SOCIAL_AUTH_DATAPORTEN_KEY
+
+SOCIAL_AUTH_DATAPORTEN_EMAIL_SECRET = SOCIAL_AUTH_DATAPORTEN_SECRET
+SOCIAL_AUTH_DATAPORTEN_FEIDE_KEY = SOCIAL_AUTH_DATAPORTEN_KEY
+
+SOCIAL_AUTH_DATAPORTEN_FEIDE_SECRET = SOCIAL_AUTH_DATAPORTEN_SECRET
+SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/'
+
+SOCIAL_AUTH_NEW_USER_REDIRECT_URL = SOCIAL_AUTH_LOGIN_REDIRECT_URL
