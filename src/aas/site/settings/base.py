@@ -136,17 +136,18 @@ AUTHENTICATION_BACKENDS = (
 )
 
 
-def read_file(path):
-    f = open(path, 'r')
-    content = f.read()
-    f.close()
-    return content
+def get_dataporten_secret():
+    dataporten_secret_file = SETTINGS_DIR / 'dataporten_secret.txt'
+    try:
+        return dataporten_secret_file.read_text().strip()
+    except IOError:
+        raise FileNotFoundError(f"Please create the file \"{dataporten_secret_file}\" containing the client key to the Dataporten app")
 
 
 SOCIAL_AUTH_ADMIN_USER_SEARCH_FIELDS = ['username', 'first_name', 'email']
 SOCIAL_AUTH_DATAPORTEN_KEY = "c816b0dd-6a80-431e-84e2-e814e999b460"
 
-SOCIAL_AUTH_DATAPORTEN_SECRET = read_file('src/aas/site/settings/dataporten_secret.txt')
+SOCIAL_AUTH_DATAPORTEN_SECRET = get_dataporten_secret()
 SOCIAL_AUTH_DATAPORTEN_EMAIL_KEY = SOCIAL_AUTH_DATAPORTEN_KEY
 
 SOCIAL_AUTH_DATAPORTEN_EMAIL_SECRET = SOCIAL_AUTH_DATAPORTEN_SECRET
@@ -156,6 +157,3 @@ SOCIAL_AUTH_DATAPORTEN_FEIDE_SECRET = SOCIAL_AUTH_DATAPORTEN_SECRET
 SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/'
 
 SOCIAL_AUTH_NEW_USER_REDIRECT_URL = SOCIAL_AUTH_LOGIN_REDIRECT_URL
-
-
-assert SOCIAL_AUTH_DATAPORTEN_KEY and SOCIAL_AUTH_DATAPORTEN_SECRET, 'Client id/secret not set'
