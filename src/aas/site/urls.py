@@ -15,6 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
+from django.views.generic import TemplateView
 
 from . import views as aas_views
 
@@ -22,6 +23,11 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     path('', aas_views.index, name='index'),  # temporary URL
+    path('', TemplateView.as_view(template_name='index.html')),
     path('', include('aas.site.auth.urls')),
     path('alert/', include('aas.site.alert.urls')),
+]
+
+urlpatterns += [
+    path('', include('social_django.urls', namespace='social')),
 ]
