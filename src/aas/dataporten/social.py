@@ -1,8 +1,5 @@
 from __future__ import unicode_literals
 
-import json
-from base64 import b64encode
-
 from social_core.backends.oauth import BaseOAuth2
 from social_core.exceptions import AuthException
 
