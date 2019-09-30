@@ -13,6 +13,9 @@
 
 	{% block content %}
 		{% if user.is_authenticated %}
+			<form action="{% url 'alert:create' %}">
+				<input type="submit" value="Create alert"/>
+			</form>
 		{% else %}
 			<form action="{% url 'auth:login' %}">
 				<input type="submit" value="Login"/>

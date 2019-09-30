@@ -23,4 +23,5 @@ urlpatterns = [
 
     path('', aas_views.index, name='index'),  # temporary URL
     path('', include('aas.site.auth.urls')),
+    path('alert/', include('aas.site.alert.urls')),
 ]
