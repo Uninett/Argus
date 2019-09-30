@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>{% block title %}AAS{% endblock %}</title>
+</head>
+<body>
+	<header>
+		<h1>
+			<a style="text-decoration: none; color: #333;" href="{% url 'index' %}">AAS</a>
+		</h1>
+	</header>
+
+	{% block content %}
+		{% if user.is_authenticated %}
+		{% else %}
+			<form action="{% url 'auth:login' %}">
+				<input type="submit" value="Login"/>
+			</form>
+		{% endif %}
+	{% endblock content %}
+</body>
+</html>

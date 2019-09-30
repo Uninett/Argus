@@ -14,8 +14,13 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import include, path
+
+from . import views as aas_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+
+    path('', aas_views.index, name='index'),  # temporary URL
+    path('', include('aas.site.auth.urls')),
 ]
