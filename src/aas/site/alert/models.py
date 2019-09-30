@@ -90,6 +90,7 @@ class AlertBase(models.Model):
     network_system = models.ForeignKey(
         NetworkSystem,
         on_delete=models.CASCADE,
+        null=True,
     )
 
 
