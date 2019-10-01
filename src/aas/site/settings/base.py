@@ -40,6 +40,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'aas.site.auth',
+    'aas.site.alert',
+
     'social_django',
 ]
 
@@ -106,13 +109,28 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTH_USER_MODEL = 'aas_auth.User'
+
+
+LOGIN_URL = "/login/"
+LOGOUT_URL = "/logout/"
+LOGIN_REDIRECT_URL = "/"
+LOGOUT_REDIRECT_URL = "/"
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+# Date formatting
+DATE_FORMAT = 'Y-m-d'
+TIME_FORMAT = 'H:i:s'
+SHORT_TIME_FORMAT = 'H:i'  # Not a Django setting
+DATETIME_FORMAT = '%s %s' % (DATE_FORMAT, TIME_FORMAT)
+SHORT_DATETIME_FORMAT = '%s %s' % (DATE_FORMAT, SHORT_TIME_FORMAT)
+
+TIME_ZONE = 'Europe/Oslo'
 
 USE_I18N = True
 
