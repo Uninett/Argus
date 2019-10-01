@@ -1,33 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="UTF-8">
-	<title>{% block title %}AAS{% endblock %}</title>
+    <meta charset="UTF-8">
+    <title>{% block title %}AAS{% endblock %}</title>
 </head>
 <body>
-	<header>
-		<h1>
-			<a style="text-decoration: none; color: #333;" href="{% url 'index' %}">AAS</a>
-		</h1>
-	</header>
+    <header>
+        <h1>
+            <a style="text-decoration: none; color: #333;" href="{% url 'index' %}">AAS</a>
+        </h1>
+    </header>
 
-	{% block content %}
-		{% if user.is_authenticated %}
-			<form action="{% url 'alert:create' %}">
-				<input type="submit" value="Create alert"/>
-			</form>
-			<form action="{% url 'alert:all' %}">
-				<input type="submit" value="Get all alerts as JSON"/>
-			</form>
-		{% else %}
-			<form action="{% url 'auth:login' %}">
-				<input type="submit" value="Login locally"/>
-			</form>
-		{% endif %}
-		<br>
-		<form action="{% url 'dataporten' %}">
-			<input type="submit" value="Dataporten"/>
-		</form>
-	{% endblock content %}
+    {% block content %}
+        {% if user.is_authenticated %}
+            <form action="{% url 'alert:create' %}">
+                <input type="submit" value="Create alert"/>
+            </form>
+            <form action="{% url 'alert:all' %}">
+                <input type="submit" value="Get all alerts as JSON"/>
+            </form>
+        {% else %}
+            <form action="{% url 'auth:login' %}">
+                <input type="submit" value="Login locally"/>
+            </form>
+        {% endif %}
+        <br>
+        <form action="{% url 'dataporten' %}">
+            <input type="submit" value="Dataporten"/>
+        </form>
+    {% endblock content %}
 </body>
 </html>
