@@ -41,11 +41,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'corsheaders',
+    'social_django',
 
     'aas.site.auth',
     'aas.site.alert',
-
-    'social_django',
 ]
 
 MIDDLEWARE = [
@@ -146,6 +145,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
+
 
 CORS_ORIGIN_WHITELIST = [
     "http://localhost:3000",

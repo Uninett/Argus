@@ -5,4 +5,3 @@ Sphinx>=2.2.0
 python-social-auth
 python-dataporten-auth
 social-auth-app-django
-django-cors-headers
