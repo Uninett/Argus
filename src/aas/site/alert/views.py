@@ -16,8 +16,8 @@ def all_alerts_view(request):
     return HttpResponse(json_result, content_type="application/json")
 
 
-def all_alerts_from_source_view(request, source_id):
-    data = serializers.serialize("json", AlertHistory.objects.filter(source=source_id))
+def all_alerts_from_source_view(request, source_pk):
+    data = serializers.serialize("json", Alert.objects.filter(source=source_pk))
     json_result = json.dumps(json.loads(data), indent=4)
     return HttpResponse(json_result, content_type="application/json")
 
