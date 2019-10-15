@@ -2,6 +2,9 @@ from django.db import models
 
 
 class NetworkSystemType(models.Model):
+    class Meta:
+        ordering = ['name']
+
     name = models.CharField(max_length=50)
 
     def __str__(self):
@@ -20,36 +23,52 @@ class NetworkSystem(models.Model):
         return self.name
 
 
-class SubjectType(models.Model):
+class ObjectType(models.Model):
+    class Meta:
+        ordering = ['name']
+
     name = models.CharField(max_length=50)
 
     def __str__(self):
         return self.name
 
 
-class Subject(models.Model):
-    subject_id = models.CharField(blank=True, max_length=20, verbose_name="subject ID")
+class Object(models.Model):
     name = models.CharField(max_length=100)
+    object_id = models.CharField(blank=True, max_length=20, verbose_name="object ID")
     url = models.URLField(verbose_name="URL")
     type = models.ForeignKey(
-        SubjectType,
+        ObjectType,
         models.CASCADE,
         related_name='instances',
     )
+    network_system = models.ForeignKey(
+        NetworkSystem,
+        on_delete=models.CASCADE,
+        null=True,
+        related_name='objects',
+    )
 
     def __str__(self):
-        return self.name
+        return f"{self.type}: {self.name} ({self.network_system})"
 
 
-class EventType(models.Model):
-    name = models.CharField(max_length=50)
-    description = models.TextField()
+class ParentObject(models.Model):
+    class Meta:
+        ordering = ['name']
+
+    name = models.CharField(blank=True, max_length=100)
+    parentobject_id = models.CharField(max_length=20, verbose_name="parent object ID")
+    url = models.URLField(blank=True, verbose_name="URL")
 
     def __str__(self):
-        return self.name
+        return f"<ID {self.parentobject_id}>" + f" {self.name}" if self.name else ""
 
 
-class AlertType(models.Model):
+class ProblemType(models.Model):
+    class Meta:
+        ordering = ['name']
+
     name = models.CharField(max_length=50)
     description = models.TextField()
 
@@ -58,61 +77,37 @@ class AlertType(models.Model):
 
 
 # TODO: review max_length on CharFields, whether fields should be nullable, and on_delete modes
-class AlertBase(models.Model):
+class Alert(models.Model):
     class Meta:
-        abstract = True
-
-    alert_id = models.IntegerField(verbose_name="alert ID")
-    subject = models.ForeignKey(
-        Subject,
-        models.CASCADE,
-    )
-    on_maintenance = models.BooleanField()
-    # acknowledgement = models.ForeignKey
-    event_history_url = models.URLField(blank=True, verbose_name="event history URL")
-    netbox_history_url = models.URLField(blank=True, verbose_name="netbox history URL")
-    event_details_url = models.URLField(blank=True, verbose_name="event details URL")
-    # device_groups =
-    type = models.ForeignKey(
-        AlertType,
-        models.CASCADE,
-    )
-    event_type = models.ForeignKey(
-        EventType,
-        models.CASCADE,
-    )
-    value = models.IntegerField()
-    severity = models.IntegerField()
-    source = models.CharField(max_length=50)
-    device = models.IntegerField(null=True, blank=True)
-    netbox = models.IntegerField()
-
-    network_system = models.ForeignKey(
-        NetworkSystem,
-        on_delete=models.CASCADE,
-        null=True,
-    )
-
-
-class AlertQueue(AlertBase):
-    class Meta:
-        default_related_name = 'alert_qs'
-        ordering = ['-timestamp']
+        ordering = ['timestamp']
 
     timestamp = models.DateTimeField()
+    source = models.ForeignKey(
+        NetworkSystem,
+        on_delete=models.CASCADE,
+        related_name='alerts',
+        verbose_name="network system source",
+    )
+    alert_id = models.CharField(max_length=20, verbose_name="alert ID")
+    object = models.ForeignKey(
+        Object,
+        models.CASCADE,
+        related_name='alerts',
+    )
+    parent_object = models.ForeignKey(
+        ParentObject,
+        models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='alerts',
+    )
+    details_url = models.URLField(blank=True, verbose_name="details URL")
+    problem_type = models.ForeignKey(
+        ProblemType,
+        models.CASCADE,
+        related_name='alerts',
+    )
+    description = models.TextField(blank=True)
 
     def __str__(self):
-        return f"{self.timestamp}; {self.type}: {self.subject}"
-
-
-class AlertHistory(AlertBase):
-    class Meta:
-        default_related_name = 'alert_hists'
-        ordering = ['-start_time']
-        verbose_name_plural = "alert histories"
-
-    start_time = models.DateTimeField()
-    end_time = models.DateTimeField(null=True, blank=True)
-
-    def __str__(self):
-        return f"{self.start_time} - {self.end_time}; {self.type}: {self.subject}"
+        return f"{self.timestamp}; {self.problem_type}: {self.object}"

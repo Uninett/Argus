@@ -1,3 +1,4 @@
+""" TODO: temporarily disabled until JSON parsing has been implemented for the new data model
 import json
 from datetime import MAXYEAR, date, datetime
 
@@ -94,3 +95,4 @@ def json_to_alert_hist(json_string):
         alert_hist.end_time = timezone.make_aware(datetime.fromisoformat(alert_hist.end_time))
 
     return alert_hist
+"""
