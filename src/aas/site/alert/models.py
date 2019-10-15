@@ -34,6 +34,12 @@ class ObjectType(models.Model):
 
 
 class Object(models.Model):
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['object_id', 'network_system'], name="unique_object_id_per_network_system"),
+            models.UniqueConstraint(fields=['name', 'type', 'network_system'], name="unique_name_and_type_per_network_system"),
+        ]
+
     name = models.CharField(max_length=100)
     object_id = models.CharField(blank=True, max_length=20, verbose_name="object ID")
     url = models.URLField(verbose_name="URL")
@@ -79,6 +85,9 @@ class ProblemType(models.Model):
 # TODO: review max_length on CharFields, whether fields should be nullable, and on_delete modes
 class Alert(models.Model):
     class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['alert_id', 'source'], name="unique_alert_id_per_source"),
+        ]
         ordering = ['timestamp']
 
     timestamp = models.DateTimeField()

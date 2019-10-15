@@ -95,4 +95,16 @@ class Migration(migrations.Migration):
                 'ordering': ['timestamp'],
             },
         ),
+        migrations.AddConstraint(
+            model_name='object',
+            constraint=models.UniqueConstraint(fields=('object_id', 'network_system'), name='unique_object_id_per_network_system'),
+        ),
+        migrations.AddConstraint(
+            model_name='object',
+            constraint=models.UniqueConstraint(fields=('name', 'type', 'network_system'), name='unique_name_and_type_per_network_system'),
+        ),
+        migrations.AddConstraint(
+            model_name='alert',
+            constraint=models.UniqueConstraint(fields=('alert_id', 'source'), name='unique_alert_id_per_source'),
+        ),
     ]
