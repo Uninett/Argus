@@ -3,12 +3,16 @@ import json
 from django.core import serializers
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic import FormView
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 
 from . import json_utils
 from .forms import AlertJsonForm
 from .models import AlertHistory
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def all_alerts_view(request):
     # json_result = json_utils.alert_hists_to_json(AlertHistory.objects.all())
     data = serializers.serialize("json", AlertHistory.objects.all())
