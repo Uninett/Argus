@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import AlertHistory, AlertQueue, AlertType, EventType, NetworkSystem, NetworkSystemType, Subject, SubjectType
+from .models import Alert, NetworkSystem, NetworkSystemType, Object, ObjectType, ParentObject, ProblemType
 
 
 class NetworkSystemTypeAdmin(admin.ModelAdmin):
@@ -11,41 +11,38 @@ class NetworkSystemAdmin(admin.ModelAdmin):
     list_display = ('name', 'type')
 
 
-class SubjectTypeAdmin(admin.ModelAdmin):
+class ObjectTypeAdmin(admin.ModelAdmin):
     list_display = ('name',)
 
 
-class SubjectAdmin(admin.ModelAdmin):
-    list_display = ('name', 'subject_id', 'type')
+class ObjectAdmin(admin.ModelAdmin):
+    list_display = ('name', 'object_id', 'type', 'network_system')
 
 
-class EventTypeAdmin(admin.ModelAdmin):
+class ParentObjectAdmin(admin.ModelAdmin):
+    list_display = ('get_str', 'name', 'url')
+
+    def get_str(self, parent_object):
+        return str(parent_object)
+
+    get_str.short_description = "Parent object"
+    get_str.admin_order_field = 'parentobject_id'
+
+
+class ProblemTypeAdmin(admin.ModelAdmin):
     list_display = ('name', 'description')
 
 
-class AlertTypeAdmin(admin.ModelAdmin):
-    list_display = ('name', 'description')
+class AlertAdmin(admin.ModelAdmin):
+    list_display = ('alert_id', 'timestamp', 'source', 'object', 'parent_object', 'details_url', 'problem_type')
 
-
-class AlertBaseAdmin(admin.ModelAdmin):
-    list_display = ('type', 'event_type', 'subject', 'network_system')
-
-    raw_id_fields = ('subject',)
-
-
-class AlertQueueAdmin(AlertBaseAdmin):
-    list_display = ('alert_id', 'timestamp') + AlertBaseAdmin.list_display
-
-
-class AlertHistoryAdmin(AlertBaseAdmin):
-    list_display = ('alert_id', 'start_time', 'end_time') + AlertBaseAdmin.list_display
+    raw_id_fields = ('object', 'parent_object')
 
 
 admin.site.register(NetworkSystemType, NetworkSystemTypeAdmin)
 admin.site.register(NetworkSystem, NetworkSystemAdmin)
-admin.site.register(SubjectType, SubjectTypeAdmin)
-admin.site.register(Subject, SubjectAdmin)
-admin.site.register(EventType, EventTypeAdmin)
-admin.site.register(AlertType, AlertTypeAdmin)
-admin.site.register(AlertQueue, AlertQueueAdmin)
-admin.site.register(AlertHistory, AlertHistoryAdmin)
+admin.site.register(ObjectType, ObjectTypeAdmin)
+admin.site.register(Object, ObjectAdmin)
+admin.site.register(ParentObject, ParentObjectAdmin)
+admin.site.register(ProblemType, ProblemTypeAdmin)
+admin.site.register(Alert, AlertAdmin)
