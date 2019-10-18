@@ -42,12 +42,11 @@ INSTALLED_APPS = [
 
     'corsheaders',
     'social_django',
+    'rest_framework',
+    'rest_framework.authtoken',
 
     'aas.site.auth',
     'aas.site.alert',
-
-    'rest_framework',
-    'rest_framework.authtoken',
 ]
 
 MIDDLEWARE = [
@@ -91,7 +90,6 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
     ),
-
 }
 
 
