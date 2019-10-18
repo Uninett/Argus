@@ -4,9 +4,11 @@ import sys
 from datetime import datetime, timedelta
 from pathlib import Path
 from string import ascii_lowercase, ascii_uppercase, digits
+from typing import List, Tuple
 
 import django
 from django.core import serializers
+from django.db.models import Model
 from django.utils import timezone
 
 FIXTURES_DIR = Path(__file__).resolve().parent
@@ -50,14 +52,14 @@ ALERT_DESCRIPTION_WORD_COUNT_RANGE = (2, 10)
 
 
 # --- Util functions ---
-def random_int(range_: tuple):
+def random_int(range_: Tuple[int, int]) -> int:
     return random.randint(*range_)
 
 
 past_ids = set()
 
 
-def random_id():
+def random_id() -> str:
     id_ = random.randint(1, MAX_ID)
     # Ensure unique IDs (note that this is across models; might want to change to check per model)
     while id_ in past_ids:
@@ -67,39 +69,40 @@ def random_id():
     return str(id_)
 
 
-def random_word(word_length_range=WORD_LENGTH_RANGE):
+def random_word(word_length_range: Tuple[int, int] = WORD_LENGTH_RANGE) -> str:
     word_length = random_int(word_length_range)
     return "".join(random.choice(ascii_lowercase) for _ in range(word_length))
 
 
-def random_word_list(word_count_range: tuple):
+def random_word_list(word_count_range: Tuple[int, int]) -> List[str]:
     word_count = random_int(word_count_range)
     return [random_word() for _ in range(word_count)]
 
 
-def random_words(word_count_range: tuple):
+def random_words(word_count_range: Tuple[int, int]) -> str:
     return " ".join(random_word_list(word_count_range))
 
 
-def random_description(word_count_range: tuple):
+def random_description(word_count_range: Tuple[int, int]) -> str:
     description = random_words(word_count_range)
+    # Make first letter upper case, and add a period
     return description[0].upper() + description[1:] + "."
 
 
-def random_timestamp():
+def random_timestamp() -> datetime:
     random_time_delta = (timezone.now() - MIN_TIMESTAMP).total_seconds() * random.random()
     return MIN_TIMESTAMP + timedelta(seconds=random_time_delta)
 
 
-def roll_dice(chance_threshold):
+def roll_dice(chance_threshold: float) -> bool:
     return random.random() < chance_threshold
 
 
-def format_url(network_system, name):
+def format_url(network_system: NetworkSystem, name: str) -> str:
     return f"http://{network_system.name}.{network_system.type.name}.no/{name.replace(' ', '%20')}".lower()
 
 
-def set_pks(model_objects):
+def set_pks(model_objects: List[Model]) -> List[Model]:
     pk = START_PK
     for obj in model_objects:
         obj.pk = pk
@@ -108,14 +111,14 @@ def set_pks(model_objects):
 
 
 # --- Generation functions ---
-def generate_network_system_types():
-    return set_pks((
+def generate_network_system_types() -> List[Model]:
+    return set_pks([
         NetworkSystemType(name="NAV"),
         NetworkSystemType(name="Zabbix"),
-    ))
+    ])
 
 
-def generate_network_systems(network_system_types):
+def generate_network_systems(network_system_types) -> List[Model]:
     network_systems = []
     for system_type in network_system_types:
         for _ in range(NUM_NETWORK_SYSTEMS_PER_TYPE):
@@ -127,7 +130,7 @@ def generate_network_systems(network_system_types):
     return set_pks(network_systems)
 
 
-def generate_object_types():
+def generate_object_types() -> List[Model]:
     object_types = []
     for _ in range(NUM_OBJECT_TYPES):
         object_types.append(ObjectType(
@@ -137,8 +140,8 @@ def generate_object_types():
     return set_pks(object_types)
 
 
-def generate_objects(object_types, network_systems):
-    def random_object_word():
+def generate_objects(object_types, network_systems) -> List[Model]:
+    def random_object_word() -> str:
         # Will most often be an empty string, sometimes a single digit, and rarely a double digit
         suffix = (
             (random.choice(digits)
@@ -173,7 +176,7 @@ def generate_objects(object_types, network_systems):
     return set_pks(objects)
 
 
-def generate_parent_objects(network_systems):
+def generate_parent_objects(network_systems) -> List[Model]:
     parent_objects = []
     for _ in range(NUM_PARENT_OBJECTS):
         network_system = random.choice(network_systems)
@@ -188,16 +191,14 @@ def generate_parent_objects(network_systems):
     return set_pks(parent_objects)
 
 
-def generate_problem_types():
+def generate_problem_types() -> List[Model]:
     problem_types = []
     for _ in range(NUM_PROBLEM_TYPES):
         name = "".join(w.title() for w in random_word_list(PROBLEM_TYPE_NAME_WORD_COUNT_RANGE))
         # Make first letter lower case
         name = name[0].lower() + name[1:]
 
-        description = random_words(PROBLEM_TYPE_DESCRIPTION_WORD_COUNT_RANGE)
-        # Make first letter upper case
-        description = description[0].upper() + description[1:] + "."
+        description = random_description(PROBLEM_TYPE_DESCRIPTION_WORD_COUNT_RANGE)
 
         problem_types.append(ProblemType(
             name=name,
@@ -207,7 +208,7 @@ def generate_problem_types():
     return set_pks(problem_types)
 
 
-def generate_alerts(network_systems, objects, parent_objects, problem_types):
+def generate_alerts(network_systems, objects, parent_objects, problem_types) -> List[Model]:
     second_delay = timedelta(seconds=1)
 
     alerts = []
