@@ -16,19 +16,20 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 from django.views.generic import TemplateView, RedirectView
-from rest_framework.authtoken import views
+from rest_framework.authtoken import views as rest_views
 
 from . import views as aas_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    path('', RedirectView.as_view(url="http://localhost:3000"), name='index'),  # temporary URL
    # path('dataporten/', TemplateView.as_view(template_name='dataporten.html'), name='dataporten'),
     path('dataporten/', RedirectView.as_view(url="http://localhost:3000"), name='dataporten'),
+    path('api-token-auth/', rest_views.obtain_auth_token, name='api-token-auth'),
+
+    path('', RedirectView.as_view(url="http://localhost:3000"), name='index'),  # temporary URL
     path('', include('aas.site.auth.urls')),
     path('alert/', include('aas.site.alert.urls')),
-    path('api-token-auth/', views.obtain_auth_token, name='api-token-auth')
 ]
 
 urlpatterns += [
