@@ -8,7 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from aas.site.alert.models import Alert
 from .models import User
-from .models import Notification_profile
+from .models import NotificationProfile
 
 
 @api_view(['GET'])
@@ -17,7 +17,7 @@ def notification_profile_view(request, username):
     # json_result = json_utils.alert_hists_to_json(AlertHistory.objects.all())
     user = User.objects.filter(username=username)
     data: QuerySet = []
-    profiles = Notification_profile.objects.filter(pk=user[0].pk)
+    profiles = NotificationProfile.objects.filter(pk=user[0].pk)
     alerts = Alert.objects.all()
     for alert in alerts:
         for profile in profiles:
@@ -29,7 +29,7 @@ def notification_profile_view(request, username):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_notification_profile_view(request):
-    new_profile = Notification_profile()
+    new_profile = NotificationProfile()
     username = request.POST.get("username")
     user = User.objects.filter(username=username)[0]
     interval_start = request.POST.get("start")
@@ -46,22 +46,22 @@ def create_notification_profile_view(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def delete_notification_profile_view(request):
-    profile = Notification_profile.objects.filter(pk=request.POST.get("pk"))[0]
+    profile = NotificationProfile.objects.filter(pk=request.POST.get("pk"))[0]
     profile.delete()
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_notification_profile_view(request, username):
     user = User.objects.filter(username=username)
-    profiles = Notification_profile.objects.filter(pk=user[0].pk)
+    profiles = NotificationProfile.objects.filter(pk=user[0].pk)
     json_result = json.dumps(serializers.serialize("json", profiles), indent=4)
     return HttpResponse(json_result, content_type="application/json")
 
 
 
-def isBetween(profile: Notification_profile, alert: Alert):
+def isBetween(profile: NotificationProfile, alert: Alert):
     """
-    :param profile: Notification_profile
+    :param profile: NotificationProfile
     :param alert: alert instance
     :return: Boolean
     True if the alert is within the given profile's desired interval

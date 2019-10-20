@@ -3,7 +3,7 @@ from django.db import models
 from ..auth.models import User
 
 
-class Notification_profile(models.Model):
+class NotificationProfile(models.Model):
     user = models.ForeignKey(
         User,
         models.CASCADE,
