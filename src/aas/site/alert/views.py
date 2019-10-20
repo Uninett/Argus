@@ -1,5 +1,4 @@
 import json
-import datetime
 
 from django.core import serializers
 from django.db.models import QuerySet
@@ -8,9 +7,7 @@ from django.views.generic import FormView
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 
-from ..auth.models import User
-from . import json_utils
-#from .utils import isBetween
+from .models import User
 from .forms import AlertJsonForm
 from .models import Alert, Notification_profile
 
@@ -91,6 +88,7 @@ def get_notification_profile_view(request, username):
     return HttpResponse(json_result, content_type="application/json")
 
 
+
 def isBetween(profile: Notification_profile, alert: Alert):
     """
     :param profile: Notification_profile
@@ -107,3 +105,4 @@ def isBetween(profile: Notification_profile, alert: Alert):
         return True
     else:
         return False
+
