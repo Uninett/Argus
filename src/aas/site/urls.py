@@ -28,6 +28,7 @@ urlpatterns = [
     path('dataporten/', RedirectView.as_view(url="http://localhost:3000"), name='dataporten'),
     path('', include('aas.site.auth.urls')),
     path('alert/', include('aas.site.alert.urls')),
+    path('', include('aas.site.notificationprofile.urls')),
     path('api-token-auth/', views.obtain_auth_token, name='api-token-auth')
 ]
 

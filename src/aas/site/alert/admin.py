@@ -1,7 +1,6 @@
 from django.contrib import admin
 
-from .models import Alert, NetworkSystem, NetworkSystemType, Object, ObjectType, ParentObject, ProblemType, \
-    Notification_profile
+from .models import Alert, NetworkSystem, NetworkSystemType, Object, ObjectType, ParentObject, ProblemType
 
 
 class NetworkSystemTypeAdmin(admin.ModelAdmin):
@@ -47,4 +46,3 @@ admin.site.register(Object, ObjectAdmin)
 admin.site.register(ParentObject, ParentObjectAdmin)
 admin.site.register(ProblemType, ProblemTypeAdmin)
 admin.site.register(Alert, AlertAdmin)
-admin.site.register(Notification_profile)
