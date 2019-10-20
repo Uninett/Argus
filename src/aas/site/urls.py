@@ -18,15 +18,13 @@ from django.urls import include, path, re_path
 from rest_framework.authtoken import views as rest_views
 from social_django.urls import extra
 
-from . import views as aas_views
 from aas.dataporten import views as dataporten_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    path('', include('aas.site.auth.urls')),
+    path('auth/', include('aas.site.auth.urls')),
     path('alert/', include('aas.site.alert.urls')),
-    path('auth/', include('aas.site.auth.urls'))
 ]
 
 urlpatterns += [

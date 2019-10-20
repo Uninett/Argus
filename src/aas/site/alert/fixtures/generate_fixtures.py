@@ -152,8 +152,9 @@ def generate_objects(object_types, network_systems) -> List[Model]:
 
     objects = []
     for _ in range(NUM_OBJECTS):
-        name_words = []
 
+        # Generate name
+        name_words = []
         for _ in range(random_int(OBJECT_NAME_WORD_COUNT_RANGE)):
             if roll_dice(COMPOSITE_WORD_CHANCE):
                 # Will be a word-like-this
@@ -161,9 +162,9 @@ def generate_objects(object_types, network_systems) -> List[Model]:
             else:
                 word = random_object_word().title()
             name_words.append(word)
+        name = " ".join(name_words)
 
         network_system = random.choice(network_systems)
-        name = " ".join(name_words)
 
         objects.append(Object(
             name=name,

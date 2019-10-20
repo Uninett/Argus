@@ -1,11 +1,11 @@
-from django.shortcuts import redirect
 from django.conf import settings
+from django.shortcuts import redirect
 from rest_framework.authtoken.models import Token
 from social_django import views as social_views
 
 
 def login_wrapper(request, backend, *args, **kwargs):
-    # Needs to be called to fetch the user's social data
+    # Needs to be called to fetch the user's Feide data (available through `social_auth`)
     _response = social_views.complete(request, backend, *args, **kwargs)
 
     user = request.user
