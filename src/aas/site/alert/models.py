@@ -128,6 +128,7 @@ class Notification_profile(models.Model):
         User,
         models.CASCADE,
     )
+    name = models.CharField(max_length=40)
     interval_start = models.DateTimeField()
     interval_stop = models.DateTimeField()
 

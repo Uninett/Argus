@@ -44,12 +44,10 @@ class CreateAlertView(FormView):
         return HttpResponseRedirect(self.request.path_info)
 
 
-@api_view(['POST'])
+@api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def notification_profile_view(request):
+def notification_profile_view(request, username):
     # json_result = json_utils.alert_hists_to_json(AlertHistory.objects.all())
-
-    username = request.POST.get("username")
     user = User.objects.filter(username=username)
     data: QuerySet = []
     profiles = Notification_profile.objects.filter(pk=user[0].pk)
@@ -59,8 +57,7 @@ def notification_profile_view(request):
             if isBetween(alert=alert, profile=profile):
                 data.append(alert)
     json_result = json.dumps(serializers.serialize("json", data), indent=4)
-    response = {"alerts": json_result }
-    return HttpResponse(json.dumps(response), content_type="application/json")
+    return HttpResponse(json_result, content_type="application/json")
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -85,7 +82,13 @@ def delete_notification_profile_view(request):
     profile = Notification_profile.objects.filter(pk=request.POST.get("pk"))[0]
     profile.delete()
 
-
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_notification_profile_view(request, username):
+    user = User.objects.filter(username=username)
+    profiles = Notification_profile.objects.filter(pk=user[0].pk)
+    json_result = json.dumps(serializers.serialize("json", profiles), indent=4)
+    return HttpResponse(json_result, content_type="application/json")
 
 
 def isBetween(profile: Notification_profile, alert: Alert):
