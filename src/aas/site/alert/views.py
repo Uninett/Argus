@@ -6,7 +6,6 @@ from django.views.generic import FormView
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 
-from . import json_utils
 from .forms import AlertJsonForm
 from .models import Alert
 

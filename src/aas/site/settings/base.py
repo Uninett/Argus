@@ -47,6 +47,7 @@ INSTALLED_APPS = [
 
     'aas.site.auth',
     'aas.site.alert',
+    'aas.site.notificationprofile',
 ]
 
 MIDDLEWARE = [
