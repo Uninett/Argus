@@ -26,6 +26,7 @@ urlpatterns = [
 
     path('', include('aas.site.auth.urls')),
     path('alert/', include('aas.site.alert.urls')),
+    path('auth/', include('aas.site.auth.urls'))
 ]
 
 urlpatterns += [
