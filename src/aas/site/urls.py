@@ -29,8 +29,8 @@ urlpatterns = [
 
     path('', RedirectView.as_view(url="http://localhost:3000"), name='index'),  # temporary URL
     path('', include('aas.site.auth.urls')),
-    path('alert/', include('aas.site.alert.urls')),
-    path('notificationprofile/', include('aas.site.notificationprofile.urls')),
+    path('alerts/', include('aas.site.alert.urls')),
+    path('notificationprofiles/', include('aas.site.notificationprofile.urls')),
 ]
 
 urlpatterns += [
