@@ -81,7 +81,7 @@ def create_notification_profile_view(request):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def create_notification_profile_view(request):
+def delete_notification_profile_view(request):
     profile = Notification_profile.objects.filter(pk=request.POST.get("pk"))[0]
     profile.delete()
 
