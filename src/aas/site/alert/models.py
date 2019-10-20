@@ -1,11 +1,11 @@
 from django.db import models
-
+from ..auth.models import User
 
 class NetworkSystemType(models.Model):
     class Meta:
         ordering = ['name']
 
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length  =50)
 
     def __str__(self):
         return self.name
@@ -120,3 +120,15 @@ class Alert(models.Model):
 
     def __str__(self):
         return f"{self.timestamp}; {self.problem_type}: {self.object}"
+
+
+
+class Notification_profile(models.Model):
+    user = models.ForeignKey(
+        User,
+        models.CASCADE,
+    )
+    interval_start = models.DateTimeField()
+    interval_stop = models.DateTimeField()
+
+
