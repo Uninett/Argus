@@ -2,4 +2,10 @@ from .base import *
 
 DEBUG = False
 
-# Add overrides here
+
+# TODO: set this
+FRONTEND_URL = None
+
+CORS_ORIGIN_WHITELIST = [
+    FRONTEND_URL,
+]
