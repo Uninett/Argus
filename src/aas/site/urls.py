@@ -14,25 +14,24 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import include, path
-from django.views.generic import TemplateView, RedirectView
+from django.urls import include, path, re_path
 from rest_framework.authtoken import views as rest_views
+from social_django.urls import extra
 
-from . import views as aas_views
+from aas.dataporten import views as dataporten_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-   # path('dataporten/', TemplateView.as_view(template_name='dataporten.html'), name='dataporten'),
-    path('dataporten/', RedirectView.as_view(url="http://localhost:3000"), name='dataporten'),
-    path('api-token-auth/', rest_views.obtain_auth_token, name='api-token-auth'),
-
-    path('', RedirectView.as_view(url="http://localhost:3000"), name='index'),  # temporary URL
-    path('', include('aas.site.auth.urls')),
+    path('auth/', include('aas.site.auth.urls')),
     path('alert/', include('aas.site.alert.urls')),
     path('notificationprofile/', include('aas.site.notificationprofile.urls')),
 ]
 
 urlpatterns += [
+    path('api-token-auth/', rest_views.obtain_auth_token, name='api-token-auth'),
+
+    # Overrides social_django's `complete` view
+    re_path(r'^complete/(?P<backend>[^/]+){0}$'.format(extra), dataporten_views.login_wrapper, name='complete'),
     path('', include('social_django.urls', namespace='social')),
 ]

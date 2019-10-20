@@ -159,16 +159,9 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 
-CORS_ORIGIN_WHITELIST = [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-]
-
-
 AUTHENTICATION_BACKENDS = (
-    'dataporten.social.DataportenFeideOAuth2',
-    'dataporten.social.DataportenEmailOAuth2',
-    'dataporten.social.DataportenOAuth2',
+    'aas.dataporten.social.DataportenFeideOAuth2',
+    'aas.dataporten.social.DataportenOAuth2',
     'django.contrib.auth.backends.ModelBackend',
 )
 
