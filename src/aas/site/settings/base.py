@@ -43,7 +43,6 @@ INSTALLED_APPS = [
     'corsheaders',
     'social_django',
     'rest_framework',
-    'rest_framework.authtoken',
 
     'aas.site.auth',
     'aas.site.alert',
@@ -86,7 +85,7 @@ WSGI_APPLICATION = 'aas.site.wsgi.application'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',

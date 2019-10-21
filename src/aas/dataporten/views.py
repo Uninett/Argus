@@ -1,6 +1,5 @@
 from django.conf import settings
 from django.shortcuts import redirect
-from rest_framework.authtoken.models import Token
 from social_django import views as social_views
 
 
@@ -18,7 +17,4 @@ def login_wrapper(request, backend, *args, **kwargs):
 
         user.save()
 
-    token, _created = Token.objects.get_or_create(user=user)
-    response = redirect(settings.FRONTEND_URL, permanent=True)
-    response.set_cookie('token', token.key)
-    return response
+    return redirect(settings.FRONTEND_URL, permanent=True)
