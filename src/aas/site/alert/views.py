@@ -3,24 +3,21 @@ import json
 from django.core import serializers
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic import FormView
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework import generics
 
 from .forms import AlertJsonForm
 from .models import Alert
+from .serializers import AlertSerializer
 
 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def all_alerts_view(request):
-    # json_result = json_utils.alert_hists_to_json(AlertHistory.objects.all())
-    data = serializers.serialize("json", Alert.objects.all())
-    json_result = json.dumps(json.loads(data), indent=4)
-    return HttpResponse(json_result, content_type="application/json")
+class AlertList(generics.ListCreateAPIView):
+    queryset = Alert.objects.all()
+    serializer_class = AlertSerializer
 
 
 def all_alerts_from_source_view(request, source_pk):
     data = serializers.serialize("json", Alert.objects.filter(source=source_pk))
+    # Prettify the JSON data:
     json_result = json.dumps(json.loads(data), indent=4)
     return HttpResponse(json_result, content_type="application/json")
 
