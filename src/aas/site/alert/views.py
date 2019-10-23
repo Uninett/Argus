@@ -5,6 +5,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic import FormView
 from rest_framework import generics
 
+from aas.site.notificationprofile import views as notification_views
 from .forms import AlertJsonForm
 from .models import Alert
 from .serializers import AlertSerializer
@@ -13,6 +14,10 @@ from .serializers import AlertSerializer
 class AlertList(generics.ListCreateAPIView):
     queryset = Alert.objects.all()
     serializer_class = AlertSerializer
+
+    def perform_create(self, serializer):
+        created_alert = serializer.save()
+        notification_views.send_notifications_to_users(created_alert)
 
 
 def all_alerts_from_source_view(request, source_pk):

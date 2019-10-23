@@ -172,6 +172,12 @@ AUTHENTICATION_BACKENDS = (
 )
 
 
+EMAIL_HOST_USER = "kundestyrt@gmail.com"
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+NOTIFICATION_SUBJECT_PREFIX = "[AAS] "  # custom setting
+
+
 def get_dataporten_secret():
     dataporten_secret_file = SETTINGS_DIR / 'dataporten_secret.txt'
     try:
