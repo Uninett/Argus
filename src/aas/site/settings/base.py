@@ -150,13 +150,14 @@ SHORT_TIME_FORMAT = 'H:i'  # Not a Django setting
 DATETIME_FORMAT = '%s %s' % (DATE_FORMAT, TIME_FORMAT)
 SHORT_DATETIME_FORMAT = '%s %s' % (DATE_FORMAT, SHORT_TIME_FORMAT)
 
-TIME_ZONE = 'Europe/Oslo'
 # Disable localized date and time formatting, due to the custom settings above
 USE_L10N = False
 
 USE_I18N = True
 
 USE_TZ = True
+
+TIME_ZONE = 'Europe/Oslo'
 
 
 # Static files (CSS, JavaScript, Images)

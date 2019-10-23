@@ -53,16 +53,9 @@ def is_between(profile: NotificationProfile, alert: Alert):
     :param alert: alert instance
     :return: Boolean
     True if the alert is within the given profile's desired interval
-    True if noe interval is set for the profile
     False if the alert is outside of the given profile's desired interval
     """
-    if profile.interval_start is None:
-        return True
-
-    if profile.interval_start.time() < alert.timestamp.time() < profile.interval_stop.time():
-        return True
-    else:
-        return False
+    return profile.interval_start.time() < alert.timestamp.time() < profile.interval_stop.time()
 
 
 def send_notifications_to_users(alert: Alert):
