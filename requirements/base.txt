@@ -7,3 +7,4 @@ python-dataporten-auth
 social-auth-app-django
 djangorestframework
 django-filter
+django-multiselectfield
