@@ -119,4 +119,4 @@ class Alert(models.Model):
     description = models.TextField(blank=True)
 
     def __str__(self):
-        return f"{self.timestamp}; {self.problem_type}: {self.object}"
+        return f"{self.timestamp} - {self.problem_type}: {self.object}"

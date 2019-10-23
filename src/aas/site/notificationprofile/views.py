@@ -1,3 +1,5 @@
+from typing import List
+
 from django.core import serializers
 from django.http import HttpResponse
 from rest_framework import generics
@@ -5,6 +7,8 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 
 from aas.site.alert.models import Alert
+from aas.site.auth.models import User
+from . import notification_media
 from .models import NotificationProfile
 from .permissions import IsOwner
 from .serializers import NotificationProfileSerializer
@@ -49,13 +53,23 @@ def is_between(profile: NotificationProfile, alert: Alert):
     :param alert: alert instance
     :return: Boolean
     True if the alert is within the given profile's desired interval
-    True if noe interval is set for the profile
     False if the alert is outside of the given profile's desired interval
     """
-    if profile.interval_start is None:
-        return True
+    return profile.interval_start.time() < alert.timestamp.time() < profile.interval_stop.time()
 
-    if profile.interval_start.time() < alert.timestamp.time() < profile.interval_stop.time():
-        return True
-    else:
-        return False
+
+def send_notifications_to_users(alert: Alert):
+    for profile in NotificationProfile.objects.select_related('user'):
+        if is_between(profile, alert):
+            send_notification(profile.user, profile, alert)
+
+
+def send_notification(user: User, profile: NotificationProfile, alert: Alert):
+    media = get_notification_media(list(profile.media))
+    for medium in media:
+        if medium is not None:
+            medium.send(alert, user)
+
+
+def get_notification_media(model_representations: List[str]):
+    return (notification_media.get_medium(representation) for representation in model_representations)

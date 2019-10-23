@@ -231,3 +231,4 @@ cloc.xml
 pylint.txt
 
 dataporten_secret.txt
+email_secret.txt
