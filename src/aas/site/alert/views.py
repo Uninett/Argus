@@ -4,10 +4,12 @@ from django.core import serializers
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic import FormView
 from rest_framework import generics
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 
 from aas.site.notificationprofile import views as notification_views
 from .forms import AlertJsonForm
-from .models import Alert
+from .models import Alert, ProblemType
 from .serializers import AlertSerializer
 
 
@@ -39,3 +41,10 @@ class CreateAlertView(FormView):
         """
         # Redirect back to same form page
         return HttpResponseRedirect(self.request.path_info)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_problem_types_view(request):
+    data = serializers.serialize("json", ProblemType.objects.all())
+    return HttpResponse(data, content_type="application/json")
+
