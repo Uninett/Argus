@@ -34,7 +34,7 @@ class ProblemTypeSerializer(serializers.ModelSerializer):
 class AlertSerializer(serializers.ModelSerializer):
     class Meta:
         model = Alert
-        fields = ['pk', 'timestamp', 'source', 'alert_id', 'object', 'parent_object', 'details_url', 'problem_type', 'description']
+        fields = ['pk', 'timestamp', 'source', 'alert_id', 'object', 'parent_object', 'details_url', 'problem_type', 'description', 'ticket_url']
         read_only_fields = ['pk']
 
     # TODO: make these return a normal dict instead of an OrderedDict

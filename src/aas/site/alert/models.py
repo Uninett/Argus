@@ -117,6 +117,7 @@ class Alert(models.Model):
         related_name='alerts',
     )
     description = models.TextField(blank=True)
+    ticket_url = models.URLField(blank=True, verbose_name="ticket URL", help_text="URL to existing ticket in a ticketing system.")
 
     def __str__(self):
         return f"{self.timestamp} - {self.problem_type}: {self.object}"
