@@ -21,7 +21,6 @@ class AlertList(generics.ListCreateAPIView):
         created_alert = serializer.save()
         notification_views.send_notifications_to_users(created_alert)
 
-
 def all_alerts_from_source_view(request, source_pk):
     data = serializers.serialize("json", Alert.objects.filter(source=source_pk))
     # Prettify the JSON data:
@@ -46,5 +45,11 @@ class CreateAlertView(FormView):
 @permission_classes([IsAuthenticated])
 def get_problem_types_view(request):
     data = serializers.serialize("json", ProblemType.objects.all())
+    return HttpResponse(data, content_type="application/json")
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_alerts_view(request):
+    data = serializers.serialize("json", Alert.objects.all())
     return HttpResponse(data, content_type="application/json")
 
