@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import NotificationProfile
+from .models import NotificationProfile, Filter
 
 
 class NotificationProfileAdmin(admin.ModelAdmin):
@@ -10,3 +10,5 @@ class NotificationProfileAdmin(admin.ModelAdmin):
 
 
 admin.site.register(NotificationProfile, NotificationProfileAdmin)
+admin.site.register(Filter)
+

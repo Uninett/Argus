@@ -10,7 +10,7 @@ from rest_framework.permissions import IsAuthenticated
 from aas.site.notificationprofile import views as notification_views
 from .forms import AlertJsonForm
 from .models import Alert, ProblemType, NetworkSystem, NetworkSystemType, ObjectType
-from .serializers import AlertSerializer, ProblemTypeSerializer, NetworkSystemTypeSerializer, ObjectTypeSerializer
+from .serializers import AlertSerializer, ProblemTypeSerializer, NetworkSystemTypeSerializer, ObjectTypeSerializer, NetworkSystemSerializer
 
 
 class AlertList(generics.ListCreateAPIView):
@@ -49,6 +49,7 @@ def get_all_meta_data_view(request):
     problem_types = ProblemTypeSerializer(ProblemType.objects.all(), many=True)
     network_system_types = NetworkSystemTypeSerializer(NetworkSystemType.objects.all(), many=True)
     object_types = ObjectTypeSerializer(ObjectType.objects.all(), many=True)
-    data = {"problemTypes": problem_types.data, "networkSystemTypes":network_system_types.data, "objectTypes":object_types.data}
+    network_systems = NetworkSystemSerializer(NetworkSystem.objects.all(), many=True)
+    data = {"problemTypes": problem_types.data, "networkSystemTypes":network_system_types.data, "objectTypes":object_types.data, "networkSystems": network_systems.data}
     return HttpResponse(json.dumps(data), content_type="application/json")
 

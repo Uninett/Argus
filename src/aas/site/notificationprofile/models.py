@@ -4,6 +4,15 @@ from multiselectfield import MultiSelectField
 from aas.site.auth.models import User
 
 
+class Filter(models.Model):
+    user = models.ForeignKey(
+        User,
+        models.CASCADE,
+        related_name='filters',
+    )
+    name = models.CharField(max_length=40)
+    filter = models.TextField()
+
 class NotificationProfile(models.Model):
     user = models.ForeignKey(
         User,
