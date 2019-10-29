@@ -52,7 +52,7 @@ class Object(models.Model):
         NetworkSystem,
         on_delete=models.CASCADE,
         null=True,
-        related_name='objects',
+        related_name='network_objects',  # can't be `objects`, because it will override the model's `.objects` manager
     )
 
     def __str__(self):
