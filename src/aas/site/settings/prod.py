@@ -1,6 +1,28 @@
 from .base import *
 
+SECRET_FILE = SETTINGS_DIR / 'secret.txt'
+
+
 DEBUG = False
+
+
+def get_secret_key():
+    try:
+        return SECRET_FILE.read_text().strip()
+    except IOError:
+        try:
+            import secrets
+
+            secret_key = "".join(secrets.choice("abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)") for _ in range(50))
+            with open(SECRET_FILE, 'w') as f:
+                f.write(secret_key)
+            return secret_key
+        except IOError:
+            raise IOError(f"Please create a {SECRET_FILE} file with random characters to generate your secret key")
+
+
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = get_secret_key()
 
 
 # TODO: set this
