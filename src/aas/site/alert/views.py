@@ -9,8 +9,8 @@ from rest_framework.permissions import IsAuthenticated
 
 from aas.site.notificationprofile import views as notification_views
 from .forms import AlertJsonForm
-from .models import Alert, ProblemType
-from .serializers import AlertSerializer
+from .models import Alert, ProblemType, NetworkSystem, NetworkSystemType, ObjectType
+from .serializers import AlertSerializer, ProblemTypeSerializer, NetworkSystemTypeSerializer, ObjectTypeSerializer
 
 
 class AlertList(generics.ListCreateAPIView):
@@ -41,15 +41,14 @@ class CreateAlertView(FormView):
         # Redirect back to same form page
         return HttpResponseRedirect(self.request.path_info)
 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def get_problem_types_view(request):
-    data = serializers.serialize("json", ProblemType.objects.all())
-    return HttpResponse(data, content_type="application/json")
+
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_alerts_view(request):
-    data = serializers.serialize("json", Alert.objects.all())
-    return HttpResponse(data, content_type="application/json")
+def get_all_meta_data_view(request):
+    problem_types = ProblemTypeSerializer(ProblemType.objects.all(), many=True)
+    network_system_types = NetworkSystemTypeSerializer(NetworkSystemType.objects.all(), many=True)
+    object_types = ObjectTypeSerializer(ObjectType.objects.all(), many=True)
+    data = {"problemTypes": problem_types.data, "networkSystemTypes":network_system_types.data, "objectTypes":object_types.data}
+    return HttpResponse(json.dumps(data), content_type="application/json")
 
