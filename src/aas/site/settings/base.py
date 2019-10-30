@@ -21,9 +21,6 @@ BASE_DIR = SITE_DIR.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'ktv+&&t=g@sp5rj1o4pspi@7yhro9jj&y(maf=af=$u$v)4n1r'
-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 

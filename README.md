@@ -1,21 +1,41 @@
 # AAS
-AAS - Aggregated Alarm System is a platform for aggregating alerts and sending notifications to users. Users build notification profiles that define which alerts they subscribe too. This repo hosts the back end built with Django, while the frontend is hosted here: https://github.com/ddabble/aas-frontend
+AAS - Aggregated Alert System is a platform for aggregating alerts and sending notifications to users. Users build notification profiles that define which alerts they subscribe to. This repository hosts the backend built with Django, while the frontend is hosted here: https://github.com/ddabble/aas-frontend.
+
 ## Prerequisites
-* Python 3.5+
-* Django 2.5.5+
+* Python 3.6+
 * pip
 
-## To run
-1. Create a python 3.5+ virtual environment
 
-2. Install dependencies
+## Dataporten setup
+* Register a new application with the following redirect URL: `{server_url}/complete/dataporten_feide/`
+  * `{server_url}` must be replaced with the URL to the server running this project, like `http://localhost:8000`
+* Add the following permission scopes:
+  * `profile`
+  * `userid`
+  * `userid-feide`
+* Create the text file `src/aas/site/settings/dataporten_secret.txt` containing the client key to the application
 
-    ```
-    pip install -r requirements/django.txt
-    pip install -r requirements/base.txt
-    pip install -r requirements/dev.txt
-    ```
 
-3. Apply migrations with ```python manage.py migrate```
+## Email setup for production
+* Change `EMAIL_HOST_USER` in [`base.py`](/src/aas/site/settings/base.py) to an email address to send notifications from
+* Change `EMAIL_HOST` in [`prod.py`](/src/aas/site/settings/prod.py) to match the email's server URL
+* Create the text file `src/aas/site/settings/email_secret.txt` containing the password to the email account
 
-4. Start server with ```python manage.py runserver 8000```
+*A Gmail account with "Allow less secure apps" turned on, was used in the development of this project.*
+
+
+## Project setup
+* Create a Python 3.6+ virtual environment
+* `pip install -r requirements/django.txt -r requirements/base.txt -r requirements/dev.txt`
+* `python manage.py migrate`
+
+Start the server with `python manage.py runserver`.
+
+
+## Endpoints
+*`/admin/` to access the project's admin pages.*
+
+All endpoints require requests to contain a header with key `Authorization` and value `Token {token}`, where `{token}` is replaced by a registered auth token; these are generated per user by logging in through Feide, and can be found at `/admin/authtoken/token/`.
+
+* `GET` to `/alerts/`: returns all alerts
+* *add more here*

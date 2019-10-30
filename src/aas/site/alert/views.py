@@ -22,6 +22,11 @@ class AlertList(generics.ListCreateAPIView):
         notification_views.send_notifications_to_users(created_alert)
 
 
+class AlertDetail(generics.RetrieveAPIView):
+    queryset = Alert.objects.all()
+    serializer_class = AlertSerializer
+
+
 def all_alerts_from_source_view(request, source_pk):
     data = serializers.serialize("json", Alert.objects.filter(source=source_pk))
     # Prettify the JSON data:
@@ -42,9 +47,9 @@ class CreateAlertView(FormView):
         # Redirect back to same form page
         return HttpResponseRedirect(self.request.path_info)
 
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_problem_types_view(request):
     data = serializers.serialize("json", ProblemType.objects.all())
     return HttpResponse(data, content_type="application/json")
-
