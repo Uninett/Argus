@@ -11,7 +11,26 @@ from aas.site.auth.models import User
 from . import notification_media
 from .models import NotificationProfile
 from .permissions import IsOwner
-from .serializers import NotificationProfileSerializer
+from .serializers import NotificationProfileSerializer, TimeSlotGroupSerializer
+
+
+class TimeSlotGroupList(generics.ListCreateAPIView):
+    permission_classes = [IsAuthenticated, IsOwner]
+    serializer_class = TimeSlotGroupSerializer
+
+    def get_queryset(self):
+        return self.request.user.time_slot_groups.all()
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+
+class TimeSlotGroupDetail(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthenticated, IsOwner]
+    serializer_class = TimeSlotGroupSerializer
+
+    def get_queryset(self):
+        return self.request.user.time_slot_groups.all()
 
 
 class NotificationProfileList(generics.ListCreateAPIView):
@@ -55,6 +74,7 @@ def is_between(profile: NotificationProfile, alert: Alert):
     True if the alert is within the given profile's desired interval
     False if the alert is outside of the given profile's desired interval
     """
+    # TODO: update with TimeSlotGroup's time slot times
     return profile.interval_start.time() < alert.timestamp.time() < profile.interval_stop.time()
 
 

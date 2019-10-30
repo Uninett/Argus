@@ -4,7 +4,7 @@ from .models import NotificationProfile
 
 
 class NotificationProfileAdmin(admin.ModelAdmin):
-    list_display = ('name', 'user', 'interval_start', 'interval_stop')
+    list_display = ('user', 'time_slot_group', 'media')
 
     raw_id_fields = ('user',)
 
