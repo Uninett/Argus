@@ -1,4 +1,5 @@
-# AAS Documentation
+# AAS
+AAS - Aggregated Alert System is a platform for aggregating alerts and sending notifications to users. Users build notification profiles that define which alerts they subscribe to. This repository hosts the backend built with Django, while the frontend is hosted here: https://github.com/ddabble/aas-frontend.
 
 ## Prerequisites
 * Python 3.6+
@@ -24,9 +25,11 @@
 
 
 ## Project setup
+* Create a Python 3.6+ virtual environment
 * `pip install -r requirements/django.txt -r requirements/base.txt -r requirements/dev.txt`
 * `python manage.py migrate`
-* `python manage.py runserver`
+
+Start the server with `python manage.py runserver`.
 
 
 ## Endpoints
