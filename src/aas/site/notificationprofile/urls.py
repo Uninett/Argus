@@ -10,4 +10,5 @@ urlpatterns = [
 
     path("timeslotgroups/", views.TimeSlotGroupList.as_view()),
     path("timeslotgroups/<int:pk>", views.TimeSlotGroupDetail.as_view()),
+    path("timeslot/", views.TimeSlotList.as_view())
 ]

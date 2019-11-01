@@ -36,15 +36,16 @@ class TimeSlot(models.Model):
         (SATURDAY, "Saturday"),
         (SUNDAY, "Sunday"),
     )
-    day = models.CharField(max_length=2, choices=DAY_CHOICES)
-    start = models.DateTimeField()  # TimeField?
-    end = models.DateTimeField()
-
     group = models.ForeignKey(
         to=TimeSlotGroup,
         on_delete=models.CASCADE,
         related_name='time_slots',
     )
+
+    day = models.CharField(max_length=2, choices=DAY_CHOICES)
+    start = models.DateTimeField()  # TimeField?
+    end = models.DateTimeField()
+
 
 
 class NotificationProfile(models.Model):
@@ -53,7 +54,7 @@ class NotificationProfile(models.Model):
         models.CASCADE,
         related_name='notification_profiles',
     )
-    time_slot_group = models.ForeignKey(
+    group = models.ForeignKey(
         to=TimeSlotGroup,
         on_delete=models.CASCADE,
         related_name='notification_profiles',
