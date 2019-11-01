@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Q
 
 
 class NetworkSystemType(models.Model):
@@ -117,6 +118,44 @@ class Alert(models.Model):
         related_name='alerts',
     )
     description = models.TextField(blank=True)
+    ticket_url = models.URLField(blank=True, verbose_name="ticket URL", help_text="URL to existing ticket in a ticketing system.")
+
+    @property
+    def alert_relations(self):
+        return AlertRelation.objects.filter(Q(alert1=self) | Q(alert2=self))
 
     def __str__(self):
         return f"{self.timestamp} - {self.problem_type}: {self.object}"
+
+
+class AlertRelationType(models.Model):
+    class Meta:
+        ordering = ['name']
+
+    name = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.name
+
+
+class AlertRelation(models.Model):
+    alert1 = models.ForeignKey(
+        Alert,
+        models.CASCADE,
+        related_name='+',  # don't create a backwards relation
+    )
+    alert2 = models.ForeignKey(
+        Alert,
+        models.CASCADE,
+        related_name='+',  # don't create a backwards relation
+    )
+    type = models.ForeignKey(
+        AlertRelationType,
+        models.CASCADE,
+        related_name='alert_relations',
+    )
+    description = models.TextField(blank=True)
+
+    def __str__(self):
+        id_label = Alert.alert_id.field_name
+        return f"{id_label}#{self.alert1.alert_id} <{self.type}> {id_label}#{self.alert2.alert_id}"

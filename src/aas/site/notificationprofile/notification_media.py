@@ -32,12 +32,13 @@ class EmailNotification(NotificationMedium):
         alert_dict.pop('pk')
 
         template_context = {
-            'title':      title,
-            'alert_dict': alert_dict,
+            'title':              title,
+            'alert_dict':         alert_dict,
+            'longest_field_name_length': len(max(alert_dict, key=len)),
         }
         user.email_user(
             subject=f"{settings.NOTIFICATION_SUBJECT_PREFIX}{title}",
-            message="",  # TODO: send text version of html_message
+            message=render_to_string("notificationprofile/email.txt", template_context),
             html_message=render_to_string("notificationprofile/email.html", template_context),
         )
 

@@ -21,6 +21,14 @@ class AlertList(generics.ListCreateAPIView):
         created_alert = serializer.save()
         notification_views.send_notifications_to_users(created_alert)
 
+
+
+class AlertDetail(generics.RetrieveAPIView):
+    queryset = Alert.objects.all()
+    serializer_class = AlertSerializer
+
+
+
 def all_alerts_from_source_view(request, source_pk):
     data = serializers.serialize("json", Alert.objects.filter(source=source_pk))
     # Prettify the JSON data:
@@ -43,6 +51,7 @@ class CreateAlertView(FormView):
 
 
 
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_all_meta_data_view(request):
@@ -52,4 +61,5 @@ def get_all_meta_data_view(request):
     network_systems = NetworkSystemSerializer(NetworkSystem.objects.all(), many=True)
     data = {"problemTypes": problem_types.data, "networkSystemTypes":network_system_types.data, "objectTypes":object_types.data, "networkSystems": network_systems.data}
     return HttpResponse(json.dumps(data), content_type="application/json")
+
 
