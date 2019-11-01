@@ -9,9 +9,9 @@ from rest_framework.permissions import IsAuthenticated
 from aas.site.alert.models import Alert
 from aas.site.auth.models import User
 from . import notification_media
-from .models import NotificationProfile
+from .models import NotificationProfile, Filter
 from .permissions import IsOwner
-from .serializers import NotificationProfileSerializer
+from .serializers import NotificationProfileSerializer, FilterSerializer
 
 
 class NotificationProfileList(generics.ListCreateAPIView):
@@ -31,6 +31,17 @@ class NotificationProfileDetail(generics.RetrieveUpdateDestroyAPIView):
 
     def get_queryset(self):
         return self.request.user.notification_profiles.all()
+
+
+class FilterList(generics.ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = FilterSerializer
+
+    def get_queryset(self):
+        return self.request.user.filters.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
 
 @api_view(['GET'])
