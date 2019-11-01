@@ -1,6 +1,7 @@
 from django.contrib import admin
 
-from .models import NotificationProfile,TimeSlot, TimeSlotGroup
+
+from .models import NotificationProfile,TimeSlot, TimeSlotGroup, Filter
 
 
 
@@ -12,7 +13,10 @@ class NotificationProfileAdmin(admin.ModelAdmin):
 
 admin.site.register(NotificationProfile, NotificationProfileAdmin)
 
+
 admin.site.register(TimeSlot)
 
 admin.site.register(TimeSlotGroup)
+admin.site.register(Filter)
+
 
