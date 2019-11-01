@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
-<<<<<<< HEAD
-from .models import NotificationProfile, TimeSlot, TimeSlotGroup
+
+from .models import NotificationProfile, TimeSlot, TimeSlotGroup, Filter
 
 
 class TimeSlotGroupSerializer(serializers.ModelSerializer):
@@ -21,9 +21,6 @@ class TimeSlotSerializer(serializers.ModelSerializer):
         model = TimeSlot
         fields = ['pk', 'day', 'start', 'end', 'group']
         read_only_fields = ['pk']
-=======
-from .models import NotificationProfile, Filter
->>>>>>> origin/dev
 
 
 class NotificationProfileSerializer(serializers.ModelSerializer):
