@@ -4,6 +4,13 @@ from rest_framework import serializers
 from .models import NotificationProfile, TimeSlot, TimeSlotGroup, Filter
 
 
+class TimeSlotSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TimeSlot
+        fields = ['pk', 'day', 'start', 'end', 'group']
+        read_only_fields = ['pk']
+
+
 class TimeSlotGroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = TimeSlotGroup
@@ -16,11 +23,11 @@ class TimeSlotGroupSerializer(serializers.ModelSerializer):
         return representation
 
 
-class TimeSlotSerializer(serializers.ModelSerializer):
+class FilterSerializer(serializers.ModelSerializer):
     class Meta:
-        model = TimeSlot
-        fields = ['pk', 'day', 'start', 'end', 'group']
-        read_only_fields = ['pk']
+        model = Filter
+        fields = ['user', 'name', 'filter']
+        read_only_fields = ["user"]
 
 
 class NotificationProfileSerializer(serializers.ModelSerializer):
@@ -28,10 +35,3 @@ class NotificationProfileSerializer(serializers.ModelSerializer):
         model = NotificationProfile
         fields = ['pk', 'time_slot_group', 'media']
         read_only_fields = ['pk']
-
-
-class FilterSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Filter
-        fields = ['user', 'name', 'filter']
-        read_only_fields = ["user"]

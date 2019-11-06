@@ -11,12 +11,7 @@ class NotificationProfileAdmin(admin.ModelAdmin):
     raw_id_fields = ('user',)
 
 
-admin.site.register(NotificationProfile, NotificationProfileAdmin)
-
-
-admin.site.register(TimeSlot)
-
 admin.site.register(TimeSlotGroup)
+admin.site.register(TimeSlot)
 admin.site.register(Filter)
-
-
+admin.site.register(NotificationProfile, NotificationProfileAdmin)

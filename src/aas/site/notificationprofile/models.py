@@ -4,16 +4,6 @@ from multiselectfield import MultiSelectField
 from aas.site.auth.models import User
 
 
-class Filter(models.Model):
-    user = models.ForeignKey(
-        User,
-        models.CASCADE,
-        related_name='filters',
-    )
-    name = models.CharField(max_length=40)
-    filter = models.TextField()
-
-
 class TimeSlotGroup(models.Model):
     class Meta:
         ordering = ['name']
@@ -56,6 +46,16 @@ class TimeSlot(models.Model):
     day = models.CharField(max_length=2, choices=DAY_CHOICES)
     start = models.DateTimeField()  # TimeField?
     end = models.DateTimeField()
+
+
+class Filter(models.Model):
+    user = models.ForeignKey(
+        User,
+        models.CASCADE,
+        related_name='filters',
+    )
+    name = models.CharField(max_length=40)
+    filter = models.TextField()
 
 
 class NotificationProfile(models.Model):

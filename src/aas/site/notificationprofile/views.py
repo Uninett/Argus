@@ -16,36 +16,6 @@ from .serializers import NotificationProfileSerializer, TimeSlotGroupSerializer,
 from .serializers import NotificationProfileSerializer, FilterSerializer
 
 
-class TimeSlotGroupList(generics.ListCreateAPIView):
-    permission_classes = [IsAuthenticated, IsOwner]
-    serializer_class = TimeSlotGroupSerializer
-
-    def get_queryset(self):
-        return self.request.user.time_slot_groups.all()
-
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
-
-
-class TimeSlotList(generics.ListCreateAPIView):
-    permission_classes = [IsAuthenticated, IsOwner]
-    serializer_class = TimeSlotSerializer
-
-    def get_queryset(self):
-        return self.request.user.time_slot.all()
-
-    def perform_create(self, serializer):
-        serializer.save()
-
-class TimeSlotGroupDetail(generics.RetrieveUpdateDestroyAPIView):
-    permission_classes = [IsAuthenticated, IsOwner]
-    serializer_class = TimeSlotGroupSerializer
-
-    def get_queryset(self):
-        return self.request.user.time_slot_groups.all()
-
-
-
 class NotificationProfileList(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated, IsOwner]
     serializer_class = NotificationProfileSerializer
@@ -65,17 +35,6 @@ class NotificationProfileDetail(generics.RetrieveUpdateDestroyAPIView):
         return self.request.user.notification_profiles.all()
 
 
-class FilterList(generics.ListCreateAPIView):
-    permission_classes = [IsAuthenticated]
-    serializer_class = FilterSerializer
-
-    def get_queryset(self):
-        return self.request.user.filters.filter(user=self.request.user)
-
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
-
-
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def notification_profile_alerts_view(request):
@@ -88,6 +47,47 @@ def notification_profile_alerts_view(request):
                 data.append(alert)
     json_result = serializers.serialize("json", data)
     return HttpResponse(json_result, content_type="application/json")
+
+
+class TimeSlotGroupList(generics.ListCreateAPIView):
+    permission_classes = [IsAuthenticated, IsOwner]
+    serializer_class = TimeSlotGroupSerializer
+
+    def get_queryset(self):
+        return self.request.user.time_slot_groups.all()
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+
+class TimeSlotGroupDetail(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthenticated, IsOwner]
+    serializer_class = TimeSlotGroupSerializer
+
+    def get_queryset(self):
+        return self.request.user.time_slot_groups.all()
+
+
+class TimeSlotList(generics.ListCreateAPIView):
+    permission_classes = [IsAuthenticated, IsOwner]
+    serializer_class = TimeSlotSerializer
+
+    def get_queryset(self):
+        return self.request.user.time_slot.all()
+
+    def perform_create(self, serializer):
+        serializer.save()
+
+
+class FilterList(generics.ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = FilterSerializer
+
+    def get_queryset(self):
+        return self.request.user.filters.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
 
 def is_between(profile: NotificationProfile, alert: Alert):

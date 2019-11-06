@@ -3,13 +3,6 @@ from rest_framework import serializers
 from .models import Alert, NetworkSystem, Object, ParentObject, ProblemType, NetworkSystemType, ObjectType
 
 
-class NetworkSystemSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = NetworkSystem
-        fields = ['name', 'type']
-
-    type = serializers.StringRelatedField()
-
 class NetworkSystemTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = NetworkSystemType
@@ -17,12 +10,22 @@ class NetworkSystemTypeSerializer(serializers.ModelSerializer):
 
     type = serializers.StringRelatedField()
 
+
+class NetworkSystemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = NetworkSystem
+        fields = ['name', 'type']
+
+    type = serializers.StringRelatedField()
+
+
 class ObjectTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = ObjectType
         fields = ['name', 'type']
 
     type = serializers.StringRelatedField()
+
 
 class ObjectSerializer(serializers.ModelSerializer):
     class Meta:
