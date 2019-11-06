@@ -9,7 +9,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from aas.site.notificationprofile import views as notification_views
 from .forms import AlertJsonForm
-from .models import Alert, ProblemType, NetworkSystem, NetworkSystemType, ObjectType
+from .models import Alert, ProblemType, NetworkSystem, NetworkSystemType, ObjectType, Object
 from .serializers import AlertSerializer, ProblemTypeSerializer, NetworkSystemTypeSerializer, ObjectTypeSerializer, NetworkSystemSerializer
 
 
@@ -61,5 +61,35 @@ def get_all_meta_data_view(request):
     network_systems = NetworkSystemSerializer(NetworkSystem.objects.all(), many=True)
     data = {"problemTypes": problem_types.data, "networkSystemTypes":network_system_types.data, "objectTypes":object_types.data, "networkSystems": network_systems.data}
     return HttpResponse(json.dumps(data), content_type="application/json")
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def preview(request):
+    body_unicode = request.body.decode('utf-8')
+    body = json.loads(body_unicode)
+
+    problem_types = body['problemTypes']
+    object_types = body['objectTypes']
+    network_systems = body['networkSystems']
+
+    if network_systems == []:
+        network_systems = [alert.source.name for alert in Alert.objects.all()]
+
+    if object_types == []:
+        objects = [object.name for object in Object.objects.all()]
+    else:
+        objects = [object.name for object in Object.objects.all() if object.type.name in object_types]
+
+    wanted = []
+    alerts = Alert.objects.all()
+    print(alerts)
+    for alert in alerts:
+        if alert.problem_type.name in problem_types and alert.source.name in network_systems and alert.object.name in objects:
+            wanted.append(AlertSerializer(alert).data)
+
+    print(wanted)
+    return HttpResponse(json.dumps( wanted), content_type="application/json")
+
 
 
