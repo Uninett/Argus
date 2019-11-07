@@ -35,7 +35,7 @@ class TimeSlotAdmin(admin.ModelAdmin):
 
 
 class FilterAdmin(admin.ModelAdmin):
-    list_display = ('name', 'user', 'query')
+    list_display = ('name', 'user', 'filter_string')
 
     raw_id_fields = ('user',)
 

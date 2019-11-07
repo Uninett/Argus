@@ -40,7 +40,7 @@ class TimeSlotGroupSerializer(serializers.ModelSerializer):
 class FilterSerializer(serializers.ModelSerializer):
     class Meta:
         model = Filter
-        fields = ['pk', 'name', 'query']
+        fields = ['pk', 'name', 'filter_string']
         read_only_fields = ['pk']
 
 

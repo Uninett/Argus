@@ -85,10 +85,10 @@ class Filter(models.Model):
         related_name='filters',
     )
     name = models.CharField(max_length=40)
-    query = models.TextField()
+    filter_string = models.TextField()
 
     def __str__(self):
-        return f"{self.name} [{self.query}]"
+        return f"{self.name} [{self.filter_string}]"
 
 
 class NotificationProfile(models.Model):
