@@ -6,9 +6,7 @@ from .models import Alert, NetworkSystem, Object, ParentObject, ProblemType, Net
 class NetworkSystemTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = NetworkSystemType
-        fields = ['name', 'type']
-
-    type = serializers.StringRelatedField()
+        fields = ['name']
 
 
 class NetworkSystemSerializer(serializers.ModelSerializer):
@@ -16,15 +14,18 @@ class NetworkSystemSerializer(serializers.ModelSerializer):
         model = NetworkSystem
         fields = ['name', 'type']
 
-    type = serializers.StringRelatedField()
+    # type = NetworkSystemTypeSerializer(read_only=True)
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['type'] = NetworkSystemTypeSerializer(instance.type).data
+        return representation
 
 
 class ObjectTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = ObjectType
-        fields = ['name', 'type']
-
-    type = serializers.StringRelatedField()
+        fields = ['name']
 
 
 class ObjectSerializer(serializers.ModelSerializer):
@@ -32,7 +33,12 @@ class ObjectSerializer(serializers.ModelSerializer):
         model = Object
         fields = ['name', 'object_id', 'url', 'type']
 
-    type = serializers.StringRelatedField()
+    # type = ObjectTypeSerializer(read_only=True)
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['type'] = ObjectTypeSerializer(instance.type).data
+        return representation
 
 
 class ParentObjectSerializer(serializers.ModelSerializer):
