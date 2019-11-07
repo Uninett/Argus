@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Alert, NetworkSystem, Object, ParentObject, ProblemType, NetworkSystemType, ObjectType
+from .models import Alert, NetworkSystem, NetworkSystemType, Object, ObjectType, ParentObject, ProblemType
 
 
 class NetworkSystemTypeSerializer(serializers.ModelSerializer):

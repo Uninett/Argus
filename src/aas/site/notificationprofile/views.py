@@ -11,7 +11,7 @@ from aas.site.auth.models import User
 from . import notification_media
 from .models import NotificationProfile
 from .permissions import IsOwner
-from .serializers import FilterSerializer, NotificationProfileSerializer, TimeSlotGroupSerializer, TimeSlotSerializer
+from .serializers import FilterSerializer, NotificationProfileSerializer, TimeSlotGroupSerializer
 
 
 class NotificationProfileList(generics.ListCreateAPIView):
@@ -64,17 +64,6 @@ class TimeSlotGroupDetail(generics.RetrieveUpdateDestroyAPIView):
 
     def get_queryset(self):
         return self.request.user.time_slot_groups.all()
-
-
-class TimeSlotList(generics.ListCreateAPIView):
-    permission_classes = [IsAuthenticated, IsOwner]
-    serializer_class = TimeSlotSerializer
-
-    def get_queryset(self):
-        return self.request.user.time_slot.all()
-
-    def perform_create(self, serializer):
-        serializer.save()
 
 
 class FilterList(generics.ListCreateAPIView):

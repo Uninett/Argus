@@ -80,8 +80,8 @@ class Filter(models.Model):
         ]
 
     user = models.ForeignKey(
-        User,
-        models.CASCADE,
+        to=User,
+        on_delete=models.CASCADE,
         related_name='filters',
     )
     name = models.CharField(max_length=40)
@@ -93,8 +93,8 @@ class Filter(models.Model):
 
 class NotificationProfile(models.Model):
     user = models.ForeignKey(
-        User,
-        models.CASCADE,
+        to=User,
+        on_delete=models.CASCADE,
         related_name='notification_profiles',
     )
     # TODO: add constraint that user must be the same

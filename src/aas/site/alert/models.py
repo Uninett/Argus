@@ -15,8 +15,8 @@ class NetworkSystemType(models.Model):
 class NetworkSystem(models.Model):
     name = models.CharField(max_length=50)
     type = models.ForeignKey(
-        NetworkSystemType,
-        models.CASCADE,
+        to=NetworkSystemType,
+        on_delete=models.CASCADE,
         related_name='instances',
     )
 
@@ -45,12 +45,12 @@ class Object(models.Model):
     object_id = models.CharField(blank=True, max_length=20, verbose_name="object ID")
     url = models.URLField(verbose_name="URL")
     type = models.ForeignKey(
-        ObjectType,
-        models.CASCADE,
+        to=ObjectType,
+        on_delete=models.CASCADE,
         related_name='instances',
     )
     network_system = models.ForeignKey(
-        NetworkSystem,
+        to=NetworkSystem,
         on_delete=models.CASCADE,
         null=True,
         related_name='network_objects',  # can't be `objects`, because it will override the model's `.objects` manager
@@ -93,28 +93,28 @@ class Alert(models.Model):
 
     timestamp = models.DateTimeField()
     source = models.ForeignKey(
-        NetworkSystem,
+        to=NetworkSystem,
         on_delete=models.CASCADE,
         related_name='alerts',
         verbose_name="network system source",
     )
     alert_id = models.CharField(max_length=20, verbose_name="alert ID")
     object = models.ForeignKey(
-        Object,
-        models.CASCADE,
+        to=Object,
+        on_delete=models.CASCADE,
         related_name='alerts',
     )
     parent_object = models.ForeignKey(
-        ParentObject,
-        models.CASCADE,
+        to=ParentObject,
+        on_delete=models.CASCADE,
         null=True,
         blank=True,
         related_name='alerts',
     )
     details_url = models.URLField(blank=True, verbose_name="details URL")
     problem_type = models.ForeignKey(
-        ProblemType,
-        models.CASCADE,
+        to=ProblemType,
+        on_delete=models.CASCADE,
         related_name='alerts',
     )
     description = models.TextField(blank=True)
@@ -140,18 +140,18 @@ class AlertRelationType(models.Model):
 
 class AlertRelation(models.Model):
     alert1 = models.ForeignKey(
-        Alert,
-        models.CASCADE,
+        to=Alert,
+        on_delete=models.CASCADE,
         related_name='+',  # don't create a backwards relation
     )
     alert2 = models.ForeignKey(
-        Alert,
-        models.CASCADE,
+        to=Alert,
+        on_delete=models.CASCADE,
         related_name='+',  # don't create a backwards relation
     )
     type = models.ForeignKey(
-        AlertRelationType,
-        models.CASCADE,
+        to=AlertRelationType,
+        on_delete=models.CASCADE,
         related_name='alert_relations',
     )
     description = models.TextField(blank=True)
