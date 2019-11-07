@@ -1,14 +1,13 @@
-from rest_framework import serializers
+from rest_framework import fields, serializers
 
-
-from .models import NotificationProfile, TimeSlot, TimeSlotGroup, Filter
+from .fields import FilterManyToManyField, TimeSlotGroupForeignKeyField
+from .models import Filter, NotificationProfile, TimeSlot, TimeSlotGroup
 
 
 class TimeSlotSerializer(serializers.ModelSerializer):
     class Meta:
         model = TimeSlot
-        fields = ['pk', 'day', 'start', 'end', 'group']
-        read_only_fields = ['pk']
+        fields = ['day', 'start', 'end']
 
 
 class TimeSlotGroupSerializer(serializers.ModelSerializer):
@@ -17,21 +16,40 @@ class TimeSlotGroupSerializer(serializers.ModelSerializer):
         fields = ['pk', 'name', 'time_slots']
         read_only_fields = ['pk']
 
-    def to_representation(self, instance):
-        representation = super().to_representation(instance)
-        representation['time_slots'] = TimeSlotSerializer(instance.time_slots, many=True).data
-        return representation
+    time_slots = TimeSlotSerializer(many=True)
+
+    def create(self, validated_data):
+        time_slots_data = validated_data.pop('time_slots')
+        time_slot_group = TimeSlotGroup.objects.create(**validated_data)
+        for time_slot_data in time_slots_data:
+            TimeSlot.objects.create(group=time_slot_group, **time_slot_data)
+
+        return time_slot_group
+
+    def update(self, time_slot_group, validated_data):
+        time_slots_data = validated_data.pop('time_slots')
+
+        # Replace existing time slots with posted time slots
+        time_slot_group.time_slots.all().delete()
+        for time_slot_data in time_slots_data:
+            TimeSlot.objects.create(group=time_slot_group, **time_slot_data)
+
+        return time_slot_group
 
 
 class FilterSerializer(serializers.ModelSerializer):
     class Meta:
         model = Filter
-        fields = ['user', 'name', 'filter']
-        read_only_fields = ["user"]
+        fields = ['pk', 'name', 'query']
+        read_only_fields = ['pk']
 
 
 class NotificationProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = NotificationProfile
-        fields = ['pk', 'time_slot_group', 'media']
+        fields = ['pk', 'time_slot_group', 'filters', 'media', 'active']
         read_only_fields = ['pk']
+
+    time_slot_group = TimeSlotGroupForeignKeyField()
+    filters = FilterManyToManyField(many=True)
+    media = fields.MultipleChoiceField(choices=NotificationProfile.MEDIA_CHOICES)

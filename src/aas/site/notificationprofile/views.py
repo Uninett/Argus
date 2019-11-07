@@ -9,11 +9,9 @@ from rest_framework.permissions import IsAuthenticated
 from aas.site.alert.models import Alert
 from aas.site.auth.models import User
 from . import notification_media
-from .models import NotificationProfile, Filter
+from .models import NotificationProfile
 from .permissions import IsOwner
-
-from .serializers import NotificationProfileSerializer, TimeSlotGroupSerializer, TimeSlotSerializer
-from .serializers import NotificationProfileSerializer, FilterSerializer
+from .serializers import FilterSerializer, NotificationProfileSerializer, TimeSlotGroupSerializer, TimeSlotSerializer
 
 
 class NotificationProfileList(generics.ListCreateAPIView):
@@ -80,14 +78,22 @@ class TimeSlotList(generics.ListCreateAPIView):
 
 
 class FilterList(generics.ListCreateAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsOwner]
     serializer_class = FilterSerializer
 
     def get_queryset(self):
-        return self.request.user.filters.filter(user=self.request.user)
+        return self.request.user.filters.all()
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+
+class FilterDetail(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthenticated, IsOwner]
+    serializer_class = FilterSerializer
+
+    def get_queryset(self):
+        return self.request.user.filters.all()
 
 
 def is_between(profile: NotificationProfile, alert: Alert):
