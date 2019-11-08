@@ -9,8 +9,8 @@ from rest_framework.permissions import IsAuthenticated
 
 from aas.site.notificationprofile import views as notification_views
 from .forms import AlertJsonForm
-from .models import Alert, ProblemType, NetworkSystem, NetworkSystemType, ObjectType, Object
-from .serializers import AlertSerializer, ProblemTypeSerializer, NetworkSystemTypeSerializer, ObjectTypeSerializer, NetworkSystemSerializer
+from .models import Alert, NetworkSystem, NetworkSystemType, Object, ObjectType, ProblemType
+from .serializers import AlertSerializer, NetworkSystemSerializer, NetworkSystemTypeSerializer, ObjectTypeSerializer, ProblemTypeSerializer
 
 
 class AlertList(generics.ListCreateAPIView):
@@ -22,11 +22,9 @@ class AlertList(generics.ListCreateAPIView):
         notification_views.send_notifications_to_users(created_alert)
 
 
-
 class AlertDetail(generics.RetrieveAPIView):
     queryset = Alert.objects.all()
     serializer_class = AlertSerializer
-
 
 
 def all_alerts_from_source_view(request, source_pk):
@@ -50,8 +48,6 @@ class CreateAlertView(FormView):
         return HttpResponseRedirect(self.request.path_info)
 
 
-
-
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_all_meta_data_view(request):
@@ -59,7 +55,12 @@ def get_all_meta_data_view(request):
     network_system_types = NetworkSystemTypeSerializer(NetworkSystemType.objects.all(), many=True)
     object_types = ObjectTypeSerializer(ObjectType.objects.all(), many=True)
     network_systems = NetworkSystemSerializer(NetworkSystem.objects.all(), many=True)
-    data = {"problemTypes": problem_types.data, "networkSystemTypes":network_system_types.data, "objectTypes":object_types.data, "networkSystems": network_systems.data}
+    data = {
+        "problemTypes":       problem_types.data,
+        "networkSystemTypes": network_system_types.data,
+        "objectTypes":        object_types.data,
+        "networkSystems":     network_systems.data,
+    }
     return HttpResponse(json.dumps(data), content_type="application/json")
 
 
@@ -89,7 +90,4 @@ def preview(request):
             wanted.append(AlertSerializer(alert).data)
 
     print(wanted)
-    return HttpResponse(json.dumps( wanted), content_type="application/json")
-
-
-
+    return HttpResponse(json.dumps(wanted), content_type="application/json")

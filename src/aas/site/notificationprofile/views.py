@@ -9,9 +9,9 @@ from rest_framework.permissions import IsAuthenticated
 from aas.site.alert.models import Alert
 from aas.site.auth.models import User
 from . import notification_media
-from .models import NotificationProfile, Filter
+from .models import NotificationProfile
 from .permissions import IsOwner
-from .serializers import NotificationProfileSerializer, FilterSerializer
+from .serializers import FilterSerializer, NotificationProfileSerializer, TimeSlotGroupSerializer
 
 
 class NotificationProfileList(generics.ListCreateAPIView):
@@ -33,17 +33,6 @@ class NotificationProfileDetail(generics.RetrieveUpdateDestroyAPIView):
         return self.request.user.notification_profiles.all()
 
 
-class FilterList(generics.ListCreateAPIView):
-    permission_classes = [IsAuthenticated]
-    serializer_class = FilterSerializer
-
-    def get_queryset(self):
-        return self.request.user.filters.filter(user=self.request.user)
-
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
-
-
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def notification_profile_alerts_view(request):
@@ -58,6 +47,44 @@ def notification_profile_alerts_view(request):
     return HttpResponse(json_result, content_type="application/json")
 
 
+class TimeSlotGroupList(generics.ListCreateAPIView):
+    permission_classes = [IsAuthenticated, IsOwner]
+    serializer_class = TimeSlotGroupSerializer
+
+    def get_queryset(self):
+        return self.request.user.time_slot_groups.all()
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+
+class TimeSlotGroupDetail(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthenticated, IsOwner]
+    serializer_class = TimeSlotGroupSerializer
+
+    def get_queryset(self):
+        return self.request.user.time_slot_groups.all()
+
+
+class FilterList(generics.ListCreateAPIView):
+    permission_classes = [IsAuthenticated, IsOwner]
+    serializer_class = FilterSerializer
+
+    def get_queryset(self):
+        return self.request.user.filters.all()
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+
+class FilterDetail(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthenticated, IsOwner]
+    serializer_class = FilterSerializer
+
+    def get_queryset(self):
+        return self.request.user.filters.all()
+
+
 def is_between(profile: NotificationProfile, alert: Alert):
     """
     :param profile: NotificationProfile
@@ -66,6 +93,7 @@ def is_between(profile: NotificationProfile, alert: Alert):
     True if the alert is within the given profile's desired interval
     False if the alert is outside of the given profile's desired interval
     """
+    # TODO: update with TimeSlotGroup's time slot times
     return profile.interval_start.time() < alert.timestamp.time() < profile.interval_stop.time()
 
 

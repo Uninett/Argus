@@ -1,6 +1,12 @@
 from rest_framework import serializers
 
-from .models import Alert, NetworkSystem, Object, ParentObject, ProblemType, NetworkSystemType, ObjectType
+from .models import Alert, NetworkSystem, NetworkSystemType, Object, ObjectType, ParentObject, ProblemType
+
+
+class NetworkSystemTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = NetworkSystemType
+        fields = ['name']
 
 
 class NetworkSystemSerializer(serializers.ModelSerializer):
@@ -8,28 +14,31 @@ class NetworkSystemSerializer(serializers.ModelSerializer):
         model = NetworkSystem
         fields = ['name', 'type']
 
-    type = serializers.StringRelatedField()
+    # type = NetworkSystemTypeSerializer(read_only=True)
 
-class NetworkSystemTypeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = NetworkSystemType
-        fields = ['name', 'type']
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['type'] = NetworkSystemTypeSerializer(instance.type).data
+        return representation
 
-    type = serializers.StringRelatedField()
 
 class ObjectTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = ObjectType
-        fields = ['name', 'type']
+        fields = ['name']
 
-    type = serializers.StringRelatedField()
 
 class ObjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Object
         fields = ['name', 'object_id', 'url', 'type']
 
-    type = serializers.StringRelatedField()
+    # type = ObjectTypeSerializer(read_only=True)
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['type'] = ObjectTypeSerializer(instance.type).data
+        return representation
 
 
 class ParentObjectSerializer(serializers.ModelSerializer):
