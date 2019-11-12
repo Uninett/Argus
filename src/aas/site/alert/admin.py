@@ -35,8 +35,21 @@ class ProblemTypeAdmin(admin.ModelAdmin):
 
 class AlertAdmin(admin.ModelAdmin):
     list_display = ('alert_id', 'timestamp', 'source', 'object', 'parent_object', 'details_url', 'problem_type', 'ticket_url')
+    search_fields = (
+        'alert_id',
+        'source__name', 'source__type__name',
+        'object__name', 'object__object_id', 'object__type__name',
+        'parent_object__name', 'parent_object__parentobject_id',
+        'problem_type__name',
+    )
+    list_filter = ('problem_type', 'source', 'source__type')
 
     raw_id_fields = ('object', 'parent_object')
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        # Reduce number of database calls
+        return qs.prefetch_related('source', 'object', 'parent_object', 'problem_type')
 
 
 class AlertRelationTypeAdmin(admin.ModelAdmin):
