@@ -6,7 +6,16 @@ from .models import Filter, NotificationProfile, TimeSlot, TimeSlotGroup
 
 
 class TimeSlotGroupAdmin(admin.ModelAdmin):
+    class TimeSlotInline(admin.TabularInline):
+        model = TimeSlot
+        # TODO: add ordering on day; probably requires representing days as numbers rather than letters
+        extra = 0
+
+    inlines = [TimeSlotInline]
+
     list_display = ('name', 'user', 'get_time_slots')
+    list_filter = ('time_slots__day',)
+    search_fields = ('name', 'user__first_name', 'user__last_name', 'user__username')
 
     raw_id_fields = ('user',)
 
@@ -19,29 +28,23 @@ class TimeSlotGroupAdmin(admin.ModelAdmin):
     get_time_slots.short_description = "Time slots"
 
 
-class TimeSlotAdmin(admin.ModelAdmin):
-    list_display = ('get_str', 'day', 'start', 'end')
-    list_filter = ('day',)
-    search_fields = ('group__user', 'group__name',)
-    ordering = [Concat('group__user', 'group__name')]
-
-    raw_id_fields = ('group',)
-
-    def get_str(self, time_slot):
-        return f"[{time_slot.group.user}] {time_slot.group}"
-
-    get_str.short_description = "[User] Time slot group"
-    get_str.admin_order_field = Concat('group__user', 'group__name')
-
-
 class FilterAdmin(admin.ModelAdmin):
     list_display = ('name', 'user', 'filter_string')
+    search_fields = (
+        'name', 'filter_string',
+        'user__first_name', 'user__last_name', 'user__username',
+    )
 
     raw_id_fields = ('user',)
 
 
 class NotificationProfileAdmin(admin.ModelAdmin):
     list_display = ('get_str', 'get_filters', 'get_media', 'active')
+    list_filter = ('active',)
+    search_fields = (
+        'time_slot_group__name', 'filters__name', 'filters__filter_string',
+        'user__first_name', 'user__last_name', 'user__username',
+    )
 
     raw_id_fields = ('user', 'time_slot_group')
     filter_horizontal = ('filters',)
@@ -68,6 +71,5 @@ class NotificationProfileAdmin(admin.ModelAdmin):
 
 
 admin.site.register(TimeSlotGroup, TimeSlotGroupAdmin)
-admin.site.register(TimeSlot, TimeSlotAdmin)
 admin.site.register(Filter, FilterAdmin)
 admin.site.register(NotificationProfile, NotificationProfileAdmin)
