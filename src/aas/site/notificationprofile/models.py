@@ -66,27 +66,12 @@ class TimeSlot(models.Model):
     def isoweekday(self):
         return self.DAY_NAME_TO_INDEX[self.day]
 
-    # TODO: replace these with making `start` and `end` custom timezone aware time fields
-    #       (time+timezone is saved in database, to_python() returns custom time object that requires specifying a timezone
-    #        - for comparison of objects)
-    @property
-    def utc_start(self):
-        return self.local_time_to_utc_time(self.start)
-
-    @property
-    def utc_end(self):
-        return self.local_time_to_utc_time(self.end)
-
-    @staticmethod
-    def local_time_to_utc_time(local_time: time):
-        current_localtime = timezone.localtime()
-        local_datetime = datetime.combine(current_localtime.date(), local_time, current_localtime.tzinfo)
-        return local_datetime.astimezone(timezone.utc).time()
-
     def timestamp_is_within(self, timestamp: datetime):
+        # FIXME: Might affect performance negatively if calling this method frequently
+        timestamp = timestamp.astimezone(timezone.get_current_timezone())
         return (
                 timestamp.isoweekday() == self.isoweekday
-                and self.utc_start < timestamp.time() < self.utc_end
+                and self.start <= timestamp.time() <= self.end
         )
 
     def __str__(self):

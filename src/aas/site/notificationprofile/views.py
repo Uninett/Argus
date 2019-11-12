@@ -38,12 +38,8 @@ class NotificationProfileDetail(generics.RetrieveUpdateDestroyAPIView):
 @permission_classes([IsAuthenticated])
 def alerts_filtered_by_notification_profile_view(request, notification_profile_pk):
     # Go through user to ensure that the user owns the requested notification profile
-    profile_time_slots = request.user.notification_profiles.get(pk=notification_profile_pk).time_slot_group.time_slots.all()
+    profile_filters = request.user.notification_profiles.get(pk=notification_profile_pk).filters.all()
     alert_query = Q()
-    for time_slot in profile_time_slots:
-        alert_query |= Q(timestamp__week_day=time_slot.isoweekday,
-                         timestamp__time__range=(time_slot.utc_start, time_slot.utc_end))
-
     # TODO: filter alerts with notification profiles' filters
     data = Alert.objects.filter(alert_query)
     json_result = serializers.serialize("json", data)
