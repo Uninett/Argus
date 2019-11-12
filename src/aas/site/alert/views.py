@@ -9,7 +9,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from aas.site.notificationprofile import views as notification_views
 from .forms import AlertJsonForm
-from .models import Alert, NetworkSystem, NetworkSystemType, Object, ObjectType, ProblemType
+from .models import ActiveAlert, Alert, NetworkSystem, NetworkSystemType, Object, ObjectType, ProblemType
 from .serializers import AlertSerializer, NetworkSystemSerializer, NetworkSystemTypeSerializer, ObjectTypeSerializer, ProblemTypeSerializer
 
 
@@ -25,6 +25,13 @@ class AlertList(generics.ListCreateAPIView):
 class AlertDetail(generics.RetrieveAPIView):
     queryset = Alert.objects.all()
     serializer_class = AlertSerializer
+
+
+class ActiveAlertList(generics.ListAPIView):
+    serializer_class = AlertSerializer
+
+    def get_queryset(self):
+        return Alert.get_active_alerts()
 
 
 def all_alerts_from_source_view(request, source_pk):

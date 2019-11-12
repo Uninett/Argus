@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Alert, AlertRelation, AlertRelationType, NetworkSystem, NetworkSystemType, Object, ObjectType, ParentObject, ProblemType
+from .models import ActiveAlert, Alert, AlertRelation, AlertRelationType, NetworkSystem, NetworkSystemType, Object, ObjectType, ParentObject, ProblemType
 
 
 class NetworkSystemTypeAdmin(admin.ModelAdmin):
@@ -52,6 +52,13 @@ class AlertAdmin(admin.ModelAdmin):
         return qs.prefetch_related('source', 'object', 'parent_object', 'problem_type')
 
 
+class ActiveAlertAdmin(admin.ModelAdmin):
+    list_display = ('alert',)
+    search_fields = ('alert__alert_id',)
+
+    raw_id_fields = ('alert',)
+
+
 class AlertRelationTypeAdmin(admin.ModelAdmin):
     list_display = ('name',)
 
@@ -75,6 +82,7 @@ admin.site.register(Object, ObjectAdmin)
 admin.site.register(ParentObject, ParentObjectAdmin)
 admin.site.register(ProblemType, ProblemTypeAdmin)
 admin.site.register(Alert, AlertAdmin)
+admin.site.register(ActiveAlert, ActiveAlertAdmin)
 
 admin.site.register(AlertRelation, AlertRelationAdmin)
 admin.site.register(AlertRelationType, AlertRelationTypeAdmin)
