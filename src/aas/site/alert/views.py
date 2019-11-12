@@ -5,7 +5,9 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic import FormView
 from rest_framework import generics
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 
 from aas.site.notificationprofile import views as notification_views
 from .forms import AlertJsonForm
@@ -32,6 +34,26 @@ class ActiveAlertList(generics.ListAPIView):
 
     def get_queryset(self):
         return Alert.get_active_alerts()
+
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def change_alert_active_view(request, alert_pk):
+    if type(request.data) is not dict:
+        raise ValidationError("The request body must contain JSON.")
+
+    new_active_state = request.data.get('active')
+    if new_active_state is None or type(new_active_state) is not bool:
+        raise ValidationError("Field 'active' with a boolean value is missing from the request body.")
+
+    alert = Alert.objects.get(pk=alert_pk)
+    if new_active_state:
+        ActiveAlert.objects.get_or_create(alert=alert)
+    else:
+        if hasattr(alert, 'active_state'):
+            alert.active_state.delete()
+
+    return Response()
 
 
 def all_alerts_from_source_view(request, source_pk):

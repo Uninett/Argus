@@ -8,6 +8,7 @@ urlpatterns = [
     path("<int:pk>", views.AlertDetail.as_view()),
 
     path("active/", views.ActiveAlertList.as_view()),
+    path("<int:alert_pk>/active", views.change_alert_active_view),
 
     # path("create/", login_required(views.CreateAlertView.as_view()), name="create"),
 
