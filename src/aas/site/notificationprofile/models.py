@@ -1,6 +1,8 @@
 from datetime import datetime, time
 
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.utils import timezone
 from multiselectfield import MultiSelectField
 
@@ -31,8 +33,23 @@ class TimeSlotGroup(models.Model):
     def __str__(self):
         return self.name
 
+    # Create default immediate TimeSlotGroup when a user is created
+    @staticmethod
+    @receiver(post_save, sender=User)
+    def create_default_time_slot_group(sender, user, created, raw, *args, **kwargs):
+        if raw or not created:
+            return
+
+        time_slot_group = TimeSlotGroup.objects.create(user=user, name="Immediately")
+        time_slot_start, time_slot_end = TimeSlot.DAY_START, TimeSlot.DAY_END
+        for day, _day_name in TimeSlot.DAY_CHOICES:
+            TimeSlot.objects.create(group=time_slot_group, day=day, start=time_slot_start, end=time_slot_end)
+
 
 class TimeSlot(models.Model):
+    DAY_START = time.min
+    DAY_END = time.max
+
     MONDAY = 'MO'
     TUESDAY = 'TU'
     WEDNESDAY = 'WE'
