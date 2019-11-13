@@ -16,7 +16,7 @@ from .serializers import AlertSerializer, ParentObjectSerializer, NetworkSystemS
 
 
 class AlertList(generics.ListCreateAPIView):
-    queryset = Alert.objects.all()
+    queryset = Alert.prefetch_related_fields(Alert.objects.select_related('active_state'))
     serializer_class = AlertSerializer
 
     def perform_create(self, serializer):
@@ -33,7 +33,7 @@ class ActiveAlertList(generics.ListAPIView):
     serializer_class = AlertSerializer
 
     def get_queryset(self):
-        return Alert.get_active_alerts()
+        return Alert.prefetch_related_fields(Alert.get_active_alerts())
 
 
 @api_view(['PUT'])

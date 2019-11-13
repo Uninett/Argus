@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models import Q
+from django.db.models import Q, QuerySet
 
 
 class NetworkSystemType(models.Model):
@@ -130,6 +130,10 @@ class Alert(models.Model):
     @staticmethod
     def get_active_alerts():
         return Alert.objects.filter(active_state__isnull=False)
+
+    @staticmethod
+    def prefetch_related_fields(qs: QuerySet):
+        return qs.prefetch_related('source', 'source__type', 'object', 'object__type', 'parent_object', 'problem_type')
 
 
 class ActiveAlert(models.Model):

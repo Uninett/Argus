@@ -62,6 +62,7 @@ class AlertAdmin(admin.ModelAdmin):
         'problem_type__name',
     )
     list_filter = (ActiveStateListFilter, 'source', 'source__type', 'problem_type', 'object__type')
+    list_select_related = ('active_state',)
 
     raw_id_fields = ('object', 'parent_object')
 
@@ -75,7 +76,7 @@ class AlertAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         # Reduce number of database calls
-        return qs.prefetch_related('source', 'object', 'parent_object', 'problem_type')
+        return Alert.prefetch_related_fields(qs)
 
 
 class ActiveAlertAdmin(admin.ModelAdmin):
