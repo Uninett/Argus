@@ -85,6 +85,7 @@ class FilterDetail(generics.RetrieveUpdateDestroyAPIView):
 
 
 def send_notifications_to_users(alert: Alert):
+    # TODO: only send one notification per medium per user
     for profile in NotificationProfile.objects.select_related('user'):
         if profile.alert_fits(alert):
             send_notification(profile.user, profile, alert)

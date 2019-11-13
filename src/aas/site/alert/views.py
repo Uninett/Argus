@@ -96,27 +96,24 @@ def get_all_meta_data_view(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def preview(request):
-    body_unicode = request.body.decode('utf-8')
-    body = json.loads(body_unicode)
+    data = json.loads(request.data)
 
-    problem_types = body['problemTypes']
-    object_types = body['objectTypes']
-    network_systems = body['networkSystems']
+    problem_type_names = set(data['problemTypes'])
+    object_type_names = set(data['objectTypes'])
+    network_system_names = set(data['networkSystems'])
 
-    if network_systems == []:
-        network_systems = [alert.source.name for alert in Alert.objects.all()]
+    if not network_system_names:
+        network_system_names = set(ns.name for ns in NetworkSystem.objects.all())
 
-    if object_types == []:
-        objects = [object.name for object in Object.objects.all()]
-    else:
-        objects = [object.name for object in Object.objects.all() if object.type.name in object_types]
+    objects = Object.objects.all() if not object_type_names else Object.objects.filter(type__name__in=object_type_names)
+    object_names = set(o.name for o in objects)
 
-    wanted = []
-    alerts = Alert.objects.all()
-    print(alerts)
-    for alert in alerts:
-        if alert.problem_type.name in problem_types and alert.source.name in network_systems and alert.object.name in objects:
-            wanted.append(AlertSerializer(alert).data)
+    wanted = [
+        alert for alert in Alert.objects.prefetch_related('problem_type', 'source', 'object')
+        if (alert.problem_type.name in problem_type_names
+            and alert.source.name in network_system_names
+            and alert.object.name in object_names)
+    ]
 
-    print(wanted)
-    return HttpResponse(json.dumps(wanted), content_type="application/json")
+    serializer = AlertSerializer(wanted, many=True)
+    return HttpResponse(json.dumps(serializer.data), content_type="application/json")

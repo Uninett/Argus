@@ -139,6 +139,7 @@ class NotificationProfile(models.Model):
         (SMS, "SMS"),
         (SLACK, "Slack"),
     )
+    # TODO: support for multiple email addresses / phone numbers / Slack users
     media = MultiSelectField(choices=MEDIA_CHOICES, min_choices=1, default=EMAIL)
     active = models.BooleanField(default=True)
 
