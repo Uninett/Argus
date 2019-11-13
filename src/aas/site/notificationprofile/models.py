@@ -36,11 +36,11 @@ class TimeSlotGroup(models.Model):
     # Create default immediate TimeSlotGroup when a user is created
     @staticmethod
     @receiver(post_save, sender=User)
-    def create_default_time_slot_group(sender, user, created, raw, *args, **kwargs):
+    def create_default_time_slot_group(sender, instance, created, raw, *args, **kwargs):
         if raw or not created:
             return
 
-        time_slot_group = TimeSlotGroup.objects.create(user=user, name="Immediately")
+        time_slot_group = TimeSlotGroup.objects.create(user=instance, name="Immediately")
         time_slot_start, time_slot_end = TimeSlot.DAY_START, TimeSlot.DAY_END
         for day, _day_name in TimeSlot.DAY_CHOICES:
             TimeSlot.objects.create(group=time_slot_group, day=day, start=time_slot_start, end=time_slot_end)
