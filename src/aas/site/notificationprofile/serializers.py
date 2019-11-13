@@ -40,8 +40,11 @@ class TimeSlotGroupSerializer(serializers.ModelSerializer):
 
         return time_slot_group
 
-    def update(self, time_slot_group, validated_data):
+    def update(self, time_slot_group: TimeSlotGroup, validated_data):
         time_slots_data = validated_data.pop('time_slots')
+
+        time_slot_group.name = validated_data['name']
+        time_slot_group.save()
 
         # Replace existing time slots with posted time slots
         time_slot_group.time_slots.all().delete()
