@@ -100,6 +100,9 @@ def preview(request):
     object_type_names = set(request.data['objectTypes'])
     network_system_names = set(request.data['networkSystems'])
 
+    if not problem_type_names:
+        problem_type_names = set(pt.name for pt in ProblemType.objects.all())
+
     if not network_system_names:
         network_system_names = set(ns.name for ns in NetworkSystem.objects.all())
 
