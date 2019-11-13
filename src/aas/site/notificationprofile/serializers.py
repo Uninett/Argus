@@ -70,7 +70,7 @@ class NotificationProfileSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         try:
-            super().create(validated_data)
+            return super().create(validated_data)
         except IntegrityError as e:
             time_slot_group_pk = validated_data['time_slot_group'].pk
             if NotificationProfile.objects.filter(pk=time_slot_group_pk).exists():
