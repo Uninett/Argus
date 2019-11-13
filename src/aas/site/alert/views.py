@@ -96,11 +96,9 @@ def get_all_meta_data_view(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def preview(request):
-    data = json.loads(request.data)
-
-    problem_type_names = set(data['problemTypes'])
-    object_type_names = set(data['objectTypes'])
-    network_system_names = set(data['networkSystems'])
+    problem_type_names = set(request.data['problemTypes'])
+    object_type_names = set(request.data['objectTypes'])
+    network_system_names = set(request.data['networkSystems'])
 
     if not network_system_names:
         network_system_names = set(ns.name for ns in NetworkSystem.objects.all())
