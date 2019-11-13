@@ -26,7 +26,7 @@ AAS - Aggregated Alert System is a platform for aggregating alerts and sending n
 
 ## Project setup
 * Create a Python 3.6+ virtual environment
-* `pip install -r requirements/django.txt -r requirements/base.txt -r requirements/dev.txt`
+* `pip install -r requirements.txt`
 * `python manage.py migrate`
 
 Start the server with `python manage.py runserver`.
