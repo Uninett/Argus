@@ -53,7 +53,9 @@ def change_alert_active_view(request, alert_pk):
         if hasattr(alert, 'active_state'):
             alert.active_state.delete()
 
-    return Response()
+    alert = Alert.objects.get(pk=alert_pk)  # re-fetch the alert to get updated state after creating/deleting ActiveAlert object
+    serializer = AlertSerializer(alert)
+    return Response(serializer.data)
 
 
 def all_alerts_from_source_view(request, source_pk):
