@@ -9,6 +9,11 @@ class TimeSlotSerializer(serializers.ModelSerializer):
         model = TimeSlot
         fields = ['day', 'start', 'end']
 
+    def validate(self, attrs):
+        if attrs['start'] >= attrs['end']:
+            raise serializers.ValidationError("Start time must be before end time.")
+        return attrs
+
 
 class TimeSlotGroupSerializer(serializers.ModelSerializer):
     class Meta:
