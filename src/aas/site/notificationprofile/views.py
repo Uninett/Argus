@@ -1,6 +1,7 @@
 from typing import List
 
 from django.core import serializers
+from django.db.models import Q
 from django.http import HttpResponse
 from rest_framework import generics
 from rest_framework.decorators import api_view, permission_classes
@@ -35,14 +36,12 @@ class NotificationProfileDetail(generics.RetrieveUpdateDestroyAPIView):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def notification_profile_alerts_view(request):
-    profiles = request.user.notification_profiles.all()
-    data = []
-    # TODO: do this with a queryset
-    for alert in Alert.objects.all():
-        for profile in profiles:
-            if is_between(alert=alert, profile=profile):
-                data.append(alert)
+def alerts_filtered_by_notification_profile_view(request, notification_profile_pk):
+    # Go through user to ensure that the user owns the requested notification profile
+    profile_filters = request.user.notification_profiles.get(pk=notification_profile_pk).filters.all()
+    alert_query = Q()
+    # TODO: filter alerts with notification profiles' filters
+    data = Alert.objects.filter(alert_query)
     json_result = serializers.serialize("json", data)
     return HttpResponse(json_result, content_type="application/json")
 
@@ -85,21 +84,10 @@ class FilterDetail(generics.RetrieveUpdateDestroyAPIView):
         return self.request.user.filters.all()
 
 
-def is_between(profile: NotificationProfile, alert: Alert):
-    """
-    :param profile: NotificationProfile
-    :param alert: alert instance
-    :return: Boolean
-    True if the alert is within the given profile's desired interval
-    False if the alert is outside of the given profile's desired interval
-    """
-    # TODO: update with TimeSlotGroup's time slot times
-    return profile.interval_start.time() < alert.timestamp.time() < profile.interval_stop.time()
-
-
 def send_notifications_to_users(alert: Alert):
+    # TODO: only send one notification per medium per user
     for profile in NotificationProfile.objects.select_related('user'):
-        if is_between(profile, alert):
+        if profile.alert_fits(alert):
             send_notification(profile.user, profile, alert)
 
 

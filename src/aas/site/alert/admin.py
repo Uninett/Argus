@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Alert, AlertRelation, AlertRelationType, NetworkSystem, NetworkSystemType, Object, ObjectType, ParentObject, ProblemType
+from .models import ActiveAlert, Alert, AlertRelation, AlertRelationType, NetworkSystem, NetworkSystemType, Object, ObjectType, ParentObject, ProblemType
 
 
 class NetworkSystemTypeAdmin(admin.ModelAdmin):
@@ -35,8 +35,28 @@ class ProblemTypeAdmin(admin.ModelAdmin):
 
 class AlertAdmin(admin.ModelAdmin):
     list_display = ('alert_id', 'timestamp', 'source', 'object', 'parent_object', 'details_url', 'problem_type', 'ticket_url')
+    search_fields = (
+        'alert_id',
+        'source__name', 'source__type__name',
+        'object__name', 'object__object_id', 'object__type__name',
+        'parent_object__name', 'parent_object__parentobject_id',
+        'problem_type__name',
+    )
+    list_filter = ('problem_type', 'source', 'source__type')
 
     raw_id_fields = ('object', 'parent_object')
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        # Reduce number of database calls
+        return qs.prefetch_related('source', 'object', 'parent_object', 'problem_type')
+
+
+class ActiveAlertAdmin(admin.ModelAdmin):
+    list_display = ('alert',)
+    search_fields = ('alert__alert_id',)
+
+    raw_id_fields = ('alert',)
 
 
 class AlertRelationTypeAdmin(admin.ModelAdmin):
@@ -62,6 +82,7 @@ admin.site.register(Object, ObjectAdmin)
 admin.site.register(ParentObject, ParentObjectAdmin)
 admin.site.register(ProblemType, ProblemTypeAdmin)
 admin.site.register(Alert, AlertAdmin)
+admin.site.register(ActiveAlert, ActiveAlertAdmin)
 
 admin.site.register(AlertRelation, AlertRelationAdmin)
 admin.site.register(AlertRelationType, AlertRelationTypeAdmin)

@@ -1,9 +1,12 @@
 from datetime import datetime, time
 
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.utils import timezone
 from multiselectfield import MultiSelectField
 
+from aas.site.alert.models import Alert
 from aas.site.auth.models import User
 
 
@@ -21,11 +24,32 @@ class TimeSlotGroup(models.Model):
     )
     name = models.CharField(max_length=40)
 
+    def timestamp_is_within_time_slots(self, timestamp: datetime):
+        for time_slot in self.time_slots.all():
+            if time_slot.timestamp_is_within(timestamp):
+                return True
+        return False
+
     def __str__(self):
         return self.name
 
+    # Create default immediate TimeSlotGroup when a user is created
+    @staticmethod
+    @receiver(post_save, sender=User)
+    def create_default_time_slot_group(sender, user, created, raw, *args, **kwargs):
+        if raw or not created:
+            return
+
+        time_slot_group = TimeSlotGroup.objects.create(user=user, name="Immediately")
+        time_slot_start, time_slot_end = TimeSlot.DAY_START, TimeSlot.DAY_END
+        for day, _day_name in TimeSlot.DAY_CHOICES:
+            TimeSlot.objects.create(group=time_slot_group, day=day, start=time_slot_start, end=time_slot_end)
+
 
 class TimeSlot(models.Model):
+    DAY_START = time.min
+    DAY_END = time.max
+
     MONDAY = 'MO'
     TUESDAY = 'TU'
     WEDNESDAY = 'WE'
@@ -42,6 +66,9 @@ class TimeSlot(models.Model):
         (SATURDAY, "Saturday"),
         (SUNDAY, "Sunday"),
     )
+    # Map day name to ISO index, e.g. 'MO': 1
+    DAY_NAME_TO_INDEX = {day: i + 1 for i, (day, _) in enumerate(DAY_CHOICES)}
+
     group = models.ForeignKey(
         to=TimeSlotGroup,
         on_delete=models.CASCADE,
@@ -52,22 +79,17 @@ class TimeSlot(models.Model):
     start = models.TimeField(help_text="Local time.")
     end = models.TimeField(help_text="Local time.")
 
-    # TODO: replace these with making `start` and `end` custom timezone aware time fields
-    #       (time+timezone is saved in database, to_python() returns custom time object that requires specifying a timezone
-    #        - for comparison of objects)
     @property
-    def utc_start(self):
-        return self.local_time_to_utc_time(self.start)
+    def isoweekday(self):
+        return self.DAY_NAME_TO_INDEX[self.day]
 
-    @property
-    def utc_end(self):
-        return self.local_time_to_utc_time(self.end)
-
-    @staticmethod
-    def local_time_to_utc_time(local_time: time):
-        current_localtime = timezone.localtime()
-        local_datetime = datetime.combine(current_localtime.date(), local_time, current_localtime.tzinfo)
-        return local_datetime.astimezone(timezone.utc).time()
+    def timestamp_is_within(self, timestamp: datetime):
+        # FIXME: Might affect performance negatively if calling this method frequently
+        timestamp = timestamp.astimezone(timezone.get_current_timezone())
+        return (
+                timestamp.isoweekday() == self.isoweekday
+                and self.start <= timestamp.time() <= self.end
+        )
 
     def __str__(self):
         return f"{self.start}-{self.end} on {self.get_day_display()}s"
@@ -117,8 +139,15 @@ class NotificationProfile(models.Model):
         (SMS, "SMS"),
         (SLACK, "Slack"),
     )
+    # TODO: support for multiple email addresses / phone numbers / Slack users
     media = MultiSelectField(choices=MEDIA_CHOICES, min_choices=1, default=EMAIL)
     active = models.BooleanField(default=True)
+
+    def alert_fits(self, alert: Alert):
+        if not self.active:
+            return False
+        # TODO: also check if alert passes filter
+        return self.time_slot_group.timestamp_is_within_time_slots(alert.timestamp)
 
     def __str__(self):
         return f"{self.time_slot_group}: {', '.join(str(f) for f in self.filters.all())}"

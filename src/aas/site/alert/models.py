@@ -57,7 +57,7 @@ class Object(models.Model):
     )
 
     def __str__(self):
-        return f"{self.type}: {self.name} ({self.network_system})"
+        return f"{self.type}: {self.name} ({self.network_system}) <ID {self.object_id}>"
 
 
 class ParentObject(models.Model):
@@ -69,7 +69,7 @@ class ParentObject(models.Model):
     url = models.URLField(blank=True, verbose_name="URL")
 
     def __str__(self):
-        return f"<ID {self.parentobject_id}>" + f" {self.name}" if self.name else ""
+        return f"{self.name or ''} <ID {self.parentobject_id}>"
 
 
 class ProblemType(models.Model):
@@ -89,7 +89,7 @@ class Alert(models.Model):
         constraints = [
             models.UniqueConstraint(fields=['alert_id', 'source'], name="unique_alert_id_per_source"),
         ]
-        ordering = ['timestamp']
+        ordering = ['-timestamp']
 
     timestamp = models.DateTimeField()
     source = models.ForeignKey(
@@ -126,6 +126,19 @@ class Alert(models.Model):
 
     def __str__(self):
         return f"{self.timestamp} - {self.problem_type}: {self.object}"
+
+    @staticmethod
+    def get_active_alerts():
+        return Alert.objects.filter(active_state__isnull=False)
+
+
+class ActiveAlert(models.Model):
+    alert = models.OneToOneField(
+        to=Alert,
+        on_delete=models.CASCADE,
+        primary_key=True,
+        related_name='active_state',
+    )
 
 
 class AlertRelationType(models.Model):
