@@ -11,8 +11,8 @@ from rest_framework.response import Response
 
 from aas.site.notificationprofile import views as notification_views
 from .forms import AlertJsonForm
-from .models import ActiveAlert, Alert, NetworkSystem, NetworkSystemType, Object, ObjectType, ProblemType
-from .serializers import AlertSerializer, NetworkSystemSerializer, NetworkSystemTypeSerializer, ObjectTypeSerializer, ProblemTypeSerializer
+from .models import ActiveAlert, Alert, NetworkSystem, NetworkSystemType, Object, ObjectType, ProblemType, ParentObject
+from .serializers import AlertSerializer, ParentObjectSerializer, NetworkSystemSerializer, NetworkSystemTypeSerializer, ObjectTypeSerializer, ProblemTypeSerializer
 
 
 class AlertList(generics.ListCreateAPIView):
@@ -81,12 +81,12 @@ class CreateAlertView(FormView):
 @permission_classes([IsAuthenticated])
 def get_all_meta_data_view(request):
     problem_types = ProblemTypeSerializer(ProblemType.objects.all(), many=True)
-    network_system_types = NetworkSystemTypeSerializer(NetworkSystemType.objects.all(), many=True)
+    parent_objects = ParentObjectSerializer(ParentObject.objects.all(), many=True)
     object_types = ObjectTypeSerializer(ObjectType.objects.all(), many=True)
     network_systems = NetworkSystemSerializer(NetworkSystem.objects.all(), many=True)
     data = {
         "problemTypes":       problem_types.data,
-        "networkSystemTypes": network_system_types.data,
+        "parentObjects": parent_objects.data,
         "objectTypes":        object_types.data,
         "networkSystems":     network_systems.data,
     }
@@ -99,12 +99,16 @@ def preview(request):
     problem_type_names = set(request.data['problemTypes'])
     object_type_names = set(request.data['objectTypes'])
     network_system_names = set(request.data['networkSystems'])
+    parent_object_names = set(request.data["parentObjects"])
 
     if not problem_type_names:
         problem_type_names = set(pt.name for pt in ProblemType.objects.all())
 
     if not network_system_names:
         network_system_names = set(ns.name for ns in NetworkSystem.objects.all())
+
+    if not parent_object_names:
+        parent_object_names = set(po.name for po in ParentObject.objects.all())
 
     objects = Object.objects.all() if not object_type_names else Object.objects.filter(type__name__in=object_type_names)
     object_names = set(o.name for o in objects)
@@ -113,7 +117,8 @@ def preview(request):
         alert for alert in Alert.objects.prefetch_related('problem_type', 'source', 'object')
         if (alert.problem_type.name in problem_type_names
             and alert.source.name in network_system_names
-            and alert.object.name in object_names)
+            and alert.object.name in object_names
+            and alert.parent_object.name in parent_object_names)
     ]
 
     serializer = AlertSerializer(wanted, many=True)
