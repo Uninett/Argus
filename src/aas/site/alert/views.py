@@ -2,22 +2,34 @@ import json
 
 from django.core import serializers
 from django.db.models import Q
-from django.http import HttpResponse, HttpResponseRedirect
-from django.views.generic import FormView
+from django.http import HttpResponse
 from rest_framework import generics
 from rest_framework.decorators import api_view
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
 from aas.site.notificationprofile import views as notification_views
-from .forms import AlertJsonForm
+from . import mappings
 from .models import ActiveAlert, Alert, NetworkSystem, ObjectType, ParentObject, ProblemType
+from .parsers import StackedJSONParser
 from .serializers import AlertSerializer, NetworkSystemSerializer, ObjectTypeSerializer, ParentObjectSerializer, ProblemTypeSerializer
 
 
 class AlertList(generics.ListCreateAPIView):
     queryset = Alert.prefetch_related_fields(Alert.objects.select_related('active_state'))
+    parser_classes = [StackedJSONParser]
     serializer_class = AlertSerializer
+
+    def post(self, request, *args, **kwargs):
+        created_alerts = [
+            mappings.NAV_FIELD_MAPPING.create_model_obj_from_json(json_dict)
+            for json_dict in request.data
+        ]
+        if len(created_alerts) == 1:
+            serializer = AlertSerializer(created_alerts[0])
+        else:
+            serializer = AlertSerializer(created_alerts, many=True)
+        return Response(serializer.data)
 
     def perform_create(self, serializer):
         created_alert = serializer.save()
@@ -62,20 +74,6 @@ def all_alerts_from_source_view(request, source_pk):
     # Prettify the JSON data:
     json_result = json.dumps(json.loads(data), indent=4)
     return HttpResponse(json_result, content_type="application/json")
-
-
-class CreateAlertView(FormView):
-    template_name = "alert/create_alert.html"
-    form_class = AlertJsonForm
-
-    def form_valid(self, form):
-        """ TODO: temporarily disabled until JSON parsing has been implemented for the new data model
-        json_string = form.cleaned_data["json"]
-        alert_hist = json_utils.json_to_alert_hist(json_string)
-        alert_hist.save()
-        """
-        # Redirect back to same form page
-        return HttpResponseRedirect(self.request.path_info)
 
 
 @api_view(['GET'])

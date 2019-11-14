@@ -91,6 +91,19 @@ class TimeSlot(models.Model):
                 and self.start <= timestamp.time() <= self.end
         )
 
+    """ needed?
+    def __eq__(self, other):
+        if type(other) is not TimeSlot:
+            return False
+        if super().__eq__(other):
+            return True
+        return (
+                self.day == other.day
+                and self.start == other.start
+                and self.end == other.end
+        )
+    """
+
     def __str__(self):
         return f"{self.start}-{self.end} on {self.get_day_display()}s"
 
