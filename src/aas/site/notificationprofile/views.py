@@ -35,7 +35,6 @@ class NotificationProfileDetail(generics.RetrieveUpdateDestroyAPIView):
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
 def alerts_filtered_by_notification_profile_view(request, notification_profile_pk):
     # Go through user to ensure that the user owns the requested notification profile
     profile_filters = request.user.notification_profiles.get(pk=notification_profile_pk).filters.all()

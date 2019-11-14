@@ -1,23 +1,35 @@
 import json
 
 from django.core import serializers
-from django.http import HttpResponse, HttpResponseRedirect
-from django.views.generic import FormView
+from django.db.models import Q
+from django.http import HttpResponse
 from rest_framework import generics
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view
 from rest_framework.exceptions import ValidationError
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from aas.site.notificationprofile import views as notification_views
-from .forms import AlertJsonForm
-from .models import ActiveAlert, Alert, NetworkSystem, NetworkSystemType, Object, ObjectType, ProblemType, ParentObject
-from .serializers import AlertSerializer, ParentObjectSerializer, NetworkSystemSerializer, NetworkSystemTypeSerializer, ObjectTypeSerializer, ProblemTypeSerializer
+from . import mappings
+from .models import ActiveAlert, Alert, NetworkSystem, ObjectType, ParentObject, ProblemType
+from .parsers import StackedJSONParser
+from .serializers import AlertSerializer, NetworkSystemSerializer, ObjectTypeSerializer, ParentObjectSerializer, ProblemTypeSerializer
 
 
 class AlertList(generics.ListCreateAPIView):
-    queryset = Alert.objects.all()
+    queryset = Alert.prefetch_related_fields(Alert.objects.select_related('active_state'))
+    parser_classes = [StackedJSONParser]
     serializer_class = AlertSerializer
+
+    def post(self, request, *args, **kwargs):
+        created_alerts = [
+            mappings.NAV_FIELD_MAPPING.create_model_obj_from_json(json_dict)
+            for json_dict in request.data
+        ]
+        if len(created_alerts) == 1:
+            serializer = AlertSerializer(created_alerts[0])
+        else:
+            serializer = AlertSerializer(created_alerts, many=True)
+        return Response(serializer.data)
 
     def perform_create(self, serializer):
         created_alert = serializer.save()
@@ -33,11 +45,10 @@ class ActiveAlertList(generics.ListAPIView):
     serializer_class = AlertSerializer
 
     def get_queryset(self):
-        return Alert.get_active_alerts()
+        return Alert.prefetch_related_fields(Alert.get_active_alerts())
 
 
 @api_view(['PUT'])
-@permission_classes([IsAuthenticated])
 def change_alert_active_view(request, alert_pk):
     if type(request.data) is not dict:
         raise ValidationError("The request body must contain JSON.")
@@ -53,7 +64,9 @@ def change_alert_active_view(request, alert_pk):
         if hasattr(alert, 'active_state'):
             alert.active_state.delete()
 
-    return Response()
+    alert = Alert.objects.get(pk=alert_pk)  # re-fetch the alert to get updated state after creating/deleting ActiveAlert object
+    serializer = AlertSerializer(alert)
+    return Response(serializer.data)
 
 
 def all_alerts_from_source_view(request, source_pk):
@@ -63,63 +76,35 @@ def all_alerts_from_source_view(request, source_pk):
     return HttpResponse(json_result, content_type="application/json")
 
 
-class CreateAlertView(FormView):
-    template_name = "alert/create_alert.html"
-    form_class = AlertJsonForm
-
-    def form_valid(self, form):
-        """ TODO: temporarily disabled until JSON parsing has been implemented for the new data model
-        json_string = form.cleaned_data["json"]
-        alert_hist = json_utils.json_to_alert_hist(json_string)
-        alert_hist.save()
-        """
-        # Redirect back to same form page
-        return HttpResponseRedirect(self.request.path_info)
-
-
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
 def get_all_meta_data_view(request):
-    problem_types = ProblemTypeSerializer(ProblemType.objects.all(), many=True)
-    parent_objects = ParentObjectSerializer(ParentObject.objects.all(), many=True)
+    network_systems = NetworkSystemSerializer(NetworkSystem.objects.select_related('type'), many=True)
     object_types = ObjectTypeSerializer(ObjectType.objects.all(), many=True)
-    network_systems = NetworkSystemSerializer(NetworkSystem.objects.all(), many=True)
+    parent_objects = ParentObjectSerializer(ParentObject.objects.all(), many=True)
+    problem_types = ProblemTypeSerializer(ProblemType.objects.all(), many=True)
     data = {
-        "problemTypes":       problem_types.data,
-        "parentObjects": parent_objects.data,
-        "objectTypes":        object_types.data,
-        "networkSystems":     network_systems.data,
+        "networkSystems": network_systems.data,
+        "objectTypes":    object_types.data,
+        "parentObjects":  parent_objects.data,
+        "problemTypes":   problem_types.data,
     }
     return HttpResponse(json.dumps(data), content_type="application/json")
 
 
+# TODO: make HTTP method GET and get query data from URL
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
 def preview(request):
-    problem_type_names = set(request.data['problemTypes'])
-    object_type_names = set(request.data['objectTypes'])
-    network_system_names = set(request.data['networkSystems'])
-    parent_object_names = set(request.data["parentObjects"])
+    source_names = request.data['sourceNames']
+    object_type_names = request.data['objectTypeNames']
+    parent_object_names = request.data['parentObjectNames']
+    problem_type_names = request.data['problemTypeNames']
 
-    if not problem_type_names:
-        problem_type_names = set(pt.name for pt in ProblemType.objects.all())
-
-    if not network_system_names:
-        network_system_names = set(ns.name for ns in NetworkSystem.objects.all())
-
-    if not parent_object_names:
-        parent_object_names = set(po.name for po in ParentObject.objects.all())
-
-    objects = Object.objects.all() if not object_type_names else Object.objects.filter(type__name__in=object_type_names)
-    object_names = set(o.name for o in objects)
-
-    wanted = [
-        alert for alert in Alert.objects.prefetch_related('problem_type', 'source', 'object')
-        if (alert.problem_type.name in problem_type_names
-            and alert.source.name in network_system_names
-            and alert.object.name in object_names
-            and alert.parent_object.name in parent_object_names)
-    ]
-
-    serializer = AlertSerializer(wanted, many=True)
+    alert_query = (
+            (Q(source__name__in=source_names) if source_names else Q())
+            & (Q(object__type__name__in=object_type_names) if object_type_names else Q())
+            & (Q(parent_object__name__in=parent_object_names) if parent_object_names else Q())
+            & (Q(problem_type__name__in=problem_type_names) if problem_type_names else Q())
+    )
+    filtered_alerts = Alert.prefetch_related_fields(Alert.objects.all()).filter(alert_query)
+    serializer = AlertSerializer(filtered_alerts, many=True)
     return HttpResponse(json.dumps(serializer.data), content_type="application/json")

@@ -33,8 +33,27 @@ class ProblemTypeAdmin(admin.ModelAdmin):
     list_display = ('name', 'description')
 
 
+class ActiveStateListFilter(admin.SimpleListFilter):
+    title = "active state"
+    # Parameter for the filter that will be used in the URL query
+    parameter_name = 'active'
+
+    def lookups(self, request, model_admin):
+        return (
+            (1, "Yes"),
+            (0, "No"),
+        )
+
+    def queryset(self, request, queryset):
+        if not self.value():
+            return queryset
+
+        lookup_value = int(self.value())
+        return queryset.filter(active_state__isnull=not lookup_value)
+
+
 class AlertAdmin(admin.ModelAdmin):
-    list_display = ('alert_id', 'timestamp', 'source', 'object', 'parent_object', 'details_url', 'problem_type', 'ticket_url')
+    list_display = ('alert_id', 'timestamp', 'source', 'object', 'parent_object', 'details_url', 'problem_type', 'ticket_url', 'get_active_state')
     search_fields = (
         'alert_id',
         'source__name', 'source__type__name',
@@ -42,14 +61,22 @@ class AlertAdmin(admin.ModelAdmin):
         'parent_object__name', 'parent_object__parentobject_id',
         'problem_type__name',
     )
-    list_filter = ('problem_type', 'source', 'source__type')
+    list_filter = (ActiveStateListFilter, 'source', 'source__type', 'problem_type', 'object__type')
+    list_select_related = ('active_state',)
 
     raw_id_fields = ('object', 'parent_object')
+
+    def get_active_state(self, alert: Alert):
+        return hasattr(alert, 'active_state')
+
+    get_active_state.boolean = True
+    get_active_state.short_description = "Active"
+    get_active_state.admin_order_field = 'active_state'
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         # Reduce number of database calls
-        return qs.prefetch_related('source', 'object', 'parent_object', 'problem_type')
+        return Alert.prefetch_related_fields(qs)
 
 
 class ActiveAlertAdmin(admin.ModelAdmin):

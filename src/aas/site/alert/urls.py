@@ -10,8 +10,6 @@ urlpatterns = [
     path("active/", views.ActiveAlertList.as_view()),
     path("<int:alert_pk>/active", views.change_alert_active_view),
 
-    # path("create/", login_required(views.CreateAlertView.as_view()), name="create"),
-
     path("source/<int:source_pk>", views.all_alerts_from_source_view, name="source"),
     path("metadata/", views.get_all_meta_data_view),
     path("preview/", views.preview),
