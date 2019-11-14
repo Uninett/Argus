@@ -5,9 +5,8 @@ from django.db.models import Q
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic import FormView
 from rest_framework import generics
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view
 from rest_framework.exceptions import ValidationError
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from aas.site.notificationprofile import views as notification_views
@@ -38,7 +37,6 @@ class ActiveAlertList(generics.ListAPIView):
 
 
 @api_view(['PUT'])
-@permission_classes([IsAuthenticated])
 def change_alert_active_view(request, alert_pk):
     if type(request.data) is not dict:
         raise ValidationError("The request body must contain JSON.")
@@ -81,7 +79,6 @@ class CreateAlertView(FormView):
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
 def get_all_meta_data_view(request):
     network_systems = NetworkSystemSerializer(NetworkSystem.objects.select_related('type'), many=True)
     object_types = ObjectTypeSerializer(ObjectType.objects.all(), many=True)
@@ -98,7 +95,6 @@ def get_all_meta_data_view(request):
 
 # TODO: make HTTP method GET and get query data from URL
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
 def preview(request):
     source_names = request.data['sourceNames']
     object_type_names = request.data['objectTypeNames']
