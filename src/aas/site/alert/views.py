@@ -25,15 +25,15 @@ class AlertList(generics.ListCreateAPIView):
             mappings.NAV_FIELD_MAPPING.create_model_obj_from_json(json_dict)
             for json_dict in request.data
         ]
+
+        for created_alert in created_alerts:
+            notification_views.send_notifications_to_users(created_alert)
+
         if len(created_alerts) == 1:
             serializer = AlertSerializer(created_alerts[0])
         else:
             serializer = AlertSerializer(created_alerts, many=True)
         return Response(serializer.data)
-
-    def perform_create(self, serializer):
-        created_alert = serializer.save()
-        notification_views.send_notifications_to_users(created_alert)
 
 
 class AlertDetail(generics.RetrieveAPIView):
