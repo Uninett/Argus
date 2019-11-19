@@ -120,7 +120,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
 
     ```
     {
-        "time_slot_group": 1,
+        "time_slot": 1,
         "filters": [
             1,
             2
@@ -142,16 +142,16 @@ All endpoints require requests to contain a header with key `Authorization` and 
 
 * `GET` to `/notificationprofiles/<int:pk>/alerts/`: returns all alerts - both active and historic - filtered by one of the logged in user's notification profiles by pk
 
-* `/notificationprofiles/timeslotgroups/`:
-  * `GET`: returns the logged in user's time slot groups
-  * `POST`: creates and returns a time slot group which is then connected to the logged in user
+* `/notificationprofiles/timeslots/`:
+  * `GET`: returns the logged in user's time slots
+  * `POST`: creates and returns a time slot which is then connected to the logged in user
     <details>
     <summary>Body:</summary>
 
     ```
     {
         "name": "Weekdays",
-        "time_slots": [
+        "time_intervals": [
             {
                 "day": "MO",
                 "start": "08:00:00",
@@ -182,11 +182,11 @@ All endpoints require requests to contain a header with key `Authorization` and 
     ```
     </details>
 
-* `/notificationprofiles/timeslotgroups/<int:pk>`:
-  * `GET`: returns one of the logged in user's time slot groups by pk
-  * `PUT`: updates and returns one of the logged in user's time slot groups by pk
-    * Body: same as `POST` to `/notificationprofiles/timeslotgroups/`
-  * `DELETE`: deletes one of the logged in user's time slot groups by pk
+* `/notificationprofiles/timeslots/<int:pk>`:
+  * `GET`: returns one of the logged in user's time slots by pk
+  * `PUT`: updates and returns one of the logged in user's time slots by pk
+    * Body: same as `POST` to `/notificationprofiles/timeslots/`
+  * `DELETE`: deletes one of the logged in user's time slots by pk
 
 * `/notificationprofiles/filters/`:
   * `GET`: returns the logged in user's filters
