@@ -94,16 +94,16 @@ def get_all_meta_data_view(request):
 # TODO: make HTTP method GET and get query data from URL
 @api_view(['POST'])
 def preview(request):
-    source_names = request.data['sourceNames']
-    object_type_names = request.data['objectTypeNames']
-    parent_object_names = request.data['parentObjectNames']
-    problem_type_names = request.data['problemTypeNames']
+    source_ids = request.data['sourceIds']
+    object_type_ids = request.data['objectTypeIds']
+    parent_object_ids = request.data['parentObjectIds']
+    problem_type_ids = request.data['problemTypeIds']
 
     alert_query = (
-            (Q(source__name__in=source_names) if source_names else Q())
-            & (Q(object__type__name__in=object_type_names) if object_type_names else Q())
-            & (Q(parent_object__name__in=parent_object_names) if parent_object_names else Q())
-            & (Q(problem_type__name__in=problem_type_names) if problem_type_names else Q())
+            (Q(source__pk__in=source_ids) if source_ids else Q())
+            & (Q(object__type__pk__in=object_type_ids) if object_type_ids else Q())
+            & (Q(parent_object__pk__in=parent_object_ids) if parent_object_ids else Q())
+            & (Q(problem_type__pk__in=problem_type_ids) if problem_type_ids else Q())
     )
     filtered_alerts = Alert.prefetch_related_fields(Alert.objects.all()).filter(alert_query)
     serializer = AlertSerializer(filtered_alerts, many=True)
