@@ -6,13 +6,15 @@ from .models import Alert, NetworkSystem, NetworkSystemType, Object, ObjectType,
 class NetworkSystemTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = NetworkSystemType
-        fields = ['name']
+        fields = ['pk', 'name']
+        read_only_fields = ['pk']
 
 
 class NetworkSystemSerializer(serializers.ModelSerializer):
     class Meta:
         model = NetworkSystem
-        fields = ['name', 'type']
+        fields = ['pk', 'name', 'type']
+        read_only_fields = ['pk']
 
     # type = NetworkSystemTypeSerializer(read_only=True)
 
@@ -25,13 +27,15 @@ class NetworkSystemSerializer(serializers.ModelSerializer):
 class ObjectTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = ObjectType
-        fields = ['name']
+        fields = ['pk', 'name']
+        read_only_fields = ['pk']
 
 
 class ObjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Object
-        fields = ['name', 'object_id', 'url', 'type']
+        fields = ['pk', 'name', 'object_id', 'url', 'type']
+        read_only_fields = ['pk']
 
     # type = ObjectTypeSerializer(read_only=True)
 
@@ -44,13 +48,15 @@ class ObjectSerializer(serializers.ModelSerializer):
 class ParentObjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = ParentObject
-        fields = ['name', 'parentobject_id', 'url']
+        fields = ['pk', 'name', 'parentobject_id', 'url']
+        read_only_fields = ['pk']
 
 
 class ProblemTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProblemType
-        fields = ['name', 'description']
+        fields = ['pk', 'name', 'description']
+        read_only_fields = ['pk']
 
 
 class AlertSerializer(serializers.ModelSerializer):
