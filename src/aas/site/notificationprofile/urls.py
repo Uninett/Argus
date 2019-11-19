@@ -8,8 +8,8 @@ urlpatterns = [
     path("<int:pk>", views.NotificationProfileDetail.as_view()),
     path("<int:notification_profile_pk>/alerts/", views.alerts_filtered_by_notification_profile_view),
 
-    path("timeslotgroups/", views.TimeSlotGroupList.as_view()),
-    path("timeslotgroups/<int:pk>", views.TimeSlotGroupDetail.as_view()),
+    path("timeslots/", views.TimeSlotList.as_view()),
+    path("timeslots/<int:pk>", views.TimeSlotDetail.as_view()),
 
     path("filters/", views.FilterList.as_view()),
     path("filters/<int:pk>", views.FilterDetail.as_view()),

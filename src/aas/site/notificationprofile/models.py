@@ -10,7 +10,7 @@ from aas.site.alert.models import Alert
 from aas.site.auth.models import User
 
 
-class TimeSlotGroup(models.Model):
+class TimeSlot(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(fields=['name', 'user'], name="unique_name_per_user"),
@@ -20,33 +20,33 @@ class TimeSlotGroup(models.Model):
     user = models.ForeignKey(
         to=User,
         on_delete=models.CASCADE,
-        related_name='time_slot_groups',
+        related_name='time_slots',
     )
     name = models.CharField(max_length=40)
 
-    def timestamp_is_within_time_slots(self, timestamp: datetime):
-        for time_slot in self.time_slots.all():
-            if time_slot.timestamp_is_within(timestamp):
+    def timestamp_is_within_time_intervals(self, timestamp: datetime):
+        for time_interval in self.time_intervals.all():
+            if time_interval.timestamp_is_within(timestamp):
                 return True
         return False
 
     def __str__(self):
         return self.name
 
-    # Create default immediate TimeSlotGroup when a user is created
+    # Create default immediate TimeSlot when a user is created
     @staticmethod
     @receiver(post_save, sender=User)
-    def create_default_time_slot_group(sender, instance, created, raw, *args, **kwargs):
+    def create_default_time_slot(sender, instance, created, raw, *args, **kwargs):
         if raw or not created:
             return
 
-        time_slot_group = TimeSlotGroup.objects.create(user=instance, name="Immediately")
-        time_slot_start, time_slot_end = TimeSlot.DAY_START, TimeSlot.DAY_END
-        for day, _day_name in TimeSlot.DAY_CHOICES:
-            TimeSlot.objects.create(group=time_slot_group, day=day, start=time_slot_start, end=time_slot_end)
+        time_slot = TimeSlot.objects.create(user=instance, name="Immediately")
+        time_interval_start, time_interval_end = TimeInterval.DAY_START, TimeInterval.DAY_END
+        for day, _day_name in TimeInterval.DAY_CHOICES:
+            TimeInterval.objects.create(time_slot=time_slot, day=day, start=time_interval_start, end=time_interval_end)
 
 
-class TimeSlot(models.Model):
+class TimeInterval(models.Model):
     DAY_START = time.min
     DAY_END = time.max
 
@@ -69,10 +69,10 @@ class TimeSlot(models.Model):
     # Map day name to ISO index, e.g. 'MO': 1
     DAY_NAME_TO_INDEX = {day: i + 1 for i, (day, _) in enumerate(DAY_CHOICES)}
 
-    group = models.ForeignKey(
-        to=TimeSlotGroup,
+    time_slot = models.ForeignKey(
+        to=TimeSlot,
         on_delete=models.CASCADE,
-        related_name='time_slots',
+        related_name='time_intervals',
     )
 
     day = models.CharField(max_length=2, choices=DAY_CHOICES)
@@ -93,7 +93,7 @@ class TimeSlot(models.Model):
 
     """ needed?
     def __eq__(self, other):
-        if type(other) is not TimeSlot:
+        if type(other) is not TimeInterval:
             return False
         if super().__eq__(other):
             return True
@@ -133,8 +133,8 @@ class NotificationProfile(models.Model):
         related_name='notification_profiles',
     )
     # TODO: add constraint that user must be the same
-    time_slot_group = models.OneToOneField(
-        to=TimeSlotGroup,
+    time_slot = models.OneToOneField(
+        to=TimeSlot,
         on_delete=models.CASCADE,
         primary_key=True,
         related_name='notification_profile',
@@ -160,7 +160,7 @@ class NotificationProfile(models.Model):
         if not self.active:
             return False
         # TODO: also check if alert passes filter
-        return self.time_slot_group.timestamp_is_within_time_slots(alert.timestamp)
+        return self.time_slot.timestamp_is_within_time_intervals(alert.timestamp)
 
     def __str__(self):
-        return f"{self.time_slot_group}: {', '.join(str(f) for f in self.filters.all())}"
+        return f"{self.time_slot}: {', '.join(str(f) for f in self.filters.all())}"
