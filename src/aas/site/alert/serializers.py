@@ -3,7 +3,18 @@ from rest_framework import serializers
 from .models import Alert, NetworkSystem, Object, ObjectType, ParentObject, ProblemType
 
 
-class NetworkSystemSerializer(serializers.ModelSerializer):
+class RemovableFieldSerializer(serializers.ModelSerializer):
+    NO_PKS_KEY = 'no_pks'
+
+    def to_representation(self, instance):
+        obj_repr = super().to_representation(instance)
+
+        if self.NO_PKS_KEY in self.context:
+            obj_repr.pop('pk')
+        return obj_repr
+
+
+class NetworkSystemSerializer(RemovableFieldSerializer):
     class Meta:
         model = NetworkSystem
         fields = ['pk', 'name', 'type']
@@ -15,14 +26,14 @@ class NetworkSystemSerializer(serializers.ModelSerializer):
         return system_repr
 
 
-class ObjectTypeSerializer(serializers.ModelSerializer):
+class ObjectTypeSerializer(RemovableFieldSerializer):
     class Meta:
         model = ObjectType
         fields = ['pk', 'name']
         read_only_fields = ['pk']
 
 
-class ObjectSerializer(serializers.ModelSerializer):
+class ObjectSerializer(RemovableFieldSerializer):
     class Meta:
         model = Object
         fields = ['pk', 'name', 'object_id', 'url', 'type']
@@ -31,21 +42,21 @@ class ObjectSerializer(serializers.ModelSerializer):
     type = ObjectTypeSerializer(read_only=True)
 
 
-class ParentObjectSerializer(serializers.ModelSerializer):
+class ParentObjectSerializer(RemovableFieldSerializer):
     class Meta:
         model = ParentObject
         fields = ['pk', 'name', 'parentobject_id', 'url']
         read_only_fields = ['pk']
 
 
-class ProblemTypeSerializer(serializers.ModelSerializer):
+class ProblemTypeSerializer(RemovableFieldSerializer):
     class Meta:
         model = ProblemType
         fields = ['pk', 'name', 'description']
         read_only_fields = ['pk']
 
 
-class AlertSerializer(serializers.ModelSerializer):
+class AlertSerializer(RemovableFieldSerializer):
     class Meta:
         model = Alert
         fields = ['pk', 'timestamp', 'source', 'alert_id', 'object', 'parent_object', 'details_url', 'problem_type', 'description', 'ticket_url', 'active_state']

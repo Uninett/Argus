@@ -29,9 +29,7 @@ class EmailNotification(NotificationMedium):
             )
 
         title = f"Alert at {alert}"
-        alert_dict = AlertSerializer(alert).data
-        # TODO: remove pk from serialization instead?
-        alert_dict.pop('pk')
+        alert_dict = AlertSerializer(alert, context={AlertSerializer.NO_PKS_KEY: True}).data
         # Convert OrderedDicts to dicts
         alert_dict = json.loads(JSONRenderer().render(alert_dict))
 
