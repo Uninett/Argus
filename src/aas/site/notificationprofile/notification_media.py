@@ -1,9 +1,11 @@
+import json
 import logging
 from abc import ABC, abstractmethod
 from typing import List
 
 from django.conf import settings
 from django.template.loader import render_to_string
+from rest_framework.renderers import JSONRenderer
 
 from aas.site.alert.models import Alert
 from aas.site.alert.serializers import AlertSerializer
@@ -30,6 +32,8 @@ class EmailNotification(NotificationMedium):
         alert_dict = AlertSerializer(alert).data
         # TODO: remove pk from serialization instead?
         alert_dict.pop('pk')
+        # Convert OrderedDicts to dicts
+        alert_dict = json.loads(JSONRenderer().render(alert_dict))
 
         template_context = {
             'title':                     title,
