@@ -13,4 +13,6 @@ urlpatterns = [
 
     path("filters/", views.FilterList.as_view()),
     path("filters/<int:pk>", views.FilterDetail.as_view()),
+
+    path("filterpreview/", views.filter_preview_view),
 ]

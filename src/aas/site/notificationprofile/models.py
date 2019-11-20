@@ -1,6 +1,8 @@
+import json
 from datetime import datetime, time
 
 from django.db import models
+from django.db.models import Q
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
@@ -8,6 +10,7 @@ from multiselectfield import MultiSelectField
 
 from aas.site.alert.models import Alert
 from aas.site.auth.models import User
+from .utils import AttrGetter, NestedAttrGetter
 
 
 class TimeSlot(models.Model):
@@ -114,6 +117,13 @@ class Filter(models.Model):
             models.UniqueConstraint(fields=['name', 'user'], name="unique_name_per_user"),
         ]
 
+    FILTER_STRING_FIELDS = {
+        'sourceIds':       AttrGetter('source'),
+        'objectTypeIds':   NestedAttrGetter('object.type'),
+        'parentObjectIds': AttrGetter('parent_object'),
+        'problemTypeIds':  AttrGetter('problem_type'),
+    }
+
     user = models.ForeignKey(
         to=User,
         on_delete=models.CASCADE,
@@ -121,6 +131,34 @@ class Filter(models.Model):
     )
     name = models.CharField(max_length=40)
     filter_string = models.TextField()
+
+    @property
+    def filter_json(self):
+        return json.loads(self.filter_string)
+
+    @property
+    def filtered_alerts(self):
+        return Alert.prefetch_related_fields(Alert.objects.filter(self.get_alert_query()))
+
+    def get_alert_query(self):
+        json_dict = self.filter_json
+        alert_query = Q()
+        for filter_field_name, attr_getter in self.FILTER_STRING_FIELDS.items():
+            filter_field_value_list = json_dict[filter_field_name]
+            if filter_field_value_list:
+                alert_arg = {f"{attr_getter.query}__in": filter_field_value_list}
+                alert_query &= Q(**alert_arg)
+        return alert_query
+
+    def alert_fits(self, alert: Alert):
+        json_dict = self.filter_json
+        for filter_field_name, attr_getter in self.FILTER_STRING_FIELDS.items():
+            filter_field_value_set = set(json_dict[filter_field_name])
+            if filter_field_value_set:
+                alert_attr = attr_getter(alert)
+                if alert_attr.pk not in filter_field_value_set:
+                    return False
+        return True
 
     def __str__(self):
         return f"{self.name} [{self.filter_string}]"
@@ -156,11 +194,21 @@ class NotificationProfile(models.Model):
     media = MultiSelectField(choices=MEDIA_CHOICES, min_choices=1, default=EMAIL)
     active = models.BooleanField(default=True)
 
+    @property
+    def filtered_alerts(self):
+        alert_query = Q()
+        for filter_ in self.filters.all():
+            alert_query |= filter_.get_alert_query()
+
+        return Alert.prefetch_related_fields(Alert.objects.filter(alert_query))
+
     def alert_fits(self, alert: Alert):
         if not self.active:
             return False
-        # TODO: also check if alert passes filter
-        return self.time_slot.timestamp_is_within_time_intervals(alert.timestamp)
+        return (
+                self.time_slot.timestamp_is_within_time_intervals(alert.timestamp)
+                and any(f.alert_fits(alert) for f in self.filters.all())
+        )
 
     def __str__(self):
         return f"{self.time_slot}: {', '.join(str(f) for f in self.filters.all())}"

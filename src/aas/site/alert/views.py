@@ -1,7 +1,6 @@
 import json
 
 from django.core import serializers
-from django.db.models import Q
 from django.http import HttpResponse
 from rest_framework import generics
 from rest_framework.decorators import api_view
@@ -69,6 +68,7 @@ def change_alert_active_view(request, alert_pk):
     return Response(serializer.data)
 
 
+# TODO: remove, as `filter_preview_view()` does the same and more?
 def all_alerts_from_source_view(request, source_pk):
     data = serializers.serialize("json", Alert.objects.filter(source=source_pk))
     # Prettify the JSON data:
@@ -89,22 +89,3 @@ def get_all_meta_data_view(request):
         "problemTypes":   problem_types.data,
     }
     return HttpResponse(json.dumps(data), content_type="application/json")
-
-
-# TODO: make HTTP method GET and get query data from URL
-@api_view(['POST'])
-def preview(request):
-    source_ids = request.data['sourceIds']
-    object_type_ids = request.data['objectTypeIds']
-    parent_object_ids = request.data['parentObjectIds']
-    problem_type_ids = request.data['problemTypeIds']
-
-    alert_query = (
-            (Q(source__pk__in=source_ids) if source_ids else Q())
-            & (Q(object__type__pk__in=object_type_ids) if object_type_ids else Q())
-            & (Q(parent_object__pk__in=parent_object_ids) if parent_object_ids else Q())
-            & (Q(problem_type__pk__in=problem_type_ids) if problem_type_ids else Q())
-    )
-    filtered_alerts = Alert.prefetch_related_fields(Alert.objects.all()).filter(alert_query)
-    serializer = AlertSerializer(filtered_alerts, many=True)
-    return HttpResponse(json.dumps(serializer.data), content_type="application/json")

@@ -1,13 +1,16 @@
-from django.core import serializers
-from django.db.models import Q
-from django.http import HttpResponse
+import json
+
 from rest_framework import generics
 from rest_framework.decorators import api_view
+from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 
-from aas.site.alert.models import Alert
+from aas.site.alert.serializers import AlertSerializer
+from .models import Filter, NotificationProfile
 from .permissions import IsOwner
 from .serializers import FilterSerializer, NotificationProfileSerializer, TimeSlotSerializer
+from .validators import FilterStringValidator
 
 
 class NotificationProfileList(generics.ListCreateAPIView):
@@ -31,13 +34,14 @@ class NotificationProfileDetail(generics.RetrieveUpdateDestroyAPIView):
 
 @api_view(['GET'])
 def alerts_filtered_by_notification_profile_view(request, notification_profile_pk):
-    # Go through user to ensure that the user owns the requested notification profile
-    profile_filters = request.user.notification_profiles.get(pk=notification_profile_pk).filters.all()
-    alert_query = Q()
-    # TODO: filter alerts with notification profiles' filters
-    data = Alert.objects.filter(alert_query)
-    json_result = serializers.serialize("json", data)
-    return HttpResponse(json_result, content_type="application/json")
+    try:
+        # Go through user to ensure that the user owns the requested notification profile
+        notification_profile = request.user.notification_profiles.get(pk=notification_profile_pk)
+    except NotificationProfile.DoesNotExist:
+        raise ValidationError(f"Notification profile with pk={notification_profile_pk} does not exist.")
+
+    serializer = AlertSerializer(notification_profile.filtered_alerts, many=True)
+    return Response(serializer.data)
 
 
 class TimeSlotList(generics.ListCreateAPIView):
@@ -76,3 +80,17 @@ class FilterDetail(generics.RetrieveUpdateDestroyAPIView):
 
     def get_queryset(self):
         return self.request.user.filters.all()
+
+
+# TODO: make HTTP method GET and get query data from URL
+@api_view(['POST'])
+def filter_preview_view(request):
+    filter_string_dict = request.data
+    # Validate posted filter string
+    filter_string_validator = FilterStringValidator()
+    filter_string_validator(filter_string_dict)
+
+    filter_string_json = json.dumps(filter_string_dict)
+    mock_filter = Filter(filter_string=filter_string_json)
+    serializer = AlertSerializer(mock_filter.filtered_alerts, many=True)
+    return Response(serializer.data)

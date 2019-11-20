@@ -93,19 +93,6 @@ All endpoints require requests to contain a header with key `Authorization` and 
 * `PUT` to `/alerts/<int:pk>/active`: changes an alert's active state by pk
   * Body: `{ "active": <bool> }`
 * `GET` to `/alerts/metadata/`: returns relevant metadata for all alerts
-* `POST` to `/alerts/preview/`: returns all alerts - both active and historic - filtered by the values in the body
-  <details>
-  <summary>Body:</summary>
-
-  ```
-  {
-      sourceNames: [<NetworkSystem.name>, ...],
-      objectTypeNames: [<ObjectType.name>, ...],
-      parentObjectNames: [<ParentObject.name>, ...],
-      problemTypeNames: [<ProblemType.name>, ...]
-  }
-  ```
-  </details>
 
 </details>
 
@@ -197,7 +184,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
     ```
     {
         "name": "Critical alerts",
-        "filter_string": "{ sourceNames: [<NetworkSystem.name>, ...], objectTypeNames: [<ObjectType.name>, ...], parentObjectNames: [<ParentObject.name>, ...], problemTypeNames: [<ProblemType.name>, ...] }"
+        "filter_string": "{\"sourceIds\":[<NetworkSystem.pk>, ...], \"objectTypeIds\":[<ObjectType.pk>, ...], \"parentObjectIds\":[<ParentObject.pk>, ...], \"problemTypeIds\":[<ProblemType.pk>, ...]}"
     }
     ```
     </details>
@@ -207,6 +194,20 @@ All endpoints require requests to contain a header with key `Authorization` and 
   * `PUT`: updates and returns one of the logged in user's filters by pk
     * Body: same as `POST` to `/notificationprofiles/filters/`
   * `DELETE`: deletes one of the logged in user's filters by pk
+
+* `POST` to `/notificationprofiles/filterpreview/`: returns all alerts - both active and historic - filtered by the values in the body
+  <details>
+  <summary>Body:</summary>
+
+  ```
+  {
+      "sourceIds": [<NetworkSystem.pk>, ...],
+      "objectTypeIds": [<ObjectType.pk>, ...],
+      "parentObjectIds": [<ParentObject.pk>, ...],
+      "problemTypeIds": [<ProblemType.pk>, ...]
+  }
+  ```
+  </details>
 
 </details>
 

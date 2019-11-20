@@ -3,6 +3,7 @@ from rest_framework import fields, serializers
 
 from .fields import FilterManyToManyField, TimeSlotForeignKeyField
 from .models import Filter, NotificationProfile, TimeInterval, TimeSlot
+from .validators import FilterStringValidator
 
 
 class TimeIntervalSerializer(serializers.ModelSerializer):
@@ -60,6 +61,8 @@ class FilterSerializer(serializers.ModelSerializer):
         fields = ['pk', 'name', 'filter_string']
         read_only_fields = ['pk']
 
+    filter_string = serializers.CharField(validators=[FilterStringValidator()])
+
 
 class NotificationProfileSerializer(serializers.ModelSerializer):
     class Meta:
@@ -77,6 +80,6 @@ class NotificationProfileSerializer(serializers.ModelSerializer):
         except IntegrityError as e:
             time_slot_pk = validated_data['time_slot'].pk
             if NotificationProfile.objects.filter(pk=time_slot_pk).exists():
-                raise serializers.ValidationError(f"NotificationProfile with TimeSlot with pk {time_slot_pk} already exists.")
+                raise serializers.ValidationError(f"NotificationProfile with TimeSlot with pk={time_slot_pk} already exists.")
             else:
                 raise e
