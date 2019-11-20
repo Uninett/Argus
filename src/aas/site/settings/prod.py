@@ -25,8 +25,12 @@ def get_secret_key():
 SECRET_KEY = get_secret_key()
 
 
-# TODO: set this
-FRONTEND_URL = None
+ALLOWED_HOSTS = [
+    "127.0.0.1",
+    "localhost",
+]
+
+FRONTEND_URL = "http://localhost:3000"
 
 CORS_ORIGIN_WHITELIST = [
     FRONTEND_URL,
