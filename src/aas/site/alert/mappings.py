@@ -106,7 +106,7 @@ class ForeignKeyField(FieldValueGetter):
 
 
 class FieldMapping:
-    def __init__(self, network_system_type: str, model: Type[models.Model], base_field_mappings: dict, *conditional_field_mappings: Choose):
+    def __init__(self, network_system_type: str, base_field_mappings: dict, *conditional_field_mappings: Choose):
         all_field_mappings = (
             base_field_mappings,
             *(cf.arg for cf in conditional_field_mappings),
@@ -115,11 +115,10 @@ class FieldMapping:
         for field_mappings in all_field_mappings:
             MappingUtils.remove_none_mappings(field_mappings)
             MappingUtils.swap_fields_with_field_names(field_mappings)
-            validate_field_mappings(model, field_mappings)
-            MappingUtils.prepare_field_value_getters(model, field_mappings)
+            validate_field_mappings(Alert, field_mappings)
+            MappingUtils.prepare_field_value_getters(Alert, field_mappings)
 
         self.network_system_type = network_system_type
-        self.model = model
         self.base_field_mappings = base_field_mappings
         self.conditional_field_mappings = conditional_field_mappings
 
@@ -128,32 +127,31 @@ class FieldMapping:
         for choice in self.conditional_field_mappings:
             field_mappings.update(choice.based_on(json_dict))
 
-        model_obj_kwargs = {
+        alert_kwargs = {
             field_name: field_value_getter.get_value_from_dict(json_dict)
             for field_name, field_value_getter in field_mappings.items()
         }
 
         # TODO: remove once source is saved from posted alerts
-        model_obj_kwargs['source'] = random.choice(NetworkSystem.objects.filter(type=self.network_system_type))
+        alert_kwargs['source'] = random.choice(NetworkSystem.objects.filter(type=self.network_system_type))
 
         try:
-            model_obj = self.model.objects.create(**model_obj_kwargs)
+            alert = Alert.objects.create(**alert_kwargs)
         except IntegrityError as e:
-            alert_id = model_obj_kwargs['alert_id']
+            alert_id = alert_kwargs['alert_id']
             if Alert.objects.filter(alert_id=alert_id).exists():
                 raise ValidationError(f"Alert with the alert_id '{alert_id}' already exists for"
-                                      f" the NetworkSystem '{model_obj_kwargs['source']}'.")
+                                      f" the NetworkSystem '{alert_kwargs['source']}'.")
             else:
                 raise e
 
         # Re-fetch the alert to get parsed field values (e.g. replace timestamp str with datetime)
-        model_obj = Alert.objects.get(pk=model_obj.pk)
-        return model_obj
+        alert = Alert.objects.get(pk=alert.pk)
+        return alert
 
 
 NAV_FIELD_MAPPING = FieldMapping(
     NetworkSystem.NAV,
-    Alert,
     {
         Alert.timestamp:    PassthroughField('time'),
         Alert.source:       None,  # TODO: save source from posted alert

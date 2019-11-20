@@ -55,7 +55,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
     <summary>Body:</summary>
 
     Attribute explanation: https://nav.uninett.no/doc/dev/reference/eventengine.html#exporting-alerts-from-nav-into-other-systems
-    ```
+    ```json
     {
         "id": 212310,
         "history": 196179,
@@ -105,7 +105,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
     <details>
     <summary>Body:</summary>
 
-    ```
+    ```json
     {
         "time_slot": 1,
         "filters": [
@@ -135,7 +135,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
     <details>
     <summary>Body:</summary>
 
-    ```
+    ```json
     {
         "name": "Weekdays",
         "time_intervals": [
@@ -181,7 +181,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
     <details>
     <summary>Body:</summary>
 
-    ```
+    ```json
     {
         "name": "Critical alerts",
         "filter_string": "{\"sourceIds\":[<NetworkSystem.pk>, ...], \"objectTypeIds\":[<ObjectType.pk>, ...], \"parentObjectIds\":[<ParentObject.pk>, ...], \"problemTypeIds\":[<ProblemType.pk>, ...]}"
@@ -199,7 +199,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
   <details>
   <summary>Body:</summary>
 
-  ```
+  ```json
   {
       "sourceIds": [<NetworkSystem.pk>, ...],
       "objectTypeIds": [<ObjectType.pk>, ...],

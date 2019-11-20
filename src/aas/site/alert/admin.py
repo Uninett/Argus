@@ -5,18 +5,25 @@ from .models import ActiveAlert, Alert, AlertRelation, AlertRelationType, Networ
 
 class NetworkSystemAdmin(admin.ModelAdmin):
     list_display = ('name', 'type')
+    search_fields = ('name',)
+    list_filter = ('type',)
 
 
 class ObjectTypeAdmin(admin.ModelAdmin):
     list_display = ('name',)
+    search_fields = ('name',)
 
 
 class ObjectAdmin(admin.ModelAdmin):
     list_display = ('name', 'object_id', 'type', 'network_system')
+    search_fields = ('name', 'object_id', 'type__name', 'url')
+    list_filter = ('network_system', 'network_system__type', 'type')
+    list_select_related = ('type', 'network_system')
 
 
 class ParentObjectAdmin(admin.ModelAdmin):
     list_display = ('get_str', 'name', 'url')
+    search_fields = ('name', 'parentobject_id', 'url')
 
     def get_str(self, parent_object):
         return str(parent_object)
@@ -27,6 +34,7 @@ class ParentObjectAdmin(admin.ModelAdmin):
 
 class ProblemTypeAdmin(admin.ModelAdmin):
     list_display = ('name', 'description')
+    search_fields = ('name', 'description')
 
 
 class ActiveStateListFilter(admin.SimpleListFilter):
@@ -78,17 +86,21 @@ class AlertAdmin(admin.ModelAdmin):
 class ActiveAlertAdmin(admin.ModelAdmin):
     list_display = ('alert',)
     search_fields = ('alert__alert_id',)
+    list_select_related = ('alert',)
 
     raw_id_fields = ('alert',)
 
 
 class AlertRelationTypeAdmin(admin.ModelAdmin):
     list_display = ('name',)
+    search_fields = ('name',)
 
 
 class AlertRelationAdmin(admin.ModelAdmin):
     list_display = ('get_str', 'type', 'description')
     search_fields = ('alert1__alert_id', 'alert2__alert_id')
+    list_filter = ('type',)
+    list_select_related = ('type',)
 
     raw_id_fields = ('alert1', 'alert2')
 

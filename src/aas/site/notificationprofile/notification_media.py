@@ -32,8 +32,8 @@ class EmailNotification(NotificationMedium):
         alert_dict.pop('pk')
 
         template_context = {
-            'title':              title,
-            'alert_dict':         alert_dict,
+            'title':                     title,
+            'alert_dict':                alert_dict,
             'longest_field_name_length': len(max(alert_dict, key=len)),
         }
         user.email_user(

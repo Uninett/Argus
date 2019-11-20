@@ -88,4 +88,4 @@ def get_all_meta_data_view(request):
         "parentObjects":  parent_objects.data,
         "problemTypes":   problem_types.data,
     }
-    return HttpResponse(json.dumps(data), content_type="application/json")
+    return Response(data)
