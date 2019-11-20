@@ -3,6 +3,11 @@ from django.db.models import Q, QuerySet
 
 
 class NetworkSystem(models.Model):
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['name', 'type'], name="unique_name_per_type"),
+        ]
+
     NAV = 'NAV'
     ZABBIX = 'Zabbix'
     TYPE_CHOICES = (
