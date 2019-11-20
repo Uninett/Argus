@@ -137,7 +137,7 @@ class FieldMapping:
         model_obj_kwargs['source'] = random.choice(NetworkSystem.objects.filter(type=self.network_system_type))
 
         try:
-            model_obj, _created = self.model.objects.get_or_create(**model_obj_kwargs)
+            model_obj = self.model.objects.create(**model_obj_kwargs)
         except IntegrityError as e:
             alert_id = model_obj_kwargs['alert_id']
             if Alert.objects.filter(alert_id=alert_id).exists():
@@ -146,6 +146,8 @@ class FieldMapping:
             else:
                 raise e
 
+        # Re-fetch the alert to get parsed field values (e.g. replace timestamp str with datetime)
+        model_obj = Alert.objects.get(pk=model_obj.pk)
         return model_obj
 
 
