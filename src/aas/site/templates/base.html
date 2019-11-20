@@ -13,11 +13,6 @@
 
     {% block content %}
         {% if user.is_authenticated %}
-            {% comment TODO: temporarily disabled until JSON parsing has been implemented for the new data model %}
-            <form action="{% url 'alert:create' %}">
-                <input type="submit" value="Create alert"/>
-            </form>
-            {% endcomment %}
             <form action="{% url 'alert:all' %}">
                 <input type="submit" value="Get all alerts as JSON"/>
             </form>
