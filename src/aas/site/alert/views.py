@@ -22,7 +22,7 @@ class AlertList(generics.ListCreateAPIView):
 
     def post(self, request, *args, **kwargs):
         created_alerts = [
-            mappings.NAV_FIELD_MAPPING.create_model_obj_from_json(json_dict)
+            mappings.create_alert_from_json(json_dict, NetworkSystem.NAV)  # TODO: interpret network system type from alerts' source IP?
             for json_dict in request.data
         ]
 
@@ -78,7 +78,7 @@ def all_alerts_from_source_view(request, source_pk):
 
 @api_view(['GET'])
 def get_all_meta_data_view(request):
-    network_systems = NetworkSystemSerializer(NetworkSystem.objects.select_related('type'), many=True)
+    network_systems = NetworkSystemSerializer(NetworkSystem.objects.all(), many=True)
     object_types = ObjectTypeSerializer(ObjectType.objects.all(), many=True)
     parent_objects = ParentObjectSerializer(ParentObject.objects.all(), many=True)
     problem_types = ProblemTypeSerializer(ProblemType.objects.all(), many=True)

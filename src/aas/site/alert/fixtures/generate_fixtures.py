@@ -99,7 +99,7 @@ def roll_dice(chance_threshold: float) -> bool:
 
 
 def format_url(network_system: NetworkSystem, name: str) -> str:
-    return f"http://{network_system.name}.{network_system.type.name}.no/{name.replace(' ', '%20')}".lower()
+    return f"http://{network_system.name}.{network_system.get_type_display()}.no/{name.replace(' ', '%20')}".lower()
 
 
 def set_pks(model_objects: List[Model]) -> List[Model]:
@@ -111,11 +111,8 @@ def set_pks(model_objects: List[Model]) -> List[Model]:
 
 
 # --- Generation functions ---
-def generate_network_system_types() -> List[Model]:
-    return set_pks([
-        NetworkSystemType(name="NAV"),
-        NetworkSystemType(name="Zabbix"),
-    ])
+def generate_network_system_types() -> List[str]:
+    return [type_key for type_key, _type_name in NetworkSystem.TYPE_CHOICES]
 
 
 def generate_network_systems(network_system_types) -> List[Model]:
@@ -238,8 +235,7 @@ def generate_alerts(network_systems, objects, parent_objects, problem_types) -> 
 
 
 def create_fixture_file():
-    network_system_types = generate_network_system_types()
-    network_systems = generate_network_systems(network_system_types)
+    network_systems = generate_network_systems(generate_network_system_types())
     object_types = generate_object_types()
     objects = generate_objects(object_types, network_systems)
     parent_objects = generate_parent_objects(network_systems)
@@ -247,7 +243,6 @@ def create_fixture_file():
     alerts = generate_alerts(network_systems, objects, parent_objects, problem_types)
 
     all_objects = (
-        *network_system_types,
         *network_systems,
         *object_types,
         *objects,

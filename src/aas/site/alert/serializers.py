@@ -1,26 +1,17 @@
 from rest_framework import serializers
 
-from .models import Alert, NetworkSystem, NetworkSystemType, Object, ObjectType, ParentObject, ProblemType
-
-
-class NetworkSystemTypeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = NetworkSystemType
-        fields = ['pk', 'name']
-        read_only_fields = ['pk']
+from .models import Alert, NetworkSystem, Object, ObjectType, ParentObject, ProblemType
 
 
 class NetworkSystemSerializer(serializers.ModelSerializer):
     class Meta:
         model = NetworkSystem
         fields = ['pk', 'name', 'type']
-        read_only_fields = ['pk']
+        read_only_fields = ['pk', 'type']
 
-    # type = NetworkSystemTypeSerializer(read_only=True)
-
-    def to_representation(self, instance):
+    def to_representation(self, instance: NetworkSystem):
         representation = super().to_representation(instance)
-        representation['type'] = NetworkSystemTypeSerializer(instance.type).data
+        representation['type'] = instance.get_type_display()
         return representation
 
 
@@ -39,7 +30,7 @@ class ObjectSerializer(serializers.ModelSerializer):
 
     # type = ObjectTypeSerializer(read_only=True)
 
-    def to_representation(self, instance):
+    def to_representation(self, instance: Object):
         representation = super().to_representation(instance)
         representation['type'] = ObjectTypeSerializer(instance.type).data
         return representation

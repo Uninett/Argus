@@ -2,26 +2,19 @@ from django.db import models
 from django.db.models import Q, QuerySet
 
 
-class NetworkSystemType(models.Model):
-    class Meta:
-        ordering = ['name']
-
-    name = models.CharField(max_length=50)
-
-    def __str__(self):
-        return self.name
-
-
 class NetworkSystem(models.Model):
-    name = models.CharField(max_length=50)
-    type = models.ForeignKey(
-        to=NetworkSystemType,
-        on_delete=models.CASCADE,
-        related_name='instances',
+    NAV = 'NAV'
+    ZABBIX = 'Zabbix'
+    TYPE_CHOICES = (
+        (NAV, NAV),
+        (ZABBIX, ZABBIX),
     )
 
+    name = models.CharField(max_length=50)
+    type = models.CharField(max_length=max(len(t[0]) for t in TYPE_CHOICES), choices=TYPE_CHOICES)
+
     def __str__(self):
-        return self.name
+        return f"{self.name} ({self.get_type_display()})"
 
 
 class ObjectType(models.Model):
@@ -133,7 +126,7 @@ class Alert(models.Model):
 
     @staticmethod
     def prefetch_related_fields(qs: QuerySet):
-        return qs.prefetch_related('source', 'source__type', 'object', 'object__type', 'parent_object', 'problem_type')
+        return qs.prefetch_related('source', 'object__type', 'parent_object', 'problem_type')
 
 
 class ActiveAlert(models.Model):

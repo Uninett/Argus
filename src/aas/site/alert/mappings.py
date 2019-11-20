@@ -2,6 +2,7 @@ import random
 from typing import Tuple, Type, Union
 
 from django.db import IntegrityError, models
+from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from .models import Alert, NetworkSystem, Object, ObjectType, ParentObject, ProblemType
@@ -105,7 +106,7 @@ class ForeignKeyField(FieldValueGetter):
 
 
 class FieldMapping:
-    def __init__(self, model: Type[models.Model], base_field_mappings: dict, *conditional_field_mappings: Choose):
+    def __init__(self, network_system_type: str, model: Type[models.Model], base_field_mappings: dict, *conditional_field_mappings: Choose):
         all_field_mappings = (
             base_field_mappings,
             *(cf.arg for cf in conditional_field_mappings),
@@ -117,6 +118,7 @@ class FieldMapping:
             validate_field_mappings(model, field_mappings)
             MappingUtils.prepare_field_value_getters(model, field_mappings)
 
+        self.network_system_type = network_system_type
         self.model = model
         self.base_field_mappings = base_field_mappings
         self.conditional_field_mappings = conditional_field_mappings
@@ -132,7 +134,7 @@ class FieldMapping:
         }
 
         # TODO: remove once source is saved from posted alerts
-        model_obj_kwargs['source'] = random.choice(NetworkSystem.objects.all())
+        model_obj_kwargs['source'] = random.choice(NetworkSystem.objects.filter(type=self.network_system_type))
 
         try:
             model_obj, _created = self.model.objects.get_or_create(**model_obj_kwargs)
@@ -148,6 +150,7 @@ class FieldMapping:
 
 
 NAV_FIELD_MAPPING = FieldMapping(
+    NetworkSystem.NAV,
     Alert,
     {
         Alert.timestamp:    PassthroughField('time'),
@@ -204,3 +207,17 @@ NAV_FIELD_MAPPING = FieldMapping(
         }
     )
 )
+
+SOURCE_MAPPING_DICT = {
+    NetworkSystem.NAV:    NAV_FIELD_MAPPING,
+    NetworkSystem.ZABBIX: None,
+}
+
+
+def create_alert_from_json(json_dict: dict, alert_source_type: str):
+    try:
+        mapping = SOURCE_MAPPING_DICT[alert_source_type]
+    except KeyError:
+        raise serializers.ValidationError(f"Invalid network system type '{alert_source_type}'.")
+
+    return mapping.create_model_obj_from_json(json_dict)

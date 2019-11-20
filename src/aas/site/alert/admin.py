@@ -1,10 +1,6 @@
 from django.contrib import admin
 
-from .models import ActiveAlert, Alert, AlertRelation, AlertRelationType, NetworkSystem, NetworkSystemType, Object, ObjectType, ParentObject, ProblemType
-
-
-class NetworkSystemTypeAdmin(admin.ModelAdmin):
-    list_display = ('name',)
+from .models import ActiveAlert, Alert, AlertRelation, AlertRelationType, NetworkSystem, Object, ObjectType, ParentObject, ProblemType
 
 
 class NetworkSystemAdmin(admin.ModelAdmin):
@@ -56,7 +52,7 @@ class AlertAdmin(admin.ModelAdmin):
     list_display = ('alert_id', 'timestamp', 'source', 'object', 'parent_object', 'details_url', 'problem_type', 'ticket_url', 'get_active_state')
     search_fields = (
         'alert_id',
-        'source__name', 'source__type__name',
+        'source__name', 'source__type',
         'object__name', 'object__object_id', 'object__type__name',
         'parent_object__name', 'parent_object__parentobject_id',
         'problem_type__name',
@@ -102,7 +98,6 @@ class AlertRelationAdmin(admin.ModelAdmin):
     get_str.short_description = "Alert relation"
 
 
-admin.site.register(NetworkSystemType, NetworkSystemTypeAdmin)
 admin.site.register(NetworkSystem, NetworkSystemAdmin)
 admin.site.register(ObjectType, ObjectTypeAdmin)
 admin.site.register(Object, ObjectAdmin)
