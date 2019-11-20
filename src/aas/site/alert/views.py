@@ -8,7 +8,7 @@ from rest_framework.decorators import api_view
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
-from aas.site.notificationprofile import views as notification_views
+from aas.site.notificationprofile.notification_media import send_notifications_to_users
 from . import mappings
 from .models import ActiveAlert, Alert, NetworkSystem, ObjectType, ParentObject, ProblemType
 from .parsers import StackedJSONParser
@@ -27,7 +27,7 @@ class AlertList(generics.ListCreateAPIView):
         ]
 
         for created_alert in created_alerts:
-            notification_views.send_notifications_to_users(created_alert)
+            send_notifications_to_users(created_alert)
 
         if len(created_alerts) == 1:
             serializer = AlertSerializer(created_alerts[0])

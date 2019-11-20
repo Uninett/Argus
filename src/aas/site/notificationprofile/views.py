@@ -1,16 +1,11 @@
-from typing import List
-
 from django.core import serializers
 from django.db.models import Q
 from django.http import HttpResponse
 from rest_framework import generics
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view
 from rest_framework.permissions import IsAuthenticated
 
 from aas.site.alert.models import Alert
-from aas.site.auth.models import User
-from . import notification_media
-from .models import NotificationProfile
 from .permissions import IsOwner
 from .serializers import FilterSerializer, NotificationProfileSerializer, TimeSlotSerializer
 
@@ -81,21 +76,3 @@ class FilterDetail(generics.RetrieveUpdateDestroyAPIView):
 
     def get_queryset(self):
         return self.request.user.filters.all()
-
-
-def send_notifications_to_users(alert: Alert):
-    # TODO: only send one notification per medium per user
-    for profile in NotificationProfile.objects.select_related('user'):
-        if profile.alert_fits(alert):
-            send_notification(profile.user, profile, alert)
-
-
-def send_notification(user: User, profile: NotificationProfile, alert: Alert):
-    media = get_notification_media(list(profile.media))
-    for medium in media:
-        if medium is not None:
-            medium.send(alert, user)
-
-
-def get_notification_media(model_representations: List[str]):
-    return (notification_media.get_medium(representation) for representation in model_representations)

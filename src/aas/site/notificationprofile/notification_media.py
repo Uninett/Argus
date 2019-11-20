@@ -1,6 +1,5 @@
 import logging
 from abc import ABC, abstractmethod
-from typing import Type
 
 from django.conf import settings
 from django.template.loader import render_to_string
@@ -50,5 +49,19 @@ MODEL_REPRESENTATION_TO_CLASS = {
 }
 
 
-def get_medium(model_representation: str) -> Type[NotificationMedium]:
-    return MODEL_REPRESENTATION_TO_CLASS[model_representation]
+def send_notifications_to_users(alert: Alert):
+    # TODO: only send one notification per medium per user
+    for profile in NotificationProfile.objects.select_related('user'):
+        if profile.alert_fits(alert):
+            send_notification(profile.user, profile, alert)
+
+
+def send_notification(user: User, profile: NotificationProfile, alert: Alert):
+    media = get_notification_media(list(profile.media))
+    for medium in media:
+        if medium is not None:
+            medium.send(alert, user)
+
+
+def get_notification_media(model_representations: List[str]):
+    return (MODEL_REPRESENTATION_TO_CLASS[representation] for representation in model_representations)
