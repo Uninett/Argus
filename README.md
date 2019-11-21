@@ -1,7 +1,9 @@
 # AAS
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-AAS - Aggregated Alert System is a platform for aggregating alerts and sending notifications to users. Users build notification profiles that define which alerts they subscribe to. This repository hosts the backend built with Django, while the frontend is hosted here: https://github.com/ddabble/aas-frontend.
+AAS - Aggregated Alert System is a platform for aggregating alerts across network management systems, and sending notifications to users. Users build notification profiles that define which alerts they subscribe to.
+
+This repository hosts the backend built with Django, while the frontend is hosted here: https://github.com/ddabble/aas-frontend.
 
 
 ## Setup
@@ -215,6 +217,14 @@ All endpoints require requests to contain a header with key `Authorization` and 
 
 
 ## Models
+
+### Explanation of terms
+* `alert`: a blob of data sent from a network management system to inform about an event in the network.
+* `source`: the network management system that the `alert` came from.
+* `object`: the most specific object that the `alert` (network event) was about.
+* `parent_object`: an object that the `object` is possibly a part of.
+* `problem_type`: the type of problem that the `alert` is informing about.
+* `active_state`: whether an `alert`'s problem has been resolved.
 
 ### ER diagram
 ![ER diagram](img/ER_model.png)
