@@ -13,52 +13,59 @@ class TimeSlotAdmin(admin.ModelAdmin):
 
     inlines = [TimeIntervalInline]
 
-    list_display = ('name', 'user', 'get_time_intervals')
-    list_filter = ('time_intervals__day',)
-    search_fields = ('name', 'user__first_name', 'user__last_name', 'user__username')
+    list_display = ("name", "user", "get_time_intervals")
+    list_filter = ("time_intervals__day",)
+    search_fields = ("name", "user__first_name", "user__last_name", "user__username")
 
-    raw_id_fields = ('user',)
+    raw_id_fields = ("user",)
 
     def get_time_intervals(self, time_slot):
         return format_html_join(
-            "", "<div>{}</div>",
-            ((ts,) for ts in time_slot.time_intervals.all())
+            "", "<div>{}</div>", ((ts,) for ts in time_slot.time_intervals.all())
         )
 
     get_time_intervals.short_description = "Time intervals"
 
 
 class FilterAdmin(admin.ModelAdmin):
-    list_display = ('name', 'user', 'filter_string')
+    list_display = ("name", "user", "filter_string")
     search_fields = (
-        'name', 'filter_string',
-        'user__first_name', 'user__last_name', 'user__username',
+        "name",
+        "filter_string",
+        "user__first_name",
+        "user__last_name",
+        "user__username",
     )
 
-    raw_id_fields = ('user',)
+    raw_id_fields = ("user",)
 
 
 class NotificationProfileAdmin(admin.ModelAdmin):
-    list_display = ('get_str', 'get_filters', 'get_media', 'active')
-    list_filter = ('active',)
+    list_display = ("get_str", "get_filters", "get_media", "active")
+    list_filter = ("active",)
     search_fields = (
-        'time_slot__name', 'filters__name', 'filters__filter_string',
-        'user__first_name', 'user__last_name', 'user__username',
+        "time_slot__name",
+        "filters__name",
+        "filters__filter_string",
+        "user__first_name",
+        "user__last_name",
+        "user__username",
     )
 
-    raw_id_fields = ('user', 'time_slot')
-    filter_horizontal = ('filters',)
+    raw_id_fields = ("user", "time_slot")
+    filter_horizontal = ("filters",)
 
     def get_str(self, notification_profile):
-        return f"[{notification_profile.time_slot.user}] {notification_profile.time_slot}"
+        return (
+            f"[{notification_profile.time_slot.user}] {notification_profile.time_slot}"
+        )
 
     get_str.short_description = "[User] Time slot"
-    get_str.admin_order_field = Concat('time_slot__user', 'time_slot__name')
+    get_str.admin_order_field = Concat("time_slot__user", "time_slot__name")
 
     def get_filters(self, notification_profile):
         return format_html_join(
-            "", "<div>{}</div>",
-            ((f,) for f in notification_profile.filters.all())
+            "", "<div>{}</div>", ((f,) for f in notification_profile.filters.all())
         )
 
     get_filters.short_description = "Filters"
@@ -67,7 +74,7 @@ class NotificationProfileAdmin(admin.ModelAdmin):
         return notification_profile.get_media_display()
 
     get_media.short_description = "Notification media"
-    get_media.admin_order_field = 'media'
+    get_media.admin_order_field = "media"
 
 
 admin.site.register(TimeSlot, TimeSlotAdmin)

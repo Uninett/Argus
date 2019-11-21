@@ -90,7 +90,9 @@ def random_description(word_count_range: Tuple[int, int]) -> str:
 
 
 def random_timestamp() -> datetime:
-    random_time_delta = (timezone.now() - MIN_TIMESTAMP).total_seconds() * random.random()
+    random_time_delta = (
+        timezone.now() - MIN_TIMESTAMP
+    ).total_seconds() * random.random()
     return MIN_TIMESTAMP + timedelta(seconds=random_time_delta)
 
 
@@ -119,10 +121,12 @@ def generate_network_systems(network_system_types) -> List[Model]:
     network_systems = []
     for system_type in network_system_types:
         for _ in range(NUM_NETWORK_SYSTEMS_PER_TYPE):
-            network_systems.append(NetworkSystem(
-                name=random.choice(ascii_uppercase) + random.choice(digits),
-                type=system_type,
-            ))
+            network_systems.append(
+                NetworkSystem(
+                    name=random.choice(ascii_uppercase) + random.choice(digits),
+                    type=system_type,
+                )
+            )
 
     return set_pks(network_systems)
 
@@ -130,9 +134,9 @@ def generate_network_systems(network_system_types) -> List[Model]:
 def generate_object_types() -> List[Model]:
     object_types = []
     for _ in range(NUM_OBJECT_TYPES):
-        object_types.append(ObjectType(
-            name=random_word(OBJECT_TYPE_NAME_LENGTH_RANGE).title(),
-        ))
+        object_types.append(
+            ObjectType(name=random_word(OBJECT_TYPE_NAME_LENGTH_RANGE).title())
+        )
 
     return set_pks(object_types)
 
@@ -141,9 +145,16 @@ def generate_objects(object_types, network_systems) -> List[Model]:
     def random_object_word() -> str:
         # Will most often be an empty string, sometimes a single digit, and rarely a double digit
         suffix = (
-            (random.choice(digits)
-             + (random.choice(digits) if roll_dice(WORD_NUMBER_SUFFIX_CHANCE) else ""))
-            if roll_dice(WORD_NUMBER_SUFFIX_CHANCE) else ""
+            (
+                random.choice(digits)
+                + (
+                    random.choice(digits)
+                    if roll_dice(WORD_NUMBER_SUFFIX_CHANCE)
+                    else ""
+                )
+            )
+            if roll_dice(WORD_NUMBER_SUFFIX_CHANCE)
+            else ""
         )
         return random_word() + suffix
 
@@ -155,7 +166,10 @@ def generate_objects(object_types, network_systems) -> List[Model]:
         for _ in range(random_int(OBJECT_NAME_WORD_COUNT_RANGE)):
             if roll_dice(COMPOSITE_WORD_CHANCE):
                 # Will be a word-like-this
-                word = "-".join(random_object_word() for _ in range(random_int(OBJECT_NAME_WORD_COUNT_RANGE)))
+                word = "-".join(
+                    random_object_word()
+                    for _ in range(random_int(OBJECT_NAME_WORD_COUNT_RANGE))
+                )
             else:
                 word = random_object_word().title()
             name_words.append(word)
@@ -163,13 +177,15 @@ def generate_objects(object_types, network_systems) -> List[Model]:
 
         network_system = random.choice(network_systems)
 
-        objects.append(Object(
-            name=name,
-            object_id=random_id(),
-            url=format_url(network_system, name),
-            type=random.choice(object_types),
-            network_system=network_system,
-        ))
+        objects.append(
+            Object(
+                name=name,
+                object_id=random_id(),
+                url=format_url(network_system, name),
+                type=random.choice(object_types),
+                network_system=network_system,
+            )
+        )
 
     return set_pks(objects)
 
@@ -180,11 +196,13 @@ def generate_parent_objects(network_systems) -> List[Model]:
         network_system = random.choice(network_systems)
         name = random_words(PARENT_OBJECT_NAME_WORD_COUNT_RANGE).title()
 
-        parent_objects.append(ParentObject(
-            name=name,
-            parentobject_id=random_id(),
-            url=format_url(network_system, name),
-        ))
+        parent_objects.append(
+            ParentObject(
+                name=name,
+                parentobject_id=random_id(),
+                url=format_url(network_system, name),
+            )
+        )
 
     return set_pks(parent_objects)
 
@@ -192,21 +210,22 @@ def generate_parent_objects(network_systems) -> List[Model]:
 def generate_problem_types() -> List[Model]:
     problem_types = []
     for _ in range(NUM_PROBLEM_TYPES):
-        name = "".join(w.title() for w in random_word_list(PROBLEM_TYPE_NAME_WORD_COUNT_RANGE))
+        name = "".join(
+            w.title() for w in random_word_list(PROBLEM_TYPE_NAME_WORD_COUNT_RANGE)
+        )
         # Make first letter lower case
         name = name[0].lower() + name[1:]
 
         description = random_description(PROBLEM_TYPE_DESCRIPTION_WORD_COUNT_RANGE)
 
-        problem_types.append(ProblemType(
-            name=name,
-            description=description,
-        ))
+        problem_types.append(ProblemType(name=name, description=description))
 
     return set_pks(problem_types)
 
 
-def generate_alerts(network_systems, objects, parent_objects, problem_types) -> List[Model]:
+def generate_alerts(
+    network_systems, objects, parent_objects, problem_types
+) -> List[Model]:
     second_delay = timedelta(seconds=1)
 
     alerts = []
@@ -220,16 +239,18 @@ def generate_alerts(network_systems, objects, parent_objects, problem_types) -> 
         network_system = random.choice(network_systems)
         alert_id = random_id()
 
-        alerts.append(Alert(
-            timestamp=timestamp,
-            source=network_system,
-            alert_id=alert_id,
-            object=random.choice(objects),
-            parent_object=random.choice(parent_objects),
-            details_url=format_url(network_system, alert_id),
-            problem_type=random.choice(problem_types),
-            description=random_description(ALERT_DESCRIPTION_WORD_COUNT_RANGE),
-        ))
+        alerts.append(
+            Alert(
+                timestamp=timestamp,
+                source=network_system,
+                alert_id=alert_id,
+                object=random.choice(objects),
+                parent_object=random.choice(parent_objects),
+                details_url=format_url(network_system, alert_id),
+                problem_type=random.choice(problem_types),
+                description=random_description(ALERT_DESCRIPTION_WORD_COUNT_RANGE),
+            )
+        )
 
     return set_pks(alerts)
 
@@ -252,9 +273,9 @@ def create_fixture_file():
     )
 
     ALERT_FIXTURES_FILE.parent.mkdir(parents=True, exist_ok=True)
-    with ALERT_FIXTURES_FILE.open('w') as f:
+    with ALERT_FIXTURES_FILE.open("w") as f:
         serializers.serialize("json", all_objects, stream=f)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     create_fixture_file()

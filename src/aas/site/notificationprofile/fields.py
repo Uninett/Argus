@@ -5,7 +5,7 @@ from . import serializers
 
 class TimeSlotForeignKeyField(PrimaryKeyRelatedField):
     def get_queryset(self):
-        return self.context['request'].user.time_slots.all()
+        return self.context["request"].user.time_slots.all()
 
     def use_pk_only_optimization(self):
         # Disable using a mock object to wrap only the pk of a TimeSlot when running `to_representation()`
@@ -17,7 +17,7 @@ class TimeSlotForeignKeyField(PrimaryKeyRelatedField):
 
 class FilterManyToManyField(PrimaryKeyRelatedField):
     def get_queryset(self):
-        return self.context['request'].user.filters.all()
+        return self.context["request"].user.filters.all()
 
     def use_pk_only_optimization(self):
         # Disable using a mock object to wrap only the pk of a Filter when running `to_representation()`

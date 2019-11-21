@@ -17,13 +17,19 @@ def validate_field_mappings(model: Type[models.Model], field_mappings: dict):
 
         if type(field_value_getter) is PassthroughField:
             if model._meta.get_field(field_name).is_relation:
-                raise ValueError(f"The field {field_name} is a relational field and cannot be paired up with a PassthroughField.")
+                raise ValueError(
+                    f"The field {field_name} is a relational field and cannot be paired up with a PassthroughField."
+                )
         elif type(field_value_getter) is ForeignKeyField:
             if not model._meta.get_field(field_name).is_relation:
-                raise ValueError(f"The field {field_name} is not a relational field and cannot be paired up with a ForeignKeyField.")
+                raise ValueError(
+                    f"The field {field_name} is not a relational field and cannot be paired up with a ForeignKeyField."
+                )
         elif field_value_getter is not None:
-            raise ValueError("The type of the values of the dicts must either be an instance of FieldValueGetter or None,"
-                             f" not {type(field_value_getter)}.")
+            raise ValueError(
+                "The type of the values of the dicts must either be an instance of FieldValueGetter or None,"
+                f" not {type(field_value_getter)}."
+            )
 
 
 class NestedKey:
@@ -41,7 +47,13 @@ class NestedKey:
 
 
 class Choose:
-    def __init__(self, arg: dict, if_value_of: Union[str, NestedKey], is_one_of: tuple, else_arg: dict):
+    def __init__(
+        self,
+        arg: dict,
+        if_value_of: Union[str, NestedKey],
+        is_one_of: tuple,
+        else_arg: dict,
+    ):
         self.arg = arg
         self.if_value_of = if_value_of
         self.is_one_of = is_one_of
@@ -85,7 +97,9 @@ class PassthroughField(FieldValueGetter):
 
 
 class ForeignKeyField(FieldValueGetter):
-    def __init__(self, foreign_model: Type[models.Model], foreign_model_field_mappings: dict):
+    def __init__(
+        self, foreign_model: Type[models.Model], foreign_model_field_mappings: dict
+    ):
         MappingUtils.remove_none_mappings(foreign_model_field_mappings)
         MappingUtils.swap_fields_with_field_names(foreign_model_field_mappings)
         validate_field_mappings(foreign_model, foreign_model_field_mappings)
@@ -94,19 +108,28 @@ class ForeignKeyField(FieldValueGetter):
         self.foreign_model_field_mappings = foreign_model_field_mappings
 
     def prepare(self, field_name, model_for_field):
-        MappingUtils.prepare_field_value_getters(self.foreign_model, self.foreign_model_field_mappings)
+        MappingUtils.prepare_field_value_getters(
+            self.foreign_model, self.foreign_model_field_mappings
+        )
 
     def get_value_from_dict(self, json_dict):
         foreign_model_obj_kwargs = {
             field_name: field_value_getter.get_value_from_dict(json_dict)
             for field_name, field_value_getter in self.foreign_model_field_mappings.items()
         }
-        foreign_model_obj, _created = self.foreign_model.objects.get_or_create(**foreign_model_obj_kwargs)
+        foreign_model_obj, _created = self.foreign_model.objects.get_or_create(
+            **foreign_model_obj_kwargs
+        )
         return foreign_model_obj
 
 
 class FieldMapping:
-    def __init__(self, network_system_type: str, base_field_mappings: dict, *conditional_field_mappings: Choose):
+    def __init__(
+        self,
+        network_system_type: str,
+        base_field_mappings: dict,
+        *conditional_field_mappings: Choose,
+    ):
         all_field_mappings = (
             base_field_mappings,
             *(cf.arg for cf in conditional_field_mappings),
@@ -133,15 +156,19 @@ class FieldMapping:
         }
 
         # TODO: remove once source is saved from posted alerts
-        alert_kwargs['source'] = random.choice(NetworkSystem.objects.filter(type=self.network_system_type))
+        alert_kwargs["source"] = random.choice(
+            NetworkSystem.objects.filter(type=self.network_system_type)
+        )
 
         try:
             alert = Alert.objects.create(**alert_kwargs)
         except IntegrityError as e:
-            alert_id = alert_kwargs['alert_id']
+            alert_id = alert_kwargs["alert_id"]
             if Alert.objects.filter(alert_id=alert_id).exists():
-                raise ValidationError(f"Alert with the alert_id '{alert_id}' already exists for"
-                                      f" the NetworkSystem '{alert_kwargs['source']}'.")
+                raise ValidationError(
+                    f"Alert with the alert_id '{alert_id}' already exists for"
+                    f" the NetworkSystem '{alert_kwargs['source']}'."
+                )
             else:
                 raise e
 
@@ -153,16 +180,20 @@ class FieldMapping:
 NAV_FIELD_MAPPING = FieldMapping(
     NetworkSystem.NAV,
     {
-        Alert.timestamp:    PassthroughField('time'),
-        Alert.source:       None,  # TODO: save source from posted alert
-        Alert.alert_id:     PassthroughField('history'),
-        Alert.details_url:  PassthroughField('alert_details_url'),
-        Alert.problem_type: ForeignKeyField(ProblemType,
-                                            {
-                                                ProblemType.name:        PassthroughField(NestedKey('alert_type')['name']),
-                                                ProblemType.description: PassthroughField(NestedKey('alert_type')['description']),
-                                            }),
-        Alert.description:  PassthroughField('message'),
+        Alert.timestamp: PassthroughField("time"),
+        Alert.source: None,  # TODO: save source from posted alert
+        Alert.alert_id: PassthroughField("history"),
+        Alert.details_url: PassthroughField("alert_details_url"),
+        Alert.problem_type: ForeignKeyField(
+            ProblemType,
+            {
+                ProblemType.name: PassthroughField(NestedKey("alert_type")["name"]),
+                ProblemType.description: PassthroughField(
+                    NestedKey("alert_type")["description"]
+                ),
+            },
+        ),
+        Alert.description: PassthroughField("message"),
         # None:               ('on_maintenance',
         #                      'acknowledgement',
         #                      'event_history_url',
@@ -175,41 +206,46 @@ NAV_FIELD_MAPPING = FieldMapping(
     },
     Choose(
         arg={
-            Alert.object:        ForeignKeyField(Object,
-                                                 {
-                                                     Object.name:      PassthroughField('subject'),
-                                                     Object.object_id: PassthroughField('netbox'),
-                                                     Object.url:       PassthroughField('subject_url'),
-                                                     Object.type:      ForeignKeyField(ObjectType,
-                                                                                       {
-                                                                                           ObjectType.name: PassthroughField('subject_type'),
-                                                                                       }),
-                                                 }),
+            Alert.object: ForeignKeyField(
+                Object,
+                {
+                    Object.name: PassthroughField("subject"),
+                    Object.object_id: PassthroughField("netbox"),
+                    Object.url: PassthroughField("subject_url"),
+                    Object.type: ForeignKeyField(
+                        ObjectType, {ObjectType.name: PassthroughField("subject_type")}
+                    ),
+                },
+            ),
             Alert.parent_object: None,
         },
-        if_value_of='subid', is_one_of=("", None),
+        if_value_of="subid",
+        is_one_of=("", None),
         else_arg={
-            Alert.object:        ForeignKeyField(Object,
-                                                 {
-                                                     Object.name:      PassthroughField('subject'),
-                                                     Object.object_id: PassthroughField('subid'),
-                                                     Object.url:       PassthroughField('subject_url'),
-                                                     Object.type:      ForeignKeyField(ObjectType,
-                                                                                       {
-                                                                                           ObjectType.name: PassthroughField('subject_type'),
-                                                                                       }),
-                                                 }),
-            Alert.parent_object: ForeignKeyField(ParentObject,
-                                                 {
-                                                     ParentObject.parentobject_id: PassthroughField('netbox'),
-                                                     ParentObject.url:             PassthroughField('netbox_history_url'),
-                                                 }),
-        }
-    )
+            Alert.object: ForeignKeyField(
+                Object,
+                {
+                    Object.name: PassthroughField("subject"),
+                    Object.object_id: PassthroughField("subid"),
+                    Object.url: PassthroughField("subject_url"),
+                    Object.type: ForeignKeyField(
+                        ObjectType, {ObjectType.name: PassthroughField("subject_type")}
+                    ),
+                },
+            ),
+            Alert.parent_object: ForeignKeyField(
+                ParentObject,
+                {
+                    ParentObject.parentobject_id: PassthroughField("netbox"),
+                    ParentObject.url: PassthroughField("netbox_history_url"),
+                },
+            ),
+        },
+    ),
 )
 
 SOURCE_MAPPING_DICT = {
-    NetworkSystem.NAV:    NAV_FIELD_MAPPING,
+    NetworkSystem.NAV: NAV_FIELD_MAPPING,
     NetworkSystem.ZABBIX: None,
 }
 
@@ -218,6 +254,8 @@ def create_alert_from_json(json_dict: dict, alert_source_type: str):
     try:
         mapping = SOURCE_MAPPING_DICT[alert_source_type]
     except KeyError:
-        raise serializers.ValidationError(f"Invalid network system type '{alert_source_type}'.")
+        raise serializers.ValidationError(
+            f"Invalid network system type '{alert_source_type}'."
+        )
 
     return mapping.create_model_obj_from_json(json_dict)

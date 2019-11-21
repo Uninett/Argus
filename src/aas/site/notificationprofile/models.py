@@ -16,14 +16,14 @@ from .utils import AttrGetter, NestedAttrGetter
 class TimeSlot(models.Model):
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=['name', 'user'], name="unique_name_per_user"),
+            models.UniqueConstraint(
+                fields=["name", "user"], name="unique_name_per_user"
+            ),
         ]
-        ordering = ['name']
+        ordering = ["name"]
 
     user = models.ForeignKey(
-        to=User,
-        on_delete=models.CASCADE,
-        related_name='time_slots',
+        to=User, on_delete=models.CASCADE, related_name="time_slots",
     )
     name = models.CharField(max_length=40)
 
@@ -44,22 +44,30 @@ class TimeSlot(models.Model):
             return
 
         time_slot = TimeSlot.objects.create(user=instance, name="Immediately")
-        time_interval_start, time_interval_end = TimeInterval.DAY_START, TimeInterval.DAY_END
+        time_interval_start, time_interval_end = (
+            TimeInterval.DAY_START,
+            TimeInterval.DAY_END,
+        )
         for day, _day_name in TimeInterval.DAY_CHOICES:
-            TimeInterval.objects.create(time_slot=time_slot, day=day, start=time_interval_start, end=time_interval_end)
+            TimeInterval.objects.create(
+                time_slot=time_slot,
+                day=day,
+                start=time_interval_start,
+                end=time_interval_end,
+            )
 
 
 class TimeInterval(models.Model):
     DAY_START = time.min
     DAY_END = time.max
 
-    MONDAY = 'MO'
-    TUESDAY = 'TU'
-    WEDNESDAY = 'WE'
-    THURSDAY = 'TH'
-    FRIDAY = 'FR'
-    SATURDAY = 'SA'
-    SUNDAY = 'SU'
+    MONDAY = "MO"
+    TUESDAY = "TU"
+    WEDNESDAY = "WE"
+    THURSDAY = "TH"
+    FRIDAY = "FR"
+    SATURDAY = "SA"
+    SUNDAY = "SU"
     DAY_CHOICES = (
         (MONDAY, "Monday"),
         (TUESDAY, "Tuesday"),
@@ -73,9 +81,7 @@ class TimeInterval(models.Model):
     DAY_NAME_TO_INDEX = {day: i + 1 for i, (day, _) in enumerate(DAY_CHOICES)}
 
     time_slot = models.ForeignKey(
-        to=TimeSlot,
-        on_delete=models.CASCADE,
-        related_name='time_intervals',
+        to=TimeSlot, on_delete=models.CASCADE, related_name="time_intervals",
     )
 
     day = models.CharField(max_length=2, choices=DAY_CHOICES)
@@ -90,8 +96,8 @@ class TimeInterval(models.Model):
         # FIXME: Might affect performance negatively if calling this method frequently
         timestamp = timestamp.astimezone(timezone.get_current_timezone())
         return (
-                timestamp.isoweekday() == self.isoweekday
-                and self.start <= timestamp.time() <= self.end
+            timestamp.isoweekday() == self.isoweekday
+            and self.start <= timestamp.time() <= self.end
         )
 
     """ needed?
@@ -114,21 +120,19 @@ class TimeInterval(models.Model):
 class Filter(models.Model):
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=['name', 'user'], name="unique_name_per_user"),
+            models.UniqueConstraint(
+                fields=["name", "user"], name="unique_name_per_user"
+            ),
         ]
 
     FILTER_STRING_FIELDS = {
-        'sourceIds':       AttrGetter('source'),
-        'objectTypeIds':   NestedAttrGetter('object.type'),
-        'parentObjectIds': AttrGetter('parent_object'),
-        'problemTypeIds':  AttrGetter('problem_type'),
+        "sourceIds": AttrGetter("source"),
+        "objectTypeIds": NestedAttrGetter("object.type"),
+        "parentObjectIds": AttrGetter("parent_object"),
+        "problemTypeIds": AttrGetter("problem_type"),
     }
 
-    user = models.ForeignKey(
-        to=User,
-        on_delete=models.CASCADE,
-        related_name='filters',
-    )
+    user = models.ForeignKey(to=User, on_delete=models.CASCADE, related_name="filters",)
     name = models.CharField(max_length=40)
     filter_string = models.TextField()
 
@@ -138,7 +142,9 @@ class Filter(models.Model):
 
     @property
     def filtered_alerts(self):
-        return Alert.prefetch_related_fields(Alert.objects.filter(self.get_alert_query()))
+        return Alert.prefetch_related_fields(
+            Alert.objects.filter(self.get_alert_query())
+        )
 
     def get_alert_query(self):
         json_dict = self.filter_json
@@ -166,25 +172,20 @@ class Filter(models.Model):
 
 class NotificationProfile(models.Model):
     user = models.ForeignKey(
-        to=User,
-        on_delete=models.CASCADE,
-        related_name='notification_profiles',
+        to=User, on_delete=models.CASCADE, related_name="notification_profiles",
     )
     # TODO: add constraint that user must be the same
     time_slot = models.OneToOneField(
         to=TimeSlot,
         on_delete=models.CASCADE,
         primary_key=True,
-        related_name='notification_profile',
+        related_name="notification_profile",
     )
-    filters = models.ManyToManyField(
-        to=Filter,
-        related_name='notification_profiles',
-    )
+    filters = models.ManyToManyField(to=Filter, related_name="notification_profiles",)
 
-    EMAIL = 'EM'
-    SMS = 'SM'
-    SLACK = 'SL'
+    EMAIL = "EM"
+    SMS = "SM"
+    SLACK = "SL"
     MEDIA_CHOICES = (
         (EMAIL, "Email"),
         (SMS, "SMS"),
@@ -205,10 +206,9 @@ class NotificationProfile(models.Model):
     def alert_fits(self, alert: Alert):
         if not self.active:
             return False
-        return (
-                self.time_slot.timestamp_is_within_time_intervals(alert.timestamp)
-                and any(f.alert_fits(alert) for f in self.filters.all())
-        )
+        return self.time_slot.timestamp_is_within_time_intervals(
+            alert.timestamp
+        ) and any(f.alert_fits(alert) for f in self.filters.all())
 
     def __str__(self):
         return f"{self.time_slot}: {', '.join(str(f) for f in self.filters.all())}"

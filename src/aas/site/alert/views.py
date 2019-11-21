@@ -9,19 +9,36 @@ from rest_framework.response import Response
 
 from aas.site.notificationprofile.notification_media import send_notifications_to_users
 from . import mappings
-from .models import ActiveAlert, Alert, NetworkSystem, ObjectType, ParentObject, ProblemType
+from .models import (
+    ActiveAlert,
+    Alert,
+    NetworkSystem,
+    ObjectType,
+    ParentObject,
+    ProblemType,
+)
 from .parsers import StackedJSONParser
-from .serializers import AlertSerializer, NetworkSystemSerializer, ObjectTypeSerializer, ParentObjectSerializer, ProblemTypeSerializer
+from .serializers import (
+    AlertSerializer,
+    NetworkSystemSerializer,
+    ObjectTypeSerializer,
+    ParentObjectSerializer,
+    ProblemTypeSerializer,
+)
 
 
 class AlertList(generics.ListCreateAPIView):
-    queryset = Alert.prefetch_related_fields(Alert.objects.select_related('active_state'))
+    queryset = Alert.prefetch_related_fields(
+        Alert.objects.select_related("active_state")
+    )
     parser_classes = [StackedJSONParser]
     serializer_class = AlertSerializer
 
     def post(self, request, *args, **kwargs):
         created_alerts = [
-            mappings.create_alert_from_json(json_dict, NetworkSystem.NAV)  # TODO: interpret network system type from alerts' source IP?
+            mappings.create_alert_from_json(
+                json_dict, NetworkSystem.NAV
+            )  # TODO: interpret network system type from alerts' source IP?
             for json_dict in request.data
         ]
 
@@ -47,23 +64,27 @@ class ActiveAlertList(generics.ListAPIView):
         return Alert.prefetch_related_fields(Alert.get_active_alerts())
 
 
-@api_view(['PUT'])
+@api_view(["PUT"])
 def change_alert_active_view(request, alert_pk):
     if type(request.data) is not dict:
         raise ValidationError("The request body must contain JSON.")
 
-    new_active_state = request.data.get('active')
+    new_active_state = request.data.get("active")
     if new_active_state is None or type(new_active_state) is not bool:
-        raise ValidationError("Field 'active' with a boolean value is missing from the request body.")
+        raise ValidationError(
+            "Field 'active' with a boolean value is missing from the request body."
+        )
 
     alert = Alert.objects.get(pk=alert_pk)
     if new_active_state:
         ActiveAlert.objects.get_or_create(alert=alert)
     else:
-        if hasattr(alert, 'active_state'):
+        if hasattr(alert, "active_state"):
             alert.active_state.delete()
 
-    alert = Alert.objects.get(pk=alert_pk)  # re-fetch the alert to get updated state after creating/deleting ActiveAlert object
+    alert = Alert.objects.get(
+        pk=alert_pk
+    )  # re-fetch the alert to get updated state after creating/deleting ActiveAlert object
     serializer = AlertSerializer(alert)
     return Response(serializer.data)
 
@@ -76,7 +97,7 @@ def all_alerts_from_source_view(request, source_pk):
     return HttpResponse(json_result, content_type="application/json")
 
 
-@api_view(['GET'])
+@api_view(["GET"])
 def get_all_meta_data_view(request):
     network_systems = NetworkSystemSerializer(NetworkSystem.objects.all(), many=True)
     object_types = ObjectTypeSerializer(ObjectType.objects.all(), many=True)
@@ -84,8 +105,8 @@ def get_all_meta_data_view(request):
     problem_types = ProblemTypeSerializer(ProblemType.objects.all(), many=True)
     data = {
         "networkSystems": network_systems.data,
-        "objectTypes":    object_types.data,
-        "parentObjects":  parent_objects.data,
-        "problemTypes":   problem_types.data,
+        "objectTypes": object_types.data,
+        "parentObjects": parent_objects.data,
+        "problemTypes": problem_types.data,
     }
     return Response(data)

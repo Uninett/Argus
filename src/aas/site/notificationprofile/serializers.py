@@ -9,10 +9,10 @@ from .validators import FilterStringValidator
 class TimeIntervalSerializer(serializers.ModelSerializer):
     class Meta:
         model = TimeInterval
-        fields = ['day', 'start', 'end']
+        fields = ["day", "start", "end"]
 
     def validate(self, attrs):
-        if attrs['start'] >= attrs['end']:
+        if attrs["start"] >= attrs["end"]:
             raise serializers.ValidationError("Start time must be before end time.")
         return attrs
 
@@ -20,19 +20,21 @@ class TimeIntervalSerializer(serializers.ModelSerializer):
 class TimeSlotSerializer(serializers.ModelSerializer):
     class Meta:
         model = TimeSlot
-        fields = ['pk', 'name', 'time_intervals']
-        read_only_fields = ['pk']
+        fields = ["pk", "name", "time_intervals"]
+        read_only_fields = ["pk"]
 
     time_intervals = TimeIntervalSerializer(many=True)
 
     def create(self, validated_data):
-        time_intervals_data = validated_data.pop('time_intervals')
+        time_intervals_data = validated_data.pop("time_intervals")
         try:
             time_slot = TimeSlot.objects.create(**validated_data)
         except IntegrityError as e:
-            name = validated_data['name']
+            name = validated_data["name"]
             if TimeSlot.objects.filter(name=name).exists():
-                raise serializers.ValidationError(f"TimeSlot with the name '{name}' already exists for the user {validated_data['user']}.")
+                raise serializers.ValidationError(
+                    f"TimeSlot with the name '{name}' already exists for the user {validated_data['user']}."
+                )
             else:
                 raise e
 
@@ -42,9 +44,9 @@ class TimeSlotSerializer(serializers.ModelSerializer):
         return time_slot
 
     def update(self, time_slot: TimeSlot, validated_data):
-        time_intervals_data = validated_data.pop('time_intervals')
+        time_intervals_data = validated_data.pop("time_intervals")
 
-        time_slot.name = validated_data['name']
+        time_slot.name = validated_data["name"]
         time_slot.save()
 
         # Replace existing time intervals with posted time intervals
@@ -58,8 +60,8 @@ class TimeSlotSerializer(serializers.ModelSerializer):
 class FilterSerializer(serializers.ModelSerializer):
     class Meta:
         model = Filter
-        fields = ['pk', 'name', 'filter_string']
-        read_only_fields = ['pk']
+        fields = ["pk", "name", "filter_string"]
+        read_only_fields = ["pk"]
 
     filter_string = serializers.CharField(validators=[FilterStringValidator()])
 
@@ -67,8 +69,8 @@ class FilterSerializer(serializers.ModelSerializer):
 class NotificationProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = NotificationProfile
-        fields = ['pk', 'time_slot', 'filters', 'media', 'active']
-        read_only_fields = ['pk']
+        fields = ["pk", "time_slot", "filters", "media", "active"]
+        read_only_fields = ["pk"]
 
     time_slot = TimeSlotForeignKeyField()
     filters = FilterManyToManyField(many=True)
@@ -78,8 +80,10 @@ class NotificationProfileSerializer(serializers.ModelSerializer):
         try:
             return super().create(validated_data)
         except IntegrityError as e:
-            time_slot_pk = validated_data['time_slot'].pk
+            time_slot_pk = validated_data["time_slot"].pk
             if NotificationProfile.objects.filter(pk=time_slot_pk).exists():
-                raise serializers.ValidationError(f"NotificationProfile with TimeSlot with pk={time_slot_pk} already exists.")
+                raise serializers.ValidationError(
+                    f"NotificationProfile with TimeSlot with pk={time_slot_pk} already exists."
+                )
             else:
                 raise e

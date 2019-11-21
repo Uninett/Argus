@@ -2,4 +2,4 @@ from django.apps import AppConfig
 
 
 class NotificationprofileConfig(AppConfig):
-    name = 'aas.site.notificationprofile'
+    name = "aas.site.notificationprofile"

@@ -4,11 +4,11 @@ from json import JSONDecodeError, JSONDecoder
 from rest_framework.exceptions import ParseError
 from rest_framework.parsers import BaseParser
 
-NOT_WHITESPACE = re.compile(r'[^\s]')
+NOT_WHITESPACE = re.compile(r"[^\s]")
 
 
 class StackedJSONParser(BaseParser):
-    media_type = 'text/plain'
+    media_type = "text/plain"
 
     decoder = JSONDecoder()
 

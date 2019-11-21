@@ -16,7 +16,9 @@ class FilterStringValidator:
         elif type(value) is dict:
             json_dict = value
         else:
-            raise serializers.ValidationError(f"The type must be either str or dict, not {type(value)}.")
+            raise serializers.ValidationError(
+                f"The type must be either str or dict, not {type(value)}."
+            )
 
         for filter_field_name in Filter.FILTER_STRING_FIELDS:
             self._get_filter_field(filter_field_name, json_dict)
@@ -27,4 +29,6 @@ class FilterStringValidator:
         try:
             return json_dict[filter_field_name]
         except KeyError:
-            raise serializers.ValidationError(f"Can't find any '{filter_field_name}' field.")
+            raise serializers.ValidationError(
+                f"Can't find any '{filter_field_name}' field."
+            )

@@ -9,7 +9,11 @@ from rest_framework.response import Response
 from aas.site.alert.serializers import AlertSerializer
 from .models import Filter, NotificationProfile
 from .permissions import IsOwner
-from .serializers import FilterSerializer, NotificationProfileSerializer, TimeSlotSerializer
+from .serializers import (
+    FilterSerializer,
+    NotificationProfileSerializer,
+    TimeSlotSerializer,
+)
 from .validators import FilterStringValidator
 
 
@@ -32,13 +36,17 @@ class NotificationProfileDetail(generics.RetrieveUpdateDestroyAPIView):
         return self.request.user.notification_profiles.all()
 
 
-@api_view(['GET'])
+@api_view(["GET"])
 def alerts_filtered_by_notification_profile_view(request, notification_profile_pk):
     try:
         # Go through user to ensure that the user owns the requested notification profile
-        notification_profile = request.user.notification_profiles.get(pk=notification_profile_pk)
+        notification_profile = request.user.notification_profiles.get(
+            pk=notification_profile_pk
+        )
     except NotificationProfile.DoesNotExist:
-        raise ValidationError(f"Notification profile with pk={notification_profile_pk} does not exist.")
+        raise ValidationError(
+            f"Notification profile with pk={notification_profile_pk} does not exist."
+        )
 
     serializer = AlertSerializer(notification_profile.filtered_alerts, many=True)
     return Response(serializer.data)
@@ -83,7 +91,7 @@ class FilterDetail(generics.RetrieveUpdateDestroyAPIView):
 
 
 # TODO: make HTTP method GET and get query data from URL
-@api_view(['POST'])
+@api_view(["POST"])
 def filter_preview_view(request):
     filter_string_dict = request.data
     # Validate posted filter string

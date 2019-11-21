@@ -13,12 +13,12 @@ def login_wrapper(request, backend, *args, **kwargs):
 
     if not user.get_full_name():
         # Update the full name of the user
-        user.first_name = ' '.join(data['fullname'].split()[:-1])
-        user.last_name = data['fullname'].split()[-1]
+        user.first_name = " ".join(data["fullname"].split()[:-1])
+        user.last_name = data["fullname"].split()[-1]
 
         user.save()
 
     token, _created = Token.objects.get_or_create(user=user)
     response = redirect(settings.FRONTEND_URL, permanent=True)
-    response.set_cookie('token', token.key)
+    response.set_cookie("token", token.key)
     return response
