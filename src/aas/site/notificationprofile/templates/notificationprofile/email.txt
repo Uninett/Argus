@@ -1,0 +1,3 @@
+{% for field, value in alert_dict.items %}
+{{ field|ljust:longest_field_name_length }} : {{ value|safe }}
+{% endfor %}

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    {% if request.user.is_authenticated %}
+        <p>You are logged in as: {{ request.user.username }}</p>
+        <p>Your associations:</p>
+        {% for associated in backends.associated %}
+            <p>{{ associated.user.username }}: <br/>
+                Provider: {{ associated.provider }}<br/>
+                Uid: {{ associated.uid }}<br/>
+                Extra: {{ associated.extra_data }}<br/>
+            </p>
+        {% endfor %}
+        {% for not_associated in backends.not_associated %}
+            <p><a href="/login/{{ not_associated }}/">Associate with {{ not_associated }}</a>. This will allow you to log in with {{ not_associated }}.</p>
+        {% endfor %}
+    {% else %}
+        {% for backend in backends.backends %}
+            <p><a href="/login/{{ backend }}/">Log in with {{ backend }}</a></p>
+        {% endfor %}
+    {% endif %}
+
+{% endblock content %}
