@@ -104,11 +104,14 @@ class Alert(models.Model):
         to=NetworkSystem,
         on_delete=models.CASCADE,
         related_name="alerts",
-        verbose_name="network system source",
+        help_text="The network management system that the alert came from.",
     )
     alert_id = models.CharField(max_length=20, verbose_name="alert ID")
     object = models.ForeignKey(
-        to=Object, on_delete=models.CASCADE, related_name="alerts",
+        to=Object,
+        on_delete=models.CASCADE,
+        related_name="alerts",
+        help_text="The most specific object that the alert was about.",
     )
     parent_object = models.ForeignKey(
         to=ParentObject,
@@ -116,10 +119,14 @@ class Alert(models.Model):
         null=True,
         blank=True,
         related_name="alerts",
+        help_text="An object that the above `object` is possibly a part of.",
     )
     details_url = models.URLField(blank=True, verbose_name="details URL")
     problem_type = models.ForeignKey(
-        to=ProblemType, on_delete=models.CASCADE, related_name="alerts",
+        to=ProblemType,
+        on_delete=models.CASCADE,
+        related_name="alerts",
+        help_text="The type of problem that the alert is informing about.",
     )
     description = models.TextField(blank=True)
     ticket_url = models.URLField(
@@ -142,7 +149,7 @@ class Alert(models.Model):
     @staticmethod
     def prefetch_related_fields(qs: QuerySet):
         return qs.prefetch_related(
-            "source", "object__type", "parent_object", "problem_type"
+            "source", "object__type", "parent_object", "problem_type",
         )
 
 
@@ -152,6 +159,7 @@ class ActiveAlert(models.Model):
         on_delete=models.CASCADE,
         primary_key=True,
         related_name="active_state",
+        help_text="Whether the alert's problem has been resolved.",
     )
 
 
