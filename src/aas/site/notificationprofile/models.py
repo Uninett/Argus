@@ -17,7 +17,7 @@ class TimeSlot(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=["name", "user"], name="unique_name_per_user"
+                fields=["name", "user"], name="unique_name_per_user1"
             ),
         ]
         ordering = ["name"]
@@ -121,7 +121,7 @@ class Filter(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=["name", "user"], name="unique_name_per_user"
+                fields=["name", "user"], name="unique_name_per_user2"
             ),
         ]
 
