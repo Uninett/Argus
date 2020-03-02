@@ -55,7 +55,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AddConstraint(
             model_name='timeslot',
-            constraint=models.UniqueConstraint(fields=('name', 'user'), name='unique_name_per_user'),
+            constraint=models.UniqueConstraint(fields=('name', 'user'), name='unique_name_per_user1'),
         ),
         migrations.AddField(
             model_name='notificationprofile',
@@ -69,6 +69,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AddConstraint(
             model_name='filter',
-            constraint=models.UniqueConstraint(fields=('name', 'user'), name='unique_name_per_user'),
+            constraint=models.UniqueConstraint(fields=('name', 'user'), name='unique_name_per_user2'),
         ),
     ]
