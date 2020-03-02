@@ -8,3 +8,4 @@ social-auth-app-django
 djangorestframework
 django-filter
 django-multiselectfield
+psycopg2-binary
