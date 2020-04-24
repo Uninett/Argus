@@ -10,13 +10,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
-from pathlib import Path
-
-# Build paths inside the project like this: BASE_DIR / ...
-SETTINGS_DIR = Path(__file__).resolve().parent
-SITE_DIR = SETTINGS_DIR.parent
-BASE_DIR = SITE_DIR.parent
-
+# Import some helpers
+from . import *
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
@@ -164,8 +159,10 @@ AUTHENTICATION_BACKENDS = (
 EMAIL_HOST_USER = "kundestyrt@gmail.com"
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
-NOTIFICATION_SUBJECT_PREFIX = "[AAS] "  # custom setting
 
+# Project specific settings
+
+NOTIFICATION_SUBJECT_PREFIX = "[AAS] "
 
 def get_dataporten_secret():
     dataporten_secret_file = SETTINGS_DIR / "dataporten_secret.txt"
@@ -175,6 +172,8 @@ def get_dataporten_secret():
         raise FileNotFoundError(
             f'Please create the file "{dataporten_secret_file}" containing the client key to the Dataporten app'
         )
+
+# 3rd party settings
 
 
 SOCIAL_AUTH_ADMIN_USER_SEARCH_FIELDS = ["username", "first_name", "email"]
