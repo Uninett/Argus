@@ -1,5 +1,8 @@
 from .base import *
 
+DEBUG = get_bool_env("DEBUG", True)
+TEMPLATES[0]["OPTIONS"]["debug"] = get_bool_env("TEMPLATE_DEBUG", True)
+
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = "secret-secret!"

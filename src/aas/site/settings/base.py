@@ -10,22 +10,16 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
-from pathlib import Path
-
-# Build paths inside the project like this: BASE_DIR / ...
-SETTINGS_DIR = Path(__file__).resolve().parent
-SITE_DIR = SETTINGS_DIR.parent
-BASE_DIR = SITE_DIR.parent
-
+# Import some helpers
+from . import *
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = get_bool_env("DEBUG", False)
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -65,6 +59,7 @@ TEMPLATES = [
         "DIRS": [str(SITE_DIR / "templates")],
         "APP_DIRS": True,
         "OPTIONS": {
+            "debug": get_bool_env("TEMPLATE_DEBUG", False),
             "context_processors": [
                 "django.template.context_processors.debug",
                 "django.template.context_processors.request",
@@ -164,23 +159,18 @@ AUTHENTICATION_BACKENDS = (
 EMAIL_HOST_USER = "kundestyrt@gmail.com"
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
-NOTIFICATION_SUBJECT_PREFIX = "[AAS] "  # custom setting
+
+# Project specific settings
+
+NOTIFICATION_SUBJECT_PREFIX = "[AAS] "
 
 
-def get_dataporten_secret():
-    dataporten_secret_file = SETTINGS_DIR / "dataporten_secret.txt"
-    try:
-        return dataporten_secret_file.read_text().strip()
-    except IOError:
-        raise FileNotFoundError(
-            f'Please create the file "{dataporten_secret_file}" containing the client key to the Dataporten app'
-        )
-
+# 3rd party settings
 
 SOCIAL_AUTH_ADMIN_USER_SEARCH_FIELDS = ["username", "first_name", "email"]
 SOCIAL_AUTH_DATAPORTEN_KEY = "c816b0dd-6a80-431e-84e2-e814e999b460"
 
-SOCIAL_AUTH_DATAPORTEN_SECRET = get_dataporten_secret()
+SOCIAL_AUTH_DATAPORTEN_SECRET = get_str_env("AAS_DATAPORTEN_SECRET", required=True)
 SOCIAL_AUTH_DATAPORTEN_EMAIL_KEY = SOCIAL_AUTH_DATAPORTEN_KEY
 
 SOCIAL_AUTH_DATAPORTEN_EMAIL_SECRET = SOCIAL_AUTH_DATAPORTEN_SECRET
