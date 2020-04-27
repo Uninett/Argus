@@ -7,7 +7,7 @@ from rest_framework.decorators import api_view
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
-from aas.site.notificationprofile.notification_media import send_notifications_to_users
+from aas.notificationprofile.notification_media import send_notifications_to_users
 from . import mappings
 from .models import (
     ActiveAlert,

@@ -34,9 +34,10 @@ INSTALLED_APPS = [
     "social_django",
     "rest_framework",
     "rest_framework.authtoken",
-    "aas.site.auth",
-    "aas.site.alert",
-    "aas.site.notificationprofile",
+
+    "aas.auth",
+    "aas.alert",
+    "aas.notificationprofile",
 ]
 
 MIDDLEWARE = [

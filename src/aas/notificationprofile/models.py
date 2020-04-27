@@ -8,8 +8,8 @@ from django.dispatch import receiver
 from django.utils import timezone
 from multiselectfield import MultiSelectField
 
-from aas.site.alert.models import Alert
-from aas.site.auth.models import User
+from aas.alert.models import Alert
+from aas.auth.models import User
 from .utils import AttrGetter, NestedAttrGetter
 
 
