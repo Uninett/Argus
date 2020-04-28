@@ -7,8 +7,10 @@ Welcome to AAS's documentation!
 ===============================
 
 .. toctree::
+   site-specific-settings
    :maxdepth: 2
    :caption: Contents:
+
 
 
 Indices and tables
