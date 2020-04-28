@@ -5,10 +5,10 @@ TEMPLATES[0]["OPTIONS"]["debug"] = get_bool_env("TEMPLATE_DEBUG", True)
 
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "secret-secret!"
+SECRET_KEY = get_str_env("SECRET_KEY", "secret-secret!")
 
 
-FRONTEND_URL = "http://localhost:3000"
+FRONTEND_URL = get_str_env("AAS_FRONTEND_URL", "http://localhost:3000")
 
 CORS_ORIGIN_WHITELIST = [
     FRONTEND_URL,
