@@ -23,13 +23,14 @@ def get_any_env(envname, required=False):
     if env is None:
         # Envvar not set!
         if required:
-            raise OsError("Environment variable \"{}\" not set!", envname)
+            error = "Environment variable \"{}\" not set!".format(envname)
+            raise OSError(error)
         return None
     return env
 
 
 def get_bool_env(envname, default=None, required=False):
-    env = get_any_env(envname, default, required)
+    env = get_any_env(envname, required)
     env = str(env).lower()
     if env in ("1", "on", "true", "yes"):
         return True
@@ -39,14 +40,14 @@ def get_bool_env(envname, default=None, required=False):
 
 
 def get_str_env(envname, default='', required=False):
-    env = get_any_env(envname, default, required)
+    env = get_any_env(envname, required)
     if env is None:
         return default
     return str(env)
 
 
 def get_int_env(envname, default=0, required=False):
-    env = get_any_env(envname, default, required)
+    env = get_any_env(envname, required)
     if env is None:
         return default
     return int(env)

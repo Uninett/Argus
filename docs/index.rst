@@ -11,9 +11,11 @@ Welcome to AAS's documentation!
    AAS is.. (developer friendly introduction, one paragraph max)
 
 .. toctree::
+   site-specific-settings
    writing-plugins
    :maxdepth: 2
    :caption: Contents:
+
 
 
 Indices and tables
