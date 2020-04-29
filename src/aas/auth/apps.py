@@ -2,5 +2,5 @@ from django.apps import AppConfig
 
 
 class AuthConfig(AppConfig):
-    name = "aas.site.auth"
+    name = "aas.auth"
     label = "aas_auth"

@@ -6,7 +6,7 @@ class NetworkSystem(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=["name", "type"], name="unique_name_per_type"
+                fields=["name", "type"], name="networksystem_unique_name_per_type"
             ),
         ]
 
@@ -41,11 +41,11 @@ class Object(models.Model):
         constraints = [
             models.UniqueConstraint(
                 fields=["object_id", "network_system"],
-                name="unique_object_id_per_network_system",
+                name="object_unique_object_id_per_network_system",
             ),
             models.UniqueConstraint(
                 fields=["name", "type", "network_system"],
-                name="unique_name_and_type_per_network_system",
+                name="object_unique_name_and_type_per_network_system",
             ),
         ]
 
@@ -94,7 +94,7 @@ class Alert(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=["alert_id", "source"], name="unique_alert_id_per_source"
+                fields=["alert_id", "source"], name="alert_unique_alert_id_per_source"
             ),
         ]
         ordering = ["-timestamp"]
