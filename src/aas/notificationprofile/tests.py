@@ -7,10 +7,10 @@ from rest_framework.authtoken.models import Token
 from rest_framework.renderers import JSONRenderer
 from rest_framework.test import APITransactionTestCase
 
-from aas.site.alert.models import Alert, NetworkSystem, Object, ObjectType, ProblemType
-from aas.site.alert.serializers import AlertSerializer
-from aas.site.auth.models import User
-from aas.site.notificationprofile.models import (
+from aas.alert.models import Alert, NetworkSystem, Object, ObjectType, ProblemType
+from aas.alert.serializers import AlertSerializer
+from aas.auth.models import User
+from aas.notificationprofile.models import (
     Filter,
     NotificationProfile,
     TimeInterval,

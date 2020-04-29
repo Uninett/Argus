@@ -22,9 +22,9 @@ from aas.dataporten import views as dataporten_views
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("auth/", include("aas.site.auth.urls")),
-    path("alerts/", include("aas.site.alert.urls")),
-    path("notificationprofiles/", include("aas.site.notificationprofile.urls")),
+    path("auth/", include("aas.auth.urls")),
+    path("alerts/", include("aas.alert.urls")),
+    path("notificationprofiles/", include("aas.notificationprofile.urls")),
 ]
 
 urlpatterns += [

@@ -6,7 +6,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from aas.site.alert.serializers import AlertSerializer
+from aas.alert.serializers import AlertSerializer
 from .models import Filter, NotificationProfile
 from .permissions import IsOwner
 from .serializers import (

@@ -8,8 +8,8 @@ from django.dispatch import receiver
 from django.utils import timezone
 from multiselectfield import MultiSelectField
 
-from aas.site.alert.models import Alert
-from aas.site.auth.models import User
+from aas.alert.models import Alert
+from aas.auth.models import User
 from .utils import AttrGetter, NestedAttrGetter
 
 
@@ -17,7 +17,7 @@ class TimeSlot(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=["name", "user"], name="unique_name_per_user1"
+                fields=["name", "user"], name="timeslot_unique_name_per_user"
             ),
         ]
         ordering = ["name"]
@@ -121,7 +121,7 @@ class Filter(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=["name", "user"], name="unique_name_per_user2"
+                fields=["name", "user"], name="filter_unique_name_per_user"
             ),
         ]
 
