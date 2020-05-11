@@ -10,3 +10,4 @@ social-auth-app-django
 Sphinx>=2.2.0
 sqlparse>=0.3.0
 wheel>=0.24.0
+whitenoise

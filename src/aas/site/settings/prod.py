@@ -6,6 +6,9 @@ TEMPLATES[0]["OPTIONS"]["debug"] = False
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = get_str_env("SECRET_KEY", required=True)
+STATIC_URL = get_str_env("STATIC_URL", "/adminstatic")
+STATIC_ROOT = get_str_env("STATIC_ROOT", required=True)
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 
 ALLOWED_HOSTS = [
