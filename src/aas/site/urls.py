@@ -20,15 +20,15 @@ from social_django.urls import extra
 
 from aas.dataporten import views as dataporten_views
 
-urlpatterns = [
-    path("admin/", admin.site.urls),
+
+api_urls = [
     path("auth/", include("aas.auth.urls")),
     path("alerts/", include("aas.alert.urls")),
     path("notificationprofiles/", include("aas.notificationprofile.urls")),
+    path("token-auth/", rest_views.obtain_auth_token, name="api-token-auth"),
 ]
 
-urlpatterns += [
-    path("api-token-auth/", rest_views.obtain_auth_token, name="api-token-auth"),
+psa_urls = [
     # Overrides social_django's `complete` view
     re_path(
         r"^complete/(?P<backend>[^/]+){0}$".format(extra),
@@ -36,4 +36,10 @@ urlpatterns += [
         name="complete",
     ),
     path("", include("social_django.urls", namespace="social")),
+]
+
+urlpatterns = [
+    path("admin/", admin.site.urls),
+    path("oidc/", include(psa_urls)),
+    path("api/v1/", include(api_urls)),
 ]
