@@ -13,8 +13,11 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.conf import settings
 from django.contrib import admin
 from django.urls import include, path, re_path
+from django.views.generic import TemplateView
+
 from rest_framework.authtoken import views as rest_views
 from social_django.urls import extra
 
@@ -43,3 +46,8 @@ urlpatterns = [
     path("oidc/", include(psa_urls)),
     path("api/v1/", include(api_urls)),
 ]
+
+if getattr(settings, "AAS_FRONTEND_SERVED_BY_DJANGO", False):
+    urlpatterns += [
+        path("", TemplateView.as_view(template_name='index.html'))
+    ]
