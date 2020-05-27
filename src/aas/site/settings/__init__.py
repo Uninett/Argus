@@ -43,11 +43,12 @@ def get_str_env(envname, default='', required=False):
     env = get_any_env(envname, required)
     if env is None:
         return default
-    return str(env)
+    return str(env).strip()
 
 
 def get_int_env(envname, default=0, required=False):
     env = get_any_env(envname, required)
     if env is None:
         return default
+    env = str(env).strip()
     return int(env)
