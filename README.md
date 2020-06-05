@@ -13,7 +13,7 @@ This repository hosts the backend built with Django, while the frontend is hoste
 * pip
 
 ### Dataporten setup
-* Register a new application with the following redirect URL: `{server_url}/complete/dataporten_feide/`
+* Register a new application with the following redirect URL: `{server_url}/oidc/complete/dataporten_feide/`
   * `{server_url}` must be replaced with the URL to the server running this project, like `http://localhost:8000`
 * Add the following permission scopes:
   * `profile`
@@ -43,16 +43,16 @@ All endpoints require requests to contain a header with key `Authorization` and 
 <details>
 <summary>Auth endpoints</summary>
 
-* `GET` to `/auth/user/`: returns the logged in user
-* `POST` to `/api-token-auth/`: returns an auth token for the posted user
+* `GET` to `/api/v1/auth/user/`: returns the logged in user
+* `POST` to `/oidc/api-token-auth/`: returns an auth token for the posted user
   * Body: `{ username: <username>, password: <password> }`
-* `/login/dataporten_feide/`: redirects to Feide login
+* `/oidc/login/dataporten_feide/`: redirects to Feide login
 </details>
 
 <details>
 <summary>Alert endpoints</summary>
 
-* `/alerts/`:
+* `/api/v1/alerts/`:
   * `GET`: returns all alerts - both active and historic
   * `POST`: creates and returns an alert
     <details>
@@ -74,10 +74,10 @@ All endpoints require requests to contain a header with key `Authorization` and 
         "subid": "",
         "subject_type": "Netbox",
         "subject": "example-sw.example.org",
-        "subject_url": "/ipdevinfo/example-sw.example.org/",
-        "alert_details_url": "/api/alert/196179/",
-        "netbox_history_url": "/devicehistory/history/%3Fnetbox=138",
-        "event_history_url": "/devicehistory/history/?eventtype=e_boxState",
+        "subject_url": "/api/v1/ipdevinfo/example-sw.example.org/",
+        "alert_details_url": "/api/v1/alerts/196179/",
+        "netbox_history_url": "/api/v1/devicehistory/history/%3Fnetbox=138",
+        "event_history_url": "/api/v1/devicehistory/history/?eventtype=e_boxState",
         "event_type": {
             "description": "Tells us whether a network-unit is down or up.",
             "id": "boxState"
@@ -92,18 +92,18 @@ All endpoints require requests to contain a header with key `Authorization` and 
     ```
     </details>
 
-* `GET` to `/alerts/<int:pk>`: returns an alert by pk
-* `GET` to `/alerts/active/`: returns all active alerts
-* `PUT` to `/alerts/<int:pk>/active`: changes an alert's active state by pk
+* `GET` to `/api/v1/alerts/<int:pk>`: returns an alert by pk
+* `GET` to `/api/v1/alerts/active/`: returns all active alerts
+* `PUT` to `/api/v1/alerts/<int:pk>/active`: changes an alert's active state by pk
   * Body: `{ "active": <bool> }`
-* `GET` to `/alerts/metadata/`: returns relevant metadata for all alerts
+* `GET` to `/api/v1/alerts/metadata/`: returns relevant metadata for all alerts
 
 </details>
 
 <details>
 <summary>Notification profile endpoints</summary>
 
-* `/notificationprofiles/`:
+* `/api/v1/notificationprofiles/`:
   * `GET`: returns the logged in user's notification profiles
   * `POST`: creates and returns a notification profile which is then connected to the logged in user
     <details>
@@ -125,15 +125,15 @@ All endpoints require requests to contain a header with key `Authorization` and 
     ```
     </details>
 
-* `/notificationprofiles/<int:pk>`:
+* `/api/v1/notificationprofiles/<int:pk>`:
   * `GET`: returns one of the logged in user's notification profiles by pk
   * `PUT`: updates and returns one of the logged in user's notification profiles by pk
-    * Body: same as `POST` to `/notificationprofiles/`
+    * Body: same as `POST` to `/api/v1/notificationprofiles/`
   * `DELETE`: deletes one of the logged in user's notification profiles by pk
 
-* `GET` to `/notificationprofiles/<int:pk>/alerts/`: returns all alerts - both active and historic - filtered by one of the logged in user's notification profiles by pk
+* `GET` to `/api/v1/notificationprofiles/<int:pk>/alerts/`: returns all alerts - both active and historic - filtered by one of the logged in user's notification profiles by pk
 
-* `/notificationprofiles/timeslots/`:
+* `/api/v1/notificationprofiles/timeslots/`:
   * `GET`: returns the logged in user's time slots
   * `POST`: creates and returns a time slot which is then connected to the logged in user
     <details>
@@ -173,13 +173,13 @@ All endpoints require requests to contain a header with key `Authorization` and 
     ```
     </details>
 
-* `/notificationprofiles/timeslots/<int:pk>`:
+* `/api/v1/notificationprofiles/timeslots/<int:pk>`:
   * `GET`: returns one of the logged in user's time slots by pk
   * `PUT`: updates and returns one of the logged in user's time slots by pk
     * Body: same as `POST` to `/notificationprofiles/timeslots/`
   * `DELETE`: deletes one of the logged in user's time slots by pk
 
-* `/notificationprofiles/filters/`:
+* `/api/v1/notificationprofiles/filters/`:
   * `GET`: returns the logged in user's filters
   * `POST`: creates and returns a filter which is then connected to the logged in user
     <details>
@@ -193,13 +193,13 @@ All endpoints require requests to contain a header with key `Authorization` and 
     ```
     </details>
 
-* `/notificationprofiles/filters/<int:pk>`:
+* `/api/v1/notificationprofiles/filters/<int:pk>`:
   * `GET`: returns one of the logged in user's filters by pk
   * `PUT`: updates and returns one of the logged in user's filters by pk
-    * Body: same as `POST` to `/notificationprofiles/filters/`
+    * Body: same as `POST` to `/api/v1/notificationprofiles/filters/`
   * `DELETE`: deletes one of the logged in user's filters by pk
 
-* `POST` to `/notificationprofiles/filterpreview/`: returns all alerts - both active and historic - filtered by the values in the body
+* `POST` to `/api/v1/notificationprofiles/filterpreview/`: returns all alerts - both active and historic - filtered by the values in the body
   <details>
   <summary>Body:</summary>
 
