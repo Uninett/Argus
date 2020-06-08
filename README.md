@@ -21,19 +21,33 @@ This repository hosts the backend built with Django, while the frontend is hoste
   * `userid-feide`
 * Create the text file `src/aas/site/settings/dataporten_secret.txt` containing the client key to the application
 
-### Email setup for production
-* Change `EMAIL_HOST_USER` in [`base.py`](/src/aas/site/settings/base.py) to an email address to send notifications from
-* Change `EMAIL_HOST` in [`prod.py`](/src/aas/site/settings/prod.py) to match the email's server URL
-* Create the text file `src/aas/site/settings/email_secret.txt` containing the password to the email account
-
-*A Gmail account with "Allow less secure apps" turned on, was used in the development of this project.*
-
 ### Project setup
 * Create a Python 3.6+ virtual environment
 * `pip install -r requirements.txt`
 * `python manage.py migrate`
 
 Start the server with `python manage.py runserver`.
+
+### Site- and deployment-specific settings
+
+Site-specific settings are set as per 12 factor, with environment variables. For more details, see the relevant section in the docs: [Setting site-specific settingsi](https://aas.readthedocs.io/en/latest/site-specific-settings.html).
+
+A recap of the environment variables that can be set by default follows.
+
+#### Environment variables
+
+* DEBUG, 1 for True, 0 for False
+* TEMPLATE_DEBUG. By default set to the same as DEBUG.
+* AAS_DATAPORTEN_SECRET, which holds the password for using dataporten for
+  authentication.
+* AAS_FRONTEND_URL, by default "http://localhost:3000", for CORS
+* EMAIL_HOST, smarthost (domain name) to send email through
+* EMAIL_HOST_PASSWORD, password if the smarthost needs that
+* EMAIL_PORT, in production by default set to 587
+* SECRET_KEY, used internally by django, should be about 50 chars of ascii
+  noise (but avoid backspaces!)
+
+*A Gmail account with "Allow less secure apps" turned on, was used in the development of this project.*
 
 ## Endpoints
 *`/admin/` to access the project's admin pages.*
