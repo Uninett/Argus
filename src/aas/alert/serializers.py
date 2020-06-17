@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Alert, NetworkSystem, Object, ObjectType, ParentObject, ProblemType
+from .models import Alert, AlertSource, Object, ObjectType, ParentObject, ProblemType
 
 
 class RemovableFieldSerializer(serializers.ModelSerializer):
@@ -14,13 +14,13 @@ class RemovableFieldSerializer(serializers.ModelSerializer):
         return obj_repr
 
 
-class NetworkSystemSerializer(RemovableFieldSerializer):
+class AlertSourceSerializer(RemovableFieldSerializer):
     class Meta:
-        model = NetworkSystem
+        model = AlertSource
         fields = ["pk", "name", "type"]
         read_only_fields = ["pk", "type"]
 
-    def to_representation(self, instance: NetworkSystem):
+    def to_representation(self, instance: AlertSource):
         system_repr = super().to_representation(instance)
         system_repr["type"] = instance.get_type_display()
         return system_repr
@@ -74,7 +74,7 @@ class AlertSerializer(RemovableFieldSerializer):
         ]
         read_only_fields = ["pk", "active_state"]
 
-    source = NetworkSystemSerializer(read_only=True)
+    source = AlertSourceSerializer(read_only=True)
     object = ObjectSerializer(read_only=True)
     parent_object = ParentObjectSerializer(read_only=True)
     problem_type = ProblemTypeSerializer(read_only=True)

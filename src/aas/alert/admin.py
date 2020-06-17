@@ -5,7 +5,7 @@ from .models import (
     Alert,
     AlertRelation,
     AlertRelationType,
-    NetworkSystem,
+    AlertSource,
     Object,
     ObjectType,
     ParentObject,
@@ -13,7 +13,7 @@ from .models import (
 )
 
 
-class NetworkSystemAdmin(admin.ModelAdmin):
+class AlertSourceAdmin(admin.ModelAdmin):
     list_display = ("name", "type")
     search_fields = ("name",)
     list_filter = ("type",)
@@ -25,10 +25,10 @@ class ObjectTypeAdmin(admin.ModelAdmin):
 
 
 class ObjectAdmin(admin.ModelAdmin):
-    list_display = ("name", "object_id", "type", "network_system")
+    list_display = ("name", "object_id", "type", "alert_source")
     search_fields = ("name", "object_id", "type__name", "url")
-    list_filter = ("network_system", "network_system__type", "type")
-    list_select_related = ("type", "network_system")
+    list_filter = ("alert_source", "alert_source__type", "type")
+    list_select_related = ("type", "alert_source")
 
 
 class ParentObjectAdmin(admin.ModelAdmin):
@@ -140,7 +140,7 @@ class AlertRelationAdmin(admin.ModelAdmin):
     get_str.short_description = "Alert relation"
 
 
-admin.site.register(NetworkSystem, NetworkSystemAdmin)
+admin.site.register(AlertSource, AlertSourceAdmin)
 admin.site.register(ObjectType, ObjectTypeAdmin)
 admin.site.register(Object, ObjectAdmin)
 admin.site.register(ParentObject, ParentObjectAdmin)

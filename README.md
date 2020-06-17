@@ -3,7 +3,7 @@
 
 AAS - Aggregated Alert System is a platform for aggregating alerts across network management systems, and sending notifications to users. Users build notification profiles that define which alerts they subscribe to.
 
-This repository hosts the backend built with Django, while the frontend is hosted here: https://github.com/ddabble/aas-frontend.
+This repository hosts the backend built with Django, while the frontend is hosted here: https://github.com/Uninett/aas-frontend.
 
 
 ## Setup
@@ -202,7 +202,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
     ```json
     {
         "name": "Critical alerts",
-        "filter_string": "{\"sourceIds\":[<NetworkSystem.pk>, ...], \"objectTypeIds\":[<ObjectType.pk>, ...], \"parentObjectIds\":[<ParentObject.pk>, ...], \"problemTypeIds\":[<ProblemType.pk>, ...]}"
+        "filter_string": "{\"sourceIds\":[<AlertSource.pk>, ...], \"objectTypeIds\":[<ObjectType.pk>, ...], \"parentObjectIds\":[<ParentObject.pk>, ...], \"problemTypeIds\":[<ProblemType.pk>, ...]}"
     }
     ```
     </details>
@@ -219,7 +219,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
 
   ```json
   {
-      "sourceIds": [<NetworkSystem.pk>, ...],
+      "sourceIds": [<AlertSource.pk>, ...],
       "objectTypeIds": [<ObjectType.pk>, ...],
       "parentObjectIds": [<ParentObject.pk>, ...],
       "problemTypeIds": [<ProblemType.pk>, ...]
