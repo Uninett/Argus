@@ -2,11 +2,11 @@ from django.db import models
 from django.db.models import Q, QuerySet
 
 
-class NetworkSystem(models.Model):
+class AlertSource(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=["name", "type"], name="networksystem_unique_name_per_type"
+                fields=["name", "type"], name="alertsource_unique_name_per_type"
             ),
         ]
 
@@ -40,12 +40,12 @@ class Object(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=["object_id", "network_system"],
-                name="object_unique_object_id_per_network_system",
+                fields=["object_id", "alert_source"],
+                name="object_unique_object_id_per_alert_source",
             ),
             models.UniqueConstraint(
-                fields=["name", "type", "network_system"],
-                name="object_unique_name_and_type_per_network_system",
+                fields=["name", "type", "alert_source"],
+                name="object_unique_name_and_type_per_alert_source",
             ),
         ]
 
@@ -55,15 +55,15 @@ class Object(models.Model):
     type = models.ForeignKey(
         to=ObjectType, on_delete=models.CASCADE, related_name="instances",
     )
-    network_system = models.ForeignKey(
-        to=NetworkSystem,
+    alert_source = models.ForeignKey(
+        to=AlertSource,
         on_delete=models.CASCADE,
         null=True,
-        related_name="network_objects",  # can't be `objects`, because it will override the model's `.objects` manager
+        related_name="object_set",  # can't be `objects`, because it will override the model's `.objects` manager
     )
 
     def __str__(self):
-        return f"{self.type}: {self.name} ({self.network_system}) <ID {self.object_id}>"
+        return f"{self.type}: {self.name} ({self.alert_source}) <ID {self.object_id}>"
 
 
 class ParentObject(models.Model):
@@ -101,7 +101,7 @@ class Alert(models.Model):
 
     timestamp = models.DateTimeField()
     source = models.ForeignKey(
-        to=NetworkSystem,
+        to=AlertSource,
         on_delete=models.CASCADE,
         related_name="alerts",
         help_text="The network management system that the alert came from.",

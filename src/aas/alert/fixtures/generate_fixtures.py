@@ -28,8 +28,8 @@ START_PK = 1
 MAX_ID = 999_999
 WORD_LENGTH_RANGE = (2, 10)
 MIN_TIMESTAMP = timezone.get_current_timezone().localize(datetime(2000, 1, 1))
-# NetworkSystem:
-NUM_NETWORK_SYSTEMS_PER_TYPE = 3
+# AlertSource:
+NUM_ALERT_SOURCES_PER_TYPE = 3
 # ObjectType:
 NUM_OBJECT_TYPES = 10
 OBJECT_TYPE_NAME_LENGTH_RANGE = (3, 7)
@@ -100,8 +100,8 @@ def roll_dice(chance_threshold: float) -> bool:
     return random.random() < chance_threshold
 
 
-def format_url(network_system: NetworkSystem, name: str) -> str:
-    return f"http://{network_system.name}.{network_system.get_type_display()}.no/{name.replace(' ', '%20')}".lower()
+def format_url(alert_source: AlertSource, name: str) -> str:
+    return f"http://{alert_source.name}.{alert_source.get_type_display()}.no/{name.replace(' ', '%20')}".lower()
 
 
 def set_pks(model_objects: List[Model]) -> List[Model]:
@@ -113,22 +113,22 @@ def set_pks(model_objects: List[Model]) -> List[Model]:
 
 
 # --- Generation functions ---
-def generate_network_system_types() -> List[str]:
-    return [type_key for type_key, _type_name in NetworkSystem.TYPE_CHOICES]
+def generate_alert_source_types() -> List[str]:
+    return [type_key for type_key, _type_name in AlertSource.TYPE_CHOICES]
 
 
-def generate_network_systems(network_system_types) -> List[Model]:
-    network_systems = []
-    for system_type in network_system_types:
-        for _ in range(NUM_NETWORK_SYSTEMS_PER_TYPE):
-            network_systems.append(
-                NetworkSystem(
+def generate_alert_sources(alert_source_types) -> List[Model]:
+    alert_sources = []
+    for system_type in alert_source_types:
+        for _ in range(NUM_ALERT_SOURCES_PER_TYPE):
+            alert_sources.append(
+                AlertSource(
                     name=random.choice(ascii_uppercase) + random.choice(digits),
                     type=system_type,
                 )
             )
 
-    return set_pks(network_systems)
+    return set_pks(alert_sources)
 
 
 def generate_object_types() -> List[Model]:
@@ -141,7 +141,7 @@ def generate_object_types() -> List[Model]:
     return set_pks(object_types)
 
 
-def generate_objects(object_types, network_systems) -> List[Model]:
+def generate_objects(object_types, alert_sources) -> List[Model]:
     def random_object_word() -> str:
         # Will most often be an empty string, sometimes a single digit, and rarely a double digit
         suffix = (
@@ -175,32 +175,32 @@ def generate_objects(object_types, network_systems) -> List[Model]:
             name_words.append(word)
         name = " ".join(name_words)
 
-        network_system = random.choice(network_systems)
+        alert_source = random.choice(alert_sources)
 
         objects.append(
             Object(
                 name=name,
                 object_id=random_id(),
-                url=format_url(network_system, name),
+                url=format_url(alert_source, name),
                 type=random.choice(object_types),
-                network_system=network_system,
+                alert_source=alert_source,
             )
         )
 
     return set_pks(objects)
 
 
-def generate_parent_objects(network_systems) -> List[Model]:
+def generate_parent_objects(alert_sources) -> List[Model]:
     parent_objects = []
     for _ in range(NUM_PARENT_OBJECTS):
-        network_system = random.choice(network_systems)
+        alert_source = random.choice(alert_sources)
         name = random_words(PARENT_OBJECT_NAME_WORD_COUNT_RANGE).title()
 
         parent_objects.append(
             ParentObject(
                 name=name,
                 parentobject_id=random_id(),
-                url=format_url(network_system, name),
+                url=format_url(alert_source, name),
             )
         )
 
@@ -224,7 +224,7 @@ def generate_problem_types() -> List[Model]:
 
 
 def generate_alerts(
-    network_systems, objects, parent_objects, problem_types
+    alert_sources, objects, parent_objects, problem_types
 ) -> List[Model]:
     second_delay = timedelta(seconds=1)
 
@@ -236,17 +236,17 @@ def generate_alerts(
         else:
             timestamp = random_timestamp()
 
-        network_system = random.choice(network_systems)
+        alert_source = random.choice(alert_sources)
         alert_id = random_id()
 
         alerts.append(
             Alert(
                 timestamp=timestamp,
-                source=network_system,
+                source=alert_source,
                 alert_id=alert_id,
                 object=random.choice(objects),
                 parent_object=random.choice(parent_objects),
-                details_url=format_url(network_system, alert_id),
+                details_url=format_url(alert_source, alert_id),
                 problem_type=random.choice(problem_types),
                 description=random_description(ALERT_DESCRIPTION_WORD_COUNT_RANGE),
             )
@@ -256,15 +256,15 @@ def generate_alerts(
 
 
 def create_fixture_file():
-    network_systems = generate_network_systems(generate_network_system_types())
+    alert_sources = generate_alert_sources(generate_alert_source_types())
     object_types = generate_object_types()
-    objects = generate_objects(object_types, network_systems)
-    parent_objects = generate_parent_objects(network_systems)
+    objects = generate_objects(object_types, alert_sources)
+    parent_objects = generate_parent_objects(alert_sources)
     problem_types = generate_problem_types()
-    alerts = generate_alerts(network_systems, objects, parent_objects, problem_types)
+    alerts = generate_alerts(alert_sources, objects, parent_objects, problem_types)
 
     all_objects = (
-        *network_systems,
+        *alert_sources,
         *object_types,
         *objects,
         *parent_objects,

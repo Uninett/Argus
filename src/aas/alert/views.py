@@ -12,7 +12,7 @@ from . import mappings
 from .models import (
     ActiveAlert,
     Alert,
-    NetworkSystem,
+    AlertSource,
     ObjectType,
     ParentObject,
     ProblemType,
@@ -20,7 +20,7 @@ from .models import (
 from .parsers import StackedJSONParser
 from .serializers import (
     AlertSerializer,
-    NetworkSystemSerializer,
+    AlertSourceSerializer,
     ObjectTypeSerializer,
     ParentObjectSerializer,
     ProblemTypeSerializer,
@@ -37,8 +37,8 @@ class AlertList(generics.ListCreateAPIView):
     def post(self, request, *args, **kwargs):
         created_alerts = [
             mappings.create_alert_from_json(
-                json_dict, NetworkSystem.NAV
-            )  # TODO: interpret network system type from alerts' source IP?
+                json_dict, AlertSource.NAV
+            )  # TODO: interpret alert source type from alerts' source IP?
             for json_dict in request.data
         ]
 
@@ -99,12 +99,12 @@ def all_alerts_from_source_view(request, source_pk):
 
 @api_view(["GET"])
 def get_all_meta_data_view(request):
-    network_systems = NetworkSystemSerializer(NetworkSystem.objects.all(), many=True)
+    alert_sources = AlertSourceSerializer(AlertSource.objects.all(), many=True)
     object_types = ObjectTypeSerializer(ObjectType.objects.all(), many=True)
     parent_objects = ParentObjectSerializer(ParentObject.objects.all(), many=True)
     problem_types = ProblemTypeSerializer(ProblemType.objects.all(), many=True)
     data = {
-        "networkSystems": network_systems.data,
+        "alertSources": alert_sources.data,
         "objectTypes": object_types.data,
         "parentObjects": parent_objects.data,
         "problemTypes": problem_types.data,

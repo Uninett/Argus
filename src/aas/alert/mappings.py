@@ -5,7 +5,7 @@ from django.db import IntegrityError, models
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from .models import Alert, NetworkSystem, Object, ObjectType, ParentObject, ProblemType
+from .models import Alert, AlertSource, Object, ObjectType, ParentObject, ProblemType
 from .utils import MappingUtils
 
 
@@ -126,7 +126,7 @@ class ForeignKeyField(FieldValueGetter):
 class FieldMapping:
     def __init__(
         self,
-        network_system_type: str,
+        alert_source_type: str,
         base_field_mappings: dict,
         *conditional_field_mappings: Choose,
     ):
@@ -141,7 +141,7 @@ class FieldMapping:
             validate_field_mappings(Alert, field_mappings)
             MappingUtils.prepare_field_value_getters(Alert, field_mappings)
 
-        self.network_system_type = network_system_type
+        self.alert_source_type = alert_source_type
         self.base_field_mappings = base_field_mappings
         self.conditional_field_mappings = conditional_field_mappings
 
@@ -157,7 +157,7 @@ class FieldMapping:
 
         # TODO: remove once source is saved from posted alerts
         alert_kwargs["source"] = random.choice(
-            NetworkSystem.objects.filter(type=self.network_system_type)
+            AlertSource.objects.filter(type=self.alert_source_type)
         )
 
         try:
@@ -167,7 +167,7 @@ class FieldMapping:
             if Alert.objects.filter(alert_id=alert_id).exists():
                 raise ValidationError(
                     f"Alert with the alert_id '{alert_id}' already exists for"
-                    f" the NetworkSystem '{alert_kwargs['source']}'."
+                    f" the AlertSource '{alert_kwargs['source']}'."
                 )
             else:
                 raise e
@@ -178,7 +178,7 @@ class FieldMapping:
 
 
 NAV_FIELD_MAPPING = FieldMapping(
-    NetworkSystem.NAV,
+    AlertSource.NAV,
     {
         Alert.timestamp: PassthroughField("time"),
         Alert.source: None,  # TODO: save source from posted alert
@@ -245,8 +245,8 @@ NAV_FIELD_MAPPING = FieldMapping(
 )
 
 SOURCE_MAPPING_DICT = {
-    NetworkSystem.NAV: NAV_FIELD_MAPPING,
-    NetworkSystem.ZABBIX: None,
+    AlertSource.NAV:    NAV_FIELD_MAPPING,
+    AlertSource.ZABBIX: None,
 }
 
 
@@ -255,7 +255,7 @@ def create_alert_from_json(json_dict: dict, alert_source_type: str):
         mapping = SOURCE_MAPPING_DICT[alert_source_type]
     except KeyError:
         raise serializers.ValidationError(
-            f"Invalid network system type '{alert_source_type}'."
+            f"Invalid alert source type '{alert_source_type}'."
         )
 
     return mapping.create_model_obj_from_json(json_dict)
