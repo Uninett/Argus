@@ -1,6 +1,14 @@
 from rest_framework import serializers
 
-from .models import Alert, AlertSource, Object, ObjectType, ParentObject, ProblemType
+from .models import (
+    Alert,
+    AlertSource,
+    AlertSourceType,
+    Object,
+    ObjectType,
+    ParentObject,
+    ProblemType,
+)
 
 
 class RemovableFieldSerializer(serializers.ModelSerializer):
@@ -14,16 +22,19 @@ class RemovableFieldSerializer(serializers.ModelSerializer):
         return obj_repr
 
 
+class AlertSourceTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AlertSourceType
+        fields = ["name"]
+
+
 class AlertSourceSerializer(RemovableFieldSerializer):
     class Meta:
         model = AlertSource
         fields = ["pk", "name", "type"]
         read_only_fields = ["pk", "type"]
 
-    def to_representation(self, instance: AlertSource):
-        system_repr = super().to_representation(instance)
-        system_repr["type"] = instance.get_type_display()
-        return system_repr
+    type = AlertSourceTypeSerializer(read_only=True)
 
 
 class ObjectTypeSerializer(RemovableFieldSerializer):

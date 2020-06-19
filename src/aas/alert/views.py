@@ -99,7 +99,9 @@ def all_alerts_from_source_view(request, source_pk):
 
 @api_view(["GET"])
 def get_all_meta_data_view(request):
-    alert_sources = AlertSourceSerializer(AlertSource.objects.all(), many=True)
+    alert_sources = AlertSourceSerializer(
+        AlertSource.objects.select_related("type"), many=True
+    )
     object_types = ObjectTypeSerializer(ObjectType.objects.all(), many=True)
     parent_objects = ParentObjectSerializer(ParentObject.objects.all(), many=True)
     problem_types = ProblemTypeSerializer(ProblemType.objects.all(), many=True)

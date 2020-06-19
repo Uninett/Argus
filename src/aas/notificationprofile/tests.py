@@ -7,7 +7,14 @@ from rest_framework.authtoken.models import Token
 from rest_framework.renderers import JSONRenderer
 from rest_framework.test import APITransactionTestCase
 
-from aas.alert.models import Alert, AlertSource, Object, ObjectType, ProblemType
+from aas.alert.models import (
+    Alert,
+    AlertSource,
+    AlertSourceType,
+    Object,
+    ObjectType,
+    ProblemType,
+)
 from aas.alert.serializers import AlertSerializer
 from aas.auth.models import User
 from aas.notificationprofile.models import (
@@ -32,12 +39,11 @@ class MockAlertData:
     def init_mock_data(self):
         self.user = User.objects.create(username="asdf")
 
-        self.nav1 = AlertSource.objects.create(
-            name="Gløshaugen", type=AlertSource.NAV
-        )
-        self.zabbix1 = AlertSource.objects.create(
-            name="Gløshaugen", type=AlertSource.ZABBIX
-        )
+        nav_type = AlertSourceType.objects.create(name="NAV")
+        zabbix_type = AlertSourceType.objects.create(name="Zabbix")
+
+        self.nav1 = AlertSource.objects.create(name="Gløshaugen", type=nav_type)
+        self.zabbix1 = AlertSource.objects.create(name="Gløshaugen", type=zabbix_type)
 
         self.object_type1 = ObjectType.objects.create(name="box")
         self.object1 = Object.objects.create(name="1", url="", type=self.object_type1)
