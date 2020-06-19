@@ -1,3 +1,4 @@
+from django.core.validators import URLValidator
 from django.db import models
 from django.db.models import Q, QuerySet
 
@@ -17,7 +18,7 @@ class AlertSource(models.Model):
         (ZABBIX, ZABBIX),
     )
 
-    name = models.CharField(max_length=50)
+    name = models.TextField()
     type = models.CharField(
         max_length=max(len(t[0]) for t in TYPE_CHOICES), choices=TYPE_CHOICES
     )
@@ -30,7 +31,7 @@ class ObjectType(models.Model):
     class Meta:
         ordering = ["name"]
 
-    name = models.CharField(max_length=50)
+    name = models.TextField()
 
     def __str__(self):
         return self.name
@@ -49,9 +50,9 @@ class Object(models.Model):
             ),
         ]
 
-    name = models.CharField(max_length=100)
-    object_id = models.CharField(blank=True, max_length=20, verbose_name="object ID")
-    url = models.URLField(verbose_name="URL")
+    name = models.TextField()
+    object_id = models.TextField(blank=True, verbose_name="object ID")
+    url = models.TextField(validators=[URLValidator], verbose_name="URL")
     type = models.ForeignKey(
         to=ObjectType, on_delete=models.CASCADE, related_name="instances",
     )
@@ -70,9 +71,9 @@ class ParentObject(models.Model):
     class Meta:
         ordering = ["name"]
 
-    name = models.CharField(blank=True, max_length=100)
-    parentobject_id = models.CharField(max_length=20, verbose_name="parent object ID")
-    url = models.URLField(blank=True, verbose_name="URL")
+    name = models.TextField(blank=True)
+    parentobject_id = models.TextField(verbose_name="parent object ID")
+    url = models.TextField(blank=True, validators=[URLValidator], verbose_name="URL")
 
     def __str__(self):
         return f"{self.name or ''} <ID {self.parentobject_id}>"
@@ -82,14 +83,14 @@ class ProblemType(models.Model):
     class Meta:
         ordering = ["name"]
 
-    name = models.CharField(max_length=50)
+    name = models.TextField()
     description = models.TextField()
 
     def __str__(self):
         return self.name
 
 
-# TODO: review max_length on CharFields, whether fields should be nullable, and on_delete modes
+# TODO: review whether fields should be nullable, and on_delete modes
 class Alert(models.Model):
     class Meta:
         constraints = [
@@ -106,7 +107,7 @@ class Alert(models.Model):
         related_name="alerts",
         help_text="The network management system that the alert came from.",
     )
-    alert_id = models.CharField(max_length=20, verbose_name="alert ID")
+    alert_id = models.TextField(verbose_name="alert ID")
     object = models.ForeignKey(
         to=Object,
         on_delete=models.CASCADE,
@@ -121,7 +122,9 @@ class Alert(models.Model):
         related_name="alerts",
         help_text="An object that the above `object` is possibly a part of.",
     )
-    details_url = models.URLField(blank=True, verbose_name="details URL")
+    details_url = models.TextField(
+        blank=True, validators=[URLValidator], verbose_name="details URL",
+    )
     problem_type = models.ForeignKey(
         to=ProblemType,
         on_delete=models.CASCADE,
@@ -129,8 +132,9 @@ class Alert(models.Model):
         help_text="The type of problem that the alert is informing about.",
     )
     description = models.TextField(blank=True)
-    ticket_url = models.URLField(
+    ticket_url = models.TextField(
         blank=True,
+        validators=[URLValidator],
         verbose_name="ticket URL",
         help_text="URL to existing ticket in a ticketing system.",
     )
@@ -167,7 +171,7 @@ class AlertRelationType(models.Model):
     class Meta:
         ordering = ["name"]
 
-    name = models.CharField(max_length=50)
+    name = models.TextField()
 
     def __str__(self):
         return self.name
