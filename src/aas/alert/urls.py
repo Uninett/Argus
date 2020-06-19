@@ -8,6 +8,7 @@ urlpatterns = [
     path("<int:pk>", views.AlertDetail.as_view()),
     path("active/", views.ActiveAlertList.as_view()),
     path("<int:alert_pk>/active", views.change_alert_active_view),
+    path("source-types/", views.AlertSourceTypeList.as_view(), name="source-types"),
     path("source/<int:source_pk>", views.all_alerts_from_source_view, name="source"),
     path("metadata/", views.get_all_meta_data_view),
 ]

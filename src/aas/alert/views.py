@@ -5,6 +5,7 @@ from django.http import HttpResponse
 from rest_framework import generics
 from rest_framework.decorators import api_view
 from rest_framework.exceptions import ValidationError
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from aas.notificationprofile.notification_media import send_notifications_to_users
@@ -13,6 +14,7 @@ from .models import (
     ActiveAlert,
     Alert,
     AlertSource,
+    AlertSourceType,
     ObjectType,
     ParentObject,
     ProblemType,
@@ -21,10 +23,17 @@ from .parsers import StackedJSONParser
 from .serializers import (
     AlertSerializer,
     AlertSourceSerializer,
+    AlertSourceTypeSerializer,
     ObjectTypeSerializer,
     ParentObjectSerializer,
     ProblemTypeSerializer,
 )
+
+
+class AlertSourceTypeList(generics.ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = AlertSourceTypeSerializer
+    queryset = AlertSourceType.objects.all()
 
 
 class AlertList(generics.ListCreateAPIView):
