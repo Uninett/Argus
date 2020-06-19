@@ -44,9 +44,10 @@ class AlertList(generics.ListCreateAPIView):
     serializer_class = AlertSerializer
 
     def post(self, request, *args, **kwargs):
+        # TODO: replace with deserializing JSON for one alert per request, with data that's already been mapped (once glue services have been implemented)
         created_alerts = [
             mappings.create_alert_from_json(
-                json_dict, AlertSource.NAV
+                json_dict, "NAV"
             )  # TODO: interpret alert source type from alerts' source IP?
             for json_dict in request.data
         ]

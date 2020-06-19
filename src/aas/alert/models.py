@@ -21,13 +21,6 @@ class AlertSource(models.Model):
             ),
         ]
 
-    NAV = "NAV"
-    ZABBIX = "Zabbix"
-    TYPE_CHOICES = (
-        (NAV, NAV),
-        (ZABBIX, ZABBIX),
-    )
-
     name = models.TextField()
     type = models.ForeignKey(
         to=AlertSourceType, on_delete=models.CASCADE, related_name="instances",

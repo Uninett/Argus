@@ -5,7 +5,7 @@ from django.db import IntegrityError, models
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from .models import Alert, AlertSource, Object, ObjectType, ParentObject, ProblemType
+from .models import Alert, AlertSource, AlertSourceType, Object, ObjectType, ParentObject, ProblemType
 from .utils import MappingUtils
 
 
@@ -177,8 +177,9 @@ class FieldMapping:
         return alert
 
 
+# TODO: remove once glue services have been implemented
 NAV_FIELD_MAPPING = FieldMapping(
-    AlertSource.NAV,
+    AlertSourceType.objects.get(name="NAV"),
     {
         Alert.timestamp: PassthroughField("time"),
         Alert.source: None,  # TODO: save source from posted alert
@@ -244,9 +245,10 @@ NAV_FIELD_MAPPING = FieldMapping(
     ),
 )
 
+# TODO: remove once glue services have been implemented
 SOURCE_MAPPING_DICT = {
-    AlertSource.NAV:    NAV_FIELD_MAPPING,
-    AlertSource.ZABBIX: None,
+    "NAV":    NAV_FIELD_MAPPING,
+    "Zabbix": None,
 }
 
 
