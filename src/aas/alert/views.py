@@ -5,6 +5,7 @@ from django.http import HttpResponse
 from rest_framework import generics
 from rest_framework.decorators import api_view
 from rest_framework.exceptions import ValidationError
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from aas.notificationprofile.notification_media import send_notifications_to_users
@@ -13,6 +14,7 @@ from .models import (
     ActiveAlert,
     Alert,
     AlertSource,
+    AlertSourceType,
     ObjectType,
     ParentObject,
     ProblemType,
@@ -21,10 +23,17 @@ from .parsers import StackedJSONParser
 from .serializers import (
     AlertSerializer,
     AlertSourceSerializer,
+    AlertSourceTypeSerializer,
     ObjectTypeSerializer,
     ParentObjectSerializer,
     ProblemTypeSerializer,
 )
+
+
+class AlertSourceTypeList(generics.ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = AlertSourceTypeSerializer
+    queryset = AlertSourceType.objects.all()
 
 
 class AlertList(generics.ListCreateAPIView):
@@ -35,9 +44,10 @@ class AlertList(generics.ListCreateAPIView):
     serializer_class = AlertSerializer
 
     def post(self, request, *args, **kwargs):
+        # TODO: replace with deserializing JSON for one alert per request, with data that's already been mapped (once glue services have been implemented)
         created_alerts = [
             mappings.create_alert_from_json(
-                json_dict, AlertSource.NAV
+                json_dict, "NAV"
             )  # TODO: interpret alert source type from alerts' source IP?
             for json_dict in request.data
         ]
@@ -99,7 +109,9 @@ def all_alerts_from_source_view(request, source_pk):
 
 @api_view(["GET"])
 def get_all_meta_data_view(request):
-    alert_sources = AlertSourceSerializer(AlertSource.objects.all(), many=True)
+    alert_sources = AlertSourceSerializer(
+        AlertSource.objects.select_related("type"), many=True
+    )
     object_types = ObjectTypeSerializer(ObjectType.objects.all(), many=True)
     parent_objects = ParentObjectSerializer(ParentObject.objects.all(), many=True)
     problem_types = ProblemTypeSerializer(ProblemType.objects.all(), many=True)

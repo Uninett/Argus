@@ -7,6 +7,7 @@ from .models import (
     AlertRelation,
     AlertRelationType,
     AlertSource,
+    AlertSourceType,
     Object,
     ObjectType,
     ParentObject,
@@ -27,6 +28,13 @@ class TextWidgetsOverrideModelAdmin(admin.ModelAdmin):
             form.base_fields[form_field].widget = widgets.AdminURLFieldWidget()
 
         return form
+
+
+class AlertSourceTypeAdmin(TextWidgetsOverrideModelAdmin):
+    list_display = ("name",)
+    search_fields = ("name",)
+
+    text_input_form_fields = ("name",)
 
 
 class AlertSourceAdmin(TextWidgetsOverrideModelAdmin):
@@ -140,7 +148,9 @@ class AlertAdmin(TextWidgetsOverrideModelAdmin):
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         # Reduce number of database calls
-        return Alert.prefetch_related_fields(qs)
+        return Alert.prefetch_related_fields(qs).prefetch_related(
+            "object__alert_source__type",
+        )
 
 
 class ActiveAlertAdmin(admin.ModelAdmin):
@@ -172,6 +182,7 @@ class AlertRelationAdmin(admin.ModelAdmin):
     get_str.short_description = "Alert relation"
 
 
+admin.site.register(AlertSourceType, AlertSourceTypeAdmin)
 admin.site.register(AlertSource, AlertSourceAdmin)
 admin.site.register(ObjectType, ObjectTypeAdmin)
 admin.site.register(Object, ObjectAdmin)
