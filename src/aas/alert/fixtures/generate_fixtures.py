@@ -49,6 +49,8 @@ PROBLEM_TYPE_DESCRIPTION_WORD_COUNT_RANGE = (5, 20)
 NUM_ALERTS = 200
 ALERT_TIMESTAMP_NOW_CHANCE = 1 / 3
 ALERT_DESCRIPTION_WORD_COUNT_RANGE = (2, 10)
+# ActiveAlert
+ALERT_ACTIVE_CHANCE = 1 / 20
 
 
 # --- Util functions ---
@@ -119,12 +121,12 @@ def generate_alert_source_types() -> List[AlertSourceType]:
 
 def generate_alert_sources(alert_source_types) -> List[Model]:
     alert_sources = []
-    for system_type in alert_source_types:
+    for source_type in alert_source_types:
         for _ in range(NUM_ALERT_SOURCES_PER_TYPE):
             alert_sources.append(
                 AlertSource(
                     name=random.choice(ascii_uppercase) + random.choice(digits),
-                    type=system_type,
+                    type=source_type,
                 )
             )
 
@@ -255,6 +257,12 @@ def generate_alerts(
     return set_pks(alerts)
 
 
+def generate_active_alerts(alerts) -> List[Model]:
+    return set_pks(
+        [ActiveAlert(alert=alert) for alert in alerts if roll_dice(ALERT_ACTIVE_CHANCE)]
+    )
+
+
 def create_fixture_file():
     alert_source_types = generate_alert_source_types()
     alert_sources = generate_alert_sources(alert_source_types)
@@ -263,6 +271,7 @@ def create_fixture_file():
     parent_objects = generate_parent_objects(alert_sources)
     problem_types = generate_problem_types()
     alerts = generate_alerts(alert_sources, objects, parent_objects, problem_types)
+    active_alerts = generate_active_alerts(alerts)
 
     all_objects = (
         *alert_source_types,
@@ -272,6 +281,7 @@ def create_fixture_file():
         *parent_objects,
         *problem_types,
         *alerts,
+        *active_alerts,
     )
 
     ALERT_FIXTURES_FILE.parent.mkdir(parents=True, exist_ok=True)
