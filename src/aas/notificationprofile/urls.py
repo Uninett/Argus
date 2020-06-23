@@ -2,17 +2,22 @@ from django.urls import path
 
 from . import views
 
-app_name = "notificationprofile"
+app_name = "notification-profile"
 urlpatterns = [
-    path("", views.NotificationProfileList.as_view()),
-    path("<int:pk>", views.NotificationProfileDetail.as_view()),
+    path("", views.NotificationProfileList.as_view(), name="notification-profiles"),
+    path(
+        "<int:pk>",
+        views.NotificationProfileDetail.as_view(),
+        name="notification-profile",
+    ),
     path(
         "<int:notification_profile_pk>/alerts/",
         views.alerts_filtered_by_notification_profile_view,
+        name="notification-profile-alerts",
     ),
-    path("timeslots/", views.TimeSlotList.as_view()),
-    path("timeslots/<int:pk>", views.TimeSlotDetail.as_view()),
-    path("filters/", views.FilterList.as_view()),
-    path("filters/<int:pk>", views.FilterDetail.as_view()),
-    path("filterpreview/", views.filter_preview_view),
+    path("timeslots/", views.TimeSlotList.as_view(), name="timeslots"),
+    path("timeslots/<int:pk>", views.TimeSlotDetail.as_view(), name="timeslot"),
+    path("filters/", views.FilterList.as_view(), name="filters"),
+    path("filters/<int:pk>", views.FilterDetail.as_view(), name="filter"),
+    path("filterpreview/", views.filter_preview_view, name="filter-preview"),
 ]
