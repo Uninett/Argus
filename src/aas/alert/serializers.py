@@ -29,12 +29,12 @@ class AlertSourceTypeSerializer(serializers.ModelSerializer):
 
 
 class AlertSourceSerializer(RemovableFieldSerializer):
+    type = AlertSourceTypeSerializer(read_only=True)
+
     class Meta:
         model = AlertSource
         fields = ["pk", "name", "type"]
         read_only_fields = ["pk", "type"]
-
-    type = AlertSourceTypeSerializer(read_only=True)
 
 
 class ObjectTypeSerializer(RemovableFieldSerializer):
@@ -45,12 +45,12 @@ class ObjectTypeSerializer(RemovableFieldSerializer):
 
 
 class ObjectSerializer(RemovableFieldSerializer):
+    type = ObjectTypeSerializer(read_only=True)
+
     class Meta:
         model = Object
         fields = ["pk", "name", "object_id", "url", "type"]
         read_only_fields = ["pk"]
-
-    type = ObjectTypeSerializer(read_only=True)
 
 
 class ParentObjectSerializer(RemovableFieldSerializer):
@@ -68,6 +68,11 @@ class ProblemTypeSerializer(RemovableFieldSerializer):
 
 
 class AlertSerializer(RemovableFieldSerializer):
+    source = AlertSourceSerializer(read_only=True)
+    object = ObjectSerializer(read_only=True)
+    parent_object = ParentObjectSerializer(read_only=True)
+    problem_type = ProblemTypeSerializer(read_only=True)
+
     class Meta:
         model = Alert
         fields = [
@@ -84,11 +89,6 @@ class AlertSerializer(RemovableFieldSerializer):
             "active_state",
         ]
         read_only_fields = ["pk", "active_state"]
-
-    source = AlertSourceSerializer(read_only=True)
-    object = ObjectSerializer(read_only=True)
-    parent_object = ParentObjectSerializer(read_only=True)
-    problem_type = ProblemTypeSerializer(read_only=True)
 
     def to_representation(self, instance: Alert):
         alert_repr = super().to_representation(instance)

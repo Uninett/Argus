@@ -4,55 +4,43 @@ from django.db.models import Q, QuerySet
 
 
 class AlertSourceType(models.Model):
+    name = models.TextField(primary_key=True)
+
     class Meta:
         ordering = ["name"]
-
-    name = models.TextField(primary_key=True)
 
     def __str__(self):
         return self.name
 
 
 class AlertSource(models.Model):
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=["name", "type"], name="alertsource_unique_name_per_type"
-            ),
-        ]
-
     name = models.TextField()
     type = models.ForeignKey(
         to=AlertSourceType, on_delete=models.CASCADE, related_name="instances",
     )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["name", "type"], name="alertsource_unique_name_per_type",
+            ),
+        ]
 
     def __str__(self):
         return f"{self.name} ({self.type})"
 
 
 class ObjectType(models.Model):
+    name = models.TextField()
+
     class Meta:
         ordering = ["name"]
-
-    name = models.TextField()
 
     def __str__(self):
         return self.name
 
 
 class Object(models.Model):
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=["object_id", "alert_source"],
-                name="object_unique_object_id_per_alert_source",
-            ),
-            models.UniqueConstraint(
-                fields=["name", "type", "alert_source"],
-                name="object_unique_name_and_type_per_alert_source",
-            ),
-        ]
-
     name = models.TextField()
     object_id = models.TextField(blank=True, verbose_name="object ID")
     url = models.TextField(validators=[URLValidator], verbose_name="URL")
@@ -66,28 +54,40 @@ class Object(models.Model):
         related_name="object_set",  # can't be `objects`, because it will override the model's `.objects` manager
     )
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["object_id", "alert_source"],
+                name="object_unique_object_id_per_alert_source",
+            ),
+            models.UniqueConstraint(
+                fields=["name", "type", "alert_source"],
+                name="object_unique_name_and_type_per_alert_source",
+            ),
+        ]
+
     def __str__(self):
         return f"{self.type}: {self.name} ({self.alert_source}) <ID {self.object_id}>"
 
 
 class ParentObject(models.Model):
-    class Meta:
-        ordering = ["name"]
-
     name = models.TextField(blank=True)
     parentobject_id = models.TextField(verbose_name="parent object ID")
     url = models.TextField(blank=True, validators=[URLValidator], verbose_name="URL")
+
+    class Meta:
+        ordering = ["name"]
 
     def __str__(self):
         return f"{self.name or ''} <ID {self.parentobject_id}>"
 
 
 class ProblemType(models.Model):
-    class Meta:
-        ordering = ["name"]
-
     name = models.TextField()
     description = models.TextField()
+
+    class Meta:
+        ordering = ["name"]
 
     def __str__(self):
         return self.name
@@ -105,14 +105,6 @@ class AlertQuerySet(models.QuerySet):
 
 # TODO: review whether fields should be nullable, and on_delete modes
 class Alert(models.Model):
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=["alert_id", "source"], name="alert_unique_alert_id_per_source"
-            ),
-        ]
-        ordering = ["-timestamp"]
-
     timestamp = models.DateTimeField()
     source = models.ForeignKey(
         to=AlertSource,
@@ -154,12 +146,20 @@ class Alert(models.Model):
 
     objects = AlertQuerySet.as_manager()
 
-    @property
-    def alert_relations(self):
-        return AlertRelation.objects.filter(Q(alert1=self) | Q(alert2=self))
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["alert_id", "source"], name="alert_unique_alert_id_per_source",
+            ),
+        ]
+        ordering = ["-timestamp"]
 
     def __str__(self):
         return f"{self.timestamp} - {self.problem_type}: {self.object}"
+
+    @property
+    def alert_relations(self):
+        return AlertRelation.objects.filter(Q(alert1=self) | Q(alert2=self))
 
 
 class ActiveAlert(models.Model):
@@ -173,10 +173,10 @@ class ActiveAlert(models.Model):
 
 
 class AlertRelationType(models.Model):
+    name = models.TextField()
+
     class Meta:
         ordering = ["name"]
-
-    name = models.TextField()
 
     def __str__(self):
         return self.name

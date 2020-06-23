@@ -49,12 +49,6 @@ class DataportenOAuth2(BaseOAuth2):
 
         return user
 
-    def check_correct_audience(self, audience):
-        """Assert that Dataporten sends back our own client id as audience"""
-        client_id, _ = self.get_key_and_secret()
-        if audience != client_id:
-            raise AuthException("Wrong audience")
-
     def user_data(self, access_token, *args, **kwargs):
         """Loads user data from service"""
         url = "{}/userinfo".format(self.BASE_URL)
@@ -70,6 +64,12 @@ class DataportenOAuth2(BaseOAuth2):
         raise NotImplementedError(
             "Refresh tokens for Dataporten have not been implemented"
         )
+
+    def check_correct_audience(self, audience):
+        """Assert that Dataporten sends back our own client id as audience"""
+        client_id, _ = self.get_key_and_secret()
+        if audience != client_id:
+            raise AuthException("Wrong audience")
 
 
 class DataportenEmailOAuth2(DataportenOAuth2):

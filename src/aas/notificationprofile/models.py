@@ -14,27 +14,27 @@ from .utils import AttrGetter, NestedAttrGetter
 
 
 class TimeSlot(models.Model):
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=["name", "user"], name="timeslot_unique_name_per_user"
-            ),
-        ]
-        ordering = ["name"]
-
     user = models.ForeignKey(
         to=User, on_delete=models.CASCADE, related_name="time_slots",
     )
     name = models.CharField(max_length=40)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["name", "user"], name="timeslot_unique_name_per_user",
+            ),
+        ]
+        ordering = ["name"]
+
+    def __str__(self):
+        return self.name
 
     def timestamp_is_within_time_intervals(self, timestamp: datetime):
         for time_interval in self.time_intervals.all():
             if time_interval.timestamp_is_within(timestamp):
                 return True
         return False
-
-    def __str__(self):
-        return self.name
 
     # Create default immediate TimeSlot when a user is created
     @staticmethod
@@ -88,18 +88,6 @@ class TimeInterval(models.Model):
     start = models.TimeField(help_text="Local time.")
     end = models.TimeField(help_text="Local time.")
 
-    @property
-    def isoweekday(self):
-        return self.DAY_NAME_TO_INDEX[self.day]
-
-    def timestamp_is_within(self, timestamp: datetime):
-        # FIXME: Might affect performance negatively if calling this method frequently
-        timestamp = timestamp.astimezone(timezone.get_current_timezone())
-        return (
-            timestamp.isoweekday() == self.isoweekday
-            and self.start <= timestamp.time() <= self.end
-        )
-
     """ needed?
     def __eq__(self, other):
         if type(other) is not TimeInterval:
@@ -116,15 +104,20 @@ class TimeInterval(models.Model):
     def __str__(self):
         return f"{self.start}-{self.end} on {self.get_day_display()}s"
 
+    @property
+    def isoweekday(self):
+        return self.DAY_NAME_TO_INDEX[self.day]
+
+    def timestamp_is_within(self, timestamp: datetime):
+        # FIXME: Might affect performance negatively if calling this method frequently
+        timestamp = timestamp.astimezone(timezone.get_current_timezone())
+        return (
+            timestamp.isoweekday() == self.isoweekday
+            and self.start <= timestamp.time() <= self.end
+        )
+
 
 class Filter(models.Model):
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=["name", "user"], name="filter_unique_name_per_user"
-            ),
-        ]
-
     FILTER_STRING_FIELDS = {
         "sourceIds": AttrGetter("source"),
         "objectTypeIds": NestedAttrGetter("object.type"),
@@ -135,6 +128,16 @@ class Filter(models.Model):
     user = models.ForeignKey(to=User, on_delete=models.CASCADE, related_name="filters",)
     name = models.CharField(max_length=40)
     filter_string = models.TextField()
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["name", "user"], name="filter_unique_name_per_user",
+            ),
+        ]
+
+    def __str__(self):
+        return f"{self.name} [{self.filter_string}]"
 
     @property
     def filter_json(self):
@@ -164,9 +167,6 @@ class Filter(models.Model):
                     return False
         return True
 
-    def __str__(self):
-        return f"{self.name} [{self.filter_string}]"
-
 
 class NotificationProfile(models.Model):
     user = models.ForeignKey(
@@ -193,6 +193,9 @@ class NotificationProfile(models.Model):
     media = MultiSelectField(choices=MEDIA_CHOICES, min_choices=1, default=EMAIL)
     active = models.BooleanField(default=True)
 
+    def __str__(self):
+        return f"{self.time_slot}: {', '.join(str(f) for f in self.filters.all())}"
+
     @property
     def filtered_alerts(self):
         alert_query = Q()
@@ -207,6 +210,3 @@ class NotificationProfile(models.Model):
         return self.time_slot.timestamp_is_within_time_intervals(
             alert.timestamp
         ) and any(f.alert_fits(alert) for f in self.filters.all())
-
-    def __str__(self):
-        return f"{self.time_slot}: {', '.join(str(f) for f in self.filters.all())}"
