@@ -23,7 +23,7 @@ def get_any_env(envname, required=False):
     if env is None:
         # Envvar not set!
         if required:
-            error = "Environment variable \"{}\" not set!".format(envname)
+            error = f'Environment variable "{envname}" not set!'
             raise OSError(error)
         return None
     return env

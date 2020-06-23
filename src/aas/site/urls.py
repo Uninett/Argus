@@ -34,7 +34,7 @@ api_urls = [
 psa_urls = [
     # Overrides social_django's `complete` view
     re_path(
-        r"^complete/(?P<backend>[^/]+){0}$".format(extra),
+        fr"^complete/(?P<backend>[^/]+){extra}$",
         dataporten_views.login_wrapper,
         name="complete",
     ),

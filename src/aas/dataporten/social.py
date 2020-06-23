@@ -16,9 +16,9 @@ class DataportenOAuth2(BaseOAuth2):
     ]
     BASE_URL = "https://auth.dataporten.no"
     API_URL = "https://api.dataporten.no"
-    AUTHORIZATION_URL = "{}/oauth/authorization".format(BASE_URL)
+    AUTHORIZATION_URL = f"{BASE_URL}/oauth/authorization"
     ACCESS_TOKEN_METHOD = "POST"
-    ACCESS_TOKEN_URL = "{}/oauth/token".format(BASE_URL)
+    ACCESS_TOKEN_URL = f"{BASE_URL}/oauth/token"
     STATE_PARAMETER = True
     REDIRECT_STATE = False
 
@@ -42,8 +42,8 @@ class DataportenOAuth2(BaseOAuth2):
         # Get profile photo url if any
         profilephoto_id = user.get("profilephoto", None)
         if profilephoto_id:
-            profilephoto_url = "{}/userinfo/v1/user/media/{}".format(
-                self.API_URL, profilephoto_id
+            profilephoto_url = (
+                f"{self.API_URL}/userinfo/v1/user/media/{profilephoto_id}"
             )
             user["profilephoto_url"] = profilephoto_url
 
@@ -51,7 +51,7 @@ class DataportenOAuth2(BaseOAuth2):
 
     def user_data(self, access_token, *args, **kwargs):
         """Loads user data from service"""
-        url = "{}/userinfo".format(self.BASE_URL)
+        url = f"{self.BASE_URL}/userinfo"
         response = self.get_json(
             url, headers={"Authorization": "Bearer " + access_token},
         )
