@@ -1,7 +1,7 @@
 # Argus
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-Argus - Aggregated Alert System is a platform for aggregating alerts across network management systems, and sending notifications to users. Users build notification profiles that define which alerts they subscribe to.
+Argus is a platform for aggregating alerts across network management systems, and sending notifications to users. Users build notification profiles that define which alerts they subscribe to.
 
 This repository hosts the backend built with Django, while the frontend is hosted here: https://github.com/Uninett/aas-frontend.
 
