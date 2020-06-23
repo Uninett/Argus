@@ -49,5 +49,5 @@ urlpatterns = [
 
 if getattr(settings, "AAS_FRONTEND_SERVED_BY_DJANGO", False):
     urlpatterns += [
-        path("", TemplateView.as_view(template_name='index.html'), name="index")
+        path("", TemplateView.as_view(template_name="index.html"), name="index")
     ]

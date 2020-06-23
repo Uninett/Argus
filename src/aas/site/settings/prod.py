@@ -8,7 +8,7 @@ TEMPLATES[0]["OPTIONS"]["debug"] = False
 SECRET_KEY = get_str_env("SECRET_KEY", required=True)
 STATIC_URL = get_str_env("STATIC_URL", "/static/")
 STATIC_ROOT = get_str_env("STATIC_ROOT", required=True)
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 
 ALLOWED_HOSTS = [

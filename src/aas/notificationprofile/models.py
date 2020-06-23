@@ -77,7 +77,7 @@ class TimeInterval(models.Model):
         (SATURDAY, "Saturday"),
         (SUNDAY, "Sunday"),
     )
-    # Map day name to ISO index, e.g. 'MO': 1
+    # Map day name to ISO index, e.g. "MO": 1
     DAY_NAME_TO_INDEX = {day: i + 1 for i, (day, _) in enumerate(DAY_CHOICES)}
 
     time_slot = models.ForeignKey(
@@ -88,7 +88,8 @@ class TimeInterval(models.Model):
     start = models.TimeField(help_text="Local time.")
     end = models.TimeField(help_text="Local time.")
 
-    """ needed?
+    # TODO: is this method needed?
+    """
     def __eq__(self, other):
         if type(other) is not TimeInterval:
             return False

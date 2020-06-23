@@ -3,12 +3,12 @@ from pathlib import Path
 
 
 __all__ = [
-    'SETTINGS_DIR',
-    'SITE_DIR',
-    'BASE_DIR',
-    'get_bool_env',
-    'get_str_env',
-    'get_int_env',
+    "SETTINGS_DIR",
+    "SITE_DIR",
+    "BASE_DIR",
+    "get_bool_env",
+    "get_str_env",
+    "get_int_env",
 ]
 
 
@@ -39,7 +39,7 @@ def get_bool_env(envname, default=None, required=False):
     return default
 
 
-def get_str_env(envname, default='', required=False):
+def get_str_env(envname, default="", required=False):
     env = get_any_env(envname, required)
     if env is None:
         return default
