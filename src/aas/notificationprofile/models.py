@@ -142,9 +142,7 @@ class Filter(models.Model):
 
     @property
     def filtered_alerts(self):
-        return Alert.prefetch_related_fields(
-            Alert.objects.filter(self.get_alert_query())
-        )
+        return Alert.objects.filter(self.get_alert_query()).prefetch_default_related()
 
     def get_alert_query(self):
         json_dict = self.filter_json
@@ -201,7 +199,7 @@ class NotificationProfile(models.Model):
         for filter_ in self.filters.all():
             alert_query |= filter_.get_alert_query()
 
-        return Alert.prefetch_related_fields(Alert.objects.filter(alert_query))
+        return Alert.objects.filter(alert_query).prefetch_default_related()
 
     def alert_fits(self, alert: Alert):
         if not self.active:

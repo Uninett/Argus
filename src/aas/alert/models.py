@@ -93,6 +93,16 @@ class ProblemType(models.Model):
         return self.name
 
 
+class AlertQuerySet(models.QuerySet):
+    def active(self):
+        return self.filter(active_state__isnull=False)
+
+    def prefetch_default_related(self):
+        return self.select_related("parent_object", "problem_type").prefetch_related(
+            "source__type", "object__type",
+        )
+
+
 # TODO: review whether fields should be nullable, and on_delete modes
 class Alert(models.Model):
     class Meta:
@@ -142,22 +152,14 @@ class Alert(models.Model):
         help_text="URL to existing ticket in a ticketing system.",
     )
 
+    objects = AlertQuerySet.as_manager()
+
     @property
     def alert_relations(self):
         return AlertRelation.objects.filter(Q(alert1=self) | Q(alert2=self))
 
     def __str__(self):
         return f"{self.timestamp} - {self.problem_type}: {self.object}"
-
-    @staticmethod
-    def get_active_alerts():
-        return Alert.objects.filter(active_state__isnull=False)
-
-    @staticmethod
-    def prefetch_related_fields(qs: QuerySet) -> QuerySet:
-        return qs.select_related("parent_object", "problem_type").prefetch_related(
-            "source__type", "object__type",
-        )
 
 
 class ActiveAlert(models.Model):

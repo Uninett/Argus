@@ -37,9 +37,7 @@ class AlertSourceTypeList(generics.ListCreateAPIView):
 
 
 class AlertList(generics.ListCreateAPIView):
-    queryset = Alert.prefetch_related_fields(
-        Alert.objects.select_related("active_state")
-    )
+    queryset = Alert.objects.prefetch_default_related().select_related("active_state")
     parser_classes = [StackedJSONParser]
     serializer_class = AlertSerializer
 
@@ -71,7 +69,7 @@ class ActiveAlertList(generics.ListAPIView):
     serializer_class = AlertSerializer
 
     def get_queryset(self):
-        return Alert.prefetch_related_fields(Alert.get_active_alerts())
+        return Alert.objects.active().prefetch_default_related()
 
 
 @api_view(["PUT"])
