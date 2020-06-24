@@ -1,1 +1,1 @@
-default_app_config = "aas.notificationprofile.apps.NotificationprofileConfig"
+default_app_config = "argus.notificationprofile.apps.NotificationprofileConfig"

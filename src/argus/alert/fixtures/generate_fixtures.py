@@ -17,7 +17,7 @@ ALERT_FIXTURES_FILE = FIXTURES_DIR / "alert" / "mock_data.json"
 
 # Must be called before any models are imported, to be able to use them
 sys.path.append(ROOT_DIR)
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "aas.site.settings.dev")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "argus.site.settings.dev")
 django.setup()
 
 from argus.alert.models import *

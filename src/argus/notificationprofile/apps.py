@@ -2,5 +2,5 @@ from django.apps import AppConfig
 
 
 class NotificationprofileConfig(AppConfig):
-    name = "aas.notificationprofile"
+    name = "argus.notificationprofile"
     label = "aas_notoprofile"

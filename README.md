@@ -3,7 +3,7 @@
 
 Argus is a platform for aggregating alerts across network management systems, and sending notifications to users. Users build notification profiles that define which alerts they subscribe to.
 
-This repository hosts the backend built with Django, while the frontend is hosted here: https://github.com/Uninett/aas-frontend.
+This repository hosts the backend built with Django, while the frontend is hosted here: https://github.com/Uninett/Argus-frontend.
 
 
 ## Setup
@@ -19,7 +19,7 @@ This repository hosts the backend built with Django, while the frontend is hoste
   * `profile`
   * `userid`
   * `userid-feide`
-* Create the text file `src/aas/site/settings/dataporten_secret.txt` containing the client key to the application
+* Create the text file `src/argus/site/settings/dataporten_secret.txt` containing the client key to the application
 
 ### Project setup
 * Create a Python 3.6+ virtual environment
@@ -30,7 +30,7 @@ Start the server with `python manage.py runserver`.
 
 ### Site- and deployment-specific settings
 
-Site-specific settings are set as per 12 factor, with environment variables. For more details, see the relevant section in the docs: [Setting site-specific settingsi](https://aas.readthedocs.io/en/latest/site-specific-settings.html).
+Site-specific settings are set as per 12 factor, with environment variables. For more details, see the relevant section in the docs: [Setting site-specific settingsi](https://argus.readthedocs.io/en/latest/site-specific-settings.html).
 
 A recap of the environment variables that can be set by default follows.
 

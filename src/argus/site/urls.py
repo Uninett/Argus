@@ -1,4 +1,4 @@
-"""aas URL Configuration
+"""Argus URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/2.2/topics/http/urls/
@@ -25,9 +25,9 @@ from argus.dataporten import views as dataporten_views
 
 
 api_urls = [
-    path("auth/", include("aas.auth.urls")),
-    path("alerts/", include("aas.alert.urls")),
-    path("notificationprofiles/", include("aas.notificationprofile.urls")),
+    path("auth/", include("argus.auth.urls")),
+    path("alerts/", include("argus.alert.urls")),
+    path("notificationprofiles/", include("argus.notificationprofile.urls")),
     path("token-auth/", rest_views.obtain_auth_token, name="api-token-auth"),
 ]
 

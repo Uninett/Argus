@@ -1,1 +1,1 @@
-default_app_config = "aas.alert.apps.AlertConfig"
+default_app_config = "argus.alert.apps.AlertConfig"

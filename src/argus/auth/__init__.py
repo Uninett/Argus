@@ -1,1 +1,1 @@
-default_app_config = "aas.auth.apps.AuthConfig"
+default_app_config = "argus.auth.apps.AuthConfig"

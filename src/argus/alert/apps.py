@@ -2,5 +2,5 @@ from django.apps import AppConfig
 
 
 class AlertConfig(AppConfig):
-    name = "aas.alert"
+    name = "argus.alert"
     label = "aas_alert"
