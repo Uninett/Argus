@@ -13,9 +13,9 @@ from argus.auth.models import User
 from .utils import AttrGetter, NestedAttrGetter
 
 
-class TimeSlot(models.Model):
+class Timeslot(models.Model):
     user = models.ForeignKey(
-        to=User, on_delete=models.CASCADE, related_name="time_slots",
+        to=User, on_delete=models.CASCADE, related_name="timeslots",
     )
     name = models.CharField(max_length=40)
 
@@ -36,21 +36,21 @@ class TimeSlot(models.Model):
                 return True
         return False
 
-    # Create default immediate TimeSlot when a user is created
+    # Create default immediate Timeslot when a user is created
     @staticmethod
     @receiver(post_save, sender=User)
-    def create_default_time_slot(sender, instance, created, raw, *args, **kwargs):
+    def create_default_timeslot(sender, instance, created, raw, *args, **kwargs):
         if raw or not created:
             return
 
-        time_slot = TimeSlot.objects.create(user=instance, name="Immediately")
+        timeslot = Timeslot.objects.create(user=instance, name="Immediately")
         time_interval_start, time_interval_end = (
             TimeInterval.DAY_START,
             TimeInterval.DAY_END,
         )
         for day, _day_name in TimeInterval.DAY_CHOICES:
             TimeInterval.objects.create(
-                time_slot=time_slot,
+                timeslot=timeslot,
                 day=day,
                 start=time_interval_start,
                 end=time_interval_end,
@@ -80,8 +80,8 @@ class TimeInterval(models.Model):
     # Map day name to ISO index, e.g. "MO": 1
     DAY_NAME_TO_INDEX = {day: i + 1 for i, (day, _) in enumerate(DAY_CHOICES)}
 
-    time_slot = models.ForeignKey(
-        to=TimeSlot, on_delete=models.CASCADE, related_name="time_intervals",
+    timeslot = models.ForeignKey(
+        to=Timeslot, on_delete=models.CASCADE, related_name="time_intervals",
     )
 
     day = models.CharField(max_length=2, choices=DAY_CHOICES)
@@ -174,8 +174,8 @@ class NotificationProfile(models.Model):
         to=User, on_delete=models.CASCADE, related_name="notification_profiles",
     )
     # TODO: add constraint that user must be the same
-    time_slot = models.OneToOneField(
-        to=TimeSlot,
+    timeslot = models.OneToOneField(
+        to=Timeslot,
         on_delete=models.CASCADE,
         primary_key=True,
         related_name="notification_profile",
@@ -195,7 +195,7 @@ class NotificationProfile(models.Model):
     active = models.BooleanField(default=True)
 
     def __str__(self):
-        return f"{self.time_slot}: {', '.join(str(f) for f in self.filters.all())}"
+        return f"{self.timeslot}: {', '.join(str(f) for f in self.filters.all())}"
 
     @property
     def filtered_alerts(self):
@@ -208,6 +208,6 @@ class NotificationProfile(models.Model):
     def alert_fits(self, alert: Alert):
         if not self.active:
             return False
-        return self.time_slot.timestamp_is_within_time_intervals(
+        return self.timeslot.timestamp_is_within_time_intervals(
             alert.timestamp
         ) and any(f.alert_fits(alert) for f in self.filters.all())

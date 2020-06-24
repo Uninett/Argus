@@ -3,16 +3,16 @@ from rest_framework.relations import PrimaryKeyRelatedField
 from . import serializers
 
 
-class TimeSlotForeignKeyField(PrimaryKeyRelatedField):
+class TimeslotForeignKeyField(PrimaryKeyRelatedField):
     def get_queryset(self):
-        return self.context["request"].user.time_slots.all()
+        return self.context["request"].user.timeslots.all()
 
     def use_pk_only_optimization(self):
-        # Disable using a mock object to wrap only the pk of a TimeSlot when running `to_representation()`
+        # Disable using a mock object to wrap only the pk of a Timeslot when running `to_representation()`
         return False
 
     def to_representation(self, value):
-        return serializers.TimeSlotSerializer(value).data
+        return serializers.TimeslotSerializer(value).data
 
 
 class FilterManyToManyField(PrimaryKeyRelatedField):

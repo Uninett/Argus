@@ -2,10 +2,10 @@ from django.contrib import admin
 from django.db.models.functions import Concat
 from django.utils.html import format_html_join
 
-from .models import Filter, NotificationProfile, TimeInterval, TimeSlot
+from .models import Filter, NotificationProfile, TimeInterval, Timeslot
 
 
-class TimeSlotAdmin(admin.ModelAdmin):
+class TimeslotAdmin(admin.ModelAdmin):
     class TimeIntervalInline(admin.TabularInline):
         model = TimeInterval
         # TODO: add ordering on day; probably requires representing days as numbers rather than letters
@@ -19,9 +19,9 @@ class TimeSlotAdmin(admin.ModelAdmin):
 
     raw_id_fields = ("user",)
 
-    def get_time_intervals(self, time_slot):
+    def get_time_intervals(self, timeslot):
         return format_html_join(
-            "", "<div>{}</div>", ((ts,) for ts in time_slot.time_intervals.all())
+            "", "<div>{}</div>", ((ts,) for ts in timeslot.time_intervals.all())
         )
 
     get_time_intervals.short_description = "Time intervals"
@@ -44,7 +44,7 @@ class NotificationProfileAdmin(admin.ModelAdmin):
     list_display = ("get_str", "get_filters", "get_media", "active")
     list_filter = ("active",)
     search_fields = (
-        "time_slot__name",
+        "timeslot__name",
         "filters__name",
         "filters__filter_string",
         "user__first_name",
@@ -52,16 +52,16 @@ class NotificationProfileAdmin(admin.ModelAdmin):
         "user__username",
     )
 
-    raw_id_fields = ("user", "time_slot")
+    raw_id_fields = ("user", "timeslot")
     filter_horizontal = ("filters",)
 
     def get_str(self, notification_profile):
         return (
-            f"[{notification_profile.time_slot.user}] {notification_profile.time_slot}"
+            f"[{notification_profile.timeslot.user}] {notification_profile.timeslot}"
         )
 
     get_str.short_description = "[User] Time slot"
-    get_str.admin_order_field = Concat("time_slot__user", "time_slot__name")
+    get_str.admin_order_field = Concat("timeslot__user", "timeslot__name")
 
     def get_filters(self, notification_profile):
         return format_html_join(
@@ -77,6 +77,6 @@ class NotificationProfileAdmin(admin.ModelAdmin):
     get_media.admin_order_field = "media"
 
 
-admin.site.register(TimeSlot, TimeSlotAdmin)
+admin.site.register(Timeslot, TimeslotAdmin)
 admin.site.register(Filter, FilterAdmin)
 admin.site.register(NotificationProfile, NotificationProfileAdmin)

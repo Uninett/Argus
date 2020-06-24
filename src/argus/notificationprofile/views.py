@@ -12,7 +12,7 @@ from .permissions import IsOwner
 from .serializers import (
     FilterSerializer,
     NotificationProfileSerializer,
-    TimeSlotSerializer,
+    TimeslotSerializer,
 )
 from .validators import FilterStringValidator
 
@@ -52,23 +52,23 @@ def alerts_filtered_by_notification_profile_view(request, notification_profile_p
     return Response(serializer.data)
 
 
-class TimeSlotList(generics.ListCreateAPIView):
+class TimeslotList(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated, IsOwner]
-    serializer_class = TimeSlotSerializer
+    serializer_class = TimeslotSerializer
 
     def get_queryset(self):
-        return self.request.user.time_slots.all()
+        return self.request.user.timeslots.all()
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
 
-class TimeSlotDetail(generics.RetrieveUpdateDestroyAPIView):
+class TimeslotDetail(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated, IsOwner]
-    serializer_class = TimeSlotSerializer
+    serializer_class = TimeslotSerializer
 
     def get_queryset(self):
-        return self.request.user.time_slots.all()
+        return self.request.user.timeslots.all()
 
 
 class FilterList(generics.ListCreateAPIView):

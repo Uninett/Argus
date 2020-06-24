@@ -22,7 +22,7 @@ from argus.notificationprofile.models import (
     Filter,
     NotificationProfile,
     TimeInterval,
-    TimeSlot,
+    Timeslot,
 )
 
 
@@ -81,21 +81,21 @@ class TestModels(TestCase, MockAlertData):
         super().init_mock_data()
         self.monday_time = make_aware(datetime.fromisoformat("2019-11-25"))
 
-        self.time_slot1 = TimeSlot.objects.create(user=self.user, name="Test")
+        self.timeslot1 = Timeslot.objects.create(user=self.user, name="Test")
         self.interval1 = TimeInterval.objects.create(
-            time_slot=self.time_slot1,
+            timeslot=self.timeslot1,
             day=TimeInterval.MONDAY,
             start=time.fromisoformat("00:30:00"),
             end=time.fromisoformat("00:30:01"),
         )
         self.interval2 = TimeInterval.objects.create(
-            time_slot=self.time_slot1,
+            timeslot=self.timeslot1,
             day=TimeInterval.MONDAY,
             start=time.fromisoformat("00:30:03"),
             end=time.fromisoformat("00:31"),
         )
         self.interval_all_day = TimeInterval.objects.create(
-            time_slot=self.time_slot1,
+            timeslot=self.timeslot1,
             day=TimeInterval.TUESDAY,
             start=TimeInterval.DAY_START,
             end=TimeInterval.DAY_END,
@@ -132,19 +132,19 @@ class TestModels(TestCase, MockAlertData):
             )
         )
 
-    def test_time_slot(self):
+    def test_timeslot(self):
         self.assertTrue(
-            self.time_slot1.timestamp_is_within_time_intervals(
+            self.timeslot1.timestamp_is_within_time_intervals(
                 self.replace_time(self.monday_time, "00:30:01")
             )
         )
         self.assertFalse(
-            self.time_slot1.timestamp_is_within_time_intervals(
+            self.timeslot1.timestamp_is_within_time_intervals(
                 self.replace_time(self.monday_time, "00:30:02")
             )
         )
         self.assertTrue(
-            self.time_slot1.timestamp_is_within_time_intervals(
+            self.timeslot1.timestamp_is_within_time_intervals(
                 self.replace_time(self.monday_time, "00:30:03")
             )
         )
@@ -185,7 +185,7 @@ class TestViews(APITestCase, MockAlertData):
         alert1_json = AlertSerializer([self.alert1], many=True).data
         self.alert1_json = JSONRenderer().render(alert1_json)
 
-        time_slot1 = TimeSlot.objects.create(user=self.user, name="Never")
+        timeslot1 = Timeslot.objects.create(user=self.user, name="Never")
         filter1 = Filter.objects.create(
             user=self.user,
             name="Critical alerts",
@@ -194,7 +194,7 @@ class TestViews(APITestCase, MockAlertData):
             "}",
         )
         self.notification_profile1 = NotificationProfile.objects.create(
-            user=self.user, time_slot=time_slot1
+            user=self.user, timeslot=timeslot1
         )
         self.notification_profile1.filters.add(filter1)
 

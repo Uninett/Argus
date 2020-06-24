@@ -125,7 +125,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
 
     ```json
     {
-        "time_slot": 1,
+        "timeslot": 1,
         "filters": [
             1,
             2
