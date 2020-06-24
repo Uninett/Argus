@@ -21,9 +21,7 @@ class MappingUtils:
 
     @staticmethod
     def _get_field_name(field: Union[DeferredAttribute, ForwardManyToOneDescriptor]):
-        if type(field) is DeferredAttribute:
-            return field.field_name
-        elif type(field) is ForwardManyToOneDescriptor:
+        if type(field) in (DeferredAttribute, ForwardManyToOneDescriptor):
             return field.field.name
         else:
             raise ValueError(f"Unknown field type {type(field)}.")
