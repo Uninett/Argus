@@ -8,7 +8,7 @@ There are several site-specific settings that need to somehow be set (and
 * SECRET_KEY
 * Any API keys, for instance OIDC keys and secrets
 * DEBUG. Newer Djangos don't have a oneliner to easily turn debugging on and
-  off for templates, but AAS supports TEMPLATE_DEBUG for this.
+  off for templates, but Argus supports TEMPLATE_DEBUG for this.
 * DATABASE-settings
 * EMAIL-settings
 
@@ -18,8 +18,8 @@ Variant 1: Use a separate settings.py file
 ==========================================
 
 This gives you the most control, and is basically what
-``aas.site.settings.dev`` and ``aas.site.settings.prod`` is. Both the extra
-settings-file and ``aas`` must be in the python path of whatever needs the
+``argus.site.settings.dev`` and ``argus.site.settings.prod`` is. Both the extra
+settings-file and ``argus`` must be in the python path of whatever needs the
 settings. However, this doesn't solve the problem of how to protect secrets,
 and hence is less suited for production environments.
 
@@ -36,9 +36,9 @@ Currently, the following settings/environment variables are supported:
 
 * DEBUG
 * TEMPLATE_DEBUG
-* AAS_DATAPORTEN_SECRET, which holds the password for using dataporten for
+* ARGUS_DATAPORTEN_SECRET, which holds the password for using dataporten for
   authentication.
-* AAS_FRONTEND_URL, by default "http://localhost:3000", for CORS
+* ARGUS_FRONTEND_URL, by default "http://localhost:3000", for CORS
 * EMAIL_HOST, smarthost to send email through
 * EMAIL_HOST_PASSWORD, password if the smarthost needs that
 * EMAIL_PORT, in production by default set to 587
@@ -46,7 +46,7 @@ Currently, the following settings/environment variables are supported:
   noise (but avoid backspaces!)
 
 If you wish to set more this way, set them in a separate settings-file, like
-``aas.site.settings.dev`` and ``aas.site.settings.prod`` demonstrates,
+``argus.site.settings.dev`` and ``argus.site.settings.prod`` demonstrates,
 basically combining variant 1 and 2.
 
 How to set environment variables

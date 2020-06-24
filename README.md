@@ -1,7 +1,7 @@
-# AAS
+# Argus
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-AAS - Aggregated Alert System is a platform for aggregating alerts across network management systems, and sending notifications to users. Users build notification profiles that define which alerts they subscribe to.
+Argus is a platform for aggregating alerts across network management systems, and sending notifications to users. Users build notification profiles that define which alerts they subscribe to.
 
 This repository hosts the backend built with Django, while the frontend is hosted here: https://github.com/Uninett/aas-frontend.
 
@@ -38,9 +38,9 @@ A recap of the environment variables that can be set by default follows.
 
 * DEBUG, 1 for True, 0 for False
 * TEMPLATE_DEBUG. By default set to the same as DEBUG.
-* AAS_DATAPORTEN_SECRET, which holds the password for using dataporten for
+* ARGUS_DATAPORTEN_SECRET, which holds the password for using dataporten for
   authentication.
-* AAS_FRONTEND_URL, by default "http://localhost:3000", for CORS
+* ARGUS_FRONTEND_URL, by default "http://localhost:3000", for CORS
 * EMAIL_HOST, smarthost (domain name) to send email through
 * EMAIL_HOST_PASSWORD, password if the smarthost needs that
 * EMAIL_PORT, in production by default set to 587
