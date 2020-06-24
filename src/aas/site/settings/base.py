@@ -165,7 +165,7 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 # Project specific settings
 
-NOTIFICATION_SUBJECT_PREFIX = "[ARGUS] "
+NOTIFICATION_SUBJECT_PREFIX = "[Argus] "
 
 
 # 3rd party settings
