@@ -8,7 +8,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.renderers import JSONRenderer
 from rest_framework.test import APITestCase
 
-from aas.alert.models import (
+from argus.alert.models import (
     Alert,
     AlertSource,
     AlertSourceType,
@@ -16,9 +16,9 @@ from aas.alert.models import (
     ObjectType,
     ProblemType,
 )
-from aas.alert.serializers import AlertSerializer
-from aas.auth.models import User
-from aas.notificationprofile.models import (
+from argus.alert.serializers import AlertSerializer
+from argus.auth.models import User
+from argus.notificationprofile.models import (
     Filter,
     NotificationProfile,
     TimeInterval,

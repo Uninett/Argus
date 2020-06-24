@@ -21,7 +21,7 @@ from django.views.generic import TemplateView
 from rest_framework.authtoken import views as rest_views
 from social_django.urls import extra
 
-from aas.dataporten import views as dataporten_views
+from argus.dataporten import views as dataporten_views
 
 
 api_urls = [

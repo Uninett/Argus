@@ -20,7 +20,7 @@ sys.path.append(ROOT_DIR)
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "aas.site.settings.dev")
 django.setup()
 
-from aas.alert.models import *
+from argus.alert.models import *
 
 
 # --- Generation configuration ---

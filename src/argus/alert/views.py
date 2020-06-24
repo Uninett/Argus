@@ -8,7 +8,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from aas.notificationprofile.notification_media import send_notifications_to_users
+from argus.notificationprofile.notification_media import send_notifications_to_users
 from . import mappings
 from .models import (
     ActiveAlert,

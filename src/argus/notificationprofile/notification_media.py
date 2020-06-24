@@ -7,9 +7,9 @@ from django.conf import settings
 from django.template.loader import render_to_string
 from rest_framework.renderers import JSONRenderer
 
-from aas.alert.models import Alert
-from aas.alert.serializers import AlertSerializer
-from aas.auth.models import User
+from argus.alert.models import Alert
+from argus.alert.serializers import AlertSerializer
+from argus.auth.models import User
 from .models import NotificationProfile
 
 
