@@ -18,12 +18,12 @@ class TimeIntervalSerializer(serializers.ModelSerializer):
 
 
 class TimeSlotSerializer(serializers.ModelSerializer):
+    time_intervals = TimeIntervalSerializer(many=True)
+
     class Meta:
         model = TimeSlot
         fields = ["pk", "name", "time_intervals"]
         read_only_fields = ["pk"]
-
-    time_intervals = TimeIntervalSerializer(many=True)
 
     def create(self, validated_data):
         time_intervals_data = validated_data.pop("time_intervals")
@@ -58,23 +58,23 @@ class TimeSlotSerializer(serializers.ModelSerializer):
 
 
 class FilterSerializer(serializers.ModelSerializer):
+    filter_string = serializers.CharField(validators=[FilterStringValidator()])
+
     class Meta:
         model = Filter
         fields = ["pk", "name", "filter_string"]
         read_only_fields = ["pk"]
 
-    filter_string = serializers.CharField(validators=[FilterStringValidator()])
-
 
 class NotificationProfileSerializer(serializers.ModelSerializer):
+    time_slot = TimeSlotForeignKeyField()
+    filters = FilterManyToManyField(many=True)
+    media = fields.MultipleChoiceField(choices=NotificationProfile.MEDIA_CHOICES)
+
     class Meta:
         model = NotificationProfile
         fields = ["pk", "time_slot", "filters", "media", "active"]
         read_only_fields = ["pk"]
-
-    time_slot = TimeSlotForeignKeyField()
-    filters = FilterManyToManyField(many=True)
-    media = fields.MultipleChoiceField(choices=NotificationProfile.MEDIA_CHOICES)
 
     def create(self, validated_data):
         try:

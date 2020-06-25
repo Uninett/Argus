@@ -1,11 +1,12 @@
 from datetime import datetime, time
 
-from django.test import TransactionTestCase
+from django.test import TestCase
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.timezone import make_aware
 from rest_framework.authtoken.models import Token
 from rest_framework.renderers import JSONRenderer
-from rest_framework.test import APITransactionTestCase
+from rest_framework.test import APITestCase
 
 from aas.alert.models import (
     Alert,
@@ -65,7 +66,7 @@ class MockAlertData:
         self.alert2.save()
 
 
-class TestModels(TransactionTestCase, MockAlertData):
+class TestModels(TestCase, MockAlertData):
     @staticmethod
     def replace_time(timestamp: datetime, new_time: str):
         new_time = time.fromisoformat(new_time)
@@ -174,7 +175,7 @@ class TestModels(TransactionTestCase, MockAlertData):
         self.assertEqual(set(filter2.filtered_alerts), {self.alert2})
 
 
-class TestViews(APITransactionTestCase, MockAlertData):
+class TestViews(APITestCase, MockAlertData):
     def setUp(self):
         super().init_mock_data()
 
@@ -199,7 +200,10 @@ class TestViews(APITransactionTestCase, MockAlertData):
 
     def test_alerts_filtered_by_notification_profile_view(self):
         response = self.client.get(
-            f"/notificationprofiles/{self.notification_profile1.pk}/alerts/"
+            reverse(
+                "notification-profile:notification-profile-alerts",
+                args=[self.notification_profile1.pk],
+            ),
         )
         response.render()
         self.assertEqual(response.content, self.alert1_json)

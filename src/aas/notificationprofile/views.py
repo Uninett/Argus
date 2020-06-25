@@ -90,7 +90,7 @@ class FilterDetail(generics.RetrieveUpdateDestroyAPIView):
         return self.request.user.filters.all()
 
 
-# TODO: make HTTP method GET and get query data from URL
+# TODO: change HTTP method to GET, and get query data from URL
 @api_view(["POST"])
 def filter_preview_view(request):
     filter_string_dict = request.data

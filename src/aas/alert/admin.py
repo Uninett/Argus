@@ -4,6 +4,7 @@ from django.contrib.admin import widgets
 from .models import (
     ActiveAlert,
     Alert,
+    AlertQuerySet,
     AlertRelation,
     AlertRelationType,
     AlertSource,
@@ -146,9 +147,9 @@ class AlertAdmin(TextWidgetsOverrideModelAdmin):
     get_active_state.admin_order_field = "active_state"
 
     def get_queryset(self, request):
-        qs = super().get_queryset(request)
+        qs: AlertQuerySet = super().get_queryset(request)
         # Reduce number of database calls
-        return Alert.prefetch_related_fields(qs).prefetch_related(
+        return qs.prefetch_default_related().prefetch_related(
             "object__alert_source__type",
         )
 
