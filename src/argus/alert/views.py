@@ -1,8 +1,4 @@
-import json
-
-from django.core import serializers
-from django.http import HttpResponse
-from rest_framework import generics
+from rest_framework import generics, serializers, status
 from rest_framework.decorators import api_view
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
@@ -10,6 +6,7 @@ from rest_framework.response import Response
 
 from argus.notificationprofile.notification_media import send_notifications_to_users
 from . import mappings
+from .forms import AddAlertSourceForm
 from .models import (
     ActiveAlert,
     Alert,
@@ -20,6 +17,7 @@ from .models import (
     ProblemType,
 )
 from .parsers import StackedJSONParser
+from .permissions import IsOwnerOrReadOnly
 from .serializers import (
     AlertSerializer,
     AlertSourceSerializer,
@@ -34,6 +32,34 @@ class AlertSourceTypeList(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = AlertSourceTypeSerializer
     queryset = AlertSourceType.objects.all()
+
+
+class AlertSourceList(generics.ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = AlertSource.objects.all()
+
+    def get_serializer_class(self):
+        # If method is POST, let `create()` below handle validation and serialization
+        return None if self.request.method == "POST" else AlertSourceSerializer
+
+    def create(self, request, *args, **kwargs):
+        # Reuse the logic in the form that's used on the admin page
+        form = AddAlertSourceForm(request.data)
+        if not form.is_valid():
+            raise serializers.ValidationError(form.errors)
+
+        alert_source = form.save()
+        serializer = AlertSourceSerializer(alert_source)
+        headers = self.get_success_headers(serializer.data)
+        return Response(
+            serializer.data, status=status.HTTP_201_CREATED, headers=headers
+        )
+
+
+class AlertSourceDetail(generics.RetrieveUpdateAPIView):
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+    queryset = AlertSource.objects.all()
+    serializer_class = AlertSourceSerializer
 
 
 class AlertList(generics.ListCreateAPIView):
@@ -95,14 +121,6 @@ def change_alert_active_view(request, alert_pk):
     )  # re-fetch the alert to get updated state after creating/deleting ActiveAlert object
     serializer = AlertSerializer(alert)
     return Response(serializer.data)
-
-
-# TODO: remove, as `filter_preview_view()` does the same and more?
-def all_alerts_from_source_view(request, source_pk):
-    data = serializers.serialize("json", Alert.objects.filter(source=source_pk))
-    # Prettify the JSON data:
-    json_result = json.dumps(json.loads(data), indent=4)
-    return HttpResponse(json_result, content_type="application/json")
 
 
 @api_view(["GET"])
