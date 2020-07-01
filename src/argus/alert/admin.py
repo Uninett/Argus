@@ -39,8 +39,8 @@ class AlertSourceTypeAdmin(TextWidgetsOverrideModelAdmin):
 
 
 class AlertSourceAdmin(TextWidgetsOverrideModelAdmin):
-    list_display = ("name", "type")
-    search_fields = ("name",)
+    list_display = ("name", "type", "user")
+    search_fields = ("name", "user__username")
     list_filter = ("type",)
 
     text_input_form_fields = ("name",)

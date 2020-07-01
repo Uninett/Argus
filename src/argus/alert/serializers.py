@@ -33,8 +33,8 @@ class AlertSourceSerializer(RemovableFieldSerializer):
 
     class Meta:
         model = AlertSource
-        fields = ["pk", "name", "type"]
-        read_only_fields = ["pk", "type"]
+        fields = ["pk", "name", "type", "user"]
+        read_only_fields = ["pk", "type", "user"]
 
 
 class ObjectTypeSerializer(RemovableFieldSerializer):

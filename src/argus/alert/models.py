@@ -2,6 +2,8 @@ from django.core.validators import URLValidator
 from django.db import models
 from django.db.models import Q, QuerySet
 
+from argus.auth.models import User
+
 
 class AlertSourceType(models.Model):
     name = models.TextField(primary_key=True)
@@ -17,6 +19,11 @@ class AlertSource(models.Model):
     name = models.TextField()
     type = models.ForeignKey(
         to=AlertSourceType, on_delete=models.CASCADE, related_name="instances",
+    )
+    user = models.OneToOneField(
+        to=User,
+        on_delete=models.CASCADE,
+        related_name="alert_source",
     )
 
     class Meta:
