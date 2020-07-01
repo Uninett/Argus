@@ -17,7 +17,7 @@ from .models import (
     ProblemType,
 )
 from .parsers import StackedJSONParser
-from .permissions import IsOwnerOrReadOnly
+from .permissions import IsOwnerOrReadOnly, IsSuperuserOrReadOnly
 from .serializers import (
     AlertSerializer,
     AlertSourceSerializer,
@@ -35,7 +35,7 @@ class AlertSourceTypeList(generics.ListCreateAPIView):
 
 
 class AlertSourceList(generics.ListCreateAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsSuperuserOrReadOnly]
     queryset = AlertSource.objects.all()
 
     def get_serializer_class(self):
