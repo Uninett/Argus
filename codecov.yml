@@ -1,0 +1,19 @@
+coverage:
+  status:
+    project:
+      default:
+        threshold: 90%
+    patch:
+      default:
+        threshold: 90%
+
+ignore:
+  - "manage.py"
+  - "setup.py"
+  - "src/argus/site/settings/**"
+  - "src/argus/dataporten/social.py"
+  - "**/apps.py"
+  - "**/wsgi.py"
+  - "**/test*.py"
+  - "**/*test.py"
+  - "**/migrations/**"
