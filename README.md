@@ -1,4 +1,6 @@
 # Argus
+[![build badge](https://github.com/Uninett/Argus/workflows/build/badge.svg)](https://github.com/Uninett/Argus/actions)
+[![codecov badge](https://codecov.io/gh/Uninett/Argus/branch/master/graph/badge.svg)](https://codecov.io/gh/Uninett/Argus)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 Argus is a platform for aggregating alerts across network management systems, and sending notifications to users. Users build notification profiles that define which alerts they subscribe to.
