@@ -1,5 +1,4 @@
 from django import forms
-from django.core.validators import EmailValidator
 from django.forms import modelform_factory
 
 from argus.auth.models import User
@@ -10,18 +9,9 @@ class AlertJsonForm(forms.Form):
     json = forms.CharField(widget=forms.Textarea)
 
 
-def validate_fqdn(value):
-    if not EmailValidator().validate_domain_part(value):
-        raise forms.ValidationError(
-            "%(value)s is not a valid FQDN", params={"value": value}
-        )
-
-
 class AddAlertSourceForm(forms.ModelForm):
     username = forms.CharField(
-        validators=[validate_fqdn],
         label="Username for alert source's system user",
-        help_text='This should be an FQDN (not ending with a ".").',
     )
 
     class Meta:

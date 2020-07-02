@@ -4,7 +4,6 @@ from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient, APITestCase
 
 from argus.auth.models import User
-from .forms import AddAlertSourceForm
 from .models import AlertSource, AlertSourceType
 
 
@@ -32,28 +31,6 @@ class AlertSourceTests(APITestCase):
         self.change_url = lambda alert_source: reverse(
             f"{self.base_admin_url}_change", args=[alert_source.pk]
         )
-
-    def test_username_validation(self):
-        def assert_validity(valid: bool, username: str):
-            form = AddAlertSourceForm(
-                {"name": "Test source", "type": self.type1, "username": username}
-            )
-            self.assertEqual(form.is_valid(), valid)
-
-        assert_validity(True, "example.com")
-        assert_validity(False, "example.com.")
-        assert_validity(False, ".example.com")
-        assert_validity(False, "example.com/")
-        assert_validity(False, "example.com/e")
-        assert_validity(False, "example.com?")
-        assert_validity(False, "example.com?q")
-
-        assert_validity(True, "glos.no")
-        assert_validity(False, "gløs.no")
-
-        assert_validity(True, "gw4.uninett.no")
-        assert_validity(True, "oslo-gw4.uninett.no")
-        assert_validity(True, "hpc-oslo-gw.uninett.no")
 
     def _test_posting(self, url: str, client: Client):
         source1_dict = {
