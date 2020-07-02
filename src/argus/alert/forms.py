@@ -11,7 +11,9 @@ class AlertJsonForm(forms.Form):
 
 class AddAlertSourceForm(forms.ModelForm):
     username = forms.CharField(
-        label="Username for alert source's system user",
+        required=False,
+        label="Username for the alert source's system user",
+        help_text="Defaults to the provided name of the alert source.",
     )
 
     class Meta:
@@ -20,6 +22,13 @@ class AddAlertSourceForm(forms.ModelForm):
 
     def clean_username(self):
         username = self.cleaned_data["username"]
+        if not username:
+            username = self.cleaned_data["name"]
+            # Update the form's bound data to show the user which value was used while validating - in case the username causes errors
+            bound_data = self.data.copy()
+            bound_data["username"] = username
+            self.data = bound_data
+
         UserForm = modelform_factory(User, fields=["username"])
         user_form = UserForm({"username": username})
         if not user_form.is_valid():

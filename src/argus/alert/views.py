@@ -1,9 +1,12 @@
+import secrets
+
 from rest_framework import generics, serializers, status
 from rest_framework.decorators import api_view
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from argus.auth.models import User
 from argus.notificationprofile.notification_media import send_notifications_to_users
 from . import mappings
 from .forms import AddAlertSourceForm
@@ -46,7 +49,11 @@ class AlertSourceList(generics.ListCreateAPIView):
         # Reuse the logic in the form that's used on the admin page
         form = AddAlertSourceForm(request.data)
         if not form.is_valid():
-            raise serializers.ValidationError(form.errors)
+            # If the form is invalid because the username is unavailable:
+            if User.objects.filter(username=form.data["username"]).exists():
+                self._set_available_username(form)
+            else:
+                raise serializers.ValidationError(form.errors)
 
         alert_source = form.save()
         serializer = AlertSourceSerializer(alert_source)
@@ -54,6 +61,15 @@ class AlertSourceList(generics.ListCreateAPIView):
         return Response(
             serializer.data, status=status.HTTP_201_CREATED, headers=headers
         )
+
+    @staticmethod
+    def _set_available_username(form: AddAlertSourceForm):
+        random_suffix = secrets.token_hex(3).upper()  # 16.8 million distinct values
+        username = f"{form.data['username']}_{random_suffix}"
+        form.data["username"] = username
+        form.full_clean()  # re-checks for errors
+        if not form.is_valid():
+            raise serializers.ValidationError(form.errors)
 
 
 class AlertSourceDetail(generics.RetrieveUpdateAPIView):
