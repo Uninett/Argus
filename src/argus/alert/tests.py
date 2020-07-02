@@ -43,8 +43,10 @@ class AlertSourcePostingTests(APITestCase):
 
     def _test_posting_should_add_alert_source_with_user(self, url: str, client: Client):
         self.assertEqual(AlertSource.objects.count(), 0)
+        self.assertEqual(User.objects.count(), 1)
         self._post_source1_dict(url, client)
         self.assertEqual(AlertSource.objects.count(), 1)
+        self.assertEqual(User.objects.count(), 2)
 
         source1 = AlertSource.objects.get(name=self.source1_dict["name"])
         self.assertEqual(source1.name, self.source1_dict["name"])
@@ -65,8 +67,11 @@ class AlertSourcePostingTests(APITestCase):
             "type": self.source1_dict["type"],
             "username": "gw2.uninett.no",
         }
+        self.assertEqual(AlertSource.objects.count(), 1)
+        self.assertEqual(User.objects.count(), 2)
         client.post(url, source1_duplicate_name)
         self.assertEqual(AlertSource.objects.count(), 1)
+        self.assertEqual(User.objects.count(), 2)
 
     def test_serializer_posting_duplicate_alert_source_name_should_not_add_objects(self):
         self._test_posting_duplicate_alert_source_name_should_not_add_objects(self.sources_url, self.rest_client)
@@ -74,22 +79,34 @@ class AlertSourcePostingTests(APITestCase):
     def test_admin_add_form_posting_duplicate_alert_source_name_should_not_add_objects(self):
         self._test_posting_duplicate_alert_source_name_should_not_add_objects(self.add_url, self.django_client)
 
-    def _test_posting_duplicate_alert_source_username_should_not_add_objects(self, url: str, client: Client):
-        source1_duplicate_username = {
+    def _test_posting_duplicate_alert_source_username(self, url: str, client: Client):
+        self._post_source1_dict(url, client)
+        self.source1_duplicate_username_dict = {
             "name": "NAV 2",
             "type": self.type2.pk,
             "username": self.source1_dict["username"],
         }
-        client.post(url, source1_duplicate_username)
         self.assertEqual(AlertSource.objects.count(), 1)
+        self.assertEqual(User.objects.count(), 2)
+        client.post(url, self.source1_duplicate_username_dict)
 
-    def test_serializer_posting_duplicate_alert_source_username_should_not_add_objects(self):
-        self._post_source1_dict(self.sources_url, self.rest_client)
-        self._test_posting_duplicate_alert_source_username_should_not_add_objects(self.sources_url, self.rest_client)
+    def test_serializer_posting_duplicate_alert_source_username_should_set_username_with_generated_suffix(self):
+        self._test_posting_duplicate_alert_source_username(self.sources_url, self.rest_client)
+        self.assertEqual(AlertSource.objects.count(), 2)
+        self.assertEqual(User.objects.count(), 3)
+
+        source1_duplicate_username = AlertSource.objects.get(name=self.source1_duplicate_username_dict["name"])
+        self.assertEqual(source1_duplicate_username.name, self.source1_duplicate_username_dict["name"])
+        self.assertEqual(source1_duplicate_username.type.pk, self.source1_duplicate_username_dict["type"])
+        duplicate_username = self.source1_duplicate_username_dict["username"]
+        generated_username = source1_duplicate_username.user.username
+        self.assertNotEqual(generated_username, duplicate_username)
+        self.assertTrue(generated_username.startswith(duplicate_username))
 
     def test_admin_add_form_posting_duplicate_alert_source_username_should_not_add_objects(self):
-        self._post_source1_dict(self.add_url, self.django_client)
-        self._test_posting_duplicate_alert_source_username_should_not_add_objects(self.add_url, self.django_client)
+        self._test_posting_duplicate_alert_source_username(self.add_url, self.django_client)
+        self.assertEqual(AlertSource.objects.count(), 1)
+        self.assertEqual(User.objects.count(), 2)
 
     def test_admin_change_form_should_change_fields(self):
         source1_user = User.objects.create_user(username="gw1.uninett.no")
