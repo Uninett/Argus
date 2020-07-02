@@ -108,6 +108,27 @@ class AlertSourcePostingTests(APITestCase):
         self.assertEqual(AlertSource.objects.count(), 1)
         self.assertEqual(User.objects.count(), 2)
 
+    def _test_posting_empty_alert_source_username_should_use_alert_source_name_as_username(self, url: str, client: Client):
+        source_name = "gw.uninett"
+        source_no_username_dict = {
+            "name": source_name,
+            "type": self.type1.pk,
+        }
+        self.assertEqual(AlertSource.objects.count(), 0)
+        self.assertEqual(User.objects.count(), 1)
+        client.post(url, source_no_username_dict)
+        self.assertEqual(AlertSource.objects.count(), 1)
+        self.assertEqual(User.objects.count(), 2)
+
+        source = AlertSource.objects.get(name=source_name)
+        self.assertEqual(source.user.username, source_name)
+
+    def test_serializer_posting_empty_alert_source_username_should_use_alert_source_name_as_username(self):
+        self._test_posting_empty_alert_source_username_should_use_alert_source_name_as_username(self.sources_url, self.rest_client)
+
+    def test_admin_add_form_posting_empty_alert_source_username_should_use_alert_source_name_as_username(self):
+        self._test_posting_empty_alert_source_username_should_use_alert_source_name_as_username(self.add_url, self.django_client)
+
     def test_admin_change_form_should_change_fields(self):
         source1_user = User.objects.create_user(username="gw1.uninett.no")
         source1_user2 = User.objects.create_user(username="new.gw1.uninett.no")
