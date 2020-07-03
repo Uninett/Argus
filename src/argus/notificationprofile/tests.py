@@ -92,19 +92,19 @@ class ModelTests(TestCase, MockAlertData):
         self.timeslot1 = Timeslot.objects.create(user=self.user, name="Test")
         self.interval1 = TimeInterval.objects.create(
             timeslot=self.timeslot1,
-            day=TimeInterval.MONDAY,
+            days={TimeInterval.Day.MONDAY},
             start=time.fromisoformat("00:30:00"),
             end=time.fromisoformat("00:30:01"),
         )
         self.interval2 = TimeInterval.objects.create(
             timeslot=self.timeslot1,
-            day=TimeInterval.MONDAY,
+            days={TimeInterval.Day.MONDAY},
             start=time.fromisoformat("00:30:03"),
             end=time.fromisoformat("00:31"),
         )
         self.interval_all_day = TimeInterval.objects.create(
             timeslot=self.timeslot1,
-            day=TimeInterval.TUESDAY,
+            days={TimeInterval.Day.TUESDAY},
             start=TimeInterval.DAY_START,
             end=TimeInterval.DAY_END,
         )
@@ -116,7 +116,6 @@ class ModelTests(TestCase, MockAlertData):
             self.replace_time(datetime.fromisoformat("2000-01-01"), "10:00"),
         )
 
-        self.assertEqual(TimeInterval.DAY_NAME_TO_INDEX["MO"], 1)
         self.assertEqual(self.monday_time.strftime("%A"), "Monday")
 
         self.assertFalse(

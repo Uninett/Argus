@@ -8,13 +8,13 @@ from .models import Filter, NotificationProfile, TimeInterval, Timeslot
 class TimeslotAdmin(admin.ModelAdmin):
     class TimeIntervalInline(admin.TabularInline):
         model = TimeInterval
-        # TODO: add ordering on day; probably requires representing days as numbers rather than letters
+        ordering = ["days"]
+        min_num = 1
         extra = 0
 
     inlines = [TimeIntervalInline]
 
     list_display = ("name", "user", "get_time_intervals")
-    list_filter = ("time_intervals__day",)
     search_fields = ("name", "user__first_name", "user__last_name", "user__username")
 
     raw_id_fields = ("user",)
