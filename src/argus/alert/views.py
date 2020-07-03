@@ -40,10 +40,7 @@ class AlertSourceTypeList(generics.ListCreateAPIView):
 class AlertSourceList(generics.ListCreateAPIView):
     permission_classes = [IsSuperuserOrReadOnly]
     queryset = AlertSource.objects.all()
-
-    def get_serializer_class(self):
-        # If method is POST, let `create()` below handle validation and serialization
-        return None if self.request.method == "POST" else AlertSourceSerializer
+    serializer_class = AlertSourceSerializer
 
     def create(self, request, *args, **kwargs):
         # Reuse the logic in the form that's used on the admin page
