@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.contrib.admin import widgets
 
+from .forms import AddAlertSourceForm
 from .models import (
     ActiveAlert,
     Alert,
@@ -39,11 +40,19 @@ class AlertSourceTypeAdmin(TextWidgetsOverrideModelAdmin):
 
 
 class AlertSourceAdmin(TextWidgetsOverrideModelAdmin):
-    list_display = ("name", "type")
-    search_fields = ("name",)
+    list_display = ("name", "type", "user")
+    search_fields = ("name", "user__username")
     list_filter = ("type",)
 
     text_input_form_fields = ("name",)
+    raw_id_fields = ("user",)
+
+    def get_form(self, request, obj=None, **kwargs):
+        # If add form (instead of change form):
+        if not obj:
+            kwargs["form"] = AddAlertSourceForm
+
+        return super().get_form(request, obj, **kwargs)
 
 
 class ObjectTypeAdmin(TextWidgetsOverrideModelAdmin):

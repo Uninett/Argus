@@ -1,15 +1,15 @@
-import json
+import secrets
 
-from django.core import serializers
-from django.http import HttpResponse
-from rest_framework import generics
+from rest_framework import generics, serializers, status
 from rest_framework.decorators import api_view
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from argus.auth.models import User
 from argus.notificationprofile.notification_media import send_notifications_to_users
 from . import mappings
+from .forms import AddAlertSourceForm
 from .models import (
     ActiveAlert,
     Alert,
@@ -20,6 +20,7 @@ from .models import (
     ProblemType,
 )
 from .parsers import StackedJSONParser
+from .permissions import IsOwnerOrReadOnly, IsSuperuserOrReadOnly
 from .serializers import (
     AlertSerializer,
     AlertSourceSerializer,
@@ -34,6 +35,44 @@ class AlertSourceTypeList(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = AlertSourceTypeSerializer
     queryset = AlertSourceType.objects.all()
+
+
+class AlertSourceList(generics.ListCreateAPIView):
+    permission_classes = [IsSuperuserOrReadOnly]
+    queryset = AlertSource.objects.all()
+    serializer_class = AlertSourceSerializer
+
+    def create(self, request, *args, **kwargs):
+        # Reuse the logic in the form that's used on the admin page
+        form = AddAlertSourceForm(request.data)
+        if not form.is_valid():
+            # If the form is invalid because the username is unavailable:
+            if User.objects.filter(username=form.data["username"]).exists():
+                self._set_available_username(form)
+            else:
+                raise serializers.ValidationError(form.errors)
+
+        alert_source = form.save()
+        serializer = AlertSourceSerializer(alert_source)
+        headers = self.get_success_headers(serializer.data)
+        return Response(
+            serializer.data, status=status.HTTP_201_CREATED, headers=headers
+        )
+
+    @staticmethod
+    def _set_available_username(form: AddAlertSourceForm):
+        random_suffix = secrets.token_hex(3).upper()  # 16.8 million distinct values
+        username = f"{form.data['username']}_{random_suffix}"
+        form.data["username"] = username
+        form.full_clean()  # re-checks for errors
+        if not form.is_valid():
+            raise serializers.ValidationError(form.errors)
+
+
+class AlertSourceDetail(generics.RetrieveUpdateAPIView):
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+    queryset = AlertSource.objects.all()
+    serializer_class = AlertSourceSerializer
 
 
 class AlertList(generics.ListCreateAPIView):
@@ -95,14 +134,6 @@ def change_alert_active_view(request, alert_pk):
     )  # re-fetch the alert to get updated state after creating/deleting ActiveAlert object
     serializer = AlertSerializer(alert)
     return Response(serializer.data)
-
-
-# TODO: remove, as `filter_preview_view()` does the same and more?
-def all_alerts_from_source_view(request, source_pk):
-    data = serializers.serialize("json", Alert.objects.filter(source=source_pk))
-    # Prettify the JSON data:
-    json_result = json.dumps(json.loads(data), indent=4)
-    return HttpResponse(json_result, content_type="application/json")
 
 
 @api_view(["GET"])

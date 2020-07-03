@@ -43,8 +43,16 @@ class MockAlertData:
         nav_type = AlertSourceType.objects.create(name="NAV")
         zabbix_type = AlertSourceType.objects.create(name="Zabbix")
 
-        self.nav1 = AlertSource.objects.create(name="Gløshaugen", type=nav_type)
-        self.zabbix1 = AlertSource.objects.create(name="Gløshaugen", type=zabbix_type)
+        self.nav1 = AlertSource.objects.create(
+            name="Gløshaugen",
+            type=nav_type,
+            user=User.objects.create(username="nav.glos.no"),
+        )
+        self.zabbix1 = AlertSource.objects.create(
+            name="Gløshaugen",
+            type=zabbix_type,
+            user=User.objects.create(username="zabbix.glos.no"),
+        )
 
         self.object_type1 = ObjectType.objects.create(name="box")
         self.object1 = Object.objects.create(name="1", url="", type=self.object_type1)
@@ -66,7 +74,7 @@ class MockAlertData:
         self.alert2.save()
 
 
-class TestModels(TestCase, MockAlertData):
+class ModelTests(TestCase, MockAlertData):
     @staticmethod
     def replace_time(timestamp: datetime, new_time: str):
         new_time = time.fromisoformat(new_time)
@@ -175,7 +183,7 @@ class TestModels(TestCase, MockAlertData):
         self.assertEqual(set(filter2.filtered_alerts), {self.alert2})
 
 
-class TestViews(APITestCase, MockAlertData):
+class ViewTests(APITestCase, MockAlertData):
     def setUp(self):
         super().init_mock_data()
 
