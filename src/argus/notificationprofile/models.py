@@ -103,6 +103,13 @@ class TimeRecurrence(models.Model):
         )
 
 
+# Sort days when a TimeRecurrence is saved
+@receiver(pre_save, sender=TimeRecurrence)
+def sort_days(sender, instance: TimeRecurrence, *args, **kwargs):
+    if instance.days:
+        instance.days = sorted(instance.days)
+
+
 class Filter(models.Model):
     FILTER_STRING_FIELDS = {
         "sourceIds": AttrGetter("source"),
