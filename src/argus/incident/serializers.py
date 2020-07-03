@@ -1,13 +1,13 @@
 from rest_framework import serializers
 
 from .models import (
-    Alert,
-    AlertSource,
-    AlertSourceType,
+    Incident,
     Object,
     ObjectType,
     ParentObject,
     ProblemType,
+    SourceSystem,
+    SourceSystemType,
 )
 
 
@@ -22,17 +22,17 @@ class RemovableFieldSerializer(serializers.ModelSerializer):
         return obj_repr
 
 
-class AlertSourceTypeSerializer(serializers.ModelSerializer):
+class SourceSystemTypeSerializer(serializers.ModelSerializer):
     class Meta:
-        model = AlertSourceType
+        model = SourceSystemType
         fields = ["name"]
 
 
-class AlertSourceSerializer(RemovableFieldSerializer):
-    type = AlertSourceTypeSerializer(read_only=True)
+class SourceSystemSerializer(RemovableFieldSerializer):
+    type = SourceSystemTypeSerializer(read_only=True)
 
     class Meta:
-        model = AlertSource
+        model = SourceSystem
         fields = ["pk", "name", "type", "user"]
         read_only_fields = ["pk", "type", "user"]
 
@@ -67,19 +67,19 @@ class ProblemTypeSerializer(RemovableFieldSerializer):
         read_only_fields = ["pk"]
 
 
-class AlertSerializer(RemovableFieldSerializer):
-    source = AlertSourceSerializer(read_only=True)
+class IncidentSerializer(RemovableFieldSerializer):
+    source = SourceSystemSerializer(read_only=True)
     object = ObjectSerializer(read_only=True)
     parent_object = ParentObjectSerializer(read_only=True)
     problem_type = ProblemTypeSerializer(read_only=True)
 
     class Meta:
-        model = Alert
+        model = Incident
         fields = [
             "pk",
             "timestamp",
             "source",
-            "alert_id",
+            "source_incident_id",
             "object",
             "parent_object",
             "details_url",
@@ -90,7 +90,7 @@ class AlertSerializer(RemovableFieldSerializer):
         ]
         read_only_fields = ["pk", "active_state"]
 
-    def to_representation(self, instance: Alert):
-        alert_repr = super().to_representation(instance)
-        alert_repr["active_state"] = hasattr(instance, "active_state")
-        return alert_repr
+    def to_representation(self, instance: Incident):
+        incident_repr = super().to_representation(instance)
+        incident_repr["active_state"] = hasattr(instance, "active_state")
+        return incident_repr

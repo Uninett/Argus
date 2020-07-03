@@ -3,7 +3,7 @@
 [![codecov badge](https://codecov.io/gh/Uninett/Argus/branch/master/graph/badge.svg)](https://codecov.io/gh/Uninett/Argus)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-Argus is a platform for aggregating alerts across network management systems, and sending notifications to users. Users build notification profiles that define which alerts they subscribe to.
+Argus is a platform for aggregating incidents across network management systems, and sending notifications to users. Users build notification profiles that define which incidents they subscribe to.
 
 This repository hosts the backend built with Django, while the frontend is hosted here: https://github.com/Uninett/Argus-frontend.
 
@@ -70,11 +70,11 @@ All endpoints require requests to contain a header with key `Authorization` and 
 </details>
 
 <details>
-<summary>Alert endpoints</summary>
+<summary>Incident endpoints</summary>
 
-* `/api/v1/alerts/`:
-  * `GET`: returns all alerts - both active and historic
-  * `POST`: creates and returns an alert
+* `/api/v1/incidents/`:
+  * `GET`: returns all incidents - both active and historic
+  * `POST`: creates and returns an incident
     <details>
     <summary>Body:</summary>
 
@@ -112,11 +112,11 @@ All endpoints require requests to contain a header with key `Authorization` and 
     ```
     </details>
 
-* `GET` to `/api/v1/alerts/<int:pk>`: returns an alert by pk
-* `GET` to `/api/v1/alerts/active/`: returns all active alerts
-* `PUT` to `/api/v1/alerts/<int:pk>/active`: changes an alert's active state by pk
+* `GET` to `/api/v1/incidents/<int:pk>`: returns an incident by pk
+* `GET` to `/api/v1/incidents/active/`: returns all active incidents
+* `PUT` to `/api/v1/incidents/<int:pk>/active`: changes an incident's active state by pk
   * Body: `{ "active": <bool> }`
-* `GET` to `/api/v1/alerts/metadata/`: returns relevant metadata for all alerts
+* `GET` to `/api/v1/incidents/metadata/`: returns relevant metadata for all incidents
 
 </details>
 
@@ -151,7 +151,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
     * Body: same as `POST` to `/api/v1/notificationprofiles/`
   * `DELETE`: deletes one of the logged in user's notification profiles by pk
 
-* `GET` to `/api/v1/notificationprofiles/<int:pk>/alerts/`: returns all alerts - both active and historic - filtered by one of the logged in user's notification profiles by pk
+* `GET` to `/api/v1/notificationprofiles/<int:pk>/incidents/`: returns all incidents - both active and historic - filtered by one of the logged in user's notification profiles by pk
 
 * `/api/v1/notificationprofiles/timeslots/`:
   * `GET`: returns the logged in user's time slots
@@ -220,8 +220,8 @@ All endpoints require requests to contain a header with key `Authorization` and 
 
     ```json
     {
-        "name": "Critical alerts",
-        "filter_string": "{\"sourceIds\":[<AlertSource.pk>, ...], \"objectTypeIds\":[<ObjectType.pk>, ...], \"parentObjectIds\":[<ParentObject.pk>, ...], \"problemTypeIds\":[<ProblemType.pk>, ...]}"
+        "name": "Critical incidents",
+        "filter_string": "{\"sourceIds\":[<SourceSystem.pk>, ...], \"objectTypeIds\":[<ObjectType.pk>, ...], \"parentObjectIds\":[<ParentObject.pk>, ...], \"problemTypeIds\":[<ProblemType.pk>, ...]}"
     }
     ```
     </details>
@@ -232,13 +232,13 @@ All endpoints require requests to contain a header with key `Authorization` and 
     * Body: same as `POST` to `/api/v1/notificationprofiles/filters/`
   * `DELETE`: deletes one of the logged in user's filters by pk
 
-* `POST` to `/api/v1/notificationprofiles/filterpreview/`: returns all alerts - both active and historic - filtered by the values in the body
+* `POST` to `/api/v1/notificationprofiles/filterpreview/`: returns all incidents - both active and historic - filtered by the values in the body
   <details>
   <summary>Body:</summary>
 
   ```json
   {
-      "sourceIds": [<AlertSource.pk>, ...],
+      "sourceIds": [<SourceSystem.pk>, ...],
       "objectTypeIds": [<ObjectType.pk>, ...],
       "parentObjectIds": [<ParentObject.pk>, ...],
       "problemTypeIds": [<ProblemType.pk>, ...]
@@ -252,12 +252,12 @@ All endpoints require requests to contain a header with key `Authorization` and 
 ## Models
 
 ### Explanation of terms
-* `alert`: a blob of data sent from a network management system to inform about an event in the network.
-* `source`: the network management system that the `alert` came from.
-* `object`: the most specific object that the `alert` (network event) was about.
+* `incident`: an unplanned interruption in the source system.
+* `source`: the source system that the `incident` originated in.
+* `object`: the most specific object that the `incident` is about.
 * `parent_object`: an object that the `object` is possibly a part of.
-* `problem_type`: the type of problem that the `alert` is informing about.
-* `active_state`: whether an `alert`'s problem has been resolved.
+* `problem_type`: the type of problem that the `incident` is about.
+* `active_state`: whether an `incident` has been resolved.
 
 ### ER diagram
 ![ER diagram](img/ER_model.png)

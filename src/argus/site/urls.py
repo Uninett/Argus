@@ -26,7 +26,7 @@ from argus.dataporten import views as dataporten_views
 
 api_urls = [
     path("auth/", include("argus.auth.urls")),
-    path("alerts/", include("argus.incident.urls")),
+    path("incidents/", include("argus.incident.urls")),
     path("notificationprofiles/", include("argus.notificationprofile.urls")),
     path("token-auth/", rest_views.obtain_auth_token, name="api-token-auth"),
 ]

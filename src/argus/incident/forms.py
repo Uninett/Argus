@@ -2,22 +2,22 @@ from django import forms
 from django.forms import modelform_factory
 
 from argus.auth.models import User
-from .models import AlertSource
+from .models import SourceSystem
 
 
 class AlertJsonForm(forms.Form):
     json = forms.CharField(widget=forms.Textarea)
 
 
-class AddAlertSourceForm(forms.ModelForm):
+class AddSourceSystemForm(forms.ModelForm):
     username = forms.CharField(
         required=False,
-        label="Username for the alert source's system user",
-        help_text="Defaults to the provided name of the alert source.",
+        label="Username for the source system's system user",
+        help_text="Defaults to the provided name of the source system.",
     )
 
     class Meta:
-        model = AlertSource
+        model = SourceSystem
         exclude = ["user"]
 
     def clean_username(self):
@@ -44,7 +44,7 @@ class AddAlertSourceForm(forms.ModelForm):
         if self.errors:
             return super().save(commit)
 
-        instance: AlertSource = super().save(False)
+        instance: SourceSystem = super().save(False)
 
         user = User.objects.create(username=self.cleaned_data["username"])
         instance.user = user

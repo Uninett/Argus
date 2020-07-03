@@ -1,4 +1,4 @@
-# Aggregated Alert System contributors
+# Argus contributors
 
 *Listed in order of appearance in the commit log:*
 

@@ -8,16 +8,16 @@ from rest_framework.authtoken.models import Token
 from rest_framework.renderers import JSONRenderer
 from rest_framework.test import APITestCase
 
+from argus.auth.models import User
 from argus.incident.models import (
-    Alert,
-    AlertSource,
-    AlertSourceType,
+    Incident,
     Object,
     ObjectType,
     ProblemType,
+    SourceSystem,
+    SourceSystemType,
 )
-from argus.incident.serializers import AlertSerializer
-from argus.auth.models import User
+from argus.incident.serializers import IncidentSerializer
 from argus.notificationprofile.models import (
     Filter,
     NotificationProfile,
@@ -26,7 +26,7 @@ from argus.notificationprofile.models import (
 )
 
 
-class MockAlertData:
+class MockIncidentData:
     # Define member variables, to avoid warnings
     user = None
     nav1 = None
@@ -34,21 +34,21 @@ class MockAlertData:
     object_type1 = None
     object1 = None
     problem_type1 = None
-    alert1 = None
-    alert2 = None
+    incident1 = None
+    incident2 = None
 
     def init_mock_data(self):
         self.user = User.objects.create(username="asdf")
 
-        nav_type = AlertSourceType.objects.create(name="NAV")
-        zabbix_type = AlertSourceType.objects.create(name="Zabbix")
+        nav_type = SourceSystemType.objects.create(name="NAV")
+        zabbix_type = SourceSystemType.objects.create(name="Zabbix")
 
-        self.nav1 = AlertSource.objects.create(
+        self.nav1 = SourceSystem.objects.create(
             name="Gløshaugen",
             type=nav_type,
             user=User.objects.create(username="nav.glos.no"),
         )
-        self.zabbix1 = AlertSource.objects.create(
+        self.zabbix1 = SourceSystem.objects.create(
             name="Gløshaugen",
             type=zabbix_type,
             user=User.objects.create(username="zabbix.glos.no"),
@@ -61,20 +61,20 @@ class MockAlertData:
             name="boxDown", description="A box is down."
         )
 
-        self.alert1 = Alert.objects.create(
+        self.incident1 = Incident.objects.create(
             timestamp=timezone.now(),
             source=self.nav1,
-            alert_id="123",
+            source_incident_id="123",
             object=self.object1,
             problem_type=self.problem_type1,
         )
-        self.alert2 = Alert.objects.get(pk=self.alert1.pk)
-        self.alert2.pk = None  # clones alert1
-        self.alert2.source = self.zabbix1
-        self.alert2.save()
+        self.incident2 = Incident.objects.get(pk=self.incident1.pk)
+        self.incident2.pk = None  # clones incident1
+        self.incident2.source = self.zabbix1
+        self.incident2.save()
 
 
-class ModelTests(TestCase, MockAlertData):
+class ModelTests(TestCase, MockIncidentData):
     @staticmethod
     def replace_time(timestamp: datetime, new_time: str):
         new_time = time.fromisoformat(new_time)
@@ -172,30 +172,30 @@ class ModelTests(TestCase, MockAlertData):
             "}",
         )
 
-        self.assertTrue(filter1.alert_fits(self.alert1))
-        self.assertFalse(filter1.alert_fits(self.alert2))
+        self.assertTrue(filter1.incident_fits(self.incident1))
+        self.assertFalse(filter1.incident_fits(self.incident2))
 
-        self.assertFalse(filter2.alert_fits(self.alert1))
-        self.assertTrue(filter2.alert_fits(self.alert2))
+        self.assertFalse(filter2.incident_fits(self.incident1))
+        self.assertTrue(filter2.incident_fits(self.incident2))
 
-        self.assertEqual(set(filter1.filtered_alerts), {self.alert1})
-        self.assertEqual(set(filter2.filtered_alerts), {self.alert2})
+        self.assertEqual(set(filter1.filtered_incidents), {self.incident1})
+        self.assertEqual(set(filter2.filtered_incidents), {self.incident2})
 
 
-class ViewTests(APITestCase, MockAlertData):
+class ViewTests(APITestCase, MockIncidentData):
     def setUp(self):
         super().init_mock_data()
 
         user_token = Token.objects.create(user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION="Token " + user_token.key)
 
-        alert1_json = AlertSerializer([self.alert1], many=True).data
-        self.alert1_json = JSONRenderer().render(alert1_json)
+        incident1_json = IncidentSerializer([self.incident1], many=True).data
+        self.incident1_json = JSONRenderer().render(incident1_json)
 
         timeslot1 = Timeslot.objects.create(user=self.user, name="Never")
         filter1 = Filter.objects.create(
             user=self.user,
-            name="Critical alerts",
+            name="Critical incidents",
             filter_string="{"
             f'"sourceIds":[{self.nav1.pk}], "objectTypeIds":[], "parentObjectIds":[], "problemTypeIds":[]'
             "}",
@@ -205,14 +205,14 @@ class ViewTests(APITestCase, MockAlertData):
         )
         self.notification_profile1.filters.add(filter1)
 
-    def test_alerts_filtered_by_notification_profile_view(self):
+    def test_incidents_filtered_by_notification_profile_view(self):
         response = self.client.get(
             reverse(
-                "notification-profile:notification-profile-alerts",
+                "notification-profile:notification-profile-incidents",
                 args=[self.notification_profile1.pk],
             ),
         )
         response.render()
-        self.assertEqual(response.content, self.alert1_json)
+        self.assertEqual(response.content, self.incident1_json)
 
     # TODO: test more endpoints

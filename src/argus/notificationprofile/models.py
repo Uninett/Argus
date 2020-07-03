@@ -8,8 +8,8 @@ from django.dispatch import receiver
 from django.utils import timezone
 from multiselectfield import MultiSelectField
 
-from argus.incident.models import Alert
 from argus.auth.models import User
+from argus.incident.models import Incident
 from .utils import AttrGetter, NestedAttrGetter
 
 
@@ -137,26 +137,26 @@ class Filter(models.Model):
         return json.loads(self.filter_string)
 
     @property
-    def filtered_alerts(self):
-        return Alert.objects.filter(self.get_alert_query()).prefetch_default_related()
+    def filtered_incidents(self):
+        return Incident.objects.filter(self.get_incident_query()).prefetch_default_related()
 
-    def get_alert_query(self):
+    def get_incident_query(self):
         json_dict = self.filter_json
-        alert_query = Q()
+        incident_query = Q()
         for filter_field_name, attr_getter in self.FILTER_STRING_FIELDS.items():
             filter_field_value_list = json_dict[filter_field_name]
             if filter_field_value_list:
-                alert_arg = {f"{attr_getter.query}__in": filter_field_value_list}
-                alert_query &= Q(**alert_arg)
-        return alert_query
+                incident_arg = {f"{attr_getter.query}__in": filter_field_value_list}
+                incident_query &= Q(**incident_arg)
+        return incident_query
 
-    def alert_fits(self, alert: Alert):
+    def incident_fits(self, incident: Incident):
         json_dict = self.filter_json
         for filter_field_name, attr_getter in self.FILTER_STRING_FIELDS.items():
             filter_field_value_set = set(json_dict[filter_field_name])
             if filter_field_value_set:
-                alert_attr = attr_getter(alert)
-                if alert_attr.pk not in filter_field_value_set:
+                incident_attr = attr_getter(incident)
+                if incident_attr.pk not in filter_field_value_set:
                     return False
         return True
 
@@ -190,16 +190,16 @@ class NotificationProfile(models.Model):
         return f"{self.timeslot}: {', '.join(str(f) for f in self.filters.all())}"
 
     @property
-    def filtered_alerts(self):
-        alert_query = Q()
+    def filtered_incidents(self):
+        incident_query = Q()
         for filter_ in self.filters.all():
-            alert_query |= filter_.get_alert_query()
+            incident_query |= filter_.get_incident_query()
 
-        return Alert.objects.filter(alert_query).prefetch_default_related()
+        return Incident.objects.filter(incident_query).prefetch_default_related()
 
-    def alert_fits(self, alert: Alert):
+    def incident_fits(self, incident: Incident):
         if not self.active:
             return False
         return self.timeslot.timestamp_is_within_time_recurrences(
-            alert.timestamp
-        ) and any(f.alert_fits(alert) for f in self.filters.all())
+            incident.timestamp
+        ) and any(f.incident_fits(incident) for f in self.filters.all())
