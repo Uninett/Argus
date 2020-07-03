@@ -51,6 +51,10 @@ A recap of the environment variables that can be set by default follows.
 
 *A Gmail account with "Allow less secure apps" turned on, was used in the development of this project.*
 
+### Running tests
+* `python manage.py test src`
+
+
 ## Endpoints
 *`/admin/` to access the project's admin pages.*
 
