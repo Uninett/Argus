@@ -43,48 +43,32 @@ class Timeslot(models.Model):
         if raw or not created:
             return
 
-        timeslot = Timeslot.objects.create(user=instance, name="Immediately")
-        time_interval_start, time_interval_end = (
-            TimeInterval.DAY_START,
-            TimeInterval.DAY_END,
+        TimeInterval.objects.create(
+            timeslot=Timeslot.objects.create(user=instance, name="Immediately"),
+            days=[day for day in TimeInterval.Day.values],
+            start=TimeInterval.DAY_START,
+            end=TimeInterval.DAY_END,
         )
-        for day, _day_name in TimeInterval.DAY_CHOICES:
-            TimeInterval.objects.create(
-                timeslot=timeslot,
-                day=day,
-                start=time_interval_start,
-                end=time_interval_end,
-            )
 
 
 class TimeInterval(models.Model):
+    class Day(models.IntegerChoices):
+        MONDAY = 1, "Monday"
+        TUESDAY = 2, "Tuesday"
+        WEDNESDAY = 3, "Wednesday"
+        THURSDAY = 4, "Thursday"
+        FRIDAY = 5, "Friday"
+        SATURDAY = 6, "Saturday"
+        SUNDAY = 7, "Sunday"
+
     DAY_START = time.min
     DAY_END = time.max
-
-    MONDAY = "MO"
-    TUESDAY = "TU"
-    WEDNESDAY = "WE"
-    THURSDAY = "TH"
-    FRIDAY = "FR"
-    SATURDAY = "SA"
-    SUNDAY = "SU"
-    DAY_CHOICES = (
-        (MONDAY, "Monday"),
-        (TUESDAY, "Tuesday"),
-        (WEDNESDAY, "Wednesday"),
-        (THURSDAY, "Thursday"),
-        (FRIDAY, "Friday"),
-        (SATURDAY, "Saturday"),
-        (SUNDAY, "Sunday"),
-    )
-    # Map day name to ISO index, e.g. "MO": 1
-    DAY_NAME_TO_INDEX = {day: i + 1 for i, (day, _) in enumerate(DAY_CHOICES)}
 
     timeslot = models.ForeignKey(
         to=Timeslot, on_delete=models.CASCADE, related_name="time_intervals",
     )
 
-    day = models.CharField(max_length=2, choices=DAY_CHOICES)
+    days = MultiSelectField(choices=Day.choices, min_choices=1)
     start = models.TimeField(help_text="Local time.")
     end = models.TimeField(help_text="Local time.")
 
@@ -96,24 +80,25 @@ class TimeInterval(models.Model):
         if super().__eq__(other):
             return True
         return (
-                self.day == other.day
+                self.isoweekdays == other.isoweekdays
                 and self.start == other.start
                 and self.end == other.end
         )
     """
 
     def __str__(self):
-        return f"{self.start}-{self.end} on {self.get_day_display()}s"
+        days_string = ", ".join(f"{day}s" for day in self.get_days_list())
+        return f"{self.start}-{self.end} on {days_string}"
 
     @property
-    def isoweekday(self):
-        return self.DAY_NAME_TO_INDEX[self.day]
+    def isoweekdays(self):
+        return {int(day) for day in self.days}
 
     def timestamp_is_within(self, timestamp: datetime):
         # FIXME: Might affect performance negatively if calling this method frequently
         timestamp = timestamp.astimezone(timezone.get_current_timezone())
         return (
-            timestamp.isoweekday() == self.isoweekday
+            timestamp.isoweekday() in self.isoweekdays
             and self.start <= timestamp.time() <= self.end
         )
 

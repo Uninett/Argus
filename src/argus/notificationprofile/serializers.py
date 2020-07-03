@@ -9,9 +9,11 @@ from .validators import FilterStringValidator
 class TimeIntervalSerializer(serializers.ModelSerializer):
     ALL_DAY_KEY = "all_day"
 
+    days = fields.MultipleChoiceField(choices=TimeInterval.Day.choices)
+
     class Meta:
         model = TimeInterval
-        fields = ["day", "start", "end"]
+        fields = ["days", "start", "end"]
 
     def validate(self, attrs):
         if attrs["start"] >= attrs["end"]:
