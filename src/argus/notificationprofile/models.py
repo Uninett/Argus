@@ -3,7 +3,7 @@ from datetime import datetime, time
 
 from django.db import models
 from django.db.models import Q
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from django.utils import timezone
 from multiselectfield import MultiSelectField
@@ -30,9 +30,9 @@ class Timeslot(models.Model):
     def __str__(self):
         return self.name
 
-    def timestamp_is_within_time_intervals(self, timestamp: datetime):
-        for time_interval in self.time_intervals.all():
-            if time_interval.timestamp_is_within(timestamp):
+    def timestamp_is_within_time_recurrences(self, timestamp: datetime):
+        for time_recurrence in self.time_recurrences.all():
+            if time_recurrence.timestamp_is_within(timestamp):
                 return True
         return False
 
@@ -43,15 +43,15 @@ class Timeslot(models.Model):
         if raw or not created:
             return
 
-        TimeInterval.objects.create(
+        TimeRecurrence.objects.create(
             timeslot=Timeslot.objects.create(user=instance, name="Immediately"),
-            days=[day for day in TimeInterval.Day.values],
-            start=TimeInterval.DAY_START,
-            end=TimeInterval.DAY_END,
+            days=[day for day in TimeRecurrence.Day.values],
+            start=TimeRecurrence.DAY_START,
+            end=TimeRecurrence.DAY_END,
         )
 
 
-class TimeInterval(models.Model):
+class TimeRecurrence(models.Model):
     class Day(models.IntegerChoices):
         MONDAY = 1, "Monday"
         TUESDAY = 2, "Tuesday"
@@ -65,7 +65,7 @@ class TimeInterval(models.Model):
     DAY_END = time.max
 
     timeslot = models.ForeignKey(
-        to=Timeslot, on_delete=models.CASCADE, related_name="time_intervals",
+        to=Timeslot, on_delete=models.CASCADE, related_name="time_recurrences",
     )
 
     days = MultiSelectField(choices=Day.choices, min_choices=1)
@@ -75,7 +75,7 @@ class TimeInterval(models.Model):
     # TODO: is this method needed?
     """
     def __eq__(self, other):
-        if type(other) is not TimeInterval:
+        if type(other) is not TimeRecurrence:
             return False
         if super().__eq__(other):
             return True
@@ -193,6 +193,6 @@ class NotificationProfile(models.Model):
     def alert_fits(self, alert: Alert):
         if not self.active:
             return False
-        return self.timeslot.timestamp_is_within_time_intervals(
+        return self.timeslot.timestamp_is_within_time_recurrences(
             alert.timestamp
         ) and any(f.alert_fits(alert) for f in self.filters.all())

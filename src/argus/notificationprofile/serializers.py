@@ -2,17 +2,17 @@ from django.db import IntegrityError
 from rest_framework import fields, serializers
 
 from .fields import FilterManyToManyField, TimeslotForeignKeyField
-from .models import Filter, NotificationProfile, TimeInterval, Timeslot
+from .models import Filter, NotificationProfile, TimeRecurrence, Timeslot
 from .validators import FilterStringValidator
 
 
-class TimeIntervalSerializer(serializers.ModelSerializer):
+class TimeRecurrenceSerializer(serializers.ModelSerializer):
     ALL_DAY_KEY = "all_day"
 
-    days = fields.MultipleChoiceField(choices=TimeInterval.Day.choices)
+    days = fields.MultipleChoiceField(choices=TimeRecurrence.Day.choices)
 
     class Meta:
-        model = TimeInterval
+        model = TimeRecurrence
         fields = ["days", "start", "end"]
 
     def validate(self, attrs):
@@ -22,29 +22,29 @@ class TimeIntervalSerializer(serializers.ModelSerializer):
 
     def to_internal_value(self, data):
         if data.get(self.ALL_DAY_KEY):
-            data["start"] = TimeInterval.DAY_START
-            data["end"] = TimeInterval.DAY_END
+            data["start"] = TimeRecurrence.DAY_START
+            data["end"] = TimeRecurrence.DAY_END
 
         return super().to_internal_value(data)
 
-    def to_representation(self, instance: TimeInterval):
+    def to_representation(self, instance: TimeRecurrence):
         instance_dict = super().to_representation(instance)
-        if instance_dict["start"] == str(TimeInterval.DAY_START) and instance_dict["end"] == str(TimeInterval.DAY_END):
+        if instance_dict["start"] == str(TimeRecurrence.DAY_START) and instance_dict["end"] == str(TimeRecurrence.DAY_END):
             instance_dict[self.ALL_DAY_KEY] = True
 
         return instance_dict
 
 
 class TimeslotSerializer(serializers.ModelSerializer):
-    time_intervals = TimeIntervalSerializer(many=True)
+    time_recurrences = TimeRecurrenceSerializer(many=True)
 
     class Meta:
         model = Timeslot
-        fields = ["pk", "name", "time_intervals"]
+        fields = ["pk", "name", "time_recurrences"]
         read_only_fields = ["pk"]
 
     def create(self, validated_data):
-        time_intervals_data = validated_data.pop("time_intervals")
+        time_recurrences_data = validated_data.pop("time_recurrences")
         try:
             timeslot = Timeslot.objects.create(**validated_data)
         except IntegrityError as e:
@@ -56,21 +56,21 @@ class TimeslotSerializer(serializers.ModelSerializer):
             else:
                 raise e
 
-        for time_interval_data in time_intervals_data:
-            TimeInterval.objects.create(timeslot=timeslot, **time_interval_data)
+        for time_recurrence_data in time_recurrences_data:
+            TimeRecurrence.objects.create(timeslot=timeslot, **time_recurrence_data)
 
         return timeslot
 
     def update(self, timeslot: Timeslot, validated_data):
-        time_intervals_data = validated_data.pop("time_intervals")
+        time_recurrences_data = validated_data.pop("time_recurrences")
 
         timeslot.name = validated_data["name"]
         timeslot.save()
 
-        # Replace existing time intervals with posted time intervals
-        timeslot.time_intervals.all().delete()
-        for time_interval_data in time_intervals_data:
-            TimeInterval.objects.create(timeslot=timeslot, **time_interval_data)
+        # Replace existing time recurrences with posted time recurrences
+        timeslot.time_recurrences.all().delete()
+        for time_recurrence_data in time_recurrences_data:
+            TimeRecurrence.objects.create(timeslot=timeslot, **time_recurrence_data)
 
         return timeslot
 
