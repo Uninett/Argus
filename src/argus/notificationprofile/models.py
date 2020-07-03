@@ -8,7 +8,7 @@ from django.dispatch import receiver
 from django.utils import timezone
 from multiselectfield import MultiSelectField
 
-from argus.alert.models import Alert
+from argus.incident.models import Alert
 from argus.auth.models import User
 from .utils import AttrGetter, NestedAttrGetter
 

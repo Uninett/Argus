@@ -31,7 +31,7 @@ class AlertSourcePostingTests(APITestCase):
         self.change_url = lambda alert_source: reverse(
             f"{self.base_admin_url}_change", args=[alert_source.pk]
         )
-        self.sources_url = reverse("alert:sources")
+        self.sources_url = reverse("incident:sources")
 
     def _post_source1_dict(self, url: str, client: Client):
         self.source1_dict = {

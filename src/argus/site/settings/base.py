@@ -35,7 +35,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework.authtoken",
     "argus.auth",
-    "argus.alert",
+    "argus.incident",
     "argus.notificationprofile",
 ]
 
