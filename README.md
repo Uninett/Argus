@@ -185,6 +185,94 @@ All endpoints require requests to contain a header with key `Authorization` and 
         ]
     }
     ```
+
+    The optional key `"all_day"` indicates that Argus should use `Time.min` and `Time.max` as `"start"` and `"end"` respectively. This also overrides any provided values for `"start"` and `"end"`. An example request body:
+    ```json
+    {
+        "name": "Immediately",
+        "time_intervals": [
+            {
+                "day": "MO",
+                "all_day": true
+            },
+            {
+                "day": "TU",
+                "all_day": true
+            },
+            {
+                "day": "WE",
+                "all_day": true
+            },
+            {
+                "day": "TH",
+                "all_day": true
+            },
+            {
+                "day": "FR",
+                "all_day": true
+            },
+            {
+                "day": "SA",
+                "all_day": true
+            },
+            {
+                "day": "SU",
+                "all_day": true
+            }
+        ]
+    }
+    ```
+    which would yield the response:
+    ```json
+    {
+        "pk": 2,
+        "name": "Immediately",
+        "time_intervals": [
+            {
+                "day": "MO",
+                "start": "00:00:00",
+                "end": "23:59:59.999999",
+                "all_day": true
+            },
+            {
+                "day": "TU",
+                "start": "00:00:00",
+                "end": "23:59:59.999999",
+                "all_day": true
+            },
+            {
+                "day": "WE",
+                "start": "00:00:00",
+                "end": "23:59:59.999999",
+                "all_day": true
+            },
+            {
+                "day": "TH",
+                "start": "00:00:00",
+                "end": "23:59:59.999999",
+                "all_day": true
+            },
+            {
+                "day": "FR",
+                "start": "00:00:00",
+                "end": "23:59:59.999999",
+                "all_day": true
+            },
+            {
+                "day": "SA",
+                "start": "00:00:00",
+                "end": "23:59:59.999999",
+                "all_day": true
+            },
+            {
+                "day": "SU",
+                "start": "00:00:00",
+                "end": "23:59:59.999999",
+                "all_day": true
+            }
+        ]
+    }
+    ```
     </details>
 
 * `/api/v1/notificationprofiles/timeslots/<int:pk>`:
