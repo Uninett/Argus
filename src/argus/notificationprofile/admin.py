@@ -2,29 +2,29 @@ from django.contrib import admin
 from django.db.models.functions import Concat
 from django.utils.html import format_html_join
 
-from .models import Filter, NotificationProfile, TimeInterval, Timeslot
+from .models import Filter, NotificationProfile, TimeRecurrence, Timeslot
 
 
 class TimeslotAdmin(admin.ModelAdmin):
-    class TimeIntervalInline(admin.TabularInline):
-        model = TimeInterval
+    class TimeRecurrenceInline(admin.TabularInline):
+        model = TimeRecurrence
         ordering = ["days"]
         min_num = 1
         extra = 0
 
-    inlines = [TimeIntervalInline]
+    inlines = [TimeRecurrenceInline]
 
-    list_display = ("name", "user", "get_time_intervals")
+    list_display = ("name", "user", "get_time_recurrences")
     search_fields = ("name", "user__first_name", "user__last_name", "user__username")
 
     raw_id_fields = ("user",)
 
-    def get_time_intervals(self, timeslot):
+    def get_time_recurrences(self, timeslot):
         return format_html_join(
-            "", "<div>{}</div>", ((ts,) for ts in timeslot.time_intervals.all())
+            "", "<div>{}</div>", ((ts,) for ts in timeslot.time_recurrences.all())
         )
 
-    get_time_intervals.short_description = "Time intervals"
+    get_time_recurrences.short_description = "Time recurrences"
 
 
 class FilterAdmin(admin.ModelAdmin):

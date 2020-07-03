@@ -21,7 +21,7 @@ from argus.auth.models import User
 from argus.notificationprofile.models import (
     Filter,
     NotificationProfile,
-    TimeInterval,
+    TimeRecurrence,
     Timeslot,
 )
 
@@ -90,26 +90,26 @@ class ModelTests(TestCase, MockAlertData):
         self.monday_time = make_aware(datetime.fromisoformat("2019-11-25"))
 
         self.timeslot1 = Timeslot.objects.create(user=self.user, name="Test")
-        self.interval1 = TimeInterval.objects.create(
+        self.recurrence1 = TimeRecurrence.objects.create(
             timeslot=self.timeslot1,
-            days={TimeInterval.Day.MONDAY},
+            days={TimeRecurrence.Day.MONDAY},
             start=time.fromisoformat("00:30:00"),
             end=time.fromisoformat("00:30:01"),
         )
-        self.interval2 = TimeInterval.objects.create(
+        self.recurrence2 = TimeRecurrence.objects.create(
             timeslot=self.timeslot1,
-            days={TimeInterval.Day.MONDAY},
+            days={TimeRecurrence.Day.MONDAY},
             start=time.fromisoformat("00:30:03"),
             end=time.fromisoformat("00:31"),
         )
-        self.interval_all_day = TimeInterval.objects.create(
+        self.recurrence_all_day = TimeRecurrence.objects.create(
             timeslot=self.timeslot1,
-            days={TimeInterval.Day.TUESDAY},
-            start=TimeInterval.DAY_START,
-            end=TimeInterval.DAY_END,
+            days={TimeRecurrence.Day.TUESDAY},
+            start=TimeRecurrence.DAY_START,
+            end=TimeRecurrence.DAY_END,
         )
 
-    def test_time_interval(self):
+    def test_time_recurrence(self):
         # Test replace_time() helper function
         self.assertEqual(
             datetime.fromisoformat("2000-01-01 10:00"),
@@ -119,39 +119,39 @@ class ModelTests(TestCase, MockAlertData):
         self.assertEqual(self.monday_time.strftime("%A"), "Monday")
 
         self.assertFalse(
-            self.interval1.timestamp_is_within(
+            self.recurrence1.timestamp_is_within(
                 self.replace_time(self.monday_time, "00:29:01")
             )
         )
         self.assertTrue(
-            self.interval1.timestamp_is_within(
+            self.recurrence1.timestamp_is_within(
                 self.replace_time(self.monday_time, "00:30:00")
             )
         )
         self.assertTrue(
-            self.interval1.timestamp_is_within(
+            self.recurrence1.timestamp_is_within(
                 self.replace_time(self.monday_time, "00:30:01")
             )
         )
         self.assertFalse(
-            self.interval1.timestamp_is_within(
+            self.recurrence1.timestamp_is_within(
                 self.replace_time(self.monday_time, "00:30:02")
             )
         )
 
     def test_timeslot(self):
         self.assertTrue(
-            self.timeslot1.timestamp_is_within_time_intervals(
+            self.timeslot1.timestamp_is_within_time_recurrences(
                 self.replace_time(self.monday_time, "00:30:01")
             )
         )
         self.assertFalse(
-            self.timeslot1.timestamp_is_within_time_intervals(
+            self.timeslot1.timestamp_is_within_time_recurrences(
                 self.replace_time(self.monday_time, "00:30:02")
             )
         )
         self.assertTrue(
-            self.timeslot1.timestamp_is_within_time_intervals(
+            self.timeslot1.timestamp_is_within_time_recurrences(
                 self.replace_time(self.monday_time, "00:30:03")
             )
         )

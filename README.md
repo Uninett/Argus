@@ -156,7 +156,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
     ```json
     {
         "name": "Weekdays",
-        "time_intervals": [
+        "time_recurrences": [
             {
                 "days": [1, 2, 3, 4, 5],
                 "start": "08:00:00",
@@ -175,7 +175,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
     ```json
     {
         "name": "Immediately",
-        "time_intervals": [
+        "time_recurrences": [
             {
                 "days": [1, 2, 3, 4, 5, 6, 7],
                 "all_day": true
@@ -188,7 +188,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
     {
         "pk": 2,
         "name": "Immediately",
-        "time_intervals": [
+        "time_recurrences": [
             {
                 "days": [1, 2, 3, 4, 5, 6, 7],
                 "start": "00:00:00",
