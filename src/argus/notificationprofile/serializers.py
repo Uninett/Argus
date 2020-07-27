@@ -7,6 +7,8 @@ from .validators import FilterStringValidator
 
 
 class TimeIntervalSerializer(serializers.ModelSerializer):
+    ALL_DAY_KEY = "all_day"
+
     class Meta:
         model = TimeInterval
         fields = ["day", "start", "end"]
@@ -15,6 +17,20 @@ class TimeIntervalSerializer(serializers.ModelSerializer):
         if attrs["start"] >= attrs["end"]:
             raise serializers.ValidationError("Start time must be before end time.")
         return attrs
+
+    def to_internal_value(self, data):
+        if data.get(self.ALL_DAY_KEY):
+            data["start"] = TimeInterval.DAY_START
+            data["end"] = TimeInterval.DAY_END
+
+        return super().to_internal_value(data)
+
+    def to_representation(self, instance: TimeInterval):
+        instance_dict = super().to_representation(instance)
+        if instance_dict["start"] == str(TimeInterval.DAY_START) and instance_dict["end"] == str(TimeInterval.DAY_END):
+            instance_dict[self.ALL_DAY_KEY] = True
+
+        return instance_dict
 
 
 class TimeslotSerializer(serializers.ModelSerializer):
