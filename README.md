@@ -125,7 +125,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
                 "name": "boxDown",
                 "description": "Box declared down."
             },
-            "description": "Netbox 11 <1234> down.",
+            "description": "Netbox 11 <12345> down.",
             "ticket_url": "https://tickettracker.com/tickets/987654/",
             "active_state": true
         }
@@ -136,36 +136,31 @@ All endpoints require requests to contain a header with key `Authorization` and 
     <details>
     <summary>Example request body:</summary>
 
-    Attribute explanation: https://nav.uninett.no/doc/dev/reference/eventengine.html#exporting-alerts-from-nav-into-other-systems
     ```json
     {
-        "id": 212310,
-        "history": 196179,
-        "time": "2019-11-05T10:03:10.235877",
-        "message": "box down example-sw.example.org 10.0.1.42",
-        "source": "pping",
-        "state": "s",
-        "on_maintenance": false,
-        "netbox": 138,
-        "device_groups": null,
-        "device": null,
-        "subid": "",
-        "subject_type": "Netbox",
-        "subject": "example-sw.example.org",
-        "subject_url": "/api/v1/ipdevinfo/example-sw.example.org/",
-        "alert_details_url": "/api/v1/alerts/196179/",
-        "netbox_history_url": "/api/v1/devicehistory/history/%3Fnetbox=138",
-        "event_history_url": "/api/v1/devicehistory/history/?eventtype=e_boxState",
-        "event_type": {
-            "description": "Tells us whether a network-unit is down or up.",
-            "id": "boxState"
+        "source": 11,
+        "timestamp": "2011-11-11 11:11:11.11111",
+        "source_incident_id": "12345",
+        "object": {
+            "name": "Netbox 11",
+            "object_id": "112233",
+            "url": "https://uninett.no/api/objects/112233/",
+            "type": {
+                "name": "Netbox"
+            }
         },
-        "alert_type": {
-            "description": "Box declared down.",
-            "name": "boxDown"
+        "parent_object": {
+            "name": "SuperNetbox",
+            "parentobject_id": "445566",
+            "url": "https://uninett.no/api/objects/445566/"
         },
-        "severity": 50,
-        "value": 100
+        "details_url": "https://uninett.no/api/alerts/12345/",
+        "problem_type": {
+            "name": "boxDown",
+            "description": "Box declared down."
+        },
+        "description": "Netbox 11 <12345> down.",
+        "active_state": true
     }
     ```
     </details>

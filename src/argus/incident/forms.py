@@ -5,10 +5,6 @@ from argus.auth.models import User
 from .models import SourceSystem
 
 
-class AlertJsonForm(forms.Form):
-    json = forms.CharField(widget=forms.Textarea)
-
-
 class AddSourceSystemForm(forms.ModelForm):
     username = forms.CharField(
         required=False,
