@@ -1,5 +1,6 @@
 import secrets
 
+from django.db import IntegrityError
 from rest_framework import generics, serializers, status
 from rest_framework.decorators import api_view
 from rest_framework.exceptions import ValidationError
@@ -7,8 +8,6 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from argus.auth.models import User
-from argus.notificationprofile.notification_media import send_notifications_to_users
-from . import mappings
 from .forms import AddSourceSystemForm
 from .models import (
     ActiveIncident,
@@ -19,7 +18,6 @@ from .models import (
     SourceSystem,
     SourceSystemType,
 )
-from .parsers import StackedJSONParser
 from .permissions import IsOwnerOrReadOnly, IsSuperuserOrReadOnly
 from .serializers import (
     IncidentSerializer,
@@ -74,27 +72,36 @@ class SourceSystemDetail(generics.RetrieveUpdateAPIView):
 
 
 class IncidentList(generics.ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
     queryset = Incident.objects.prefetch_default_related().select_related("active_state")
-    parser_classes = [StackedJSONParser]
     serializer_class = IncidentSerializer
 
-    def post(self, request, *args, **kwargs):
-        # TODO: replace with deserializing JSON for one incident per request, with data that's already been mapped (once glue services have been implemented)
-        created_incidents = [
-            mappings.create_incident_from_json(
-                json_dict, "NAV"
-            )  # TODO: interpret source system type from incidents' source IP?
-            for json_dict in request.data
-        ]
+    def perform_create(self, serializer):
+        user = self.request.user
 
-        for created_incident in created_incidents:
-            send_notifications_to_users(created_incident)
+        if "source" in serializer.initial_data:
+            if not user.is_superuser:
+                raise serializers.ValidationError(
+                    "You must be a superuser to be allowed to specify the 'source' field."
+                )
 
-        if len(created_incidents) == 1:
-            serializer = IncidentSerializer(created_incidents[0])
+            source_pk = serializer.initial_data["source"]
+            try:
+                source = SourceSystem.objects.get(pk=source_pk)
+            except SourceSystem.DoesNotExist:
+                raise serializers.ValidationError(f"SourceSystem with pk={source_pk} does not exist.")
         else:
-            serializer = IncidentSerializer(created_incidents, many=True)
-        return Response(serializer.data)
+            try:
+                source = user.source_system
+            except SourceSystem.DoesNotExist:
+                raise serializers.ValidationError("The requesting user must have a connected source system.")
+
+        # TODO: send notifications to users
+        try:
+            serializer.save(source=source)
+        except IntegrityError as e:
+            # TODO: this should be replaced by more verbose feedback, that also doesn't reference database tables
+            raise serializers.ValidationError(e)
 
 
 class IncidentDetail(generics.RetrieveAPIView):
