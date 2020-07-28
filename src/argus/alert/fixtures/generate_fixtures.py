@@ -119,18 +119,27 @@ def generate_alert_source_types() -> List[AlertSourceType]:
     return [AlertSourceType(name="NAV"), AlertSourceType(name="Zabbix")]
 
 
-def generate_alert_sources(alert_source_types) -> List[Model]:
+def generate_alert_sources(alert_source_types) -> Tuple[List[Model], List[Model]]:
     alert_sources = []
+    alert_source_users = []
     for source_type in alert_source_types:
         for _ in range(NUM_ALERT_SOURCES_PER_TYPE):
+            name = random.choice(ascii_uppercase) + random.choice(digits)
+            user = User(username=f"{source_type}.{name}".lower())
             alert_sources.append(
                 AlertSource(
-                    name=random.choice(ascii_uppercase) + random.choice(digits),
+                    name=name,
                     type=source_type,
+                    user=user,
                 )
             )
+            alert_source_users.append(user)
 
-    return set_pks(alert_sources)
+    tuples = set_pks(alert_sources), set_pks(alert_source_users)
+    # Reassign user after PKs have been set, to prevent `null` values in the JSON
+    for alert_source in alert_sources:
+        alert_source.user = alert_source.user
+    return tuples
 
 
 def generate_object_types() -> List[Model]:
@@ -265,7 +274,7 @@ def generate_active_alerts(alerts) -> List[Model]:
 
 def create_fixture_file():
     alert_source_types = generate_alert_source_types()
-    alert_sources = generate_alert_sources(alert_source_types)
+    alert_sources, alert_source_users = generate_alert_sources(alert_source_types)
     object_types = generate_object_types()
     objects = generate_objects(object_types, alert_sources)
     parent_objects = generate_parent_objects(alert_sources)
@@ -275,6 +284,7 @@ def create_fixture_file():
 
     all_objects = (
         *alert_source_types,
+        *alert_source_users,
         *alert_sources,
         *object_types,
         *objects,
