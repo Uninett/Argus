@@ -5,7 +5,7 @@ djangorestframework
 psycopg2-binary
 python-dataporten-auth
 python-social-auth
-pytz>=2019.3
+pytz>=2020.1
 social-auth-app-django
 Sphinx>=2.2.0
 sqlparse>=0.3.0
