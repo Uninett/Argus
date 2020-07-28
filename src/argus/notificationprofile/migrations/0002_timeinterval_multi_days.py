@@ -14,12 +14,45 @@ DAY_TEXT_TO_INDEX = {
     "SU": 7,
 }
 
+DAY_INDEX_TO_TEXT = {
+    index: text
+    for text, index in DAY_TEXT_TO_INDEX.items()
+}
+
 
 def convert_from_text_to_index(apps, schema_editor):
     TimeInterval = apps.get_model("argus_notificationprofile", "timeinterval")
+    Timeslot = apps.get_model("argus_notificationprofile", "timeslot")
+    for timeslot in Timeslot.objects.all():
+        time_tuple_to_intervals = {}
+        # Find time intervals with equal start and end
+        for interval in timeslot.time_intervals.all():
+            time_tuple = (interval.start, interval.end)
+            if time_tuple not in time_tuple_to_intervals:
+                time_tuple_to_intervals[time_tuple] = []
+            time_tuple_to_intervals[time_tuple].append(interval)
+
+        # "Merge" time intervals with equal start and end (by creating a new one with the days consolidated)
+        for time_tuple, intervals in time_tuple_to_intervals.items():
+            start, end = time_tuple
+            days = {DAY_TEXT_TO_INDEX[interval.days[0]] for interval in intervals}
+            TimeInterval.objects.create(
+                timeslot=timeslot, days=days, start=start, end=end,
+            )
+            for interval in intervals:
+                interval.delete()
+
+
+def convert_from_index_to_text(apps, schema_editor):
+    TimeInterval = apps.get_model("argus_notificationprofile", "timeinterval")
     for interval in TimeInterval.objects.all():
-        interval.day = DAY_TEXT_TO_INDEX[interval.day]
-        interval.save()
+        # Create a new time interval for each day, with the times copied
+        for day in interval.days:
+            day_index = DAY_INDEX_TO_TEXT[int(day)]
+            TimeInterval.objects.create(
+                timeslot=interval.timeslot, days=day_index, start=interval.start, end=interval.end,
+            )
+        interval.delete()
 
 
 class Migration(migrations.Migration):
@@ -29,7 +62,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(convert_from_text_to_index, migrations.RunPython.noop),
         migrations.AlterField(
             model_name='timeinterval',
             name='day',
@@ -40,4 +72,5 @@ class Migration(migrations.Migration):
             old_name='day',
             new_name='days',
         ),
+        migrations.RunPython(convert_from_text_to_index, convert_from_index_to_text),
     ]
