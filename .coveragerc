@@ -1,0 +1,8 @@
+[run]
+# Current, top-level directory
+source=.
+
+[report]
+exclude_lines =
+    # Ignore not abstract methods, as these cannot be tested
+    raise NotImplementedError
