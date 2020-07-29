@@ -42,7 +42,7 @@ A recap of the environment variables that can be set by default follows.
 * TEMPLATE_DEBUG. By default set to the same as DEBUG.
 * ARGUS_DATAPORTEN_SECRET, which holds the password for using dataporten for
   authentication.
-* ARGUS_FRONTEND_URL, by default "http://localhost:3000", for CORS
+* ARGUS_FRONTEND_URL, for redirecting back to frontend after logging in through Feide, and also CORS
 * EMAIL_HOST, smarthost (domain name) to send email through
 * EMAIL_HOST_PASSWORD, password if the smarthost needs that
 * EMAIL_PORT, in production by default set to 587

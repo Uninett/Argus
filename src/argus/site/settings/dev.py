@@ -16,7 +16,7 @@ ALLOWED_HOSTS = [
     "localhost",
 ]
 
-FRONTEND_URL = get_str_env("ARGUS_FRONTEND_URL", "http://localhost:3000")
+FRONTEND_URL = get_str_env("ARGUS_FRONTEND_URL")
 
 CORS_ORIGIN_WHITELIST = [
     FRONTEND_URL,
