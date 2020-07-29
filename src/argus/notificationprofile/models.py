@@ -151,6 +151,11 @@ class Filter(models.Model):
 
 
 class NotificationProfile(models.Model):
+    class Media(models.TextChoices):
+        EMAIL = "EM", "Email"
+        SMS = "SM", "SMS"
+        SLACK = "SL", "Slack"
+
     user = models.ForeignKey(to=User, on_delete=models.CASCADE, related_name="notification_profiles")
     # TODO: add constraint that user must be the same
     timeslot = models.OneToOneField(
@@ -158,16 +163,8 @@ class NotificationProfile(models.Model):
     )
     filters = models.ManyToManyField(to=Filter, related_name="notification_profiles")
 
-    EMAIL = "EM"
-    SMS = "SM"
-    SLACK = "SL"
-    MEDIA_CHOICES = (
-        (EMAIL, "Email"),
-        (SMS, "SMS"),
-        (SLACK, "Slack"),
-    )
     # TODO: support for multiple email addresses / phone numbers / Slack users
-    media = MultiSelectField(choices=MEDIA_CHOICES, min_choices=1, default=EMAIL)
+    media = MultiSelectField(choices=Media.choices, min_choices=1, default=Media.EMAIL)
     active = models.BooleanField(default=True)
 
     def __str__(self):
