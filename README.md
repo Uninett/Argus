@@ -170,9 +170,9 @@ All endpoints require requests to contain a header with key `Authorization` and 
     ```
     </details>
 
-* `GET` to `/api/v1/incidents/<int:pk>`: returns an incident by pk
+* `GET` to `/api/v1/incidents/<int:pk>/`: returns an incident by pk
 * `GET` to `/api/v1/incidents/active/`: returns all active incidents
-* `PUT` to `/api/v1/incidents/<int:pk>/active`: changes an incident's active state by pk
+* `PUT` to `/api/v1/incidents/<int:pk>/active/`: changes an incident's active state by pk
   * Body: `{ "active": <bool> }`
 * `GET` to `/api/v1/incidents/metadata/`: returns relevant metadata for all incidents
 
@@ -203,7 +203,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
     ```
     </details>
 
-* `/api/v1/notificationprofiles/<int:pk>`:
+* `/api/v1/notificationprofiles/<int:pk>/`:
   * `GET`: returns one of the logged in user's notification profiles by pk
   * `PUT`: updates and returns one of the logged in user's notification profiles by pk
     * Body: same as `POST` to `/api/v1/notificationprofiles/`
@@ -264,7 +264,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
     ```
     </details>
 
-* `/api/v1/notificationprofiles/timeslots/<int:pk>`:
+* `/api/v1/notificationprofiles/timeslots/<int:pk>/`:
   * `GET`: returns one of the logged in user's time slots by pk
   * `PUT`: updates and returns one of the logged in user's time slots by pk
     * Body: same as `POST` to `/notificationprofiles/timeslots/`
@@ -284,7 +284,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
     ```
     </details>
 
-* `/api/v1/notificationprofiles/filters/<int:pk>`:
+* `/api/v1/notificationprofiles/filters/<int:pk>/`:
   * `GET`: returns one of the logged in user's filters by pk
   * `PUT`: updates and returns one of the logged in user's filters by pk
     * Body: same as `POST` to `/api/v1/notificationprofiles/filters/`
