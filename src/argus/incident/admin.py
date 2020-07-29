@@ -158,9 +158,7 @@ class IncidentAdmin(TextWidgetsOverrideModelAdmin):
     def get_queryset(self, request):
         qs: IncidentQuerySet = super().get_queryset(request)
         # Reduce number of database calls
-        return qs.prefetch_default_related().prefetch_related(
-            "object__source_system__type",
-        )
+        return qs.prefetch_default_related().prefetch_related("object__source_system__type")
 
 
 class ActiveIncidentAdmin(admin.ModelAdmin):

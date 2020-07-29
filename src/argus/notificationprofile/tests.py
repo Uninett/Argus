@@ -44,22 +44,16 @@ class MockIncidentData:
         zabbix_type = SourceSystemType.objects.create(name="Zabbix")
 
         self.nav1 = SourceSystem.objects.create(
-            name="Gløshaugen",
-            type=nav_type,
-            user=User.objects.create(username="nav.glos.no"),
+            name="Gløshaugen", type=nav_type, user=User.objects.create(username="nav.glos.no"),
         )
         self.zabbix1 = SourceSystem.objects.create(
-            name="Gløshaugen",
-            type=zabbix_type,
-            user=User.objects.create(username="zabbix.glos.no"),
+            name="Gløshaugen", type=zabbix_type, user=User.objects.create(username="zabbix.glos.no"),
         )
 
         self.object_type1 = ObjectType.objects.create(name="box")
         self.object1 = Object.objects.create(name="1", url="", type=self.object_type1)
 
-        self.problem_type1 = ProblemType.objects.create(
-            name="boxDown", description="A box is down."
-        )
+        self.problem_type1 = ProblemType.objects.create(name="boxDown", description="A box is down.")
 
         self.incident1 = Incident.objects.create(
             timestamp=timezone.now(),
@@ -79,10 +73,7 @@ class ModelTests(TestCase, MockIncidentData):
     def replace_time(timestamp: datetime, new_time: str):
         new_time = time.fromisoformat(new_time)
         return timestamp.replace(
-            hour=new_time.hour,
-            minute=new_time.minute,
-            second=new_time.second,
-            microsecond=new_time.microsecond,
+            hour=new_time.hour, minute=new_time.minute, second=new_time.second, microsecond=new_time.microsecond,
         )
 
     def setUp(self):
@@ -118,42 +109,20 @@ class ModelTests(TestCase, MockIncidentData):
 
         self.assertEqual(self.monday_time.strftime("%A"), "Monday")
 
-        self.assertFalse(
-            self.recurrence1.timestamp_is_within(
-                self.replace_time(self.monday_time, "00:29:01")
-            )
-        )
-        self.assertTrue(
-            self.recurrence1.timestamp_is_within(
-                self.replace_time(self.monday_time, "00:30:00")
-            )
-        )
-        self.assertTrue(
-            self.recurrence1.timestamp_is_within(
-                self.replace_time(self.monday_time, "00:30:01")
-            )
-        )
-        self.assertFalse(
-            self.recurrence1.timestamp_is_within(
-                self.replace_time(self.monday_time, "00:30:02")
-            )
-        )
+        self.assertFalse(self.recurrence1.timestamp_is_within(self.replace_time(self.monday_time, "00:29:01")))
+        self.assertTrue(self.recurrence1.timestamp_is_within(self.replace_time(self.monday_time, "00:30:00")))
+        self.assertTrue(self.recurrence1.timestamp_is_within(self.replace_time(self.monday_time, "00:30:01")))
+        self.assertFalse(self.recurrence1.timestamp_is_within(self.replace_time(self.monday_time, "00:30:02")))
 
     def test_timeslot(self):
         self.assertTrue(
-            self.timeslot1.timestamp_is_within_time_recurrences(
-                self.replace_time(self.monday_time, "00:30:01")
-            )
+            self.timeslot1.timestamp_is_within_time_recurrences(self.replace_time(self.monday_time, "00:30:01"))
         )
         self.assertFalse(
-            self.timeslot1.timestamp_is_within_time_recurrences(
-                self.replace_time(self.monday_time, "00:30:02")
-            )
+            self.timeslot1.timestamp_is_within_time_recurrences(self.replace_time(self.monday_time, "00:30:02"))
         )
         self.assertTrue(
-            self.timeslot1.timestamp_is_within_time_recurrences(
-                self.replace_time(self.monday_time, "00:30:03")
-            )
+            self.timeslot1.timestamp_is_within_time_recurrences(self.replace_time(self.monday_time, "00:30:03"))
         )
 
     def test_filter(self):
@@ -200,17 +169,12 @@ class ViewTests(APITestCase, MockIncidentData):
             f'"sourceSystemIds":[{self.nav1.pk}], "objectTypeIds":[], "parentObjectIds":[], "problemTypeIds":[]'
             "}",
         )
-        self.notification_profile1 = NotificationProfile.objects.create(
-            user=self.user, timeslot=timeslot1
-        )
+        self.notification_profile1 = NotificationProfile.objects.create(user=self.user, timeslot=timeslot1)
         self.notification_profile1.filters.add(filter1)
 
     def test_incidents_filtered_by_notification_profile_view(self):
         response = self.client.get(
-            reverse(
-                "notification-profile:notification-profile-incidents",
-                args=[self.notification_profile1.pk],
-            ),
+            reverse("notification-profile:notification-profile-incidents", args=[self.notification_profile1.pk])
         )
         response.render()
         self.assertEqual(response.content, self.incident1_json)

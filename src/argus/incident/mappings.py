@@ -56,11 +56,7 @@ class NestedKey:
 
 class Choose:
     def __init__(
-        self,
-        arg: dict,
-        if_value_of: Union[str, NestedKey],
-        is_one_of: tuple,
-        else_arg: dict,
+        self, arg: dict, if_value_of: Union[str, NestedKey], is_one_of: tuple, else_arg: dict,
     ):
         self.arg = arg
         self.if_value_of = if_value_of
@@ -105,9 +101,7 @@ class PassthroughField(FieldValueGetter):
 
 
 class ForeignKeyField(FieldValueGetter):
-    def __init__(
-        self, foreign_model: Type[models.Model], foreign_model_field_mappings: dict
-    ):
+    def __init__(self, foreign_model: Type[models.Model], foreign_model_field_mappings: dict):
         MappingUtils.remove_none_mappings(foreign_model_field_mappings)
         MappingUtils.swap_fields_with_field_names(foreign_model_field_mappings)
         validate_field_mappings(foreign_model, foreign_model_field_mappings)
@@ -116,27 +110,20 @@ class ForeignKeyField(FieldValueGetter):
         self.foreign_model_field_mappings = foreign_model_field_mappings
 
     def prepare(self, field_name, model_for_field):
-        MappingUtils.prepare_field_value_getters(
-            self.foreign_model, self.foreign_model_field_mappings
-        )
+        MappingUtils.prepare_field_value_getters(self.foreign_model, self.foreign_model_field_mappings)
 
     def get_value_from_dict(self, json_dict):
         foreign_model_obj_kwargs = {
             field_name: field_value_getter.get_value_from_dict(json_dict)
             for field_name, field_value_getter in self.foreign_model_field_mappings.items()
         }
-        foreign_model_obj, _created = self.foreign_model.objects.get_or_create(
-            **foreign_model_obj_kwargs
-        )
+        foreign_model_obj, _created = self.foreign_model.objects.get_or_create(**foreign_model_obj_kwargs)
         return foreign_model_obj
 
 
 class FieldMapping:
     def __init__(
-        self,
-        source_system_type_name: str,
-        base_field_mappings: dict,
-        *conditional_field_mappings: Choose,
+        self, source_system_type_name: str, base_field_mappings: dict, *conditional_field_mappings: Choose,
     ):
         all_field_mappings = (
             base_field_mappings,
@@ -163,13 +150,9 @@ class FieldMapping:
             for field_name, field_value_getter in field_mappings.items()
         }
 
-        source_system_type = SourceSystemType.objects.get(
-            name=self.source_system_type_name
-        )
+        source_system_type = SourceSystemType.objects.get(name=self.source_system_type_name)
         # TODO: remove once source is saved from posted incidents
-        incident_kwargs["source"] = random.choice(
-            SourceSystem.objects.filter(type=source_system_type)
-        )
+        incident_kwargs["source"] = random.choice(SourceSystem.objects.filter(type=source_system_type))
 
         try:
             incident = Incident.objects.create(**incident_kwargs)
@@ -200,9 +183,7 @@ NAV_FIELD_MAPPING = FieldMapping(
             ProblemType,
             {
                 ProblemType.name: PassthroughField(NestedKey("alert_type")["name"]),
-                ProblemType.description: PassthroughField(
-                    NestedKey("alert_type")["description"]
-                ),
+                ProblemType.description: PassthroughField(NestedKey("alert_type")["description"]),
             },
         ),
         Incident.description: PassthroughField("message"),
@@ -224,9 +205,7 @@ NAV_FIELD_MAPPING = FieldMapping(
                     Object.name: PassthroughField("subject"),
                     Object.object_id: PassthroughField("netbox"),
                     Object.url: PassthroughField("subject_url"),
-                    Object.type: ForeignKeyField(
-                        ObjectType, {ObjectType.name: PassthroughField("subject_type")}
-                    ),
+                    Object.type: ForeignKeyField(ObjectType, {ObjectType.name: PassthroughField("subject_type")}),
                 },
             ),
             Incident.parent_object: None,
@@ -240,9 +219,7 @@ NAV_FIELD_MAPPING = FieldMapping(
                     Object.name: PassthroughField("subject"),
                     Object.object_id: PassthroughField("subid"),
                     Object.url: PassthroughField("subject_url"),
-                    Object.type: ForeignKeyField(
-                        ObjectType, {ObjectType.name: PassthroughField("subject_type")}
-                    ),
+                    Object.type: ForeignKeyField(ObjectType, {ObjectType.name: PassthroughField("subject_type")}),
                 },
             ),
             Incident.parent_object: ForeignKeyField(
@@ -267,8 +244,6 @@ def create_incident_from_json(json_dict: dict, source_system_type_name: str):
     try:
         mapping = SOURCE_MAPPING_DICT[source_system_type_name]
     except KeyError:
-        raise serializers.ValidationError(
-            f"Invalid source system type '{source_system_type_name}'."
-        )
+        raise serializers.ValidationError(f"Invalid source system type '{source_system_type_name}'.")
 
     return mapping.create_model_obj_from_json(json_dict)

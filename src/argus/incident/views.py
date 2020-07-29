@@ -55,9 +55,7 @@ class SourceSystemList(generics.ListCreateAPIView):
         source_system = form.save()
         serializer = SourceSystemSerializer(source_system)
         headers = self.get_success_headers(serializer.data)
-        return Response(
-            serializer.data, status=status.HTTP_201_CREATED, headers=headers
-        )
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
     @staticmethod
     def _set_available_username(form: AddSourceSystemForm):
@@ -118,9 +116,7 @@ def change_incident_active_view(request, incident_pk):
 
     new_active_state = request.data.get("active")
     if new_active_state is None or type(new_active_state) is not bool:
-        raise ValidationError(
-            "Field 'active' with a boolean value is missing from the request body."
-        )
+        raise ValidationError("Field 'active' with a boolean value is missing from the request body.")
 
     incident = Incident.objects.get(pk=incident_pk)
     if new_active_state:
@@ -129,18 +125,15 @@ def change_incident_active_view(request, incident_pk):
         if hasattr(incident, "active_state"):
             incident.active_state.delete()
 
-    incident = Incident.objects.get(
-        pk=incident_pk
-    )  # re-fetch the incident to get updated state after creating/deleting ActiveIncident object
+    # Re-fetch the incident to get updated state after creating/deleting ActiveIncident object
+    incident = Incident.objects.get(pk=incident_pk)
     serializer = IncidentSerializer(incident)
     return Response(serializer.data)
 
 
 @api_view(["GET"])
 def get_all_meta_data_view(request):
-    source_systems = SourceSystemSerializer(
-        SourceSystem.objects.select_related("type"), many=True
-    )
+    source_systems = SourceSystemSerializer(SourceSystem.objects.select_related("type"), many=True)
     object_types = ObjectTypeSerializer(ObjectType.objects.all(), many=True)
     parent_objects = ParentObjectSerializer(ParentObject.objects.all(), many=True)
     problem_types = ProblemTypeSerializer(ProblemType.objects.all(), many=True)

@@ -92,9 +92,7 @@ def random_description(word_count_range: Tuple[int, int]) -> str:
 
 
 def random_timestamp() -> datetime:
-    random_time_delta = (
-        timezone.now() - MIN_TIMESTAMP
-    ).total_seconds() * random.random()
+    random_time_delta = (timezone.now() - MIN_TIMESTAMP).total_seconds() * random.random()
     return MIN_TIMESTAMP + timedelta(seconds=random_time_delta)
 
 
@@ -126,13 +124,7 @@ def generate_source_systems(source_system_types) -> Tuple[List[Model], List[Mode
         for _ in range(NUM_SOURCE_SYSTEMS_PER_TYPE):
             name = random.choice(ascii_uppercase) + random.choice(digits)
             user = User(username=f"{source_type}.{name}".lower())
-            source_systems.append(
-                SourceSystem(
-                    name=name,
-                    type=source_type,
-                    user=user,
-                )
-            )
+            source_systems.append(SourceSystem(name=name, type=source_type, user=user))
             source_system_users.append(user)
 
     tuples = set_pks(source_systems), set_pks(source_system_users)
@@ -145,9 +137,7 @@ def generate_source_systems(source_system_types) -> Tuple[List[Model], List[Mode
 def generate_object_types() -> List[Model]:
     object_types = []
     for _ in range(NUM_OBJECT_TYPES):
-        object_types.append(
-            ObjectType(name=random_word(OBJECT_TYPE_NAME_LENGTH_RANGE).title())
-        )
+        object_types.append(ObjectType(name=random_word(OBJECT_TYPE_NAME_LENGTH_RANGE).title()))
 
     return set_pks(object_types)
 
@@ -156,14 +146,7 @@ def generate_objects(object_types, source_systems) -> List[Model]:
     def random_object_word() -> str:
         # Will most often be an empty string, sometimes a single digit, and rarely a double digit
         suffix = (
-            (
-                random.choice(digits)
-                + (
-                    random.choice(digits)
-                    if roll_dice(WORD_NUMBER_SUFFIX_CHANCE)
-                    else ""
-                )
-            )
+            (random.choice(digits) + (random.choice(digits) if roll_dice(WORD_NUMBER_SUFFIX_CHANCE) else ""))
             if roll_dice(WORD_NUMBER_SUFFIX_CHANCE)
             else ""
         )
@@ -177,10 +160,7 @@ def generate_objects(object_types, source_systems) -> List[Model]:
         for _ in range(random_int(OBJECT_NAME_WORD_COUNT_RANGE)):
             if roll_dice(COMPOSITE_WORD_CHANCE):
                 # Will be a word-like-this
-                word = "-".join(
-                    random_object_word()
-                    for _ in range(random_int(OBJECT_NAME_WORD_COUNT_RANGE))
-                )
+                word = "-".join(random_object_word() for _ in range(random_int(OBJECT_NAME_WORD_COUNT_RANGE)))
             else:
                 word = random_object_word().title()
             name_words.append(word)
@@ -207,13 +187,7 @@ def generate_parent_objects(source_systems) -> List[Model]:
         source_system = random.choice(source_systems)
         name = random_words(PARENT_OBJECT_NAME_WORD_COUNT_RANGE).title()
 
-        parent_objects.append(
-            ParentObject(
-                name=name,
-                parentobject_id=random_id(),
-                url=format_url(source_system, name),
-            )
-        )
+        parent_objects.append(ParentObject(name=name, parentobject_id=random_id(), url=format_url(source_system, name)))
 
     return set_pks(parent_objects)
 
@@ -221,9 +195,7 @@ def generate_parent_objects(source_systems) -> List[Model]:
 def generate_problem_types() -> List[Model]:
     problem_types = []
     for _ in range(NUM_PROBLEM_TYPES):
-        name = "".join(
-            w.title() for w in random_word_list(PROBLEM_TYPE_NAME_WORD_COUNT_RANGE)
-        )
+        name = "".join(w.title() for w in random_word_list(PROBLEM_TYPE_NAME_WORD_COUNT_RANGE))
         # Make first letter lower case
         name = name[0].lower() + name[1:]
 
@@ -234,9 +206,7 @@ def generate_problem_types() -> List[Model]:
     return set_pks(problem_types)
 
 
-def generate_incidents(
-    source_systems, objects, parent_objects, problem_types
-) -> List[Model]:
+def generate_incidents(source_systems, objects, parent_objects, problem_types) -> List[Model]:
     second_delay = timedelta(seconds=1)
 
     incidents = []
@@ -267,9 +237,7 @@ def generate_incidents(
 
 
 def generate_active_incidents(incidents) -> List[Model]:
-    return set_pks(
-        [ActiveIncident(incident=incident) for incident in incidents if roll_dice(INCIDENT_ACTIVE_CHANCE)]
-    )
+    return set_pks([ActiveIncident(incident=incident) for incident in incidents if roll_dice(INCIDENT_ACTIVE_CHANCE)])
 
 
 def create_fixture_file():

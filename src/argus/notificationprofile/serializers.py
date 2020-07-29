@@ -32,7 +32,9 @@ class TimeRecurrenceSerializer(serializers.ModelSerializer):
         # `days` is initially represented as a set; this converts it into a sorted list (`days` is stored sorted in the DB - see `.models.sort_days()`)
         instance_dict["days"] = sorted(instance_dict["days"])
 
-        if instance_dict["start"] == str(TimeRecurrence.DAY_START) and instance_dict["end"] == str(TimeRecurrence.DAY_END):
+        if instance_dict["start"] == str(TimeRecurrence.DAY_START) and instance_dict["end"] == str(
+            TimeRecurrence.DAY_END
+        ):
             instance_dict[self.ALL_DAY_KEY] = True
 
         return instance_dict

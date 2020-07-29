@@ -42,9 +42,7 @@ class DataportenOAuth2(BaseOAuth2):
         # Get profile photo url if any
         profilephoto_id = user.get("profilephoto", None)
         if profilephoto_id:
-            profilephoto_url = (
-                f"{self.API_URL}/userinfo/v1/user/media/{profilephoto_id}"
-            )
+            profilephoto_url = f"{self.API_URL}/userinfo/v1/user/media/{profilephoto_id}"
             user["profilephoto_url"] = profilephoto_url
 
         return user
@@ -52,18 +50,14 @@ class DataportenOAuth2(BaseOAuth2):
     def user_data(self, access_token, *args, **kwargs):
         """Loads user data from service"""
         url = f"{self.BASE_URL}/userinfo"
-        response = self.get_json(
-            url, headers={"Authorization": "Bearer " + access_token},
-        )
+        response = self.get_json(url, headers={"Authorization": "Bearer " + access_token})
         self.check_correct_audience(response["audience"])
 
         userdata = response["user"]
         return userdata
 
     def refresh_token(self, *args, **kwargs):
-        raise NotImplementedError(
-            "Refresh tokens for Dataporten have not been implemented"
-        )
+        raise NotImplementedError("Refresh tokens for Dataporten have not been implemented")
 
     def check_correct_audience(self, audience):
         """Assert that Dataporten sends back our own client id as audience"""

@@ -33,11 +33,7 @@ api_urls = [
 
 psa_urls = [
     # Overrides social_django's `complete` view
-    re_path(
-        fr"^complete/(?P<backend>[^/]+){extra}$",
-        dataporten_views.login_wrapper,
-        name="complete",
-    ),
+    re_path(fr"^complete/(?P<backend>[^/]+){extra}$", dataporten_views.login_wrapper, name="complete"),
     path("", include("social_django.urls", namespace="social")),
 ]
 

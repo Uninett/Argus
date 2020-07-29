@@ -13,9 +13,7 @@ class SourceSystemPostingTests(APITestCase):
         self.type2 = SourceSystemType.objects.create(name="Zabbix")
 
         password = "1234"
-        self.user1 = User.objects.create_user(
-            username="user1", password=password, is_staff=True, is_superuser=True,
-        )
+        self.user1 = User.objects.create_user(username="user1", password=password, is_staff=True, is_superuser=True)
         user_token = Token.objects.create(user=self.user1)
 
         self.rest_client = APIClient()
@@ -24,13 +22,9 @@ class SourceSystemPostingTests(APITestCase):
         self.django_client.login(username=self.user1.username, password=password)
 
         # URL format: https://docs.djangoproject.com/en/3.0/ref/contrib/admin/#reversing-admin-urls
-        self.base_admin_url = (
-            f"admin:{SourceSystem._meta.app_label}_{SourceSystem._meta.model_name}"
-        )
+        self.base_admin_url = f"admin:{SourceSystem._meta.app_label}_{SourceSystem._meta.model_name}"
         self.add_url = reverse(f"{self.base_admin_url}_add")
-        self.change_url = lambda source_system: reverse(
-            f"{self.base_admin_url}_change", args=[source_system.pk]
-        )
+        self.change_url = lambda source_system: reverse(f"{self.base_admin_url}_change", args=[source_system.pk])
         self.sources_url = reverse("incident:sources")
 
     def _post_source1_dict(self, url: str, client: Client):
@@ -108,7 +102,9 @@ class SourceSystemPostingTests(APITestCase):
         self.assertEqual(SourceSystem.objects.count(), 1)
         self.assertEqual(User.objects.count(), 2)
 
-    def _test_posting_empty_source_system_username_should_use_source_system_name_as_username(self, url: str, client: Client):
+    def _test_posting_empty_source_system_username_should_use_source_system_name_as_username(
+        self, url: str, client: Client
+    ):
         source_name = "gw.uninett"
         source_no_username_dict = {
             "name": source_name,
@@ -124,17 +120,19 @@ class SourceSystemPostingTests(APITestCase):
         self.assertEqual(source.user.username, source_name)
 
     def test_posting_empty_source_system_username_to_serializer_should_use_source_system_name_as_username(self):
-        self._test_posting_empty_source_system_username_should_use_source_system_name_as_username(self.sources_url, self.rest_client)
+        self._test_posting_empty_source_system_username_should_use_source_system_name_as_username(
+            self.sources_url, self.rest_client
+        )
 
     def test_posting_empty_source_system_username_to_admin_add_form_should_use_source_system_name_as_username(self):
-        self._test_posting_empty_source_system_username_should_use_source_system_name_as_username(self.add_url, self.django_client)
+        self._test_posting_empty_source_system_username_should_use_source_system_name_as_username(
+            self.add_url, self.django_client
+        )
 
     def test_admin_change_form_should_change_fields(self):
         source1_user = User.objects.create_user(username="gw1.uninett")
         source1_user2 = User.objects.create_user(username="new.gw1.uninett")
-        source1 = SourceSystem.objects.create(
-            name="gw1.uninett", type=self.type1, user=source1_user,
-        )
+        source1 = SourceSystem.objects.create(name="gw1.uninett", type=self.type1, user=source1_user)
 
         source1_dict = {
             "name": "new.gw1.uninett",
