@@ -267,7 +267,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
     ```json
     {
         "name": "Critical incidents",
-        "filter_string": "{\"sourceIds\":[<SourceSystem.pk>, ...], \"objectTypeIds\":[<ObjectType.pk>, ...], \"parentObjectIds\":[<ParentObject.pk>, ...], \"problemTypeIds\":[<ProblemType.pk>, ...]}"
+        "filter_string": "{\"sourceSystemIds\":[<SourceSystem.pk>, ...], \"objectTypeIds\":[<ObjectType.pk>, ...], \"parentObjectIds\":[<ParentObject.pk>, ...], \"problemTypeIds\":[<ProblemType.pk>, ...]}"
     }
     ```
     </details>
@@ -284,7 +284,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
 
   ```json
   {
-      "sourceIds": [<SourceSystem.pk>, ...],
+      "sourceSystemIds": [<SourceSystem.pk>, ...],
       "objectTypeIds": [<ObjectType.pk>, ...],
       "parentObjectIds": [<ParentObject.pk>, ...],
       "problemTypeIds": [<ProblemType.pk>, ...]

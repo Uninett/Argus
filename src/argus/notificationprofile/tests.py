@@ -161,14 +161,14 @@ class ModelTests(TestCase, MockIncidentData):
             user=self.user,
             name="Filter1",
             filter_string="{"
-            f'"sourceIds":[{self.nav1.pk}], "objectTypeIds":[], "parentObjectIds":[], "problemTypeIds":[]'
+            f'"sourceSystemIds":[{self.nav1.pk}], "objectTypeIds":[], "parentObjectIds":[], "problemTypeIds":[]'
             "}",
         )
         filter2 = Filter.objects.create(
             user=self.user,
             name="Filter2",
             filter_string="{"
-            f'"sourceIds":[{self.zabbix1.pk}], "objectTypeIds":[], "parentObjectIds":[], "problemTypeIds":[]'
+            f'"sourceSystemIds":[{self.zabbix1.pk}], "objectTypeIds":[], "parentObjectIds":[], "problemTypeIds":[]'
             "}",
         )
 
@@ -197,7 +197,7 @@ class ViewTests(APITestCase, MockIncidentData):
             user=self.user,
             name="Critical incidents",
             filter_string="{"
-            f'"sourceIds":[{self.nav1.pk}], "objectTypeIds":[], "parentObjectIds":[], "problemTypeIds":[]'
+            f'"sourceSystemIds":[{self.nav1.pk}], "objectTypeIds":[], "parentObjectIds":[], "problemTypeIds":[]'
             "}",
         )
         self.notification_profile1 = NotificationProfile.objects.create(

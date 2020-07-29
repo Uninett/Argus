@@ -112,7 +112,7 @@ def sort_days(sender, instance: TimeRecurrence, *args, **kwargs):
 
 class Filter(models.Model):
     FILTER_STRING_FIELDS = {
-        "sourceIds": AttrGetter("source"),
+        "sourceSystemIds": AttrGetter("source"),
         "objectTypeIds": NestedAttrGetter("object.type"),
         "parentObjectIds": AttrGetter("parent_object"),
         "problemTypeIds": AttrGetter("problem_type"),
