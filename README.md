@@ -55,6 +55,18 @@ A recap of the environment variables that can be set by default follows.
 * `python manage.py test src`
 
 
+### Mock data
+##### Generating
+```sh
+PYTHONPATH=src python src/argus/incident/fixtures/generate_fixtures.py
+```
+This creates the file `src/argus/incident/fixtures/incident/mock_data.json`.
+
+##### Loading
+```sh
+python manage.py loaddata incident/mock_data
+```
+
 ## Endpoints
 *`/admin/` to access the project's admin pages.*
 
