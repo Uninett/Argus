@@ -1,3 +1,4 @@
+python-dotenv
 black
 coverage
 ipython

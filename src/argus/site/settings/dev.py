@@ -1,4 +1,9 @@
+from dotenv import load_dotenv
+
+load_dotenv()
+
 from .base import *
+
 
 DEBUG = get_bool_env("DEBUG", True)
 TEMPLATES[0]["OPTIONS"]["debug"] = get_bool_env("TEMPLATE_DEBUG", True)
