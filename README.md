@@ -74,6 +74,52 @@ All endpoints require requests to contain a header with key `Authorization` and 
 
 * `/api/v1/incidents/`:
   * `GET`: returns all incidents - both active and historic
+    <details>
+    <summary>Example response body:</summary>
+
+    ```json
+    [
+        {
+            "pk": 10101,
+            "timestamp": "2011-11-11T11:11:11+02:00",
+            "source": {
+                "pk": 11,
+                "name": "Uninett GW 3",
+                "type": {
+                    "name": "NAV"
+                },
+                "user": 12
+            },
+            "source_incident_id": "12345",
+            "object": {
+                "pk": 11,
+                "name": "Netbox 4",
+                "object_id": "112233",
+                "url": "https://uninett.no/api/objects/112233/",
+                "type": {
+                    "pk": 1,
+                    "name": "Netbox"
+                }
+            },
+            "parent_object": {
+                "pk": 5,
+                "name": "SuperNetbox",
+                "parentobject_id": "445566",
+                "url": "https://uninett.no/api/objects/445566/"
+            },
+            "details_url": "https://uninett.no/api/alerts/12345/",
+            "problem_type": {
+                "pk": 1,
+                "name": "boxDown",
+                "description": "Box declared down."
+            },
+            "description": "Netbox 11 <1234> down.",
+            "ticket_url": "https://tickettracker.com/tickets/987654/",
+            "active_state": true
+        }
+    ]
+    ```
+    </details>
   * `POST`: creates and returns an incident
     <details>
     <summary>Body:</summary>
