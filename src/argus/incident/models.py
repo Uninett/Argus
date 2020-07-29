@@ -1,6 +1,6 @@
 from django.core.validators import URLValidator
 from django.db import models
-from django.db.models import Q, QuerySet
+from django.db.models import Q
 
 from argus.auth.models import User
 

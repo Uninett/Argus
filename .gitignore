@@ -229,7 +229,3 @@ pip-selfcheck.json
 npm-debug.log
 cloc.xml
 pylint.txt
-
-secret.txt
-dataporten_secret.txt
-email_secret.txt

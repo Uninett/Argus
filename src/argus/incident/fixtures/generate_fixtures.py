@@ -137,7 +137,8 @@ def generate_source_systems(source_system_types) -> Tuple[List[Model], List[Mode
 def generate_object_types() -> List[Model]:
     object_types = []
     for _ in range(NUM_OBJECT_TYPES):
-        object_types.append(ObjectType(name=random_word(OBJECT_TYPE_NAME_LENGTH_RANGE).title()))
+        name = random_word(OBJECT_TYPE_NAME_LENGTH_RANGE).title()
+        object_types.append(ObjectType(name=name))
 
     return set_pks(object_types)
 
@@ -146,7 +147,7 @@ def generate_objects(object_types, source_systems) -> List[Model]:
     def random_object_word() -> str:
         # Will most often be an empty string, sometimes a single digit, and rarely a double digit
         suffix = (
-            (random.choice(digits) + (random.choice(digits) if roll_dice(WORD_NUMBER_SUFFIX_CHANCE) else ""))
+            f"{random.choice(digits)}{random.choice(digits) if roll_dice(WORD_NUMBER_SUFFIX_CHANCE) else ''}"
             if roll_dice(WORD_NUMBER_SUFFIX_CHANCE)
             else ""
         )
@@ -237,7 +238,10 @@ def generate_incidents(source_systems, objects, parent_objects, problem_types) -
 
 
 def generate_active_incidents(incidents) -> List[Model]:
-    return set_pks([ActiveIncident(incident=incident) for incident in incidents if roll_dice(INCIDENT_ACTIVE_CHANCE)])
+    active_incidents = [
+        ActiveIncident(incident=incident) for incident in incidents if roll_dice(INCIDENT_ACTIVE_CHANCE)
+    ]
+    return set_pks(active_incidents)
 
 
 def create_fixture_file():

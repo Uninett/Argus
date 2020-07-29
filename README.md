@@ -77,7 +77,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
 
 * `GET` to `/api/v1/auth/user/`: returns the logged in user
 * `POST` to `/oidc/api-token-auth/`: returns an auth token for the posted user
-  * Body: `{ username: <username>, password: <password> }`
+  * Example request body: `{ username: <username>, password: <password> }`
 * `/oidc/login/dataporten_feide/`: redirects to Feide login
 </details>
 
@@ -134,7 +134,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
     </details>
   * `POST`: creates and returns an incident
     <details>
-    <summary>Body:</summary>
+    <summary>Example request body:</summary>
 
     Attribute explanation: https://nav.uninett.no/doc/dev/reference/eventengine.html#exporting-alerts-from-nav-into-other-systems
     ```json
@@ -173,7 +173,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
 * `GET` to `/api/v1/incidents/<int:pk>/`: returns an incident by pk
 * `GET` to `/api/v1/incidents/active/`: returns all active incidents
 * `PUT` to `/api/v1/incidents/<int:pk>/active/`: changes an incident's active state by pk
-  * Body: `{ "active": <bool> }`
+  * Example request body: `{ "active": <bool> }`
 * `GET` to `/api/v1/incidents/metadata/`: returns relevant metadata for all incidents
 
 </details>
@@ -185,7 +185,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
   * `GET`: returns the logged in user's notification profiles
   * `POST`: creates and returns a notification profile which is then connected to the logged in user
     <details>
-    <summary>Body:</summary>
+    <summary>Example request body:</summary>
 
     ```json
     {
@@ -206,7 +206,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
 * `/api/v1/notificationprofiles/<int:pk>/`:
   * `GET`: returns one of the logged in user's notification profiles by pk
   * `PUT`: updates and returns one of the logged in user's notification profiles by pk
-    * Body: same as `POST` to `/api/v1/notificationprofiles/`
+    * Example request body: same as `POST` to `/api/v1/notificationprofiles/`
   * `DELETE`: deletes one of the logged in user's notification profiles by pk
 
 * `GET` to `/api/v1/notificationprofiles/<int:pk>/incidents/`: returns all incidents - both active and historic - filtered by one of the logged in user's notification profiles by pk
@@ -215,7 +215,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
   * `GET`: returns the logged in user's time slots
   * `POST`: creates and returns a time slot which is then connected to the logged in user
     <details>
-    <summary>Body:</summary>
+    <summary>Example request body:</summary>
 
     ```json
     {
@@ -267,14 +267,14 @@ All endpoints require requests to contain a header with key `Authorization` and 
 * `/api/v1/notificationprofiles/timeslots/<int:pk>/`:
   * `GET`: returns one of the logged in user's time slots by pk
   * `PUT`: updates and returns one of the logged in user's time slots by pk
-    * Body: same as `POST` to `/notificationprofiles/timeslots/`
+    * Example request body: same as `POST` to `/notificationprofiles/timeslots/`
   * `DELETE`: deletes one of the logged in user's time slots by pk
 
 * `/api/v1/notificationprofiles/filters/`:
   * `GET`: returns the logged in user's filters
   * `POST`: creates and returns a filter which is then connected to the logged in user
     <details>
-    <summary>Body:</summary>
+    <summary>Example request body:</summary>
 
     ```json
     {
@@ -287,12 +287,12 @@ All endpoints require requests to contain a header with key `Authorization` and 
 * `/api/v1/notificationprofiles/filters/<int:pk>/`:
   * `GET`: returns one of the logged in user's filters by pk
   * `PUT`: updates and returns one of the logged in user's filters by pk
-    * Body: same as `POST` to `/api/v1/notificationprofiles/filters/`
+    * Example request body: same as `POST` to `/api/v1/notificationprofiles/filters/`
   * `DELETE`: deletes one of the logged in user's filters by pk
 
 * `POST` to `/api/v1/notificationprofiles/filterpreview/`: returns all incidents - both active and historic - filtered by the values in the body
   <details>
-  <summary>Body:</summary>
+  <summary>Example request body:</summary>
 
   ```json
   {

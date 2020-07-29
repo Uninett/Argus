@@ -86,6 +86,7 @@ class TimeRecurrence(models.Model):
 
     @property
     def isoweekdays(self):
+        # `days` are stored as strings in the db
         return {int(day) for day in self.days}
 
     def timestamp_is_within(self, timestamp: datetime):
