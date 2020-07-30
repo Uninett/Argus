@@ -5,7 +5,7 @@ from django.db.models import Q, QuerySet
 from argus.auth.models import User
 
 
-class AlertSourceType(models.Model):
+class SourceSystemType(models.Model):
     name = models.TextField(primary_key=True)
 
     class Meta:
@@ -15,21 +15,21 @@ class AlertSourceType(models.Model):
         return self.name
 
 
-class AlertSource(models.Model):
+class SourceSystem(models.Model):
     name = models.TextField()
     type = models.ForeignKey(
-        to=AlertSourceType, on_delete=models.CASCADE, related_name="instances",
+        to=SourceSystemType, on_delete=models.CASCADE, related_name="instances",
     )
     user = models.OneToOneField(
         to=User,
         on_delete=models.CASCADE,
-        related_name="alert_source",
+        related_name="source_system",
     )
 
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=["name", "type"], name="alertsource_unique_name_per_type",
+                fields=["name", "type"], name="sourcesystem_unique_name_per_type",
             ),
         ]
 
@@ -54,8 +54,8 @@ class Object(models.Model):
     type = models.ForeignKey(
         to=ObjectType, on_delete=models.CASCADE, related_name="instances",
     )
-    alert_source = models.ForeignKey(
-        to=AlertSource,
+    source_system = models.ForeignKey(
+        to=SourceSystem,
         on_delete=models.CASCADE,
         null=True,
         related_name="object_set",  # can't be `objects`, because it will override the model's `.objects` manager
@@ -64,17 +64,17 @@ class Object(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=["object_id", "alert_source"],
-                name="object_unique_object_id_per_alert_source",
+                fields=["object_id", "source_system"],
+                name="object_unique_object_id_per_source_system",
             ),
             models.UniqueConstraint(
-                fields=["name", "type", "alert_source"],
-                name="object_unique_name_and_type_per_alert_source",
+                fields=["name", "type", "source_system"],
+                name="object_unique_name_and_type_per_source_system",
             ),
         ]
 
     def __str__(self):
-        return f"{self.type}: {self.name} ({self.alert_source}) <ID {self.object_id}>"
+        return f"{self.type}: {self.name} ({self.source_system}) <ID {self.object_id}>"
 
 
 class ParentObject(models.Model):
@@ -100,7 +100,7 @@ class ProblemType(models.Model):
         return self.name
 
 
-class AlertQuerySet(models.QuerySet):
+class IncidentQuerySet(models.QuerySet):
     def active(self):
         return self.filter(active_state__isnull=False)
 
@@ -111,27 +111,27 @@ class AlertQuerySet(models.QuerySet):
 
 
 # TODO: review whether fields should be nullable, and on_delete modes
-class Alert(models.Model):
+class Incident(models.Model):
     timestamp = models.DateTimeField()
     source = models.ForeignKey(
-        to=AlertSource,
+        to=SourceSystem,
         on_delete=models.CASCADE,
-        related_name="alerts",
-        help_text="The network management system that the alert came from.",
+        related_name="incidents",
+        help_text="The source system that the incident originated in.",
     )
-    alert_id = models.TextField(verbose_name="alert ID")
+    source_incident_id = models.TextField(verbose_name="source incident ID")
     object = models.ForeignKey(
         to=Object,
         on_delete=models.CASCADE,
-        related_name="alerts",
-        help_text="The most specific object that the alert was about.",
+        related_name="incidents",
+        help_text="The most specific object that the incident is about.",
     )
     parent_object = models.ForeignKey(
         to=ParentObject,
         on_delete=models.CASCADE,
         null=True,
         blank=True,
-        related_name="alerts",
+        related_name="incidents",
         help_text="An object that the above `object` is possibly a part of.",
     )
     details_url = models.TextField(
@@ -140,8 +140,8 @@ class Alert(models.Model):
     problem_type = models.ForeignKey(
         to=ProblemType,
         on_delete=models.CASCADE,
-        related_name="alerts",
-        help_text="The type of problem that the alert is informing about.",
+        related_name="incidents",
+        help_text="The type of problem that the incident is about.",
     )
     description = models.TextField(blank=True)
     ticket_url = models.TextField(
@@ -151,12 +151,12 @@ class Alert(models.Model):
         help_text="URL to existing ticket in a ticketing system.",
     )
 
-    objects = AlertQuerySet.as_manager()
+    objects = IncidentQuerySet.as_manager()
 
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=["alert_id", "source"], name="alert_unique_alert_id_per_source",
+                fields=["source_incident_id", "source"], name="incident_unique_source_incident_id_per_source",
             ),
         ]
         ordering = ["-timestamp"]
@@ -165,21 +165,21 @@ class Alert(models.Model):
         return f"{self.timestamp} - {self.problem_type}: {self.object}"
 
     @property
-    def alert_relations(self):
-        return AlertRelation.objects.filter(Q(alert1=self) | Q(alert2=self))
+    def incident_relations(self):
+        return IncidentRelation.objects.filter(Q(incident1=self) | Q(incident2=self))
 
 
-class ActiveAlert(models.Model):
-    alert = models.OneToOneField(
-        to=Alert,
+class ActiveIncident(models.Model):
+    incident = models.OneToOneField(
+        to=Incident,
         on_delete=models.CASCADE,
         primary_key=True,
         related_name="active_state",
-        help_text="Whether the alert's problem has been resolved.",
+        help_text="Whether the incident has been resolved.",
     )
 
 
-class AlertRelationType(models.Model):
+class IncidentRelationType(models.Model):
     name = models.TextField()
 
     class Meta:
@@ -189,22 +189,22 @@ class AlertRelationType(models.Model):
         return self.name
 
 
-class AlertRelation(models.Model):
-    alert1 = models.ForeignKey(
-        to=Alert,
+class IncidentRelation(models.Model):
+    incident1 = models.ForeignKey(
+        to=Incident,
         on_delete=models.CASCADE,
         related_name="+",  # don't create a backwards relation
     )
-    alert2 = models.ForeignKey(
-        to=Alert,
+    incident2 = models.ForeignKey(
+        to=Incident,
         on_delete=models.CASCADE,
         related_name="+",  # don't create a backwards relation
     )
     type = models.ForeignKey(
-        to=AlertRelationType, on_delete=models.CASCADE, related_name="alert_relations",
+        to=IncidentRelationType, on_delete=models.CASCADE, related_name="incident_relations",
     )
     description = models.TextField(blank=True)
 
     def __str__(self):
-        id_label = Alert.alert_id.field_name
-        return f"{id_label}#{self.alert1.alert_id} <{self.type}> {id_label}#{self.alert2.alert_id}"
+        id_label = Incident.source_incident_id.field_name
+        return f"{id_label}#{self.incident1.source_incident_id} <{self.type}> {id_label}#{self.incident2.source_incident_id}"

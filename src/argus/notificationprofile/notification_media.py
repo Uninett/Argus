@@ -7,38 +7,38 @@ from django.conf import settings
 from django.template.loader import render_to_string
 from rest_framework.renderers import JSONRenderer
 
-from argus.alert.models import Alert
-from argus.alert.serializers import AlertSerializer
 from argus.auth.models import User
+from argus.incident.models import Incident
+from argus.incident.serializers import IncidentSerializer
 from .models import NotificationProfile
 
 
 class NotificationMedium(ABC):
     @staticmethod
     @abstractmethod
-    def send(alert: Alert, user: User):
+    def send(incident: Incident, user: User):
         pass
 
 
 class EmailNotification(NotificationMedium):
     @staticmethod
-    def send(alert, user):
+    def send(incident, user):
         if not user.email:
             logging.getLogger("django.request").warning(
                 f"Cannot send email notification to user '{user}', as they have not set an email address."
             )
 
-        title = f"Alert at {alert}"
-        alert_dict = AlertSerializer(
-            alert, context={AlertSerializer.NO_PKS_KEY: True}
+        title = f"Incident at {incident}"
+        incident_dict = IncidentSerializer(
+            incident, context={IncidentSerializer.NO_PKS_KEY: True}
         ).data
         # Convert OrderedDicts to dicts
-        alert_dict = json.loads(JSONRenderer().render(alert_dict))
+        incident_dict = json.loads(JSONRenderer().render(incident_dict))
 
         template_context = {
             "title": title,
-            "alert_dict": alert_dict,
-            "longest_field_name_length": len(max(alert_dict, key=len)),
+            "incident_dict": incident_dict,
+            "longest_field_name_length": len(max(incident_dict, key=len)),
         }
         user.email_user(
             subject=f"{settings.NOTIFICATION_SUBJECT_PREFIX}{title}",
@@ -56,18 +56,18 @@ MODEL_REPRESENTATION_TO_CLASS = {
 }
 
 
-def send_notifications_to_users(alert: Alert):
+def send_notifications_to_users(incident: Incident):
     # TODO: only send one notification per medium per user
     for profile in NotificationProfile.objects.select_related("user"):
-        if profile.alert_fits(alert):
-            send_notification(profile.user, profile, alert)
+        if profile.incident_fits(incident):
+            send_notification(profile.user, profile, incident)
 
 
-def send_notification(user: User, profile: NotificationProfile, alert: Alert):
+def send_notification(user: User, profile: NotificationProfile, incident: Incident):
     media = get_notification_media(list(profile.media))
     for medium in media:
         if medium is not None:
-            medium.send(alert, user)
+            medium.send(incident, user)
 
 
 def get_notification_media(model_representations: List[str]):

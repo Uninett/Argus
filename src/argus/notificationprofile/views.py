@@ -6,7 +6,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from argus.alert.serializers import AlertSerializer
+from argus.incident.serializers import IncidentSerializer
 from .models import Filter, NotificationProfile
 from .permissions import IsOwner
 from .serializers import (
@@ -37,7 +37,7 @@ class NotificationProfileDetail(generics.RetrieveUpdateDestroyAPIView):
 
 
 @api_view(["GET"])
-def alerts_filtered_by_notification_profile_view(request, notification_profile_pk):
+def incidents_filtered_by_notification_profile_view(request, notification_profile_pk):
     try:
         # Go through user to ensure that the user owns the requested notification profile
         notification_profile = request.user.notification_profiles.get(
@@ -48,7 +48,7 @@ def alerts_filtered_by_notification_profile_view(request, notification_profile_p
             f"Notification profile with pk={notification_profile_pk} does not exist."
         )
 
-    serializer = AlertSerializer(notification_profile.filtered_alerts, many=True)
+    serializer = IncidentSerializer(notification_profile.filtered_incidents, many=True)
     return Response(serializer.data)
 
 
@@ -100,5 +100,5 @@ def filter_preview_view(request):
 
     filter_string_json = json.dumps(filter_string_dict)
     mock_filter = Filter(filter_string=filter_string_json)
-    serializer = AlertSerializer(mock_filter.filtered_alerts, many=True)
+    serializer = IncidentSerializer(mock_filter.filtered_incidents, many=True)
     return Response(serializer.data)

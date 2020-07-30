@@ -9,42 +9,42 @@ from rest_framework.response import Response
 from argus.auth.models import User
 from argus.notificationprofile.notification_media import send_notifications_to_users
 from . import mappings
-from .forms import AddAlertSourceForm
+from .forms import AddSourceSystemForm
 from .models import (
-    ActiveAlert,
-    Alert,
-    AlertSource,
-    AlertSourceType,
+    ActiveIncident,
+    Incident,
     ObjectType,
     ParentObject,
     ProblemType,
+    SourceSystem,
+    SourceSystemType,
 )
 from .parsers import StackedJSONParser
 from .permissions import IsOwnerOrReadOnly, IsSuperuserOrReadOnly
 from .serializers import (
-    AlertSerializer,
-    AlertSourceSerializer,
-    AlertSourceTypeSerializer,
+    IncidentSerializer,
     ObjectTypeSerializer,
     ParentObjectSerializer,
     ProblemTypeSerializer,
+    SourceSystemSerializer,
+    SourceSystemTypeSerializer,
 )
 
 
-class AlertSourceTypeList(generics.ListCreateAPIView):
+class SourceSystemTypeList(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
-    serializer_class = AlertSourceTypeSerializer
-    queryset = AlertSourceType.objects.all()
+    serializer_class = SourceSystemTypeSerializer
+    queryset = SourceSystemType.objects.all()
 
 
-class AlertSourceList(generics.ListCreateAPIView):
+class SourceSystemList(generics.ListCreateAPIView):
     permission_classes = [IsSuperuserOrReadOnly]
-    queryset = AlertSource.objects.all()
-    serializer_class = AlertSourceSerializer
+    queryset = SourceSystem.objects.all()
+    serializer_class = SourceSystemSerializer
 
     def create(self, request, *args, **kwargs):
         # Reuse the logic in the form that's used on the admin page
-        form = AddAlertSourceForm(request.data)
+        form = AddSourceSystemForm(request.data)
         if not form.is_valid():
             # If the form is invalid because the username is unavailable:
             if User.objects.filter(username=form.data["username"]).exists():
@@ -52,15 +52,15 @@ class AlertSourceList(generics.ListCreateAPIView):
             else:
                 raise serializers.ValidationError(form.errors)
 
-        alert_source = form.save()
-        serializer = AlertSourceSerializer(alert_source)
+        source_system = form.save()
+        serializer = SourceSystemSerializer(source_system)
         headers = self.get_success_headers(serializer.data)
         return Response(
             serializer.data, status=status.HTTP_201_CREATED, headers=headers
         )
 
     @staticmethod
-    def _set_available_username(form: AddAlertSourceForm):
+    def _set_available_username(form: AddSourceSystemForm):
         random_suffix = secrets.token_hex(3).upper()  # 16.8 million distinct values
         username = f"{form.data['username']}_{random_suffix}"
         form.data["username"] = username
@@ -69,50 +69,50 @@ class AlertSourceList(generics.ListCreateAPIView):
             raise serializers.ValidationError(form.errors)
 
 
-class AlertSourceDetail(generics.RetrieveUpdateAPIView):
+class SourceSystemDetail(generics.RetrieveUpdateAPIView):
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
-    queryset = AlertSource.objects.all()
-    serializer_class = AlertSourceSerializer
+    queryset = SourceSystem.objects.all()
+    serializer_class = SourceSystemSerializer
 
 
-class AlertList(generics.ListCreateAPIView):
-    queryset = Alert.objects.prefetch_default_related().select_related("active_state")
+class IncidentList(generics.ListCreateAPIView):
+    queryset = Incident.objects.prefetch_default_related().select_related("active_state")
     parser_classes = [StackedJSONParser]
-    serializer_class = AlertSerializer
+    serializer_class = IncidentSerializer
 
     def post(self, request, *args, **kwargs):
-        # TODO: replace with deserializing JSON for one alert per request, with data that's already been mapped (once glue services have been implemented)
-        created_alerts = [
-            mappings.create_alert_from_json(
+        # TODO: replace with deserializing JSON for one incident per request, with data that's already been mapped (once glue services have been implemented)
+        created_incidents = [
+            mappings.create_incident_from_json(
                 json_dict, "NAV"
-            )  # TODO: interpret alert source type from alerts' source IP?
+            )  # TODO: interpret source system type from incidents' source IP?
             for json_dict in request.data
         ]
 
-        for created_alert in created_alerts:
-            send_notifications_to_users(created_alert)
+        for created_incident in created_incidents:
+            send_notifications_to_users(created_incident)
 
-        if len(created_alerts) == 1:
-            serializer = AlertSerializer(created_alerts[0])
+        if len(created_incidents) == 1:
+            serializer = IncidentSerializer(created_incidents[0])
         else:
-            serializer = AlertSerializer(created_alerts, many=True)
+            serializer = IncidentSerializer(created_incidents, many=True)
         return Response(serializer.data)
 
 
-class AlertDetail(generics.RetrieveAPIView):
-    queryset = Alert.objects.all()
-    serializer_class = AlertSerializer
+class IncidentDetail(generics.RetrieveAPIView):
+    queryset = Incident.objects.all()
+    serializer_class = IncidentSerializer
 
 
-class ActiveAlertList(generics.ListAPIView):
-    serializer_class = AlertSerializer
+class ActiveIncidentList(generics.ListAPIView):
+    serializer_class = IncidentSerializer
 
     def get_queryset(self):
-        return Alert.objects.active().prefetch_default_related()
+        return Incident.objects.active().prefetch_default_related()
 
 
 @api_view(["PUT"])
-def change_alert_active_view(request, alert_pk):
+def change_incident_active_view(request, incident_pk):
     if type(request.data) is not dict:
         raise ValidationError("The request body must contain JSON.")
 
@@ -122,30 +122,30 @@ def change_alert_active_view(request, alert_pk):
             "Field 'active' with a boolean value is missing from the request body."
         )
 
-    alert = Alert.objects.get(pk=alert_pk)
+    incident = Incident.objects.get(pk=incident_pk)
     if new_active_state:
-        ActiveAlert.objects.get_or_create(alert=alert)
+        ActiveIncident.objects.get_or_create(incident=incident)
     else:
-        if hasattr(alert, "active_state"):
-            alert.active_state.delete()
+        if hasattr(incident, "active_state"):
+            incident.active_state.delete()
 
-    alert = Alert.objects.get(
-        pk=alert_pk
-    )  # re-fetch the alert to get updated state after creating/deleting ActiveAlert object
-    serializer = AlertSerializer(alert)
+    incident = Incident.objects.get(
+        pk=incident_pk
+    )  # re-fetch the incident to get updated state after creating/deleting ActiveIncident object
+    serializer = IncidentSerializer(incident)
     return Response(serializer.data)
 
 
 @api_view(["GET"])
 def get_all_meta_data_view(request):
-    alert_sources = AlertSourceSerializer(
-        AlertSource.objects.select_related("type"), many=True
+    source_systems = SourceSystemSerializer(
+        SourceSystem.objects.select_related("type"), many=True
     )
     object_types = ObjectTypeSerializer(ObjectType.objects.all(), many=True)
     parent_objects = ParentObjectSerializer(ParentObject.objects.all(), many=True)
     problem_types = ProblemTypeSerializer(ProblemType.objects.all(), many=True)
     data = {
-        "alertSources": alert_sources.data,
+        "sourceSystems": source_systems.data,
         "objectTypes": object_types.data,
         "parentObjects": parent_objects.data,
         "problemTypes": problem_types.data,

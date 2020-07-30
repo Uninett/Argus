@@ -1,19 +1,19 @@
 from django.contrib import admin
 from django.contrib.admin import widgets
 
-from .forms import AddAlertSourceForm
+from .forms import AddSourceSystemForm
 from .models import (
-    ActiveAlert,
-    Alert,
-    AlertQuerySet,
-    AlertRelation,
-    AlertRelationType,
-    AlertSource,
-    AlertSourceType,
+    ActiveIncident,
+    Incident,
+    IncidentQuerySet,
+    IncidentRelation,
+    IncidentRelationType,
     Object,
     ObjectType,
     ParentObject,
     ProblemType,
+    SourceSystem,
+    SourceSystemType,
 )
 
 
@@ -32,14 +32,14 @@ class TextWidgetsOverrideModelAdmin(admin.ModelAdmin):
         return form
 
 
-class AlertSourceTypeAdmin(TextWidgetsOverrideModelAdmin):
+class SourceSystemTypeAdmin(TextWidgetsOverrideModelAdmin):
     list_display = ("name",)
     search_fields = ("name",)
 
     text_input_form_fields = ("name",)
 
 
-class AlertSourceAdmin(TextWidgetsOverrideModelAdmin):
+class SourceSystemAdmin(TextWidgetsOverrideModelAdmin):
     list_display = ("name", "type", "user")
     search_fields = ("name", "user__username")
     list_filter = ("type",)
@@ -50,7 +50,7 @@ class AlertSourceAdmin(TextWidgetsOverrideModelAdmin):
     def get_form(self, request, obj=None, **kwargs):
         # If add form (instead of change form):
         if not obj:
-            kwargs["form"] = AddAlertSourceForm
+            kwargs["form"] = AddSourceSystemForm
 
         return super().get_form(request, obj, **kwargs)
 
@@ -63,10 +63,10 @@ class ObjectTypeAdmin(TextWidgetsOverrideModelAdmin):
 
 
 class ObjectAdmin(TextWidgetsOverrideModelAdmin):
-    list_display = ("name", "object_id", "type", "alert_source")
+    list_display = ("name", "object_id", "type", "source_system")
     search_fields = ("name", "object_id", "type__name", "url")
-    list_filter = ("alert_source", "alert_source__type", "type")
-    list_select_related = ("type", "alert_source")
+    list_filter = ("source_system", "source_system__type", "type")
+    list_select_related = ("type", "source_system")
 
     text_input_form_fields = ("name", "object_id")
     url_input_form_fields = ("url",)
@@ -112,9 +112,9 @@ class ActiveStateListFilter(admin.SimpleListFilter):
         return queryset.filter(active_state__isnull=not lookup_value)
 
 
-class AlertAdmin(TextWidgetsOverrideModelAdmin):
+class IncidentAdmin(TextWidgetsOverrideModelAdmin):
     list_display = (
-        "alert_id",
+        "source_incident_id",
         "timestamp",
         "source",
         "object",
@@ -125,7 +125,7 @@ class AlertAdmin(TextWidgetsOverrideModelAdmin):
         "get_active_state",
     )
     search_fields = (
-        "alert_id",
+        "source_incident_id",
         "source__name",
         "source__type",
         "object__name",
@@ -145,61 +145,61 @@ class AlertAdmin(TextWidgetsOverrideModelAdmin):
     list_select_related = ("active_state",)
 
     raw_id_fields = ("object", "parent_object")
-    text_input_form_fields = ("alert_id",)
+    text_input_form_fields = ("source_incident_id",)
     url_input_form_fields = ("details_url", "ticket_url")
 
-    def get_active_state(self, alert: Alert):
-        return hasattr(alert, "active_state")
+    def get_active_state(self, incident: Incident):
+        return hasattr(incident, "active_state")
 
     get_active_state.boolean = True
     get_active_state.short_description = "Active"
     get_active_state.admin_order_field = "active_state"
 
     def get_queryset(self, request):
-        qs: AlertQuerySet = super().get_queryset(request)
+        qs: IncidentQuerySet = super().get_queryset(request)
         # Reduce number of database calls
         return qs.prefetch_default_related().prefetch_related(
-            "object__alert_source__type",
+            "object__source_system__type",
         )
 
 
-class ActiveAlertAdmin(admin.ModelAdmin):
-    list_display = ("alert",)
-    search_fields = ("alert__alert_id",)
-    list_select_related = ("alert",)
+class ActiveIncidentAdmin(admin.ModelAdmin):
+    list_display = ("incident",)
+    search_fields = ("incident__source_incident_id",)
+    list_select_related = ("incident",)
 
-    raw_id_fields = ("alert",)
+    raw_id_fields = ("incident",)
 
 
-class AlertRelationTypeAdmin(TextWidgetsOverrideModelAdmin):
+class IncidentRelationTypeAdmin(TextWidgetsOverrideModelAdmin):
     list_display = ("name",)
     search_fields = ("name",)
 
     text_input_form_fields = ("name",)
 
 
-class AlertRelationAdmin(admin.ModelAdmin):
+class IncidentRelationAdmin(admin.ModelAdmin):
     list_display = ("get_str", "type", "description")
-    search_fields = ("alert1__alert_id", "alert2__alert_id")
+    search_fields = ("incident1__source_incident_id", "incident2__source_incident_id")
     list_filter = ("type",)
     list_select_related = ("type",)
 
-    raw_id_fields = ("alert1", "alert2")
+    raw_id_fields = ("incident1", "incident2")
 
-    def get_str(self, alert_relation):
-        return str(alert_relation)
+    def get_str(self, incident_relation):
+        return str(incident_relation)
 
-    get_str.short_description = "Alert relation"
+    get_str.short_description = "Incident relation"
 
 
-admin.site.register(AlertSourceType, AlertSourceTypeAdmin)
-admin.site.register(AlertSource, AlertSourceAdmin)
+admin.site.register(SourceSystemType, SourceSystemTypeAdmin)
+admin.site.register(SourceSystem, SourceSystemAdmin)
 admin.site.register(ObjectType, ObjectTypeAdmin)
 admin.site.register(Object, ObjectAdmin)
 admin.site.register(ParentObject, ParentObjectAdmin)
 admin.site.register(ProblemType, ProblemTypeAdmin)
-admin.site.register(Alert, AlertAdmin)
-admin.site.register(ActiveAlert, ActiveAlertAdmin)
+admin.site.register(Incident, IncidentAdmin)
+admin.site.register(ActiveIncident, ActiveIncidentAdmin)
 
-admin.site.register(AlertRelation, AlertRelationAdmin)
-admin.site.register(AlertRelationType, AlertRelationTypeAdmin)
+admin.site.register(IncidentRelation, IncidentRelationAdmin)
+admin.site.register(IncidentRelationType, IncidentRelationTypeAdmin)
