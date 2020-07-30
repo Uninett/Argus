@@ -10,7 +10,7 @@ from multiselectfield import MultiSelectField
 
 from argus.auth.models import User
 from argus.incident.models import Incident
-from .utils import AttrGetter, NestedAttrGetter
+from argus.site.utils import AttrGetter, NestedAttrGetter
 
 
 class Timeslot(models.Model):
