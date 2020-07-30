@@ -17,20 +17,12 @@ class SourceSystemType(models.Model):
 
 class SourceSystem(models.Model):
     name = models.TextField()
-    type = models.ForeignKey(
-        to=SourceSystemType, on_delete=models.CASCADE, related_name="instances",
-    )
-    user = models.OneToOneField(
-        to=User,
-        on_delete=models.CASCADE,
-        related_name="source_system",
-    )
+    type = models.ForeignKey(to=SourceSystemType, on_delete=models.CASCADE, related_name="instances")
+    user = models.OneToOneField(to=User, on_delete=models.CASCADE, related_name="source_system")
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(
-                fields=["name", "type"], name="sourcesystem_unique_name_per_type",
-            ),
+            models.UniqueConstraint(fields=["name", "type"], name="sourcesystem_unique_name_per_type"),
         ]
 
     def __str__(self):
@@ -51,9 +43,7 @@ class Object(models.Model):
     name = models.TextField()
     object_id = models.TextField(blank=True, verbose_name="object ID")
     url = models.TextField(validators=[URLValidator], verbose_name="URL")
-    type = models.ForeignKey(
-        to=ObjectType, on_delete=models.CASCADE, related_name="instances",
-    )
+    type = models.ForeignKey(to=ObjectType, on_delete=models.CASCADE, related_name="instances")
     source_system = models.ForeignKey(
         to=SourceSystem,
         on_delete=models.CASCADE,
@@ -64,12 +54,10 @@ class Object(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=["object_id", "source_system"],
-                name="object_unique_object_id_per_source_system",
+                fields=["object_id", "source_system"], name="object_unique_object_id_per_source_system",
             ),
             models.UniqueConstraint(
-                fields=["name", "type", "source_system"],
-                name="object_unique_name_and_type_per_source_system",
+                fields=["name", "type", "source_system"], name="object_unique_name_and_type_per_source_system",
             ),
         ]
 
@@ -105,9 +93,7 @@ class IncidentQuerySet(models.QuerySet):
         return self.filter(active_state__isnull=False)
 
     def prefetch_default_related(self):
-        return self.select_related("parent_object", "problem_type").prefetch_related(
-            "source__type", "object__type",
-        )
+        return self.select_related("parent_object", "problem_type").prefetch_related("source__type", "object__type")
 
 
 # TODO: review whether fields should be nullable, and on_delete modes
@@ -134,9 +120,7 @@ class Incident(models.Model):
         related_name="incidents",
         help_text="An object that the above `object` is possibly a part of.",
     )
-    details_url = models.TextField(
-        blank=True, validators=[URLValidator], verbose_name="details URL",
-    )
+    details_url = models.TextField(blank=True, validators=[URLValidator], verbose_name="details URL")
     problem_type = models.ForeignKey(
         to=ProblemType,
         on_delete=models.CASCADE,
@@ -190,19 +174,10 @@ class IncidentRelationType(models.Model):
 
 
 class IncidentRelation(models.Model):
-    incident1 = models.ForeignKey(
-        to=Incident,
-        on_delete=models.CASCADE,
-        related_name="+",  # don't create a backwards relation
-    )
-    incident2 = models.ForeignKey(
-        to=Incident,
-        on_delete=models.CASCADE,
-        related_name="+",  # don't create a backwards relation
-    )
-    type = models.ForeignKey(
-        to=IncidentRelationType, on_delete=models.CASCADE, related_name="incident_relations",
-    )
+    # "+" prevents creating a backwards relation
+    incident1 = models.ForeignKey(to=Incident, on_delete=models.CASCADE, related_name="+")
+    incident2 = models.ForeignKey(to=Incident, on_delete=models.CASCADE, related_name="+")
+    type = models.ForeignKey(to=IncidentRelationType, on_delete=models.CASCADE, related_name="incident_relations")
     description = models.TextField(blank=True)
 
     def __str__(self):

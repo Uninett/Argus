@@ -14,16 +14,12 @@ from .utils import AttrGetter, NestedAttrGetter
 
 
 class Timeslot(models.Model):
-    user = models.ForeignKey(
-        to=User, on_delete=models.CASCADE, related_name="timeslots",
-    )
+    user = models.ForeignKey(to=User, on_delete=models.CASCADE, related_name="timeslots")
     name = models.CharField(max_length=40)
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(
-                fields=["name", "user"], name="timeslot_unique_name_per_user",
-            ),
+            models.UniqueConstraint(fields=["name", "user"], name="timeslot_unique_name_per_user"),
         ]
         ordering = ["name"]
 
@@ -64,9 +60,7 @@ class TimeRecurrence(models.Model):
     DAY_START = time.min
     DAY_END = time.max
 
-    timeslot = models.ForeignKey(
-        to=Timeslot, on_delete=models.CASCADE, related_name="time_recurrences",
-    )
+    timeslot = models.ForeignKey(to=Timeslot, on_delete=models.CASCADE, related_name="time_recurrences")
 
     days = MultiSelectField(choices=Day.choices, min_choices=1)
     start = models.TimeField(help_text="Local time.")
@@ -97,10 +91,7 @@ class TimeRecurrence(models.Model):
     def timestamp_is_within(self, timestamp: datetime):
         # FIXME: Might affect performance negatively if calling this method frequently
         timestamp = timestamp.astimezone(timezone.get_current_timezone())
-        return (
-            timestamp.isoweekday() in self.isoweekdays
-            and self.start <= timestamp.time() <= self.end
-        )
+        return timestamp.isoweekday() in self.isoweekdays and self.start <= timestamp.time() <= self.end
 
 
 # Sort days when a TimeRecurrence is saved
@@ -118,15 +109,13 @@ class Filter(models.Model):
         "problemTypeIds": AttrGetter("problem_type"),
     }
 
-    user = models.ForeignKey(to=User, on_delete=models.CASCADE, related_name="filters",)
+    user = models.ForeignKey(to=User, on_delete=models.CASCADE, related_name="filters")
     name = models.CharField(max_length=40)
     filter_string = models.TextField()
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(
-                fields=["name", "user"], name="filter_unique_name_per_user",
-            ),
+            models.UniqueConstraint(fields=["name", "user"], name="filter_unique_name_per_user"),
         ]
 
     def __str__(self):
@@ -162,17 +151,12 @@ class Filter(models.Model):
 
 
 class NotificationProfile(models.Model):
-    user = models.ForeignKey(
-        to=User, on_delete=models.CASCADE, related_name="notification_profiles",
-    )
+    user = models.ForeignKey(to=User, on_delete=models.CASCADE, related_name="notification_profiles")
     # TODO: add constraint that user must be the same
     timeslot = models.OneToOneField(
-        to=Timeslot,
-        on_delete=models.CASCADE,
-        primary_key=True,
-        related_name="notification_profile",
+        to=Timeslot, on_delete=models.CASCADE, primary_key=True, related_name="notification_profile",
     )
-    filters = models.ManyToManyField(to=Filter, related_name="notification_profiles",)
+    filters = models.ManyToManyField(to=Filter, related_name="notification_profiles")
 
     EMAIL = "EM"
     SMS = "SM"
@@ -200,6 +184,6 @@ class NotificationProfile(models.Model):
     def incident_fits(self, incident: Incident):
         if not self.active:
             return False
-        return self.timeslot.timestamp_is_within_time_recurrences(
-            incident.timestamp
-        ) and any(f.incident_fits(incident) for f in self.filters.all())
+        return self.timeslot.timestamp_is_within_time_recurrences(incident.timestamp) and any(
+            f.incident_fits(incident) for f in self.filters.all()
+        )

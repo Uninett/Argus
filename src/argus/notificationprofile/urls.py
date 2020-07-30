@@ -5,11 +5,7 @@ from . import views
 app_name = "notification-profile"
 urlpatterns = [
     path("", views.NotificationProfileList.as_view(), name="notification-profiles"),
-    path(
-        "<int:pk>",
-        views.NotificationProfileDetail.as_view(),
-        name="notification-profile",
-    ),
+    path("<int:pk>", views.NotificationProfileDetail.as_view(), name="notification-profile"),
     path(
         "<int:notification_profile_pk>/incidents/",
         views.incidents_filtered_by_notification_profile_view,

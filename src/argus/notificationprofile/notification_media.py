@@ -29,9 +29,7 @@ class EmailNotification(NotificationMedium):
             )
 
         title = f"Incident at {incident}"
-        incident_dict = IncidentSerializer(
-            incident, context={IncidentSerializer.NO_PKS_KEY: True}
-        ).data
+        incident_dict = IncidentSerializer(incident, context={IncidentSerializer.NO_PKS_KEY: True}).data
         # Convert OrderedDicts to dicts
         incident_dict = json.loads(JSONRenderer().render(incident_dict))
 
@@ -43,9 +41,7 @@ class EmailNotification(NotificationMedium):
         user.email_user(
             subject=f"{settings.NOTIFICATION_SUBJECT_PREFIX}{title}",
             message=render_to_string("notificationprofile/email.txt", template_context),
-            html_message=render_to_string(
-                "notificationprofile/email.html", template_context
-            ),
+            html_message=render_to_string("notificationprofile/email.html", template_context),
         )
 
 
@@ -71,7 +67,4 @@ def send_notification(user: User, profile: NotificationProfile, incident: Incide
 
 
 def get_notification_media(model_representations: List[str]):
-    return (
-        MODEL_REPRESENTATION_TO_CLASS[representation]
-        for representation in model_representations
-    )
+    return (MODEL_REPRESENTATION_TO_CLASS[representation] for representation in model_representations)

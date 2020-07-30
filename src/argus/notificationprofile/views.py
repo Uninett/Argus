@@ -40,13 +40,9 @@ class NotificationProfileDetail(generics.RetrieveUpdateDestroyAPIView):
 def incidents_filtered_by_notification_profile_view(request, notification_profile_pk):
     try:
         # Go through user to ensure that the user owns the requested notification profile
-        notification_profile = request.user.notification_profiles.get(
-            pk=notification_profile_pk
-        )
+        notification_profile = request.user.notification_profiles.get(pk=notification_profile_pk)
     except NotificationProfile.DoesNotExist:
-        raise ValidationError(
-            f"Notification profile with pk={notification_profile_pk} does not exist."
-        )
+        raise ValidationError(f"Notification profile with pk={notification_profile_pk} does not exist.")
 
     serializer = IncidentSerializer(notification_profile.filtered_incidents, many=True)
     return Response(serializer.data)
