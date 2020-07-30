@@ -1,6 +1,6 @@
 black
 coverage
-ipython3
+ipython
 django-extensions
 Werkzeug  # for django-extensions:runserver_plus
 pyOpenSSL  # for django-extensions:runserver_plus with tls support
