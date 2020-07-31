@@ -125,3 +125,33 @@ class IncidentSerializer(RemovableFieldSerializer):
         validator = URLValidator()
         validator(value)
         return value
+
+
+# TODO: remove once it's not in use anymore
+class IncidentSerializer_legacy(RemovableFieldSerializer):
+    source = SourceSystemSerializer(read_only=True)
+    object = ObjectSerializer(read_only=True)
+    parent_object = ParentObjectSerializer(read_only=True)
+    problem_type = ProblemTypeSerializer(read_only=True)
+
+    class Meta:
+        model = Incident
+        fields = [
+            "pk",
+            "timestamp",
+            "source",
+            "source_incident_id",
+            "object",
+            "parent_object",
+            "details_url",
+            "problem_type",
+            "description",
+            "ticket_url",
+            "active_state",
+        ]
+        read_only_fields = ["pk", "active_state"]
+
+    def to_representation(self, instance: Incident):
+        incident_repr = super().to_representation(instance)
+        incident_repr["active_state"] = hasattr(instance, "active_state")
+        return incident_repr

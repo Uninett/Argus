@@ -7,6 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from argus.auth.models import User
+from . import mappings
 from .forms import AddSourceSystemForm
 from .models import (
     ActiveIncident,
@@ -17,9 +18,11 @@ from .models import (
     SourceSystem,
     SourceSystemType,
 )
+from .parsers import StackedJSONParser
 from .permissions import IsOwnerOrReadOnly, IsSuperuserOrReadOnly
 from .serializers import (
     IncidentSerializer,
+    IncidentSerializer_legacy,
     ObjectTypeSerializer,
     ParentObjectSerializer,
     ProblemTypeSerializer,
@@ -131,6 +134,25 @@ class IncidentViewSet(
         except IntegrityError as e:
             # TODO: this should be replaced by more verbose feedback, that also doesn't reference database tables
             raise serializers.ValidationError(e)
+
+
+# TODO: remove once it's not in use anymore
+class IncidentCreate_legacy(generics.CreateAPIView):
+    queryset = Incident.objects.prefetch_default_related().select_related("active_state")
+    parser_classes = [StackedJSONParser]
+    serializer_class = IncidentSerializer_legacy
+
+    def post(self, request, *args, **kwargs):
+        created_incidents = [mappings.create_incident_from_json(json_dict, "NAV") for json_dict in request.data]
+
+        # for created_incident in created_incidents:
+        #     send_notifications_to_users(created_incident)
+
+        if len(created_incidents) == 1:
+            serializer = IncidentSerializer_legacy(created_incidents[0])
+        else:
+            serializer = IncidentSerializer_legacy(created_incidents, many=True)
+        return Response(serializer.data)
 
 
 class ActiveIncidentList(generics.ListAPIView):
