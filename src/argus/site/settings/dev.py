@@ -23,13 +23,11 @@ ALLOWED_HOSTS = [
 
 FRONTEND_URL = get_str_env("ARGUS_FRONTEND_URL")
 
-CORS_ORIGIN_WHITELIST = [
-    "http://127.0.0.1:3000",
-]
+CORS_ORIGIN_WHITELIST = []
 if FRONTEND_URL:
     CORS_ORIGIN_WHITELIST.append(FRONTEND_URL)
 
-INSTALLED_APPS += ['django_extensions']
+INSTALLED_APPS += ["django_extensions"]
 
 
 # Prints sent emails to the console
