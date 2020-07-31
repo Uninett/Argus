@@ -1,7 +1,7 @@
 import secrets
 
-from rest_framework import generics, serializers, status
-from rest_framework.decorators import api_view
+from rest_framework import generics, mixins, serializers, status, viewsets
+from rest_framework.decorators import api_view, action
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -73,33 +73,39 @@ class SourceSystemDetail(generics.RetrieveUpdateAPIView):
     serializer_class = SourceSystemSerializer
 
 
-class IncidentList(generics.ListCreateAPIView):
+class IncidentViewSet(
+    mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.ListModelMixin, viewsets.GenericViewSet,
+):
     queryset = Incident.objects.prefetch_default_related().select_related("active_state")
-    parser_classes = [StackedJSONParser]
     serializer_class = IncidentSerializer
 
-    def post(self, request, *args, **kwargs):
-        # TODO: replace with deserializing JSON for one incident per request, with data that's already been mapped (once glue services have been implemented)
-        created_incidents = [
-            mappings.create_incident_from_json(
-                json_dict, "NAV"
-            )  # TODO: interpret source system type from incidents' source IP?
-            for json_dict in request.data
-        ]
+    @action(detail=True, methods=["put"])
+    def active(self, request, pk=None):
+        if type(request.data) is not dict:
+            raise ValidationError("The request body must contain JSON.")
 
-        for created_incident in created_incidents:
-            send_notifications_to_users(created_incident)
-
-        if len(created_incidents) == 1:
-            serializer = IncidentSerializer(created_incidents[0])
+        new_active_state = request.data.get("active")
+        if new_active_state is None or type(new_active_state) is not bool:
+            raise ValidationError("Field 'active' with a boolean value is missing from the request body.")
+        incident = self.get_object()
+        if new_active_state:
+            ActiveIncident.objects.get_or_create(incident=incident)
         else:
-            serializer = IncidentSerializer(created_incidents, many=True)
+            if hasattr(incident, "active_state"):
+                incident.active_state.delete()
+
+        incident = self.get_object()
+        serializer = self.serializer_class(incident)
         return Response(serializer.data)
 
-
-class IncidentDetail(generics.RetrieveAPIView):
-    queryset = Incident.objects.all()
-    serializer_class = IncidentSerializer
+    @action(detail=True, methods=["put"])
+    def ticket_url(self, request, pk=None):
+        new_ticket_url = request.data.get("ticket_url")
+        incident = self.get_object()
+        new_incident = self.serializer_class(incident, data={"ticket_url": new_ticket_url}, partial=True)
+        new_incident.is_valid(raise_exception=True)
+        new_incident.save()
+        return Response(new_incident.data)
 
 
 class ActiveIncidentList(generics.ListAPIView):
