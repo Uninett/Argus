@@ -1,14 +1,11 @@
 import secrets
 
 from rest_framework import generics, mixins, serializers, status, viewsets
-from rest_framework.decorators import api_view, action
-from rest_framework.exceptions import ValidationError
+from rest_framework.decorators import action, api_view
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from argus.auth.models import User
-from argus.notificationprofile.notification_media import send_notifications_to_users
-from . import mappings
 from .forms import AddSourceSystemForm
 from .models import (
     ActiveIncident,
@@ -19,7 +16,6 @@ from .models import (
     SourceSystem,
     SourceSystemType,
 )
-from .parsers import StackedJSONParser
 from .permissions import IsOwnerOrReadOnly, IsSuperuserOrReadOnly
 from .serializers import (
     IncidentSerializer,
@@ -82,11 +78,11 @@ class IncidentViewSet(
     @action(detail=True, methods=["put"])
     def active(self, request, pk=None):
         if type(request.data) is not dict:
-            raise ValidationError("The request body must contain JSON.")
+            raise serializers.ValidationError("The request body must contain JSON.")
 
         new_active_state = request.data.get("active")
         if new_active_state is None or type(new_active_state) is not bool:
-            raise ValidationError("Field 'active' with a boolean value is missing from the request body.")
+            raise serializers.ValidationError("Field 'active' with a boolean value is missing from the request body.")
         incident = self.get_object()
         if new_active_state:
             ActiveIncident.objects.get_or_create(incident=incident)
@@ -118,11 +114,11 @@ class ActiveIncidentList(generics.ListAPIView):
 @api_view(["PUT"])
 def change_incident_active_view(request, incident_pk):
     if type(request.data) is not dict:
-        raise ValidationError("The request body must contain JSON.")
+        raise serializers.ValidationError("The request body must contain JSON.")
 
     new_active_state = request.data.get("active")
     if new_active_state is None or type(new_active_state) is not bool:
-        raise ValidationError("Field 'active' with a boolean value is missing from the request body.")
+        raise serializers.ValidationError("Field 'active' with a boolean value is missing from the request body.")
 
     incident = Incident.objects.get(pk=incident_pk)
     if new_active_state:

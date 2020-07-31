@@ -46,9 +46,9 @@ class EmailNotification(NotificationMedium):
 
 
 MODEL_REPRESENTATION_TO_CLASS = {
-    NotificationProfile.EMAIL: EmailNotification,
-    NotificationProfile.SMS: None,
-    NotificationProfile.SLACK: None,
+    NotificationProfile.Media.EMAIL: EmailNotification,
+    NotificationProfile.Media.SMS: None,
+    NotificationProfile.Media.SLACK: None,
 }
 
 

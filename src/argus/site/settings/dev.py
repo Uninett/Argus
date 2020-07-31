@@ -1,4 +1,9 @@
+from dotenv import load_dotenv
+
+load_dotenv()
+
 from .base import *
+
 
 DEBUG = get_bool_env("DEBUG", True)
 TEMPLATES[0]["OPTIONS"]["debug"] = get_bool_env("TEMPLATE_DEBUG", True)
@@ -16,14 +21,13 @@ ALLOWED_HOSTS = [
     "localhost",
 ]
 
-FRONTEND_URL = get_str_env("ARGUS_FRONTEND_URL", "http://localhost:3000")
+FRONTEND_URL = get_str_env("ARGUS_FRONTEND_URL")
 
-CORS_ORIGIN_WHITELIST = [
-    FRONTEND_URL,
-    "http://127.0.0.1:3000",
-]
+CORS_ORIGIN_WHITELIST = []
+if FRONTEND_URL:
+    CORS_ORIGIN_WHITELIST.append(FRONTEND_URL)
 
-INSTALLED_APPS += ['django_extensions']
+INSTALLED_APPS += ["django_extensions"]
 
 
 # Prints sent emails to the console

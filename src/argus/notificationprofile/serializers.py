@@ -92,7 +92,7 @@ class FilterSerializer(serializers.ModelSerializer):
 class NotificationProfileSerializer(serializers.ModelSerializer):
     timeslot = TimeslotForeignKeyField()
     filters = FilterManyToManyField(many=True)
-    media = fields.MultipleChoiceField(choices=NotificationProfile.MEDIA_CHOICES)
+    media = fields.MultipleChoiceField(choices=NotificationProfile.Media.choices)
 
     class Meta:
         model = NotificationProfile

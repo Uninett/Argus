@@ -10,7 +10,7 @@ from multiselectfield import MultiSelectField
 
 from argus.auth.models import User
 from argus.incident.models import Incident
-from .utils import AttrGetter, NestedAttrGetter
+from argus.site.utils import AttrGetter, NestedAttrGetter
 
 
 class Timeslot(models.Model):
@@ -19,7 +19,7 @@ class Timeslot(models.Model):
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=["name", "user"], name="timeslot_unique_name_per_user"),
+            models.UniqueConstraint(fields=["name", "user"], name="%(class)s_unique_name_per_user"),
         ]
         ordering = ["name"]
 
@@ -32,19 +32,19 @@ class Timeslot(models.Model):
                 return True
         return False
 
-    # Create default immediate Timeslot when a user is created
-    @staticmethod
-    @receiver(post_save, sender=User)
-    def create_default_timeslot(sender, instance, created, raw, *args, **kwargs):
-        if raw or not created:
-            return
 
-        TimeRecurrence.objects.create(
-            timeslot=Timeslot.objects.create(user=instance, name="Immediately"),
-            days=[day for day in TimeRecurrence.Day.values],
-            start=TimeRecurrence.DAY_START,
-            end=TimeRecurrence.DAY_END,
-        )
+# Create default immediate Timeslot when a user is created
+@receiver(post_save, sender=User)
+def create_default_timeslot(sender, instance: User, created, raw, *args, **kwargs):
+    if raw or not created or instance.timeslots.exists():
+        return
+
+    TimeRecurrence.objects.create(
+        timeslot=Timeslot.objects.create(user=instance, name="Immediately"),
+        days=[day for day in TimeRecurrence.Day.values],
+        start=TimeRecurrence.DAY_START,
+        end=TimeRecurrence.DAY_END,
+    )
 
 
 class TimeRecurrence(models.Model):
@@ -86,6 +86,7 @@ class TimeRecurrence(models.Model):
 
     @property
     def isoweekdays(self):
+        # `days` are stored as strings in the db
         return {int(day) for day in self.days}
 
     def timestamp_is_within(self, timestamp: datetime):
@@ -115,7 +116,7 @@ class Filter(models.Model):
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=["name", "user"], name="filter_unique_name_per_user"),
+            models.UniqueConstraint(fields=["name", "user"], name="%(class)s_unique_name_per_user"),
         ]
 
     def __str__(self):
@@ -151,6 +152,11 @@ class Filter(models.Model):
 
 
 class NotificationProfile(models.Model):
+    class Media(models.TextChoices):
+        EMAIL = "EM", "Email"
+        SMS = "SM", "SMS"
+        SLACK = "SL", "Slack"
+
     user = models.ForeignKey(to=User, on_delete=models.CASCADE, related_name="notification_profiles")
     # TODO: add constraint that user must be the same
     timeslot = models.OneToOneField(
@@ -158,16 +164,8 @@ class NotificationProfile(models.Model):
     )
     filters = models.ManyToManyField(to=Filter, related_name="notification_profiles")
 
-    EMAIL = "EM"
-    SMS = "SM"
-    SLACK = "SL"
-    MEDIA_CHOICES = (
-        (EMAIL, "Email"),
-        (SMS, "SMS"),
-        (SLACK, "Slack"),
-    )
     # TODO: support for multiple email addresses / phone numbers / Slack users
-    media = MultiSelectField(choices=MEDIA_CHOICES, min_choices=1, default=EMAIL)
+    media = MultiSelectField(choices=Media.choices, min_choices=1, default=Media.EMAIL)
     active = models.BooleanField(default=True)
 
     def __str__(self):

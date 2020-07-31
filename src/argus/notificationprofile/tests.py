@@ -1,8 +1,9 @@
-from datetime import datetime, time
+from datetime import datetime
 
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.dateparse import parse_datetime, parse_time
 from django.utils.timezone import make_aware
 from rest_framework.authtoken.models import Token
 from rest_framework.renderers import JSONRenderer
@@ -68,30 +69,30 @@ class MockIncidentData:
         self.incident2.save()
 
 
-class ModelTests(TestCase, MockIncidentData):
-    @staticmethod
-    def replace_time(timestamp: datetime, new_time: str):
-        new_time = time.fromisoformat(new_time)
-        return timestamp.replace(
-            hour=new_time.hour, minute=new_time.minute, second=new_time.second, microsecond=new_time.microsecond,
-        )
+def set_time(timestamp: datetime, new_time: str):
+    new_time = parse_time(new_time)
+    return timestamp.replace(
+        hour=new_time.hour, minute=new_time.minute, second=new_time.second, microsecond=new_time.microsecond,
+    )
 
+
+class ModelTests(TestCase, MockIncidentData):
     def setUp(self):
         super().init_mock_data()
-        self.monday_time = make_aware(datetime.fromisoformat("2019-11-25"))
+        self.monday_datetime = make_aware(parse_datetime("2019-11-25 00:00"))
 
         self.timeslot1 = Timeslot.objects.create(user=self.user, name="Test")
         self.recurrence1 = TimeRecurrence.objects.create(
             timeslot=self.timeslot1,
             days={TimeRecurrence.Day.MONDAY},
-            start=time.fromisoformat("00:30:00"),
-            end=time.fromisoformat("00:30:01"),
+            start=parse_time("00:30:00"),
+            end=parse_time("00:30:01"),
         )
         self.recurrence2 = TimeRecurrence.objects.create(
             timeslot=self.timeslot1,
             days={TimeRecurrence.Day.MONDAY},
-            start=time.fromisoformat("00:30:03"),
-            end=time.fromisoformat("00:31"),
+            start=parse_time("00:30:03"),
+            end=parse_time("00:31"),
         )
         self.recurrence_all_day = TimeRecurrence.objects.create(
             timeslot=self.timeslot1,
@@ -101,29 +102,24 @@ class ModelTests(TestCase, MockIncidentData):
         )
 
     def test_time_recurrence(self):
-        # Test replace_time() helper function
+        # Test set_time() helper function
         self.assertEqual(
-            datetime.fromisoformat("2000-01-01 10:00"),
-            self.replace_time(datetime.fromisoformat("2000-01-01"), "10:00"),
+            parse_datetime("2000-01-01 10:00"), set_time(parse_datetime("2000-01-01 00:00"), "10:00"),
         )
 
-        self.assertEqual(self.monday_time.strftime("%A"), "Monday")
+        self.assertEqual(self.monday_datetime.strftime("%A"), "Monday")
 
-        self.assertFalse(self.recurrence1.timestamp_is_within(self.replace_time(self.monday_time, "00:29:01")))
-        self.assertTrue(self.recurrence1.timestamp_is_within(self.replace_time(self.monday_time, "00:30:00")))
-        self.assertTrue(self.recurrence1.timestamp_is_within(self.replace_time(self.monday_time, "00:30:01")))
-        self.assertFalse(self.recurrence1.timestamp_is_within(self.replace_time(self.monday_time, "00:30:02")))
+        self.assertFalse(self.recurrence1.timestamp_is_within(set_time(self.monday_datetime, "00:29:01")))
+        self.assertTrue(self.recurrence1.timestamp_is_within(set_time(self.monday_datetime, "00:30:00")))
+        self.assertTrue(self.recurrence1.timestamp_is_within(set_time(self.monday_datetime, "00:30:01")))
+        self.assertFalse(self.recurrence1.timestamp_is_within(set_time(self.monday_datetime, "00:30:02")))
 
     def test_timeslot(self):
-        self.assertTrue(
-            self.timeslot1.timestamp_is_within_time_recurrences(self.replace_time(self.monday_time, "00:30:01"))
-        )
+        self.assertTrue(self.timeslot1.timestamp_is_within_time_recurrences(set_time(self.monday_datetime, "00:30:01")))
         self.assertFalse(
-            self.timeslot1.timestamp_is_within_time_recurrences(self.replace_time(self.monday_time, "00:30:02"))
+            self.timeslot1.timestamp_is_within_time_recurrences(set_time(self.monday_datetime, "00:30:02"))
         )
-        self.assertTrue(
-            self.timeslot1.timestamp_is_within_time_recurrences(self.replace_time(self.monday_time, "00:30:03"))
-        )
+        self.assertTrue(self.timeslot1.timestamp_is_within_time_recurrences(set_time(self.monday_datetime, "00:30:03")))
 
     def test_filter(self):
         filter1 = Filter.objects.create(

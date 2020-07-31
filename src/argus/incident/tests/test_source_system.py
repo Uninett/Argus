@@ -4,7 +4,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient, APITestCase
 
 from argus.auth.models import User
-from .models import SourceSystem, SourceSystemType
+from ..models import SourceSystem, SourceSystemType
 
 
 class SourceSystemPostingTests(APITestCase):

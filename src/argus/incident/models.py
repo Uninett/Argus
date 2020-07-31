@@ -1,6 +1,6 @@
 from django.core.validators import URLValidator
 from django.db import models
-from django.db.models import Q, QuerySet
+from django.db.models import Q
 
 from argus.auth.models import User
 
@@ -22,7 +22,7 @@ class SourceSystem(models.Model):
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=["name", "type"], name="sourcesystem_unique_name_per_type"),
+            models.UniqueConstraint(fields=["name", "type"], name="%(class)s_unique_name_per_type"),
         ]
 
     def __str__(self):
@@ -54,10 +54,10 @@ class Object(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=["object_id", "source_system"], name="object_unique_object_id_per_source_system",
+                fields=["object_id", "source_system"], name="%(class)s_unique_object_id_per_source_system",
             ),
             models.UniqueConstraint(
-                fields=["name", "type", "source_system"], name="object_unique_name_and_type_per_source_system",
+                fields=["name", "type", "source_system"], name="%(class)s_unique_name_and_type_per_source_system",
             ),
         ]
 
@@ -140,7 +140,7 @@ class Incident(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=["source_incident_id", "source"], name="incident_unique_source_incident_id_per_source",
+                fields=["source_incident_id", "source"], name="%(class)s_unique_source_incident_id_per_source",
             ),
         ]
         ordering = ["-timestamp"]
