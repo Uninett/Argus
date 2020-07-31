@@ -18,9 +18,9 @@ ALLOWED_HOSTS = [
 
 FRONTEND_URL = get_str_env("ARGUS_FRONTEND_URL", required=True)
 
-CORS_ORIGIN_WHITELIST = [
-    FRONTEND_URL,
-]
+CORS_ORIGIN_WHITELIST = []
+if FRONTEND_URL:
+    CORS_ORIGIN_WHITELIST.append(FRONTEND_URL)
 
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
