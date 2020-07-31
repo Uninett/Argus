@@ -9,11 +9,11 @@ incident_ticket_url = views.IncidentViewSet.as_view({"put": "ticket_url",})
 
 app_name = "incident"
 urlpatterns = [
-    path("active/", views.ActiveIncidentList.as_view(), name="incidents-active"),
     path("", incident_list, name="alerts"),
     path("<int:pk>", incident_detail, name="alert"),
     path("<int:pk>/active", incident_active, name="alert-active"),
     path("<int:pk>/ticket_url", incident_ticket_url, name="alert-ticket-url"),
+    path("active/", views.ActiveIncidentList.as_view(), name="incidents-active"),
     path("source-types/", views.SourceSystemTypeList.as_view(), name="source-types"),
     path("sources/", views.SourceSystemList.as_view(), name="sources"),
     path("sources/<int:pk>/", views.SourceSystemDetail.as_view(), name="source"),
