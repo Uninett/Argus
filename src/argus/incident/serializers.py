@@ -1,3 +1,4 @@
+from django.core.validators import URLValidator
 from rest_framework import serializers
 
 from .models import (
@@ -94,3 +95,8 @@ class IncidentSerializer(RemovableFieldSerializer):
         incident_repr = super().to_representation(instance)
         incident_repr["active_state"] = hasattr(instance, "active_state")
         return incident_repr
+
+    def validate_ticket_url(self, value):
+        validator = URLValidator()
+        validator(value)
+        return value
