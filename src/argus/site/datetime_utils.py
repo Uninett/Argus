@@ -32,15 +32,15 @@ def make_naive(value: datetime):
     return value.replace(tzinfo=None)
 
 
-def infinity_repr(value):
+def infinity_repr(value, *, str_repr):
     if not isinstance(value, datetime):
         return None
 
     value = make_naive(value)
     if value == INFINITY:
-        return INFINITY_REPR
+        return INFINITY_REPR if str_repr else INFINITY
     elif value == NEGATIVE_INFINITY:
-        return NEGATIVE_INFINITY_REPR
+        return NEGATIVE_INFINITY_REPR if str_repr else NEGATIVE_INFINITY
     return None
 
 
@@ -54,11 +54,11 @@ def infinity_time(value):
     return None
 
 
-def parse_infinity(value):
+def parse_infinity(value: str, *, return_localized=True):
     if value == INFINITY_REPR:
-        return LOCAL_INFINITY
+        return LOCAL_INFINITY if return_localized else INFINITY
     elif value == NEGATIVE_INFINITY_REPR:
-        return LOCAL_NEGATIVE_INFINITY
+        return LOCAL_NEGATIVE_INFINITY if return_localized else NEGATIVE_INFINITY
     return None
 
 
