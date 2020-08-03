@@ -1,9 +1,11 @@
 import json
 import logging
 from abc import ABC, abstractmethod
+from multiprocessing import Process
 from typing import List
 
 from django.conf import settings
+from django.db import connections
 from django.template.loader import render_to_string
 from rest_framework.renderers import JSONRenderer
 
@@ -57,6 +59,13 @@ def send_notifications_to_users(incident: Incident):
     for profile in NotificationProfile.objects.select_related("user"):
         if profile.incident_fits(incident):
             send_notification(profile.user, profile, incident)
+
+
+def background_send_notifications_to_users(incident: Incident):
+    connections.close_all()
+    p = Process(target=send_notifications_to_users, args=(incident,))
+    p.start()
+    return p
 
 
 def send_notification(user: User, profile: NotificationProfile, incident: Incident):
