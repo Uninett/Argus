@@ -24,10 +24,12 @@ if FRONTEND_URL:
 
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = get_str_env("EMAIL_HOST", "smtp.gmail.com", required=True)
+EMAIL_HOST = get_str_env("EMAIL_HOST", required=True)
+EMAIL_HOST_USER = get_str_env("EMAIL_HOST_USER")
 EMAIL_PORT = get_int_env("EMAIL_PORT", 587)
 EMAIL_USE_TLS = True
 EMAIL_HOST_PASSWORD = get_str_env("EMAIL_HOST_PASSWORD")
+DEFAULT_FROM_EMAIL = get_str_env("DEFAULT_FROM_EMAIL", required=True)
 
 # PSA for login
 

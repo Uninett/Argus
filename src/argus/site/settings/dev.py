@@ -32,6 +32,12 @@ INSTALLED_APPS += ["django_extensions"]
 
 # Prints sent emails to the console
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+EMAIL_HOST = get_str_env("EMAIL_HOST", "localhost")
+EMAIL_HOST_USER = get_str_env("EMAIL_HOST_USER")
+EMAIL_PORT = get_int_env("EMAIL_PORT", 587)
+EMAIL_USE_TLS = True
+EMAIL_HOST_PASSWORD = get_str_env("EMAIL_HOST_PASSWORD")
+DEFAULT_FROM_EMAIL = get_str_env("DEFAULT_FROM_EMAIL", "argus@localhost")
 
 # PSA for login
 

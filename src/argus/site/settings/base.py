@@ -156,10 +156,6 @@ AUTHENTICATION_BACKENDS = (
 )
 
 
-EMAIL_HOST_USER = "kundestyrt@gmail.com"
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
-
-
 # Project specific settings
 
 NOTIFICATION_SUBJECT_PREFIX = "[Argus] "

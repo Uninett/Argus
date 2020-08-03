@@ -43,8 +43,10 @@ A recap of the environment variables that can be set by default follows.
 * ARGUS_DATAPORTEN_SECRET, which holds the password for using dataporten for
   authentication.
 * ARGUS_FRONTEND_URL, for redirecting back to frontend after logging in through Feide, and also CORS
+* DEFAULT_FROM_EMAIL, the email From-address used for notifications sent via email
 * EMAIL_HOST, smarthost (domain name) to send email through
-* EMAIL_HOST_PASSWORD, password if the smarthost needs that
+* EMAIL_HOST_USER, (optional) if the host in EMAIL_HOST needs authentication
+* EMAIL_HOST_PASSWORD, (optional) password if the smarthost needs that
 * EMAIL_PORT, in production by default set to 587
 * SECRET_KEY, used internally by django, should be about 50 chars of ascii
   noise (but avoid backspaces!)
