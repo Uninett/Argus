@@ -1,11 +1,13 @@
 import secrets
 
+from django.db import IntegrityError
 from rest_framework import generics, mixins, serializers, status, viewsets
 from rest_framework.decorators import action, api_view
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from argus.auth.models import User
+from . import mappings
 from .forms import AddSourceSystemForm
 from .models import (
     ActiveIncident,
@@ -16,9 +18,11 @@ from .models import (
     SourceSystem,
     SourceSystemType,
 )
+from .parsers import StackedJSONParser
 from .permissions import IsOwnerOrReadOnly, IsSuperuserOrReadOnly
 from .serializers import (
     IncidentSerializer,
+    IncidentSerializer_legacy,
     ObjectTypeSerializer,
     ParentObjectSerializer,
     ProblemTypeSerializer,
@@ -72,6 +76,7 @@ class SourceSystemDetail(generics.RetrieveUpdateAPIView):
 class IncidentViewSet(
     mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.ListModelMixin, viewsets.GenericViewSet,
 ):
+    permission_classes = [IsAuthenticated]
     queryset = Incident.objects.prefetch_default_related().select_related("active_state")
     serializer_class = IncidentSerializer
 
@@ -102,6 +107,52 @@ class IncidentViewSet(
         new_incident.is_valid(raise_exception=True)
         new_incident.save()
         return Response(new_incident.data)
+
+    def perform_create(self, serializer):
+        user = self.request.user
+
+        if "source" in serializer.initial_data:
+            if not user.is_superuser:
+                raise serializers.ValidationError(
+                    "You must be a superuser to be allowed to specify the 'source' field."
+                )
+
+            source_pk = serializer.initial_data["source"]
+            try:
+                source = SourceSystem.objects.get(pk=source_pk)
+            except SourceSystem.DoesNotExist:
+                raise serializers.ValidationError(f"SourceSystem with pk={source_pk} does not exist.")
+        else:
+            try:
+                source = user.source_system
+            except SourceSystem.DoesNotExist:
+                raise serializers.ValidationError("The requesting user must have a connected source system.")
+
+        # TODO: send notifications to users
+        try:
+            serializer.save(source=source)
+        except IntegrityError as e:
+            # TODO: this should be replaced by more verbose feedback, that also doesn't reference database tables
+            raise serializers.ValidationError(e)
+
+
+# TODO: remove once it's not in use anymore
+class IncidentCreate_legacy(generics.CreateAPIView):
+    queryset = Incident.objects.prefetch_default_related().select_related("active_state")
+    parser_classes = [StackedJSONParser]
+    serializer_class = IncidentSerializer_legacy
+
+    def post(self, request, *args, **kwargs):
+        created_incidents = [mappings.create_incident_from_json(json_dict, "NAV") for json_dict in request.data]
+
+        # for created_incident in created_incidents:
+        #     send_notifications_to_users(created_incident)
+
+        if len(created_incidents) == 1:
+            serializer = IncidentSerializer_legacy(created_incidents[0])
+        else:
+            serializer = IncidentSerializer_legacy(created_incidents, many=True)
+        return Response(serializer.data)
 
 
 class ActiveIncidentList(generics.ListAPIView):

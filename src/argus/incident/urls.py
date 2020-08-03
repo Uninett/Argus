@@ -11,6 +11,7 @@ incident_ticket_url = views.IncidentViewSet.as_view({"put": "ticket_url",})
 app_name = "incident"
 urlpatterns = [
     path("", incident_list, name="incidents"),
+    path("legacy/", views.IncidentCreate_legacy.as_view()),  # TODO: remove once it's not in use anymore
     path("<int:pk>/", incident_detail, name="incident"),
     path("<int:pk>/active/", incident_active, name="incident-active"),
     path("<int:pk>/ticket_url/", incident_ticket_url, name="incident-ticket-url"),
