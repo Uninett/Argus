@@ -8,7 +8,7 @@ from .consumers import ActiveIncidentConsumer
 application = ProtocolTypeRouter({
     "websocket": AuthMiddlewareStack(
         URLRouter([
-            path("active/", ActiveIncidentConsumer),
+            path("ws/active/", ActiveIncidentConsumer),
         ])
     ),
 })
