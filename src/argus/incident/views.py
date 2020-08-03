@@ -7,6 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from argus.auth.models import User
+from argus.notificationprofile.notification_media import background_send_notifications_to_users
 from . import mappings
 from .forms import AddSourceSystemForm
 from .models import (
@@ -145,8 +146,8 @@ class IncidentCreate_legacy(generics.CreateAPIView):
     def post(self, request, *args, **kwargs):
         created_incidents = [mappings.create_incident_from_json(json_dict, "NAV") for json_dict in request.data]
 
-        # for created_incident in created_incidents:
-        #     send_notifications_to_users(created_incident)
+        for created_incident in created_incidents:
+            background_send_notifications_to_users(created_incident)
 
         if len(created_incidents) == 1:
             serializer = IncidentSerializer_legacy(created_incidents[0])
