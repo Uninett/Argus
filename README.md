@@ -38,11 +38,14 @@ A recap of the environment variables that can be set by default follows.
 
 #### Environment variables
 
-* DEBUG, 1 for True, 0 for False
-* TEMPLATE_DEBUG. By default set to the same as DEBUG.
+* ARGUS_DATAPORTEN_KEY, which holds the id/key for using dataporten for
+  authentication.
 * ARGUS_DATAPORTEN_SECRET, which holds the password for using dataporten for
   authentication.
 * ARGUS_FRONTEND_URL, for redirecting back to frontend after logging in through Feide, and also CORS
+* ARGUS_SEND_NOTIFICATIONS, True in production and False by default, to allow supressing notifications
+* DEBUG, 1 for True, 0 for False
+* TEMPLATE_DEBUG. By default set to the same as DEBUG.
 * DEFAULT_FROM_EMAIL, the email From-address used for notifications sent via email
 * EMAIL_HOST, smarthost (domain name) to send email through
 * EMAIL_HOST_USER, (optional) if the host in EMAIL_HOST needs authentication

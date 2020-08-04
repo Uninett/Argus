@@ -64,6 +64,9 @@ MODEL_REPRESENTATION_TO_CLASS = {
 
 
 def send_notifications_to_users(incident: Incident):
+    if not getattr(settings, "SEND_NOTIFICATIONS", False):
+        LOG.info("Notification: turned off sitewide, not sending for \"%s\"", incident)
+        return
     # TODO: only send one notification per medium per user
     LOG.info("Notification: sending incident \"%s\"", incident)
     for profile in NotificationProfile.objects.select_related("user"):

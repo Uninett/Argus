@@ -160,6 +160,8 @@ AUTHENTICATION_BACKENDS = (
 
 NOTIFICATION_SUBJECT_PREFIX = "[Argus] "
 
+SEND_NOTIFICATIONS = False  # Don't spam by accident
+
 
 # 3rd party settings
 
