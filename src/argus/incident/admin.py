@@ -1,6 +1,5 @@
 from django.contrib import admin
 from django.contrib.admin import widgets
-from django.utils import timezone
 
 from .forms import AddSourceSystemForm
 from .models import (
@@ -93,6 +92,30 @@ class ProblemTypeAdmin(TextWidgetsOverrideModelAdmin):
     text_input_form_fields = ("name",)
 
 
+class StatefulListFilter(admin.SimpleListFilter):
+    title = "stateful"
+    # Parameter for the filter that will be used in the URL query
+    parameter_name = "stateful"
+
+    STATEFUL = 1
+    STATELESS = 0
+
+    def lookups(self, request, model_admin):
+        return (
+            (self.STATEFUL, "Yes"),
+            (self.STATELESS, "No"),
+        )
+
+    def queryset(self, request, queryset: IncidentQuerySet):
+        if not self.value():
+            return queryset
+
+        if int(self.value()) == self.STATEFUL:
+            return queryset.stateful()
+        else:
+            return queryset.stateless()
+
+
 class ActiveListFilter(admin.SimpleListFilter):
     title = "active"
     # Parameter for the filter that will be used in the URL query
@@ -114,7 +137,7 @@ class ActiveListFilter(admin.SimpleListFilter):
         if int(self.value()) == self.ACTIVE:
             return queryset.active()
         else:
-            return queryset.filter(end_time__lte=timezone.now())
+            return queryset.inactive()
 
 
 class IncidentAdmin(TextWidgetsOverrideModelAdmin):
@@ -141,6 +164,7 @@ class IncidentAdmin(TextWidgetsOverrideModelAdmin):
         "problem_type__name",
     )
     list_filter = (
+        StatefulListFilter,
         ActiveListFilter,
         "source",
         "source__type",

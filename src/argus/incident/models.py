@@ -107,8 +107,17 @@ class ProblemType(models.Model):
 
 
 class IncidentQuerySet(models.QuerySet):
+    def stateful(self):
+        return self.filter(end_time__isnull=False)
+
+    def stateless(self):
+        return self.filter(end_time__isnull=True)
+
     def active(self):
         return self.filter(end_time__gt=timezone.now())
+
+    def inactive(self):
+        return self.filter(end_time__lte=timezone.now())
 
     def prefetch_default_related(self):
         return self.select_related("parent_object", "problem_type").prefetch_related("source__type", "object__type")
