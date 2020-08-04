@@ -31,6 +31,8 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_PASSWORD = get_str_env("EMAIL_HOST_PASSWORD")
 DEFAULT_FROM_EMAIL = get_str_env("DEFAULT_FROM_EMAIL", required=True)
 
+SEND_NOTIFICATIONS = get_bool_env("ARGUS_SEND_NOTIFICATIONS", default=True)
+
 # PSA for login
 
 SOCIAL_AUTH_DATAPORTEN_KEY = get_str_env("ARGUS_DATAPORTEN_KEY", required=True)
