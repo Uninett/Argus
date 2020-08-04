@@ -32,6 +32,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Set Environment Variables
+        run: |
+          echo "::set-env name=DJANGO_SETTINGS_MODULE::argus.site.settings.test_CI"
+
       - name: Run Tests
         run: |
           python manage.py collectstatic --no-input
