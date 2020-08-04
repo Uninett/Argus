@@ -173,7 +173,7 @@ class FieldMapping:
 
 # TODO: remove once glue services have been implemented
 NAV_FIELD_MAPPING = FieldMapping(
-    "NAV",
+    "nav",
     {
         Incident.timestamp: PassthroughField("time"),
         Incident.source: None,  # TODO: save source from posted incident
@@ -235,8 +235,8 @@ NAV_FIELD_MAPPING = FieldMapping(
 
 # TODO: remove once glue services have been implemented
 SOURCE_MAPPING_DICT = {
-    "NAV": NAV_FIELD_MAPPING,
-    "Zabbix": None,
+    "nav": NAV_FIELD_MAPPING,
+    "zabbix": None,
 }
 
 

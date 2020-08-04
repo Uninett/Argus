@@ -9,8 +9,8 @@ from ..models import SourceSystem, SourceSystemType
 
 class SourceSystemPostingTests(APITestCase):
     def setUp(self):
-        self.type1 = SourceSystemType.objects.create(name="NAV")
-        self.type2 = SourceSystemType.objects.create(name="Zabbix")
+        self.type1 = SourceSystemType.objects.create(name="nav")
+        self.type2 = SourceSystemType.objects.create(name="zabbix")
 
         password = "1234"
         self.user1 = User.objects.create_user(username="user1", password=password, is_staff=True, is_superuser=True)
