@@ -47,8 +47,10 @@ PROBLEM_TYPE_NAME_WORD_COUNT_RANGE = (2, 3)
 PROBLEM_TYPE_DESCRIPTION_WORD_COUNT_RANGE = (5, 20)
 # Incident:
 NUM_INCIDENTS = 200
-INCIDENT_TIMESTAMP_NOW_CHANCE = 1 / 3
+INCIDENT_START_TIME_NOW_CHANCE = 1 / 5
 INCIDENT_DESCRIPTION_WORD_COUNT_RANGE = (2, 10)
+INCIDENT_STATEFUL_CHANCE = 1 / 2
+STATEFUL_INCIDENT_ACTIVE_CHANCE = 1 / 5
 # ActiveIncident
 INCIDENT_ACTIVE_CHANCE = 1 / 20
 
@@ -212,18 +214,31 @@ def generate_incidents(source_systems, objects, parent_objects, problem_types) -
 
     incidents = []
     for i in range(NUM_INCIDENTS):
-        if roll_dice(INCIDENT_TIMESTAMP_NOW_CHANCE):
+        start_time_now = roll_dice(INCIDENT_START_TIME_NOW_CHANCE)
+        if start_time_now:
             # Adds a small delay between each incident with a "now" timestamp
-            timestamp = timezone.now() + i * second_delay
+            start_time = timezone.now() + i * second_delay
         else:
-            timestamp = random_timestamp()
+            start_time = random_timestamp()
 
         source_system = random.choice(source_systems)
         source_incident_id = random_id()
 
+        if roll_dice(INCIDENT_STATEFUL_CHANCE):
+            if roll_dice(STATEFUL_INCIDENT_ACTIVE_CHANCE):
+                end_time = "infinity"
+            elif start_time_now:
+                end_time = start_time + second_delay
+            else:
+                random_timedelta = abs(random_timestamp() - start_time)
+                end_time = start_time + random_timedelta
+        else:
+            end_time = None
+
         incidents.append(
             Incident(
-                timestamp=timestamp,
+                start_time=start_time,
+                end_time=end_time,
                 source=source_system,
                 source_incident_id=source_incident_id,
                 object=random.choice(objects),
