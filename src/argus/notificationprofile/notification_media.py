@@ -50,9 +50,14 @@ class EmailNotification(NotificationMedium):
                 html_message=render_to_string("notificationprofile/email.html", template_context),
             )
         except ConnectionRefusedError as e:
-            EMAIL_HOST = getattr(settings, "EMAIL_HOST", "Error: Not set")
-            EMAIL_PORT = getattr(settings, "EMAIL_PORT", "Error: Not set")
-            LOG.error("Notification: Email: Connection refused to \"%s\", port \"%s\"", EMAIL_HOST, EMAIL_PORT)
+            EMAIL_HOST = getattr(settings, "EMAIL_HOST", None)
+            if not EMAIL_HOST:
+                LOG.error("Notification: Email: EMAIL_HOST not set, cannot send")
+            EMAIL_PORT = getattr(settings, "EMAIL_PORT", None)
+            if not EMAIL_PORT:
+                LOG.error("Notification: Email: EMAIL_PORT not set, cannot send")
+            if EMAIL_HOST and EMAIL_PORT:
+                LOG.error("Notification: Email: Connection refused to \"%s\", port \"%s\"", EMAIL_HOST, EMAIL_PORT)
             # TODO: Store error as incident
 
 
