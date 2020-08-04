@@ -95,7 +95,8 @@ All endpoints require requests to contain a header with key `Authorization` and 
     [
         {
             "pk": 10101,
-            "timestamp": "2011-11-11T11:11:11+02:00",
+            "start_time": "2011-11-11T11:11:11+02:00",
+            "end_time": "2011-11-11T11:11:12+02:00",
             "source": {
                 "pk": 11,
                 "name": "Uninett GW 3",
@@ -133,6 +134,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
         }
     ]
     ```
+    Refer to [this section](#explanation-of-terms) for an explanation of the fields.
     </details>
   * `POST`: creates and returns an incident
     <details>
@@ -141,7 +143,8 @@ All endpoints require requests to contain a header with key `Authorization` and 
     ```json
     {
         "source": 11,
-        "timestamp": "2011-11-11 11:11:11.11111",
+        "start_time": "2011-11-11 11:11:11.11111",
+        "end_time": null,
         "source_incident_id": "12345",
         "object": {
             "name": "Netbox 11",
@@ -165,6 +168,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
         "active_state": true
     }
     ```
+    Refer to [this section](#explanation-of-terms) for an explanation of the fields.
     </details>
 
 * `GET` to `/api/v1/incidents/<int:pk>/`: returns an incident by pk
@@ -308,6 +312,11 @@ All endpoints require requests to contain a header with key `Authorization` and 
 
 ### Explanation of terms
 * `incident`: an unplanned interruption in the source system.
+* `start_time`: the time the `incident` was created.
+* `end_time`: the time the `incident` was resolved or closed.
+  * If `null`: the incident has no state.
+  * If `"infinity"`: the incident has state, but has not yet been resolved or closed.
+  * If an instance of `datetime`: the incident has state, and was resolved or closed at the given time.
 * `source`: the source system that the `incident` originated in.
 * `object`: the most specific object that the `incident` is about.
 * `parent_object`: an object that the `object` is possibly a part of.

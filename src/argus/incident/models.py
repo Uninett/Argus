@@ -6,6 +6,8 @@ from django.db.models.signals import pre_save
 from django.dispatch import receiver
 
 from argus.auth.models import User
+from argus.site.datetime_utils import infinity_repr
+from .fields import DateTimeInfinityField
 
 
 def validate_lowercase(value: str):
@@ -113,7 +115,14 @@ class IncidentQuerySet(models.QuerySet):
 
 # TODO: review whether fields should be nullable, and on_delete modes
 class Incident(models.Model):
-    timestamp = models.DateTimeField()
+    start_time = models.DateTimeField(help_text="The time the incident was created.")
+    end_time = DateTimeInfinityField(
+        null=True,
+        blank=True,
+        # TODO: add 'infinity' checkbox to admin
+        help_text="The time the incident was resolved or closed. If not set, the incident has no state;"
+        " if 'infinity' is checked, the incident has state, but has not yet been resolved or closed.",
+    )
     source = models.ForeignKey(
         to=SourceSystem,
         on_delete=models.CASCADE,
@@ -158,10 +167,14 @@ class Incident(models.Model):
                 fields=["source_incident_id", "source"], name="%(class)s_unique_source_incident_id_per_source",
             ),
         ]
-        ordering = ["-timestamp"]
+        ordering = ["-start_time"]
 
     def __str__(self):
-        return f"{self.timestamp} - {self.problem_type}: {self.object}"
+        if self.end_time:
+            end_time_str = f" - {infinity_repr(self.end_time, str_repr=True) or self.end_time}"
+        else:
+            end_time_str = ""
+        return f"{self.start_time}{end_time_str} [{self.problem_type}: {self.object}]"
 
     @property
     def incident_relations(self):

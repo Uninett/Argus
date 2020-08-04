@@ -115,7 +115,8 @@ class ActiveStateListFilter(admin.SimpleListFilter):
 class IncidentAdmin(TextWidgetsOverrideModelAdmin):
     list_display = (
         "source_incident_id",
-        "timestamp",
+        "start_time",
+        "end_time",
         "source",
         "object",
         "parent_object",

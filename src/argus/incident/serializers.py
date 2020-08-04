@@ -80,7 +80,8 @@ class IncidentSerializer(RemovableFieldSerializer):
         model = Incident
         fields = [
             "pk",
-            "timestamp",
+            "start_time",
+            "end_time",
             "source",
             "source_incident_id",
             "object",
@@ -138,7 +139,8 @@ class IncidentSerializer_legacy(RemovableFieldSerializer):
         model = Incident
         fields = [
             "pk",
-            "timestamp",
+            "start_time",
+            "end_time",
             "source",
             "source_incident_id",
             "object",

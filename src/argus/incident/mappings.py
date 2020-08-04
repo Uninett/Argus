@@ -175,7 +175,7 @@ class FieldMapping:
 NAV_FIELD_MAPPING = FieldMapping(
     "nav",
     {
-        Incident.timestamp: PassthroughField("time"),
+        Incident.start_time: PassthroughField("time"),
         Incident.source: None,  # TODO: save source from posted incident
         Incident.source_incident_id: PassthroughField("history"),
         Incident.details_url: PassthroughField("alert_details_url"),

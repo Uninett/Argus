@@ -182,6 +182,6 @@ class NotificationProfile(models.Model):
     def incident_fits(self, incident: Incident):
         if not self.active:
             return False
-        return self.timeslot.timestamp_is_within_time_recurrences(incident.timestamp) and any(
+        return self.timeslot.timestamp_is_within_time_recurrences(incident.start_time) and any(
             f.incident_fits(incident) for f in self.filters.all()
         )
