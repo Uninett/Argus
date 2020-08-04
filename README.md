@@ -132,8 +132,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
                 "description": "Box declared down."
             },
             "description": "Netbox 11 <12345> down.",
-            "ticket_url": "https://tickettracker.com/tickets/987654/",
-            "active_state": true
+            "ticket_url": "https://tickettracker.com/tickets/987654/"
         }
     ]
     ```
@@ -167,8 +166,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
             "name": "boxDown",
             "description": "Box declared down."
         },
-        "description": "Netbox 11 <12345> down.",
-        "active_state": true
+        "description": "Netbox 11 <12345> down."
     }
     ```
     Refer to [this section](#explanation-of-terms) for an explanation of the fields.
@@ -324,7 +322,6 @@ All endpoints require requests to contain a header with key `Authorization` and 
 * `object`: the most specific object that the `incident` is about.
 * `parent_object`: an object that the `object` is possibly a part of.
 * `problem_type`: the type of problem that the `incident` is about.
-* `active_state`: whether an `incident` has been resolved.
 
 ### ER diagram
 ![ER diagram](img/ER_model.png)

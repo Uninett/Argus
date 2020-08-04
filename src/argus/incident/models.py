@@ -4,6 +4,7 @@ from django.db import models
 from django.db.models import Q
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
+from django.utils import timezone
 
 from argus.auth.models import User
 from argus.site.datetime_utils import infinity_repr
@@ -107,7 +108,7 @@ class ProblemType(models.Model):
 
 class IncidentQuerySet(models.QuerySet):
     def active(self):
-        return self.filter(active_state__isnull=False)
+        return self.filter(end_time__gt=timezone.now())
 
     def prefetch_default_related(self):
         return self.select_related("parent_object", "problem_type").prefetch_related("source__type", "object__type")
@@ -179,16 +180,6 @@ class Incident(models.Model):
     @property
     def incident_relations(self):
         return IncidentRelation.objects.filter(Q(incident1=self) | Q(incident2=self))
-
-
-class ActiveIncident(models.Model):
-    incident = models.OneToOneField(
-        to=Incident,
-        on_delete=models.CASCADE,
-        primary_key=True,
-        related_name="active_state",
-        help_text="Whether the incident has been resolved.",
-    )
 
 
 class IncidentRelationType(models.Model):
