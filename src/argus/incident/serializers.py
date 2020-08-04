@@ -1,6 +1,7 @@
 from django.core.validators import URLValidator
 from rest_framework import serializers
 
+from . import fields
 from .models import (
     ActiveIncident,
     Incident,
@@ -70,6 +71,7 @@ class ProblemTypeSerializer(RemovableFieldSerializer):
 
 
 class IncidentSerializer(RemovableFieldSerializer):
+    end_time = fields.DateTimeInfinitySerializerField(required=False, allow_null=True)
     source = SourceSystemSerializer(read_only=True)
     object = ObjectSerializer()
     parent_object = ParentObjectSerializer()

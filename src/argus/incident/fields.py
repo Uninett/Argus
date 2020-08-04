@@ -1,5 +1,6 @@
 from datetime import datetime
 
+import rest_framework.fields as rest_framework_fields
 from django.db import models
 
 import argus.site.datetime_utils as utils
@@ -36,3 +37,20 @@ class DateTimeInfinityField(models.DateTimeField):
     @staticmethod
     def is_postgres(connection):
         return connection.settings_dict["ENGINE"].startswith("django.db.backends.postgresql")
+
+
+def _get_default_error_messages_for_datetime_infinity_serializer_field():
+    messages = rest_framework_fields.DateTimeField.default_error_messages
+    invalid_message = messages["invalid"]
+    messages["invalid"] = f"{invalid_message.rstrip('.')}, or 'infinity'."
+    return messages
+
+
+class DateTimeInfinitySerializerField(rest_framework_fields.DateTimeField):
+    default_error_messages = _get_default_error_messages_for_datetime_infinity_serializer_field()
+
+    def to_internal_value(self, value):
+        return utils.infinity_time(value) or super().to_internal_value(value)
+
+    def to_representation(self, value):
+        return utils.infinity_repr(value, str_repr=True) or super().to_representation(value)
