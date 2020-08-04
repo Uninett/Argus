@@ -1,3 +1,5 @@
+import subprocess
+
 from .dev import *
 
 
@@ -21,4 +23,9 @@ if POSTGRES:
         }
     }
     # fmt: on
-    _LOGGER.debug(f"Using PostgreSQL as database backend.")
+    try:
+        postgres_version_str = subprocess.check_output(["pg_config", "--version"]).decode().strip()
+    except Exception as e:
+        _LOGGER.error(e)
+        postgres_version_str = "PostgreSQL (unable to get version)"
+    _LOGGER.debug(f"Using {postgres_version_str} as database backend.")
