@@ -224,7 +224,13 @@ def generate_incidents(source_systems, objects, parent_objects, problem_types) -
 
         if roll_dice(INCIDENT_STATEFUL_CHANCE):
             if roll_dice(STATEFUL_INCIDENT_ACTIVE_CHANCE):
-                end_time = "infinity"
+                # FIXME: hacky solution that relies purely on the fact that
+                #  Django's `serializers.serialize()` calls `isoformat()` when serializing
+                class InfinityDatetime:
+                    def isoformat(self):
+                        return "infinity"
+
+                end_time = InfinityDatetime()
             elif start_time_now:
                 end_time = start_time + second_delay
             else:
