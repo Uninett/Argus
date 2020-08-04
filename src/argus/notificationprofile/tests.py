@@ -41,8 +41,8 @@ class MockIncidentData:
     def init_mock_data(self):
         self.user = User.objects.create(username="asdf")
 
-        nav_type = SourceSystemType.objects.create(name="NAV")
-        zabbix_type = SourceSystemType.objects.create(name="Zabbix")
+        nav_type = SourceSystemType.objects.create(name="nav")
+        zabbix_type = SourceSystemType.objects.create(name="zabbix")
 
         self.nav1 = SourceSystem.objects.create(
             name="Gløshaugen", type=nav_type, user=User.objects.create(username="nav.glos.no"),

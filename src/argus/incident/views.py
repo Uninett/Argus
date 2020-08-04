@@ -143,7 +143,7 @@ class IncidentCreate_legacy(generics.CreateAPIView):
     serializer_class = IncidentSerializer_legacy
 
     def post(self, request, *args, **kwargs):
-        created_incidents = [mappings.create_incident_from_json(json_dict, "NAV") for json_dict in request.data]
+        created_incidents = [mappings.create_incident_from_json(json_dict, "nav") for json_dict in request.data]
 
         # for created_incident in created_incidents:
         #     send_notifications_to_users(created_incident)

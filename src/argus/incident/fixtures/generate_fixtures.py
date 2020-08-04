@@ -114,7 +114,7 @@ def set_pks(model_objects: List[Model]) -> List[Model]:
 
 # --- Generation functions ---
 def generate_source_system_types() -> List[SourceSystemType]:
-    return [SourceSystemType(name="NAV"), SourceSystemType(name="Zabbix")]
+    return [SourceSystemType(name="nav"), SourceSystemType(name="zabbix")]
 
 
 def generate_source_systems(source_system_types) -> Tuple[List[Model], List[Model]]:

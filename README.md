@@ -100,7 +100,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
                 "pk": 11,
                 "name": "Uninett GW 3",
                 "type": {
-                    "name": "NAV"
+                    "name": "nav"
                 },
                 "user": 12
             },

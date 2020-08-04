@@ -1,18 +1,33 @@
+from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
 from django.db import models
 from django.db.models import Q
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
 
 from argus.auth.models import User
 
 
+def validate_lowercase(value: str):
+    if not value.islower():
+        raise ValidationError(f"'{value}' is not a lowercase string")
+
+
 class SourceSystemType(models.Model):
-    name = models.TextField(primary_key=True)
+    name = models.TextField(primary_key=True, validators=[validate_lowercase])
 
     class Meta:
         ordering = ["name"]
 
     def __str__(self):
         return self.name
+
+
+# Ensure that the name is always lowercase, to avoid names that only differ by case
+# Note: this is not run when calling `update()` on a queryset
+@receiver(pre_save, sender=SourceSystemType)
+def set_name_lowercase(sender, instance: SourceSystemType, *args, **kwargs):
+    instance.name = instance.name.lower()
 
 
 class SourceSystem(models.Model):
