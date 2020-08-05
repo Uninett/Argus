@@ -187,6 +187,14 @@ class Incident(models.Model):
         return f"{self.start_time}{end_time_str} [{self.problem_type}: {self.object}]"
 
     @property
+    def stateful(self):
+        return self.end_time is not None
+
+    @property
+    def active(self):
+        return self.stateful and self.end_time > timezone.now()
+
+    @property
     def incident_relations(self):
         return IncidentRelation.objects.filter(Q(incident1=self) | Q(incident2=self))
 

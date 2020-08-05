@@ -111,6 +111,12 @@ class IncidentSerializer(RemovableFieldSerializer):
             object=object_, parent_object=parent_object, problem_type=problem_type, **validated_data,
         )
 
+    def to_representation(self, instance: Incident):
+        incident_repr = super().to_representation(instance)
+        incident_repr["stateful"] = instance.stateful
+        incident_repr["active"] = instance.active
+        return incident_repr
+
     def validate_ticket_url(self, value):
         validator = URLValidator()
         validator(value)

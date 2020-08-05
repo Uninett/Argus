@@ -132,7 +132,9 @@ All endpoints require requests to contain a header with key `Authorization` and 
                 "description": "Box declared down."
             },
             "description": "Netbox 11 <12345> down.",
-            "ticket_url": "https://tickettracker.com/tickets/987654/"
+            "ticket_url": "https://tickettracker.com/tickets/987654/",
+            "stateful": true,
+            "active": false
         }
     ]
     ```
