@@ -10,7 +10,8 @@ from rest_framework.response import Response
 
 from argus.auth.models import User
 from argus.drf.permissions import IsOwnerOrReadOnly, IsSuperuserOrReadOnly
-from argus.notificationprofile.notification_media import background_send_notifications_to_users
+from argus.notificationprofile.media import background_send_notifications_to_users
+
 from . import mappings
 from .forms import AddSourceSystemForm
 from .models import (
