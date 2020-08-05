@@ -1,3 +1,4 @@
+import importlib
 import logging
 from multiprocessing import Process
 from typing import List
@@ -23,11 +24,27 @@ __all__ = [
 ]
 
 
-MODEL_REPRESENTATION_TO_CLASS = {
-    NotificationProfile.Media.EMAIL: EmailNotification,
-    NotificationProfile.Media.SMS: None,
-    NotificationProfile.Media.SLACK: None,
+# Poor mans's plugins
+MEDIA_CLASSES = {
+    NotificationProfile.Media.EMAIL: getattr(settings, "DEFAULT_EMAIL_MEDIA", EmailNotification),
+    NotificationProfile.Media.SMS: getattr(settings, "DEFAULT_SMS_MEDIA", None),
+    NotificationProfile.Media.SLACK: getattr(settings, "DEFAULT_SLACK_MEDIA", None),
 }
+
+
+def _import_class_from_dotted_path(dotted_path: str):
+    module_name, class_name = dotted_path.rsplit('.', 1)
+    module = importlib.import_module(module_name)
+    class_ = getattr(module, class_name)
+    return class_
+
+
+for media_type, media_class in MEDIA_CLASSES.items():
+    if not media_class or not isinstance(media_class, str):
+        continue
+    # Dotted paths here!
+    # TODO: Raise Incident if media_class not importable
+    MEDIA_CLASSES[media_type] = _import_class_from_dotted_path(media_class)
 
 
 def send_notifications_to_users(incident: Incident):
@@ -65,9 +82,9 @@ def send_notification(user: User, profile: NotificationProfile, incident: Incide
 def get_notification_media(model_representations: List[str]):
     # This will never be a long list
     media = [
-        MODEL_REPRESENTATION_TO_CLASS[representation]
+        MEDIA_CLASSES[representation]
         for representation in model_representations
-        if MODEL_REPRESENTATION_TO_CLASS[representation]
+        if MEDIA_CLASSES[representation]
     ]
     if media:
         return media
