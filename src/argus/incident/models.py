@@ -216,6 +216,11 @@ class Incident(models.Model):
             end_time_str = ""
         return f"{self.start_time}{end_time_str} [{self.problem_type}: {self.object}]"
 
+    def save(self, *args, **kwargs):
+        # Parse and replace `end_time`, to avoid having to call `refresh_from_db()`
+        self.end_time = self._meta.get_field("end_time").to_python(self.end_time)
+        super().save(*args, **kwargs)
+
     @property
     def stateful(self):
         return self.end_time is not None

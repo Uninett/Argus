@@ -33,7 +33,6 @@ class EndTimeInfinityFieldTests(TestCase):
     def _save_end_time(incident: Incident, end_time):
         incident.end_time = end_time
         incident.save(update_fields=["end_time"])
-        incident.refresh_from_db(fields=["end_time"])
 
     def _assert_inserting_infinity_end_time_retrieves(self, insert_value, retrieval_value):
         self._save_end_time(self.incident1, insert_value)
