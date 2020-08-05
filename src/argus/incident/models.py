@@ -1,3 +1,5 @@
+from random import randint
+
 from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
 from django.db import models
@@ -14,6 +16,34 @@ from .fields import DateTimeInfinityField
 def validate_lowercase(value: str):
     if not value.islower():
         raise ValidationError(f"'{value}' is not a lowercase string")
+
+
+def get_or_create_default_instances():
+    argus_user, _ = User.objects.get_or_create(username="argus", is_superuser=True)
+    sst, _ = SourceSystemType.objects.get_or_create(name="argus")
+    ss, _ = SourceSystem.objects.get_or_create(name="argus", type=sst, user=argus_user)
+    return (argus_user, sst, ss)
+
+
+def create_fake_incident():
+    MAX_ID = 2 ** 32 - 1
+    MIN_ID = 1
+    _, _, source_system = get_or_create_default_instances()
+    objtype = ObjectType.objects.all()[0]
+    obj, _ = Object.objects.get_or_create(name='Object created via "create_fake_incident"', type=objtype)
+    problem_type = ProblemType.objects.all()[0]
+    incident = Incident(
+        start_time=timezone.now(),
+        end_time="infinity",
+        source_incident_id=randint(MIN_ID, MAX_ID),
+        source=source_system,
+        object=obj,
+        problem_type=problem_type,
+        description='Incident created via "create_fake_incident"',
+    )
+    incident.save()
+    # TODO: Use method on Incident queryset instead
+    return incident
 
 
 class SourceSystemType(models.Model):
