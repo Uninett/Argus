@@ -33,7 +33,8 @@ def create_fake_incident():
     obj, _ = Object.objects.get_or_create(name='Object created via "create_fake_incident"', type=objtype)
     problem_type = ProblemType.objects.all()[0]
     incident = Incident(
-        timestamp=timezone.now(),
+        start_time=timezone.now(),
+        end_time="infinity",
         source_incident_id=randint(MIN_ID, MAX_ID),
         source=source_system,
         object=obj,
@@ -42,8 +43,6 @@ def create_fake_incident():
     )
     incident.save()
     # TODO: Use method on Incident queryset instead
-    active = ActiveIncident(incident=incident)
-    active.save()
     return incident
 
 
