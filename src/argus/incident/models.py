@@ -7,7 +7,6 @@ from django.db.models import Q
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
 from django.utils import timezone
-from django.utils.timezone import now as tznow
 
 from argus.auth.models import User
 from argus.site.datetime_utils import infinity_repr
@@ -27,14 +26,14 @@ def get_or_create_default_instances():
 
 
 def create_fake_incident():
-    MAX_ID = 2**32 - 1
+    MAX_ID = 2 ** 32 - 1
     MIN_ID = 1
     _, _, source_system = get_or_create_default_instances()
     objtype = ObjectType.objects.all()[0]
     obj, _ = Object.objects.get_or_create(name='Object created via "create_fake_incident"', type=objtype)
     problem_type = ProblemType.objects.all()[0]
     incident = Incident(
-        timestamp=tznow(),
+        timestamp=timezone.now(),
         source_incident_id=randint(MIN_ID, MAX_ID),
         source=source_system,
         object=obj,
@@ -42,7 +41,7 @@ def create_fake_incident():
         description='Incident created via "create_fake_incident"',
     )
     incident.save()
-    # Use method on Incident queryset instead
+    # TODO: Use method on Incident queryset instead
     active = ActiveIncident(incident=incident)
     active.save()
     return incident
