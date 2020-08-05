@@ -5,6 +5,7 @@ from channels.auth import AuthMiddlewareStack
 
 from .consumers import ActiveIncidentConsumer
 
+# fmt: off
 application = ProtocolTypeRouter({
     "websocket": AuthMiddlewareStack(
         URLRouter([
@@ -12,4 +13,4 @@ application = ProtocolTypeRouter({
         ])
     ),
 })
-
+# fmt: on

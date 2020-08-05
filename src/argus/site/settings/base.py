@@ -182,8 +182,9 @@ SOCIAL_AUTH_NEW_USER_REDIRECT_URL = SOCIAL_AUTH_LOGIN_REDIRECT_URL
 # SOCIAL_AUTH_DATAPORTEN_FEIDE_KEY = SOCIAL_AUTH_DATAPORTEN_KEY
 # SOCIAL_AUTH_DATAPORTEN_FEIDE_SECRET = SOCIAL_AUTH_DATAPORTEN_SECRET
 
-ASGI_APPLICATION = 'argus.ws.routing.application'
+ASGI_APPLICATION = "argus.ws.routing.application"
 
+# fmt: off
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
@@ -192,3 +193,4 @@ CHANNEL_LAYERS = {
         },
     },
 }
+# fmt: on
