@@ -130,8 +130,8 @@ class Incident(models.Model):
         null=True,
         blank=True,
         # TODO: add 'infinity' checkbox to admin
-        help_text="The time the incident was resolved or closed. If not set, the incident has no state;"
-        " if 'infinity' is checked, the incident has state, but has not yet been resolved or closed.",
+        help_text="The time the incident was resolved or closed. If not set, the incident is stateless;"
+        " if 'infinity' is checked, the incident is stateful, but has not yet been resolved or closed - i.e. active.",
     )
     source = models.ForeignKey(
         to=SourceSystem,

@@ -317,9 +317,9 @@ All endpoints require requests to contain a header with key `Authorization` and 
 * `incident`: an unplanned interruption in the source system.
 * `start_time`: the time the `incident` was created.
 * `end_time`: the time the `incident` was resolved or closed.
-  * If `null`: the incident has no state.
-  * If `"infinity"`: the incident has state, but has not yet been resolved or closed.
-  * If an instance of `datetime`: the incident has state, and was resolved or closed at the given time.
+  * If `null`: the incident is stateless.
+  * If `"infinity"`: the incident is stateful, but has not yet been resolved or closed - i.e. active.
+  * If an instance of `datetime`: the incident is stateful, and was resolved or closed at the given time; if it's in the future, the incident is also considered active.
 * `source`: the source system that the `incident` originated in.
 * `object`: the most specific object that the `incident` is about.
 * `parent_object`: an object that the `object` is possibly a part of.
