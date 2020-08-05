@@ -1,12 +1,10 @@
 from channels.generic.websocket import AsyncJsonWebsocketConsumer, JsonWebsocketConsumer
 
 from asgiref.sync import async_to_sync
-from channels.db import database_sync_to_async
-from channels.layers import get_channel_layer
-from argus.incident.models import Incident, ActiveIncident
+from argus.incident.models import Incident
 from argus.incident.serializers import IncidentSerializer
 
-SUBSCRIBED_ACTIVE_INCIDENTS = "subscribed_active_incidents"
+from .models import SUBSCRIBED_ACTIVE_INCIDENTS
 
 class ClientError(Exception):
     """
@@ -34,10 +32,10 @@ class ActiveIncidentConsumer(JsonWebsocketConsumer):
     def receive_json(self, content):
         action = content.get("action", None)
         try:
-            if action == "list":
-                self.list()
-            elif action == "subscribe":
+            if action == "subscribe":
                 self.subscribe()
+            else:
+                self.send_json({"error": f"unknown action {action}"})
         except ClientError as e:
             # Catch any errors and send it back
             self.send_json({"error": e.code})
