@@ -50,4 +50,4 @@ class ActiveIncidentConsumer(JsonWebsocketConsumer):
         self.send_json({"type": "subscribed", "channel_name": self.channel_name, "start_incidents": serialized.data})
 
     def get_active_incidents(self, last=25):
-        return Incident.objects.active().order_by("-timestamp")[:last]
+        return Incident.objects.active().order_by("-start_time")[:last]
