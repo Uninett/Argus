@@ -6,9 +6,12 @@ from django.db import models
 from django.db.models import Q
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
+from django.utils import timezone
 from django.utils.timezone import now as tznow
 
 from argus.auth.models import User
+from argus.site.datetime_utils import infinity_repr
+from .fields import DateTimeInfinityField
 
 
 def validate_lowercase(value: str):
@@ -136,8 +139,17 @@ class ProblemType(models.Model):
 
 
 class IncidentQuerySet(models.QuerySet):
+    def stateful(self):
+        return self.filter(end_time__isnull=False)
+
+    def stateless(self):
+        return self.filter(end_time__isnull=True)
+
     def active(self):
-        return self.filter(active_state__isnull=False)
+        return self.filter(end_time__gt=timezone.now())
+
+    def inactive(self):
+        return self.filter(end_time__lte=timezone.now())
 
     def prefetch_default_related(self):
         return self.select_related("parent_object", "problem_type").prefetch_related("source__type", "object__type")
@@ -145,7 +157,14 @@ class IncidentQuerySet(models.QuerySet):
 
 # TODO: review whether fields should be nullable, and on_delete modes
 class Incident(models.Model):
-    timestamp = models.DateTimeField()
+    start_time = models.DateTimeField(help_text="The time the incident was created.")
+    end_time = DateTimeInfinityField(
+        null=True,
+        blank=True,
+        # TODO: add 'infinity' checkbox to admin
+        help_text="The time the incident was resolved or closed. If not set, the incident is stateless;"
+        " if 'infinity' is checked, the incident is stateful, but has not yet been resolved or closed - i.e. active.",
+    )
     source = models.ForeignKey(
         to=SourceSystem,
         on_delete=models.CASCADE,
@@ -190,24 +209,26 @@ class Incident(models.Model):
                 fields=["source_incident_id", "source"], name="%(class)s_unique_source_incident_id_per_source",
             ),
         ]
-        ordering = ["-timestamp"]
+        ordering = ["-start_time"]
 
     def __str__(self):
-        return f"{self.timestamp} - {self.problem_type}: {self.object}"
+        if self.end_time:
+            end_time_str = f" - {infinity_repr(self.end_time, str_repr=True) or self.end_time}"
+        else:
+            end_time_str = ""
+        return f"{self.start_time}{end_time_str} [{self.problem_type}: {self.object}]"
+
+    @property
+    def stateful(self):
+        return self.end_time is not None
+
+    @property
+    def active(self):
+        return self.stateful and self.end_time > timezone.now()
 
     @property
     def incident_relations(self):
         return IncidentRelation.objects.filter(Q(incident1=self) | Q(incident2=self))
-
-
-class ActiveIncident(models.Model):
-    incident = models.OneToOneField(
-        to=Incident,
-        on_delete=models.CASCADE,
-        primary_key=True,
-        related_name="active_state",
-        help_text="Whether the incident has been resolved.",
-    )
 
 
 class IncidentRelationType(models.Model):

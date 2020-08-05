@@ -32,14 +32,36 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Set Environment Variables
+        run: |
+          echo "::set-env name=DJANGO_SETTINGS_MODULE::argus.site.settings.test_CI"
+          echo "::set-env name=POSTGRES_DB::argus_db"
+          echo "::set-env name=POSTGRES_USER::argus"
+          echo "::set-env name=POSTGRES_PASSWORD::password"
+
       - name: Run Tests
         run: |
           python manage.py collectstatic --no-input
-          coverage run manage.py test src
+          coverage run -p manage.py test src
+
+      - name: Set up PostgreSQL
+        uses: harmon758/postgresql-action@v1
+        with:
+          postgresql db: $POSTGRES_DB
+          postgresql user: $POSTGRES_USER
+          postgresql password: $POSTGRES_PASSWORD
+
+      - name: Run Tests with PostgreSQL
+        env:
+          POSTGRES: true
+        run: |
+          python manage.py collectstatic --no-input
+          coverage run -p manage.py test src
+          coverage combine
           coverage xml
 
       - name: Upload to Codecov
-        uses: codecov/codecov-action@v1.0.7
+        uses: codecov/codecov-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: ./coverage.xml

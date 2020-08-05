@@ -38,11 +38,14 @@ A recap of the environment variables that can be set by default follows.
 
 #### Environment variables
 
-* DEBUG, 1 for True, 0 for False
-* TEMPLATE_DEBUG. By default set to the same as DEBUG.
+* ARGUS_DATAPORTEN_KEY, which holds the id/key for using dataporten for
+  authentication.
 * ARGUS_DATAPORTEN_SECRET, which holds the password for using dataporten for
   authentication.
 * ARGUS_FRONTEND_URL, for redirecting back to frontend after logging in through Feide, and also CORS
+* ARGUS_SEND_NOTIFICATIONS, True in production and False by default, to allow supressing notifications
+* DEBUG, 1 for True, 0 for False
+* TEMPLATE_DEBUG. By default set to the same as DEBUG.
 * DEFAULT_FROM_EMAIL, the email From-address used for notifications sent via email
 * EMAIL_HOST, smarthost (domain name) to send email through
 * EMAIL_HOST_USER, (optional) if the host in EMAIL_HOST needs authentication
@@ -95,7 +98,8 @@ All endpoints require requests to contain a header with key `Authorization` and 
     [
         {
             "pk": 10101,
-            "timestamp": "2011-11-11T11:11:11+02:00",
+            "start_time": "2011-11-11T11:11:11+02:00",
+            "end_time": "2011-11-11T11:11:12+02:00",
             "source": {
                 "pk": 11,
                 "name": "Uninett GW 3",
@@ -129,10 +133,12 @@ All endpoints require requests to contain a header with key `Authorization` and 
             },
             "description": "Netbox 11 <12345> down.",
             "ticket_url": "https://tickettracker.com/tickets/987654/",
-            "active_state": true
+            "stateful": true,
+            "active": false
         }
     ]
     ```
+    Refer to [this section](#explanation-of-terms) for an explanation of the fields.
     </details>
   * `POST`: creates and returns an incident
     <details>
@@ -141,7 +147,8 @@ All endpoints require requests to contain a header with key `Authorization` and 
     ```json
     {
         "source": 11,
-        "timestamp": "2011-11-11 11:11:11.11111",
+        "start_time": "2011-11-11 11:11:11.11111",
+        "end_time": null,
         "source_incident_id": "12345",
         "object": {
             "name": "Netbox 11",
@@ -161,10 +168,10 @@ All endpoints require requests to contain a header with key `Authorization` and 
             "name": "boxDown",
             "description": "Box declared down."
         },
-        "description": "Netbox 11 <12345> down.",
-        "active_state": true
+        "description": "Netbox 11 <12345> down."
     }
     ```
+    Refer to [this section](#explanation-of-terms) for an explanation of the fields.
     </details>
 
 * `GET` to `/api/v1/incidents/<int:pk>/`: returns an incident by pk
@@ -308,11 +315,15 @@ All endpoints require requests to contain a header with key `Authorization` and 
 
 ### Explanation of terms
 * `incident`: an unplanned interruption in the source system.
+* `start_time`: the time the `incident` was created.
+* `end_time`: the time the `incident` was resolved or closed.
+  * If `null`: the incident is stateless.
+  * If `"infinity"`: the incident is stateful, but has not yet been resolved or closed - i.e. active.
+  * If an instance of `datetime`: the incident is stateful, and was resolved or closed at the given time; if it's in the future, the incident is also considered active.
 * `source`: the source system that the `incident` originated in.
 * `object`: the most specific object that the `incident` is about.
 * `parent_object`: an object that the `object` is possibly a part of.
 * `problem_type`: the type of problem that the `incident` is about.
-* `active_state`: whether an `incident` has been resolved.
 
 ### ER diagram
 ![ER diagram](img/ER_model.png)

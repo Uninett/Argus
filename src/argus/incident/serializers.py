@@ -1,8 +1,8 @@
 from django.core.validators import URLValidator
 from rest_framework import serializers
 
+from . import fields
 from .models import (
-    ActiveIncident,
     Incident,
     Object,
     ObjectType,
@@ -70,17 +70,18 @@ class ProblemTypeSerializer(RemovableFieldSerializer):
 
 
 class IncidentSerializer(RemovableFieldSerializer):
+    end_time = fields.DateTimeInfinitySerializerField(required=False, allow_null=True)
     source = SourceSystemSerializer(read_only=True)
     object = ObjectSerializer()
     parent_object = ParentObjectSerializer()
     problem_type = ProblemTypeSerializer()
-    active_state = serializers.BooleanField()
 
     class Meta:
         model = Incident
         fields = [
             "pk",
-            "timestamp",
+            "start_time",
+            "end_time",
             "source",
             "source_incident_id",
             "object",
@@ -89,7 +90,6 @@ class IncidentSerializer(RemovableFieldSerializer):
             "problem_type",
             "description",
             "ticket_url",
-            "active_state",
         ]
         read_only_fields = ["pk"]
 
@@ -101,24 +101,20 @@ class IncidentSerializer(RemovableFieldSerializer):
         object_type_data = object_data.pop("type")
         parent_object_data = validated_data.pop("parent_object")
         problem_type_data = validated_data.pop("problem_type")
-        active_state = validated_data.pop("active_state")
 
         object_type, _created = ObjectType.objects.get_or_create(**object_type_data)
         object_, _created = Object.objects.get_or_create(source_system=source, type=object_type, **object_data)
         parent_object, _created = ParentObject.objects.get_or_create(**parent_object_data)
         problem_type, _created = ProblemType.objects.get_or_create(**problem_type_data)
 
-        incident = Incident.objects.create(
+        return Incident.objects.create(
             object=object_, parent_object=parent_object, problem_type=problem_type, **validated_data,
         )
-        if active_state:
-            ActiveIncident.objects.create(incident=incident)
-
-        return incident
 
     def to_representation(self, instance: Incident):
         incident_repr = super().to_representation(instance)
-        incident_repr["active_state"] = hasattr(instance, "active_state")
+        incident_repr["stateful"] = instance.stateful
+        incident_repr["active"] = instance.active
         return incident_repr
 
     def validate_ticket_url(self, value):
@@ -138,7 +134,8 @@ class IncidentSerializer_legacy(RemovableFieldSerializer):
         model = Incident
         fields = [
             "pk",
-            "timestamp",
+            "start_time",
+            "end_time",
             "source",
             "source_incident_id",
             "object",
@@ -147,11 +144,5 @@ class IncidentSerializer_legacy(RemovableFieldSerializer):
             "problem_type",
             "description",
             "ticket_url",
-            "active_state",
         ]
-        read_only_fields = ["pk", "active_state"]
-
-    def to_representation(self, instance: Incident):
-        incident_repr = super().to_representation(instance)
-        incident_repr["active_state"] = hasattr(instance, "active_state")
-        return incident_repr
+        read_only_fields = ["pk"]

@@ -57,7 +57,7 @@ class MockIncidentData:
         self.problem_type1 = ProblemType.objects.create(name="boxDown", description="A box is down.")
 
         self.incident1 = Incident.objects.create(
-            timestamp=timezone.now(),
+            start_time=timezone.now(),
             source=self.nav1,
             source_incident_id="123",
             object=self.object1,
