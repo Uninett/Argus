@@ -51,8 +51,6 @@ INCIDENT_START_TIME_NOW_CHANCE = 1 / 5
 INCIDENT_DESCRIPTION_WORD_COUNT_RANGE = (2, 10)
 INCIDENT_STATEFUL_CHANCE = 1 / 2
 STATEFUL_INCIDENT_ACTIVE_CHANCE = 1 / 5
-# ActiveIncident
-INCIDENT_ACTIVE_CHANCE = 1 / 20
 
 
 # --- Util functions ---
@@ -226,7 +224,13 @@ def generate_incidents(source_systems, objects, parent_objects, problem_types) -
 
         if roll_dice(INCIDENT_STATEFUL_CHANCE):
             if roll_dice(STATEFUL_INCIDENT_ACTIVE_CHANCE):
-                end_time = "infinity"
+                # FIXME: hacky solution that relies purely on the fact that
+                #  Django's `serializers.serialize()` calls `isoformat()` when serializing
+                class InfinityDatetime:
+                    def isoformat(self):
+                        return "infinity"
+
+                end_time = InfinityDatetime()
             elif start_time_now:
                 end_time = start_time + second_delay
             else:
@@ -252,13 +256,6 @@ def generate_incidents(source_systems, objects, parent_objects, problem_types) -
     return set_pks(incidents)
 
 
-def generate_active_incidents(incidents) -> List[Model]:
-    active_incidents = [
-        ActiveIncident(incident=incident) for incident in incidents if roll_dice(INCIDENT_ACTIVE_CHANCE)
-    ]
-    return set_pks(active_incidents)
-
-
 def create_fixture_file():
     source_system_types = generate_source_system_types()
     source_systems, source_system_users = generate_source_systems(source_system_types)
@@ -267,7 +264,6 @@ def create_fixture_file():
     parent_objects = generate_parent_objects(source_systems)
     problem_types = generate_problem_types()
     incidents = generate_incidents(source_systems, objects, parent_objects, problem_types)
-    active_incidents = generate_active_incidents(incidents)
 
     all_objects = (
         *source_system_types,
@@ -278,7 +274,6 @@ def create_fixture_file():
         *parent_objects,
         *problem_types,
         *incidents,
-        *active_incidents,
     )
 
     INCIDENT_FIXTURES_FILE.parent.mkdir(parents=True, exist_ok=True)

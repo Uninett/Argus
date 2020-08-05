@@ -28,6 +28,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='incident',
             name='end_time',
-            field=argus.incident.fields.DateTimeInfinityField(blank=True, help_text="The time the incident was resolved or closed. If not set, the incident has no state; if 'infinity' is checked, the incident has state, but has not yet been resolved or closed.", null=True),
+            field=argus.incident.fields.DateTimeInfinityField(blank=True, help_text="The time the incident was resolved or closed. If not set, the incident is stateless; if 'infinity' is checked, the incident is stateful, but has not yet been resolved or closed - i.e. active.", null=True),
         ),
     ]

@@ -3,7 +3,6 @@ from django.contrib.admin import widgets
 
 from .forms import AddSourceSystemForm
 from .models import (
-    ActiveIncident,
     Incident,
     IncidentQuerySet,
     IncidentRelation,
@@ -93,23 +92,52 @@ class ProblemTypeAdmin(TextWidgetsOverrideModelAdmin):
     text_input_form_fields = ("name",)
 
 
-class ActiveStateListFilter(admin.SimpleListFilter):
-    title = "active state"
+class StatefulListFilter(admin.SimpleListFilter):
+    title = "stateful"
     # Parameter for the filter that will be used in the URL query
-    parameter_name = "active"
+    parameter_name = "stateful"
+
+    STATEFUL = 1
+    STATELESS = 0
 
     def lookups(self, request, model_admin):
         return (
-            (1, "Yes"),
-            (0, "No"),
+            (self.STATEFUL, "Yes"),
+            (self.STATELESS, "No"),
         )
 
-    def queryset(self, request, queryset):
+    def queryset(self, request, queryset: IncidentQuerySet):
         if not self.value():
             return queryset
 
-        lookup_value = int(self.value())
-        return queryset.filter(active_state__isnull=not lookup_value)
+        if int(self.value()) == self.STATEFUL:
+            return queryset.stateful()
+        else:
+            return queryset.stateless()
+
+
+class ActiveListFilter(admin.SimpleListFilter):
+    title = "active"
+    # Parameter for the filter that will be used in the URL query
+    parameter_name = "active"
+
+    ACTIVE = 1
+    INACTIVE = 0
+
+    def lookups(self, request, model_admin):
+        return (
+            (self.ACTIVE, "Yes"),
+            (self.INACTIVE, "No"),
+        )
+
+    def queryset(self, request, queryset: IncidentQuerySet):
+        if not self.value():
+            return queryset
+
+        if int(self.value()) == self.ACTIVE:
+            return queryset.active()
+        else:
+            return queryset.inactive()
 
 
 class IncidentAdmin(TextWidgetsOverrideModelAdmin):
@@ -123,7 +151,6 @@ class IncidentAdmin(TextWidgetsOverrideModelAdmin):
         "details_url",
         "problem_type",
         "ticket_url",
-        "get_active_state",
     )
     search_fields = (
         "source_incident_id",
@@ -137,37 +164,22 @@ class IncidentAdmin(TextWidgetsOverrideModelAdmin):
         "problem_type__name",
     )
     list_filter = (
-        ActiveStateListFilter,
+        StatefulListFilter,
+        ActiveListFilter,
         "source",
         "source__type",
         "problem_type",
         "object__type",
     )
-    list_select_related = ("active_state",)
 
     raw_id_fields = ("object", "parent_object")
     text_input_form_fields = ("source_incident_id",)
     url_input_form_fields = ("details_url", "ticket_url")
 
-    def get_active_state(self, incident: Incident):
-        return hasattr(incident, "active_state")
-
-    get_active_state.boolean = True
-    get_active_state.short_description = "Active"
-    get_active_state.admin_order_field = "active_state"
-
     def get_queryset(self, request):
         qs: IncidentQuerySet = super().get_queryset(request)
         # Reduce number of database calls
         return qs.prefetch_default_related().prefetch_related("object__source_system__type")
-
-
-class ActiveIncidentAdmin(admin.ModelAdmin):
-    list_display = ("incident",)
-    search_fields = ("incident__source_incident_id",)
-    list_select_related = ("incident",)
-
-    raw_id_fields = ("incident",)
 
 
 class IncidentRelationTypeAdmin(TextWidgetsOverrideModelAdmin):
@@ -198,7 +210,6 @@ admin.site.register(Object, ObjectAdmin)
 admin.site.register(ParentObject, ParentObjectAdmin)
 admin.site.register(ProblemType, ProblemTypeAdmin)
 admin.site.register(Incident, IncidentAdmin)
-admin.site.register(ActiveIncident, ActiveIncidentAdmin)
 
 admin.site.register(IncidentRelation, IncidentRelationAdmin)
 admin.site.register(IncidentRelationType, IncidentRelationTypeAdmin)

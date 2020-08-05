@@ -133,7 +133,8 @@ All endpoints require requests to contain a header with key `Authorization` and 
             },
             "description": "Netbox 11 <12345> down.",
             "ticket_url": "https://tickettracker.com/tickets/987654/",
-            "active_state": true
+            "stateful": true,
+            "active": false
         }
     ]
     ```
@@ -167,8 +168,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
             "name": "boxDown",
             "description": "Box declared down."
         },
-        "description": "Netbox 11 <12345> down.",
-        "active_state": true
+        "description": "Netbox 11 <12345> down."
     }
     ```
     Refer to [this section](#explanation-of-terms) for an explanation of the fields.
@@ -317,14 +317,13 @@ All endpoints require requests to contain a header with key `Authorization` and 
 * `incident`: an unplanned interruption in the source system.
 * `start_time`: the time the `incident` was created.
 * `end_time`: the time the `incident` was resolved or closed.
-  * If `null`: the incident has no state.
-  * If `"infinity"`: the incident has state, but has not yet been resolved or closed.
-  * If an instance of `datetime`: the incident has state, and was resolved or closed at the given time.
+  * If `null`: the incident is stateless.
+  * If `"infinity"`: the incident is stateful, but has not yet been resolved or closed - i.e. active.
+  * If an instance of `datetime`: the incident is stateful, and was resolved or closed at the given time; if it's in the future, the incident is also considered active.
 * `source`: the source system that the `incident` originated in.
 * `object`: the most specific object that the `incident` is about.
 * `parent_object`: an object that the `object` is possibly a part of.
 * `problem_type`: the type of problem that the `incident` is about.
-* `active_state`: whether an `incident` has been resolved.
 
 ### ER diagram
 ![ER diagram](img/ER_model.png)

@@ -4,6 +4,7 @@ from django.db import models
 from django.db.models import Q
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
+from django.utils import timezone
 
 from argus.auth.models import User
 from argus.site.datetime_utils import infinity_repr
@@ -106,8 +107,17 @@ class ProblemType(models.Model):
 
 
 class IncidentQuerySet(models.QuerySet):
+    def stateful(self):
+        return self.filter(end_time__isnull=False)
+
+    def stateless(self):
+        return self.filter(end_time__isnull=True)
+
     def active(self):
-        return self.filter(active_state__isnull=False)
+        return self.filter(end_time__gt=timezone.now())
+
+    def inactive(self):
+        return self.filter(end_time__lte=timezone.now())
 
     def prefetch_default_related(self):
         return self.select_related("parent_object", "problem_type").prefetch_related("source__type", "object__type")
@@ -120,8 +130,8 @@ class Incident(models.Model):
         null=True,
         blank=True,
         # TODO: add 'infinity' checkbox to admin
-        help_text="The time the incident was resolved or closed. If not set, the incident has no state;"
-        " if 'infinity' is checked, the incident has state, but has not yet been resolved or closed.",
+        help_text="The time the incident was resolved or closed. If not set, the incident is stateless;"
+        " if 'infinity' is checked, the incident is stateful, but has not yet been resolved or closed - i.e. active.",
     )
     source = models.ForeignKey(
         to=SourceSystem,
@@ -177,18 +187,16 @@ class Incident(models.Model):
         return f"{self.start_time}{end_time_str} [{self.problem_type}: {self.object}]"
 
     @property
+    def stateful(self):
+        return self.end_time is not None
+
+    @property
+    def active(self):
+        return self.stateful and self.end_time > timezone.now()
+
+    @property
     def incident_relations(self):
         return IncidentRelation.objects.filter(Q(incident1=self) | Q(incident2=self))
-
-
-class ActiveIncident(models.Model):
-    incident = models.OneToOneField(
-        to=Incident,
-        on_delete=models.CASCADE,
-        primary_key=True,
-        related_name="active_state",
-        help_text="Whether the incident has been resolved.",
-    )
 
 
 class IncidentRelationType(models.Model):
