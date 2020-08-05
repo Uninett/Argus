@@ -11,6 +11,11 @@ SUBSCRIBED_ACTIVE_INCIDENTS = "subscribed_active_incidents"
 
 @receiver(post_save, sender=Incident)
 def notify_on_change_or_create(sender, instance: Incident, created: bool, raw: bool, *args, **kwargs):
+    # FIXME: We need to refresh from database due to post_save
+    # signal recievers of Incidents are recieving incident instances
+    # with invalid field values set. A refresh from db resolves this.
+    # See: https://github.com/Uninett/Argus/issues/98
+    instance.refresh_from_db()
     is_new = created or raw
     type_str = "created" if is_new else "modified"
 
