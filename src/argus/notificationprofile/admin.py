@@ -38,9 +38,25 @@ class FilterAdmin(admin.ModelAdmin):
     raw_id_fields = ("user",)
 
 
+class HasPhoneNumberFilter(admin.SimpleListFilter):
+    title = "has phone number"
+    parameter_name = "has_phone_number"
+
+    def lookups(self, request, model_admin):
+        return (("yes", "Yes"), ("no", "No"))
+
+    def queryset(self, request, queryset):
+        value = self.value()
+        if value == "yes":
+            queryset = queryset.exclude(phone_number__isnull=True)
+        elif value == "no":
+            queryset = queryset.filter(phonenumber__isnull=True)
+        return queryset
+
+
 class NotificationProfileAdmin(admin.ModelAdmin):
     list_display = ("get_str", "get_filters", "get_media", "active")
-    list_filter = ("active",)
+    list_filter = ("active", HasPhoneNumberFilter)
     search_fields = (
         "timeslot__name",
         "filters__name",
