@@ -1,11 +1,19 @@
 from django.contrib.auth import views as django_views
-from django.urls import path
+from django.urls import path, include
+
+from rest_framework import routers
 
 from . import views
+
+
+router = routers.SimpleRouter()
+router.register("phone-number", views.PhoneNumberViewSet)
+
 
 app_name = "auth"
 urlpatterns = [
     path("login/", django_views.LoginView.as_view(redirect_authenticated_user=True), name="login"),
     path("logout/", django_views.LogoutView.as_view(), name="logout"),
     path("user/", views.get_user, name="user"),
+    path("", include(router.urls)),
 ]
