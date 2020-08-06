@@ -6,9 +6,9 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from argus.drf.permissions import IsOwner
 from argus.incident.serializers import IncidentSerializer
 from .models import Filter, NotificationProfile
-from .permissions import IsOwner
 from .serializers import (
     FilterSerializer,
     NotificationProfileSerializer,
