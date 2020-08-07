@@ -9,7 +9,7 @@ from django.dispatch import receiver
 from django.utils import timezone
 
 from argus.auth.models import User
-from argus.site.datetime_utils import INFINITY_REPR, infinity_repr
+from argus.site.datetime_utils import INFINITY_REPR, get_infinity_repr
 from .fields import DateTimeInfinityField
 
 
@@ -211,7 +211,7 @@ class Incident(models.Model):
 
     def __str__(self):
         if self.end_time:
-            end_time_str = f" - {infinity_repr(self.end_time, str_repr=True) or self.end_time}"
+            end_time_str = f" - {get_infinity_repr(self.end_time, str_repr=True) or self.end_time}"
         else:
             end_time_str = ""
         return f"{self.start_time}{end_time_str} [{self.problem_type}: {self.object}]"
