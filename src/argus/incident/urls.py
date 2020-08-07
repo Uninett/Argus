@@ -4,7 +4,7 @@ from . import views
 
 
 incident_list = views.IncidentViewSet.as_view({"get": "list", "post": "create"})
-incident_detail = views.IncidentViewSet.as_view({"get": "retrieve",})
+incident_detail = views.IncidentViewSet.as_view({"get": "retrieve", "patch": "partial_update"})
 incident_active = views.IncidentViewSet.as_view({"put": "active",})
 incident_ticket_url = views.IncidentViewSet.as_view({"put": "ticket_url",})
 

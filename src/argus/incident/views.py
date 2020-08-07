@@ -22,6 +22,7 @@ from .models import (
 )
 from .parsers import StackedJSONParser
 from .serializers import (
+    IncidentPureDeserializer,
     IncidentSerializer,
     IncidentSerializer_legacy,
     ObjectTypeSerializer,
@@ -75,13 +76,20 @@ class SourceSystemDetail(generics.RetrieveUpdateAPIView):
 
 
 class IncidentViewSet(
-    mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.ListModelMixin, viewsets.GenericViewSet,
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
+    viewsets.GenericViewSet,
 ):
     permission_classes = [IsAuthenticated]
     queryset = Incident.objects.prefetch_default_related()
-    serializer_class = IncidentSerializer
 
-    # TODO: replace action with simply setting end_time directly
+    def get_serializer_class(self):
+        if self.request.method in {"PUT", "PATCH"}:
+            return IncidentPureDeserializer
+        return IncidentSerializer
+
     @action(detail=True, methods=["put"])
     def active(self, request, pk=None):
         if type(request.data) is not dict:
