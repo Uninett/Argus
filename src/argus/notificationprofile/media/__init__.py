@@ -74,7 +74,7 @@ def send_notification(user: User, profile: NotificationProfile, incident: Incide
     media = get_notification_media(profile.media)
     for medium in media:
         if medium is not None:
-            medium.send(incident, user)
+            medium.send(incident, user, phone_number=profile.phone_number)
     else:
         LOG.warn("Notification: Could not send notification, nowhere to send it to")
 

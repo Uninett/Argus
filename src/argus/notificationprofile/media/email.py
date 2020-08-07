@@ -35,7 +35,7 @@ def send_email_safely(function, additional_error=None, *args, **kwargs):
 
 class EmailNotification(NotificationMedium):
     @staticmethod
-    def send(incident, user):
+    def send(incident, user, **_):
         if not user.email:
             logging.getLogger("django.request").warning(
                 f"Cannot send email notification to user '{user}', as they have not set an email address."

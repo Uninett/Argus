@@ -10,5 +10,5 @@ __all__ = ['NotificationMedium']
 class NotificationMedium(ABC):
     @staticmethod
     @abstractmethod
-    def send(incident: Incident, user: User):
+    def send(incident: Incident, user: User, **kwargs):
         pass
