@@ -9,7 +9,7 @@ from django.dispatch import receiver
 from django.utils import timezone
 
 from argus.auth.models import User
-from argus.site.datetime_utils import infinity_repr
+from argus.site.datetime_utils import INFINITY_REPR, infinity_repr
 from .fields import DateTimeInfinityField
 
 
@@ -228,6 +228,24 @@ class Incident(models.Model):
     @property
     def active(self):
         return self.stateful and self.end_time > timezone.now()
+
+    def set_active(self):
+        if not self.stateful:
+            raise ValidationError("Cannot set a stateless incident as active")
+        if self.active:
+            return
+
+        self.end_time = INFINITY_REPR
+        self.save(update_fields=["end_time"])
+
+    def set_inactive(self):
+        if not self.stateful:
+            raise ValidationError("Cannot set a stateless incident as inactive")
+        if not self.active:
+            return
+
+        self.end_time = timezone.now()
+        self.save(update_fields=["end_time"])
 
     @property
     def incident_relations(self):
