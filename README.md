@@ -71,6 +71,17 @@ This creates the file `src/argus/incident/fixtures/incident/mock_data.json`.
 python manage.py loaddata incident/mock_data
 ```
 
+### Debugging tips
+
+To test/debug notifications as a whole, use the email subsystem (Media: Email in a NotificationProfile).
+Set EMAIL_HOST to "localhost", EMAIL_PORT to "1025", and run a dummy mailserver:
+
+```
+$ python3 -m smtpd -n -c DebuggingServer localhost:1025
+```
+
+Notifications sent will then be dumped to the console where the dummy server runs.
+
 ## Endpoints
 *`/admin/` to access the project's admin pages.*
 
