@@ -24,6 +24,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    "channels",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -36,6 +37,7 @@ INSTALLED_APPS = [
     "rest_framework.authtoken",
     "argus.auth",
     "argus.incident",
+    "argus.ws",
     "argus.notificationprofile",
     "argus.dev",
 ]
@@ -179,3 +181,16 @@ SOCIAL_AUTH_NEW_USER_REDIRECT_URL = SOCIAL_AUTH_LOGIN_REDIRECT_URL
 #
 # SOCIAL_AUTH_DATAPORTEN_FEIDE_KEY = SOCIAL_AUTH_DATAPORTEN_KEY
 # SOCIAL_AUTH_DATAPORTEN_FEIDE_SECRET = SOCIAL_AUTH_DATAPORTEN_SECRET
+
+ASGI_APPLICATION = "argus.ws.routing.application"
+
+# fmt: off
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}
+# fmt: on

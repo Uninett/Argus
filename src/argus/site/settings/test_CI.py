@@ -6,6 +6,16 @@ from .dev import *
 _LOGGER = logging.getLogger(__name__)
 
 
+# Use in-memory channel layer when testing.
+# fmt: off
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
+}
+# fmt: on
+
+
 POSTGRES = get_bool_env("POSTGRES")
 POSTGRES_DB = get_str_env("POSTGRES_DB")
 POSTGRES_USER = get_str_env("POSTGRES_USER")
