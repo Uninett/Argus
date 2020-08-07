@@ -104,15 +104,6 @@ class IncidentViewSet(
         incident.save()
         return Response(self.serializer_class(incident).data)
 
-    @action(detail=True, methods=["put"])
-    def ticket_url(self, request, pk=None):
-        new_ticket_url = request.data.get("ticket_url")
-        incident = self.get_object()
-        new_incident = self.serializer_class(incident, data={"ticket_url": new_ticket_url}, partial=True)
-        new_incident.is_valid(raise_exception=True)
-        new_incident.save()
-        return Response(new_incident.data)
-
     def perform_create(self, serializer):
         user = self.request.user
 
