@@ -149,6 +149,16 @@ class IncidentQuerySet(models.QuerySet):
     def inactive(self):
         return self.filter(end_time__lte=timezone.now())
 
+    def set_active(self):
+        # Don't use update(), as it doesn't trigger signals
+        for incident in self.all():
+            incident.set_active()
+
+    def set_inactive(self):
+        # Don't use update(), as it doesn't trigger signals
+        for incident in self.all():
+            incident.set_inactive()
+
     def prefetch_default_related(self):
         return self.select_related("parent_object", "problem_type").prefetch_related("source__type", "object__type")
 
