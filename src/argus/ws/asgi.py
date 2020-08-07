@@ -1,6 +1,9 @@
 """
 ASGI entrypoint. Configures Django and then runs the application
 defined in the ASGI_APPLICATION setting.
+
+Source:
+https://channels.readthedocs.io/en/latest/deploying.html#run-protocol-servers
 """
 
 import os
