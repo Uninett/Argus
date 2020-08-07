@@ -20,8 +20,8 @@ class ClientError(Exception):
 
 class ActiveIncidentConsumer(JsonWebsocketConsumer):
     def connect(self):
-        self.user = self.scope["user"]
-        if self.user and self.user.is_authenticated:
+        user = self.scope["user"]
+        if user and user.is_authenticated:
             return self.accept()
 
     def disconnect(self, code):
