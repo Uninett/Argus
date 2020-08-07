@@ -168,16 +168,31 @@ All endpoints require requests to contain a header with key `Authorization` and 
             "name": "boxDown",
             "description": "Box declared down."
         },
-        "description": "Netbox 11 <12345> down."
+        "description": "Netbox 11 <12345> down.",
+        "ticket_url": "https://tickettracker.com/tickets/987654/"
     }
     ```
     Refer to [this section](#explanation-of-terms) for an explanation of the fields.
     </details>
 
-* `GET` to `/api/v1/incidents/<int:pk>/`: returns an incident by pk
+* `/api/v1/incidents/<int:pk>/`:
+  * `GET`: returns an incident by pk
+  * `PATCH`: modifies parts of an incident and returns it
+    <details>
+    <summary>Example request body:</summary>
+
+    ```json
+    {
+        "end_time": "infinity",
+        "parent_object": 99,
+        "details_url": "https://uninett.no/api/alerts/12345/",
+        "ticket_url": "https://tickettracker.com/tickets/987654/"
+    }
+    ```
+    </details>
 * `GET` to `/api/v1/incidents/active/`: returns all active incidents
-* `PUT` to `/api/v1/incidents/<int:pk>/active/`: changes an incident's active state by pk
-  * Example request body: `{ "active": <bool> }`
+* `PUT` to `/api/v1/incidents/<int:pk>/active/`: changes a stateful incident's state to active by setting `end_time` to `"infinity"`
+* `PUT` to `/api/v1/incidents/<int:pk>/inactive/`: changes a stateful incident's state to inactive by setting `end_time` to now
 * `GET` to `/api/v1/incidents/metadata/`: returns relevant metadata for all incidents
 
 </details>
