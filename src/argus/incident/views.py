@@ -23,6 +23,7 @@ from .models import (
 )
 from .parsers import StackedJSONParser
 from .serializers import (
+    IncidentPureDeserializer,
     IncidentSerializer,
     IncidentSerializer_legacy,
     ObjectTypeSerializer,
@@ -76,13 +77,20 @@ class SourceSystemDetail(generics.RetrieveUpdateAPIView):
 
 
 class IncidentViewSet(
-    mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.ListModelMixin, viewsets.GenericViewSet,
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
+    viewsets.GenericViewSet,
 ):
     permission_classes = [IsAuthenticated]
     queryset = Incident.objects.prefetch_default_related()
-    serializer_class = IncidentSerializer
 
-    # TODO: replace action with simply setting end_time directly
+    def get_serializer_class(self):
+        if self.request.method in {"PUT", "PATCH"}:
+            return IncidentPureDeserializer
+        return IncidentSerializer
+
     @action(detail=True, methods=["PUT"])
     def active(self, request, pk=None):
         return self._set_state_action(lambda incident: incident.set_active())
@@ -98,15 +106,6 @@ class IncidentViewSet(
         except django_exceptions.ValidationError as e:
             raise serializers.ValidationError(e)
         return Response(self.get_serializer(incident).data)
-
-    @action(detail=True, methods=["put"])
-    def ticket_url(self, request, pk=None):
-        new_ticket_url = request.data.get("ticket_url")
-        incident = self.get_object()
-        new_incident = self.serializer_class(incident, data={"ticket_url": new_ticket_url}, partial=True)
-        new_incident.is_valid(raise_exception=True)
-        new_incident.save()
-        return Response(new_incident.data)
 
     def perform_create(self, serializer):
         user = self.request.user

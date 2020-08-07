@@ -123,6 +123,46 @@ class IncidentSerializer(RemovableFieldSerializer):
         return value
 
 
+class IncidentPureDeserializer(serializers.ModelSerializer):
+    end_time = fields.DateTimeInfinitySerializerField(required=False, allow_null=True)
+
+    class Meta:
+        model = Incident
+        fields = [
+            "end_time",
+            "object",
+            "parent_object",
+            "details_url",
+            "problem_type",
+            "ticket_url",
+        ]
+
+    def to_representation(self, instance):
+        return IncidentSerializer(instance).data
+
+    def validate_empty_values(self, data):
+        allowed_fields = self.get_fields()
+        all_fields = {field.name for field in Incident._meta.get_fields()}
+        all_fields.add("pk")  # for providing feedback (the default "pk" field is acually named "id")
+        errors = {}
+        for field in data:
+            if field not in allowed_fields:
+                if field in all_fields:
+                    error_message = "The field is not allowed to be changed."
+                else:
+                    error_message = "The field does not exist."
+                errors[field] = error_message
+        if errors:
+            raise serializers.ValidationError(errors)
+
+        return super().validate_empty_values(data)
+
+    def validate_ticket_url(self, value):
+        validator = URLValidator()
+        validator(value)
+        return value
+
+
 # TODO: remove once it's not in use anymore
 class IncidentSerializer_legacy(RemovableFieldSerializer):
     source = SourceSystemSerializer(read_only=True)
