@@ -9,7 +9,7 @@ from django.dispatch import receiver
 from django.utils import timezone
 
 from argus.auth.models import User
-from argus.site.datetime_utils import infinity_repr
+from argus.site.datetime_utils import INFINITY_REPR, get_infinity_repr
 from .fields import DateTimeInfinityField
 
 
@@ -149,6 +149,16 @@ class IncidentQuerySet(models.QuerySet):
     def inactive(self):
         return self.filter(end_time__lte=timezone.now())
 
+    def set_active(self):
+        # Don't use update(), as it doesn't trigger signals
+        for incident in self.all():
+            incident.set_active()
+
+    def set_inactive(self):
+        # Don't use update(), as it doesn't trigger signals
+        for incident in self.all():
+            incident.set_inactive()
+
     def prefetch_default_related(self):
         return self.select_related("parent_object", "problem_type").prefetch_related("source__type", "object__type")
 
@@ -211,7 +221,7 @@ class Incident(models.Model):
 
     def __str__(self):
         if self.end_time:
-            end_time_str = f" - {infinity_repr(self.end_time, str_repr=True) or self.end_time}"
+            end_time_str = f" - {get_infinity_repr(self.end_time, str_repr=True) or self.end_time}"
         else:
             end_time_str = ""
         return f"{self.start_time}{end_time_str} [{self.problem_type}: {self.object}]"
@@ -228,6 +238,24 @@ class Incident(models.Model):
     @property
     def active(self):
         return self.stateful and self.end_time > timezone.now()
+
+    def set_active(self):
+        if not self.stateful:
+            raise ValidationError("Cannot set a stateless incident as active")
+        if self.active:
+            return
+
+        self.end_time = INFINITY_REPR
+        self.save(update_fields=["end_time"])
+
+    def set_inactive(self):
+        if not self.stateful:
+            raise ValidationError("Cannot set a stateless incident as inactive")
+        if not self.active:
+            return
+
+        self.end_time = timezone.now()
+        self.save(update_fields=["end_time"])
 
     @property
     def incident_relations(self):

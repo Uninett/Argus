@@ -1,7 +1,8 @@
 import secrets
+from typing import Callable
 
+from django.core import exceptions as django_exceptions
 from django.db import IntegrityError
-from django.utils import timezone
 from rest_framework import generics, mixins, serializers, status, viewsets
 from rest_framework.decorators import action, api_view
 from rest_framework.permissions import IsAuthenticated
@@ -90,19 +91,21 @@ class IncidentViewSet(
             return IncidentPureDeserializer
         return IncidentSerializer
 
-    @action(detail=True, methods=["put"])
+    @action(detail=True, methods=["PUT"])
     def active(self, request, pk=None):
-        if type(request.data) is not dict:
-            raise serializers.ValidationError("The request body must contain JSON.")
+        return self._set_state_action(lambda incident: incident.set_active())
 
-        active = request.data.get("active")
-        if active is None or type(active) is not bool:
-            raise serializers.ValidationError("Field 'active' with a boolean value is missing from the request body.")
+    @action(detail=True, methods=["PUT"])
+    def inactive(self, request, pk=None):
+        return self._set_state_action(lambda incident: incident.set_inactive())
 
+    def _set_state_action(self, set_state: Callable[[Incident], None]):
         incident = self.get_object()
-        incident.end_time = "infinity" if active else timezone.now()
-        incident.save()
-        return Response(self.serializer_class(incident).data)
+        try:
+            set_state(incident)
+        except django_exceptions.ValidationError as e:
+            raise serializers.ValidationError(e)
+        return Response(self.get_serializer(incident).data)
 
     def perform_create(self, serializer):
         user = self.request.user

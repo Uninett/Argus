@@ -12,7 +12,7 @@ class DateTimeInfinityField(models.DateTimeField):
         is_postgres = self.is_postgres(connection)
 
         if isinstance(value, datetime):
-            infinity_repr = utils.infinity_repr(value, str_repr=is_postgres)
+            infinity_repr = utils.get_infinity_repr(value, str_repr=is_postgres)
             if infinity_repr:
                 # (Presumably) only PostgreSQL accepts - and correctly adapts - infinity strings
                 if is_postgres:
@@ -29,10 +29,10 @@ class DateTimeInfinityField(models.DateTimeField):
         if value is None:
             return value
 
-        return utils.infinity_time(value) or utils.convert_datetimefield_value(value, connection)
+        return utils.get_infinity_time(value) or utils.convert_datetimefield_value(value, connection)
 
     def to_python(self, value):
-        return utils.infinity_time(value) or super().to_python(value)
+        return utils.get_infinity_time(value) or super().to_python(value)
 
     @staticmethod
     def is_postgres(connection):
@@ -50,7 +50,7 @@ class DateTimeInfinitySerializerField(rest_framework_fields.DateTimeField):
     default_error_messages = _get_default_error_messages_for_datetime_infinity_serializer_field()
 
     def to_internal_value(self, value):
-        return utils.infinity_time(value) or super().to_internal_value(value)
+        return utils.get_infinity_time(value) or super().to_internal_value(value)
 
     def to_representation(self, value):
-        return utils.infinity_repr(value, str_repr=True) or super().to_representation(value)
+        return utils.get_infinity_repr(value, str_repr=True) or super().to_representation(value)

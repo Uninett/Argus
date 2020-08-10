@@ -32,7 +32,7 @@ def make_naive(value: datetime):
     return value.replace(tzinfo=None)
 
 
-def infinity_repr(value, *, str_repr):
+def get_infinity_repr(value, *, str_repr):
     if not isinstance(value, datetime):
         return None
 
@@ -44,7 +44,7 @@ def infinity_repr(value, *, str_repr):
     return None
 
 
-def infinity_time(value):
+def get_infinity_time(value):
     if isinstance(value, datetime):
         value = make_naive(value)
         if value in (INFINITY, NEGATIVE_INFINITY):
