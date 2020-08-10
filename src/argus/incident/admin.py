@@ -185,7 +185,7 @@ class IncidentAdmin(TextWidgetsOverrideModelAdmin):
     search_fields = (
         "source_incident_id",
         "source__name",
-        "source__type",
+        "source__type__name",
         "incident_tag_relations__tag__key",
         "incident_tag_relations__tag__value",
         "object__name",
