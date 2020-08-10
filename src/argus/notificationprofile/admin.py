@@ -41,17 +41,18 @@ class FilterAdmin(admin.ModelAdmin):
 class HasPhoneNumberFilter(admin.SimpleListFilter):
     title = "has phone number"
     parameter_name = "has_phone_number"
+    YES = 1
+    NO = 0
 
     def lookups(self, request, model_admin):
-        return (("yes", "Yes"), ("no", "No"))
+        return ((self.YES, "Yes"), (self.NO, "No"))
 
     def queryset(self, request, queryset):
-        value = self.value()
-        if value == "yes":
-            queryset = queryset.exclude(phone_number__isnull=True)
-        elif value == "no":
-            queryset = queryset.filter(phonenumber__isnull=True)
-        return queryset
+        try:
+            value = bool(int(self.value()))
+        except ValueError:
+            return queryset
+        return queryset.exclude(phone_number__isnull=value)
 
 
 class NotificationProfileAdmin(admin.ModelAdmin):
