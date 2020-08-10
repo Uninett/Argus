@@ -129,10 +129,13 @@ class IncidentViewSet(
 
         # TODO: send notifications to users
         try:
-            serializer.save(source=source)
+            serializer.save(user=user, source=source)
         except IntegrityError as e:
             # TODO: this should be replaced by more verbose feedback, that also doesn't reference database tables
             raise serializers.ValidationError(e)
+
+    def perform_update(self, serializer):
+        serializer.save(user=self.request.user)
 
 
 # TODO: remove once it's not in use anymore

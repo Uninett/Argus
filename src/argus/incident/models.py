@@ -1,5 +1,6 @@
 from random import randint
 
+from django.core import validators
 from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
 from django.db import models
@@ -136,6 +137,55 @@ class ProblemType(models.Model):
         return self.name
 
 
+class Tag(models.Model):
+    TAG_DELIMITER = "="
+
+    key = models.TextField(
+        validators=[
+            validators.RegexValidator(
+                r"^[a-z0-9_]+\Z",
+                message="Please enter a valid key consisting of lowercase letters, numbers and underscores.",
+            )
+        ]
+    )
+    value = models.TextField()
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["key", "value"], name="%(class)s_unique_key_and_value"),
+        ]
+
+    def __str__(self):
+        return self.representation
+
+    @property
+    def representation(self):
+        return self.join(self.key, self.value)
+
+    @staticmethod
+    def join(key, value):
+        return f"{key}{Tag.TAG_DELIMITER}{value}"
+
+    @staticmethod
+    def split(tag: str):
+        return tag.split(Tag.TAG_DELIMITER, maxsplit=1)
+
+
+class IncidentTagRelation(models.Model):
+    tag = models.ForeignKey(to=Tag, on_delete=models.CASCADE, related_name="incident_tag_relations")
+    incident = models.ForeignKey(to="Incident", on_delete=models.CASCADE, related_name="incident_tag_relations")
+    added_by = models.ForeignKey(to=User, on_delete=models.PROTECT, related_name="tags_added")
+    added_time = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["tag", "incident"], name="%(class)s_unique_tags_per_incident"),
+        ]
+
+    def __str__(self):
+        return f"Tag <{self.tag}> on incident #{self.incident.pk} added by {self.added_by}"
+
+
 class IncidentQuerySet(models.QuerySet):
     def stateful(self):
         return self.filter(end_time__isnull=False)
@@ -160,7 +210,9 @@ class IncidentQuerySet(models.QuerySet):
             incident.set_inactive()
 
     def prefetch_default_related(self):
-        return self.select_related("parent_object", "problem_type").prefetch_related("source__type", "object__type")
+        return self.select_related("parent_object", "problem_type").prefetch_related(
+            "incident_tag_relations__tag", "source__type", "object__type"
+        )
 
 
 # TODO: review whether fields should be nullable, and on_delete modes
@@ -256,6 +308,10 @@ class Incident(models.Model):
 
         self.end_time = timezone.now()
         self.save(update_fields=["end_time"])
+
+    @property
+    def tags(self):
+        return Tag.objects.filter(incident_tag_relations__incident=self)
 
     @property
     def incident_relations(self):

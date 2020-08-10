@@ -1,5 +1,8 @@
 from django.contrib import admin
 from django.contrib.admin import widgets
+from django.db.models.functions import Concat
+from django.utils.html import format_html_join
+from django.utils.safestring import mark_safe
 
 from .forms import AddSourceSystemForm
 from .models import (
@@ -7,12 +10,14 @@ from .models import (
     IncidentQuerySet,
     IncidentRelation,
     IncidentRelationType,
+    IncidentTagRelation,
     Object,
     ObjectType,
     ParentObject,
     ProblemType,
     SourceSystem,
     SourceSystemType,
+    Tag,
 )
 
 
@@ -92,6 +97,20 @@ class ProblemTypeAdmin(TextWidgetsOverrideModelAdmin):
     text_input_form_fields = ("name",)
 
 
+class TagAdmin(TextWidgetsOverrideModelAdmin):
+    list_display = ("get_str",)
+    search_fields = ("key", "value")
+    ordering = [Concat("key", "value")]
+
+    text_input_form_fields = ("key", "value")
+
+    def get_str(self, tag: Tag):
+        return str(tag)
+
+    get_str.short_description = "Tag"
+    get_str.admin_order_field = Concat("key", "value")
+
+
 class StatefulListFilter(admin.SimpleListFilter):
     title = "stateful"
     # Parameter for the filter that will be used in the URL query
@@ -141,11 +160,22 @@ class ActiveListFilter(admin.SimpleListFilter):
 
 
 class IncidentAdmin(TextWidgetsOverrideModelAdmin):
+    class IncidentTagRelationInline(admin.TabularInline):
+        model = IncidentTagRelation
+        ordering = ["tag__key", "tag__value"]
+        readonly_fields = ("added_time",)
+        raw_id_fields = ("tag", "added_by")
+        min_num = 1
+        extra = 0
+
+    inlines = [IncidentTagRelationInline]
+
     list_display = (
         "source_incident_id",
         "start_time",
         "end_time",
         "source",
+        "get_tags",
         "object",
         "parent_object",
         "details_url",
@@ -156,6 +186,8 @@ class IncidentAdmin(TextWidgetsOverrideModelAdmin):
         "source_incident_id",
         "source__name",
         "source__type",
+        "incident_tag_relations__tag__key",
+        "incident_tag_relations__tag__value",
         "object__name",
         "object__object_id",
         "object__type__name",
@@ -175,6 +207,15 @@ class IncidentAdmin(TextWidgetsOverrideModelAdmin):
     raw_id_fields = ("object", "parent_object")
     text_input_form_fields = ("source_incident_id",)
     url_input_form_fields = ("details_url", "ticket_url")
+
+    def get_tags(self, incident: Incident):
+        html_open_tag = '<div style="display: inline-block; white-space: nowrap;">'
+        html_bullet = "<b>&bull;</b>"
+        return format_html_join(
+            mark_safe("<br />"), f"{html_open_tag}{html_bullet} {{}}</div>", ((tag,) for tag in incident.tags)
+        )
+
+    get_tags.short_description = "Tags"
 
     def get_queryset(self, request):
         qs: IncidentQuerySet = super().get_queryset(request)
@@ -209,6 +250,7 @@ admin.site.register(ObjectType, ObjectTypeAdmin)
 admin.site.register(Object, ObjectAdmin)
 admin.site.register(ParentObject, ParentObjectAdmin)
 admin.site.register(ProblemType, ProblemTypeAdmin)
+admin.site.register(Tag, TagAdmin)
 admin.site.register(Incident, IncidentAdmin)
 
 admin.site.register(IncidentRelation, IncidentRelationAdmin)
