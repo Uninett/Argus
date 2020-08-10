@@ -1,6 +1,15 @@
 from rest_framework.relations import PrimaryKeyRelatedField
 
+from argus.auth.serializers import PhoneNumberSerializer
+
 from . import serializers
+
+
+__all__ = [
+    "TimeslotForeignKeyField",
+    "FilterManyToManyField",
+    "PhoneNumberForeignKeyField",
+]
 
 
 class TimeslotForeignKeyField(PrimaryKeyRelatedField):
@@ -25,3 +34,15 @@ class FilterManyToManyField(PrimaryKeyRelatedField):
 
     def to_representation(self, value):
         return serializers.FilterSerializer(value).data
+
+
+class PhoneNumberForeignKeyField(PrimaryKeyRelatedField):
+
+    def get_queryset(self):
+        return self.context["request"].user.phonenumbers.all()
+
+    def use_pk_only_optimization(self):
+        return False
+
+    def to_representation(self, value):
+        return PhoneNumberSerializer(value).data

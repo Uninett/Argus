@@ -1,7 +1,7 @@
 from django.db import IntegrityError
 from rest_framework import fields, serializers
 
-from .fields import FilterManyToManyField, TimeslotForeignKeyField
+from .fields import FilterManyToManyField, TimeslotForeignKeyField, PhoneNumberForeignKeyField
 from .models import Filter, NotificationProfile, TimeRecurrence, Timeslot
 from .validators import FilterStringValidator
 
@@ -92,11 +92,12 @@ class FilterSerializer(serializers.ModelSerializer):
 class NotificationProfileSerializer(serializers.ModelSerializer):
     timeslot = TimeslotForeignKeyField()
     filters = FilterManyToManyField(many=True)
+    phone_number = PhoneNumberForeignKeyField()
     media = fields.MultipleChoiceField(choices=NotificationProfile.Media.choices)
 
     class Meta:
         model = NotificationProfile
-        fields = ["pk", "timeslot", "filters", "media", "active"]
+        fields = ["pk", "timeslot", "filters", "media", "phone_number", "active"]
         read_only_fields = ["pk"]
 
     def create(self, validated_data):
