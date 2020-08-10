@@ -29,11 +29,11 @@ def get_or_create_default_instances():
 def create_fake_incident():
     MAX_ID = 2 ** 32 - 1
     MIN_ID = 1
-    _, _, source_system = get_or_create_default_instances()
+    argus_user, _, source_system = get_or_create_default_instances()
     objtype = ObjectType.objects.all()[0]
     obj, _ = Object.objects.get_or_create(name='Object created via "create_fake_incident"', type=objtype)
     problem_type = ProblemType.objects.all()[0]
-    incident = Incident(
+    incident = Incident.objects.create(
         start_time=timezone.now(),
         end_time="infinity",
         source_incident_id=randint(MIN_ID, MAX_ID),
@@ -42,8 +42,8 @@ def create_fake_incident():
         problem_type=problem_type,
         description='Incident created via "create_fake_incident"',
     )
-    incident.save()
-    # TODO: Use method on Incident queryset instead
+    for tag in Tag.objects.all()[:3]:
+        IncidentTagRelation.objects.create(tag=tag, incident=incident, added_by=argus_user)
     return incident
 
 
