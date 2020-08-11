@@ -17,7 +17,7 @@ class SourceSystemPostingTests(APITestCase):
         user_token = Token.objects.create(user=self.user1)
 
         self.rest_client = APIClient()
-        self.rest_client.credentials(HTTP_AUTHORIZATION="Token " + user_token.key)
+        self.rest_client.credentials(HTTP_AUTHORIZATION=f"Token {user_token.key}")
         self.django_client = Client()
         self.django_client.login(username=self.user1.username, password=password)
 

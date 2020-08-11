@@ -186,7 +186,7 @@ class IncidentRelationAdmin(admin.ModelAdmin):
 
     raw_id_fields = ("incident1", "incident2")
 
-    def get_str(self, incident_relation):
+    def get_str(self, incident_relation: IncidentRelation):
         return str(incident_relation)
 
     get_str.short_description = "Incident relation"

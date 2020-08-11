@@ -127,7 +127,7 @@ class ViewTests(APITestCase, MockIncidentData):
         super().init_mock_data()
 
         user_token = Token.objects.create(user=self.user)
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + user_token.key)
+        self.client.credentials(HTTP_AUTHORIZATION=f"Token {user_token.key}")
 
         incident1_json = IncidentSerializer([self.incident1], many=True).data
         self.incident1_json = JSONRenderer().render(incident1_json)

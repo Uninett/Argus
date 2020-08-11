@@ -50,7 +50,7 @@ class DataportenOAuth2(BaseOAuth2):
     def user_data(self, access_token, *args, **kwargs):
         """Loads user data from service"""
         url = f"{self.BASE_URL}/userinfo"
-        response = self.get_json(url, headers={"Authorization": "Bearer " + access_token})
+        response = self.get_json(url, headers={"Authorization": f"Bearer {access_token}"})
         self.check_correct_audience(response["audience"])
 
         userdata = response["user"]
