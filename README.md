@@ -177,8 +177,6 @@ All endpoints require requests to contain a header with key `Authorization` and 
     ```json
     {
         "end_time": "infinity",
-        "details_url": "https://uninett.no/api/alerts/12345/",
-        "ticket_url": "https://tickettracker.com/tickets/987654/",
         "tags": [
             {"tag": "object=Netbox 4"},
             {"tag": "problem_type=boxDown"}
