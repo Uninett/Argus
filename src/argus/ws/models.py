@@ -1,8 +1,8 @@
-from django.dispatch import receiver
-from django.db.models.signals import post_save, post_delete
-
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
 from argus.incident.models import Incident
 from argus.incident.serializers import IncidentSerializer
 

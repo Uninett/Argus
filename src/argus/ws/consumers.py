@@ -1,9 +1,8 @@
-from channels.generic.websocket import AsyncJsonWebsocketConsumer, JsonWebsocketConsumer
-
 from asgiref.sync import async_to_sync
+from channels.generic.websocket import JsonWebsocketConsumer
+
 from argus.incident.models import Incident
 from argus.incident.serializers import IncidentSerializer
-
 from .models import SUBSCRIBED_ACTIVE_INCIDENTS
 
 

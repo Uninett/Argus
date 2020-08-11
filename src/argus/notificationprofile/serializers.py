@@ -1,7 +1,7 @@
 from django.db import IntegrityError
 from rest_framework import fields, serializers
 
-from .fields import FilterManyToManyField, TimeslotForeignKeyField, PhoneNumberForeignKeyField
+from .fields import FilterManyToManyField, PhoneNumberForeignKeyField, TimeslotForeignKeyField
 from .models import Filter, NotificationProfile, TimeRecurrence, Timeslot
 from .validators import FilterStringValidator
 

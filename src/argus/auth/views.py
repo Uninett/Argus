@@ -4,10 +4,8 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
 from argus.drf.permissions import IsOwner
-
 from .models import PhoneNumber
-from .serializers import UserSerializer
-from .serializers import PhoneNumberSerializer
+from .serializers import PhoneNumberSerializer, UserSerializer
 
 
 @api_view(["GET"])

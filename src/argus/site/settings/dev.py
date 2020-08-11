@@ -1,12 +1,11 @@
 import logging.config
-from django.utils.log import DEFAULT_LOGGING
 
+from django.utils.log import DEFAULT_LOGGING
 from dotenv import load_dotenv
 
 load_dotenv()
 
 from .base import *
-
 
 
 DEBUG = get_bool_env("DEBUG", True)
@@ -60,43 +59,45 @@ SOCIAL_AUTH_DATAPORTEN_FEIDE_SECRET = SOCIAL_AUTH_DATAPORTEN_SECRET
 
 LOGGING_CONFIG = None
 
+# fmt: off
 logging.config.dictConfig({
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'console': {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "console": {
             # exact format is not important, this is the minimum information
-            'format': '%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
+            "format": "%(asctime)s %(name)-12s %(levelname)-8s %(message)s",
         },
-        'django.server': DEFAULT_LOGGING['formatters']['django.server'],
+        "django.server": DEFAULT_LOGGING["formatters"]["django.server"],
     },
-    'handlers': {
-        'null': {
-            'class': 'logging.NullHandler',
+    "handlers": {
+        "null": {
+            "class": "logging.NullHandler",
 
         },
-        'console': {
-            'class': 'logging.StreamHandler',
-            'formatter': 'console',
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "console",
         },
-        'django.server': DEFAULT_LOGGING['handlers']['django.server'],
+        "django.server": DEFAULT_LOGGING["handlers"]["django.server"],
     },
-    'loggers': {
+    "loggers": {
         # root logger
-        '': {
-            'level': 'DEBUG',
-            'handlers': ['console',],
+        "": {
+            "level": "DEBUG",
+            "handlers": ["console"],
         },
-        'django.db.backends': {
-            'handlers': ['null'],
-            'level': 'NOTSET',
-            'propagate': False,
+        "django.db.backends": {
+            "handlers": ["null"],
+            "level": "NOTSET",
+            "propagate": False,
         },
-        'django.utils.autoreload': {
-            'handlers': ['null'],
-            'level': 'NOTSET',
-            'propagate': False,
+        "django.utils.autoreload": {
+            "handlers": ["null"],
+            "level": "NOTSET",
+            "propagate": False,
         },
-        #'django.server': DEFAULT_LOGGING['loggers']['django.server'],
+        #"django.server": DEFAULT_LOGGING["loggers"]["django.server"],
     },
 })
+# fmt: on

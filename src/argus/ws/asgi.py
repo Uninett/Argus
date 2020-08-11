@@ -7,6 +7,7 @@ https://channels.readthedocs.io/en/latest/deploying.html#run-protocol-servers
 """
 
 import os
+
 import django
 from channels.routing import get_default_application
 

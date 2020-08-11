@@ -57,7 +57,7 @@ class EmailNotification(NotificationMedium):
             if not EMAIL_PORT:
                 LOG.error("Notification: Email: EMAIL_PORT not set, cannot send")
             if EMAIL_HOST and EMAIL_PORT:
-                LOG.error("Notification: Email: Connection refused to \"%s\", port \"%s\"", EMAIL_HOST, EMAIL_PORT)
+                LOG.error('Notification: Email: Connection refused to "%s", port "%s"', EMAIL_HOST, EMAIL_PORT)
             # TODO: Store error as incident
 
 
@@ -70,22 +70,22 @@ MODEL_REPRESENTATION_TO_CLASS = {
 
 def send_notifications_to_users(incident: Incident):
     if not getattr(settings, "SEND_NOTIFICATIONS", False):
-        LOG.info("Notification: turned off sitewide, not sending for \"%s\"", incident)
+        LOG.info('Notification: turned off sitewide, not sending for "%s"', incident)
         return
     # TODO: only send one notification per medium per user
-    LOG.info("Notification: sending incident \"%s\"", incident)
+    LOG.info('Notification: sending incident "%s"', incident)
     for profile in NotificationProfile.objects.select_related("user"):
         if profile.incident_fits(incident):
             send_notification(profile.user, profile, incident)
     else:
-        LOG.info("Notification: no listeners for \"%s\"", incident)
+        LOG.info('Notification: no listeners for "%s"', incident)
         return
-    LOG.info("Notification: incident \"%s\" sent!", incident)
+    LOG.info('Notification: incident "%s" sent!', incident)
 
 
 def background_send_notifications_to_users(incident: Incident):
     connections.close_all()
-    LOG.info("Notification: backgrounded: about to send incident \"%s\"", incident)
+    LOG.info('Notification: backgrounded: about to send incident "%s"', incident)
     p = Process(target=send_notifications_to_users, args=(incident,))
     p.start()
     return p
@@ -102,9 +102,11 @@ def send_notification(user: User, profile: NotificationProfile, incident: Incide
 
 def get_notification_media(model_representations: List[str]):
     # This will never be a long list
-    media = [MODEL_REPRESENTATION_TO_CLASS[representation]
-             for representation in model_representations
-             if MODEL_REPRESENTATION_TO_CLASS[representation]]
+    media = [
+        MODEL_REPRESENTATION_TO_CLASS[representation]
+        for representation in model_representations
+        if MODEL_REPRESENTATION_TO_CLASS[representation]
+    ]
     if media:
         return media
     LOG.error("Notification: nowhere to send notifications!")
