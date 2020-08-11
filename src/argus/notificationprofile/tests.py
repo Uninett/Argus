@@ -12,9 +12,6 @@ from rest_framework.test import APITestCase
 from argus.auth.models import User
 from argus.incident.models import (
     Incident,
-    Object,
-    ObjectType,
-    ProblemType,
     SourceSystem,
     SourceSystemType,
 )
@@ -32,9 +29,6 @@ class MockIncidentData:
     user = None
     nav1 = None
     zabbix1 = None
-    object_type1 = None
-    object1 = None
-    problem_type1 = None
     incident1 = None
     incident2 = None
 
@@ -51,18 +45,7 @@ class MockIncidentData:
             name="Gløshaugen", type=zabbix_type, user=User.objects.create(username="zabbix.glos.no"),
         )
 
-        self.object_type1 = ObjectType.objects.create(name="box")
-        self.object1 = Object.objects.create(name="1", url="", type=self.object_type1)
-
-        self.problem_type1 = ProblemType.objects.create(name="boxDown", description="A box is down.")
-
-        self.incident1 = Incident.objects.create(
-            start_time=timezone.now(),
-            source=self.nav1,
-            source_incident_id="123",
-            object=self.object1,
-            problem_type=self.problem_type1,
-        )
+        self.incident1 = Incident.objects.create(start_time=timezone.now(), source=self.nav1, source_incident_id="123",)
         self.incident2 = Incident.objects.get(pk=self.incident1.pk)
         self.incident2.pk = None  # clones incident1
         self.incident2.source = self.zabbix1
@@ -123,18 +106,10 @@ class ModelTests(TestCase, MockIncidentData):
 
     def test_filter(self):
         filter1 = Filter.objects.create(
-            user=self.user,
-            name="Filter1",
-            filter_string="{"
-            f'"sourceSystemIds":[{self.nav1.pk}], "objectTypeIds":[], "parentObjectIds":[], "problemTypeIds":[]'
-            "}",
+            user=self.user, name="Filter1", filter_string="{" f'"sourceSystemIds": [{self.nav1.pk}]' "}",
         )
         filter2 = Filter.objects.create(
-            user=self.user,
-            name="Filter2",
-            filter_string="{"
-            f'"sourceSystemIds":[{self.zabbix1.pk}], "objectTypeIds":[], "parentObjectIds":[], "problemTypeIds":[]'
-            "}",
+            user=self.user, name="Filter2", filter_string="{" f'"sourceSystemIds": [{self.zabbix1.pk}]' "}",
         )
 
         self.assertTrue(filter1.incident_fits(self.incident1))
@@ -159,11 +134,7 @@ class ViewTests(APITestCase, MockIncidentData):
 
         timeslot1 = Timeslot.objects.create(user=self.user, name="Never")
         filter1 = Filter.objects.create(
-            user=self.user,
-            name="Critical incidents",
-            filter_string="{"
-            f'"sourceSystemIds":[{self.nav1.pk}], "objectTypeIds":[], "parentObjectIds":[], "problemTypeIds":[]'
-            "}",
+            user=self.user, name="Critical incidents", filter_string="{" f'"sourceSystemIds": [{self.nav1.pk}]' "}",
         )
         self.notification_profile1 = NotificationProfile.objects.create(user=self.user, timeslot=timeslot1)
         self.notification_profile1.filters.add(filter1)

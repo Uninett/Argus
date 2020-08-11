@@ -11,10 +11,6 @@ from .models import (
     IncidentRelation,
     IncidentRelationType,
     IncidentTagRelation,
-    Object,
-    ObjectType,
-    ParentObject,
-    ProblemType,
     SourceSystem,
     SourceSystemType,
     Tag,
@@ -57,44 +53,6 @@ class SourceSystemAdmin(TextWidgetsOverrideModelAdmin):
             kwargs["form"] = AddSourceSystemForm
 
         return super().get_form(request, obj, **kwargs)
-
-
-class ObjectTypeAdmin(TextWidgetsOverrideModelAdmin):
-    list_display = ("name",)
-    search_fields = ("name",)
-
-    text_input_form_fields = ("name",)
-
-
-class ObjectAdmin(TextWidgetsOverrideModelAdmin):
-    list_display = ("name", "object_id", "type", "source_system")
-    search_fields = ("name", "object_id", "type__name", "url")
-    list_filter = ("source_system", "source_system__type", "type")
-    list_select_related = ("type", "source_system")
-
-    text_input_form_fields = ("name", "object_id")
-    url_input_form_fields = ("url",)
-
-
-class ParentObjectAdmin(TextWidgetsOverrideModelAdmin):
-    list_display = ("get_str", "name", "url")
-    search_fields = ("name", "parentobject_id", "url")
-
-    text_input_form_fields = ("name", "parentobject_id")
-    url_input_form_fields = ("url",)
-
-    def get_str(self, parent_object):
-        return str(parent_object)
-
-    get_str.short_description = "Parent object"
-    get_str.admin_order_field = "parentobject_id"
-
-
-class ProblemTypeAdmin(TextWidgetsOverrideModelAdmin):
-    list_display = ("name", "description")
-    search_fields = ("name", "description")
-
-    text_input_form_fields = ("name",)
 
 
 class TagAdmin(TextWidgetsOverrideModelAdmin):
@@ -176,10 +134,7 @@ class IncidentAdmin(TextWidgetsOverrideModelAdmin):
         "end_time",
         "source",
         "get_tags",
-        "object",
-        "parent_object",
         "details_url",
-        "problem_type",
         "ticket_url",
     )
     search_fields = (
@@ -188,23 +143,14 @@ class IncidentAdmin(TextWidgetsOverrideModelAdmin):
         "source__type__name",
         "incident_tag_relations__tag__key",
         "incident_tag_relations__tag__value",
-        "object__name",
-        "object__object_id",
-        "object__type__name",
-        "parent_object__name",
-        "parent_object__parentobject_id",
-        "problem_type__name",
     )
     list_filter = (
         StatefulListFilter,
         ActiveListFilter,
         "source",
         "source__type",
-        "problem_type",
-        "object__type",
     )
 
-    raw_id_fields = ("object", "parent_object")
     text_input_form_fields = ("source_incident_id",)
     url_input_form_fields = ("details_url", "ticket_url")
 
@@ -220,7 +166,7 @@ class IncidentAdmin(TextWidgetsOverrideModelAdmin):
     def get_queryset(self, request):
         qs: IncidentQuerySet = super().get_queryset(request)
         # Reduce number of database calls
-        return qs.prefetch_default_related().prefetch_related("object__source_system__type")
+        return qs.prefetch_default_related()
 
 
 class IncidentRelationTypeAdmin(TextWidgetsOverrideModelAdmin):
@@ -246,10 +192,6 @@ class IncidentRelationAdmin(admin.ModelAdmin):
 
 admin.site.register(SourceSystemType, SourceSystemTypeAdmin)
 admin.site.register(SourceSystem, SourceSystemAdmin)
-admin.site.register(ObjectType, ObjectTypeAdmin)
-admin.site.register(Object, ObjectAdmin)
-admin.site.register(ParentObject, ParentObjectAdmin)
-admin.site.register(ProblemType, ProblemTypeAdmin)
 admin.site.register(Tag, TagAdmin)
 admin.site.register(Incident, IncidentAdmin)
 

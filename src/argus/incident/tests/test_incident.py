@@ -10,7 +10,7 @@ from rest_framework.test import APIClient, APITestCase
 from argus.auth.models import User
 from argus.site import datetime_utils
 from argus.site.utils import duplicate
-from ..models import Incident, Object, ObjectType, ProblemType, SourceSystem, SourceSystemType
+from ..models import Incident, SourceSystem, SourceSystemType
 
 
 class EndTimeInfinityFieldTests(TestCase):
@@ -18,16 +18,9 @@ class EndTimeInfinityFieldTests(TestCase):
         source_system_type = SourceSystemType.objects.create(name="Type")
         source_system_user = User.objects.create_user(username="system_1")
         source_system1 = SourceSystem.objects.create(name="System 1", type=source_system_type, user=source_system_user)
-        object_type = ObjectType.objects.create(name="ObjectType")
-        object1 = Object.objects.create(name="Object 1", object_id="123", type=object_type)
-        problem_type = ProblemType.objects.create(name="ProblemType")
 
         self.incident1 = Incident.objects.create(
-            start_time=make_aware(datetime(2000, 1, 1)),
-            source=source_system1,
-            source_incident_id="1",
-            object=object1,
-            problem_type=problem_type,
+            start_time=make_aware(datetime(2000, 1, 1)), source=source_system1, source_incident_id="1",
         )
         self.incident2 = duplicate(self.incident1, source_incident_id="2")
         self.incident3 = duplicate(self.incident1, source_incident_id="3")
@@ -123,17 +116,12 @@ class IncidentAPITests(APITestCase):
         source_system_type = SourceSystemType.objects.create(name="Type")
         source_system_user = User.objects.create_user(username="system_1")
         source_system1 = SourceSystem.objects.create(name="System 1", type=source_system_type, user=source_system_user)
-        object_type = ObjectType.objects.create(name="ObjectType")
-        object1 = Object.objects.create(name="Object 1", object_id="123", type=object_type)
-        problem_type = ProblemType.objects.create(name="ProblemType")
 
         self.stateful_incident1 = Incident.objects.create(
             start_time=make_aware(datetime(2000, 1, 1)),
             end_time=timezone.now(),
             source=source_system1,
             source_incident_id="1",
-            object=object1,
-            problem_type=problem_type,
         )
         self.stateless_incident1 = duplicate(self.stateful_incident1, end_time=None, source_incident_id="2")
 
