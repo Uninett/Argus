@@ -7,10 +7,6 @@ from rest_framework.exceptions import ValidationError
 
 from .models import (
     Incident,
-    Object,
-    ObjectType,
-    ParentObject,
-    ProblemType,
     SourceSystem,
     SourceSystemType,
 )
@@ -179,13 +175,13 @@ NAV_FIELD_MAPPING = FieldMapping(
         Incident.source: None,  # TODO: save source from posted incident
         Incident.source_incident_id: PassthroughField("history"),
         Incident.details_url: PassthroughField("alert_details_url"),
-        Incident.problem_type: ForeignKeyField(
-            ProblemType,
-            {
-                ProblemType.name: PassthroughField(NestedKey("alert_type")["name"]),
-                ProblemType.description: PassthroughField(NestedKey("alert_type")["description"]),
-            },
-        ),
+        # Incident.problem_type: ForeignKeyField(
+        #     ProblemType,
+        #     {
+        #         ProblemType.name: PassthroughField(NestedKey("alert_type")["name"]),
+        #         ProblemType.description: PassthroughField(NestedKey("alert_type")["description"]),
+        #     },
+        # ),
         Incident.description: PassthroughField("message"),
         # None:               ('on_maintenance',
         #                      'acknowledgement',
@@ -197,40 +193,40 @@ NAV_FIELD_MAPPING = FieldMapping(
         #                      'source',
         #                      'device'),
     },
-    Choose(
-        arg={
-            Incident.object: ForeignKeyField(
-                Object,
-                {
-                    Object.name: PassthroughField("subject"),
-                    Object.object_id: PassthroughField("netbox"),
-                    Object.url: PassthroughField("subject_url"),
-                    Object.type: ForeignKeyField(ObjectType, {ObjectType.name: PassthroughField("subject_type")}),
-                },
-            ),
-            Incident.parent_object: None,
-        },
-        if_value_of="subid",
-        is_one_of=("", None),
-        else_arg={
-            Incident.object: ForeignKeyField(
-                Object,
-                {
-                    Object.name: PassthroughField("subject"),
-                    Object.object_id: PassthroughField("subid"),
-                    Object.url: PassthroughField("subject_url"),
-                    Object.type: ForeignKeyField(ObjectType, {ObjectType.name: PassthroughField("subject_type")}),
-                },
-            ),
-            Incident.parent_object: ForeignKeyField(
-                ParentObject,
-                {
-                    ParentObject.parentobject_id: PassthroughField("netbox"),
-                    ParentObject.url: PassthroughField("netbox_history_url"),
-                },
-            ),
-        },
-    ),
+    # Choose(
+    #     arg={
+    #         Incident.object: ForeignKeyField(
+    #             Object,
+    #             {
+    #                 Object.name: PassthroughField("subject"),
+    #                 Object.object_id: PassthroughField("netbox"),
+    #                 Object.url: PassthroughField("subject_url"),
+    #                 Object.type: ForeignKeyField(ObjectType, {ObjectType.name: PassthroughField("subject_type")}),
+    #             },
+    #         ),
+    #         Incident.parent_object: None,
+    #     },
+    #     if_value_of="subid",
+    #     is_one_of=("", None),
+    #     else_arg={
+    #         Incident.object: ForeignKeyField(
+    #             Object,
+    #             {
+    #                 Object.name: PassthroughField("subject"),
+    #                 Object.object_id: PassthroughField("subid"),
+    #                 Object.url: PassthroughField("subject_url"),
+    #                 Object.type: ForeignKeyField(ObjectType, {ObjectType.name: PassthroughField("subject_type")}),
+    #             },
+    #         ),
+    #         Incident.parent_object: ForeignKeyField(
+    #             ParentObject,
+    #             {
+    #                 ParentObject.parentobject_id: PassthroughField("netbox"),
+    #                 ParentObject.url: PassthroughField("netbox_history_url"),
+    #             },
+    #         ),
+    #     },
+    # ),
 )
 
 # TODO: remove once glue services have been implemented

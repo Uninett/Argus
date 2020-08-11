@@ -6,10 +6,6 @@ from . import fields
 from .models import (
     Incident,
     IncidentTagRelation,
-    Object,
-    ObjectType,
-    ParentObject,
-    ProblemType,
     SourceSystem,
     SourceSystemType,
     Tag,
@@ -40,36 +36,6 @@ class SourceSystemSerializer(RemovableFieldSerializer):
         model = SourceSystem
         fields = ["pk", "name", "type", "user"]
         read_only_fields = ["pk", "type", "user"]
-
-
-class ObjectTypeSerializer(RemovableFieldSerializer):
-    class Meta:
-        model = ObjectType
-        fields = ["pk", "name"]
-        read_only_fields = ["pk"]
-
-
-class ObjectSerializer(RemovableFieldSerializer):
-    type = ObjectTypeSerializer()
-
-    class Meta:
-        model = Object
-        fields = ["pk", "name", "object_id", "url", "type"]
-        read_only_fields = ["pk"]
-
-
-class ParentObjectSerializer(RemovableFieldSerializer):
-    class Meta:
-        model = ParentObject
-        fields = ["pk", "name", "parentobject_id", "url"]
-        read_only_fields = ["pk"]
-
-
-class ProblemTypeSerializer(RemovableFieldSerializer):
-    class Meta:
-        model = ProblemType
-        fields = ["pk", "name", "description"]
-        read_only_fields = ["pk"]
 
 
 class IncidentTagRelationSerializer(RemovableFieldSerializer):
@@ -116,9 +82,6 @@ class IncidentSerializer(RemovableFieldSerializer):
     end_time = fields.DateTimeInfinitySerializerField(required=False, allow_null=True)
     source = SourceSystemSerializer(read_only=True)
     tags = IncidentTagRelationSerializer(many=True, write_only=True)
-    object = ObjectSerializer()
-    parent_object = ParentObjectSerializer()
-    problem_type = ProblemTypeSerializer()
 
     class Meta:
         model = Incident
@@ -129,10 +92,7 @@ class IncidentSerializer(RemovableFieldSerializer):
             "source",
             "source_incident_id",
             "tags",
-            "object",
-            "parent_object",
             "details_url",
-            "problem_type",
             "description",
             "ticket_url",
         ]
@@ -142,24 +102,11 @@ class IncidentSerializer(RemovableFieldSerializer):
         assert "user" in validated_data
         assert "source" in validated_data
         user = validated_data.pop("user")
-        source = validated_data["source"]
 
-        object_data = validated_data.pop("object")
-        object_type_data = object_data.pop("type")
-        parent_object_data = validated_data.pop("parent_object")
-        problem_type_data = validated_data.pop("problem_type")
         tags_data = validated_data.pop("tags")
-
-        object_type, _created = ObjectType.objects.get_or_create(**object_type_data)
-        object_, _created = Object.objects.get_or_create(source_system=source, type=object_type, **object_data)
-        parent_object, _created = ParentObject.objects.get_or_create(**parent_object_data)
-        problem_type, _created = ProblemType.objects.get_or_create(**problem_type_data)
-
         tags = {Tag.objects.get_or_create(**tag_data)[0] for tag_data in tags_data}
 
-        incident = Incident.objects.create(
-            object=object_, parent_object=parent_object, problem_type=problem_type, **validated_data,
-        )
+        incident = Incident.objects.create(**validated_data)
         for tag in tags:
             IncidentTagRelation.objects.create(tag=tag, incident=incident, added_by=user)
 
@@ -196,10 +143,7 @@ class IncidentPureDeserializer(serializers.ModelSerializer):
         fields = [
             "end_time",
             "tags",
-            "object",
-            "parent_object",
             "details_url",
-            "problem_type",
             "ticket_url",
         ]
 
@@ -263,9 +207,6 @@ class IncidentPureDeserializer(serializers.ModelSerializer):
 # TODO: remove once it's not in use anymore
 class IncidentSerializer_legacy(RemovableFieldSerializer):
     source = SourceSystemSerializer(read_only=True)
-    object = ObjectSerializer(read_only=True)
-    parent_object = ParentObjectSerializer(read_only=True)
-    problem_type = ProblemTypeSerializer(read_only=True)
 
     class Meta:
         model = Incident
@@ -275,10 +216,7 @@ class IncidentSerializer_legacy(RemovableFieldSerializer):
             "end_time",
             "source",
             "source_incident_id",
-            "object",
-            "parent_object",
             "details_url",
-            "problem_type",
             "description",
             "ticket_url",
         ]

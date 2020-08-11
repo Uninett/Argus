@@ -15,9 +15,6 @@ from . import mappings
 from .forms import AddSourceSystemForm
 from .models import (
     Incident,
-    ObjectType,
-    ParentObject,
-    ProblemType,
     SourceSystem,
     SourceSystemType,
 )
@@ -26,9 +23,6 @@ from .serializers import (
     IncidentPureDeserializer,
     IncidentSerializer,
     IncidentSerializer_legacy,
-    ObjectTypeSerializer,
-    ParentObjectSerializer,
-    ProblemTypeSerializer,
     SourceSystemSerializer,
     SourceSystemTypeSerializer,
 )
@@ -167,13 +161,7 @@ class ActiveIncidentList(generics.ListAPIView):
 @api_view(["GET"])
 def get_all_meta_data_view(request):
     source_systems = SourceSystemSerializer(SourceSystem.objects.select_related("type"), many=True)
-    object_types = ObjectTypeSerializer(ObjectType.objects.all(), many=True)
-    parent_objects = ParentObjectSerializer(ParentObject.objects.all(), many=True)
-    problem_types = ProblemTypeSerializer(ProblemType.objects.all(), many=True)
     data = {
         "sourceSystems": source_systems.data,
-        "objectTypes": object_types.data,
-        "parentObjects": parent_objects.data,
-        "problemTypes": problem_types.data,
     }
     return Response(data)

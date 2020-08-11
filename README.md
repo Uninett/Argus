@@ -119,28 +119,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
                 "user": 12
             },
             "source_incident_id": "12345",
-            "object": {
-                "pk": 11,
-                "name": "Netbox 4",
-                "object_id": "112233",
-                "url": "https://uninett.no/api/objects/112233/",
-                "type": {
-                    "pk": 1,
-                    "name": "Netbox"
-                }
-            },
-            "parent_object": {
-                "pk": 5,
-                "name": "SuperNetbox",
-                "parentobject_id": "445566",
-                "url": "https://uninett.no/api/objects/445566/"
-            },
             "details_url": "https://uninett.no/api/alerts/12345/",
-            "problem_type": {
-                "pk": 1,
-                "name": "boxDown",
-                "description": "Box declared down."
-            },
             "description": "Netbox 11 <12345> down.",
             "ticket_url": "https://tickettracker.com/tickets/987654/",
             "tags": [
@@ -177,24 +156,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
         "start_time": "2011-11-11 11:11:11.11111",
         "end_time": null,
         "source_incident_id": "12345",
-        "object": {
-            "name": "Netbox 11",
-            "object_id": "112233",
-            "url": "https://uninett.no/api/objects/112233/",
-            "type": {
-                "name": "Netbox"
-            }
-        },
-        "parent_object": {
-            "name": "SuperNetbox",
-            "parentobject_id": "445566",
-            "url": "https://uninett.no/api/objects/445566/"
-        },
         "details_url": "https://uninett.no/api/alerts/12345/",
-        "problem_type": {
-            "name": "boxDown",
-            "description": "Box declared down."
-        },
         "description": "Netbox 11 <12345> down.",
         "ticket_url": "https://tickettracker.com/tickets/987654/",
         "tags": [
@@ -215,7 +177,6 @@ All endpoints require requests to contain a header with key `Authorization` and 
     ```json
     {
         "end_time": "infinity",
-        "parent_object": 99,
         "details_url": "https://uninett.no/api/alerts/12345/",
         "ticket_url": "https://tickettracker.com/tickets/987654/",
         "tags": [
@@ -227,10 +188,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
 
     The fields allowed to be modified are:
     * `end_time`
-    * `object`
-    * `parent_object`
     * `details_url`
-    * `problem_type`
     * `ticket_url`
     * `tags`
     </details>
@@ -342,7 +300,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
     ```json
     {
         "name": "Critical incidents",
-        "filter_string": "{\"sourceSystemIds\":[<SourceSystem.pk>, ...], \"objectTypeIds\":[<ObjectType.pk>, ...], \"parentObjectIds\":[<ParentObject.pk>, ...], \"problemTypeIds\":[<ProblemType.pk>, ...]}"
+        "filter_string": "{\"sourceSystemIds\": [<SourceSystem.pk>, ...]}"
     }
     ```
     </details>
@@ -359,10 +317,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
 
   ```json
   {
-      "sourceSystemIds": [<SourceSystem.pk>, ...],
-      "objectTypeIds": [<ObjectType.pk>, ...],
-      "parentObjectIds": [<ParentObject.pk>, ...],
-      "problemTypeIds": [<ProblemType.pk>, ...]
+      "sourceSystemIds": [<SourceSystem.pk>, ...]
   }
   ```
   </details>

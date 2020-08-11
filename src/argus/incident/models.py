@@ -30,16 +30,11 @@ def create_fake_incident():
     MAX_ID = 2 ** 32 - 1
     MIN_ID = 1
     argus_user, _, source_system = get_or_create_default_instances()
-    objtype = ObjectType.objects.all()[0]
-    obj, _ = Object.objects.get_or_create(name='Object created via "create_fake_incident"', type=objtype)
-    problem_type = ProblemType.objects.all()[0]
     incident = Incident.objects.create(
         start_time=timezone.now(),
         end_time="infinity",
         source_incident_id=randint(MIN_ID, MAX_ID),
         source=source_system,
-        object=obj,
-        problem_type=problem_type,
         description='Incident created via "create_fake_incident"',
     )
     for tag in Tag.objects.all()[:3]:
@@ -76,65 +71,6 @@ class SourceSystem(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.type})"
-
-
-class ObjectType(models.Model):
-    name = models.TextField()
-
-    class Meta:
-        ordering = ["name"]
-
-    def __str__(self):
-        return self.name
-
-
-class Object(models.Model):
-    name = models.TextField()
-    object_id = models.TextField(blank=True, verbose_name="object ID")
-    url = models.TextField(validators=[URLValidator], verbose_name="URL")
-    type = models.ForeignKey(to=ObjectType, on_delete=models.CASCADE, related_name="instances")
-    source_system = models.ForeignKey(
-        to=SourceSystem,
-        on_delete=models.CASCADE,
-        null=True,
-        related_name="object_set",  # can't be `objects`, because it will override the model's `.objects` manager
-    )
-
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=["object_id", "source_system"], name="%(class)s_unique_object_id_per_source_system",
-            ),
-            models.UniqueConstraint(
-                fields=["name", "type", "source_system"], name="%(class)s_unique_name_and_type_per_source_system",
-            ),
-        ]
-
-    def __str__(self):
-        return f"{self.type}: {self.name} ({self.source_system}) <ID {self.object_id}>"
-
-
-class ParentObject(models.Model):
-    name = models.TextField(blank=True)
-    parentobject_id = models.TextField(verbose_name="parent object ID")
-    url = models.TextField(blank=True, validators=[URLValidator], verbose_name="URL")
-
-    class Meta:
-        ordering = ["name"]
-
-    def __str__(self):
-        return f"{self.name or ''} <ID {self.parentobject_id}>"
-
-
-class ProblemType(models.Model):
-    name = models.TextField()
-    description = models.TextField()
-
-    class Meta:
-        ordering = ["name"]
-
-    def __str__(self):
-        return self.name
 
 
 class Tag(models.Model):
@@ -210,9 +146,7 @@ class IncidentQuerySet(models.QuerySet):
             incident.set_inactive()
 
     def prefetch_default_related(self):
-        return self.select_related("parent_object", "problem_type").prefetch_related(
-            "incident_tag_relations__tag", "source__type", "object__type"
-        )
+        return self.prefetch_related("incident_tag_relations__tag", "source__type")
 
 
 # TODO: review whether fields should be nullable, and on_delete modes
@@ -232,27 +166,7 @@ class Incident(models.Model):
         help_text="The source system that the incident originated in.",
     )
     source_incident_id = models.TextField(verbose_name="source incident ID")
-    object = models.ForeignKey(
-        to=Object,
-        on_delete=models.CASCADE,
-        related_name="incidents",
-        help_text="The most specific object that the incident is about.",
-    )
-    parent_object = models.ForeignKey(
-        to=ParentObject,
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-        related_name="incidents",
-        help_text="An object that the above `object` is possibly a part of.",
-    )
     details_url = models.TextField(blank=True, validators=[URLValidator], verbose_name="details URL")
-    problem_type = models.ForeignKey(
-        to=ProblemType,
-        on_delete=models.CASCADE,
-        related_name="incidents",
-        help_text="The type of problem that the incident is about.",
-    )
     description = models.TextField(blank=True)
     ticket_url = models.TextField(
         blank=True,
@@ -276,7 +190,7 @@ class Incident(models.Model):
             end_time_str = f" - {get_infinity_repr(self.end_time, str_repr=True) or self.end_time}"
         else:
             end_time_str = ""
-        return f"{self.start_time}{end_time_str} [{self.problem_type}: {self.object}]"
+        return f"{self.start_time}{end_time_str}"
 
     def save(self, *args, **kwargs):
         # Parse and replace `end_time`, to avoid having to call `refresh_from_db()`

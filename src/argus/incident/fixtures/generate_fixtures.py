@@ -30,9 +30,6 @@ WORD_LENGTH_RANGE = (2, 10)
 MIN_TIMESTAMP = timezone.get_current_timezone().localize(datetime(2000, 1, 1))
 # SourceSystem:
 NUM_SOURCE_SYSTEMS_PER_TYPE = 3
-# ObjectType:
-NUM_OBJECT_TYPES = 10
-OBJECT_TYPE_NAME_LENGTH_RANGE = (3, 7)
 # Object:
 NUM_OBJECTS = 50
 OBJECT_NAME_WORD_COUNT_RANGE = (2, 5)
@@ -44,7 +41,6 @@ PARENT_OBJECT_NAME_WORD_COUNT_RANGE = (1, 2)
 # ProblemType:
 NUM_PROBLEM_TYPES = 10
 PROBLEM_TYPE_NAME_WORD_COUNT_RANGE = (2, 3)
-PROBLEM_TYPE_DESCRIPTION_WORD_COUNT_RANGE = (5, 20)
 # Incident:
 NUM_INCIDENTS = 200
 INCIDENT_START_TIME_NOW_CHANCE = 1 / 5
@@ -134,16 +130,7 @@ def generate_source_systems(source_system_types) -> Tuple[List[Model], List[Mode
     return tuples
 
 
-def generate_object_types() -> List[Model]:
-    object_types = []
-    for _ in range(NUM_OBJECT_TYPES):
-        name = random_word(OBJECT_TYPE_NAME_LENGTH_RANGE).title()
-        object_types.append(ObjectType(name=name))
-
-    return set_pks(object_types)
-
-
-def generate_objects(object_types, source_systems) -> List[Model]:
+def generate_object_names() -> List[str]:
     def random_object_word() -> str:
         # Will most often be an empty string, sometimes a single digit, and rarely a double digit
         suffix = (
@@ -153,10 +140,8 @@ def generate_objects(object_types, source_systems) -> List[Model]:
         )
         return random_word() + suffix
 
-    objects = []
+    object_names = []
     for _ in range(NUM_OBJECTS):
-
-        # Generate name
         name_words = []
         for _ in range(random_int(OBJECT_NAME_WORD_COUNT_RANGE)):
             if roll_dice(COMPOSITE_WORD_CHANCE):
@@ -165,49 +150,27 @@ def generate_objects(object_types, source_systems) -> List[Model]:
             else:
                 word = random_object_word().title()
             name_words.append(word)
-        name = " ".join(name_words)
+        object_names.append(" ".join(name_words))
 
-        source_system = random.choice(source_systems)
-
-        objects.append(
-            Object(
-                name=name,
-                object_id=random_id(),
-                url=format_url(source_system, name),
-                type=random.choice(object_types),
-                source_system=source_system,
-            )
-        )
-
-    return set_pks(objects)
+    return object_names
 
 
-def generate_parent_objects(source_systems) -> List[Model]:
-    parent_objects = []
-    for _ in range(NUM_PARENT_OBJECTS):
-        source_system = random.choice(source_systems)
-        name = random_words(PARENT_OBJECT_NAME_WORD_COUNT_RANGE).title()
-
-        parent_objects.append(ParentObject(name=name, parentobject_id=random_id(), url=format_url(source_system, name)))
-
-    return set_pks(parent_objects)
+def generate_parent_object_names() -> List[str]:
+    return [random_words(PARENT_OBJECT_NAME_WORD_COUNT_RANGE).title() for _ in range(NUM_PARENT_OBJECTS)]
 
 
-def generate_problem_types() -> List[Model]:
-    problem_types = []
+def generate_problem_type_names() -> List[str]:
+    problem_type_names = []
     for _ in range(NUM_PROBLEM_TYPES):
         name = "".join(w.title() for w in random_word_list(PROBLEM_TYPE_NAME_WORD_COUNT_RANGE))
         # Make first letter lower case
         name = name[0].lower() + name[1:]
+        problem_type_names.append(name)
 
-        description = random_description(PROBLEM_TYPE_DESCRIPTION_WORD_COUNT_RANGE)
-
-        problem_types.append(ProblemType(name=name, description=description))
-
-    return set_pks(problem_types)
+    return problem_type_names
 
 
-def generate_incidents(source_systems, objects, parent_objects, problem_types) -> List[Model]:
+def generate_incidents(source_systems) -> List[Model]:
     second_delay = timedelta(seconds=1)
 
     incidents = []
@@ -245,10 +208,7 @@ def generate_incidents(source_systems, objects, parent_objects, problem_types) -
                 end_time=end_time,
                 source=source_system,
                 source_incident_id=source_incident_id,
-                object=random.choice(objects),
-                parent_object=random.choice(parent_objects),
                 details_url=format_url(source_system, source_incident_id),
-                problem_type=random.choice(problem_types),
                 description=random_description(INCIDENT_DESCRIPTION_WORD_COUNT_RANGE),
             )
         )
@@ -256,30 +216,27 @@ def generate_incidents(source_systems, objects, parent_objects, problem_types) -
     return set_pks(incidents)
 
 
-def generate_tags_and_relations(incidents) -> Tuple[List[Model], List[Model]]:
-    tags_dict = {}
-    tag_relations = []
-    fields_to_tag = ("object", "parent_object", "problem_type")
-    for incident in incidents:
-        for field in fields_to_tag:
-            # `.name` works, because the above fields' model classes all have a `name` field
-            value = getattr(incident, field).name
-            key = field
-            tag = Tag(key=key, value=value)
-            tags_dict[(key, value)] = tag
-            tag_relations.append(
-                IncidentTagRelation(
-                    tag=tag, incident=incident, added_by=incident.source.user, added_time=incident.start_time
-                )
-            )
+def generate_tags_and_relations(
+    incidents, object_names, parent_object_names, problem_type_names
+) -> Tuple[List[Model], List[Model]]:
+    def create_tag_relation_from_random_choice(collection, incident_):
+        return IncidentTagRelation(
+            tag=random.choice(collection),
+            incident=incident_,
+            added_by=incident_.source.user,
+            added_time=incident_.start_time,
+        )
 
-    tags = list(tags_dict.values())
-    set_pks(tags)
-    # Reassign tag after PKs have been set, to prevent `null` values in the JSON
-    for tag_relation in tag_relations:
-        old_tag = tag_relation.tag
-        updated_tag = tags_dict[(old_tag.key, old_tag.value)]
-        tag_relation.tag = updated_tag
+    object_tags = [Tag(key="object", value=name) for name in object_names]
+    parent_object_tags = [Tag(key="parent_object", value=name) for name in parent_object_names]
+    problem_type_tags = [Tag(key="problem_type", value=name) for name in problem_type_names]
+    tags = set_pks(object_tags + parent_object_tags + problem_type_tags)
+
+    tag_relations = []
+    for incident in incidents:
+        tag_relations.append(create_tag_relation_from_random_choice(object_tags, incident))
+        tag_relations.append(create_tag_relation_from_random_choice(parent_object_tags, incident))
+        tag_relations.append(create_tag_relation_from_random_choice(problem_type_tags, incident))
 
     return tags, set_pks(tag_relations)
 
@@ -287,21 +244,16 @@ def generate_tags_and_relations(incidents) -> Tuple[List[Model], List[Model]]:
 def create_fixture_file():
     source_system_types = generate_source_system_types()
     source_systems, source_system_users = generate_source_systems(source_system_types)
-    object_types = generate_object_types()
-    objects = generate_objects(object_types, source_systems)
-    parent_objects = generate_parent_objects(source_systems)
-    problem_types = generate_problem_types()
-    incidents = generate_incidents(source_systems, objects, parent_objects, problem_types)
-    tags, tag_relations = generate_tags_and_relations(incidents)
+    object_names = generate_object_names()
+    parent_object_names = generate_parent_object_names()
+    problem_type_names = generate_problem_type_names()
+    incidents = generate_incidents(source_systems)
+    tags, tag_relations = generate_tags_and_relations(incidents, object_names, parent_object_names, problem_type_names)
 
     all_objects = (
         *source_system_types,
         *source_system_users,
         *source_systems,
-        *object_types,
-        *objects,
-        *parent_objects,
-        *problem_types,
         *incidents,
         *tags,
         *tag_relations,

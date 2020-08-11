@@ -10,7 +10,7 @@ from multiselectfield import MultiSelectField
 
 from argus.auth.models import User
 from argus.incident.models import Incident
-from argus.site.utils import AttrGetter, NestedAttrGetter
+from argus.site.utils import AttrGetter
 
 
 class Timeslot(models.Model):
@@ -105,9 +105,6 @@ def sort_days(sender, instance: TimeRecurrence, *args, **kwargs):
 class Filter(models.Model):
     FILTER_STRING_FIELDS = {
         "sourceSystemIds": AttrGetter("source"),
-        "objectTypeIds": NestedAttrGetter("object.type"),
-        "parentObjectIds": AttrGetter("parent_object"),
-        "problemTypeIds": AttrGetter("problem_type"),
     }
 
     user = models.ForeignKey(to=User, on_delete=models.CASCADE, related_name="filters")
