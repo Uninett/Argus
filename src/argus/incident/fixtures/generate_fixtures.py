@@ -241,7 +241,7 @@ def generate_tags_and_relations(
     return tags, set_pks(tag_relations)
 
 
-def create_fixture_file():
+def create_fixture_file(file_path=INCIDENT_FIXTURES_FILE):
     source_system_types = generate_source_system_types()
     source_systems, source_system_users = generate_source_systems(source_system_types)
     object_names = generate_object_names()
@@ -259,8 +259,8 @@ def create_fixture_file():
         *tag_relations,
     )
 
-    INCIDENT_FIXTURES_FILE.parent.mkdir(parents=True, exist_ok=True)
-    with INCIDENT_FIXTURES_FILE.open("w") as f:
+    file_path.parent.mkdir(parents=True, exist_ok=True)
+    with file_path.open("w") as f:
         serializers.serialize("json", all_objects, stream=f)
 
 
