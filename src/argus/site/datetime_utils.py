@@ -47,7 +47,7 @@ def get_infinity_repr(value, *, str_repr):
 def get_infinity_time(value):
     if isinstance(value, datetime):
         value = make_naive(value)
-        if value in (INFINITY, NEGATIVE_INFINITY):
+        if value in {INFINITY, NEGATIVE_INFINITY}:
             return make_aware(value)
     elif isinstance(value, str):
         return parse_infinity(value)

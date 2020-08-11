@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import User, PhoneNumber
+from .models import PhoneNumber, User
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -10,7 +10,6 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class PhoneNumberSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = PhoneNumber
         fields = ["pk", "user", "phone_number"]

@@ -19,7 +19,7 @@ class TimeslotAdmin(admin.ModelAdmin):
 
     raw_id_fields = ("user",)
 
-    def get_time_recurrences(self, timeslot):
+    def get_time_recurrences(self, timeslot: Timeslot):
         return format_html_join("", "<div>{}</div>", ((ts,) for ts in timeslot.time_recurrences.all()))
 
     get_time_recurrences.short_description = "Time recurrences"
@@ -70,18 +70,18 @@ class NotificationProfileAdmin(admin.ModelAdmin):
     raw_id_fields = ("user", "timeslot")
     filter_horizontal = ("filters",)
 
-    def get_str(self, notification_profile):
+    def get_str(self, notification_profile: NotificationProfile):
         return f"[{notification_profile.timeslot.user}] {notification_profile.timeslot}"
 
     get_str.short_description = "[User] Time slot"
     get_str.admin_order_field = Concat("timeslot__user", "timeslot__name")
 
-    def get_filters(self, notification_profile):
+    def get_filters(self, notification_profile: NotificationProfile):
         return format_html_join("", "<div>{}</div>", ((f,) for f in notification_profile.filters.all()))
 
     get_filters.short_description = "Filters"
 
-    def get_media(self, notification_profile):
+    def get_media(self, notification_profile: NotificationProfile):
         return notification_profile.get_media_display()
 
     get_media.short_description = "Notification media"

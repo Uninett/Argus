@@ -35,7 +35,7 @@ class SourceSystemSerializer(RemovableFieldSerializer):
     class Meta:
         model = SourceSystem
         fields = ["pk", "name", "type", "user"]
-        read_only_fields = ["pk", "type", "user"]
+        read_only_fields = ["type", "user"]
 
 
 class IncidentTagRelationSerializer(RemovableFieldSerializer):
@@ -91,12 +91,11 @@ class IncidentSerializer(RemovableFieldSerializer):
             "end_time",
             "source",
             "source_incident_id",
-            "tags",
             "details_url",
             "description",
             "ticket_url",
+            "tags",
         ]
-        read_only_fields = ["pk"]
 
     def create(self, validated_data: dict):
         assert "user" in validated_data
@@ -178,7 +177,7 @@ class IncidentPureDeserializer(serializers.ModelSerializer):
 
         return super().update(instance, validated_data)
 
-    def to_representation(self, instance):
+    def to_representation(self, instance: Incident):
         return IncidentSerializer(instance).data
 
     def validate_empty_values(self, data):
@@ -199,9 +198,7 @@ class IncidentPureDeserializer(serializers.ModelSerializer):
         return super().validate_empty_values(data)
 
     def validate_ticket_url(self, value):
-        validator = URLValidator()
-        validator(value)
-        return value
+        return IncidentSerializer().validate_ticket_url(value)
 
 
 # TODO: remove once it's not in use anymore
@@ -220,4 +217,3 @@ class IncidentSerializer_legacy(RemovableFieldSerializer):
             "description",
             "ticket_url",
         ]
-        read_only_fields = ["pk"]

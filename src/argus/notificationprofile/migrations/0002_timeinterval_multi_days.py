@@ -21,8 +21,8 @@ DAY_INDEX_TO_TEXT = {
 
 
 def convert_from_text_to_index(apps, schema_editor):
-    TimeInterval = apps.get_model("argus_notificationprofile", "timeinterval")
-    Timeslot = apps.get_model("argus_notificationprofile", "timeslot")
+    TimeInterval = apps.get_model("argus_notificationprofile", "TimeInterval")
+    Timeslot = apps.get_model("argus_notificationprofile", "Timeslot")
     for timeslot in Timeslot.objects.all():
         time_tuple_to_intervals = {}
         # Find time intervals with equal start and end
@@ -44,7 +44,7 @@ def convert_from_text_to_index(apps, schema_editor):
 
 
 def convert_from_index_to_text(apps, schema_editor):
-    TimeInterval = apps.get_model("argus_notificationprofile", "timeinterval")
+    TimeInterval = apps.get_model("argus_notificationprofile", "TimeInterval")
     for interval in TimeInterval.objects.all():
         # Create a new time interval for each day, with the times copied
         for day in interval.days:

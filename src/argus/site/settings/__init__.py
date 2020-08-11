@@ -32,9 +32,9 @@ def get_any_env(envname, required=False):
 def get_bool_env(envname, default=None, required=False):
     env = get_any_env(envname, required)
     env = str(env).lower()
-    if env in ("1", "on", "true", "yes"):
+    if env in {"1", "on", "true", "yes"}:
         return True
-    if env in ("0", "off", "false", "no"):
+    if env in {"0", "off", "false", "no"}:
         return False
     return default
 

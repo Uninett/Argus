@@ -1,7 +1,6 @@
 from rest_framework.relations import PrimaryKeyRelatedField
 
 from argus.auth.serializers import PhoneNumberSerializer
-
 from . import serializers
 
 
@@ -37,7 +36,6 @@ class FilterManyToManyField(PrimaryKeyRelatedField):
 
 
 class PhoneNumberForeignKeyField(PrimaryKeyRelatedField):
-
     def get_queryset(self):
         return self.context["request"].user.phonenumbers.all()
 

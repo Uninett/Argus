@@ -134,10 +134,12 @@ class IncidentAdmin(TextWidgetsOverrideModelAdmin):
         "end_time",
         "source",
         "get_tags",
+        "description",
         "details_url",
         "ticket_url",
     )
     search_fields = (
+        "description",
         "source_incident_id",
         "source__name",
         "source__type__name",
@@ -184,7 +186,7 @@ class IncidentRelationAdmin(admin.ModelAdmin):
 
     raw_id_fields = ("incident1", "incident2")
 
-    def get_str(self, incident_relation):
+    def get_str(self, incident_relation: IncidentRelation):
         return str(incident_relation)
 
     get_str.short_description = "Incident relation"

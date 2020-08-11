@@ -190,7 +190,7 @@ class Incident(models.Model):
             end_time_str = f" - {get_infinity_repr(self.end_time, str_repr=True) or self.end_time}"
         else:
             end_time_str = ""
-        return f"{self.start_time}{end_time_str}"
+        return f"Incident #{self.pk} at {self.start_time}{end_time_str} [#{self.source_incident_id} from {self.source}]"
 
     def save(self, *args, **kwargs):
         # Parse and replace `end_time`, to avoid having to call `refresh_from_db()`
@@ -250,5 +250,4 @@ class IncidentRelation(models.Model):
     description = models.TextField(blank=True)
 
     def __str__(self):
-        id_label = Incident.source_incident_id.field_name
-        return f"{id_label}#{self.incident1.source_incident_id} <{self.type}> {id_label}#{self.incident2.source_incident_id}"
+        return f"Incident #{self.incident1.pk} {self.type} #{self.incident2.pk}"
