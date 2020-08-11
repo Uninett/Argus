@@ -134,10 +134,12 @@ class IncidentAdmin(TextWidgetsOverrideModelAdmin):
         "end_time",
         "source",
         "get_tags",
+        "description",
         "details_url",
         "ticket_url",
     )
     search_fields = (
+        "description",
         "source_incident_id",
         "source__name",
         "source__type__name",
