@@ -35,7 +35,7 @@ class SourceSystemSerializer(RemovableFieldSerializer):
     class Meta:
         model = SourceSystem
         fields = ["pk", "name", "type", "user"]
-        read_only_fields = ["pk", "type", "user"]
+        read_only_fields = ["type", "user"]
 
 
 class IncidentTagRelationSerializer(RemovableFieldSerializer):
@@ -96,7 +96,6 @@ class IncidentSerializer(RemovableFieldSerializer):
             "description",
             "ticket_url",
         ]
-        read_only_fields = ["pk"]
 
     def create(self, validated_data: dict):
         assert "user" in validated_data
@@ -220,4 +219,3 @@ class IncidentSerializer_legacy(RemovableFieldSerializer):
             "description",
             "ticket_url",
         ]
-        read_only_fields = ["pk"]

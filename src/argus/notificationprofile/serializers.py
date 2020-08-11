@@ -46,7 +46,6 @@ class TimeslotSerializer(serializers.ModelSerializer):
     class Meta:
         model = Timeslot
         fields = ["pk", "name", "time_recurrences"]
-        read_only_fields = ["pk"]
 
     def create(self, validated_data):
         time_recurrences_data = validated_data.pop("time_recurrences")
@@ -86,7 +85,6 @@ class FilterSerializer(serializers.ModelSerializer):
     class Meta:
         model = Filter
         fields = ["pk", "name", "filter_string"]
-        read_only_fields = ["pk"]
 
 
 class NotificationProfileSerializer(serializers.ModelSerializer):
@@ -98,7 +96,6 @@ class NotificationProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = NotificationProfile
         fields = ["pk", "timeslot", "filters", "media", "phone_number", "active"]
-        read_only_fields = ["pk"]
 
     def create(self, validated_data):
         try:
