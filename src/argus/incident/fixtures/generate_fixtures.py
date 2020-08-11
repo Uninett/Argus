@@ -256,6 +256,34 @@ def generate_incidents(source_systems, objects, parent_objects, problem_types) -
     return set_pks(incidents)
 
 
+def generate_tags_and_relations(incidents) -> Tuple[List[Model], List[Model]]:
+    tags_dict = {}
+    tag_relations = []
+    fields_to_tag = ("object", "parent_object", "problem_type")
+    for incident in incidents:
+        for field in fields_to_tag:
+            # `.name` works, because the above fields' model classes all have a `name` field
+            value = getattr(incident, field).name
+            key = field
+            tag = Tag(key=key, value=value)
+            tags_dict[(key, value)] = tag
+            tag_relations.append(
+                IncidentTagRelation(
+                    tag=tag, incident=incident, added_by=incident.source.user, added_time=incident.start_time
+                )
+            )
+
+    tags = list(tags_dict.values())
+    set_pks(tags)
+    # Reassign tag after PKs have been set, to prevent `null` values in the JSON
+    for tag_relation in tag_relations:
+        old_tag = tag_relation.tag
+        updated_tag = tags_dict[(old_tag.key, old_tag.value)]
+        tag_relation.tag = updated_tag
+
+    return tags, set_pks(tag_relations)
+
+
 def create_fixture_file():
     source_system_types = generate_source_system_types()
     source_systems, source_system_users = generate_source_systems(source_system_types)
@@ -264,6 +292,7 @@ def create_fixture_file():
     parent_objects = generate_parent_objects(source_systems)
     problem_types = generate_problem_types()
     incidents = generate_incidents(source_systems, objects, parent_objects, problem_types)
+    tags, tag_relations = generate_tags_and_relations(incidents)
 
     all_objects = (
         *source_system_types,
@@ -274,6 +303,8 @@ def create_fixture_file():
         *parent_objects,
         *problem_types,
         *incidents,
+        *tags,
+        *tag_relations,
     )
 
     INCIDENT_FIXTURES_FILE.parent.mkdir(parents=True, exist_ok=True)

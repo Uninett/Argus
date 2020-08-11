@@ -143,6 +143,23 @@ All endpoints require requests to contain a header with key `Authorization` and 
             },
             "description": "Netbox 11 <12345> down.",
             "ticket_url": "https://tickettracker.com/tickets/987654/",
+            "tags": [
+                {
+                    "added_by": 12,
+                    "added_time": "2011-11-11T11:11:11.111111+02:00",
+                    "tag": "object=Netbox 4"
+                },
+                {
+                    "added_by": 12,
+                    "added_time": "2011-11-11T11:11:11.111111+02:00",
+                    "tag": "problem_type=boxDown"
+                },
+                {
+                    "added_by": 200,
+                    "added_time": "2020-08-10T11:26:14.550951+02:00",
+                    "tag": "color=red"
+                }
+            ],
             "stateful": true,
             "active": false
         }
@@ -179,7 +196,11 @@ All endpoints require requests to contain a header with key `Authorization` and 
             "description": "Box declared down."
         },
         "description": "Netbox 11 <12345> down.",
-        "ticket_url": "https://tickettracker.com/tickets/987654/"
+        "ticket_url": "https://tickettracker.com/tickets/987654/",
+        "tags": [
+            {"tag": "object=Netbox 4"},
+            {"tag": "problem_type=boxDown"}
+        ]
     }
     ```
     Refer to [this section](#explanation-of-terms) for an explanation of the fields.
@@ -196,9 +217,22 @@ All endpoints require requests to contain a header with key `Authorization` and 
         "end_time": "infinity",
         "parent_object": 99,
         "details_url": "https://uninett.no/api/alerts/12345/",
-        "ticket_url": "https://tickettracker.com/tickets/987654/"
+        "ticket_url": "https://tickettracker.com/tickets/987654/",
+        "tags": [
+            {"tag": "object=Netbox 4"},
+            {"tag": "problem_type=boxDown"}
+        ]
     }
     ```
+
+    The fields allowed to be modified are:
+    * `end_time`
+    * `object`
+    * `parent_object`
+    * `details_url`
+    * `problem_type`
+    * `ticket_url`
+    * `tags`
     </details>
 * `GET` to `/api/v1/incidents/active/`: returns all active incidents
 * `PUT` to `/api/v1/incidents/<int:pk>/active/`: changes a stateful incident's state to active by setting `end_time` to `"infinity"`
@@ -349,6 +383,9 @@ All endpoints require requests to contain a header with key `Authorization` and 
 * `object`: the most specific object that the `incident` is about.
 * `parent_object`: an object that the `object` is possibly a part of.
 * `problem_type`: the type of problem that the `incident` is about.
+* `tag`: a key-value pair separated by an equality sign (=), in the shape of a string.
+  * The key can consist of lowercase letters, numbers and underscores.
+  * The value can consist of any length of any characters.
 
 ### ER diagram
 ![ER diagram](img/ER_model.png)
