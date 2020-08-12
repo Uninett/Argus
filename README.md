@@ -53,6 +53,14 @@ A recap of the environment variables that can be set by default follows.
 * SECRET_KEY, used internally by django, should be about 50 chars of ascii
   noise (but avoid backspaces!)
 
+There are also settings (not env-variables) for which notification plugins to use:
+
+DEFAULT_SMS_MEDIA, which by default is unset, since there is no standardized
+way of sending SMSes. See **Notifications and notification plugins**.
+
+DEFAULT_EMAIL_MEDIA, which is included and uses Django's email backend. It is
+better to switch out the email backend than replcaing this plugin.
+
 *A Gmail account with "Allow less secure apps" turned on, was used in the development of this project.*
 
 ### Running tests
@@ -391,3 +399,9 @@ All endpoints require requests to contain a header with key `Authorization` and 
 
 ### ER diagram
 ![ER diagram](img/ER_model.png)
+
+## Notifications and notification plugins
+
+A notification plugin is a class that inherits from `argus.notificationprofile.media.base.NotificationMedium`. It has a `send(incident, user, **kwargs)` static method that does the actual sending.
+
+The included `argus.notificationprofile.media.email.EmailNotification` needs only `incident` and `user`, while an SMS medium in addition needs a `phone_number`. A `phone_number` is a string that includes the international calling code, see for instance [Wikipedia: List of mobile telephone prefixes by country](https://en.wikipedia.org/wiki/List_of_mobile_telephone_prefixes_by_country).
