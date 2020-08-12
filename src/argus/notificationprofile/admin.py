@@ -48,9 +48,12 @@ class HasPhoneNumberFilter(admin.SimpleListFilter):
         return ((self.YES, "Yes"), (self.NO, "No"))
 
     def queryset(self, request, queryset):
-        try:
-            value = bool(int(self.value()))
-        except ValueError:
+        value = self.value()
+        if not value:  # Filter turned off!
+            return queryset
+        try:  # Unknown value
+            value = bool(int(value))
+        except TypeError:
             return queryset
         return queryset.exclude(phone_number__isnull=value)
 
