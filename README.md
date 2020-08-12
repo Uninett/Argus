@@ -94,6 +94,51 @@ All endpoints require requests to contain a header with key `Authorization` and 
 * `POST` to `/oidc/api-token-auth/`: returns an auth token for the posted user
   * Example request body: `{ username: <username>, password: <password> }`
 * `/oidc/login/dataporten_feide/`: redirects to Feide login
+* `/api/v1/auth/phone-number/`: 
+  * `GET` returns the phone numbers of the logged in user
+    <details>
+    <summary>Example response body:</summary>
+    ```json
+    [
+      {
+        "pk": 2,
+        "user": 1,
+        "phone_number": "+4767676767"
+      },
+      {
+        "pk": 1,
+        "user": 1,
+        "phone_number": "+4790909090"
+      }
+    ]
+    ```
+    </details>
+  * `POST` creates and returns the phone numbers of the logged in user
+    <details>
+    <summary>Example request body:</summary>
+    ```json
+    {
+      "pk": 2,
+      "user": 1,
+      "phone_number": "+4767676767"
+    }
+    ```
+    </details>
+* `/api/v1/auth/phone-number/<int:pk>`: 
+  * `GET` returns the specific phone number of the logged in user
+    <details>
+    <summary>Example response body:</summary>
+    ```json
+    {
+      "pk": 2,
+      "user": 1,
+      "phone_number": "+4767676767"
+    },
+    ```
+    </details>
+  * `PUT`: updates and returns one of the logged in user's phone numbers by pk
+    * Example request body: same as `POST` to `/api/v1/auth/phone-number/`
+  * `DELETE`: deletes one of the logged in user's phone numbers by pk
 </details>
 
 <details>
@@ -217,6 +262,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
             "EM",
             "SM"
         ],
+        "phone_number": 1,
         "active": true
     }
     ```
