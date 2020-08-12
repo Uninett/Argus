@@ -95,9 +95,10 @@ All endpoints require requests to contain a header with key `Authorization` and 
   * Example request body: `{ username: <username>, password: <password> }`
 * `/oidc/login/dataporten_feide/`: redirects to Feide login
 * `/api/v1/auth/phone-number/`: 
-  * `GET` returns the phone numbers of the logged in user
+  * `GET`: returns the phone numbers of the logged in user
     <details>
     <summary>Example response body:</summary>
+ 
     ```json
     [
       {
@@ -113,9 +114,10 @@ All endpoints require requests to contain a header with key `Authorization` and 
     ]
     ```
     </details>
-  * `POST` creates and returns the phone numbers of the logged in user
+  * `POST`: creates and returns the phone numbers of the logged in user
     <details>
     <summary>Example request body:</summary>
+ 
     ```json
     {
       "pk": 2,
@@ -125,9 +127,10 @@ All endpoints require requests to contain a header with key `Authorization` and 
     ```
     </details>
 * `/api/v1/auth/phone-number/<int:pk>`: 
-  * `GET` returns the specific phone number of the logged in user
+  * `GET`: returns the specific phone number of the logged in user
     <details>
     <summary>Example response body:</summary>
+ 
     ```json
     {
       "pk": 2,
