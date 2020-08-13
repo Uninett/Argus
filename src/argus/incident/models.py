@@ -1,3 +1,6 @@
+from collections import defaultdict
+from functools import reduce
+from operator import and_
 from random import randint
 
 from django.core import validators
@@ -74,6 +77,16 @@ class SourceSystem(models.Model):
         return f"{self.name} ({self.type})"
 
 
+class TagQuerySet(models.QuerySet):
+    def parse(self, *tags):
+        "Return a list of querysets that match `tags`"
+        set_dict = defaultdict(set)
+        for k, v in (Tag.split(tag) for tag in tags):
+            set_dict[k].add(v)
+        querysets = [self.filter(key=k, value__in=v) for k, v in set_dict.items()]
+        return querysets
+
+
 class Tag(models.Model):
     TAG_DELIMITER = "="
 
@@ -87,6 +100,8 @@ class Tag(models.Model):
     )
     value = models.TextField()
 
+    objects = TagQuerySet.as_manager()
+
     class Meta:
         constraints = [
             models.UniqueConstraint(fields=["key", "value"], name="%(class)s_unique_key_and_value"),
@@ -99,13 +114,13 @@ class Tag(models.Model):
     def representation(self):
         return self.join(self.key, self.value)
 
-    @staticmethod
-    def join(key, value):
-        return f"{key}{Tag.TAG_DELIMITER}{value}"
+    @classmethod
+    def join(cls, key: str, value: str):
+        return f"{key}{cls.TAG_DELIMITER}{value}"
 
-    @staticmethod
-    def split(tag: str):
-        return tag.split(Tag.TAG_DELIMITER, maxsplit=1)
+    @classmethod
+    def split(cls, tag: str):
+        return tag.split(cls.TAG_DELIMITER, maxsplit=1)
 
 
 class IncidentTagRelation(models.Model):
@@ -148,6 +163,14 @@ class IncidentQuerySet(models.QuerySet):
 
     def prefetch_default_related(self):
         return self.prefetch_related("incident_tag_relations__tag", "source__type")
+
+    def from_tags(self, *tags):
+        tag_qss = Tag.objects.parse(*tags)
+        qs = []
+        for tag_qs in tag_qss:
+            qs.append(self.filter(incident_tag_relations__tag__in=tag_qs))
+        qs = reduce(and_, qs)
+        return qs.distinct()
 
 
 # TODO: review whether fields should be nullable, and on_delete modes
