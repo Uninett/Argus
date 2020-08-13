@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
 from django.db import models
 from django.db.models import Q
-from django.db.models.signals import pre_save
+from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from django.utils import timezone
 
@@ -231,6 +231,33 @@ class Incident(models.Model):
     def incident_relations(self):
         return IncidentRelation.objects.filter(Q(incident1=self) | Q(incident2=self))
 
+    @property
+    def start_event(self):
+        return self.events.get(type=Event.Type.INCIDENT_START)
+
+    @property
+    def end_event(self):
+        return self.events.get(type=Event.Type.INCIDENT_END)
+
+    @property
+    def last_close_or_end_event(self):
+        return self.events.order_by("timestamp").filter(type__in=(Event.Type.CLOSE, Event.Type.INCIDENT_END)).last()
+
+
+@receiver(post_save, sender=Incident)
+def create_start_event(sender, instance: Incident, created, raw, *args, **kwargs):
+    if raw or not created:
+        return
+    try:
+        _ = instance.start_event
+    except Event.DoesNotExist:
+        Event.objects.create(
+            incident=instance,
+            actor=instance.source.user,
+            timestamp=instance.start_time,
+            type=Event.Type.INCIDENT_START,
+        )
+
 
 class IncidentRelationType(models.Model):
     name = models.TextField()
@@ -251,3 +278,28 @@ class IncidentRelation(models.Model):
 
     def __str__(self):
         return f"Incident #{self.incident1.pk} {self.type} #{self.incident2.pk}"
+
+
+class Event(models.Model):
+    class Type(models.TextChoices):
+        INCIDENT_START = "STA", "Incident start"
+        INCIDENT_END = "END", "Incident end"
+        CLOSE = "CLO", "Close"
+        REOPEN = "REO", "Reopen"
+        ACKNOWLEDGE = "ACK", "Acknowledge"
+        OTHER = "OTH", "Other"
+
+    ALLOWED_TYPES_FOR_SOURCE_SYSTEMS = {Type.INCIDENT_START, Type.INCIDENT_END, Type.OTHER}
+    ALLOWED_TYPES_FOR_END_USERS = {Type.CLOSE, Type.REOPEN, Type.ACKNOWLEDGE, Type.OTHER}
+
+    incident = models.ForeignKey(to=Incident, on_delete=models.PROTECT, related_name="events")
+    actor = models.ForeignKey(to=User, on_delete=models.PROTECT, related_name="caused_events")
+    timestamp = models.DateTimeField()
+    type = models.CharField(choices=Type.choices, max_length=3)
+    description = models.TextField(blank=True)
+
+    class Meta:
+        ordering = ["-timestamp"]
+
+    def __str__(self):
+        return f"'{self.get_type_display()}' event by {self.actor} at {self.timestamp}"

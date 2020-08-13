@@ -6,6 +6,7 @@ from django.utils.safestring import mark_safe
 
 from .forms import AddSourceSystemForm
 from .models import (
+    Event,
     Incident,
     IncidentQuerySet,
     IncidentRelation,
@@ -192,10 +193,38 @@ class IncidentRelationAdmin(admin.ModelAdmin):
     get_str.short_description = "Incident relation"
 
 
+class EventAdmin(admin.ModelAdmin):
+    list_display = ("get_id", "timestamp", "type", "actor", "description")
+    search_fields = (
+        "incident__pk",
+        "incident__source_incident_id",
+        "incident__description",
+        "actor__username",
+        "actor__first_name",
+        "actor__last_name",
+        "description",
+    )
+    list_filter = ("type", "incident__source", "incident__source__type")
+
+    raw_id_fields = ("incident", "actor")
+
+    def get_id(self, event: Event):
+        source_incident_str = f"{event.incident.source_incident_id} in {event.incident.source}"
+        return mark_safe(f"#{event.incident.pk} &emsp; [{source_incident_str}]")
+
+    get_id.short_description = "Incident ID"
+    get_id.admin_order_field = "incident__pk"
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        # Reduce number of database calls
+        return qs.select_related("actor").prefetch_related("incident__source__type")
+
+
 admin.site.register(SourceSystemType, SourceSystemTypeAdmin)
 admin.site.register(SourceSystem, SourceSystemAdmin)
 admin.site.register(Tag, TagAdmin)
 admin.site.register(Incident, IncidentAdmin)
-
 admin.site.register(IncidentRelation, IncidentRelationAdmin)
 admin.site.register(IncidentRelationType, IncidentRelationTypeAdmin)
+admin.site.register(Event, EventAdmin)
