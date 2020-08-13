@@ -1,10 +1,8 @@
 import secrets
-from typing import Callable
 
-from django.core import exceptions as django_exceptions
 from django.db import IntegrityError
 from rest_framework import generics, mixins, serializers, status, viewsets
-from rest_framework.decorators import action, api_view
+from rest_framework.decorators import api_view
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -89,22 +87,6 @@ class IncidentViewSet(
         if self.request.method in {"PUT", "PATCH"}:
             return IncidentPureDeserializer
         return IncidentSerializer
-
-    @action(detail=True, methods=["PUT"])
-    def active(self, request, pk=None):
-        return self._set_state_action(lambda incident: incident.set_active())
-
-    @action(detail=True, methods=["PUT"])
-    def inactive(self, request, pk=None):
-        return self._set_state_action(lambda incident: incident.set_inactive())
-
-    def _set_state_action(self, set_state: Callable[[Incident], None]):
-        incident = self.get_object()
-        try:
-            set_state(incident)
-        except django_exceptions.ValidationError as e:
-            raise serializers.ValidationError(e)
-        return Response(self.get_serializer(incident).data)
 
     def perform_create(self, serializer):
         user = self.request.user

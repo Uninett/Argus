@@ -232,7 +232,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
 
     ```json
     {
-        "end_time": "infinity",
+        "ticket_url": "https://tickettracker.com/tickets/987654/",
         "tags": [
             {"tag": "object=Netbox 4"},
             {"tag": "problem_type=boxDown"}
@@ -241,7 +241,6 @@ All endpoints require requests to contain a header with key `Authorization` and 
     ```
 
     The fields allowed to be modified are:
-    * `end_time`
     * `details_url`
     * `ticket_url`
     * `tags`
@@ -309,8 +308,6 @@ All endpoints require requests to contain a header with key `Authorization` and 
 * `GET` to `/api/v1/incidents/<int:pk>/events/<int:pk>/`: returns a specific event related to the specified incident
 
 * `GET` to `/api/v1/incidents/active/`: returns all active incidents
-* `PUT` to `/api/v1/incidents/<int:pk>/active/`: changes a stateful incident's state to active by setting `end_time` to `"infinity"`
-* `PUT` to `/api/v1/incidents/<int:pk>/inactive/`: changes a stateful incident's state to inactive by setting `end_time` to now
 * `GET` to `/api/v1/incidents/metadata/`: returns relevant metadata for all incidents
 
 </details>

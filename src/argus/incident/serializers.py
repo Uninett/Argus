@@ -137,13 +137,11 @@ class IncidentSerializer(RemovableFieldSerializer):
 
 
 class IncidentPureDeserializer(serializers.ModelSerializer):
-    end_time = fields.DateTimeInfinitySerializerField(required=False, allow_null=True)
     tags = IncidentTagRelationSerializer(many=True, write_only=True)
 
     class Meta:
         model = Incident
         fields = [
-            "end_time",
             "tags",
             "details_url",
             "ticket_url",
