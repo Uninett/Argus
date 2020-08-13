@@ -37,7 +37,8 @@ def create_fake_incident():
         source=source_system,
         description='Incident created via "create_fake_incident"',
     )
-    for tag in Tag.objects.all()[:3]:
+    for k, v in (("location", "argus"), ("object", f"{incident.id}"), ("problem_type", "test")):
+        tag, _ = Tag.objects.get_or_create(key=k, value=v)
         IncidentTagRelation.objects.create(tag=tag, incident=incident, added_by=argus_user)
     return incident
 
