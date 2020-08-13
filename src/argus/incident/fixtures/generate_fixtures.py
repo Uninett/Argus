@@ -47,6 +47,8 @@ INCIDENT_START_TIME_NOW_CHANCE = 1 / 5
 INCIDENT_DESCRIPTION_WORD_COUNT_RANGE = (2, 10)
 INCIDENT_STATEFUL_CHANCE = 1 / 2
 STATEFUL_INCIDENT_ACTIVE_CHANCE = 1 / 5
+# Event:
+EVENT_OTHER_CHANCE = 1 / 5
 
 
 # --- Util functions ---
@@ -170,6 +172,13 @@ def generate_problem_type_names() -> List[str]:
     return problem_type_names
 
 
+# FIXME: hacky solution that relies purely on the fact that
+#  Django's `serializers.serialize()` calls `isoformat()` when serializing
+class InfinityDatetime:
+    def isoformat(self):
+        return "infinity"
+
+
 def generate_incidents(source_systems) -> List[Model]:
     second_delay = timedelta(seconds=1)
 
@@ -177,8 +186,8 @@ def generate_incidents(source_systems) -> List[Model]:
     for i in range(NUM_INCIDENTS):
         start_time_now = roll_dice(INCIDENT_START_TIME_NOW_CHANCE)
         if start_time_now:
-            # Adds a small delay between each incident with a "now" timestamp
-            start_time = timezone.now() + i * second_delay
+            # Ensures a small delay between each incident with a "now" timestamp
+            start_time = timezone.now() - i * second_delay
         else:
             start_time = random_timestamp()
 
@@ -187,12 +196,6 @@ def generate_incidents(source_systems) -> List[Model]:
 
         if roll_dice(INCIDENT_STATEFUL_CHANCE):
             if roll_dice(STATEFUL_INCIDENT_ACTIVE_CHANCE):
-                # FIXME: hacky solution that relies purely on the fact that
-                #  Django's `serializers.serialize()` calls `isoformat()` when serializing
-                class InfinityDatetime:
-                    def isoformat(self):
-                        return "infinity"
-
                 end_time = InfinityDatetime()
             elif start_time_now:
                 end_time = start_time + second_delay
@@ -241,6 +244,49 @@ def generate_tags_and_relations(
     return tags, set_pks(tag_relations)
 
 
+def generate_events(incidents) -> List[Model]:
+    def end_time_is_in_the_future(incident_: Incident):
+        if not incident_.stateful:
+            return False
+        return isinstance(incident_.end_time, InfinityDatetime) or incident_.active
+
+    events = []
+    for incident in incidents:
+        events.append(
+            Event(
+                incident=incident,
+                actor=incident.source.user,
+                timestamp=incident.start_time,
+                type=Event.Type.INCIDENT_START,
+            )
+        )
+        if incident.stateful and not end_time_is_in_the_future(incident):
+            events.append(
+                Event(
+                    incident=incident,
+                    actor=incident.source.user,
+                    timestamp=incident.end_time,
+                    type=Event.Type.INCIDENT_END,
+                )
+            )
+        if roll_dice(EVENT_OTHER_CHANCE):
+            if not incident.stateful or end_time_is_in_the_future(incident):
+                random_timedelta = (timezone.now() - incident.start_time) * random.random()
+            else:
+                random_timedelta = (incident.end_time - incident.start_time) * random.random()
+            events.append(
+                Event(
+                    incident=incident,
+                    actor=incident.source.user,
+                    timestamp=incident.start_time + random_timedelta,
+                    type=Event.Type.OTHER,
+                    description=f"Info: {random_description(INCIDENT_DESCRIPTION_WORD_COUNT_RANGE)}",
+                )
+            )
+
+    return set_pks(events)
+
+
 def create_fixture_file(file_path=INCIDENT_FIXTURES_FILE):
     source_system_types = generate_source_system_types()
     source_systems, source_system_users = generate_source_systems(source_system_types)
@@ -249,6 +295,7 @@ def create_fixture_file(file_path=INCIDENT_FIXTURES_FILE):
     problem_type_names = generate_problem_type_names()
     incidents = generate_incidents(source_systems)
     tags, tag_relations = generate_tags_and_relations(incidents, object_names, parent_object_names, problem_type_names)
+    events = generate_events(incidents)
 
     all_objects = (
         *source_system_types,
@@ -257,6 +304,7 @@ def create_fixture_file(file_path=INCIDENT_FIXTURES_FILE):
         *incidents,
         *tags,
         *tag_relations,
+        *events,
     )
 
     file_path.parent.mkdir(parents=True, exist_ok=True)
