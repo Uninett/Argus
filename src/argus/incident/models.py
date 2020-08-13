@@ -135,16 +135,6 @@ class IncidentQuerySet(models.QuerySet):
     def inactive(self):
         return self.filter(end_time__lte=timezone.now())
 
-    def set_active(self):
-        # Don't use update(), as it doesn't trigger signals
-        for incident in self.all():
-            incident.set_active()
-
-    def set_inactive(self):
-        # Don't use update(), as it doesn't trigger signals
-        for incident in self.all():
-            incident.set_inactive()
-
     def prefetch_default_related(self):
         return self.prefetch_related("incident_tag_relations__tag", "source__type")
 
@@ -205,7 +195,7 @@ class Incident(models.Model):
     def active(self):
         return self.stateful and self.end_time > timezone.now()
 
-    def set_active(self):
+    def set_active(self, actor: User):
         if not self.stateful:
             raise ValidationError("Cannot set a stateless incident as active")
         if self.active:
@@ -213,8 +203,9 @@ class Incident(models.Model):
 
         self.end_time = INFINITY_REPR
         self.save(update_fields=["end_time"])
+        Event.objects.create(incident=self, actor=actor, timestamp=timezone.now(), type=Event.Type.REOPEN)
 
-    def set_inactive(self):
+    def set_inactive(self, actor: User):
         if not self.stateful:
             raise ValidationError("Cannot set a stateless incident as inactive")
         if not self.active:
@@ -222,6 +213,7 @@ class Incident(models.Model):
 
         self.end_time = timezone.now()
         self.save(update_fields=["end_time"])
+        Event.objects.create(incident=self, actor=actor, timestamp=self.end_time, type=Event.Type.CLOSE)
 
     @property
     def tags(self):
