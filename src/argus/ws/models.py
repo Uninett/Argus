@@ -1,3 +1,4 @@
+import logging
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 from django.db.models.signals import post_save
@@ -6,6 +7,7 @@ from django.dispatch import receiver
 from argus.incident.models import Incident
 from argus.incident.serializers import IncidentSerializer
 
+LOG = logging.getLogger(__name__)
 SUBSCRIBED_ACTIVE_INCIDENTS = "subscribed_active_incidents"
 
 
@@ -20,4 +22,8 @@ def notify_on_change_or_create(sender, instance: Incident, created: bool, raw: b
         "type": type_str,
         "payload": serializer.data,
     }
-    async_to_sync(channel_layer.group_send)(SUBSCRIBED_ACTIVE_INCIDENTS, {"type": "notify", "content": content,})
+    try:
+        async_to_sync(channel_layer.group_send)(SUBSCRIBED_ACTIVE_INCIDENTS, {"type": "notify", "content": content,})
+    except ConnectionRefusedError as error:
+        LOG.error("Websockets: Could not push: %s", error)
+        # TODO: make a (non-signal inducing incident)
