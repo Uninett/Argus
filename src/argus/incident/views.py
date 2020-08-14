@@ -1,6 +1,7 @@
 import secrets
 
 from django.db import IntegrityError
+from django.urls import reverse
 from rest_framework import generics, mixins, serializers, status, viewsets
 from rest_framework.decorators import api_view
 from rest_framework.generics import get_object_or_404
@@ -22,6 +23,7 @@ from .models import (
 )
 from .parsers import StackedJSONParser
 from .serializers import (
+    AcknowledgementSerializer,
     EventSerializer,
     IncidentPureDeserializer,
     IncidentSerializer,
@@ -199,11 +201,34 @@ class EventViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, mixins.Retrie
                 self._raise_type_validation_error("Cannot change the state of a stateless incident.")
 
         if event_type == Event.Type.ACKNOWLEDGE:
-            self._raise_type_validation_error(f"The type '{event_type}' is not yet supported.")
+            acks_endpoint = reverse("incident:incident-acks", args=[incident.pk])
+            self._raise_type_validation_error(
+                f"Acknowledgements of this incidents should be posted through {acks_endpoint}."
+            )
 
     @staticmethod
     def _raise_type_validation_error(message: str):
         raise serializers.ValidationError({"type": message})
+
+
+class AcknowledgementViewSet(
+    mixins.ListModelMixin, mixins.CreateModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet
+):
+    permission_classes = [IsAuthenticated]
+    serializer_class = AcknowledgementSerializer
+
+    def get_queryset(self):
+        incident_pk = self.kwargs["incident_pk"]
+        incident = get_object_or_404(Incident.objects.all(), pk=incident_pk)
+        return incident.acks
+
+    def perform_create(self, serializer: AcknowledgementSerializer):
+        user = self.request.user
+        if hasattr(user, "source_system"):
+            EventViewSet._raise_type_validation_error("A source system cannot post acknowledgements.")
+
+        incident = Incident.objects.get(pk=self.kwargs["incident_pk"])
+        serializer.save(incident=incident, actor=user)
 
 
 @api_view(["GET"])

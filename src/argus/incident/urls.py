@@ -9,6 +9,9 @@ incident_detail = views.IncidentViewSet.as_view({"get": "retrieve", "patch": "pa
 event_list = views.EventViewSet.as_view({"get": "list", "post": "create"})
 event_detail = views.EventViewSet.as_view({"get": "retrieve"})
 
+ack_list = views.AcknowledgementViewSet.as_view({"get": "list", "post": "create"})
+ack_detail = views.AcknowledgementViewSet.as_view({"get": "retrieve"})
+
 app_name = "incident"
 urlpatterns = [
     path("", incident_list, name="incidents"),
@@ -16,6 +19,8 @@ urlpatterns = [
     path("<int:pk>/", incident_detail, name="incident"),
     path("<int:incident_pk>/events/", event_list, name="incident-events"),
     path("<int:incident_pk>/events/<int:pk>/", event_detail, name="incident-event"),
+    path("<int:incident_pk>/acks/", ack_list, name="incident-acks"),
+    path("<int:incident_pk>/acks/<int:pk>/", ack_detail, name="incident-ack"),
     path("active/", views.ActiveIncidentList.as_view(), name="incidents-active"),
     path("source-types/", views.SourceSystemTypeList.as_view(), name="source-types"),
     path("sources/", views.SourceSystemList.as_view(), name="sources"),

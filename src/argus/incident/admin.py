@@ -6,6 +6,7 @@ from django.utils.safestring import mark_safe
 
 from .forms import AddSourceSystemForm
 from .models import (
+    Acknowledgement,
     Event,
     Incident,
     IncidentQuerySet,
@@ -221,6 +222,56 @@ class EventAdmin(admin.ModelAdmin):
         return qs.select_related("actor").prefetch_related("incident__source__type")
 
 
+class AcknowledgementAdmin(admin.ModelAdmin):
+    list_display = ("get_id", "get_timestamp", "expiration", "get_actor", "get_description")
+    search_fields = (
+        "event__incident__pk",
+        "event__incident__source_incident_id",
+        "event__incident__description",
+        "event__actor__username",
+        "event__actor__first_name",
+        "event__actor__last_name",
+        "event__description",
+    )
+    list_filter = ("event__incident__source", "event__incident__source__type")
+
+    raw_id_fields = ("event",)
+
+    def get_readonly_fields(self, request, obj=None):
+        # Prevent `event` from being changed, as it contains the acknowledgement's data
+        return ("event",) if obj else ()
+
+    def get_id(self, ack: Acknowledgement):
+        source_incident_str = f"{ack.event.incident.source_incident_id} in {ack.event.incident.source}"
+        return mark_safe(f"#{ack.event.incident.pk} &emsp; [{source_incident_str}]")
+
+    get_id.short_description = "Incident ID"
+    get_id.admin_order_field = "event__indicent__pk"
+
+    def get_timestamp(self, ack: Acknowledgement):
+        return ack.event.timestamp
+
+    get_timestamp.short_description = "Timestamp"
+    get_timestamp.admin_order_field = "event__timestamp"
+
+    def get_actor(self, ack: Acknowledgement):
+        return ack.event.actor
+
+    get_actor.short_description = "Actor"
+    get_actor.admin_order_field = "event__actor"
+
+    def get_description(self, ack: Acknowledgement):
+        return ack.event.description
+
+    get_description.short_description = "Description"
+    get_description.admin_order_field = "event__description"
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        # Reduce number of database calls
+        return qs.prefetch_related("event__incident__source__type", "event__actor")
+
+
 admin.site.register(SourceSystemType, SourceSystemTypeAdmin)
 admin.site.register(SourceSystem, SourceSystemAdmin)
 admin.site.register(Tag, TagAdmin)
@@ -228,3 +279,4 @@ admin.site.register(Incident, IncidentAdmin)
 admin.site.register(IncidentRelation, IncidentRelationAdmin)
 admin.site.register(IncidentRelationType, IncidentRelationTypeAdmin)
 admin.site.register(Event, EventAdmin)
+admin.site.register(Acknowledgement, AcknowledgementAdmin)

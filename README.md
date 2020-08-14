@@ -284,8 +284,8 @@ All endpoints require requests to contain a header with key `Authorization` and 
     ```json
     {
         "timestamp": "2020-02-20 20:02:20.202021",
-        "type": "ACK",
-        "description": "The situation is under control!"
+        "type": "OTH",
+        "description": "The investigation is still ongoing."
     }
     ```
 
@@ -299,13 +299,70 @@ All endpoints require requests to contain a header with key `Authorization` and 
     * `REO` - Reopen
       * Only end users can post an event of this type, which reopens the incident if it's been closed (either manually or by a source system).
     * `ACK` - Acknowledge
-      # TODO: should not be posted through this endpoint, but rather through the ack endpoint
-      * Not yet supported
+      * Use the `/api/v1/incidents/<int:pk>/acks/` endpoint.
     * `OTH` - Other
       * Any other type of event, which simply provides information on something that happened related to an incident, without changing its state in any way.
     </details>
 
 * `GET` to `/api/v1/incidents/<int:pk>/events/<int:pk>/`: returns a specific event related to the specified incident
+
+* `/api/v1/incidents/<int:pk>/acks/`:
+  * `GET`: returns all acknowledgements of the specified incident
+    <details>
+    <summary>Example response body:</summary>
+
+    ```json
+    [
+        {
+            "pk": 2,
+            "event": {
+                "pk": 2,
+                "incident": 10101,
+                "actor": 140,
+                "timestamp": "2011-11-11T11:11:11.235877+02:00",
+                "type": {
+                    "value": "ACK",
+                    "display": "Acknowledge"
+                },
+                "description": "The incident is being investigated."
+            },
+            "expiration": "2011-11-13T12:00:00+02:00"
+        },
+        {
+            "pk": 20,
+            "event": {
+                "pk": 20,
+                "incident": 10101,
+                "actor": 130,
+                "timestamp": "2011-11-12T11:11:11+02:00",
+                "type": {
+                    "value": "ACK",
+                    "display": "Acknowledge"
+                },
+                "description": "The situation is under control!"
+            },
+            "expiration": null
+        }
+    ]
+    ```
+  * `POST`: creates and returns an acknowledgement of the specified incident
+    <details>
+    <summary>Example request body:</summary>
+
+    ```json
+    {
+        "event": {
+            "timestamp": "2011-11-11 11:11:11.235877",
+            "description": "The incident is being investigated."
+        },
+        "expiration": "2011-11-13 12:00:00"
+    }
+    ```
+    
+    Only end users can post acknowledgements.
+    </details>
+
+* `GET` to `/api/v1/incidents/<int:pk>/acks/<int:pk>/`: returns a specific acknowledgement of the specified incident
 
 * `GET` to `/api/v1/incidents/active/`: returns all active incidents
 * `GET` to `/api/v1/incidents/metadata/`: returns relevant metadata for all incidents
@@ -444,6 +501,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
 ### Explanation of terms
 * `incident`: an unplanned interruption in the source system.
 * `event`: something that happened related to an incident.
+* `acknowledgement`: an acknowledgement of an incident by a user.
 * `start_time`: the time the `incident` was created.
 * `end_time`: the time the `incident` was resolved or closed.
   * If `null`: the incident is stateless.

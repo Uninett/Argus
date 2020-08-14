@@ -8,7 +8,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
 from django.db import models
 from django.db.models import Q
-from django.db.models.signals import post_save, pre_save
+from django.db.models.signals import post_delete, post_save, pre_save
 from django.dispatch import receiver
 from django.utils import timezone
 
@@ -263,6 +263,10 @@ class Incident(models.Model):
     def last_close_or_end_event(self):
         return self.events.order_by("timestamp").filter(type__in=(Event.Type.CLOSE, Event.Type.INCIDENT_END)).last()
 
+    @property
+    def acks(self):
+        return Acknowledgement.objects.filter(event__incident=self)
+
 
 @receiver(post_save, sender=Incident)
 def create_start_event(sender, instance: Incident, created, raw, *args, **kwargs):
@@ -323,3 +327,23 @@ class Event(models.Model):
 
     def __str__(self):
         return f"'{self.get_type_display()}' event by {self.actor} at {self.timestamp}"
+
+
+class Acknowledgement(models.Model):
+    event = models.OneToOneField(to=Event, on_delete=models.PROTECT, primary_key=True, related_name="ack")
+    expiration = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["-event__timestamp"]
+
+    def __str__(self):
+        expiration_message = f" (expires {self.expiration})" if self.expiration else ""
+        return f"Acknowledgement of incident #{self.event.incident.pk} by {self.event.actor}{expiration_message}"
+
+
+# TODO: ensure that Django admin displays the event(s) that will be deleted when deleting Acknowledgements
+#  see https://docs.djangoproject.com/en/3.0/ref/contrib/admin/actions/ under the first "Warning" box
+@receiver(post_delete, sender=Acknowledgement)
+def delete_associated_event(sender, instance: Acknowledgement, *args, **kwargs):
+    if hasattr(instance, "event") and instance.event:
+        instance.event.delete()
