@@ -1,8 +1,9 @@
 import json
 from datetime import datetime, time
+from functools import reduce
+from operator import or_
 
 from django.db import models
-from django.db.models import Q
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from django.utils import timezone
@@ -10,7 +11,6 @@ from multiselectfield import MultiSelectField
 
 from argus.auth.models import User
 from argus.incident.models import Incident
-from argus.site.utils import AttrGetter
 
 
 class Timeslot(models.Model):
@@ -103,10 +103,6 @@ def sort_days(sender, instance: TimeRecurrence, *args, **kwargs):
 
 
 class Filter(models.Model):
-    FILTER_STRING_FIELDS = {
-        "sourceSystemIds": AttrGetter("source"),
-    }
-
     user = models.ForeignKey(to=User, on_delete=models.CASCADE, related_name="filters")
     name = models.CharField(max_length=40)
     filter_string = models.TextField()
@@ -125,27 +121,42 @@ class Filter(models.Model):
 
     @property
     def filtered_incidents(self):
-        return Incident.objects.filter(self.get_incident_query()).prefetch_default_related()
+        data = self.filter_json
+        filtered_by_source = self.incidents_with_source_systems(data)
+        filtered_by_tags = self.incidents_with_tags(data)
+        return filtered_by_source & filtered_by_tags
 
-    def get_incident_query(self):
-        json_dict = self.filter_json
-        incident_query = Q()
-        for filter_field_name, attr_getter in self.FILTER_STRING_FIELDS.items():
-            filter_field_value_list = json_dict[filter_field_name]
-            if filter_field_value_list:
-                incident_arg = {f"{attr_getter.query}__in": filter_field_value_list}
-                incident_query &= Q(**incident_arg)
-        return incident_query
+    def incidents_with_source_systems(self, data=None):
+        if not data:
+            data = self.filter_json
+        source_list = data.pop("sourceSystemIds", [])
+        if source_list:
+            return Incident.objects.filter(source__in=source_list)
+        return Incident.objects.all()
+
+    def source_system_fits(self, incident: Incident, data=None):
+        if not data:
+            data = self.filter_json
+        return self.incidents_with_source_systems(data).filter(id=incident.id).exists()
+
+    def incidents_with_tags(self, data=None):
+        if not data:
+            data = self.filter_json
+        tags_list = data.pop("tags", [])
+        if tags_list:
+            return Incident.objects.from_tags(*tags_list)
+        return Incident.objects.all()
+
+    def tags_fit(self, incident: Incident, data=None):
+        if not data:
+            data = self.filter_json
+        return self.incidents_with_tags(data).filter(id=incident.id).exists()
 
     def incident_fits(self, incident: Incident):
-        json_dict = self.filter_json
-        for filter_field_name, attr_getter in self.FILTER_STRING_FIELDS.items():
-            filter_field_value_set = set(json_dict[filter_field_name])
-            if filter_field_value_set:
-                incident_attr = attr_getter(incident)
-                if incident_attr.pk not in filter_field_value_set:
-                    return False
-        return True
+        data = self.filter_json
+        source_fits = self.source_system_fits(incident, data)
+        tags_fit = self.tags_fit(incident, data)
+        return source_fits and tags_fit
 
 
 class NotificationProfile(models.Model):
@@ -171,11 +182,8 @@ class NotificationProfile(models.Model):
 
     @property
     def filtered_incidents(self):
-        incident_query = Q()
-        for filter_ in self.filters.all():
-            incident_query |= filter_.get_incident_query()
-
-        return Incident.objects.filter(incident_query).prefetch_default_related()
+        qs = [filter_.filtered_incidents for filter_ in self.filters.all()]
+        return reduce(or_, qs)
 
     def incident_fits(self, incident: Incident):
         if not self.active:

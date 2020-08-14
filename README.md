@@ -414,7 +414,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
     ```json
     {
         "name": "Critical incidents",
-        "filter_string": "{\"sourceSystemIds\": [<SourceSystem.pk>, ...]}"
+        "filter_string": "{\"sourceSystemIds\": [<SourceSystem.pk>, ...], \"tags\": [\"key1=value1\", ...]}"
     }
     ```
     </details>
