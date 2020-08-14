@@ -86,6 +86,10 @@ class TagQuerySet(models.QuerySet):
         querysets = [self.filter(key=k, value__in=v) for k, v in set_dict.items()]
         return querysets
 
+    def create_from_tag(self, tag):
+        key, value = Tag.split(tag)
+        return self.create(key=key, value=value)
+
 
 class Tag(models.Model):
     TAG_DELIMITER = "="
