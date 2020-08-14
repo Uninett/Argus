@@ -12,8 +12,10 @@ from rest_framework.test import APITestCase
 from argus.auth.models import User
 from argus.incident.models import (
     Incident,
+    IncidentTagRelation,
     SourceSystem,
     SourceSystemType,
+    Tag,
 )
 from argus.incident.serializers import IncidentSerializer
 from argus.notificationprofile.models import (
@@ -31,6 +33,9 @@ class MockIncidentData:
     zabbix1 = None
     incident1 = None
     incident2 = None
+    tagstr1 = "object=1"
+    tagstr2 = "object=2"
+    tagstr3 = "location=Oslo"
 
     def init_mock_data(self):
         self.user = User.objects.create(username="asdf")
@@ -50,6 +55,15 @@ class MockIncidentData:
         self.incident2.pk = None  # clones incident1
         self.incident2.source = self.zabbix1
         self.incident2.save()
+
+        self.tag1 = Tag.objects.create_from_tag(self.tagstr1)
+        self.tag2 = Tag.objects.create_from_tag(self.tagstr2)
+        self.tag3 = Tag.objects.create_from_tag(self.tagstr3)
+
+        IncidentTagRelation.objects.create(tag=self.tag1, incident=self.incident1, added_by=self.user)
+        IncidentTagRelation.objects.create(tag=self.tag3, incident=self.incident1, added_by=self.user)
+        IncidentTagRelation.objects.create(tag=self.tag2, incident=self.incident2, added_by=self.user)
+        IncidentTagRelation.objects.create(tag=self.tag3, incident=self.incident2, added_by=self.user)
 
 
 def set_time(timestamp: datetime, new_time: str):
@@ -103,6 +117,31 @@ class ModelTests(TestCase, MockIncidentData):
             self.timeslot1.timestamp_is_within_time_recurrences(set_time(self.monday_datetime, "00:30:02"))
         )
         self.assertTrue(self.timeslot1.timestamp_is_within_time_recurrences(set_time(self.monday_datetime, "00:30:03")))
+
+    def test_source_fits(self):
+        filter1 = Filter.objects.create(
+            user=self.user, name="Filter1", filter_string="{" f'"sourceSystemIds": [{self.nav1.pk}]' "}",
+        )
+        filter2 = Filter.objects.create(
+            user=self.user, name="Filter2", filter_string="{" f'"sourceSystemIds": [{self.zabbix1.pk}]' "}",
+        )
+
+        self.assertTrue(filter1.source_system_fits(self.incident1))
+
+    def test_tags_fit(self):
+        filter1 = Filter.objects.create(
+            user=self.user, name="Filter1", filter_string="{" f'"tags": []' "}",
+        )
+        filter2 = Filter.objects.create(
+            user=self.user, name="Filter2", filter_string="{" f'"tags": ["object=1"]' "}",
+        )
+        filter3 = Filter.objects.create(
+            user=self.user, name="Filter3", filter_string="{" f'"tags": ["object=2"]' "}",
+        )
+
+        self.assertTrue(filter1.tags_fit(self.incident1))
+        self.assertTrue(filter2.tags_fit(self.incident1))
+        self.assertFalse(filter3.tags_fit(self.incident1))
 
     def test_filter(self):
         filter1 = Filter.objects.create(
