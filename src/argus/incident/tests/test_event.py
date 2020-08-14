@@ -7,8 +7,8 @@ from django.utils.dateparse import parse_datetime
 from django.utils.timezone import make_aware
 from rest_framework.test import APITestCase
 
-from argus.site import datetime_utils
-from argus.site.utils import duplicate
+from argus.util import datetime_utils
+from argus.util.utils import duplicate
 from .test_incident import IncidentBasedAPITestCaseHelper
 from ..models import Event, Incident
 

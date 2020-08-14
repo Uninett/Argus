@@ -13,7 +13,7 @@ from django.dispatch import receiver
 from django.utils import timezone
 
 from argus.auth.models import User
-from argus.site.datetime_utils import INFINITY_REPR, get_infinity_repr
+from argus.util.datetime_utils import INFINITY_REPR, get_infinity_repr
 from .fields import DateTimeInfinityField
 
 

@@ -3,7 +3,7 @@ from datetime import datetime
 import rest_framework.fields as rest_framework_fields
 from django.db import models
 
-import argus.site.datetime_utils as utils
+import argus.util.datetime_utils as utils
 
 
 class DateTimeInfinityField(models.DateTimeField):
