@@ -5,12 +5,12 @@ from django.db import IntegrityError, models
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
+from argus.util.mapping_utils import MappingUtils
 from .models import (
     Incident,
     SourceSystem,
     SourceSystemType,
 )
-from .utils import MappingUtils
 
 
 # TODO: move to tests

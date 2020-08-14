@@ -7,7 +7,7 @@ from django.utils.timezone import is_aware, make_aware
 from rest_framework.test import APIClient
 
 from argus.auth.models import User
-from argus.site.utils import duplicate
+from argus.util.utils import duplicate
 from ..models import Incident, SourceSystem, SourceSystemType
 
 

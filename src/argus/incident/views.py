@@ -12,7 +12,7 @@ from argus.auth.models import User
 from argus.drf.permissions import IsOwnerOrReadOnly, IsSuperuserOrReadOnly
 from argus.notificationprofile.media import background_send_notifications_to_users
 
-from argus.site.datetime_utils import INFINITY_REPR
+from argus.util.datetime_utils import INFINITY_REPR
 from . import mappings
 from .forms import AddSourceSystemForm
 from .models import (
