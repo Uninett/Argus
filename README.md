@@ -232,7 +232,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
 
     ```json
     {
-        "end_time": "infinity",
+        "ticket_url": "https://tickettracker.com/tickets/987654/",
         "tags": [
             {"tag": "object=Netbox 4"},
             {"tag": "problem_type=boxDown"}
@@ -241,14 +241,73 @@ All endpoints require requests to contain a header with key `Authorization` and 
     ```
 
     The fields allowed to be modified are:
-    * `end_time`
     * `details_url`
     * `ticket_url`
     * `tags`
     </details>
+
+* `/api/v1/incidents/<int:pk>/events/`:
+  * `GET`: returns all events related to the specified incident
+    <details>
+    <summary>Example response body:</summary>
+
+    ```json
+    [
+        {
+            "pk": 1,
+            "incident": 10101,
+            "actor": 12,
+            "timestamp": "2011-11-11T11:11:11+02:00",
+            "type": {
+                "value": "STA",
+                "display": "Incident start"
+            },
+            "description": ""
+        },
+        {
+            "pk": 20,
+            "incident": 10101,
+            "actor": 12,
+            "timestamp": "2011-11-11T11:11:12+02:00",
+            "type": {
+                "value": "END",
+                "display": "Incident end"
+            },
+            "description": ""
+        }
+    ]
+    ```
+  * `POST`: creates and returns an event related to the specified incident
+    <details>
+    <summary>Example request body:</summary>
+
+    ```json
+    {
+        "timestamp": "2020-02-20 20:02:20.202021",
+        "type": "ACK",
+        "description": "The situation is under control!"
+    }
+    ```
+
+    The valid `type`s are:
+    * `STA` - Incident start
+      * An incident automatically creates an event of this type when the incident is created, but cannot have more than one. In other words, it's never allowed to post an event of this type.
+    * `END` - Incident end
+      * Only source systems can post an event of this type, which is the standard way of closing an indicent. An incident cannot have more than one event of this type.
+    * `CLO` - Close
+      * Only end users can post an event of this type, which manually closes the incident.
+    * `REO` - Reopen
+      * Only end users can post an event of this type, which reopens the incident if it's been closed (either manually or by a source system).
+    * `ACK` - Acknowledge
+      # TODO: should not be posted through this endpoint, but rather through the ack endpoint
+      * Not yet supported
+    * `OTH` - Other
+      * Any other type of event, which simply provides information on something that happened related to an incident, without changing its state in any way.
+    </details>
+
+* `GET` to `/api/v1/incidents/<int:pk>/events/<int:pk>/`: returns a specific event related to the specified incident
+
 * `GET` to `/api/v1/incidents/active/`: returns all active incidents
-* `PUT` to `/api/v1/incidents/<int:pk>/active/`: changes a stateful incident's state to active by setting `end_time` to `"infinity"`
-* `PUT` to `/api/v1/incidents/<int:pk>/inactive/`: changes a stateful incident's state to inactive by setting `end_time` to now
 * `GET` to `/api/v1/incidents/metadata/`: returns relevant metadata for all incidents
 
 </details>
@@ -384,6 +443,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
 
 ### Explanation of terms
 * `incident`: an unplanned interruption in the source system.
+* `event`: something that happened related to an incident.
 * `start_time`: the time the `incident` was created.
 * `end_time`: the time the `incident` was resolved or closed.
   * If `null`: the incident is stateless.

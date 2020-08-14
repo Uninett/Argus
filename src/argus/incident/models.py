@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
 from django.db import models
 from django.db.models import Q
-from django.db.models.signals import pre_save
+from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from django.utils import timezone
 
@@ -135,16 +135,6 @@ class IncidentQuerySet(models.QuerySet):
     def inactive(self):
         return self.filter(end_time__lte=timezone.now())
 
-    def set_active(self):
-        # Don't use update(), as it doesn't trigger signals
-        for incident in self.all():
-            incident.set_active()
-
-    def set_inactive(self):
-        # Don't use update(), as it doesn't trigger signals
-        for incident in self.all():
-            incident.set_inactive()
-
     def prefetch_default_related(self):
         return self.prefetch_related("incident_tag_relations__tag", "source__type")
 
@@ -205,7 +195,7 @@ class Incident(models.Model):
     def active(self):
         return self.stateful and self.end_time > timezone.now()
 
-    def set_active(self):
+    def set_active(self, actor: User):
         if not self.stateful:
             raise ValidationError("Cannot set a stateless incident as active")
         if self.active:
@@ -213,8 +203,9 @@ class Incident(models.Model):
 
         self.end_time = INFINITY_REPR
         self.save(update_fields=["end_time"])
+        Event.objects.create(incident=self, actor=actor, timestamp=timezone.now(), type=Event.Type.REOPEN)
 
-    def set_inactive(self):
+    def set_inactive(self, actor: User):
         if not self.stateful:
             raise ValidationError("Cannot set a stateless incident as inactive")
         if not self.active:
@@ -222,6 +213,7 @@ class Incident(models.Model):
 
         self.end_time = timezone.now()
         self.save(update_fields=["end_time"])
+        Event.objects.create(incident=self, actor=actor, timestamp=self.end_time, type=Event.Type.CLOSE)
 
     @property
     def tags(self):
@@ -230,6 +222,33 @@ class Incident(models.Model):
     @property
     def incident_relations(self):
         return IncidentRelation.objects.filter(Q(incident1=self) | Q(incident2=self))
+
+    @property
+    def start_event(self):
+        return self.events.get(type=Event.Type.INCIDENT_START)
+
+    @property
+    def end_event(self):
+        return self.events.get(type=Event.Type.INCIDENT_END)
+
+    @property
+    def last_close_or_end_event(self):
+        return self.events.order_by("timestamp").filter(type__in=(Event.Type.CLOSE, Event.Type.INCIDENT_END)).last()
+
+
+@receiver(post_save, sender=Incident)
+def create_start_event(sender, instance: Incident, created, raw, *args, **kwargs):
+    if raw or not created:
+        return
+    try:
+        _ = instance.start_event
+    except Event.DoesNotExist:
+        Event.objects.create(
+            incident=instance,
+            actor=instance.source.user,
+            timestamp=instance.start_time,
+            type=Event.Type.INCIDENT_START,
+        )
 
 
 class IncidentRelationType(models.Model):
@@ -251,3 +270,28 @@ class IncidentRelation(models.Model):
 
     def __str__(self):
         return f"Incident #{self.incident1.pk} {self.type} #{self.incident2.pk}"
+
+
+class Event(models.Model):
+    class Type(models.TextChoices):
+        INCIDENT_START = "STA", "Incident start"
+        INCIDENT_END = "END", "Incident end"
+        CLOSE = "CLO", "Close"
+        REOPEN = "REO", "Reopen"
+        ACKNOWLEDGE = "ACK", "Acknowledge"
+        OTHER = "OTH", "Other"
+
+    ALLOWED_TYPES_FOR_SOURCE_SYSTEMS = {Type.INCIDENT_START, Type.INCIDENT_END, Type.OTHER}
+    ALLOWED_TYPES_FOR_END_USERS = {Type.CLOSE, Type.REOPEN, Type.ACKNOWLEDGE, Type.OTHER}
+
+    incident = models.ForeignKey(to=Incident, on_delete=models.PROTECT, related_name="events")
+    actor = models.ForeignKey(to=User, on_delete=models.PROTECT, related_name="caused_events")
+    timestamp = models.DateTimeField()
+    type = models.CharField(choices=Type.choices, max_length=3)
+    description = models.TextField(blank=True)
+
+    class Meta:
+        ordering = ["-timestamp"]
+
+    def __str__(self):
+        return f"'{self.get_type_display()}' event by {self.actor} at {self.timestamp}"

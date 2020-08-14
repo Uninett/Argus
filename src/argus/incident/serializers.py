@@ -1,9 +1,12 @@
+from collections import OrderedDict
+
 from django.core.validators import URLValidator
 from rest_framework import serializers
 
 from argus.auth.models import User
 from . import fields
 from .models import (
+    Event,
     Incident,
     IncidentTagRelation,
     SourceSystem,
@@ -134,13 +137,11 @@ class IncidentSerializer(RemovableFieldSerializer):
 
 
 class IncidentPureDeserializer(serializers.ModelSerializer):
-    end_time = fields.DateTimeInfinitySerializerField(required=False, allow_null=True)
     tags = IncidentTagRelationSerializer(many=True, write_only=True)
 
     class Meta:
         model = Incident
         fields = [
-            "end_time",
             "tags",
             "details_url",
             "ticket_url",
@@ -217,3 +218,33 @@ class IncidentSerializer_legacy(RemovableFieldSerializer):
             "description",
             "ticket_url",
         ]
+
+
+class EventSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Event
+        fields = [
+            "pk",
+            "incident",
+            "actor",
+            "timestamp",
+            "type",
+            "description",
+        ]
+        read_only_fields = ["incident", "actor"]
+
+    def update(self, *args, **kwargs):
+        """
+        Events should not be changed.
+        """
+        raise NotImplementedError()
+
+    def to_representation(self, instance: Event):
+        event_repr = super().to_representation(instance)
+
+        type_tuples = [
+            ("value", instance.type),
+            ("display", instance.get_type_display()),
+        ]
+        event_repr["type"] = OrderedDict(type_tuples)
+        return event_repr
