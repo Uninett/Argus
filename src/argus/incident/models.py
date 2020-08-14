@@ -155,6 +155,12 @@ class IncidentQuerySet(models.QuerySet):
     def inactive(self):
         return self.filter(end_time__lte=timezone.now())
 
+    def acked(self):
+        return self.filter(self._generate_acked_query()).distinct()
+
+    def not_acked(self):
+        return self.exclude(self._generate_acked_query())
+
     def prefetch_default_related(self):
         return self.prefetch_related("incident_tag_relations__tag", "source__type")
 
@@ -165,6 +171,13 @@ class IncidentQuerySet(models.QuerySet):
             qs.append(self.filter(incident_tag_relations__tag__in=tag_qs))
         qs = reduce(and_, qs)
         return qs.distinct()
+
+    # Cannot be a constant, because `timezone.now()` would have been evaluated at compile time
+    @staticmethod
+    def _generate_acked_query():
+        acks_query = Q(events__ack__isnull=False)
+        acks_not_expired_query = Q(events__ack__expiration__isnull=True) | Q(events__ack__expiration__gt=timezone.now())
+        return acks_query & acks_not_expired_query
 
 
 # TODO: review whether fields should be nullable, and on_delete modes
@@ -266,6 +279,12 @@ class Incident(models.Model):
     @property
     def acks(self):
         return Acknowledgement.objects.filter(event__incident=self)
+
+    @property
+    def acked(self):
+        acks_query = Q(ack__isnull=False)
+        acks_not_expired_query = Q(ack__expiration__isnull=True) | Q(ack__expiration__gt=timezone.now())
+        return self.events.filter(acks_query & acks_not_expired_query).exists()
 
 
 @receiver(post_save, sender=Incident)

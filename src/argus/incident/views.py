@@ -144,7 +144,7 @@ class ActiveIncidentList(generics.ListAPIView):
     serializer_class = IncidentSerializer
 
     def get_queryset(self):
-        return Incident.objects.active().prefetch_default_related()
+        return Incident.objects.active().not_acked().prefetch_default_related()
 
 
 class EventViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):

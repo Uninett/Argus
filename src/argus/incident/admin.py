@@ -119,6 +119,30 @@ class ActiveListFilter(admin.SimpleListFilter):
             return queryset.inactive()
 
 
+class AckedListFilter(admin.SimpleListFilter):
+    title = "acked"
+    # Parameter for the filter that will be used in the URL query
+    parameter_name = "acked"
+
+    ACKED = 1
+    NOT_ACKED = 0
+
+    def lookups(self, request, model_admin):
+        return (
+            (self.ACKED, "Yes"),
+            (self.NOT_ACKED, "No"),
+        )
+
+    def queryset(self, request, queryset: IncidentQuerySet):
+        if not self.value():
+            return queryset
+
+        if int(self.value()) == self.ACKED:
+            return queryset.acked()
+        else:
+            return queryset.not_acked()
+
+
 class IncidentAdmin(TextWidgetsOverrideModelAdmin):
     class IncidentTagRelationInline(admin.TabularInline):
         model = IncidentTagRelation
@@ -139,6 +163,8 @@ class IncidentAdmin(TextWidgetsOverrideModelAdmin):
         "description",
         "details_url",
         "ticket_url",
+        "get_open",
+        "get_shown",
     )
     search_fields = (
         "description",
@@ -151,6 +177,7 @@ class IncidentAdmin(TextWidgetsOverrideModelAdmin):
     list_filter = (
         StatefulListFilter,
         ActiveListFilter,
+        AckedListFilter,
         "source",
         "source__type",
     )
@@ -167,10 +194,22 @@ class IncidentAdmin(TextWidgetsOverrideModelAdmin):
 
     get_tags.short_description = "Tags"
 
+    def get_open(self, incident: Incident):
+        return incident.active
+
+    get_open.short_description = "Open"
+    get_open.boolean = True
+
+    def get_shown(self, incident: Incident):
+        return incident.active and not incident.acked
+
+    get_shown.short_description = "Shown"
+    get_shown.boolean = True
+
     def get_queryset(self, request):
         qs: IncidentQuerySet = super().get_queryset(request)
         # Reduce number of database calls
-        return qs.prefetch_default_related()
+        return qs.prefetch_default_related().prefetch_related("events__ack")
 
 
 class IncidentRelationTypeAdmin(TextWidgetsOverrideModelAdmin):

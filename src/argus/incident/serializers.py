@@ -129,6 +129,7 @@ class IncidentSerializer(RemovableFieldSerializer):
 
         incident_repr["stateful"] = instance.stateful
         incident_repr["active"] = instance.active
+        incident_repr["acked"] = instance.acked
         return incident_repr
 
     def validate_ticket_url(self, value):

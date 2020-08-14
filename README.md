@@ -196,7 +196,8 @@ All endpoints require requests to contain a header with key `Authorization` and 
                 }
             ],
             "stateful": true,
-            "active": false
+            "active": false,
+            "acked": false
         }
     ]
     ```
@@ -364,7 +365,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
 
 * `GET` to `/api/v1/incidents/<int:pk>/acks/<int:pk>/`: returns a specific acknowledgement of the specified incident
 
-* `GET` to `/api/v1/incidents/active/`: returns all active incidents
+* `GET` to `/api/v1/incidents/active/`: returns all active incidents that have not been acked
 * `GET` to `/api/v1/incidents/metadata/`: returns relevant metadata for all incidents
 
 </details>
@@ -501,7 +502,10 @@ All endpoints require requests to contain a header with key `Authorization` and 
 ### Explanation of terms
 * `incident`: an unplanned interruption in the source system.
 * `event`: something that happened related to an incident.
-* `acknowledgement`: an acknowledgement of an incident by a user.
+* `acknowledgement`: an acknowledgement of an incident by a user, which hides the incident from the other open incidents.
+  * If `expiration` is an instance of `datetime`, the incident will be shown again after the expiration time.
+  * If `expiration` is `null`, the acknowledgement will never expire.
+  * An incident is considered "acked" if it has one or more acknowledgements that have not expired.
 * `start_time`: the time the `incident` was created.
 * `end_time`: the time the `incident` was resolved or closed.
   * If `null`: the incident is stateless.
