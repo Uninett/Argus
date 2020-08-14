@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.db.models.functions import Concat
 from django.utils.html import format_html_join
 
+from argus.util.admin_utils import list_filter_factory
 from .models import Filter, NotificationProfile, TimeRecurrence, Timeslot
 
 
@@ -38,29 +39,12 @@ class FilterAdmin(admin.ModelAdmin):
     raw_id_fields = ("user",)
 
 
-class HasPhoneNumberFilter(admin.SimpleListFilter):
-    title = "has phone number"
-    parameter_name = "has_phone_number"
-    YES = 1
-    NO = 0
-
-    def lookups(self, request, model_admin):
-        return ((self.YES, "Yes"), (self.NO, "No"))
-
-    def queryset(self, request, queryset):
-        value = self.value()
-        if not value:  # Filter turned off!
-            return queryset
-        try:  # Unknown value
-            value = bool(int(value))
-        except TypeError:
-            return queryset
-        return queryset.exclude(phone_number__isnull=value)
-
-
 class NotificationProfileAdmin(admin.ModelAdmin):
     list_display = ("get_str", "get_filters", "get_media", "active")
-    list_filter = ("active", HasPhoneNumberFilter)
+    list_filter = (
+        "active",
+        list_filter_factory("has phone number", lambda qs, yes_filter: qs.exclude(phone_number__isnull=yes_filter)),
+    )
     search_fields = (
         "timeslot__name",
         "filters__name",
