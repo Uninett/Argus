@@ -4,6 +4,7 @@ from django.db.models.functions import Concat
 from django.utils.html import format_html_join
 from django.utils.safestring import mark_safe
 
+from argus.util.admin_utils import list_filter_factory
 from .forms import AddSourceSystemForm
 from .models import (
     Acknowledgement,
@@ -71,78 +72,6 @@ class TagAdmin(TextWidgetsOverrideModelAdmin):
     get_str.admin_order_field = Concat("key", "value")
 
 
-class StatefulListFilter(admin.SimpleListFilter):
-    title = "stateful"
-    # Parameter for the filter that will be used in the URL query
-    parameter_name = "stateful"
-
-    STATEFUL = 1
-    STATELESS = 0
-
-    def lookups(self, request, model_admin):
-        return (
-            (self.STATEFUL, "Yes"),
-            (self.STATELESS, "No"),
-        )
-
-    def queryset(self, request, queryset: IncidentQuerySet):
-        if not self.value():
-            return queryset
-
-        if int(self.value()) == self.STATEFUL:
-            return queryset.stateful()
-        else:
-            return queryset.stateless()
-
-
-class ActiveListFilter(admin.SimpleListFilter):
-    title = "active"
-    # Parameter for the filter that will be used in the URL query
-    parameter_name = "active"
-
-    ACTIVE = 1
-    INACTIVE = 0
-
-    def lookups(self, request, model_admin):
-        return (
-            (self.ACTIVE, "Yes"),
-            (self.INACTIVE, "No"),
-        )
-
-    def queryset(self, request, queryset: IncidentQuerySet):
-        if not self.value():
-            return queryset
-
-        if int(self.value()) == self.ACTIVE:
-            return queryset.active()
-        else:
-            return queryset.inactive()
-
-
-class AckedListFilter(admin.SimpleListFilter):
-    title = "acked"
-    # Parameter for the filter that will be used in the URL query
-    parameter_name = "acked"
-
-    ACKED = 1
-    NOT_ACKED = 0
-
-    def lookups(self, request, model_admin):
-        return (
-            (self.ACKED, "Yes"),
-            (self.NOT_ACKED, "No"),
-        )
-
-    def queryset(self, request, queryset: IncidentQuerySet):
-        if not self.value():
-            return queryset
-
-        if int(self.value()) == self.ACKED:
-            return queryset.acked()
-        else:
-            return queryset.not_acked()
-
-
 class IncidentAdmin(TextWidgetsOverrideModelAdmin):
     class IncidentTagRelationInline(admin.TabularInline):
         model = IncidentTagRelation
@@ -175,9 +104,9 @@ class IncidentAdmin(TextWidgetsOverrideModelAdmin):
         "incident_tag_relations__tag__value",
     )
     list_filter = (
-        StatefulListFilter,
-        ActiveListFilter,
-        AckedListFilter,
+        list_filter_factory("stateful", lambda qs, yes_filter: qs.stateful() if yes_filter else qs.stateless()),
+        list_filter_factory("active", lambda qs, yes_filter: qs.active() if yes_filter else qs.inactive()),
+        list_filter_factory("acked", lambda qs, yes_filter: qs.acked() if yes_filter else qs.not_acked()),
         "source",
         "source__type",
     )
