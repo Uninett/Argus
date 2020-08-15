@@ -3,7 +3,7 @@ from channels.generic.websocket import JsonWebsocketConsumer
 
 from argus.incident.models import Incident
 from argus.incident.serializers import IncidentSerializer
-from .models import SUBSCRIBED_ACTIVE_INCIDENTS
+from .models import SUBSCRIBED_OPEN_INCIDENTS
 
 
 class ClientError(Exception):
@@ -17,14 +17,14 @@ class ClientError(Exception):
         self.code = code
 
 
-class ActiveIncidentConsumer(JsonWebsocketConsumer):
+class OpenIncidentConsumer(JsonWebsocketConsumer):
     def connect(self):
         user = self.scope["user"]
         if user and user.is_authenticated:
             return self.accept()
 
     def disconnect(self, code):
-        async_to_sync(self.channel_layer.group_discard)(SUBSCRIBED_ACTIVE_INCIDENTS, self.channel_name)
+        async_to_sync(self.channel_layer.group_discard)(SUBSCRIBED_OPEN_INCIDENTS, self.channel_name)
 
     def receive_json(self, content):
         action = content.get("action", None)
@@ -41,12 +41,12 @@ class ActiveIncidentConsumer(JsonWebsocketConsumer):
         self.send_json(event["content"])
 
     def subscribe(self, limit=25):
-        async_to_sync(self.channel_layer.group_add)(SUBSCRIBED_ACTIVE_INCIDENTS, self.channel_name)
+        async_to_sync(self.channel_layer.group_add)(SUBSCRIBED_OPEN_INCIDENTS, self.channel_name)
 
-        incidents = self.get_active_incidents()
+        incidents = self.get_open_incidents()
         serialized = IncidentSerializer(incidents, many=True)
 
         self.send_json({"type": "subscribed", "channel_name": self.channel_name, "start_incidents": serialized.data})
 
-    def get_active_incidents(self, last=25):
-        return Incident.objects.active().order_by("-start_time")[:last]
+    def get_open_incidents(self, last=25):
+        return Incident.objects.open().order_by("-start_time")[:last]

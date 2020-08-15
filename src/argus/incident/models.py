@@ -156,10 +156,10 @@ class IncidentQuerySet(models.QuerySet):
     def stateless(self):
         return self.filter(end_time__isnull=True)
 
-    def active(self):
+    def open(self):
         return self.filter(end_time__gt=timezone.now())
 
-    def inactive(self):
+    def closed(self):
         return self.filter(end_time__lte=timezone.now())
 
     def acked(self):
@@ -195,7 +195,7 @@ class Incident(models.Model):
         blank=True,
         # TODO: add 'infinity' checkbox to admin
         help_text="The time the incident was resolved or closed. If not set, the incident is stateless;"
-        " if 'infinity' is checked, the incident is stateful, but has not yet been resolved or closed - i.e. active.",
+        " if 'infinity' is checked, the incident is stateful, but has not yet been resolved or closed - i.e. open.",
     )
     source = models.ForeignKey(
         to=SourceSystem,
@@ -240,23 +240,23 @@ class Incident(models.Model):
         return self.end_time is not None
 
     @property
-    def active(self):
+    def open(self):
         return self.stateful and self.end_time > timezone.now()
 
-    def set_active(self, actor: User):
+    def set_open(self, actor: User):
         if not self.stateful:
-            raise ValidationError("Cannot set a stateless incident as active")
-        if self.active:
+            raise ValidationError("Cannot set a stateless incident as open")
+        if self.open:
             return
 
         self.end_time = INFINITY_REPR
         self.save(update_fields=["end_time"])
         Event.objects.create(incident=self, actor=actor, timestamp=timezone.now(), type=Event.Type.REOPEN)
 
-    def set_inactive(self, actor: User):
+    def set_closed(self, actor: User):
         if not self.stateful:
-            raise ValidationError("Cannot set a stateless incident as inactive")
-        if not self.active:
+            raise ValidationError("Cannot set a stateless incident as closed")
+        if not self.open:
             return
 
         self.end_time = timezone.now()

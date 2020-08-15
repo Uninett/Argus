@@ -105,7 +105,7 @@ class IncidentAdmin(TextWidgetsOverrideModelAdmin):
     )
     list_filter = (
         list_filter_factory("stateful", lambda qs, yes_filter: qs.stateful() if yes_filter else qs.stateless()),
-        list_filter_factory("active", lambda qs, yes_filter: qs.active() if yes_filter else qs.inactive()),
+        list_filter_factory("open", lambda qs, yes_filter: qs.open() if yes_filter else qs.closed()),
         list_filter_factory("acked", lambda qs, yes_filter: qs.acked() if yes_filter else qs.not_acked()),
         "source",
         "source__type",
@@ -124,13 +124,13 @@ class IncidentAdmin(TextWidgetsOverrideModelAdmin):
     get_tags.short_description = "Tags"
 
     def get_open(self, incident: Incident):
-        return incident.active
+        return incident.open
 
     get_open.short_description = "Open"
     get_open.boolean = True
 
     def get_shown(self, incident: Incident):
-        return incident.active and not incident.acked
+        return incident.open and not incident.acked
 
     get_shown.short_description = "Shown"
     get_shown.boolean = True

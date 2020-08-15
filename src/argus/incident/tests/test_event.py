@@ -63,7 +63,7 @@ class EventAPITests(APITestCase, IncidentBasedAPITestCaseHelper):
 
     def test_posting_close_and_reopen_events_properly_changes_stateful_incidents(self):
         self.assertTrue(self.stateful_incident1.stateful)
-        self.assertTrue(self.stateful_incident1.active)
+        self.assertTrue(self.stateful_incident1.open)
 
         # Test closing incident
         close_event_dict = self._create_event_dict(Event.Type.CLOSE)
@@ -71,7 +71,7 @@ class EventAPITests(APITestCase, IncidentBasedAPITestCaseHelper):
         response = self.user1_rest_client.post(self.events_url(self.stateful_incident1), close_event_dict)
         self.assertEqual(parse_datetime(response.data["timestamp"]), event_timestamp)
         self.stateful_incident1.refresh_from_db()
-        self.assertFalse(self.stateful_incident1.active)
+        self.assertFalse(self.stateful_incident1.open)
         set_end_time = self.stateful_incident1.end_time
         self.assertEqual(set_end_time, event_timestamp)
 
@@ -85,7 +85,7 @@ class EventAPITests(APITestCase, IncidentBasedAPITestCaseHelper):
         response = self.user1_rest_client.post(self.events_url(self.stateful_incident1), reopen_event_dict)
         self.assertEqual(parse_datetime(response.data["timestamp"]), reopen_event_dict["timestamp"])
         self.stateful_incident1.refresh_from_db()
-        self.assertTrue(self.stateful_incident1.active)
+        self.assertTrue(self.stateful_incident1.open)
         set_end_time = self.stateful_incident1.end_time
         self.assertEqual(datetime_utils.make_naive(set_end_time), datetime.max)
 
@@ -98,7 +98,7 @@ class EventAPITests(APITestCase, IncidentBasedAPITestCaseHelper):
         def assert_incident_stateless():
             self.stateless_incident1.refresh_from_db()
             self.assertFalse(self.stateless_incident1.stateful)
-            self.assertFalse(self.stateless_incident1.active)
+            self.assertFalse(self.stateless_incident1.open)
 
         assert_incident_stateless()
         response = self.user1_rest_client.post(
