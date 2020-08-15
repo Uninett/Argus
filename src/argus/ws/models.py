@@ -8,7 +8,7 @@ from argus.incident.models import Incident
 from argus.incident.serializers import IncidentSerializer
 
 LOG = logging.getLogger(__name__)
-SUBSCRIBED_ACTIVE_INCIDENTS = "subscribed_active_incidents"
+SUBSCRIBED_OPEN_INCIDENTS = "subscribed_open_incidents"
 
 
 @receiver(post_save, sender=Incident)
@@ -23,7 +23,7 @@ def notify_on_change_or_create(sender, instance: Incident, created: bool, raw: b
         "payload": serializer.data,
     }
     try:
-        async_to_sync(channel_layer.group_send)(SUBSCRIBED_ACTIVE_INCIDENTS, {"type": "notify", "content": content,})
+        async_to_sync(channel_layer.group_send)(SUBSCRIBED_OPEN_INCIDENTS, {"type": "notify", "content": content})
     except ConnectionRefusedError as error:
         LOG.error("Websockets: Could not push: %s", error)
         # TODO: make a (non-signal inducing incident)

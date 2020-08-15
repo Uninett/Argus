@@ -140,11 +140,11 @@ class IncidentCreate_legacy(generics.CreateAPIView):
         return Response(serializer.data)
 
 
-class ActiveIncidentList(generics.ListAPIView):
+class OpenIncidentList(generics.ListAPIView):
     serializer_class = IncidentSerializer
 
     def get_queryset(self):
-        return Incident.objects.active().not_acked().prefetch_default_related()
+        return Incident.objects.open().not_acked().prefetch_default_related()
 
 
 class EventViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
@@ -190,9 +190,9 @@ class EventViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, mixins.Retrie
         if incident.stateful:
             if event_type in {Event.Type.INCIDENT_START, Event.Type.INCIDENT_END}:
                 validate_incident_has_no_relation_to_event_type()
-            elif event_type == Event.Type.CLOSE and not incident.active:
+            elif event_type == Event.Type.CLOSE and not incident.open:
                 self._raise_type_validation_error("The incident is already closed.")
-            elif event_type == Event.Type.REOPEN and incident.active:
+            elif event_type == Event.Type.REOPEN and incident.open:
                 self._raise_type_validation_error("The incident is already open.")
         else:
             if event_type == Event.Type.INCIDENT_START:

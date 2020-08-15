@@ -46,7 +46,7 @@ NUM_INCIDENTS = 200
 INCIDENT_START_TIME_NOW_CHANCE = 1 / 5
 INCIDENT_DESCRIPTION_WORD_COUNT_RANGE = (2, 10)
 INCIDENT_STATEFUL_CHANCE = 1 / 2
-STATEFUL_INCIDENT_ACTIVE_CHANCE = 1 / 5
+STATEFUL_INCIDENT_OPEN_CHANCE = 1 / 5
 # Event:
 EVENT_OTHER_CHANCE = 1 / 5
 
@@ -195,7 +195,7 @@ def generate_incidents(source_systems) -> List[Model]:
         source_incident_id = random_id()
 
         if roll_dice(INCIDENT_STATEFUL_CHANCE):
-            if roll_dice(STATEFUL_INCIDENT_ACTIVE_CHANCE):
+            if roll_dice(STATEFUL_INCIDENT_OPEN_CHANCE):
                 end_time = InfinityDatetime()
             elif start_time_now:
                 end_time = start_time + second_delay
@@ -248,7 +248,7 @@ def generate_events(incidents) -> List[Model]:
     def end_time_is_in_the_future(incident_: Incident):
         if not incident_.stateful:
             return False
-        return isinstance(incident_.end_time, InfinityDatetime) or incident_.active
+        return isinstance(incident_.end_time, InfinityDatetime) or incident_.open
 
     events = []
     for incident in incidents:

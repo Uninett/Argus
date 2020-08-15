@@ -128,7 +128,7 @@ class IncidentSerializer(RemovableFieldSerializer):
         incident_repr["tags"] = tags_field.to_representation(instance.incident_tag_relations.all())
 
         incident_repr["stateful"] = instance.stateful
-        incident_repr["active"] = instance.active
+        incident_repr["open"] = instance.open
         incident_repr["acked"] = instance.acked
         return incident_repr
 
