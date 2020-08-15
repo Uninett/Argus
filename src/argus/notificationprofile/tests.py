@@ -5,7 +5,6 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime, parse_time
 from django.utils.timezone import make_aware
-from rest_framework.authtoken.models import Token
 from rest_framework.renderers import JSONRenderer
 from rest_framework.test import APITestCase
 
@@ -18,52 +17,38 @@ from argus.incident.models import (
     Tag,
 )
 from argus.incident.serializers import IncidentSerializer
+from argus.incident.tests.test_incident import IncidentBasedAPITestCaseHelper
 from argus.notificationprofile.models import (
     Filter,
     NotificationProfile,
     TimeRecurrence,
     Timeslot,
 )
+from argus.util.utils import duplicate
 
 
-class MockIncidentData:
-    # Define member variables, to avoid warnings
-    user = None
-    nav1 = None
-    zabbix1 = None
-    incident1 = None
-    incident2 = None
-    tagstr1 = "object=1"
-    tagstr2 = "object=2"
-    tagstr3 = "location=Oslo"
+class IncidentAPITestCaseHelper(IncidentBasedAPITestCaseHelper):
+    def init_test_objects(self):
+        super().init_test_objects()
 
-    def init_mock_data(self):
-        self.user = User.objects.create(username="asdf")
-
-        nav_type = SourceSystemType.objects.create(name="nav")
-        zabbix_type = SourceSystemType.objects.create(name="zabbix")
-
-        self.nav1 = SourceSystem.objects.create(
-            name="Gløshaugen", type=nav_type, user=User.objects.create(username="nav.glos.no"),
-        )
-        self.zabbix1 = SourceSystem.objects.create(
-            name="Gløshaugen", type=zabbix_type, user=User.objects.create(username="zabbix.glos.no"),
+        self.source_type2 = SourceSystemType.objects.create(name="type2")
+        self.source2 = SourceSystem.objects.create(
+            name="System 2", type=self.source_type2, user=User.objects.create(username="system_2"),
         )
 
-        self.incident1 = Incident.objects.create(start_time=timezone.now(), source=self.nav1, source_incident_id="123",)
-        self.incident2 = Incident.objects.get(pk=self.incident1.pk)
-        self.incident2.pk = None  # clones incident1
-        self.incident2.source = self.zabbix1
-        self.incident2.save()
+        self.incident1 = Incident.objects.create(
+            start_time=timezone.now(), source=self.source1, source_incident_id="123",
+        )
+        self.incident2 = duplicate(self.incident1, source=self.source2)
 
-        self.tag1 = Tag.objects.create_from_tag(self.tagstr1)
-        self.tag2 = Tag.objects.create_from_tag(self.tagstr2)
-        self.tag3 = Tag.objects.create_from_tag(self.tagstr3)
+        self.tag1 = Tag.objects.create_from_tag("object=1")
+        self.tag2 = Tag.objects.create_from_tag("object=2")
+        self.tag3 = Tag.objects.create_from_tag("location=Oslo")
 
-        IncidentTagRelation.objects.create(tag=self.tag1, incident=self.incident1, added_by=self.user)
-        IncidentTagRelation.objects.create(tag=self.tag3, incident=self.incident1, added_by=self.user)
-        IncidentTagRelation.objects.create(tag=self.tag2, incident=self.incident2, added_by=self.user)
-        IncidentTagRelation.objects.create(tag=self.tag3, incident=self.incident2, added_by=self.user)
+        IncidentTagRelation.objects.create(tag=self.tag1, incident=self.incident1, added_by=self.user1)
+        IncidentTagRelation.objects.create(tag=self.tag3, incident=self.incident1, added_by=self.user1)
+        IncidentTagRelation.objects.create(tag=self.tag2, incident=self.incident2, added_by=self.user1)
+        IncidentTagRelation.objects.create(tag=self.tag3, incident=self.incident2, added_by=self.user1)
 
 
 def set_time(timestamp: datetime, new_time: str):
@@ -73,12 +58,12 @@ def set_time(timestamp: datetime, new_time: str):
     )
 
 
-class ModelTests(TestCase, MockIncidentData):
+class ModelTests(TestCase, IncidentAPITestCaseHelper):
     def setUp(self):
-        super().init_mock_data()
+        super().init_test_objects()
         self.monday_datetime = make_aware(parse_datetime("2019-11-25 00:00"))
 
-        self.timeslot1 = Timeslot.objects.create(user=self.user, name="Test")
+        self.timeslot1 = Timeslot.objects.create(user=self.user1, name="Test")
         self.recurrence1 = TimeRecurrence.objects.create(
             timeslot=self.timeslot1,
             days={TimeRecurrence.Day.MONDAY},
@@ -120,24 +105,18 @@ class ModelTests(TestCase, MockIncidentData):
 
     def test_source_fits(self):
         filter1 = Filter.objects.create(
-            user=self.user, name="Filter1", filter_string="{" f'"sourceSystemIds": [{self.nav1.pk}]' "}",
+            user=self.user1, name="Filter1", filter_string="{" f'"sourceSystemIds": [{self.source1.pk}]' "}",
         )
         filter2 = Filter.objects.create(
-            user=self.user, name="Filter2", filter_string="{" f'"sourceSystemIds": [{self.zabbix1.pk}]' "}",
+            user=self.user1, name="Filter2", filter_string="{" f'"sourceSystemIds": [{self.source2.pk}]' "}",
         )
 
         self.assertTrue(filter1.source_system_fits(self.incident1))
 
     def test_tags_fit(self):
-        filter1 = Filter.objects.create(
-            user=self.user, name="Filter1", filter_string="{" f'"tags": []' "}",
-        )
-        filter2 = Filter.objects.create(
-            user=self.user, name="Filter2", filter_string="{" f'"tags": ["object=1"]' "}",
-        )
-        filter3 = Filter.objects.create(
-            user=self.user, name="Filter3", filter_string="{" f'"tags": ["object=2"]' "}",
-        )
+        filter1 = Filter.objects.create(user=self.user1, name="Filter1", filter_string="{" f'"tags": []' "}",)
+        filter2 = Filter.objects.create(user=self.user1, name="Filter2", filter_string="{" f'"tags": ["object=1"]' "}",)
+        filter3 = Filter.objects.create(user=self.user1, name="Filter3", filter_string="{" f'"tags": ["object=2"]' "}",)
 
         self.assertTrue(filter1.tags_fit(self.incident1))
         self.assertTrue(filter2.tags_fit(self.incident1))
@@ -145,10 +124,10 @@ class ModelTests(TestCase, MockIncidentData):
 
     def test_filter(self):
         filter1 = Filter.objects.create(
-            user=self.user, name="Filter1", filter_string="{" f'"sourceSystemIds": [{self.nav1.pk}]' "}",
+            user=self.user1, name="Filter1", filter_string="{" f'"sourceSystemIds": [{self.source1.pk}]' "}",
         )
         filter2 = Filter.objects.create(
-            user=self.user, name="Filter2", filter_string="{" f'"sourceSystemIds": [{self.zabbix1.pk}]' "}",
+            user=self.user1, name="Filter2", filter_string="{" f'"sourceSystemIds": [{self.source2.pk}]' "}",
         )
 
         self.assertTrue(filter1.incident_fits(self.incident1))
@@ -161,25 +140,22 @@ class ModelTests(TestCase, MockIncidentData):
         self.assertEqual(set(filter2.filtered_incidents), {self.incident2})
 
 
-class ViewTests(APITestCase, MockIncidentData):
+class ViewTests(APITestCase, IncidentAPITestCaseHelper):
     def setUp(self):
-        super().init_mock_data()
-
-        user_token = Token.objects.create(user=self.user)
-        self.client.credentials(HTTP_AUTHORIZATION=f"Token {user_token.key}")
+        super().init_test_objects()
 
         incident1_json = IncidentSerializer([self.incident1], many=True).data
         self.incident1_json = JSONRenderer().render(incident1_json)
 
-        timeslot1 = Timeslot.objects.create(user=self.user, name="Never")
+        timeslot1 = Timeslot.objects.create(user=self.user1, name="Never")
         filter1 = Filter.objects.create(
-            user=self.user, name="Critical incidents", filter_string="{" f'"sourceSystemIds": [{self.nav1.pk}]' "}",
+            user=self.user1, name="Critical incidents", filter_string="{" f'"sourceSystemIds": [{self.source1.pk}]' "}",
         )
-        self.notification_profile1 = NotificationProfile.objects.create(user=self.user, timeslot=timeslot1)
+        self.notification_profile1 = NotificationProfile.objects.create(user=self.user1, timeslot=timeslot1)
         self.notification_profile1.filters.add(filter1)
 
     def test_incidents_filtered_by_notification_profile_view(self):
-        response = self.client.get(
+        response = self.user1_rest_client.get(
             reverse("notification-profile:notification-profile-incidents", args=[self.notification_profile1.pk])
         )
         response.render()
