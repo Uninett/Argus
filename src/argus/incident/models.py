@@ -35,7 +35,7 @@ def create_fake_incident():
     argus_user, _, source_system = get_or_create_default_instances()
     incident = Incident.objects.create(
         start_time=timezone.now(),
-        end_time="infinity",
+        end_time=INFINITY_REPR,
         source_incident_id=randint(MIN_ID, MAX_ID),
         source=source_system,
         description='Incident created via "create_fake_incident"',
@@ -265,7 +265,7 @@ class Incident(models.Model):
 
     @property
     def last_close_or_end_event(self):
-        return self.events.order_by("timestamp").filter(type__in=(Event.Type.CLOSE, Event.Type.INCIDENT_END)).last()
+        return self.events.filter(type__in=(Event.Type.CLOSE, Event.Type.INCIDENT_END)).order_by("timestamp").last()
 
     @property
     def acks(self):

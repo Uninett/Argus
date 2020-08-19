@@ -5,6 +5,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 from django.utils.timezone import make_aware
+from rest_framework import status
 from rest_framework.test import APITestCase
 
 from argus.util import datetime_utils
@@ -35,7 +36,7 @@ class EventAPITests(APITestCase, IncidentBasedAPITestCaseHelper):
         }
 
     def _assert_response_field_invalid(self, response, field_name: str):
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn(field_name, response.data)
         self.assertEqual(response.data[field_name].code, "invalid")
 
@@ -55,7 +56,7 @@ class EventAPITests(APITestCase, IncidentBasedAPITestCaseHelper):
         event_count = self.stateful_incident1.events.count()
 
         response = client.post(self.events_url(self.stateful_incident1), post_data)
-        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         self.assertEqual(self.stateful_incident1.events.count(), event_count + 1)
         self.assertTrue(self.stateful_incident1.events.filter(pk=response.data["pk"]).exists())

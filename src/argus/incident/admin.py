@@ -76,7 +76,7 @@ class TagAdmin(TextWidgetsOverrideModelAdmin):
     text_input_form_fields = ("key", "value")
 
     def get_str(self, tag: Tag):
-        return str(tag)
+        return tag
 
     get_str.short_description = "Tag"
     get_str.admin_order_field = Concat("key", "value")
@@ -184,7 +184,7 @@ class IncidentRelationAdmin(admin.ModelAdmin):
     raw_id_fields = ("incident1", "incident2")
 
     def get_str(self, incident_relation: IncidentRelation):
-        return str(incident_relation)
+        return incident_relation
 
     get_str.short_description = "Incident relation"
 

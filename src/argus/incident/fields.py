@@ -61,7 +61,7 @@ class SplitDateTimeInfinityField(forms.SplitDateTimeField):
 def _get_default_error_messages_for_datetime_infinity_serializer_field():
     messages = rest_framework_fields.DateTimeField.default_error_messages
     invalid_message = messages["invalid"]
-    messages["invalid"] = f"{invalid_message.rstrip('.')}, or 'infinity'."
+    messages["invalid"] = f"{invalid_message.rstrip('.')}, or '{utils.INFINITY_REPR}'."
     return messages
 
 

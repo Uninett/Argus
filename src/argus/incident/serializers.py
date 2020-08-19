@@ -57,7 +57,7 @@ class IncidentTagRelationSerializer(serializers.ModelSerializer):
         key, value = Tag.split(tag)
         return Tag.objects.create(key=key, value=value, **validated_data)
 
-    def to_internal_value(self, data):
+    def to_internal_value(self, data: dict):
         tag_dict = super().to_internal_value(data)
         if "tag" in tag_dict:
             key, value = Tag.split(tag_dict.pop("tag"))
@@ -89,10 +89,10 @@ class IncidentSerializer(serializers.ModelSerializer):
             "ticket_url",
             "tags",
         ]
+        read_only_fields = ["source"]
 
     def create(self, validated_data: dict):
         assert "user" in validated_data
-        assert "source" in validated_data
         user = validated_data.pop("user")
 
         tags_data = validated_data.pop("tags")
@@ -178,7 +178,7 @@ class IncidentPureDeserializer(serializers.ModelSerializer):
     def to_representation(self, instance: Incident):
         return IncidentSerializer(instance).data
 
-    def validate_empty_values(self, data):
+    def validate_empty_values(self, data: dict):
         allowed_fields = self.get_fields()
         all_fields = {field.name for field in Incident._meta.get_fields()}
         all_fields.add("pk")  # for providing feedback (the default "pk" field is acually named "id")

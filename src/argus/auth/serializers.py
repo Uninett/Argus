@@ -6,7 +6,11 @@ from .models import PhoneNumber, User
 class PhoneNumberSerializer(serializers.ModelSerializer):
     class Meta:
         model = PhoneNumber
-        fields = ["pk", "user", "phone_number"]
+        fields = [
+            "pk",
+            "user",
+            "phone_number",
+        ]
 
 
 class UserSerializer(serializers.ModelSerializer):

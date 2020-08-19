@@ -176,7 +176,7 @@ def generate_problem_type_names() -> List[str]:
 #  Django's `serializers.serialize()` calls `isoformat()` when serializing
 class InfinityDatetime:
     def isoformat(self):
-        return "infinity"
+        return INFINITY_REPR
 
 
 def generate_incidents(source_systems) -> List[Model]:

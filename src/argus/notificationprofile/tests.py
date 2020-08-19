@@ -106,18 +106,19 @@ class ModelTests(TestCase, IncidentAPITestCaseHelper):
 
     def test_source_fits(self):
         filter1 = Filter.objects.create(
-            user=self.user1, name="Filter1", filter_string="{" f'"sourceSystemIds": [{self.source1.pk}]' "}",
+            user=self.user1, name="Filter1", filter_string=f'{{"sourceSystemIds": [{self.source1.pk}]}}',
         )
         filter2 = Filter.objects.create(
-            user=self.user1, name="Filter2", filter_string="{" f'"sourceSystemIds": [{self.source2.pk}]' "}",
+            user=self.user1, name="Filter2", filter_string=f'{{"sourceSystemIds": [{self.source2.pk}]}}',
         )
 
         self.assertTrue(filter1.source_system_fits(self.incident1))
+        self.assertFalse(filter2.source_system_fits(self.incident1))
 
     def test_tags_fit(self):
-        filter1 = Filter.objects.create(user=self.user1, name="Filter1", filter_string="{" f'"tags": []' "}",)
-        filter2 = Filter.objects.create(user=self.user1, name="Filter2", filter_string="{" f'"tags": ["object=1"]' "}",)
-        filter3 = Filter.objects.create(user=self.user1, name="Filter3", filter_string="{" f'"tags": ["object=2"]' "}",)
+        filter1 = Filter.objects.create(user=self.user1, name="Filter1", filter_string='{"tags": []}')
+        filter2 = Filter.objects.create(user=self.user1, name="Filter2", filter_string=f'{{"tags": ["{self.tag1}"]}}')
+        filter3 = Filter.objects.create(user=self.user1, name="Filter3", filter_string=f'{{"tags": ["{self.tag2}"]}}')
 
         self.assertTrue(filter1.tags_fit(self.incident1))
         self.assertTrue(filter2.tags_fit(self.incident1))
@@ -125,10 +126,10 @@ class ModelTests(TestCase, IncidentAPITestCaseHelper):
 
     def test_filter(self):
         filter1 = Filter.objects.create(
-            user=self.user1, name="Filter1", filter_string="{" f'"sourceSystemIds": [{self.source1.pk}]' "}",
+            user=self.user1, name="Filter1", filter_string=f'{{"sourceSystemIds": [{self.source1.pk}]}}',
         )
         filter2 = Filter.objects.create(
-            user=self.user1, name="Filter2", filter_string="{" f'"sourceSystemIds": [{self.source2.pk}]' "}",
+            user=self.user1, name="Filter2", filter_string=f'{{"sourceSystemIds": [{self.source2.pk}]}}',
         )
 
         self.assertTrue(filter1.incident_fits(self.incident1))
@@ -151,7 +152,7 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
         self.timeslot1 = Timeslot.objects.create(user=self.user1, name="Never")
         self.timeslot2 = Timeslot.objects.create(user=self.user1, name="Never 2: Ever-expanding Void")
         filter1 = Filter.objects.create(
-            user=self.user1, name="Critical incidents", filter_string="{" f'"sourceSystemIds": [{self.source1.pk}]' "}",
+            user=self.user1, name="Critical incidents", filter_string=f'{{"sourceSystemIds": [{self.source1.pk}]}}',
         )
         self.notification_profile1 = NotificationProfile.objects.create(user=self.user1, timeslot=self.timeslot1)
         self.notification_profile1.filters.add(filter1)
