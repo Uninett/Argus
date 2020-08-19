@@ -1,3 +1,4 @@
+from django.contrib.auth import logout
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -7,6 +8,20 @@ from rest_framework.viewsets import ModelViewSet
 from argus.drf.permissions import IsOwner
 from .models import PhoneNumber, User
 from .serializers import BasicUserSerializer, PhoneNumberSerializer, UserSerializer
+
+
+class LogoutView(APIView):
+    permission_classes = []
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        if hasattr(user, "auth_token"):
+            user_token = request.user.auth_token
+            user_token.delete()
+        # Log out from session
+        logout(request)
+
+        return Response()
 
 
 class CurrentUserView(APIView):
