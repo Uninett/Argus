@@ -21,3 +21,14 @@ class UserSerializer(serializers.ModelSerializer):
             "email",
             "phone_numbers",
         ]
+
+
+class BasicUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = [
+            "username",
+            "first_name",
+            "last_name",
+            "email",
+        ]
