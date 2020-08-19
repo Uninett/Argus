@@ -108,3 +108,8 @@ class NotificationProfileSerializer(serializers.ModelSerializer):
                 )
             else:
                 raise e
+
+    def validate(self, attrs: dict):
+        if attrs["timeslot"].user != self.context["request"].user:
+            raise serializers.ValidationError("The user of 'timeslot' must be the same as the requesting user.")
+        return attrs

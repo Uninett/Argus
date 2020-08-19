@@ -165,7 +165,6 @@ class NotificationProfile(models.Model):
         SLACK = "SL", "Slack"
 
     user = models.ForeignKey(to=User, on_delete=models.CASCADE, related_name="notification_profiles")
-    # TODO: add constraint that user must be the same
     timeslot = models.OneToOneField(
         to=Timeslot, on_delete=models.CASCADE, primary_key=True, related_name="notification_profile",
     )
