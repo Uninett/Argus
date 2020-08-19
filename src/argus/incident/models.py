@@ -66,7 +66,7 @@ def set_name_lowercase(sender, instance: SourceSystemType, *args, **kwargs):
 class SourceSystem(models.Model):
     name = models.TextField()
     type = models.ForeignKey(to=SourceSystemType, on_delete=models.CASCADE, related_name="instances")
-    user = models.OneToOneField(to=User, on_delete=models.CASCADE, related_name="source_system")
+    user = models.OneToOneField(to=User, on_delete=models.PROTECT, related_name="source_system")
 
     class Meta:
         constraints = [
@@ -75,6 +75,12 @@ class SourceSystem(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.type})"
+
+
+@receiver(post_delete, sender=SourceSystem)
+def delete_associated_user(sender, instance: SourceSystem, *args, **kwargs):
+    if hasattr(instance, "user") and instance.user:
+        instance.user.delete()
 
 
 class TagQuerySet(models.QuerySet):
