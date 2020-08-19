@@ -64,7 +64,7 @@ def set_name_lowercase(sender, instance: SourceSystemType, *args, **kwargs):
 
 class SourceSystem(models.Model):
     name = models.TextField()
-    type = models.ForeignKey(to=SourceSystemType, on_delete=models.CASCADE, related_name="instances")
+    type = models.ForeignKey(to=SourceSystemType, on_delete=models.PROTECT, related_name="instances")
     user = models.OneToOneField(to=User, on_delete=models.PROTECT, related_name="source_system")
     base_url = models.TextField(help_text="Base url to combine with an incident's relative url to point to more info in the source system.", blank=True)
 
@@ -203,7 +203,7 @@ class Incident(models.Model):
     )
     source = models.ForeignKey(
         to=SourceSystem,
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
         related_name="incidents",
         help_text="The source system that the incident originated in.",
     )
@@ -326,7 +326,7 @@ class IncidentRelation(models.Model):
     # "+" prevents creating a backwards relation
     incident1 = models.ForeignKey(to=Incident, on_delete=models.CASCADE, related_name="+")
     incident2 = models.ForeignKey(to=Incident, on_delete=models.CASCADE, related_name="+")
-    type = models.ForeignKey(to=IncidentRelationType, on_delete=models.CASCADE, related_name="incident_relations")
+    type = models.ForeignKey(to=IncidentRelationType, on_delete=models.PROTECT, related_name="incident_relations")
     description = models.TextField(blank=True)
 
     def __str__(self):
