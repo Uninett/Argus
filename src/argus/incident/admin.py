@@ -1,10 +1,11 @@
 from django.contrib import admin
-from django.contrib.admin import widgets
+from django.contrib.admin import widgets as admin_widgets
 from django.db.models.functions import Concat
 from django.utils.html import format_html_join
 from django.utils.safestring import mark_safe
 
 from argus.util.admin_utils import list_filter_factory
+from . import fields, widgets
 from .forms import AddSourceSystemForm
 from .models import (
     Acknowledgement,
@@ -28,9 +29,9 @@ class TextWidgetsOverrideModelAdmin(admin.ModelAdmin):
         form = super().get_form(request, obj, **kwargs)
 
         for form_field in self.text_input_form_fields:
-            form.base_fields[form_field].widget = widgets.AdminTextInputWidget()
+            form.base_fields[form_field].widget = admin_widgets.AdminTextInputWidget()
         for form_field in self.url_input_form_fields:
-            form.base_fields[form_field].widget = widgets.AdminURLFieldWidget()
+            form.base_fields[form_field].widget = admin_widgets.AdminURLFieldWidget()
 
         return form
 
@@ -78,7 +79,6 @@ class IncidentAdmin(TextWidgetsOverrideModelAdmin):
         ordering = ["tag__key", "tag__value"]
         readonly_fields = ("added_time",)
         raw_id_fields = ("tag", "added_by")
-        min_num = 1
         extra = 0
 
     inlines = [IncidentTagRelationInline]
@@ -140,6 +140,18 @@ class IncidentAdmin(TextWidgetsOverrideModelAdmin):
 
     get_shown.short_description = "Shown"
     get_shown.boolean = True
+
+    def get_form(self, request, obj: Incident = None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        end_time_field = form.base_fields["end_time"]
+        end_time_field_inheritance_attrs = {
+            attr: getattr(end_time_field, attr) for attr in ("required", "label", "help_text")
+        }
+        end_time = obj.end_time if obj else None
+        form.base_fields["end_time"] = fields.SplitDateTimeInfinityField(
+            **end_time_field_inheritance_attrs, widget=widgets.AdminSplitDateTimeInfinity(initial_value=end_time)
+        )
+        return form
 
     def get_queryset(self, request):
         qs: IncidentQuerySet = super().get_queryset(request)

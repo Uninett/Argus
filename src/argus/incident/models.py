@@ -193,7 +193,6 @@ class Incident(models.Model):
     end_time = DateTimeInfinityField(
         null=True,
         blank=True,
-        # TODO: add 'infinity' checkbox to admin
         help_text="The time the incident was resolved or closed. If not set, the incident is stateless;"
         " if 'infinity' is checked, the incident is stateful, but has not yet been resolved or closed - i.e. open.",
     )

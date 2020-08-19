@@ -1,0 +1,27 @@
+{# Code based on https://github.com/django/django/blob/3.0.7/django/contrib/admin/templates/admin/widgets/split_datetime.html #}
+<p class="datetime">
+    {{ date_label }} {% with widget=widget.subwidgets.0 %}{% include widget.template_name %}{% endwith %}<br />
+    {{ time_label }} {% with widget=widget.subwidgets.1 %}{% include widget.template_name %}{% endwith %}<br />
+
+    Infinity: {% with widget=widget.subwidgets.2 %}{% include widget.template_name %}{% endwith %}
+</p>
+
+
+<script>
+    const $ = django.jQuery;
+
+    $(document).ready(() => {
+        const dateInput = $("#{{ widget.subwidgets.0.attrs.id }}");
+        const timeInput = $("#{{ widget.subwidgets.1.attrs.id }}");
+        const infinityCheckbox = $("#{{ widget.subwidgets.2.attrs.id }}");
+
+        function setDateAndTimeState() {
+            const checked = infinityCheckbox.prop("checked");
+            dateInput.prop("disabled", checked);
+            timeInput.prop("disabled", checked);
+        }
+
+        infinityCheckbox.click(setDateAndTimeState);
+        setDateAndTimeState();
+    });
+</script>

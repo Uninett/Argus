@@ -1,7 +1,9 @@
 from datetime import datetime
 
 import rest_framework.fields as rest_framework_fields
+from django import forms
 from django.db import models
+from django.forms import fields
 
 import argus.util.datetime_utils as utils
 
@@ -37,6 +39,23 @@ class DateTimeInfinityField(models.DateTimeField):
     @staticmethod
     def is_postgres(connection):
         return connection.settings_dict["ENGINE"].startswith("django.db.backends.postgresql")
+
+
+class SplitDateTimeInfinityField(forms.SplitDateTimeField):
+    empty_values = forms.SplitDateTimeField.empty_values + [False]
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.fields = (*self.fields, fields.BooleanField(required=False))
+
+    def compress(self, data_list: list):
+        if not data_list:
+            return None
+
+        date, time, infinity_checked = data_list
+        if infinity_checked:
+            return utils.INFINITY_REPR
+        return super().compress([date, time])
 
 
 def _get_default_error_messages_for_datetime_infinity_serializer_field():
