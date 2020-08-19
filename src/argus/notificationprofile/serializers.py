@@ -96,6 +96,8 @@ class NotificationProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = NotificationProfile
         fields = ["pk", "timeslot", "filters", "media", "phone_number", "active"]
+        # "pk" needs to be listed, as "timeslot" is the actual primary key
+        read_only_fields = ["pk"]
 
     def create(self, validated_data):
         try:
