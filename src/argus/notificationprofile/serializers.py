@@ -29,7 +29,7 @@ class TimeRecurrenceSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance: TimeRecurrence):
         instance_dict = super().to_representation(instance)
-        # `days` is initially represented as a set; this converts it into a sorted list (`days` is stored sorted in the DB - see `.models.sort_days()`)
+        # `days` is initially represented as a set; this converts it into a sorted list (`days` is stored sorted in the DB - see `TimeRecurrence.save()`)
         instance_dict["days"] = sorted(instance_dict["days"])
 
         if instance_dict["start"] == str(TimeRecurrence.DAY_START) and instance_dict["end"] == str(

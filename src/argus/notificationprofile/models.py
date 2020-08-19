@@ -4,7 +4,7 @@ from functools import reduce
 from operator import or_
 
 from django.db import models
-from django.db.models.signals import post_save, pre_save
+from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
 from multiselectfield import MultiSelectField
@@ -94,12 +94,11 @@ class TimeRecurrence(models.Model):
         timestamp = timestamp.astimezone(timezone.get_current_timezone())
         return timestamp.isoweekday() in self.isoweekdays and self.start <= timestamp.time() <= self.end
 
-
-# Sort days when a TimeRecurrence is saved
-@receiver(pre_save, sender=TimeRecurrence)
-def sort_days(sender, instance: TimeRecurrence, *args, **kwargs):
-    if instance.days:
-        instance.days = sorted(instance.days)
+    def save(self, *args, **kwargs):
+        # Ensure that the days are always sorted, for a nicer display
+        if self.days:
+            self.days = sorted(self.days)
+        super().save(*args, **kwargs)
 
 
 class Filter(models.Model):
