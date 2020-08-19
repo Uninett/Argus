@@ -57,7 +57,6 @@ class SourceSystemType(models.Model):
 
 
 # Ensure that the name is always lowercase, to avoid names that only differ by case
-# Note: this is not run when calling `update()` on a queryset
 @receiver(pre_save, sender=SourceSystemType)
 def set_name_lowercase(sender, instance: SourceSystemType, *args, **kwargs):
     instance.name = instance.name.lower()
@@ -150,6 +149,12 @@ class IncidentTagRelation(models.Model):
 
 
 class IncidentQuerySet(models.QuerySet):
+    def update(self, **kwargs):
+        """
+        This should not be used, as it doesn't call `save()`, which breaks things like the ws (WebSocket) app.
+        """
+        raise NotImplementedError()
+
     def stateful(self):
         return self.filter(end_time__isnull=False)
 
