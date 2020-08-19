@@ -6,7 +6,6 @@ from django.template.loader import render_to_string
 from rest_framework.renderers import JSONRenderer
 
 from argus.incident.serializers import IncidentSerializer
-
 from .base import NotificationMedium
 
 

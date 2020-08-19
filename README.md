@@ -128,7 +128,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
 <summary>Auth endpoints</summary>
 
 * `GET` to `/api/v1/auth/user/`: returns the logged in user
-* `GET` to `/api/v1/auth/users/<int:pk>/`: returns a user by pk
+* `GET` to `/api/v1/auth/users/<int:pk>/`: returns a user by PK
 * `POST` to `/oidc/api-token-auth/`: returns an auth token for the posted user
   * Note that this token will expire after 14 days, and can be replaced by posting to the same endpoint.
   * Example request body: `{ username: <username>, password: <password> }`
@@ -137,7 +137,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
   * `GET`: returns the phone numbers of the logged in user
     <details>
     <summary>Example response body:</summary>
- 
+
     ```json
     [
       {
@@ -156,7 +156,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
   * `POST`: creates and returns the phone numbers of the logged in user
     <details>
     <summary>Example request body:</summary>
- 
+
     ```json
     {
       "pk": 2,
@@ -169,18 +169,18 @@ All endpoints require requests to contain a header with key `Authorization` and 
   * `GET`: returns the specific phone number of the logged in user
     <details>
     <summary>Example response body:</summary>
- 
+
     ```json
     {
       "pk": 2,
       "user": 1,
       "phone_number": "+4767676767"
-    },
+    }
     ```
     </details>
-  * `PUT`: updates and returns one of the logged in user's phone numbers by pk
+  * `PUT`: updates and returns one of the logged in user's phone numbers by PK
     * Example request body: same as `POST` to `/api/v1/auth/phone-number/`
-  * `DELETE`: deletes one of the logged in user's phone numbers by pk
+  * `DELETE`: deletes one of the logged in user's phone numbers by PK
 </details>
 
 <details>
@@ -258,7 +258,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
     </details>
 
 * `/api/v1/incidents/<int:pk>/`:
-  * `GET`: returns an incident by pk
+  * `GET`: returns an incident by PK
   * `PATCH`: modifies parts of an incident and returns it
     <details>
     <summary>Example request body:</summary>
@@ -393,7 +393,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
         "expiration": "2011-11-13 12:00:00"
     }
     ```
-    
+
     Only end users can post acknowledgements.
 
     The `timestamp` field is optional, and will be set to the time the server received it if omitted.
@@ -433,13 +433,13 @@ All endpoints require requests to contain a header with key `Authorization` and 
     </details>
 
 * `/api/v1/notificationprofiles/<int:pk>/`:
-  * `GET`: returns one of the logged in user's notification profiles by pk
-  * `PUT`: updates and returns one of the logged in user's notification profiles by pk
+  * `GET`: returns one of the logged in user's notification profiles by PK
+  * `PUT`: updates and returns one of the logged in user's notification profiles by PK
     * Note that if `timeslot` is changed, the notification profile's PK will also change. This consequently means that the URL containing the previous PK will return a `404 Not Found` status code.
     * Example request body: same as `POST` to `/api/v1/notificationprofiles/`
-  * `DELETE`: deletes one of the logged in user's notification profiles by pk
+  * `DELETE`: deletes one of the logged in user's notification profiles by PK
 
-* `GET` to `/api/v1/notificationprofiles/<int:pk>/incidents/`: returns all incidents - both open and historic - filtered by one of the logged in user's notification profiles by pk
+* `GET` to `/api/v1/notificationprofiles/<int:pk>/incidents/`: returns all incidents - both open and historic - filtered by one of the logged in user's notification profiles by PK
 
 * `/api/v1/notificationprofiles/timeslots/`:
   * `GET`: returns the logged in user's time slots
@@ -495,10 +495,10 @@ All endpoints require requests to contain a header with key `Authorization` and 
     </details>
 
 * `/api/v1/notificationprofiles/timeslots/<int:pk>/`:
-  * `GET`: returns one of the logged in user's time slots by pk
-  * `PUT`: updates and returns one of the logged in user's time slots by pk
+  * `GET`: returns one of the logged in user's time slots by PK
+  * `PUT`: updates and returns one of the logged in user's time slots by PK
     * Example request body: same as `POST` to `/notificationprofiles/timeslots/`
-  * `DELETE`: deletes one of the logged in user's time slots by pk
+  * `DELETE`: deletes one of the logged in user's time slots by PK
 
 * `/api/v1/notificationprofiles/filters/`:
   * `GET`: returns the logged in user's filters
@@ -515,10 +515,10 @@ All endpoints require requests to contain a header with key `Authorization` and 
     </details>
 
 * `/api/v1/notificationprofiles/filters/<int:pk>/`:
-  * `GET`: returns one of the logged in user's filters by pk
-  * `PUT`: updates and returns one of the logged in user's filters by pk
+  * `GET`: returns one of the logged in user's filters by PK
+  * `PUT`: updates and returns one of the logged in user's filters by PK
     * Example request body: same as `POST` to `/api/v1/notificationprofiles/filters/`
-  * `DELETE`: deletes one of the logged in user's filters by pk
+  * `DELETE`: deletes one of the logged in user's filters by PK
 
 * `POST` to `/api/v1/notificationprofiles/filterpreview/`: returns all incidents - both open and historic - filtered by the values in the body
   <details>

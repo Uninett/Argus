@@ -8,9 +8,8 @@ from django.db import connections
 
 from argus.auth.models import User
 from argus.incident.models import Incident
-
-from ..models import NotificationProfile
 from .email import EmailNotification
+from ..models import NotificationProfile
 
 
 LOG = logging.getLogger(__name__)

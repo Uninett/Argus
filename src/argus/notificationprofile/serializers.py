@@ -13,14 +13,18 @@ class TimeRecurrenceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TimeRecurrence
-        fields = ["days", "start", "end"]
+        fields = [
+            "days",
+            "start",
+            "end",
+        ]
 
-    def validate(self, attrs):
+    def validate(self, attrs: dict):
         if attrs["start"] >= attrs["end"]:
-            raise serializers.ValidationError("Start time must be before end time.")
+            raise serializers.ValidationError("'start' must be before 'end'.")
         return attrs
 
-    def to_internal_value(self, data):
+    def to_internal_value(self, data: dict):
         if data.get(self.ALL_DAY_KEY):
             data["start"] = TimeRecurrence.DAY_START
             data["end"] = TimeRecurrence.DAY_END
@@ -29,7 +33,8 @@ class TimeRecurrenceSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance: TimeRecurrence):
         instance_dict = super().to_representation(instance)
-        # `days` is initially represented as a set; this converts it into a sorted list (`days` is stored sorted in the DB - see `TimeRecurrence.save()`)
+        # `days` is initially represented as a set; this converts it into a sorted list
+        # (`days` is stored sorted in the DB - see `TimeRecurrence.save()`)
         instance_dict["days"] = sorted(instance_dict["days"])
 
         if instance_dict["start"] == str(TimeRecurrence.DAY_START) and instance_dict["end"] == str(
@@ -45,9 +50,13 @@ class TimeslotSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Timeslot
-        fields = ["pk", "name", "time_recurrences"]
+        fields = [
+            "pk",
+            "name",
+            "time_recurrences",
+        ]
 
-    def create(self, validated_data):
+    def create(self, validated_data: dict):
         time_recurrences_data = validated_data.pop("time_recurrences")
         try:
             timeslot = Timeslot.objects.create(**validated_data)
@@ -65,7 +74,7 @@ class TimeslotSerializer(serializers.ModelSerializer):
 
         return timeslot
 
-    def update(self, timeslot: Timeslot, validated_data):
+    def update(self, timeslot: Timeslot, validated_data: dict):
         time_recurrences_data = validated_data.pop("time_recurrences")
 
         timeslot.name = validated_data["name"]
@@ -84,7 +93,11 @@ class FilterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Filter
-        fields = ["pk", "name", "filter_string"]
+        fields = [
+            "pk",
+            "name",
+            "filter_string",
+        ]
 
 
 class NotificationProfileSerializer(serializers.ModelSerializer):
@@ -95,11 +108,18 @@ class NotificationProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = NotificationProfile
-        fields = ["pk", "timeslot", "filters", "media", "phone_number", "active"]
+        fields = [
+            "pk",
+            "timeslot",
+            "filters",
+            "media",
+            "phone_number",
+            "active",
+        ]
         # "pk" needs to be listed, as "timeslot" is the actual primary key
         read_only_fields = ["pk"]
 
-    def create(self, validated_data):
+    def create(self, validated_data: dict):
         try:
             return super().create(validated_data)
         except IntegrityError as e:
