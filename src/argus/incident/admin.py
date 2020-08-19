@@ -4,7 +4,8 @@ from django.db.models.functions import Concat
 from django.utils.html import format_html_join
 from django.utils.safestring import mark_safe
 
-from argus.util.admin_utils import list_filter_factory
+from argus.auth.models import User
+from argus.util.admin_utils import add_elements_to_deleted_objects, list_filter_factory
 from . import fields, widgets
 from .forms import AddSourceSystemForm
 from .models import (
@@ -57,6 +58,14 @@ class SourceSystemAdmin(TextWidgetsOverrideModelAdmin):
             kwargs["form"] = AddSourceSystemForm
 
         return super().get_form(request, obj, **kwargs)
+
+    def get_deleted_objects(self, objs, request):
+        to_delete, model_count, perms_needed, protected = super().get_deleted_objects(objs, request)
+
+        new_to_delete = add_elements_to_deleted_objects(objs, to_delete, lambda source: [source.user], self.admin_site)
+        model_count[User._meta.verbose_name_plural] = len(objs)
+
+        return new_to_delete, model_count, perms_needed, protected
 
 
 class TagAdmin(TextWidgetsOverrideModelAdmin):
@@ -256,6 +265,14 @@ class AcknowledgementAdmin(admin.ModelAdmin):
         qs = super().get_queryset(request)
         # Reduce number of database calls
         return qs.prefetch_related("event__incident__source__type", "event__actor")
+
+    def get_deleted_objects(self, objs, request):
+        to_delete, model_count, perms_needed, protected = super().get_deleted_objects(objs, request)
+
+        new_to_delete = add_elements_to_deleted_objects(objs, to_delete, lambda ack: [ack.event], self.admin_site)
+        model_count[Event._meta.verbose_name_plural] = len(objs)
+
+        return new_to_delete, model_count, perms_needed, protected
 
 
 admin.site.register(SourceSystemType, SourceSystemTypeAdmin)
