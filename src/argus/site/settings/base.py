@@ -146,12 +146,13 @@ AUTHENTICATION_BACKENDS = (
     "django.contrib.auth.backends.ModelBackend",
 )
 
+
 # django-rest-framework
 
 # fmt: off
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
-        "rest_framework.authentication.TokenAuthentication",
+        "argus.auth.authentication.ExpiringTokenAuthentication",
         # For BrowsableAPIRenderer
         "rest_framework.authentication.SessionAuthentication",
     ),
@@ -169,6 +170,9 @@ REST_FRAMEWORK = {
     "TEST_REQUEST_DEFAULT_FORMAT": "json",
 }
 # fmt: on
+
+AUTH_TOKEN_EXPIRES_AFTER_DAYS = 14
+
 
 # django-channels
 

@@ -101,6 +101,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
 * `GET` to `/api/v1/auth/user/`: returns the logged in user
 * `GET` to `/api/v1/auth/users/<int:pk>/`: returns a user by pk
 * `POST` to `/oidc/api-token-auth/`: returns an auth token for the posted user
+  * Note that this token will expire after 14 days.
   * Example request body: `{ username: <username>, password: <password> }`
 * `/oidc/login/dataporten_feide/`: redirects to Feide login
 * `/api/v1/auth/phone-number/`: 
