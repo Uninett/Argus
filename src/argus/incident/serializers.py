@@ -6,6 +6,7 @@ from rest_framework import serializers
 from argus.auth.models import User
 from . import fields
 from .models import (
+    Acknowledgement,
     Event,
     Incident,
     IncidentTagRelation,
@@ -128,6 +129,7 @@ class IncidentSerializer(RemovableFieldSerializer):
 
         incident_repr["stateful"] = instance.stateful
         incident_repr["active"] = instance.active
+        incident_repr["acked"] = instance.acked
         return incident_repr
 
     def validate_ticket_url(self, value):
@@ -248,3 +250,47 @@ class EventSerializer(serializers.ModelSerializer):
         ]
         event_repr["type"] = OrderedDict(type_tuples)
         return event_repr
+
+
+class AcknowledgementSerializer(serializers.ModelSerializer):
+    event = EventSerializer()
+
+    class Meta:
+        model = Acknowledgement
+        fields = [
+            "pk",
+            "event",
+            "expiration",
+        ]
+        # "pk" needs to be listed, as "event" is the actual primary key
+        read_only_fields = ["pk"]
+
+    def create(self, validated_data: dict):
+        assert "incident" in validated_data
+        assert "actor" in validated_data
+        incident = validated_data.pop("incident")
+        actor = validated_data.pop("actor")
+
+        event_data = validated_data.pop("event")
+        event = Event.objects.create(incident=incident, actor=actor, **event_data)
+        return Acknowledgement.objects.create(event=event, **validated_data)
+
+    def to_internal_value(self, data: dict):
+        if "type" not in data["event"]:
+            data["event"]["type"] = Event.Type.ACKNOWLEDGE
+        return super().to_internal_value(data)
+
+    def validate_event(self, value: dict):
+        event_type = value["type"]
+        if event_type != Event.Type.ACKNOWLEDGE:
+            raise serializers.ValidationError(
+                f"'{event_type}' is not a valid event type for acknowledgements."
+                f" Use '{Event.Type.ACKNOWLEDGE}' or omit 'type' completely."
+            )
+        return value
+
+    def validate(self, attrs: dict):
+        expiration = attrs.get("expiration")
+        if expiration and expiration <= attrs["event"]["timestamp"]:
+            raise serializers.ValidationError("'expiration' must be after 'event.timestamp'.")
+        return attrs

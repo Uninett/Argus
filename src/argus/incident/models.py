@@ -8,7 +8,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
 from django.db import models
 from django.db.models import Q
-from django.db.models.signals import post_save, pre_save
+from django.db.models.signals import post_delete, post_save, pre_save
 from django.dispatch import receiver
 from django.utils import timezone
 
@@ -155,6 +155,12 @@ class IncidentQuerySet(models.QuerySet):
     def inactive(self):
         return self.filter(end_time__lte=timezone.now())
 
+    def acked(self):
+        return self.filter(self._generate_acked_query()).distinct()
+
+    def not_acked(self):
+        return self.exclude(self._generate_acked_query())
+
     def prefetch_default_related(self):
         return self.prefetch_related("incident_tag_relations__tag", "source__type")
 
@@ -165,6 +171,13 @@ class IncidentQuerySet(models.QuerySet):
             qs.append(self.filter(incident_tag_relations__tag__in=tag_qs))
         qs = reduce(and_, qs)
         return qs.distinct()
+
+    # Cannot be a constant, because `timezone.now()` would have been evaluated at compile time
+    @staticmethod
+    def _generate_acked_query():
+        acks_query = Q(events__ack__isnull=False)
+        acks_not_expired_query = Q(events__ack__expiration__isnull=True) | Q(events__ack__expiration__gt=timezone.now())
+        return acks_query & acks_not_expired_query
 
 
 # TODO: review whether fields should be nullable, and on_delete modes
@@ -263,6 +276,16 @@ class Incident(models.Model):
     def last_close_or_end_event(self):
         return self.events.order_by("timestamp").filter(type__in=(Event.Type.CLOSE, Event.Type.INCIDENT_END)).last()
 
+    @property
+    def acks(self):
+        return Acknowledgement.objects.filter(event__incident=self)
+
+    @property
+    def acked(self):
+        acks_query = Q(ack__isnull=False)
+        acks_not_expired_query = Q(ack__expiration__isnull=True) | Q(ack__expiration__gt=timezone.now())
+        return self.events.filter(acks_query & acks_not_expired_query).exists()
+
 
 @receiver(post_save, sender=Incident)
 def create_start_event(sender, instance: Incident, created, raw, *args, **kwargs):
@@ -323,3 +346,23 @@ class Event(models.Model):
 
     def __str__(self):
         return f"'{self.get_type_display()}' event by {self.actor} at {self.timestamp}"
+
+
+class Acknowledgement(models.Model):
+    event = models.OneToOneField(to=Event, on_delete=models.PROTECT, primary_key=True, related_name="ack")
+    expiration = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["-event__timestamp"]
+
+    def __str__(self):
+        expiration_message = f" (expires {self.expiration})" if self.expiration else ""
+        return f"Acknowledgement of incident #{self.event.incident.pk} by {self.event.actor}{expiration_message}"
+
+
+# TODO: ensure that Django admin displays the event(s) that will be deleted when deleting Acknowledgements
+#  see https://docs.djangoproject.com/en/3.0/ref/contrib/admin/actions/ under the first "Warning" box
+@receiver(post_delete, sender=Acknowledgement)
+def delete_associated_event(sender, instance: Acknowledgement, *args, **kwargs):
+    if hasattr(instance, "event") and instance.event:
+        instance.event.delete()

@@ -6,6 +6,7 @@ from django.utils.safestring import mark_safe
 
 from .forms import AddSourceSystemForm
 from .models import (
+    Acknowledgement,
     Event,
     Incident,
     IncidentQuerySet,
@@ -118,6 +119,30 @@ class ActiveListFilter(admin.SimpleListFilter):
             return queryset.inactive()
 
 
+class AckedListFilter(admin.SimpleListFilter):
+    title = "acked"
+    # Parameter for the filter that will be used in the URL query
+    parameter_name = "acked"
+
+    ACKED = 1
+    NOT_ACKED = 0
+
+    def lookups(self, request, model_admin):
+        return (
+            (self.ACKED, "Yes"),
+            (self.NOT_ACKED, "No"),
+        )
+
+    def queryset(self, request, queryset: IncidentQuerySet):
+        if not self.value():
+            return queryset
+
+        if int(self.value()) == self.ACKED:
+            return queryset.acked()
+        else:
+            return queryset.not_acked()
+
+
 class IncidentAdmin(TextWidgetsOverrideModelAdmin):
     class IncidentTagRelationInline(admin.TabularInline):
         model = IncidentTagRelation
@@ -138,6 +163,8 @@ class IncidentAdmin(TextWidgetsOverrideModelAdmin):
         "description",
         "details_url",
         "ticket_url",
+        "get_open",
+        "get_shown",
     )
     search_fields = (
         "description",
@@ -150,6 +177,7 @@ class IncidentAdmin(TextWidgetsOverrideModelAdmin):
     list_filter = (
         StatefulListFilter,
         ActiveListFilter,
+        AckedListFilter,
         "source",
         "source__type",
     )
@@ -166,10 +194,22 @@ class IncidentAdmin(TextWidgetsOverrideModelAdmin):
 
     get_tags.short_description = "Tags"
 
+    def get_open(self, incident: Incident):
+        return incident.active
+
+    get_open.short_description = "Open"
+    get_open.boolean = True
+
+    def get_shown(self, incident: Incident):
+        return incident.active and not incident.acked
+
+    get_shown.short_description = "Shown"
+    get_shown.boolean = True
+
     def get_queryset(self, request):
         qs: IncidentQuerySet = super().get_queryset(request)
         # Reduce number of database calls
-        return qs.prefetch_default_related()
+        return qs.prefetch_default_related().prefetch_related("events__ack")
 
 
 class IncidentRelationTypeAdmin(TextWidgetsOverrideModelAdmin):
@@ -221,6 +261,56 @@ class EventAdmin(admin.ModelAdmin):
         return qs.select_related("actor").prefetch_related("incident__source__type")
 
 
+class AcknowledgementAdmin(admin.ModelAdmin):
+    list_display = ("get_id", "get_timestamp", "expiration", "get_actor", "get_description")
+    search_fields = (
+        "event__incident__pk",
+        "event__incident__source_incident_id",
+        "event__incident__description",
+        "event__actor__username",
+        "event__actor__first_name",
+        "event__actor__last_name",
+        "event__description",
+    )
+    list_filter = ("event__incident__source", "event__incident__source__type")
+
+    raw_id_fields = ("event",)
+
+    def get_readonly_fields(self, request, obj=None):
+        # Prevent `event` from being changed, as it contains the acknowledgement's data
+        return ("event",) if obj else ()
+
+    def get_id(self, ack: Acknowledgement):
+        source_incident_str = f"{ack.event.incident.source_incident_id} in {ack.event.incident.source}"
+        return mark_safe(f"#{ack.event.incident.pk} &emsp; [{source_incident_str}]")
+
+    get_id.short_description = "Incident ID"
+    get_id.admin_order_field = "event__indicent__pk"
+
+    def get_timestamp(self, ack: Acknowledgement):
+        return ack.event.timestamp
+
+    get_timestamp.short_description = "Timestamp"
+    get_timestamp.admin_order_field = "event__timestamp"
+
+    def get_actor(self, ack: Acknowledgement):
+        return ack.event.actor
+
+    get_actor.short_description = "Actor"
+    get_actor.admin_order_field = "event__actor"
+
+    def get_description(self, ack: Acknowledgement):
+        return ack.event.description
+
+    get_description.short_description = "Description"
+    get_description.admin_order_field = "event__description"
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        # Reduce number of database calls
+        return qs.prefetch_related("event__incident__source__type", "event__actor")
+
+
 admin.site.register(SourceSystemType, SourceSystemTypeAdmin)
 admin.site.register(SourceSystem, SourceSystemAdmin)
 admin.site.register(Tag, TagAdmin)
@@ -228,3 +318,4 @@ admin.site.register(Incident, IncidentAdmin)
 admin.site.register(IncidentRelation, IncidentRelationAdmin)
 admin.site.register(IncidentRelationType, IncidentRelationTypeAdmin)
 admin.site.register(Event, EventAdmin)
+admin.site.register(Acknowledgement, AcknowledgementAdmin)
