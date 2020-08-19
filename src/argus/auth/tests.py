@@ -57,6 +57,26 @@ class APITests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         return response
 
+    def test_get_auth_token_always_replaces_old_token(self):
+        def assert_token_is_replaced(user: User, user_password: str, old_token: Token, client: APIClient):
+            old_token_key = old_token.key
+
+            response = self._successfully_get_auth_token(user, user_password, client)
+            new_token_key = response.data["token"]
+
+            self.assertNotEqual(new_token_key, old_token_key)
+            with self.assertRaises(Token.DoesNotExist):
+                old_token.refresh_from_db()
+            user.refresh_from_db()
+            self.assertEqual(new_token_key, user.auth_token.key)
+
+        assert_token_is_replaced(
+            self.normal_user1, self.normal_user1_password, self.normal_user1_token, self.normal_user1_client
+        )
+        assert_token_is_replaced(
+            self.superuser1, self.superuser1_password, self.superuser1_token, self.superuser1_client
+        )
+
     def test_auth_token_expires_and_is_deleted(self):
         some_auth_required_path = reverse("auth:current-user")
 
