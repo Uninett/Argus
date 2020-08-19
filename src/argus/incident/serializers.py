@@ -16,24 +16,13 @@ from .models import (
 )
 
 
-class RemovableFieldSerializer(serializers.ModelSerializer):
-    NO_PKS_KEY = "no_pks"
-
-    def to_representation(self, instance):
-        obj_repr = super().to_representation(instance)
-
-        if self.NO_PKS_KEY in self.context:
-            obj_repr.pop("pk")
-        return obj_repr
-
-
 class SourceSystemTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = SourceSystemType
         fields = ["name"]
 
 
-class SourceSystemSerializer(RemovableFieldSerializer):
+class SourceSystemSerializer(serializers.ModelSerializer):
     type = SourceSystemTypeSerializer(read_only=True)
 
     class Meta:
@@ -42,7 +31,7 @@ class SourceSystemSerializer(RemovableFieldSerializer):
         read_only_fields = ["type", "user", "base_url"]
 
 
-class IncidentTagRelationSerializer(RemovableFieldSerializer):
+class IncidentTagRelationSerializer(serializers.ModelSerializer):
     tag = serializers.CharField(write_only=True)
 
     class Meta:
@@ -82,7 +71,7 @@ class IncidentTagRelationSerializer(RemovableFieldSerializer):
         return tag_repr
 
 
-class IncidentSerializer(RemovableFieldSerializer):
+class IncidentSerializer(serializers.ModelSerializer):
     end_time = fields.DateTimeInfinitySerializerField(required=False, allow_null=True)
     source = SourceSystemSerializer(read_only=True)
     tags = IncidentTagRelationSerializer(many=True, write_only=True)
@@ -205,7 +194,7 @@ class IncidentPureDeserializer(serializers.ModelSerializer):
 
 
 # TODO: remove once it's not in use anymore
-class IncidentSerializer_legacy(RemovableFieldSerializer):
+class IncidentSerializer_legacy(serializers.ModelSerializer):
     source = SourceSystemSerializer(read_only=True)
 
     class Meta:
