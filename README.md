@@ -291,6 +291,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
             "incident": 10101,
             "actor": 12,
             "timestamp": "2011-11-11T11:11:11+02:00",
+            "received": "2011-11-11T11:11:10+02:00",
             "type": {
                 "value": "STA",
                 "display": "Incident start"
@@ -302,6 +303,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
             "incident": 10101,
             "actor": 12,
             "timestamp": "2011-11-11T11:11:12+02:00",
+            "received": "2011-11-11T11:11:11+02:00",
             "type": {
                 "value": "END",
                 "display": "Incident end"
@@ -355,6 +357,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
                 "incident": 10101,
                 "actor": 140,
                 "timestamp": "2011-11-11T11:11:11.235877+02:00",
+                received": "2011-11-11T11:11:11.235897+02:00",
                 "type": {
                     "value": "ACK",
                     "display": "Acknowledge"
@@ -370,6 +373,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
                 "incident": 10101,
                 "actor": 130,
                 "timestamp": "2011-11-12T11:11:11+02:00",
+                "received": "2011-11-12T11:11:11+02:00",
                 "type": {
                     "value": "ACK",
                     "display": "Acknowledge"
