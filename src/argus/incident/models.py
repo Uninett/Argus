@@ -366,8 +366,6 @@ class Acknowledgement(models.Model):
         return f"Acknowledgement of incident #{self.event.incident.pk} by {self.event.actor}{expiration_message}"
 
 
-# TODO: ensure that Django admin displays the event(s) that will be deleted when deleting Acknowledgements
-#  see https://docs.djangoproject.com/en/3.0/ref/contrib/admin/actions/ under the first "Warning" box
 @receiver(post_delete, sender=Acknowledgement)
 def delete_associated_event(sender, instance: Acknowledgement, *args, **kwargs):
     if hasattr(instance, "event") and instance.event:
