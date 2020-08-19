@@ -15,9 +15,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path, re_path
-from rest_framework.authtoken import views as rest_views
 from social_django.urls import extra
 
+from argus.auth.views import ObtainNewAuthToken
 from argus.dataporten import views as dataporten_views
 
 
@@ -25,7 +25,7 @@ api_urls = [
     path("auth/", include("argus.auth.urls")),
     path("incidents/", include("argus.incident.urls")),
     path("notificationprofiles/", include("argus.notificationprofile.urls")),
-    path("token-auth/", rest_views.obtain_auth_token, name="api-token-auth"),
+    path("token-auth/", ObtainNewAuthToken.as_view(), name="api-token-auth"),
 ]
 
 psa_urls = [
