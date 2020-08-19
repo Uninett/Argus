@@ -127,6 +127,12 @@ class IncidentSerializer(serializers.ModelSerializer):
         validator(value)
         return value
 
+    def validate(self, attrs: dict):
+        end_time = attrs.get("end_time")
+        if end_time and end_time < attrs["start_time"]:
+            raise serializers.ValidationError("'end_time' cannot be before 'start_time'.")
+        return attrs
+
 
 class IncidentPureDeserializer(serializers.ModelSerializer):
     tags = IncidentTagRelationSerializer(many=True, write_only=True)
