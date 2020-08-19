@@ -8,7 +8,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
 from django.db import models
 from django.db.models import Q
-from django.db.models.signals import post_delete, post_save, pre_save
+from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
 from django.utils import timezone
 
@@ -55,11 +55,10 @@ class SourceSystemType(models.Model):
     def __str__(self):
         return self.name
 
-
-# Ensure that the name is always lowercase, to avoid names that only differ by case
-@receiver(pre_save, sender=SourceSystemType)
-def set_name_lowercase(sender, instance: SourceSystemType, *args, **kwargs):
-    instance.name = instance.name.lower()
+    def save(self, *args, **kwargs):
+        # Ensure that the name is always lowercase, to avoid names that only differ by case
+        self.name = self.name.lower()
+        super().save(*args, **kwargs)
 
 
 class SourceSystem(models.Model):
