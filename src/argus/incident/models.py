@@ -249,7 +249,8 @@ class Incident(models.Model):
 
     @property
     def tags(self):
-        return Tag.objects.filter(incident_tag_relations__incident=self)
+        # Don't do `Tag.objects.filter()`, which ignores prefetched data
+        return [relation.tag for relation in self.incident_tag_relations.all()]
 
     @property
     def incident_relations(self):

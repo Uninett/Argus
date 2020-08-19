@@ -179,7 +179,7 @@ class IncidentRelationAdmin(admin.ModelAdmin):
     list_display = ("get_str", "type", "description")
     search_fields = ("incident1__source_incident_id", "incident2__source_incident_id")
     list_filter = ("type",)
-    list_select_related = ("type",)
+    list_select_related = ("incident1", "incident2", "type")
 
     raw_id_fields = ("incident1", "incident2")
 
