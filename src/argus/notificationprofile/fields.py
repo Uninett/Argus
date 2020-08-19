@@ -37,7 +37,7 @@ class FilterManyToManyField(PrimaryKeyRelatedField):
 
 class PhoneNumberForeignKeyField(PrimaryKeyRelatedField):
     def get_queryset(self):
-        return self.context["request"].user.phonenumbers.all()
+        return self.context["request"].user.phone_numbers.all()
 
     def use_pk_only_optimization(self):
         return False
