@@ -27,6 +27,21 @@ class APITests(APITestCase):
     def assemble_token_auth_kwarg(token_key: str):
         return {"HTTP_AUTHORIZATION": f"Token {token_key}"}
 
+    def test_logout_deletes_token(self):
+        logout_path = reverse("auth:logout")
+
+        def assert_token_is_deleted(token: Token, user: User, client: APIClient):
+            self.assertTrue(hasattr(user, "auth_token"))
+            self.assertEqual(client.post(logout_path).status_code, status.HTTP_200_OK)
+
+            user.refresh_from_db()
+            self.assertFalse(hasattr(user, "auth_token"))
+            with self.assertRaises(Token.DoesNotExist):
+                token.refresh_from_db()
+
+        assert_token_is_deleted(self.normal_user1_token, self.normal_user1, self.normal_user1_client)
+        assert_token_is_deleted(self.superuser1_token, self.superuser1, self.superuser1_client)
+
     def test_get_current_user_returns_correct_user(self):
         current_user_path = reverse("auth:current-user")
 
