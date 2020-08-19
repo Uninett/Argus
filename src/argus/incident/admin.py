@@ -86,7 +86,7 @@ class IncidentAdmin(TextWidgetsOverrideModelAdmin):
     list_display = (
         "source_incident_id",
         "start_time",
-        "end_time",
+        "get_end_time",
         "source",
         "get_tags",
         "description",
@@ -113,6 +113,12 @@ class IncidentAdmin(TextWidgetsOverrideModelAdmin):
 
     text_input_form_fields = ("source_incident_id",)
     url_input_form_fields = ("details_url", "ticket_url")
+
+    def get_end_time(self, incident: Incident):
+        return incident.end_time_str
+
+    get_end_time.short_description = "End time"
+    get_end_time.admin_order_field = "end_time"
 
     def get_tags(self, incident: Incident):
         html_open_tag = '<div style="display: inline-block; white-space: nowrap;">'

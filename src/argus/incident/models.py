@@ -217,16 +217,17 @@ class Incident(models.Model):
         ordering = ["-start_time"]
 
     def __str__(self):
-        if self.end_time:
-            end_time_str = f" - {get_infinity_repr(self.end_time, str_repr=True) or self.end_time}"
-        else:
-            end_time_str = ""
+        end_time_str = f" - {self.end_time_str}" if self.end_time else ""
         return f"Incident #{self.pk} at {self.start_time}{end_time_str} [#{self.source_incident_id} from {self.source}]"
 
     def save(self, *args, **kwargs):
         # Parse and replace `end_time`, to avoid having to call `refresh_from_db()`
         self.end_time = self._meta.get_field("end_time").to_python(self.end_time)
         super().save(*args, **kwargs)
+
+    @property
+    def end_time_str(self):
+        return get_infinity_repr(self.end_time, str_repr=True) or self.end_time
 
     @property
     def stateful(self):
