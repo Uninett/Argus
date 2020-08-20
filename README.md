@@ -292,6 +292,8 @@ All endpoints require requests to contain a header with key `Authorization` and 
     }
     ```
 
+    If posted by an end user (a user with no associated source system), the `timestamp` field is optional, and will be set to the time the server received it if omitted.
+
     The valid `type`s are:
     * `STA` - Incident start
       * An incident automatically creates an event of this type when the incident is created, but cannot have more than one. In other words, it's never allowed to post an event of this type.
@@ -363,6 +365,8 @@ All endpoints require requests to contain a header with key `Authorization` and 
     ```
 
     Only end users can post acknowledgements.
+
+    The `timestamp` field is optional, and will be set to the time the server received it if omitted.
     </details>
 
 * `GET` to `/api/v1/incidents/<int:pk>/acks/<int:pk>/`: returns a specific acknowledgement of the specified incident

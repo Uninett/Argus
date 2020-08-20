@@ -1,6 +1,7 @@
 from collections import OrderedDict
 
 from django.core.validators import URLValidator
+from django.utils import timezone
 from rest_framework import serializers
 
 from argus.auth.models import User
@@ -235,6 +236,13 @@ class EventSerializer(serializers.ModelSerializer):
         Events should not be changed.
         """
         raise NotImplementedError()
+
+    def to_internal_value(self, data: dict):
+        user = self.context["request"].user
+        if user.is_end_user and "timestamp" not in data:
+            data["timestamp"] = timezone.now()
+            # TODO: should set `received` to the same as `timestamp`, once the field is added
+        return super().to_internal_value(data)
 
     def to_representation(self, instance: Event):
         event_repr = super().to_representation(instance)
