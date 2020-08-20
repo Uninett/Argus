@@ -111,6 +111,18 @@ class NotificationProfileSerializer(serializers.ModelSerializer):
             else:
                 raise e
 
+    def update(self, instance: NotificationProfile, validated_data: dict):
+        new_timeslot = validated_data.pop("timeslot")
+        old_timeslot = instance.timeslot
+        if new_timeslot != old_timeslot:
+            # Save the notification profile with the new timeslot (will duplicate the object with a different PK)
+            instance.timeslot = new_timeslot
+            instance.save()
+            # Delete the duplicate (old) object
+            NotificationProfile.objects.get(timeslot=old_timeslot).delete()
+
+        return super().update(instance, validated_data)
+
     def validate(self, attrs: dict):
         if attrs["timeslot"].user != self.context["request"].user:
             raise serializers.ValidationError("The user of 'timeslot' must be the same as the requesting user.")

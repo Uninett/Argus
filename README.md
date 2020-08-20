@@ -401,6 +401,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
 * `/api/v1/notificationprofiles/<int:pk>/`:
   * `GET`: returns one of the logged in user's notification profiles by pk
   * `PUT`: updates and returns one of the logged in user's notification profiles by pk
+    * Note that if `timeslot` is changed, the notification profile's PK will also change. This consequently means that the URL containing the previous PK will return a `404 Not Found` status code.
     * Example request body: same as `POST` to `/api/v1/notificationprofiles/`
   * `DELETE`: deletes one of the logged in user's notification profiles by pk
 
