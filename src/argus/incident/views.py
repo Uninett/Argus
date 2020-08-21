@@ -160,17 +160,19 @@ class EventViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, mixins.Retrie
         user = self.request.user
         incident = Incident.objects.get(pk=self.kwargs["incident_pk"])
 
-        timestamp = serializer.validated_data["timestamp"]
         event_type = serializer.validated_data["type"]
         self.validate_event_type_for_user(event_type, user)
-        self.validate_event_type_for_incident(event_type, incident)
-
-        if event_type in {Event.Type.INCIDENT_END, Event.Type.CLOSE}:
-            incident.end_time = timestamp
-            incident.save()
-        elif event_type == Event.Type.REOPEN:
-            incident.end_time = INFINITY_REPR
-            incident.save()
+        try:
+            self.validate_event_type_for_incident(event_type, incident)
+        except serializers.ValidationError as e:
+            # Allow any event from source systems (as long as the user is allowed to post the event type),
+            # even if the posted type is invalid for the incident - like if an `INCIDENT_END` event
+            # is sent after the incident has been manually closed
+            if not user.is_source_system:
+                raise e
+        else:
+            # Only update incident if everything is valid; otherwise, just record the event
+            self.update_incident(serializer.validated_data, incident)
 
         serializer.save(incident=incident, actor=user)
 
@@ -190,7 +192,7 @@ class EventViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, mixins.Retrie
         if incident.stateful:
             if event_type in {Event.Type.INCIDENT_START, Event.Type.INCIDENT_END}:
                 validate_incident_has_no_relation_to_event_type()
-            elif event_type == Event.Type.CLOSE and not incident.open:
+            if event_type in {Event.Type.INCIDENT_END, Event.Type.CLOSE} and not incident.open:
                 self._raise_type_validation_error("The incident is already closed.")
             elif event_type == Event.Type.REOPEN and incident.open:
                 self._raise_type_validation_error("The incident is already open.")
@@ -205,6 +207,16 @@ class EventViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, mixins.Retrie
             self._raise_type_validation_error(
                 f"Acknowledgements of this incidents should be posted through {acks_endpoint}."
             )
+
+    def update_incident(self, validated_data: dict, incident: Incident):
+        timestamp = validated_data["timestamp"]
+        event_type = validated_data["type"]
+        if event_type in {Event.Type.INCIDENT_END, Event.Type.CLOSE}:
+            incident.end_time = timestamp
+            incident.save()
+        elif event_type == Event.Type.REOPEN:
+            incident.end_time = INFINITY_REPR
+            incident.save()
 
     @staticmethod
     def _raise_type_validation_error(message: str):

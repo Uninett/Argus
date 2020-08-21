@@ -258,11 +258,11 @@ class Incident(models.Model):
 
     @property
     def start_event(self):
-        return self.events.get(type=Event.Type.INCIDENT_START)
+        return self.events.filter(type=Event.Type.INCIDENT_START).order_by("timestamp").first()
 
     @property
     def end_event(self):
-        return self.events.get(type=Event.Type.INCIDENT_END)
+        return self.events.filter(type=Event.Type.INCIDENT_END).order_by("timestamp").first()
 
     @property
     def last_close_or_end_event(self):
@@ -303,9 +303,7 @@ class Incident(models.Model):
 def create_start_event(sender, instance: Incident, created, raw, *args, **kwargs):
     if raw or not created:
         return
-    try:
-        _ = instance.start_event
-    except Event.DoesNotExist:
+    if not instance.start_event:
         Event.objects.create(
             incident=instance,
             actor=instance.source.user,
