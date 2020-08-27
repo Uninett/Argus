@@ -88,6 +88,7 @@ a safe place to stash all the dependencies.
 2. Fill the activated virtualenv with dependencies:
 
 ```
+$ pip install -r requirements/prod.txt
 $ pip install -r requirements/dev.txt
 ```
 
