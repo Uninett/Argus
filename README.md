@@ -79,6 +79,34 @@ This creates the file `src/argus/incident/fixtures/incident/mock_data.json`.
 python manage.py loaddata incident/mock_data
 ```
 
+### Running in development
+
+The fastest is to use virtualenv or virtaulenvwrapper or similar to create
+a safe place to stash all the dependencies.
+
+1. Create the virtualenv
+2. Fill the activated virtualenv with dependencies:
+
+```
+$ pip install -r requirements/dev.txt
+```
+
+Copy the `cmd.sh-template` to a new name ending with ".sh", make it executable
+and set the environment variables within. This file must not be checked in to
+version control, since it contains passwords. You *must* set DATABASE_URL,
+DJANGO_SETTINGS_MODULE and SECRET_KEY. If you want to test the frontend you
+must also set all the DATAPORTEN-settings. Get the values from
+https://dashboard.dataporten.no/ or create a new application there.
+
+For the database we recommend postgres as we use a postgres-specific feature in
+the Incident-model.
+
+DJANGO_SETTINGS_MODULE can be set to "argus.site.settings.dev" but we recommend
+having a `localsettings.py` in the same directory as `manage.py` with any
+overrides. This file also does not belong in version control since it reflects
+a specific developer's preferences. Smart things first tested in
+a localsettings can be moved to the other settings-files later on.
+
 ### Debugging tips
 
 To test/debug notifications as a whole, use the email subsystem (Media: Email in a NotificationProfile).
