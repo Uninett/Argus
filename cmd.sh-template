@@ -1,0 +1,27 @@
+#!/bin/bash
+
+# This will run manage.py with any command with lots of environmnent variables
+# set to something useful
+#
+# It assumes it is running inside a virtualenv
+#
+# Useful commands:
+#
+# * runserver <PORT>
+# * The migrate commands
+# * dbshell
+# * shell
+#
+# Run without any args to get all available commands
+
+export DEBUG=1  # 1 for True, 0 for False
+export ARGUS_DATAPORTEN_SECRET=UUID  # Get one at dataporten
+export ARGUS_DATAPORTEN_KEY=  # Get one at dataporten
+export EMAIL_HOST=localhost
+export EMAIL_PORT=25  # Needs to be 587 if on AWS
+export SECRET_KEY=  # 50 random charcaters, I use pwgen -s 50
+
+export DJANGO_SETTINGS_MODULE=  # Start out with copy of argus.site.settings.dev, or start-import from it
+export DATABASE_URL=  # I use: postgresql://argus:<LOCAL DB PASSWORD>@localhost:5432/argus
+
+python3.8 manage.py "$@"
