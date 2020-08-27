@@ -57,7 +57,6 @@ class SourceSystemType(models.Model):
 
 
 # Ensure that the name is always lowercase, to avoid names that only differ by case
-# Note: this is not run when calling `update()` on a queryset
 @receiver(pre_save, sender=SourceSystemType)
 def set_name_lowercase(sender, instance: SourceSystemType, *args, **kwargs):
     instance.name = instance.name.lower()
@@ -150,16 +149,22 @@ class IncidentTagRelation(models.Model):
 
 
 class IncidentQuerySet(models.QuerySet):
+    def update(self, **kwargs):
+        """
+        This should not be used, as it doesn't call `save()`, which breaks things like the ws (WebSocket) app.
+        """
+        raise NotImplementedError()
+
     def stateful(self):
         return self.filter(end_time__isnull=False)
 
     def stateless(self):
         return self.filter(end_time__isnull=True)
 
-    def active(self):
+    def open(self):
         return self.filter(end_time__gt=timezone.now())
 
-    def inactive(self):
+    def closed(self):
         return self.filter(end_time__lte=timezone.now())
 
     def acked(self):
@@ -193,9 +198,8 @@ class Incident(models.Model):
     end_time = DateTimeInfinityField(
         null=True,
         blank=True,
-        # TODO: add 'infinity' checkbox to admin
         help_text="The time the incident was resolved or closed. If not set, the incident is stateless;"
-        " if 'infinity' is checked, the incident is stateful, but has not yet been resolved or closed - i.e. active.",
+        " if 'infinity' is checked, the incident is stateful, but has not yet been resolved or closed - i.e. open.",
     )
     source = models.ForeignKey(
         to=SourceSystem,
@@ -224,10 +228,7 @@ class Incident(models.Model):
         ordering = ["-start_time"]
 
     def __str__(self):
-        if self.end_time:
-            end_time_str = f" - {get_infinity_repr(self.end_time, str_repr=True) or self.end_time}"
-        else:
-            end_time_str = ""
+        end_time_str = f" - {self.end_time_str}" if self.end_time else ""
         return f"Incident #{self.pk} at {self.start_time}{end_time_str} [#{self.source_incident_id} from {self.source}]"
 
     def save(self, *args, **kwargs):
@@ -236,32 +237,16 @@ class Incident(models.Model):
         super().save(*args, **kwargs)
 
     @property
+    def end_time_str(self):
+        return get_infinity_repr(self.end_time, str_repr=True) or self.end_time
+
+    @property
     def stateful(self):
         return self.end_time is not None
 
     @property
-    def active(self):
+    def open(self):
         return self.stateful and self.end_time > timezone.now()
-
-    def set_active(self, actor: User):
-        if not self.stateful:
-            raise ValidationError("Cannot set a stateless incident as active")
-        if self.active:
-            return
-
-        self.end_time = INFINITY_REPR
-        self.save(update_fields=["end_time"])
-        Event.objects.create(incident=self, actor=actor, timestamp=timezone.now(), type=Event.Type.REOPEN)
-
-    def set_inactive(self, actor: User):
-        if not self.stateful:
-            raise ValidationError("Cannot set a stateless incident as inactive")
-        if not self.active:
-            return
-
-        self.end_time = timezone.now()
-        self.save(update_fields=["end_time"])
-        Event.objects.create(incident=self, actor=actor, timestamp=self.end_time, type=Event.Type.CLOSE)
 
     @property
     def tags(self):
@@ -273,11 +258,11 @@ class Incident(models.Model):
 
     @property
     def start_event(self):
-        return self.events.get(type=Event.Type.INCIDENT_START)
+        return self.events.filter(type=Event.Type.INCIDENT_START).order_by("timestamp").first()
 
     @property
     def end_event(self):
-        return self.events.get(type=Event.Type.INCIDENT_END)
+        return self.events.filter(type=Event.Type.INCIDENT_END).order_by("timestamp").first()
 
     @property
     def last_close_or_end_event(self):
@@ -293,14 +278,32 @@ class Incident(models.Model):
         acks_not_expired_query = Q(ack__expiration__isnull=True) | Q(ack__expiration__gt=timezone.now())
         return self.events.filter(acks_query & acks_not_expired_query).exists()
 
+    def set_open(self, actor: User):
+        if not self.stateful:
+            raise ValidationError("Cannot set a stateless incident as open")
+        if self.open:
+            return
+
+        self.end_time = INFINITY_REPR
+        self.save(update_fields=["end_time"])
+        Event.objects.create(incident=self, actor=actor, timestamp=timezone.now(), type=Event.Type.REOPEN)
+
+    def set_closed(self, actor: User):
+        if not self.stateful:
+            raise ValidationError("Cannot set a stateless incident as closed")
+        if not self.open:
+            return
+
+        self.end_time = timezone.now()
+        self.save(update_fields=["end_time"])
+        Event.objects.create(incident=self, actor=actor, timestamp=self.end_time, type=Event.Type.CLOSE)
+
 
 @receiver(post_save, sender=Incident)
 def create_start_event(sender, instance: Incident, created, raw, *args, **kwargs):
     if raw or not created:
         return
-    try:
-        _ = instance.start_event
-    except Event.DoesNotExist:
+    if not instance.start_event:
         Event.objects.create(
             incident=instance,
             actor=instance.source.user,
@@ -367,8 +370,6 @@ class Acknowledgement(models.Model):
         return f"Acknowledgement of incident #{self.event.incident.pk} by {self.event.actor}{expiration_message}"
 
 
-# TODO: ensure that Django admin displays the event(s) that will be deleted when deleting Acknowledgements
-#  see https://docs.djangoproject.com/en/3.0/ref/contrib/admin/actions/ under the first "Warning" box
 @receiver(post_delete, sender=Acknowledgement)
 def delete_associated_event(sender, instance: Acknowledgement, *args, **kwargs):
     if hasattr(instance, "event") and instance.event:

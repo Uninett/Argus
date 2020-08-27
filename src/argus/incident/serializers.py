@@ -1,6 +1,7 @@
 from collections import OrderedDict
 
 from django.core.validators import URLValidator
+from django.utils import timezone
 from rest_framework import serializers
 
 from argus.auth.models import User
@@ -16,24 +17,13 @@ from .models import (
 )
 
 
-class RemovableFieldSerializer(serializers.ModelSerializer):
-    NO_PKS_KEY = "no_pks"
-
-    def to_representation(self, instance):
-        obj_repr = super().to_representation(instance)
-
-        if self.NO_PKS_KEY in self.context:
-            obj_repr.pop("pk")
-        return obj_repr
-
-
 class SourceSystemTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = SourceSystemType
         fields = ["name"]
 
 
-class SourceSystemSerializer(RemovableFieldSerializer):
+class SourceSystemSerializer(serializers.ModelSerializer):
     type = SourceSystemTypeSerializer(read_only=True)
 
     class Meta:
@@ -42,7 +32,7 @@ class SourceSystemSerializer(RemovableFieldSerializer):
         read_only_fields = ["type", "user", "base_url"]
 
 
-class IncidentTagRelationSerializer(RemovableFieldSerializer):
+class IncidentTagRelationSerializer(serializers.ModelSerializer):
     tag = serializers.CharField(write_only=True)
 
     class Meta:
@@ -82,7 +72,7 @@ class IncidentTagRelationSerializer(RemovableFieldSerializer):
         return tag_repr
 
 
-class IncidentSerializer(RemovableFieldSerializer):
+class IncidentSerializer(serializers.ModelSerializer):
     end_time = fields.DateTimeInfinitySerializerField(required=False, allow_null=True)
     source = SourceSystemSerializer(read_only=True)
     tags = IncidentTagRelationSerializer(many=True, write_only=True)
@@ -128,7 +118,7 @@ class IncidentSerializer(RemovableFieldSerializer):
         incident_repr["tags"] = tags_field.to_representation(instance.incident_tag_relations.all())
 
         incident_repr["stateful"] = instance.stateful
-        incident_repr["active"] = instance.active
+        incident_repr["open"] = instance.open
         incident_repr["acked"] = instance.acked
         return incident_repr
 
@@ -205,7 +195,7 @@ class IncidentPureDeserializer(serializers.ModelSerializer):
 
 
 # TODO: remove once it's not in use anymore
-class IncidentSerializer_legacy(RemovableFieldSerializer):
+class IncidentSerializer_legacy(serializers.ModelSerializer):
     source = SourceSystemSerializer(read_only=True)
 
     class Meta:
@@ -240,6 +230,13 @@ class EventSerializer(serializers.ModelSerializer):
         Events should not be changed.
         """
         raise NotImplementedError()
+
+    def to_internal_value(self, data: dict):
+        user = self.context["request"].user
+        if user.is_end_user and "timestamp" not in data:
+            data["timestamp"] = timezone.now()
+            # TODO: should set `received` to the same as `timestamp`, once the field is added
+        return super().to_internal_value(data)
 
     def to_representation(self, instance: Event):
         event_repr = super().to_representation(instance)

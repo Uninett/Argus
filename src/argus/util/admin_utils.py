@@ -1,7 +1,11 @@
-from typing import Callable
+from typing import Callable, List, Sequence, Union
 
 from django.contrib import admin
-from django.db.models import QuerySet
+from django.contrib.admin.utils import quote
+from django.db.models import Model, QuerySet
+from django.urls import NoReverseMatch, reverse
+from django.utils.html import format_html
+from django.utils.text import capfirst
 
 
 class YesNoListFilter(admin.SimpleListFilter):
@@ -46,3 +50,42 @@ def list_filter_factory(
     }
     new_class = type(new_class_name, (YesNoListFilter,), new_class_members)
     return new_class
+
+
+def add_elements_to_deleted_objects(
+    objs: Sequence[Model],
+    to_delete: List[Union[str, list]],
+    get_elements_func: Callable[[Model], Sequence[Model]],
+    admin_site,
+):
+    new_to_delete = []
+    num_objs = len(objs)
+    obj_index = 0
+    for element in to_delete:
+        current_obj = objs[obj_index] if obj_index < num_objs else None
+        if not isinstance(element, str) or str(current_obj) not in element:
+            new_to_delete.append(element)
+            continue
+
+        new_to_delete.append(element)
+        extra_elements = [admin_urlize(e, admin_site) for e in get_elements_func(current_obj)]
+        new_to_delete.append(extra_elements)
+        obj_index += 1
+
+    return new_to_delete
+
+
+def admin_urlize(obj: Model, admin_site):
+    # Code based on https://github.com/django/django/blob/3.0.7/django/contrib/admin/utils.py#L121-L149
+    opts = obj._meta
+
+    no_edit_link = f"{capfirst(opts.verbose_name)}: {obj}"
+
+    try:
+        admin_url = reverse(f"{admin_site.name}:{opts.app_label}_{opts.model_name}_change", args=[quote(obj.pk)])
+    except NoReverseMatch:
+        # Change url doesn't exist -- don't display link to edit
+        return no_edit_link
+
+    # Display a link to the admin page.
+    return format_html('{}: <a href="{}">{}</a>', capfirst(opts.verbose_name), admin_url, obj)

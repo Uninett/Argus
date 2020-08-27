@@ -1,10 +1,12 @@
 from django.contrib import admin
-from django.contrib.admin import widgets
+from django.contrib.admin import widgets as admin_widgets
 from django.db.models.functions import Concat
 from django.utils.html import format_html_join
 from django.utils.safestring import mark_safe
 
-from argus.util.admin_utils import list_filter_factory
+from argus.auth.models import User
+from argus.util.admin_utils import add_elements_to_deleted_objects, list_filter_factory
+from . import fields, widgets
 from .forms import AddSourceSystemForm
 from .models import (
     Acknowledgement,
@@ -28,9 +30,9 @@ class TextWidgetsOverrideModelAdmin(admin.ModelAdmin):
         form = super().get_form(request, obj, **kwargs)
 
         for form_field in self.text_input_form_fields:
-            form.base_fields[form_field].widget = widgets.AdminTextInputWidget()
+            form.base_fields[form_field].widget = admin_widgets.AdminTextInputWidget()
         for form_field in self.url_input_form_fields:
-            form.base_fields[form_field].widget = widgets.AdminURLFieldWidget()
+            form.base_fields[form_field].widget = admin_widgets.AdminURLFieldWidget()
 
         return form
 
@@ -57,6 +59,14 @@ class SourceSystemAdmin(TextWidgetsOverrideModelAdmin):
 
         return super().get_form(request, obj, **kwargs)
 
+    def get_deleted_objects(self, objs, request):
+        to_delete, model_count, perms_needed, protected = super().get_deleted_objects(objs, request)
+
+        new_to_delete = add_elements_to_deleted_objects(objs, to_delete, lambda source: [source.user], self.admin_site)
+        model_count[User._meta.verbose_name_plural] = len(objs)
+
+        return new_to_delete, model_count, perms_needed, protected
+
 
 class TagAdmin(TextWidgetsOverrideModelAdmin):
     list_display = ("get_str",)
@@ -78,7 +88,6 @@ class IncidentAdmin(TextWidgetsOverrideModelAdmin):
         ordering = ["tag__key", "tag__value"]
         readonly_fields = ("added_time",)
         raw_id_fields = ("tag", "added_by")
-        min_num = 1
         extra = 0
 
     inlines = [IncidentTagRelationInline]
@@ -86,7 +95,7 @@ class IncidentAdmin(TextWidgetsOverrideModelAdmin):
     list_display = (
         "source_incident_id",
         "start_time",
-        "end_time",
+        "get_end_time",
         "source",
         "get_tags",
         "description",
@@ -105,7 +114,7 @@ class IncidentAdmin(TextWidgetsOverrideModelAdmin):
     )
     list_filter = (
         list_filter_factory("stateful", lambda qs, yes_filter: qs.stateful() if yes_filter else qs.stateless()),
-        list_filter_factory("active", lambda qs, yes_filter: qs.active() if yes_filter else qs.inactive()),
+        list_filter_factory("open", lambda qs, yes_filter: qs.open() if yes_filter else qs.closed()),
         list_filter_factory("acked", lambda qs, yes_filter: qs.acked() if yes_filter else qs.not_acked()),
         "source",
         "source__type",
@@ -113,6 +122,12 @@ class IncidentAdmin(TextWidgetsOverrideModelAdmin):
 
     text_input_form_fields = ("source_incident_id",)
     url_input_form_fields = ("details_url", "ticket_url")
+
+    def get_end_time(self, incident: Incident):
+        return incident.end_time_str
+
+    get_end_time.short_description = "End time"
+    get_end_time.admin_order_field = "end_time"
 
     def get_tags(self, incident: Incident):
         html_open_tag = '<div style="display: inline-block; white-space: nowrap;">'
@@ -124,16 +139,28 @@ class IncidentAdmin(TextWidgetsOverrideModelAdmin):
     get_tags.short_description = "Tags"
 
     def get_open(self, incident: Incident):
-        return incident.active
+        return incident.open
 
     get_open.short_description = "Open"
     get_open.boolean = True
 
     def get_shown(self, incident: Incident):
-        return incident.active and not incident.acked
+        return incident.open and not incident.acked
 
     get_shown.short_description = "Shown"
     get_shown.boolean = True
+
+    def get_form(self, request, obj: Incident = None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        end_time_field = form.base_fields["end_time"]
+        end_time_field_inheritance_attrs = {
+            attr: getattr(end_time_field, attr) for attr in ("required", "label", "help_text")
+        }
+        end_time = obj.end_time if obj else None
+        form.base_fields["end_time"] = fields.SplitDateTimeInfinityField(
+            **end_time_field_inheritance_attrs, widget=widgets.AdminSplitDateTimeInfinity(initial_value=end_time)
+        )
+        return form
 
     def get_queryset(self, request):
         qs: IncidentQuerySet = super().get_queryset(request)
@@ -238,6 +265,14 @@ class AcknowledgementAdmin(admin.ModelAdmin):
         qs = super().get_queryset(request)
         # Reduce number of database calls
         return qs.prefetch_related("event__incident__source__type", "event__actor")
+
+    def get_deleted_objects(self, objs, request):
+        to_delete, model_count, perms_needed, protected = super().get_deleted_objects(objs, request)
+
+        new_to_delete = add_elements_to_deleted_objects(objs, to_delete, lambda ack: [ack.event], self.admin_site)
+        model_count[Event._meta.verbose_name_plural] = len(objs)
+
+        return new_to_delete, model_count, perms_needed, protected
 
 
 admin.site.register(SourceSystemType, SourceSystemTypeAdmin)

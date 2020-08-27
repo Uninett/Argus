@@ -187,7 +187,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
 <summary>Incident endpoints</summary>
 
 * `/api/v1/incidents/`:
-  * `GET`: returns all incidents - both active and historic
+  * `GET`: returns all incidents - both open and historic
     <details>
     <summary>Example response body:</summary>
 
@@ -228,7 +228,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
                 }
             ],
             "stateful": true,
-            "active": false,
+            "open": false,
             "acked": false
         }
     ]
@@ -322,6 +322,8 @@ All endpoints require requests to contain a header with key `Authorization` and 
     }
     ```
 
+    If posted by an end user (a user with no associated source system), the `timestamp` field is optional, and will be set to the time the server received it if omitted.
+
     The valid `type`s are:
     * `STA` - Incident start
       * An incident automatically creates an event of this type when the incident is created, but cannot have more than one. In other words, it's never allowed to post an event of this type.
@@ -393,11 +395,13 @@ All endpoints require requests to contain a header with key `Authorization` and 
     ```
     
     Only end users can post acknowledgements.
+
+    The `timestamp` field is optional, and will be set to the time the server received it if omitted.
     </details>
 
 * `GET` to `/api/v1/incidents/<int:pk>/acks/<int:pk>/`: returns a specific acknowledgement of the specified incident
 
-* `GET` to `/api/v1/incidents/active/`: returns all active incidents that have not been acked
+* `GET` to `/api/v1/incidents/open/`: returns all open incidents that have not been acked
 * `GET` to `/api/v1/incidents/metadata/`: returns relevant metadata for all incidents
 
 </details>
@@ -435,7 +439,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
     * Example request body: same as `POST` to `/api/v1/notificationprofiles/`
   * `DELETE`: deletes one of the logged in user's notification profiles by pk
 
-* `GET` to `/api/v1/notificationprofiles/<int:pk>/incidents/`: returns all incidents - both active and historic - filtered by one of the logged in user's notification profiles by pk
+* `GET` to `/api/v1/notificationprofiles/<int:pk>/incidents/`: returns all incidents - both open and historic - filtered by one of the logged in user's notification profiles by pk
 
 * `/api/v1/notificationprofiles/timeslots/`:
   * `GET`: returns the logged in user's time slots
@@ -516,7 +520,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
     * Example request body: same as `POST` to `/api/v1/notificationprofiles/filters/`
   * `DELETE`: deletes one of the logged in user's filters by pk
 
-* `POST` to `/api/v1/notificationprofiles/filterpreview/`: returns all incidents - both active and historic - filtered by the values in the body
+* `POST` to `/api/v1/notificationprofiles/filterpreview/`: returns all incidents - both open and historic - filtered by the values in the body
   <details>
   <summary>Example request body:</summary>
 
@@ -542,8 +546,8 @@ All endpoints require requests to contain a header with key `Authorization` and 
 * `start_time`: the time the `incident` was created.
 * `end_time`: the time the `incident` was resolved or closed.
   * If `null`: the incident is stateless.
-  * If `"infinity"`: the incident is stateful, but has not yet been resolved or closed - i.e. active.
-  * If an instance of `datetime`: the incident is stateful, and was resolved or closed at the given time; if it's in the future, the incident is also considered active.
+  * If `"infinity"`: the incident is stateful, but has not yet been resolved or closed - i.e. open.
+  * If an instance of `datetime`: the incident is stateful, and was resolved or closed at the given time; if it's in the future, the incident is also considered open.
 * `source`: the source system that the `incident` originated in.
 * `object`: the most specific object that the `incident` is about.
 * `parent_object`: an object that the `object` is possibly a part of.
