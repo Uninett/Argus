@@ -139,11 +139,18 @@ class IncidentCreate_legacy(generics.CreateAPIView):
         return Response(serializer.data)
 
 
-class OpenIncidentList(generics.ListAPIView):
+class OpenUnAckedIncidentList(generics.ListAPIView):
     serializer_class = IncidentSerializer
 
     def get_queryset(self):
         return Incident.objects.open().not_acked().prefetch_default_related()
+
+
+class OpenIncidentList(generics.ListAPIView):
+    serializer_class = IncidentSerializer
+
+    def get_queryset(self):
+        return Incident.objects.open().prefetch_default_related()
 
 
 class EventViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
