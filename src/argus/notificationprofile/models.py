@@ -173,7 +173,7 @@ class NotificationProfile(models.Model):
     filters = models.ManyToManyField(to=Filter, related_name="notification_profiles")
 
     # TODO: support for multiple email addresses / phone numbers / Slack users
-    media = MultiSelectField(choices=Media.choices, min_choices=1, default=Media.EMAIL)
+    media = MultiSelectField(choices=Media.choices, min_choices=1, default=[Media.EMAIL])
     active = models.BooleanField(default=True)
     phone_number = models.ForeignKey("argus_auth.PhoneNumber", on_delete=models.SET_NULL, blank=True, null=True)
 
