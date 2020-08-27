@@ -8,7 +8,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
 from django.db import models
 from django.db.models import Q
-from django.db.models.signals import post_delete, post_save, pre_save
+from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
 from django.utils import timezone
 
@@ -35,7 +35,7 @@ def create_fake_incident():
     argus_user, _, source_system = get_or_create_default_instances()
     incident = Incident.objects.create(
         start_time=timezone.now(),
-        end_time="infinity",
+        end_time=INFINITY_REPR,
         source_incident_id=randint(MIN_ID, MAX_ID),
         source=source_system,
         description='Incident created via "create_fake_incident"',
@@ -55,16 +55,15 @@ class SourceSystemType(models.Model):
     def __str__(self):
         return self.name
 
-
-# Ensure that the name is always lowercase, to avoid names that only differ by case
-@receiver(pre_save, sender=SourceSystemType)
-def set_name_lowercase(sender, instance: SourceSystemType, *args, **kwargs):
-    instance.name = instance.name.lower()
+    def save(self, *args, **kwargs):
+        # Ensure that the name is always lowercase, to avoid names that only differ by case
+        self.name = self.name.lower()
+        super().save(*args, **kwargs)
 
 
 class SourceSystem(models.Model):
     name = models.TextField()
-    type = models.ForeignKey(to=SourceSystemType, on_delete=models.CASCADE, related_name="instances")
+    type = models.ForeignKey(to=SourceSystemType, on_delete=models.PROTECT, related_name="instances")
     user = models.OneToOneField(to=User, on_delete=models.PROTECT, related_name="source_system")
     base_url = models.TextField(help_text="Base url to combine with an incident's relative url to point to more info in the source system.", blank=True)
 
@@ -203,7 +202,7 @@ class Incident(models.Model):
     )
     source = models.ForeignKey(
         to=SourceSystem,
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
         related_name="incidents",
         help_text="The source system that the incident originated in.",
     )
@@ -250,7 +249,8 @@ class Incident(models.Model):
 
     @property
     def tags(self):
-        return Tag.objects.filter(incident_tag_relations__incident=self)
+        # Don't do `Tag.objects.filter()`, which ignores prefetched data
+        return [relation.tag for relation in self.incident_tag_relations.all()]
 
     @property
     def incident_relations(self):
@@ -266,7 +266,7 @@ class Incident(models.Model):
 
     @property
     def last_close_or_end_event(self):
-        return self.events.order_by("timestamp").filter(type__in=(Event.Type.CLOSE, Event.Type.INCIDENT_END)).last()
+        return self.events.filter(type__in=(Event.Type.CLOSE, Event.Type.INCIDENT_END)).order_by("timestamp").last()
 
     @property
     def acks(self):
@@ -326,7 +326,7 @@ class IncidentRelation(models.Model):
     # "+" prevents creating a backwards relation
     incident1 = models.ForeignKey(to=Incident, on_delete=models.CASCADE, related_name="+")
     incident2 = models.ForeignKey(to=Incident, on_delete=models.CASCADE, related_name="+")
-    type = models.ForeignKey(to=IncidentRelationType, on_delete=models.CASCADE, related_name="incident_relations")
+    type = models.ForeignKey(to=IncidentRelationType, on_delete=models.PROTECT, related_name="incident_relations")
     description = models.TextField(blank=True)
 
     def __str__(self):

@@ -20,7 +20,8 @@ class AddSourceSystemForm(forms.ModelForm):
         username = self.cleaned_data["username"]
         if not username:
             username = self.cleaned_data["name"]
-            # Update the form's bound data to show the user which value was used while validating - in case the username causes errors
+            # Update the form's bound data to show the user which value was used while validating
+            # - in case the username causes errors
             bound_data = self.data.copy()
             bound_data["username"] = username
             self.data = bound_data

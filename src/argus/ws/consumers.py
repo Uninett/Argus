@@ -26,7 +26,7 @@ class OpenIncidentConsumer(JsonWebsocketConsumer):
     def disconnect(self, code):
         async_to_sync(self.channel_layer.group_discard)(SUBSCRIBED_OPEN_INCIDENTS, self.channel_name)
 
-    def receive_json(self, content):
+    def receive_json(self, content, **kwargs):
         action = content.get("action", None)
         try:
             if action == "subscribe":

@@ -25,6 +25,11 @@ class TimeslotAdmin(admin.ModelAdmin):
 
     get_time_recurrences.short_description = "Time recurrences"
 
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        # Reduce number of database calls
+        return qs.select_related("user").prefetch_related("time_recurrences")
+
 
 class FilterAdmin(admin.ModelAdmin):
     list_display = ("name", "user", "filter_string")
@@ -35,6 +40,7 @@ class FilterAdmin(admin.ModelAdmin):
         "user__last_name",
         "user__username",
     )
+    list_select_related = ("user",)
 
     raw_id_fields = ("user",)
 
@@ -73,6 +79,11 @@ class NotificationProfileAdmin(admin.ModelAdmin):
 
     get_media.short_description = "Notification media"
     get_media.admin_order_field = "media"
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        # Reduce number of database calls
+        return qs.prefetch_related("timeslot__user", "filters")
 
 
 admin.site.register(Timeslot, TimeslotAdmin)
