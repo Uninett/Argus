@@ -172,7 +172,8 @@ All endpoints require requests to contain a header with key `Authorization` and 
                 "type": {
                     "name": "nav"
                 },
-                "user": 12
+                "user": 12,
+                "base_url": "https://somenav.somewhere.com"
             },
             "source_incident_id": "12345",
             "details_url": "https://uninett.no/api/alerts/12345/",

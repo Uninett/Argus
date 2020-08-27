@@ -67,6 +67,7 @@ class SourceSystem(models.Model):
     name = models.TextField()
     type = models.ForeignKey(to=SourceSystemType, on_delete=models.CASCADE, related_name="instances")
     user = models.OneToOneField(to=User, on_delete=models.CASCADE, related_name="source_system")
+    base_url = models.TextField(help_text="Base url to combine with an incident's relative url to point to more info in the source system.", blank=True)
 
     class Meta:
         constraints = [

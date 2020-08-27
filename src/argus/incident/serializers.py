@@ -38,8 +38,8 @@ class SourceSystemSerializer(RemovableFieldSerializer):
 
     class Meta:
         model = SourceSystem
-        fields = ["pk", "name", "type", "user"]
-        read_only_fields = ["type", "user"]
+        fields = ["pk", "name", "type", "user", "base_url"]
+        read_only_fields = ["type", "user", "base_url"]
 
 
 class IncidentTagRelationSerializer(RemovableFieldSerializer):
