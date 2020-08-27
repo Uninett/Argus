@@ -175,7 +175,7 @@ class EventViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, mixins.Retrie
         serializer.save(incident=incident, actor=user)
 
     def validate_event_type_for_user(self, event_type: str, user: User):
-        if hasattr(user, "source_system"):
+        if user.is_source_system:
             if event_type not in Event.ALLOWED_TYPES_FOR_SOURCE_SYSTEMS:
                 self._raise_type_validation_error(f"A source system cannot post events of type '{event_type}'.")
         else:
@@ -224,7 +224,7 @@ class AcknowledgementViewSet(
 
     def perform_create(self, serializer: AcknowledgementSerializer):
         user = self.request.user
-        if hasattr(user, "source_system"):
+        if user.is_source_system:
             EventViewSet._raise_type_validation_error("A source system cannot post acknowledgements.")
 
         incident = Incident.objects.get(pk=self.kwargs["incident_pk"])

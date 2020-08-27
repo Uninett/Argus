@@ -13,6 +13,7 @@ app_name = "auth"
 urlpatterns = [
     path("login/", django_views.LoginView.as_view(redirect_authenticated_user=True), name="login"),
     path("logout/", django_views.LogoutView.as_view(), name="logout"),
-    path("user/", views.get_user, name="user"),
+    path("user/", views.CurrentUserView.as_view(), name="current-user"),
+    path("users/<int:pk>/", views.BasicUserDetail.as_view(), name="user"),
     path("", include(router.urls)),
 ]
