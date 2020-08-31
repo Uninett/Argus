@@ -226,10 +226,11 @@ class EventSerializer(serializers.ModelSerializer):
             "incident",
             "actor",
             "timestamp",
+            "received",
             "type",
             "description",
         ]
-        read_only_fields = ["incident", "actor"]
+        read_only_fields = ["incident", "actor", "received"]
 
     def update(self, *args, **kwargs):
         """

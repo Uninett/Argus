@@ -291,6 +291,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
             "incident": 10101,
             "actor": 12,
             "timestamp": "2011-11-11T11:11:11+02:00",
+            "received": "2011-11-11T11:12:11+02:00",
             "type": {
                 "value": "STA",
                 "display": "Incident start"
@@ -302,6 +303,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
             "incident": 10101,
             "actor": 12,
             "timestamp": "2011-11-11T11:11:12+02:00",
+            "received": "2011-11-11T11:11:13+02:00",
             "type": {
                 "value": "END",
                 "display": "Incident end"
@@ -309,6 +311,13 @@ All endpoints require requests to contain a header with key `Authorization` and 
             "description": ""
         }
     ]
+
+    Note that `received` is set by argus on reception of an event. Normally,
+    this should be the same as, or a little later, than `timestamp`. If there
+    is a large gap (in minutes), or `received` is earlier `timestamp`, it
+    is likely something wrong with the internal clock either on the argus
+    server or the event source.
+
     ```
   * `POST`: creates and returns an event related to the specified incident
     <details>
@@ -355,6 +364,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
                 "incident": 10101,
                 "actor": 140,
                 "timestamp": "2011-11-11T11:11:11.235877+02:00",
+                received": "2011-11-11T11:11:11.235897+02:00",
                 "type": {
                     "value": "ACK",
                     "display": "Acknowledge"
@@ -370,6 +380,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
                 "incident": 10101,
                 "actor": 130,
                 "timestamp": "2011-11-12T11:11:11+02:00",
+                "received": "2011-11-12T11:11:11+02:00",
                 "type": {
                     "value": "ACK",
                     "display": "Acknowledge"
