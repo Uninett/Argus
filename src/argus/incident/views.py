@@ -2,6 +2,8 @@ import secrets
 
 from django.db import IntegrityError
 from django.urls import reverse
+
+from django_filters import rest_framework as filters
 from rest_framework import generics, mixins, serializers, status, viewsets
 from rest_framework.decorators import api_view
 from rest_framework.generics import get_object_or_404
@@ -74,6 +76,46 @@ class SourceSystemDetail(generics.RetrieveUpdateAPIView):
     serializer_class = SourceSystemSerializer
 
 
+class IncidentFilter(filters.FilterSet):
+    open = filters.BooleanFilter(label='Open', method='incident_filter')
+    acked = filters.BooleanFilter(label='Acked', method='incident_filter')
+    stateful = filters.BooleanFilter(label='Stateful', method='incident_filter')
+    tags = filters.CharFilter(label='Tags', method='incident_filter')
+
+    @classmethod
+    def incident_filter(cls, queryset, name, value):
+        if name == 'open':
+            if value:
+                return queryset.open()
+            else:
+                return queryset.closed()
+        elif name == 'acked':
+            if value:
+                return queryset.acked()
+            else:
+                return queryset.not_acked()
+        elif name == 'stateful':
+            if value:
+                return queryset.stateful()
+            else:
+                return queryset.stateless()
+        elif name == 'tags':
+            if value:
+                tags = value.split(',')
+                return queryset.from_tags(*tags)
+        return queryset
+
+
+    class Meta:
+        model = Incident
+        fields = {
+            'source': ['exact'],
+            'source__type': ['exact'],
+            'start_time': ['gte', 'lte'],
+            'end_time': ['gte', 'lte', 'isnull'],
+        }
+
+
 class IncidentViewSet(
     mixins.ListModelMixin,
     mixins.CreateModelMixin,
@@ -83,6 +125,8 @@ class IncidentViewSet(
 ):
     permission_classes = [IsAuthenticated]
     queryset = Incident.objects.prefetch_default_related()
+    filter_backends = [filters.DjangoFilterBackend]
+    filterset_class = IncidentFilter
 
     def get_serializer_class(self):
         if self.request.method in {"PUT", "PATCH"}:
