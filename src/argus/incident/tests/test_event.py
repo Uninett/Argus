@@ -10,7 +10,7 @@ from rest_framework.test import APITestCase
 
 from argus.util import datetime_utils
 from argus.util.utils import duplicate
-from .test_incident import IncidentBasedAPITestCaseHelper
+from . import IncidentBasedAPITestCaseHelper
 from ..models import Event, Incident
 
 
