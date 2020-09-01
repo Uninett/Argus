@@ -3,6 +3,7 @@ django-filter
 django-multiselectfield
 django-phonenumber-field[phonenumberslite]
 djangorestframework
+factory_boy
 psycopg2-binary
 python-dataporten-auth
 python-social-auth
