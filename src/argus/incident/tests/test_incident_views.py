@@ -1,0 +1,50 @@
+from datetime import datetime, timedelta
+
+from django.core.exceptions import ValidationError
+from django.test import TestCase
+from django.utils import timezone
+from django.utils.timezone import is_aware, make_aware
+
+from argus.auth.factories import SourceUserFactory
+from ..factories import *
+from ..models import Incident
+from ..views import IncidentFilter
+
+
+class IncidentBasedAPITestCaseHelper:
+    def init_test_objects(self):
+        self.source_type = SourceSystemTypeFactory(name="nav")
+        self.source1_user = SourceUserFactory(username="nav1")
+        self.source1 = SourceSystemFactory(name="NAV 1", type=self.source_type, user=self.source1_user)
+        self.source2_user = SourceUserFactory(username="nav2")
+        self.source2 = SourceSystemFactory(name="NAV 2", type=self.source_type, user=self.source2_user)
+
+
+class IncidentFilterTestCase(IncidentBasedAPITestCaseHelper, TestCase):
+
+    def setUp(self):
+        super().init_test_objects()
+        self.incident1 = IncidentFactory(source=self.source1, end_time=None)
+        self.incident2 = IncidentFactory(source=self.source1)
+        self.incident3 = IncidentFactory(source=self.source2)
+        self.incident4 = IncidentFactory(source=self.source2)
+        self.incident4.end_time = self.incident4.start_time
+        self.incident4.save()
+
+    def test_stateful(self):
+        qs = Incident.objects.order_by('pk')
+        expected = qs.stateful()
+        result = IncidentFilter.incident_filter(qs, 'stateful', True)
+        self.assertEqual(list(expected), list(result.order_by('pk')))
+        expected = qs.stateless()
+        result = IncidentFilter.incident_filter(qs, 'stateful', False)
+        self.assertEqual(list(expected), list(result.order_by('pk')))
+
+    def test_open(self):
+        qs = Incident.objects.order_by('pk')
+        expected = qs.open()
+        result = IncidentFilter.incident_filter(qs, 'open', True)
+        self.assertEqual(list(expected), list(result.order_by('pk')))
+        expected = qs.closed()
+        result = IncidentFilter.incident_filter(qs, 'open', False)
+        self.assertEqual(list(expected), list(result.order_by('pk')))
