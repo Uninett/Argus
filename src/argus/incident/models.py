@@ -3,7 +3,6 @@ from functools import reduce
 from operator import and_
 from random import randint
 
-from django.core import validators
 from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
 from django.db import models
@@ -15,11 +14,7 @@ from django.utils import timezone
 from argus.auth.models import User
 from argus.util.datetime_utils import INFINITY_REPR, get_infinity_repr
 from .fields import DateTimeInfinityField
-
-
-def validate_lowercase(value: str):
-    if not value.islower():
-        raise ValidationError(f"'{value}' is not a lowercase string")
+from .validators import validate_lowercase, validate_key
 
 
 def get_or_create_default_instances():
@@ -99,14 +94,7 @@ class TagQuerySet(models.QuerySet):
 class Tag(models.Model):
     TAG_DELIMITER = "="
 
-    key = models.TextField(
-        validators=[
-            validators.RegexValidator(
-                r"^[a-z0-9_]+\Z",
-                message="Please enter a valid key consisting of lowercase letters, numbers and underscores.",
-            )
-        ]
-    )
+    key = models.TextField(validators=[validate_key])
     value = models.TextField()
 
     objects = TagQuerySet.as_manager()
