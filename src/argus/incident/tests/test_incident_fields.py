@@ -9,6 +9,7 @@ from rest_framework.test import APIClient
 from argus.auth.models import User
 from argus.util.utils import duplicate
 from . import IncidentBasedAPITestCaseHelper
+from ..fields import KeyValueField
 from ..models import Incident, SourceSystem, SourceSystemType
 
 
@@ -105,3 +106,29 @@ class EndTimeInfinityFieldTests(TestCase, IncidentBasedAPITestCaseHelper):
 
         self.assertFalse(Incident.objects.filter(end_time__lt="-infinity").exists())
         self.assertFalse(Incident.objects.filter(end_time__gt="infinity").exists())
+
+
+class KeyValueFieldTest(TestCase):
+
+    def test_clean_invalid(self):
+        f = KeyValueField()
+        with self.assertRaises(ValidationError):
+            result = f.clean('')
+        with self.assertRaises(ValidationError):
+            result = f.clean('=')
+        with self.assertRaises(ValidationError):
+            result = f.clean('boo')
+
+    def test_clean_invalid_key(self):
+        f = KeyValueField()
+        with self.assertRaises(ValidationError):
+            result = f.clean(' =v')
+        with self.assertRaises(ValidationError):
+            result = f.clean('A=v')
+        with self.assertRaises(ValidationError):
+            result = f.clean('-=v')
+
+    def test_clean_invalid_value(self):
+        f = KeyValueField()
+        with self.assertRaises(ValidationError):
+            result = f.clean('a=')

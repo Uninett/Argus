@@ -1,11 +1,13 @@
 from datetime import datetime
 
-import rest_framework.fields as rest_framework_fields
 from django import forms
 from django.db import models
 from django.forms import fields
 
+import rest_framework.fields as rest_framework_fields
+
 import argus.util.datetime_utils as utils
+from .validators import validate_key_value
 
 
 class DateTimeInfinityField(models.DateTimeField):
@@ -73,3 +75,7 @@ class DateTimeInfinitySerializerField(rest_framework_fields.DateTimeField):
 
     def to_representation(self, value):
         return utils.get_infinity_repr(value, str_repr=True) or super().to_representation(value)
+
+
+class KeyValueField(forms.CharField):
+    default_validators = [validate_key_value]

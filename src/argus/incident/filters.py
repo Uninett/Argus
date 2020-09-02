@@ -1,16 +1,25 @@
 from django_filters import rest_framework as filters
 
+from .fields import KeyValueField
 from .models import Incident
 
 
 __all__ = ['IncidentFilter']
 
 
+class TagFilter(filters.Filter):
+    field_class = KeyValueField
+
+
+class TagInFilter(filters.BaseInFilter, TagFilter):
+    pass
+
+
 class IncidentFilter(filters.FilterSet):
     open = filters.BooleanFilter(label='Open', method='incident_filter')
     acked = filters.BooleanFilter(label='Acked', method='incident_filter')
     stateful = filters.BooleanFilter(label='Stateful', method='incident_filter')
-    tags = filters.CharFilter(label='Tags', method='incident_filter')
+    tags = TagInFilter(label='Tags', method='incident_filter')
 
     @classmethod
     def incident_filter(cls, queryset, name, value):
@@ -31,10 +40,8 @@ class IncidentFilter(filters.FilterSet):
                 return queryset.stateless()
         elif name == 'tags':
             if value:
-                tags = value.split(',')
-                return queryset.from_tags(*tags)
+                return queryset.from_tags(*value)
         return queryset
-
 
     class Meta:
         model = Incident
