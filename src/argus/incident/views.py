@@ -16,6 +16,7 @@ from argus.notificationprofile.media import background_send_notifications_to_use
 from argus.util.datetime_utils import INFINITY_REPR
 from . import mappings
 from .forms import AddSourceSystemForm
+from .filters import IncidentFilter
 from .models import (
     Event,
     Incident,
@@ -74,46 +75,6 @@ class SourceSystemDetail(generics.RetrieveUpdateAPIView):
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
     queryset = SourceSystem.objects.all()
     serializer_class = SourceSystemSerializer
-
-
-class IncidentFilter(filters.FilterSet):
-    open = filters.BooleanFilter(label='Open', method='incident_filter')
-    acked = filters.BooleanFilter(label='Acked', method='incident_filter')
-    stateful = filters.BooleanFilter(label='Stateful', method='incident_filter')
-    tags = filters.CharFilter(label='Tags', method='incident_filter')
-
-    @classmethod
-    def incident_filter(cls, queryset, name, value):
-        if name == 'open':
-            if value:
-                return queryset.open()
-            else:
-                return queryset.closed()
-        elif name == 'acked':
-            if value:
-                return queryset.acked()
-            else:
-                return queryset.not_acked()
-        elif name == 'stateful':
-            if value:
-                return queryset.stateful()
-            else:
-                return queryset.stateless()
-        elif name == 'tags':
-            if value:
-                tags = value.split(',')
-                return queryset.from_tags(*tags)
-        return queryset
-
-
-    class Meta:
-        model = Incident
-        fields = {
-            'source': ['exact'],
-            'source__type': ['exact'],
-            'start_time': ['gte', 'lte'],
-            'end_time': ['gte', 'lte', 'isnull'],
-        }
 
 
 class IncidentViewSet(
