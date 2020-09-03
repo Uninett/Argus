@@ -199,15 +199,17 @@ All endpoints require requests to contain a header with key `Authorization` and 
     <dd>Fetch only open (true) or closed (false) incidents.</dd>
     <dt>stateful=true|false</dt>
     <dd>Fetch only stateful (true) or stateless (false) incidents.</dd>
-    <dt>source=ID</dt>
-    <dd>Fetch only incidents with a source with numeric id ID.
+    <dt>source__id__in=ID1[,ID2,..]</dt>
+    <dd>Fetch only incidents with a source with numeric id ID1 or ID2 or..
+    <dt>source__name__in=NAME1[,NAME2,..]</dt>
+    <dd>Fetch only incidents with a source with name NAME1 or NAME2 or..
     <dt>tags=key1=value1,key1=value2,key2=value</dt>
     <dd>Fetch only incidents with one or more of the tags. Tag-format is
     "key=value". If there are multiple tags with the same key, only one of the
     tags need match. If there are multiple keys, one of each key must match.</dd>
     </dl>
 
-    So: `/api/v1/incidents/?acked=false&open=true&stateful&true&source=1&tags=location=broomcloset,location=understairs,problem=onfire` will fetch incidents that are all of "open", "unacked", "stateful", from source number 1, with "location" either "broomcloset" or "understairs", and that is on fire (problem=onfire).
+    So: `/api/v1/incidents/?acked=false&open=true&stateful&true&source__id__in=1&tags=location=broomcloset,location=understairs,problem=onfire` will fetch incidents that are all of "open", "unacked", "stateful", from source number 1, with "location" either "broomcloset" or "understairs", and that is on fire (problem=onfire).
     </details>
     <details>
     <summary>Example response body:</summary>

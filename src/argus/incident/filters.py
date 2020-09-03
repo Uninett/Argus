@@ -48,8 +48,9 @@ class IncidentFilter(filters.FilterSet):
     class Meta:
         model = Incident
         fields = {
-            'source': ['exact'],
-            'source__type': ['exact'],
+            'source__id': ['in'],
+            'source__name': ['in'],
+            'source__type': ['in'],
             'start_time': ['gte', 'lte'],
             'end_time': ['gte', 'lte', 'isnull'],
         }
