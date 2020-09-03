@@ -7,7 +7,7 @@ from django.utils.timezone import is_aware, make_aware
 
 from argus.auth.factories import SourceUserFactory
 from ..factories import *
-from ..models import Incident
+from ..models import Incident, IncidentTagRelation
 from ..views import IncidentFilter
 
 
@@ -47,4 +47,24 @@ class IncidentFilterTestCase(IncidentBasedAPITestCaseHelper, TestCase):
         self.assertEqual(list(expected), list(result.order_by('pk')))
         expected = qs.closed()
         result = IncidentFilter.incident_filter(qs, 'open', False)
+        self.assertEqual(list(expected), list(result.order_by('pk')))
+
+    def test_tags(self):
+        user = SourceUserFactory()
+        tag1 = TagFactory(key='testkey1', value='testvalue1')
+        tag2 = TagFactory(key='testkey2', value='testvalue2')
+        incident5 = IncidentFactory(source=self.source1)
+        for incident in (self.incident1, self.incident2, self.incident3):
+            IncidentTagRelation.objects.get_or_create(tag=tag1, incident=incident, added_by=user)
+        for incident in (self.incident3, self.incident4, incident5):
+            IncidentTagRelation.objects.get_or_create(tag=tag1, incident=incident, added_by=user)
+
+        qs = Incident.objects.order_by('pk')
+
+        expected = qs.from_tags(str(tag1))
+        result = IncidentFilter.incident_filter(qs, 'tags', str(tag1))
+        self.assertEqual(list(expected), list(result.order_by('pk')))
+
+        expected = qs.from_tags(str(tag1), str(tag2))
+        result = IncidentFilter.incident_filter(qs, 'tags', [str(tag1), str(tag2)])
         self.assertEqual(list(expected), list(result.order_by('pk')))

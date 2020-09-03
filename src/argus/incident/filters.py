@@ -40,6 +40,8 @@ class IncidentFilter(filters.FilterSet):
                 return queryset.stateless()
         elif name == 'tags':
             if value:
+                if isinstance(value, str):
+                    value = [value]
                 return queryset.from_tags(*value)
         return queryset
 

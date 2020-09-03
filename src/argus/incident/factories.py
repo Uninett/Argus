@@ -8,6 +8,7 @@ from . import models
 __all__ = [
     'SourceSystemTypeFactory',
     'SourceSystemFactory',
+    'TagFactory',
     'IncidentFactory',
 ]
 
@@ -30,6 +31,16 @@ class SourceSystemFactory(factory.django.DjangoModelFactory):
     type = factory.SubFactory(SourceSystemTypeFactory)
     user = factory.SubFactory(SourceUserFactory)
     base_url = factory.Faker("url")
+
+
+class TagFactory(factory.django.DjangoModelFactory):
+
+    class Meta:
+        model = models.Tag
+        django_get_or_create = ('key', 'value')
+
+    key = factory.Faker("word")
+    value = factory.Faker("word")
 
 
 class IncidentFactory(factory.django.DjangoModelFactory):
