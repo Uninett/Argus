@@ -190,7 +190,10 @@ All endpoints require requests to contain a header with key `Authorization` and 
   * `GET`: returns all incidents - both open and historic
     <details>
     <summary>Query parameters:</summary>
-    All query parameters are optional.
+    All query parameters are optional. If a query parameter is not included or
+    empty, for instance `acked=`, then the rows returned are not affected by
+    that filter and shows rows of all kinds of that value, for instance both
+    "acked" and "unacked" in the case of `acked=`.
 
     <dl>
     <dt>acked=true|false</dt>
