@@ -110,25 +110,34 @@ class EndTimeInfinityFieldTests(TestCase, IncidentBasedAPITestCaseHelper):
 
 class KeyValueFieldTest(TestCase):
 
-    def test_clean_invalid(self):
+    def test_key_value_must_not_be_empty(self):
         f = KeyValueField()
         with self.assertRaises(ValidationError):
             result = f.clean('')
+
+    def test_key_value_must_not_be_just_equals(self):
+        f = KeyValueField()
         with self.assertRaises(ValidationError):
             result = f.clean('=')
+
+    def test_key_value_must_contain_at_least_one_equals(self):
+        f = KeyValueField()
         with self.assertRaises(ValidationError):
             result = f.clean('boo')
 
-    def test_clean_invalid_key(self):
+    def test_value_cannot_be_empty(self):
         f = KeyValueField()
+        with self.assertRaises(ValidationError):
+            result = f.clean('a=')
+
+    def test_key_must_fit_regex(self):
+        # [a-z0-9_]+
+        f = KeyValueField()
+        with self.assertRaises(ValidationError):
+            result = f.clean('=v')
         with self.assertRaises(ValidationError):
             result = f.clean(' =v')
         with self.assertRaises(ValidationError):
             result = f.clean('A=v')
         with self.assertRaises(ValidationError):
             result = f.clean('-=v')
-
-    def test_clean_invalid_value(self):
-        f = KeyValueField()
-        with self.assertRaises(ValidationError):
-            result = f.clean('a=')
