@@ -133,7 +133,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
   * Note that this token will expire after 14 days, and can be replaced by posting to the same endpoint.
   * Example request body: `{ username: <username>, password: <password> }`
 * `/oidc/login/dataporten_feide/`: redirects to Feide login
-* `/api/v1/auth/phone-number/`: 
+* `/api/v1/auth/phone-number/`:
   * `GET`: returns the phone numbers of the logged in user
     <details>
     <summary>Example response body:</summary>
@@ -160,12 +160,11 @@ All endpoints require requests to contain a header with key `Authorization` and 
     ```json
     {
       "pk": 2,
-      "user": 1,
       "phone_number": "+4767676767"
     }
     ```
     </details>
-* `/api/v1/auth/phone-number/<int:pk>`: 
+* `/api/v1/auth/phone-number/<int:pk>/`:
   * `GET`: returns the specific phone number of the logged in user
     <details>
     <summary>Example response body:</summary>
@@ -181,6 +180,11 @@ All endpoints require requests to contain a header with key `Authorization` and 
   * `PUT`: updates and returns one of the logged in user's phone numbers by PK
     * Example request body: same as `POST` to `/api/v1/auth/phone-number/`
   * `DELETE`: deletes one of the logged in user's phone numbers by PK
+
+  The phone number is validated with a python version of the Google library
+  [libphonenumber](https://github.com/google/libphonenumber). It *will* check
+  that the number is in a valid number series. Using a random number
+  with enough digits that is not in a valid series will *not* work.
 </details>
 
 <details>

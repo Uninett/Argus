@@ -11,6 +11,7 @@ class PhoneNumberSerializer(serializers.ModelSerializer):
             "user",
             "phone_number",
         ]
+        read_only_fields = ['pk', 'user']
 
 
 class UserSerializer(serializers.ModelSerializer):
