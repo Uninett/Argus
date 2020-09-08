@@ -196,6 +196,8 @@ NOTIFICATION_SUBJECT_PREFIX = "[Argus] "
 
 SEND_NOTIFICATIONS = False  # Don't spam by accident
 
+COOKIE_DOMAIN = get_str_env("ARGUS_COOKIE_DOMAIN", None)
+
 
 # 3rd party settings
 

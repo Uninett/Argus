@@ -17,6 +17,7 @@ ALLOWED_HOSTS = [
 ]
 
 FRONTEND_URL = get_str_env("ARGUS_FRONTEND_URL", required=True)
+COOKIE_DOMAIN = get_str_env("ARGUS_COOKIE_DOMAIN", required=True)
 
 CORS_ORIGIN_WHITELIST = []
 if FRONTEND_URL:

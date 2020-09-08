@@ -41,7 +41,10 @@ A recap of the environment variables that can be set by default follows.
   authentication.
 * ARGUS_DATAPORTEN_SECRET, which holds the password for using dataporten for
   authentication.
-* ARGUS_FRONTEND_URL, for redirecting back to frontend after logging in through Feide, and also CORS
+* ARGUS_COOKIE_DOMAIN, the domain the cookie is set for
+* ARGUS_FRONTEND_URL, for redirecting back to frontend after logging in through
+  Feide, and also CORS. Must either be a subdomain of or the same as
+  ARGUS_COOKIE_DOMAIN
 * ARGUS_SEND_NOTIFICATIONS, True in production and False by default, to allow supressing notifications
 * DEBUG, 1 for True, 0 for False
 * TEMPLATE_DEBUG. By default set to the same as DEBUG.
@@ -62,6 +65,13 @@ DEFAULT_EMAIL_MEDIA, which is included and uses Django's email backend. It is
 better to switch out the email backend than replcaing this plugin.
 
 *A Gmail account with "Allow less secure apps" turned on, was used in the development of this project.*
+
+### Production gotchas
+
+The frontend and backend currently needs to be on either the same domain or be
+subdomains of the same domain (ARGUS_COOKIE_DOMAIN).
+
+When running on localhost for dev and test, ARGUS_COOKIE_DOMAIN may be empty.
 
 ### Running tests
 * `python manage.py test src`
