@@ -2,6 +2,8 @@ import secrets
 
 from django.db import IntegrityError
 from django.urls import reverse
+
+from django_filters import rest_framework as filters
 from rest_framework import generics, mixins, serializers, status, viewsets
 from rest_framework.decorators import api_view
 from rest_framework.generics import get_object_or_404
@@ -14,6 +16,7 @@ from argus.notificationprofile.media import background_send_notifications_to_use
 from argus.util.datetime_utils import INFINITY_REPR
 from . import mappings
 from .forms import AddSourceSystemForm
+from .filters import IncidentFilter
 from .models import (
     Event,
     Incident,
@@ -83,6 +86,8 @@ class IncidentViewSet(
 ):
     permission_classes = [IsAuthenticated]
     queryset = Incident.objects.prefetch_default_related()
+    filter_backends = [filters.DjangoFilterBackend]
+    filterset_class = IncidentFilter
 
     def get_serializer_class(self):
         if self.request.method in {"PUT", "PATCH"}:

@@ -18,7 +18,7 @@ from argus.incident.models import (
     Tag,
 )
 from argus.incident.serializers import IncidentSerializer
-from argus.incident.tests.test_incident import IncidentBasedAPITestCaseHelper
+from argus.incident.tests import IncidentBasedAPITestCaseHelper
 from argus.notificationprofile.models import (
     Filter,
     NotificationProfile,

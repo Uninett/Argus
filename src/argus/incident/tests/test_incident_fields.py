@@ -8,22 +8,9 @@ from rest_framework.test import APIClient
 
 from argus.auth.models import User
 from argus.util.utils import duplicate
+from . import IncidentBasedAPITestCaseHelper
+from ..fields import KeyValueField
 from ..models import Incident, SourceSystem, SourceSystemType
-
-
-class IncidentBasedAPITestCaseHelper:
-    def init_test_objects(self):
-        self.source_type1 = SourceSystemType.objects.create(name="type1")
-        self.source1_user = User.objects.create_user(username="system_1")
-        self.source1 = SourceSystem.objects.create(name="System 1", type=self.source_type1, user=self.source1_user)
-
-        self.user1 = User.objects.create_user(username="user1", is_staff=True, is_superuser=True)
-
-        self.user1_rest_client = APIClient()
-        self.user1_rest_client.force_authenticate(user=self.user1)
-
-        self.source1_rest_client = APIClient()
-        self.source1_rest_client.force_authenticate(user=self.source1_user)
 
 
 class EndTimeInfinityFieldTests(TestCase, IncidentBasedAPITestCaseHelper):
@@ -119,3 +106,38 @@ class EndTimeInfinityFieldTests(TestCase, IncidentBasedAPITestCaseHelper):
 
         self.assertFalse(Incident.objects.filter(end_time__lt="-infinity").exists())
         self.assertFalse(Incident.objects.filter(end_time__gt="infinity").exists())
+
+
+class KeyValueFieldTest(TestCase):
+
+    def test_key_value_must_not_be_empty(self):
+        f = KeyValueField()
+        with self.assertRaises(ValidationError):
+            result = f.clean('')
+
+    def test_key_value_must_not_be_just_equals(self):
+        f = KeyValueField()
+        with self.assertRaises(ValidationError):
+            result = f.clean('=')
+
+    def test_key_value_must_contain_at_least_one_equals(self):
+        f = KeyValueField()
+        with self.assertRaises(ValidationError):
+            result = f.clean('boo')
+
+    def test_value_cannot_be_empty(self):
+        f = KeyValueField()
+        with self.assertRaises(ValidationError):
+            result = f.clean('a=')
+
+    def test_key_must_fit_regex(self):
+        # [a-z0-9_]+
+        f = KeyValueField()
+        with self.assertRaises(ValidationError):
+            result = f.clean('=v')
+        with self.assertRaises(ValidationError):
+            result = f.clean(' =v')
+        with self.assertRaises(ValidationError):
+            result = f.clean('A=v')
+        with self.assertRaises(ValidationError):
+            result = f.clean('-=v')
