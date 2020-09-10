@@ -102,6 +102,7 @@ class TimeRecurrence(models.Model):
 
 
 class Filter(models.Model):
+    FILTER_NAMES = set(('sourceSystemIds', 'tags'))
     user = models.ForeignKey(to=User, on_delete=models.CASCADE, related_name="filters")
     name = models.CharField(max_length=40)
     filter_string = models.TextField()

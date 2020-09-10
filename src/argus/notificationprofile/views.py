@@ -14,7 +14,7 @@ from .serializers import (
     NotificationProfileSerializer,
     TimeslotSerializer,
 )
-from .validators import FilterStringValidator
+from .validators import validate_filter_string
 
 
 class NotificationProfileList(generics.ListCreateAPIView):
@@ -90,9 +90,7 @@ class FilterDetail(generics.RetrieveUpdateDestroyAPIView):
 @api_view(["POST"])
 def filter_preview_view(request):
     filter_string_dict = request.data
-    # Validate posted filter string
-    filter_string_validator = FilterStringValidator()
-    filter_string_validator(filter_string_dict)
+    validate_filter_string(filter_string_dict)
 
     filter_string_json = json.dumps(filter_string_dict)
     mock_filter = Filter(filter_string=filter_string_json)

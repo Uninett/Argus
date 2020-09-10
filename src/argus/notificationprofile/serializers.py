@@ -3,7 +3,7 @@ from rest_framework import fields, serializers
 
 from .fields import FilterManyToManyField, PhoneNumberForeignKeyField, TimeslotForeignKeyField
 from .models import Filter, NotificationProfile, TimeRecurrence, Timeslot
-from .validators import FilterStringValidator
+from .validators import validate_filter_string
 
 
 class TimeRecurrenceSerializer(serializers.ModelSerializer):
@@ -89,7 +89,7 @@ class TimeslotSerializer(serializers.ModelSerializer):
 
 
 class FilterSerializer(serializers.ModelSerializer):
-    filter_string = serializers.CharField(validators=[FilterStringValidator()])
+    filter_string = serializers.CharField(validators=[validate_filter_string])
 
     class Meta:
         model = Filter
