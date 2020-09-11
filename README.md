@@ -220,6 +220,8 @@ All endpoints require requests to contain a header with key `Authorization` and 
     <dd>Fetch only incidents with a source with numeric id ID1 or ID2 or..
     <dt>source__name__in=NAME1[,NAME2,..]</dt>
     <dd>Fetch only incidents with a source with name NAME1 or NAME2 or..
+    <dt>source_incident_id=ID</dt>
+    <dd>Fetch only incidents with source_incident_id set to ID.</dd>
     <dt>tags=key1=value1,key1=value2,key2=value</dt>
     <dd>Fetch only incidents with one or more of the tags. Tag-format is
     "key=value". If there are multiple tags with the same key, only one of the

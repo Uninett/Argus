@@ -51,6 +51,7 @@ class IncidentFilter(filters.FilterSet):
             'source__id': ['in'],
             'source__name': ['in'],
             'source__type': ['in'],
+            "source_incident_id": ["exact"],
             'start_time': ['gte', 'lte'],
             'end_time': ['gte', 'lte', 'isnull'],
         }
