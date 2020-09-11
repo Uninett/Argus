@@ -72,6 +72,15 @@ class IncidentTagRelationSerializer(serializers.ModelSerializer):
         return tag_repr
 
 
+class IncidentTicketUrlSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Incident
+        fields = [
+            "ticket_url",
+        ]
+
+
 class IncidentSerializer(serializers.ModelSerializer):
     end_time = fields.DateTimeInfinitySerializerField(required=False, allow_null=True)
     source = SourceSystemSerializer(read_only=True)
