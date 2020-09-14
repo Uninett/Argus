@@ -321,6 +321,20 @@ All endpoints require requests to contain a header with key `Authorization` and 
     * `tags`
     </details>
 
+* `/api/v1/incidents/<int:pk>/ticket_url/`:
+  * `PUT`: modifies just the ticket url of an incident and returns it
+    <details>
+    <summary>Example request body:</summary>
+
+    ```json
+    {
+        "ticket_url": "https://tickettracker.com/tickets/987654/",
+    }
+    ```
+
+    Only `ticket_url` may be modified.
+    </details>
+
 * `/api/v1/incidents/<int:pk>/events/`:
   * `GET`: returns all events related to the specified incident
     <details>
@@ -454,7 +468,8 @@ All endpoints require requests to contain a header with key `Authorization` and 
 
 * `GET` to `/api/v1/incidents/<int:pk>/acks/<int:pk>/`: returns a specific acknowledgement of the specified incident
 
-* `GET` to `/api/v1/incidents/open/`: returns all open incidents that have not been acked
+* `GET` to `/api/v1/incidents/open/`: returns all open incidents
+* `GET` to `/api/v1/incidents/open+unacked/`: returns all open incidents that have not been acked
 * `GET` to `/api/v1/incidents/metadata/`: returns relevant metadata for all incidents
 
 </details>

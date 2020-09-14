@@ -5,7 +5,7 @@ from django.urls import reverse
 
 from django_filters import rest_framework as filters
 from rest_framework import generics, mixins, serializers, status, viewsets
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, action
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -30,6 +30,7 @@ from .serializers import (
     IncidentPureDeserializer,
     IncidentSerializer,
     IncidentSerializer_legacy,
+    IncidentTicketUrlSerializer,
     SourceSystemSerializer,
     SourceSystemTypeSerializer,
 )
@@ -123,6 +124,18 @@ class IncidentViewSet(
 
     def perform_update(self, serializer):
         serializer.save(user=self.request.user)
+
+    @action(detail=True, methods=['put'])
+    def ticket_url(self, request, pk=None):
+        incident = self.get_object()
+        serializer = IncidentTicketUrlSerializer(data=request.data)
+        if serializer.is_valid():
+            incident.ticket_url = serializer.data['ticket_url']
+            incident.save()
+            # TODO: make argus stateless incident about the url being saved? event?
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 # TODO: remove once it's not in use anymore
