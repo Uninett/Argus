@@ -498,6 +498,8 @@ All endpoints require requests to contain a header with key `Authorization` and 
         "active": true
     }
     ```
+
+    The phone number field is optional and may also be null.
     </details>
 
 * `/api/v1/notificationprofiles/<int:pk>/`:
