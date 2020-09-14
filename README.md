@@ -468,6 +468,9 @@ All endpoints require requests to contain a header with key `Authorization` and 
 
 * `GET` to `/api/v1/incidents/<int:pk>/acks/<int:pk>/`: returns a specific acknowledgement of the specified incident
 
+* `GET` to `/api/v1/incidents/mine/`: behaves like `/api/v1/incidents/` except
+  only showing the incidents added by the logged-in user, and no filtering on
+  source or source type is possible.
 * `GET` to `/api/v1/incidents/open/`: returns all open incidents
 * `GET` to `/api/v1/incidents/open+unacked/`: returns all open incidents that have not been acked
 * `GET` to `/api/v1/incidents/metadata/`: returns relevant metadata for all incidents

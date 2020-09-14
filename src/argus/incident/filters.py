@@ -4,7 +4,10 @@ from .fields import KeyValueField
 from .models import Incident
 
 
-__all__ = ['IncidentFilter']
+__all__ = [
+    "IncidentFilter",
+    "SourceLockedIncidentFilter",
+]
 
 
 class TagFilter(filters.Filter):
@@ -54,4 +57,14 @@ class IncidentFilter(filters.FilterSet):
             "source_incident_id": ["exact"],
             'start_time': ['gte', 'lte'],
             'end_time': ['gte', 'lte', 'isnull'],
+        }
+
+
+class SourceLockedIncidentFilter(IncidentFilter):
+    class Meta:
+        model = Incident
+        fields = {
+            "source_incident_id": ["exact"],
+            "start_time": ["gte", "lte"],
+            "end_time": ["gte", "lte", "isnull"],
         }
