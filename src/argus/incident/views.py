@@ -16,7 +16,7 @@ from argus.notificationprofile.media import background_send_notifications_to_use
 from argus.util.datetime_utils import INFINITY_REPR
 from . import mappings
 from .forms import AddSourceSystemForm
-from .filters import IncidentFilter
+from .filters import IncidentFilter, SourceLockedIncidentFilter
 from .models import (
     Event,
     Incident,
@@ -156,6 +156,13 @@ class IncidentCreate_legacy(generics.CreateAPIView):
             serializer = IncidentSerializer_legacy(created_incidents, many=True)
         return Response(serializer.data)
 
+
+class SourceLockedIncidentViewSet(IncidentViewSet):
+    filter_backends = [filters.DjangoFilterBackend]
+    filterset_class = SourceLockedIncidentFilter
+
+    def get_queryset(self):
+        return Incident.objects.filter(source__user=self.request.user).prefetch_default_related()
 
 class OpenUnAckedIncidentList(generics.ListAPIView):
     serializer_class = IncidentSerializer
