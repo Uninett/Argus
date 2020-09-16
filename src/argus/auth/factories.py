@@ -2,29 +2,42 @@ import factory
 
 from .models import *
 
+__all__ = [
+    "PersonUserFactory",
+    "SourceUserFactory",
+    "AdminUserFactory",
+]
 
-class PersonUserFactory(factory.django.DjangoModelFactory):
 
+class BaseUserFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = User
-        django_get_or_create = ('username',)
+        django_get_or_create = ("username",)
 
-    first_name = factory.Faker('first_name')
-    last_name = factory.Faker('last_name')
-    email = factory.LazyAttribute(lambda o: '%s.%s@%s' % (o.first_name.lower(), o.last_name.lower(), factory.Faker('safe_domain_name')))
-    username = email
     is_staff = False
     is_superuser = False
-    password = factory.Faker('password')
+    password = factory.PostGenerationMethodCall('set_password', 'defaultpassword')
 
 
-class SourceUserFactory(factory.django.DjangoModelFactory):
-
+class PersonUserFactory(BaseUserFactory):
     class Meta:
         model = User
-        django_get_or_create = ('username',)
+        django_get_or_create = ("username",)
 
-    username = factory.Faker('word')
+    first_name = factory.Faker("first_name")
+    last_name = factory.Faker("last_name")
+    email = factory.LazyAttribute(
+        lambda o: "%s.%s@%s" % (o.first_name.lower(), o.last_name.lower(), factory.Faker("safe_domain_name"))
+    )
+    username = email
+
+
+class SourceUserFactory(BaseUserFactory):
+    class Meta:
+        model = User
+        django_get_or_create = ("username",)
+
+    username = factory.Faker("word")
     is_staff = False
     is_superuser = False
 

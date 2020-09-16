@@ -4,16 +4,18 @@ from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient, APITestCase
 
 from argus.auth.models import User
-from ..models import SourceSystem, SourceSystemType
+from argus.auth.factories import AdminUserFactory
+from ..factories import SourceSystemTypeFactory
+from ..models import SourceSystem
 
 
 class SourceSystemPostingTests(APITestCase):
     def setUp(self):
-        self.type1 = SourceSystemType.objects.create(name="nav")
-        self.type2 = SourceSystemType.objects.create(name="zabbix")
+        self.type1 = SourceSystemTypeFactory(name="nav")
+        self.type2 = SourceSystemTypeFactory(name="zabbix")
 
         password = "1234"
-        self.user1 = User.objects.create_user(username="user1", password=password, is_staff=True, is_superuser=True)
+        self.user1 = AdminUserFactory(username="user1", password=password)
         user_token = Token.objects.create(user=self.user1)
 
         self.rest_client = APIClient()

@@ -11,6 +11,7 @@ from rest_framework.test import APITestCase
 from argus.util import datetime_utils
 from argus.util.utils import duplicate
 from . import IncidentBasedAPITestCaseHelper
+from ..factories import IncidentFactory
 from ..models import Event, Incident
 
 
@@ -18,7 +19,7 @@ class EventAPITests(APITestCase, IncidentBasedAPITestCaseHelper):
     def setUp(self):
         super().init_test_objects()
 
-        self.stateful_incident1 = Incident.objects.create(
+        self.stateful_incident1 = IncidentFactory(
             start_time=make_aware(datetime(2000, 1, 1)),
             end_time=timezone.now() + timedelta(weeks=1),
             source=self.source1,

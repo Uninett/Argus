@@ -6,17 +6,17 @@ from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient, APITestCase
 
+from .factories import AdminUserFactory, PersonUserFactory
 from .models import User
 
 
 class APITests(APITestCase):
     def setUp(self):
         self.superuser1_password = "best_admin#1"
-        self.superuser1 = User.objects.create_user(
-            username="superuser1", password=self.superuser1_password, is_staff=True, is_superuser=True,
-        )
+        self.superuser1 = AdminUserFactory(username="superuser1", password=self.superuser1_password)
+
         self.normal_user1_password = "12345"
-        self.normal_user1 = User.objects.create_user(username="normal_user1", password=self.normal_user1_password)
+        self.normal_user1 = PersonUserFactory(username="normal_user1", password=self.normal_user1_password)
 
         self.superuser1_client = APIClient()
         self.superuser1_token = Token.objects.create(user=self.superuser1)
