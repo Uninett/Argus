@@ -37,3 +37,13 @@ class BasicUserSerializer(serializers.ModelSerializer):
             "last_name",
             "email",
         ]
+
+
+class UsernameSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = [
+            "pk",
+            "username",
+        ]
+        read_only_fields = ["pk", "username"]

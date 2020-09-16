@@ -5,6 +5,7 @@ from django.utils import timezone
 from rest_framework import serializers
 
 from argus.auth.models import User
+from argus.auth.serializers import UsernameSerializer
 from . import fields
 from .models import (
     Acknowledgement,
@@ -228,6 +229,8 @@ class IncidentSerializer_legacy(serializers.ModelSerializer):
 
 
 class EventSerializer(serializers.ModelSerializer):
+    actor = UsernameSerializer(required=False)
+
     class Meta:
         model = Event
         fields = [
@@ -251,7 +254,6 @@ class EventSerializer(serializers.ModelSerializer):
         user = self.context["request"].user
         if user.is_end_user and "timestamp" not in data:
             data["timestamp"] = timezone.now()
-            # TODO: should set `received` to the same as `timestamp`, once the field is added
         return super().to_internal_value(data)
 
     def to_representation(self, instance: Event):
