@@ -345,7 +345,10 @@ All endpoints require requests to contain a header with key `Authorization` and 
         {
             "pk": 1,
             "incident": 10101,
-            "actor": 12,
+            "actor": {
+                "pk": 12,
+                "username": "nav.oslo.uninett.no"
+            },
             "timestamp": "2011-11-11T11:11:11+02:00",
             "received": "2011-11-11T11:12:11+02:00",
             "type": {
@@ -357,7 +360,10 @@ All endpoints require requests to contain a header with key `Authorization` and 
         {
             "pk": 20,
             "incident": 10101,
-            "actor": 12,
+            "actor": {
+                "pk": 12,
+                "username": "nav.oslo.uninett.no"
+            },
             "timestamp": "2011-11-11T11:11:12+02:00",
             "received": "2011-11-11T11:11:13+02:00",
             "type": {
@@ -418,7 +424,10 @@ All endpoints require requests to contain a header with key `Authorization` and 
             "event": {
                 "pk": 2,
                 "incident": 10101,
-                "actor": 140,
+                "actor": {
+                    "pk": 140,
+                    "username": "jp@example.org"
+                },
                 "timestamp": "2011-11-11T11:11:11.235877+02:00",
                 received": "2011-11-11T11:11:11.235897+02:00",
                 "type": {
@@ -434,7 +443,10 @@ All endpoints require requests to contain a header with key `Authorization` and 
             "event": {
                 "pk": 20,
                 "incident": 10101,
-                "actor": 130,
+                "actor": {
+                    "pk": 130,
+                    "username": "ferrari.testarossa@example.com"
+                },
                 "timestamp": "2011-11-12T11:11:11+02:00",
                 "received": "2011-11-12T11:11:11+02:00",
                 "type": {
