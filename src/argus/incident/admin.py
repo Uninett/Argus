@@ -1,7 +1,9 @@
+from urllib.parse import urljoin
+
 from django.contrib import admin
 from django.contrib.admin import widgets as admin_widgets
 from django.db.models.functions import Concat
-from django.utils.html import format_html_join
+from django.utils.html import format_html_join, format_html
 from django.utils.safestring import mark_safe
 
 from argus.auth.models import User
@@ -99,8 +101,8 @@ class IncidentAdmin(TextWidgetsOverrideModelAdmin):
         "source",
         "get_tags",
         "description",
-        "details_url",
-        "ticket_url",
+        "get_details_url",
+        "get_ticket_url",
         "get_open",
         "get_shown",
     )
@@ -137,6 +139,28 @@ class IncidentAdmin(TextWidgetsOverrideModelAdmin):
         )
 
     get_tags.short_description = "Tags"
+
+    def get_details_url(self, incident: Incident):
+        url = ""
+        path = incident.details_url
+        if path:
+            if incident.source.base_url:
+                url = urljoin(incident.source.base_url, path)
+            else:
+                return path  # Just show the relative url
+        if url:
+            return format_html('<a href="{}" title="{}">Link</a>', url, url)
+        else:
+            return ""
+    get_details_url.description = "Details url"
+
+    def get_ticket_url(self, incident: Incident):
+        url = incident.ticket_url
+        if url:
+            return format_html('<a href="{}" title="{}">Link</a>', url, url)
+        else:
+            return ""
+    get_ticket_url.description = "Ticket url"
 
     def get_open(self, incident: Incident):
         return incident.open
