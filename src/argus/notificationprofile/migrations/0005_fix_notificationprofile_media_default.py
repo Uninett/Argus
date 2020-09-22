@@ -14,6 +14,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='notificationprofile',
             name='media',
-            field=multiselectfield.db.fields.MultiSelectField(choices=[('EM', 'Email'), ('SM', 'SMS'), ('SL', 'Slack')], default=['EM'], max_length=8),
+            field=multiselectfield.db.fields.MultiSelectField(choices=[('EM', 'Email'), ('SM', 'SMS')], default=['EM'], max_length=8),
         ),
     ]

@@ -163,7 +163,6 @@ class NotificationProfile(models.Model):
     class Media(models.TextChoices):
         EMAIL = "EM", "Email"
         SMS = "SM", "SMS"
-        SLACK = "SL", "Slack"
 
     user = models.ForeignKey(to=User, on_delete=models.CASCADE, related_name="notification_profiles")
     timeslot = models.OneToOneField(
@@ -171,7 +170,7 @@ class NotificationProfile(models.Model):
     )
     filters = models.ManyToManyField(to=Filter, related_name="notification_profiles")
 
-    # TODO: support for multiple email addresses / phone numbers / Slack users
+    # TODO: support for multiple email addresses / phone numbers / etc.
     media = MultiSelectField(choices=Media.choices, min_choices=1, default=[Media.EMAIL])
     active = models.BooleanField(default=True)
     phone_number = models.ForeignKey("argus_auth.PhoneNumber", on_delete=models.SET_NULL, blank=True, null=True)
