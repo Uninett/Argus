@@ -116,7 +116,10 @@ DJANGO_SETTINGS_MODULE can be set to "argus.site.settings.dev" but we recommend
 having a `localsettings.py` in the same directory as `manage.py` with any
 overrides. This file also does not belong in version control since it reflects
 a specific developer's preferences. Smart things first tested in
-a localsettings can be moved to the other settings-files later on.
+a localsettings can be moved to the other settings-files later on. If you copy
+the entire logging-setup from "argus.site.settings.dev" to "localsettings.py"
+remember to set "disable_existing_loggers" to True or logentries will occur
+twice.
 
 ### Debugging tips
 
