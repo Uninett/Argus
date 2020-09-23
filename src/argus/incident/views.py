@@ -14,7 +14,6 @@ from argus.auth.models import User
 from argus.drf.permissions import IsOwnerOrReadOnly, IsSuperuserOrReadOnly
 from argus.notificationprofile.media import background_send_notifications_to_users
 from argus.util.datetime_utils import INFINITY_REPR
-from . import mappings
 from .forms import AddSourceSystemForm
 from .filters import IncidentFilter, SourceLockedIncidentFilter
 from .models import (
@@ -23,13 +22,11 @@ from .models import (
     SourceSystem,
     SourceSystemType,
 )
-from .parsers import StackedJSONParser
 from .serializers import (
     AcknowledgementSerializer,
     EventSerializer,
     IncidentPureDeserializer,
     IncidentSerializer,
-    IncidentSerializer_legacy,
     IncidentTicketUrlSerializer,
     SourceSystemSerializer,
     SourceSystemTypeSerializer,
@@ -138,31 +135,13 @@ class IncidentViewSet(
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# TODO: remove once it's not in use anymore
-class IncidentCreate_legacy(generics.CreateAPIView):
-    queryset = Incident.objects.prefetch_default_related()
-    parser_classes = [StackedJSONParser]
-    serializer_class = IncidentSerializer_legacy
-
-    def post(self, request, *args, **kwargs):
-        created_incidents = [mappings.create_incident_from_json(json_dict, "nav") for json_dict in request.data]
-
-        for created_incident in created_incidents:
-            background_send_notifications_to_users(created_incident)
-
-        if len(created_incidents) == 1:
-            serializer = IncidentSerializer_legacy(created_incidents[0])
-        else:
-            serializer = IncidentSerializer_legacy(created_incidents, many=True)
-        return Response(serializer.data)
-
-
 class SourceLockedIncidentViewSet(IncidentViewSet):
     filter_backends = [filters.DjangoFilterBackend]
     filterset_class = SourceLockedIncidentFilter
 
     def get_queryset(self):
         return Incident.objects.filter(source__user=self.request.user).prefetch_default_related()
+
 
 class OpenUnAckedIncidentList(generics.ListAPIView):
     serializer_class = IncidentSerializer

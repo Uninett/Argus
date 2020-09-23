@@ -210,24 +210,6 @@ class IncidentPureDeserializer(serializers.ModelSerializer):
         return IncidentSerializer().validate_ticket_url(value)
 
 
-# TODO: remove once it's not in use anymore
-class IncidentSerializer_legacy(serializers.ModelSerializer):
-    source = SourceSystemSerializer(read_only=True)
-
-    class Meta:
-        model = Incident
-        fields = [
-            "pk",
-            "start_time",
-            "end_time",
-            "source",
-            "source_incident_id",
-            "details_url",
-            "description",
-            "ticket_url",
-        ]
-
-
 class EventSerializer(serializers.ModelSerializer):
     actor = UsernameSerializer(required=False)
 

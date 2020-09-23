@@ -19,7 +19,6 @@ app_name = "incident"
 urlpatterns = [
     path("", incident_list, name="incidents"),
     path("mine/", sourced_incident_list, name="source_locked_incidents"),
-    path("legacy/", views.IncidentCreate_legacy.as_view()),  # TODO: remove once it's not in use anymore
     path("<int:pk>/", incident_detail, name="incident"),
     path("<int:pk>/ticket_url/", incident_ticket_url_update, name="incident-ticket-url-update"),
     path("<int:incident_pk>/events/", event_list, name="incident-events"),
