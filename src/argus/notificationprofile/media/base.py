@@ -1,7 +1,11 @@
-from abc import ABC, abstractmethod
+from __future__ import annotations
 
-from argus.auth.models import User
-from argus.incident.models import Incident
+from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from argus.incident.models import Event
+    from argus.notificationprofile.models import NotificationProfile
 
 
 __all__ = ['NotificationMedium']
@@ -10,5 +14,5 @@ __all__ = ['NotificationMedium']
 class NotificationMedium(ABC):
     @staticmethod
     @abstractmethod
-    def send(incident: Incident, user: User, **kwargs):
+    def send(event: Event, profile: NotificationProfile, **kwargs):
         pass

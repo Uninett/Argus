@@ -1,7 +1,10 @@
+from __future__ import annotations
+
 import json
 from datetime import datetime, time
 from functools import reduce
 from operator import or_
+from typing import TYPE_CHECKING
 
 from django.db import models
 from django.db.models.signals import post_save
@@ -10,7 +13,9 @@ from django.utils import timezone
 from multiselectfield import MultiSelectField
 
 from argus.auth.models import User
-from argus.incident.models import Incident
+
+if TYPE_CHECKING:
+    from argus.incident.models import Incident
 
 
 class Timeslot(models.Model):
@@ -120,6 +125,12 @@ class Filter(models.Model):
         return json.loads(self.filter_string)
 
     @property
+    def all_incidents(Self):
+        # Prevent cyclical import
+        from argus.incident.models import Incident
+        return Incident.objects.all()
+
+    @property
     def filtered_incidents(self):
         data = self.filter_json
         filtered_by_source = self.incidents_with_source_systems(data)
@@ -131,8 +142,8 @@ class Filter(models.Model):
             data = self.filter_json
         source_list = data.pop("sourceSystemIds", [])
         if source_list:
-            return Incident.objects.filter(source__in=source_list)
-        return Incident.objects.all()
+            return self.all_incidents.filter(source__in=source_list)
+        return self.all_incidents
 
     def source_system_fits(self, incident: Incident, data=None):
         if not data:
@@ -144,8 +155,8 @@ class Filter(models.Model):
             data = self.filter_json
         tags_list = data.pop("tags", [])
         if tags_list:
-            return Incident.objects.from_tags(*tags_list)
-        return Incident.objects.all()
+            return self.all_incidents.from_tags(*tags_list)
+        return self.all_incidents
 
     def tags_fit(self, incident: Incident, data=None):
         if not data:

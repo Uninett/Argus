@@ -28,12 +28,13 @@ def create_fake_incident():
     MAX_ID = 2 ** 32 - 1
     MIN_ID = 1
     argus_user, _, source_system = get_or_create_default_instances()
+    source_incident_id = randint(MIN_ID, MAX_ID)
     incident = Incident.objects.create(
         start_time=timezone.now(),
         end_time=INFINITY_REPR,
-        source_incident_id=randint(MIN_ID, MAX_ID),
+        source_incident_id=source_incident_id,
         source=source_system,
-        description='Incident created via "create_fake_incident"',
+        description=f'Incident #{source_incident_id} created via "create_fake_incident"',
     )
     for k, v in (("location", "argus"), ("object", f"{incident.id}"), ("problem_type", "test")):
         tag, _ = Tag.objects.get_or_create(key=k, value=v)
@@ -344,7 +345,7 @@ class Event(models.Model):
         ordering = ["-timestamp"]
 
     def __str__(self):
-        return f"'{self.get_type_display()}' event by {self.actor} at {self.timestamp}"
+        return f"'{self.get_type_display()}': {self.incident.description}, {self.actor} @ {self.timestamp}"
 
 
 class Acknowledgement(models.Model):

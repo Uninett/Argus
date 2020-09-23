@@ -1,16 +1,17 @@
+from __future__ import annotations
+
 import importlib
 import logging
 from multiprocessing import Process
-from typing import List
+from typing import List, TYPE_CHECKING
 
 from django.conf import settings
 from django.db import connections
 
-from argus.auth.models import User
-from argus.incident.models import Incident
-from .email import EmailNotification
 from ..models import NotificationProfile
 
+if TYPE_CHECKING:
+    from argus.incident.models import Event  # noqa: Break circular import
 
 LOG = logging.getLogger(__name__)
 
@@ -25,7 +26,10 @@ __all__ = [
 
 # Poor mans's plugins
 MEDIA_CLASSES = {
-    NotificationProfile.Media.EMAIL: getattr(settings, "DEFAULT_EMAIL_MEDIA", EmailNotification),
+    NotificationProfile.Media.EMAIL: getattr(
+        settings, "DEFAULT_EMAIL_MEDIA",
+        "argus.notificationprofile.media.email.EmailNotification"
+    ),
     NotificationProfile.Media.SMS: getattr(settings, "DEFAULT_SMS_MEDIA", None),
 }
 
@@ -45,35 +49,39 @@ for media_type, media_class in MEDIA_CLASSES.items():
     MEDIA_CLASSES[media_type] = _import_class_from_dotted_path(media_class)
 
 
-def send_notifications_to_users(incident: Incident):
+def send_notifications_to_users(event: Event):
     if not getattr(settings, "SEND_NOTIFICATIONS", False):
-        LOG.info('Notification: turned off sitewide, not sending for "%s"', incident)
+        LOG.info('Notification: turned off sitewide, not sending for "%s"', event)
         return
     # TODO: only send one notification per medium per user
-    LOG.info('Notification: sending incident "%s"', incident)
+    LOG.info('Notification: sending event "%s"', event)
+    sent = False
     for profile in NotificationProfile.objects.select_related("user"):
-        if profile.incident_fits(incident):
-            send_notification(profile.user, profile, incident)
-    else:
-        LOG.info('Notification: no listeners for "%s"', incident)
+        if profile.incident_fits(event.incident):
+            send_notification(profile, event)
+            sent = True
+    if not sent:
+        LOG.info('Notification: no listeners for "%s"', event)
         return
-    LOG.info('Notification: incident "%s" sent!', incident)
+    LOG.info('Notification: event "%s" sent!', event)
 
 
-def background_send_notifications_to_users(incident: Incident):
+def background_send_notifications_to_users(event: Event):
     connections.close_all()
-    LOG.info('Notification: backgrounded: about to send incident "%s"', incident)
-    p = Process(target=send_notifications_to_users, args=(incident,))
+    LOG.info('Notification: backgrounded: about to send event "%s"', event)
+    p = Process(target=send_notifications_to_users, args=(event,))
     p.start()
     return p
 
 
-def send_notification(user: User, profile: NotificationProfile, incident: Incident):
+def send_notification(profile: NotificationProfile, event: Event):
     media = get_notification_media(profile.media)
+    sent = False
     for medium in media:
         if medium is not None:
-            medium.send(incident, user, phone_number=profile.phone_number)
-    else:
+            medium.send(event, profile)
+            sent = True
+    if not sent:
         LOG.warn("Notification: Could not send notification, nowhere to send it to")
 
 

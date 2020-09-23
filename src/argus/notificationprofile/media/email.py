@@ -3,15 +3,22 @@ import logging
 
 from django.conf import settings
 from django.template.loader import render_to_string
-from rest_framework.renderers import JSONRenderer
 
-from argus.incident.serializers import IncidentSerializer
 from .base import NotificationMedium
 
 
 LOG = logging.getLogger(__name__)
 
-__all__ = ['EmailNotification']
+__all__ = [
+    'send_email_safely',
+    'EmailNotification',
+]
+
+
+def modelinstance_to_dict(obj):
+    dict_ = vars(obj)
+    dict_.pop('_state')
+    return dict_
 
 
 def send_email_safely(function, additional_error=None, *args, **kwargs):
@@ -34,21 +41,22 @@ def send_email_safely(function, additional_error=None, *args, **kwargs):
 
 class EmailNotification(NotificationMedium):
     @staticmethod
-    def send(incident, user, **_):
+    def send(event, profile, **_):
+        user = profile.user
         if not user.email:
             logging.getLogger("django.request").warning(
                 f"Cannot send email notification to user '{user}', as they have not set an email address."
             )
 
-        title = f"Incident at {incident}"
-        incident_dict = IncidentSerializer(incident, context={IncidentSerializer.NO_PKS_KEY: True}).data
-        # Convert OrderedDicts to dicts
-        incident_dict = json.loads(JSONRenderer().render(incident_dict))
+        title = f"{event}"
+        incident_dict = modelinstance_to_dict(event.incident)
+        for field in ('id', 'source_id'):
+            incident_dict.pop(field)
 
         template_context = {
             "title": title,
+            "event": event,
             "incident_dict": incident_dict,
-            "longest_field_name_length": len(max(incident_dict, key=len)),
         }
         subject = f"{settings.NOTIFICATION_SUBJECT_PREFIX}{title}"
         message = render_to_string("notificationprofile/email.txt", template_context)
