@@ -7,8 +7,6 @@ from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
 from django.db import models
 from django.db.models import Q
-from django.db.models.signals import post_delete, post_save
-from django.dispatch import receiver
 from django.utils import timezone
 
 from argus.auth.models import User
@@ -70,12 +68,6 @@ class SourceSystem(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.type})"
-
-
-@receiver(post_delete, sender=SourceSystem)
-def delete_associated_user(sender, instance: SourceSystem, *args, **kwargs):
-    if hasattr(instance, "user") and instance.user:
-        instance.user.delete()
 
 
 class TagQuerySet(models.QuerySet):
@@ -288,19 +280,6 @@ class Incident(models.Model):
         Event.objects.create(incident=self, actor=actor, timestamp=self.end_time, type=Event.Type.CLOSE)
 
 
-@receiver(post_save, sender=Incident)
-def create_start_event(sender, instance: Incident, created, raw, *args, **kwargs):
-    if raw or not created:
-        return
-    if not instance.start_event:
-        Event.objects.create(
-            incident=instance,
-            actor=instance.source.user,
-            timestamp=instance.start_time,
-            type=Event.Type.INCIDENT_START,
-        )
-
-
 class IncidentRelationType(models.Model):
     name = models.TextField()
 
@@ -358,9 +337,3 @@ class Acknowledgement(models.Model):
     def __str__(self):
         expiration_message = f" (expires {self.expiration})" if self.expiration else ""
         return f"Acknowledgement of incident #{self.event.incident.pk} by {self.event.actor}{expiration_message}"
-
-
-@receiver(post_delete, sender=Acknowledgement)
-def delete_associated_event(sender, instance: Acknowledgement, *args, **kwargs):
-    if hasattr(instance, "event") and instance.event:
-        instance.event.delete()

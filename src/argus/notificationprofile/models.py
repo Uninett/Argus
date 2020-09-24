@@ -7,8 +7,6 @@ from operator import or_
 from typing import TYPE_CHECKING
 
 from django.db import models
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 from django.utils import timezone
 from multiselectfield import MultiSelectField
 
@@ -36,20 +34,6 @@ class Timeslot(models.Model):
             if time_recurrence.timestamp_is_within(timestamp):
                 return True
         return False
-
-
-# Create default immediate Timeslot when a user is created
-@receiver(post_save, sender=User)
-def create_default_timeslot(sender, instance: User, created, raw, *args, **kwargs):
-    if raw or not created or instance.timeslots.exists():
-        return
-
-    TimeRecurrence.objects.create(
-        timeslot=Timeslot.objects.create(user=instance, name="Immediately"),
-        days=[day for day in TimeRecurrence.Day.values],
-        start=TimeRecurrence.DAY_START,
-        end=TimeRecurrence.DAY_END,
-    )
 
 
 class TimeRecurrence(models.Model):
