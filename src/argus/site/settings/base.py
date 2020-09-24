@@ -169,6 +169,7 @@ REST_FRAMEWORK = {
         "rest_framework.parsers.MultiPartParser",
     ),
     "TEST_REQUEST_DEFAULT_FORMAT": "json",
+    "PAGE_SIZE": 100,
 }
 # fmt: on
 

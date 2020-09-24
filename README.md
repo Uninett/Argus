@@ -212,6 +212,8 @@ All endpoints require requests to contain a header with key `Authorization` and 
     that filter and shows rows of all kinds of that value, for instance both
     "acked" and "unacked" in the case of `acked=`.
 
+    Filtering paramaeters:
+
     <dl>
     <dt>acked=true|false</dt>
     <dd>Fetch only acked (true) or unacked (false) incidents.</dd>
@@ -232,53 +234,78 @@ All endpoints require requests to contain a header with key `Authorization` and 
     </dl>
 
     So: `/api/v1/incidents/?acked=false&open=true&stateful&true&source__id__in=1&tags=location=broomcloset,location=understairs,problem=onfire` will fetch incidents that are all of "open", "unacked", "stateful", from source number 1, with "location" either "broomcloset" or "understairs", and that is on fire (problem=onfire).
+
+    Paginating parameters:
+    <dl>
+    <dt>cursor=LONG RANDOM STRING|null</dt>
+    <dd>Go to the page of that cursor. The cursor string for next and previous page is part of the response body./dd>
+    <dt>page_size=INTEGER</dt>
+    <dd>The number of rows to return. Defaukt is 100.</dd>
+    </dl>
+
+    So:
+    `api/v1/incidents/?cursor=cD0yMDIwLTA5LTIzKzEzJTNBMDIlM0ExNi40NTU4MzIlMkIwMCUzQTAw&page_size=10`
+    will go to the page indicated by "cD0yMDIwLTA5LTIzKzEzJTNBMDIlM0ExNi40NTU4MzIlMkIwMCUzQTAw"
+    and show the next 10 rows from that point onward. Do not attempt to guess
+    the cursor string. `null` means there is no more to fetch.
     </details>
     <details>
     <summary>Example response body:</summary>
 
     ```json
-    [
-        {
-            "pk": 10101,
-            "start_time": "2011-11-11T11:11:11+02:00",
-            "end_time": "2011-11-11T11:11:12+02:00",
-            "source": {
-                "pk": 11,
-                "name": "Uninett GW 3",
-                "type": {
-                    "name": "nav"
+    {
+        "next": "http://localhost:8000/api/v1/incidents/?cursor=cD0yMDIwLTA5LTIzKzEzJTNBMDIlM0ExNi40NTU4MzIlMkIwMCUzQTAw&page_size=10",
+        "previous": null,
+        "results": [
+            {
+                "pk": 10101,
+                "start_time": "2011-11-11T11:11:11+02:00",
+                "end_time": "2011-11-11T11:11:12+02:00",
+                "source": {
+                    "pk": 11,
+                    "name": "Uninett GW 3",
+                    "type": {
+                        "name": "nav"
+                    },
+                    "user": 12,
+                    "base_url": "https://somenav.somewhere.com"
                 },
-                "user": 12,
-                "base_url": "https://somenav.somewhere.com"
-            },
-            "source_incident_id": "12345",
-            "details_url": "https://uninett.no/api/alerts/12345/",
-            "description": "Netbox 11 <12345> down.",
-            "ticket_url": "https://tickettracker.com/tickets/987654/",
-            "tags": [
-                {
-                    "added_by": 12,
-                    "added_time": "2011-11-11T11:11:11.111111+02:00",
-                    "tag": "object=Netbox 4"
-                },
-                {
-                    "added_by": 12,
-                    "added_time": "2011-11-11T11:11:11.111111+02:00",
-                    "tag": "problem_type=boxDown"
-                },
-                {
-                    "added_by": 200,
-                    "added_time": "2020-08-10T11:26:14.550951+02:00",
-                    "tag": "color=red"
-                }
-            ],
-            "stateful": true,
-            "open": false,
-            "acked": false
-        }
-    ]
+                "source_incident_id": "12345",
+                "details_url": "https://uninett.no/api/alerts/12345/",
+                "description": "Netbox 11 <12345> down.",
+                "ticket_url": "https://tickettracker.com/tickets/987654/",
+                "tags": [
+                    {
+                        "added_by": 12,
+                        "added_time": "2011-11-11T11:11:11.111111+02:00",
+                        "tag": "object=Netbox 4"
+                    },
+                    {
+                        "added_by": 12,
+                        "added_time": "2011-11-11T11:11:11.111111+02:00",
+                        "tag": "problem_type=boxDown"
+                    },
+                    {
+                        "added_by": 200,
+                        "added_time": "2020-08-10T11:26:14.550951+02:00",
+                        "tag": "color=red"
+                    }
+                ],
+                "stateful": true,
+                "open": false,
+                "acked": false
+            }
+        ]
+    }
     ```
-    Refer to [this section](#explanation-of-terms) for an explanation of the fields.
+    Pagination-support:
+    <dl>
+    <dt>`next`</dt><dd>The link to the next page, according to the cursor, or `null` if on the last page.</dd>
+    <dt>`prevous`</dt><dd>The link to the previous page, according to the cursor, or `null` if on the first page.</dd>
+    <dt>`results`</dt><dd>An array of the resulting subset of rows, or an empty array if no results.</dd>
+    </dl>
+
+    Refer to [this section](#explanation-of-terms) for an explanation of the other fields.
     </details>
   * `POST`: creates and returns an incident
     <details>
