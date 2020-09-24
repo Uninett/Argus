@@ -6,6 +6,7 @@ from django.utils import timezone
 from django.utils.timezone import is_aware, make_aware
 
 from argus.auth.factories import SourceUserFactory
+from argus.util.testing import disconnect_signals, connect_signals
 from ..factories import *
 from ..models import Incident, IncidentTagRelation
 from ..views import IncidentFilter
@@ -23,6 +24,7 @@ class IncidentBasedAPITestCaseHelper:
 class IncidentFilterTestCase(IncidentBasedAPITestCaseHelper, TestCase):
 
     def setUp(self):
+        disconnect_signals()
         super().init_test_objects()
         self.incident1 = IncidentFactory(source=self.source1, end_time=None)
         self.incident2 = IncidentFactory(source=self.source1)
@@ -30,6 +32,9 @@ class IncidentFilterTestCase(IncidentBasedAPITestCaseHelper, TestCase):
         self.incident4 = IncidentFactory(source=self.source2)
         self.incident4.end_time = self.incident4.start_time
         self.incident4.save()
+
+    def tearDown(self):
+        connect_signals()
 
     def test_stateful_true(self):
         qs = Incident.objects.order_by('pk')

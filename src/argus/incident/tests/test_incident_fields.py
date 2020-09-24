@@ -8,6 +8,7 @@ from rest_framework.test import APIClient
 
 from argus.auth.models import User
 from argus.util.utils import duplicate
+from argus.util.testing import disconnect_signals, connect_signals
 from . import IncidentBasedAPITestCaseHelper
 from ..fields import KeyValueField
 from ..models import Incident, SourceSystem, SourceSystemType
@@ -15,6 +16,7 @@ from ..models import Incident, SourceSystem, SourceSystemType
 
 class EndTimeInfinityFieldTests(TestCase, IncidentBasedAPITestCaseHelper):
     def setUp(self):
+        disconnect_signals()
         super().init_test_objects()
 
         self.incident1 = Incident.objects.create(
@@ -22,6 +24,9 @@ class EndTimeInfinityFieldTests(TestCase, IncidentBasedAPITestCaseHelper):
         )
         self.incident2 = duplicate(self.incident1, source_incident_id="2")
         self.incident3 = duplicate(self.incident1, source_incident_id="3")
+
+    def tearDown(self):
+        connect_signals()
 
     @staticmethod
     def _save_end_time(incident: Incident, end_time):
