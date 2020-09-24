@@ -30,7 +30,7 @@ class Migration(migrations.Migration):
             name='NotificationProfile',
             fields=[
                 ('timeslot', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, primary_key=True, related_name='notification_profile', serialize=False, to='argus_notificationprofile.Timeslot')),
-                ('media', multiselectfield.db.fields.MultiSelectField(choices=[('EM', 'Email'), ('SM', 'SMS'), ('SL', 'Slack')], default='EM', max_length=8)),
+                ('media', multiselectfield.db.fields.MultiSelectField(choices=[('EM', 'Email'), ('SM', 'SMS')], default='EM', max_length=8)),
                 ('active', models.BooleanField(default=True)),
             ],
         ),

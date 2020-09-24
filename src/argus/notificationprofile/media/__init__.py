@@ -27,7 +27,6 @@ __all__ = [
 MEDIA_CLASSES = {
     NotificationProfile.Media.EMAIL: getattr(settings, "DEFAULT_EMAIL_MEDIA", EmailNotification),
     NotificationProfile.Media.SMS: getattr(settings, "DEFAULT_SMS_MEDIA", None),
-    NotificationProfile.Media.SLACK: getattr(settings, "DEFAULT_SLACK_MEDIA", None),
 }
 
 
