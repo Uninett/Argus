@@ -1,4 +1,4 @@
-from urllib.parse import urljoin
+from urllib.parse import urlsplit
 
 from django.contrib import admin
 from django.contrib.admin import widgets as admin_widgets
@@ -141,26 +141,21 @@ class IncidentAdmin(TextWidgetsOverrideModelAdmin):
     get_tags.short_description = "Tags"
 
     def get_details_url(self, incident: Incident):
-        url = ""
-        path = incident.details_url
-        if path:
-            if incident.source.base_url:
-                url = urljoin(incident.source.base_url, path)
-            else:
-                return path  # Just show the relative url
-        if url:
-            return format_html('<a href="{}" title="{}">Link</a>', url, url)
-        else:
+        url = incident.pp_details_url()
+        if not url:
             return ""
-    get_details_url.description = "Details url"
+        scheme, netloc, *_ = urlsplit(url)
+        if scheme and netloc:  # absolute url: linkify!
+            return format_html('<a href="{}" title="{}">Link</a>', url, url)
+        return url  # relative url
+    get_details_url.short_description = "Details url"
 
     def get_ticket_url(self, incident: Incident):
-        url = incident.ticket_url
+        url = incident.ticket_url.strip()
         if url:
             return format_html('<a href="{}" title="{}">Link</a>', url, url)
-        else:
-            return ""
-    get_ticket_url.description = "Ticket url"
+        return ""
+    get_ticket_url.short_description = "Ticket url"
 
     def get_open(self, incident: Incident):
         return incident.open

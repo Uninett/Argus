@@ -127,6 +127,8 @@ class IncidentSerializer(serializers.ModelSerializer):
         tags_field: IncidentTagRelationSerializer = self.get_fields()["tags"]
         incident_repr["tags"] = tags_field.to_representation(instance.incident_tag_relations.all())
 
+        incident_repr["details_url"] = instance.pp_details_url()
+
         incident_repr["stateful"] = instance.stateful
         incident_repr["open"] = instance.open
         incident_repr["acked"] = instance.acked
