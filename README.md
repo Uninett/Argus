@@ -212,7 +212,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
     that filter and shows rows of all kinds of that value, for instance both
     "acked" and "unacked" in the case of `acked=`.
 
-    Filtering paramaeters:
+    Filtering parameters:
 
     <dl>
     <dt>acked=true|false</dt>
@@ -240,7 +240,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
     <dt>cursor=LONG RANDOM STRING|null</dt>
     <dd>Go to the page of that cursor. The cursor string for next and previous page is part of the response body./dd>
     <dt>page_size=INTEGER</dt>
-    <dd>The number of rows to return. Defaukt is 100.</dd>
+    <dd>The number of rows to return. Default is 100.</dd>
     </dl>
 
     So:
@@ -301,7 +301,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
     Pagination-support:
     <dl>
     <dt>`next`</dt><dd>The link to the next page, according to the cursor, or `null` if on the last page.</dd>
-    <dt>`prevous`</dt><dd>The link to the previous page, according to the cursor, or `null` if on the first page.</dd>
+    <dt>`previous`</dt><dd>The link to the previous page, according to the cursor, or `null` if on the first page.</dd>
     <dt>`results`</dt><dd>An array of the resulting subset of rows, or an empty array if no results.</dd>
     </dl>
 
