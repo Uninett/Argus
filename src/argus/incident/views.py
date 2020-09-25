@@ -83,7 +83,7 @@ class IncidentViewSet(
     viewsets.GenericViewSet,
 ):
     permission_classes = [IsAuthenticated]
-    queryset = Incident.objects.prefetch_default_related()
+    queryset = Incident.objects.prefetch_default_related().prefetch_related("source")
     filter_backends = [filters.DjangoFilterBackend]
     filterset_class = IncidentFilter
 

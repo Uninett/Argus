@@ -2,6 +2,7 @@ from collections import defaultdict
 from functools import reduce
 from operator import and_
 from random import randint
+from urllib.parse import urljoin
 
 from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
@@ -285,6 +286,16 @@ class Incident(models.Model):
         self.end_time = timezone.now()
         self.save(update_fields=["end_time"])
         Event.objects.create(incident=self, actor=actor, timestamp=self.end_time, type=Event.Type.CLOSE)
+
+    def pp_details_url(self):
+        "Merge Incident.details_url with Source.base_url"
+        path = self.details_url.strip()
+        if not path:
+            return ""
+        base_url = self.source.base_url.strip()
+        if base_url:
+            return urljoin(base_url, path)
+        return path  # Just show the relative url
 
 
 @receiver(post_save, sender=Incident)
