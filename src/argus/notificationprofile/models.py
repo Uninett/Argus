@@ -109,7 +109,7 @@ class Filter(models.Model):
         return json.loads(self.filter_string)
 
     @property
-    def all_incidents(Self):
+    def all_incidents(self):
         # Prevent cyclical import
         from argus.incident.models import Incident
         return Incident.objects.all()
