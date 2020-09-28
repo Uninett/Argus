@@ -26,6 +26,7 @@ from argus.notificationprofile.models import (
     Timeslot,
 )
 from argus.util.utils import duplicate
+from argus.util.testing import disconnect_signals, connect_signals
 
 
 class IncidentAPITestCaseHelper(IncidentBasedAPITestCaseHelper):
@@ -61,6 +62,7 @@ def set_time(timestamp: datetime, new_time: str):
 
 class ModelTests(TestCase, IncidentAPITestCaseHelper):
     def setUp(self):
+        disconnect_signals()
         super().init_test_objects()
         self.monday_datetime = make_aware(parse_datetime("2019-11-25 00:00"))
 
@@ -83,6 +85,9 @@ class ModelTests(TestCase, IncidentAPITestCaseHelper):
             start=TimeRecurrence.DAY_START,
             end=TimeRecurrence.DAY_END,
         )
+
+    def teardown(self):
+        connect_signals()
 
     def test_time_recurrence(self):
         # Test set_time() helper function
@@ -144,6 +149,7 @@ class ModelTests(TestCase, IncidentAPITestCaseHelper):
 
 class ViewTests(APITestCase, IncidentAPITestCaseHelper):
     def setUp(self):
+        disconnect_signals()
         super().init_test_objects()
 
         incident1_json = IncidentSerializer([self.incident1], many=True).data
@@ -156,6 +162,9 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
         )
         self.notification_profile1 = NotificationProfile.objects.create(user=self.user1, timeslot=self.timeslot1)
         self.notification_profile1.filters.add(filter1)
+
+    def teardown(self):
+        connect_signals()
 
     def test_incidents_filtered_by_notification_profile_view(self):
         response = self.user1_rest_client.get(

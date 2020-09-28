@@ -1,3 +1,5 @@
+Status: {{ event.type }}
+Actor: {{ event.actor.username }}
 {% for field, value in incident_dict.items %}
-{{ field|ljust:longest_field_name_length }} : {{ value|safe }}
+{{ field|ljust:17 }}: {{ value|safe }}
 {% endfor %}

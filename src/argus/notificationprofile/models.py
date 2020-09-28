@@ -1,16 +1,19 @@
+from __future__ import annotations
+
 import json
 from datetime import datetime, time
 from functools import reduce
 from operator import or_
+from typing import TYPE_CHECKING
 
 from django.db import models
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 from django.utils import timezone
 from multiselectfield import MultiSelectField
 
 from argus.auth.models import User
-from argus.incident.models import Incident
+
+if TYPE_CHECKING:
+    from argus.incident.models import Incident
 
 
 class Timeslot(models.Model):
@@ -31,20 +34,6 @@ class Timeslot(models.Model):
             if time_recurrence.timestamp_is_within(timestamp):
                 return True
         return False
-
-
-# Create default immediate Timeslot when a user is created
-@receiver(post_save, sender=User)
-def create_default_timeslot(sender, instance: User, created, raw, *args, **kwargs):
-    if raw or not created or instance.timeslots.exists():
-        return
-
-    TimeRecurrence.objects.create(
-        timeslot=Timeslot.objects.create(user=instance, name="Immediately"),
-        days=[day for day in TimeRecurrence.Day.values],
-        start=TimeRecurrence.DAY_START,
-        end=TimeRecurrence.DAY_END,
-    )
 
 
 class TimeRecurrence(models.Model):
@@ -120,6 +109,12 @@ class Filter(models.Model):
         return json.loads(self.filter_string)
 
     @property
+    def all_incidents(self):
+        # Prevent cyclical import
+        from argus.incident.models import Incident
+        return Incident.objects.all()
+
+    @property
     def filtered_incidents(self):
         data = self.filter_json
         filtered_by_source = self.incidents_with_source_systems(data)
@@ -131,8 +126,8 @@ class Filter(models.Model):
             data = self.filter_json
         source_list = data.pop("sourceSystemIds", [])
         if source_list:
-            return Incident.objects.filter(source__in=source_list)
-        return Incident.objects.all()
+            return self.all_incidents.filter(source__in=source_list)
+        return self.all_incidents
 
     def source_system_fits(self, incident: Incident, data=None):
         if not data:
@@ -144,8 +139,8 @@ class Filter(models.Model):
             data = self.filter_json
         tags_list = data.pop("tags", [])
         if tags_list:
-            return Incident.objects.from_tags(*tags_list)
-        return Incident.objects.all()
+            return self.all_incidents.from_tags(*tags_list)
+        return self.all_incidents
 
     def tags_fit(self, incident: Incident, data=None):
         if not data:

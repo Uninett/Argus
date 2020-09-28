@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 
+from django.db.models import signals
 from django.test import Client
 from django.urls import reverse
 from django.utils import timezone
@@ -10,6 +11,7 @@ from rest_framework.test import APITestCase
 
 from argus.util import datetime_utils
 from argus.util.utils import duplicate
+from argus.util.testing import disconnect_signals, connect_signals
 from . import IncidentBasedAPITestCaseHelper
 from ..factories import IncidentFactory
 from ..models import Event, Incident
@@ -17,6 +19,8 @@ from ..models import Event, Incident
 
 class EventAPITests(APITestCase, IncidentBasedAPITestCaseHelper):
     def setUp(self):
+        disconnect_signals()
+
         super().init_test_objects()
 
         self.stateful_incident1 = IncidentFactory(
@@ -28,6 +32,9 @@ class EventAPITests(APITestCase, IncidentBasedAPITestCaseHelper):
         self.stateless_incident1 = duplicate(self.stateful_incident1, end_time=None, source_incident_id="2")
 
         self.events_url = lambda incident: reverse("incident:incident-events", args=[incident.pk])
+
+    def tearDown(self):
+        connect_signals()
 
     @staticmethod
     def _create_event_dict(event_type: str):
