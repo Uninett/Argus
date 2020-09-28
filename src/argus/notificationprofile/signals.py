@@ -12,7 +12,7 @@ def create_default_timeslot(sender, instance: User, created, raw, *args, **kwarg
         return
 
     TimeRecurrence.objects.create(
-        timeslot=Timeslot.objects.create(user=instance, name="Immediately"),
+        timeslot=Timeslot.objects.create(user=instance, name="All the time"),
         days=[day for day in TimeRecurrence.Day.values],
         start=TimeRecurrence.DAY_START,
         end=TimeRecurrence.DAY_END,

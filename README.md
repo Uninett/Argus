@@ -583,7 +583,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
     The optional key `"all_day"` indicates that Argus should use `Time.min` and `Time.max` as `"start"` and `"end"` respectively. This also overrides any provided values for `"start"` and `"end"`. An example request body:
     ```json
     {
-        "name": "Immediately",
+        "name": "All the time",
         "time_recurrences": [
             {
                 "days": [1, 2, 3, 4, 5, 6, 7],
@@ -596,7 +596,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
     ```json
     {
         "pk": 2,
-        "name": "Immediately",
+        "name": "All the time",
         "time_recurrences": [
             {
                 "days": [1, 2, 3, 4, 5, 6, 7],
