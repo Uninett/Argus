@@ -7,7 +7,6 @@ from django_filters import rest_framework as filters
 from rest_framework import generics, mixins, serializers, status, viewsets
 from rest_framework.decorators import api_view, action
 from rest_framework.generics import get_object_or_404
-from rest_framework.pagination import CursorPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
@@ -31,11 +30,6 @@ from .serializers import (
     SourceSystemSerializer,
     SourceSystemTypeSerializer,
 )
-
-
-class IncidentPagination(CursorPagination):
-    ordering = '-start_time'
-    page_size_query_param = 'page_size'
 
 
 class SourceSystemTypeList(generics.ListCreateAPIView):
@@ -87,7 +81,6 @@ class IncidentViewSet(
     mixins.UpdateModelMixin,
     viewsets.GenericViewSet,
 ):
-    pagination_class = IncidentPagination
     permission_classes = [IsAuthenticated]
     queryset = Incident.objects.prefetch_default_related().prefetch_related("source")
     filter_backends = [filters.DjangoFilterBackend]
