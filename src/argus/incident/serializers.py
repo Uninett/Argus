@@ -1,4 +1,5 @@
 from collections import OrderedDict
+from typing import List
 
 from django.core.validators import URLValidator
 from django.utils import timezone
@@ -149,7 +150,14 @@ class IncidentPureDeserializer(serializers.ModelSerializer):
         assert "user" in validated_data
         user: User = validated_data["user"]
 
-        tags_data = validated_data.pop("tags", [])
+        if "tags" in validated_data:
+            tags_data = validated_data.pop("tags")
+            self.add_and_remove_tags(instance, user, tags_data)
+
+        return super().update(instance, validated_data)
+
+    @staticmethod
+    def add_and_remove_tags(instance: Incident, user: User, tags_data: List[dict]):
         posted_tags = {Tag.objects.get_or_create(**tag_data)[0] for tag_data in tags_data}
 
         existing_tag_relations = instance.incident_tag_relations.select_related("tag")
@@ -173,8 +181,6 @@ class IncidentPureDeserializer(serializers.ModelSerializer):
 
         for tag in add_tags:
             IncidentTagRelation.objects.create(tag=tag, incident=instance, added_by=user)
-
-        return super().update(instance, validated_data)
 
     def to_representation(self, instance: Incident):
         return IncidentSerializer(instance).data
