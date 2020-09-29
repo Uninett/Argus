@@ -26,6 +26,7 @@ This repository hosts the backend built with Django, while the frontend is hoste
 * Create a Python 3.6+ virtual environment
 * `pip install -r requirements.txt`
 * `python manage.py migrate`
+* `python manage.py initial_setup`
 
 Start the server with `python manage.py runserver`.
 
