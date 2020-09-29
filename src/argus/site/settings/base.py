@@ -148,6 +148,11 @@ AUTHENTICATION_BACKENDS = (
 )
 
 
+SILENCED_SYSTEM_CHECKS = [
+    "rest_framework.W001",  # Turns off warning about PAGE_SIZE without DEFAULT_PAGINATION_CLASS
+]
+
+
 # django-rest-framework
 
 # fmt: off
