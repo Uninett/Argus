@@ -11,7 +11,7 @@ This repository hosts the backend built with Django, while the frontend is hoste
 ## Setup
 
 ### Prerequisites
-* Python 3.6+
+* Python 3.7+
 * pip
 
 ### Dataporten setup
@@ -23,7 +23,7 @@ This repository hosts the backend built with Django, while the frontend is hoste
   * `userid-feide`
 
 ### Project setup
-* Create a Python 3.6+ virtual environment
+* Create a Python 3.7+ virtual environment
 * `pip install -r requirements.txt`
 * `python manage.py migrate`
 * `python manage.py initial_setup`
