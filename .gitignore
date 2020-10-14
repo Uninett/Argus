@@ -1,3 +1,7 @@
+# local config files
+cmd.sh
+localsettings.py
+
 # Created by https://www.gitignore.io/api/venv,django,pycharm+all
 # Edit at https://www.gitignore.io/?templates=venv,django,pycharm+all
 
