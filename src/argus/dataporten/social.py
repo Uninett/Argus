@@ -66,24 +66,9 @@ class DataportenOAuth2(BaseOAuth2):
             raise AuthException("Wrong audience")
 
 
-class DataportenEmailOAuth2(DataportenOAuth2):
-    name = "dataporten_email"
-    DEFAULT_SCOPE = ["userid", "profile", "email"]
-
-    def get_user_details(self, response):
-        """
-        Return user details from Dataporten
-
-        Set username to email address
-        """
-        user = super(DataportenEmailOAuth2, self).get_user_details(response)
-        user["username"] = user["email"]
-        return user
-
-
 class DataportenFeideOAuth2(DataportenOAuth2):
     name = "dataporten_feide"
-    DEFAULT_SCOPE = ["userid", "profile", "userid-feide"]
+    DEFAULT_SCOPE = ["userid", "profile", "userid-feide", "email"]
 
     def get_user_details(self, response):
         """
