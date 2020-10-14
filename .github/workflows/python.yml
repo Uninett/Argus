@@ -38,6 +38,8 @@ jobs:
           echo "::set-env name=POSTGRES_DB::argus_db"
           echo "::set-env name=POSTGRES_USER::argus"
           echo "::set-env name=POSTGRES_PASSWORD::password"
+          echo "::set-env name=DATABASE_URL::sqlite://argus.db"
+
 
       - name: Run Tests
         run: |
@@ -54,6 +56,7 @@ jobs:
       - name: Run Tests with PostgreSQL
         env:
           POSTGRES: true
+          DATABASE_URL: postgresql://argus:password@localhost/argus_db
         run: |
           python manage.py collectstatic --no-input
           coverage run -p manage.py test src
