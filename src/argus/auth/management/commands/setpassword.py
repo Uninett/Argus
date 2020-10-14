@@ -4,11 +4,11 @@ from argus.auth.models import User
 
 
 class Command(BaseCommand):
-    help = "Set password"
+    help = "Set password for a user, settable from script"
 
     def add_arguments(self, parser):
+        parser.add_argument('username', type=str, help="Set password for username")
         parser.add_argument('password', type=str, help="Set this password")
-        parser.add_argument('-u', '--username', type=str, help="Set password for username")
 
     def handle(self, *args, **options):
         user = User.objects.get(username=options['username'])
