@@ -34,12 +34,11 @@ jobs:
 
       - name: Set Environment Variables
         run: |
-          echo "::set-env name=DJANGO_SETTINGS_MODULE::argus.site.settings.test_CI"
-          echo "::set-env name=POSTGRES_DB::argus_db"
-          echo "::set-env name=POSTGRES_USER::argus"
-          echo "::set-env name=POSTGRES_PASSWORD::password"
-          echo "::set-env name=DATABASE_URL::sqlite://argus.db"
-
+          echo "DJANGO_SETTINGS_MODULE=argus.site.settings.test_CI" >> $GITHUB_ENV
+          echo "POSTGRES_DB=argus_db" >> $GITHUB_ENV
+          echo "POSTGRES_USER=argus" >> $GITHUB_ENV
+          echo "POSTGRES_PASSWORD=password" >> $GITHUB_ENV
+          echo "DATABASE_URL=sqlite://argus.db" >> $GITHUB_ENV
 
       - name: Run Tests
         run: |
