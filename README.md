@@ -30,6 +30,12 @@ This repository hosts the backend built with Django, while the frontend is hoste
 
 Start the server with `python manage.py runserver`.
 
+#### Alternative setup using Docker Compose
+
+* `docker-compose up`
+* `docker-compose exec argus-api django-admin initial_setup`
+* Visit http://localhost:8000/
+
 ### Site- and deployment-specific settings
 
 Site-specific settings are set as per 12 factor, with environment variables. For more details, see the relevant section in the docs: [Setting site-specific settings](https://argus.readthedocs.io/en/latest/site-specific-settings.html).

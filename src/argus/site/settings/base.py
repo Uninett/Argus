@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/2.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.2/ref/settings/
 """
+import dj_database_url
 
 # Import some helpers
 from . import *
@@ -84,11 +85,9 @@ WSGI_APPLICATION = "argus.site.wsgi.application"
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
 # fmt: off
+DATABASE_URL = get_str_env("DATABASE_URL", required=True)
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": str(SITE_DIR / "db.sqlite3"),
-    }
+    "default": dj_database_url.parse(DATABASE_URL),
 }
 # fmt: on
 

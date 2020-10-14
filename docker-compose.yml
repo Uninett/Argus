@@ -1,0 +1,30 @@
+version: '3.5'
+services:
+  argus-api:
+    build: .
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+    environment:
+      - TIME_ZONE=Europe/Oslo
+      - DJANGO_SETTINGS_MODULE=argus.site.settings.dev
+      - DATABASE_URL=postgresql://argus:HahF9araeKoo@postgres/argus
+    volumes:
+      - ${PWD}:/argus
+    restart: always
+
+
+  postgres:
+    image: "postgres:12"
+    volumes:
+      - postgres:/var/lib/postgresql/data:Z
+    restart: always
+    environment:
+      - POSTGRES_USER=argus
+      - POSTGRES_PASSWORD=HahF9araeKoo
+      - POSTGRES_DB=argus
+
+volumes:
+  postgres:
+    driver: local
