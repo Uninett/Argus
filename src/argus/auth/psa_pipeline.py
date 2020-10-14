@@ -1,5 +1,24 @@
+"""
+Place to put changes to the python social auth (psa) pipeline system.
+
+See https://python-social-auth.readthedocs.io/en/latest/pipeline.html
+for tons of detail that doesn't really help that much.
+"""
+
 def user_details(strategy, details, backend, user=None, *args, **kwargs):
-    """Replaces social_core.pipeline.user.user_details"""
+    """Replaces social_core.pipeline.user.user_details in SOCIAL_AUTH_PIPELINE
+
+    Only necessary to use if the scope-list didn't start out with "email" in it.
+    When "email" has been added to the scope-list, this will set email on the
+    user on next login. After all users have logged in again, the default
+    authentication-pipeline can be restored.
+
+    Also needed if we will always trust the email from the OIDC provider no
+    matter what.
+
+    The only change ``from social_core.pipeline.user.user_details`` is the
+    commenting out of "email" in the ``protected``-tuple.
+    """
 
     if not user:
         return
