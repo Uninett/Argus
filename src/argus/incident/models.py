@@ -23,19 +23,29 @@ def get_or_create_default_instances():
     return (argus_user, sst, ss)
 
 
-def create_fake_incident():
+def create_fake_incident(tags=None, description=None):
+    argus_user, _, source_system = get_or_create_default_instances()
+
     MAX_ID = 2 ** 32 - 1
     MIN_ID = 1
-    argus_user, _, source_system = get_or_create_default_instances()
     source_incident_id = randint(MIN_ID, MAX_ID)
+
+    if not description:
+        description=f'Incident #{source_incident_id} created via "create_fake_incident"'
     incident = Incident.objects.create(
         start_time=timezone.now(),
         end_time=INFINITY_REPR,
         source_incident_id=source_incident_id,
         source=source_system,
-        description=f'Incident #{source_incident_id} created via "create_fake_incident"',
+        description=description,
     )
-    for k, v in (("location", "argus"), ("object", f"{incident.id}"), ("problem_type", "test")):
+
+    taglist = [("location", "argus"), ("object", f"{incident.id}"),
+               ("problem_type", "test")]
+    if tags:
+        tags = [tag.split("=", 1) for tag in tags]
+        taglist.extend(tags)
+    for k, v in taglist:
         tag, _ = Tag.objects.get_or_create(key=k, value=v)
         IncidentTagRelation.objects.create(tag=tag, incident=incident, added_by=argus_user)
     return incident
