@@ -85,10 +85,12 @@ WSGI_APPLICATION = "argus.site.wsgi.application"
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
 # fmt: off
-DATABASE_URL = get_str_env("DATABASE_URL", required=True)
-DATABASES = {
-    "default": dj_database_url.parse(DATABASE_URL),
-}
+DATABASE_URL = get_str_env("DATABASE_URL")
+if DATABASE_URL:
+    DATABASES = {
+        "default": dj_database_url.parse(DATABASE_URL),
+    }
+del DATABASE_URL
 # fmt: on
 
 
