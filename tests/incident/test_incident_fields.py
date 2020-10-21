@@ -9,9 +9,9 @@ from rest_framework.test import APIClient
 from argus.auth.models import User
 from argus.util.utils import duplicate
 from argus.util.testing import disconnect_signals, connect_signals
+from argus.incident.fields import KeyValueField
+from argus.incident.models import Incident, SourceSystem, SourceSystemType
 from . import IncidentBasedAPITestCaseHelper
-from ..fields import KeyValueField
-from ..models import Incident, SourceSystem, SourceSystemType
 
 
 class EndTimeInfinityFieldTests(TestCase, IncidentBasedAPITestCaseHelper):

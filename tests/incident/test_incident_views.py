@@ -7,9 +7,9 @@ from django.utils.timezone import is_aware, make_aware
 
 from argus.auth.factories import SourceUserFactory
 from argus.util.testing import disconnect_signals, connect_signals
-from ..factories import *
-from ..models import Incident, IncidentTagRelation
-from ..views import IncidentFilter
+from argus.incident.factories import *
+from argus.incident.models import Incident, IncidentTagRelation
+from argus.incident.views import IncidentFilter
 
 
 class IncidentBasedAPITestCaseHelper:
