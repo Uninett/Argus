@@ -13,7 +13,7 @@ from argus.util import datetime_utils
 from argus.util.utils import duplicate
 from argus.util.testing import disconnect_signals, connect_signals
 from . import IncidentBasedAPITestCaseHelper
-from ..factories import IncidentFactory
+from ..factories import IncidentFactory, SourceSystemFactory
 from ..models import Event, Incident
 
 
@@ -173,3 +173,25 @@ class EventAPITests(APITestCase, IncidentBasedAPITestCaseHelper):
                 self._assert_posting_event_is_rejected_and_does_not_change_end_time(
                     self._create_event_dict(event_type), original_end_time, self.user1_rest_client
                 )
+
+
+class EventSignalTests(APITestCase):
+    def setUp(self):
+        disconnect_signals()
+
+    def tearDown(self):
+        connect_signals()
+
+    def test_event_has_description(self):
+        source_incident_id = "abcknekkebrod"
+        incident = Incident.objects.create(
+            start_time=timezone.now(),
+            end_time=datetime_utils.INFINITY_REPR,
+            source_incident_id=source_incident_id,
+            source=SourceSystemFactory(),
+            description=f"Incident #{source_incident_id} created for testing",
+        )
+        event_start = incident.events.filter(type=Event.Type.INCIDENT_START)
+
+        self.assertTrue(event_start)
+        self.assertEquals(incident.description, incident.events.get(type="STA").description)
