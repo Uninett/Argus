@@ -38,7 +38,7 @@ Start the server with `python manage.py runserver`.
 
 ### Site- and deployment-specific settings
 
-Site-specific settings are set as per 12 factor, with environment variables. For more details, see the relevant section in the docs: [Setting site-specific settings](https://argus.readthedocs.io/en/latest/site-specific-settings.html).
+Site-specific settings are set as per 12 factor, with environment variables. For more details, see the relevant section in the docs: [Setting site-specific settings](docs/site-specific-settings.rst).
 
 A recap of the environment variables that can be set by default follows.
 
