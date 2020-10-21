@@ -24,6 +24,7 @@ def create_start_event(sender, instance: Incident, created, raw, *args, **kwargs
             actor=instance.source.user,
             timestamp=instance.start_time,
             type=Event.Type.INCIDENT_START,
+            description=instance.description,
         )
 
 
