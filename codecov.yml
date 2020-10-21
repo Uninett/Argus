@@ -10,6 +10,7 @@ coverage:
 ignore:
   - "manage.py"
   - "setup.py"
+  - "tests/**"
   - "src/argus/site/settings/**"
   - "src/argus/dataporten/social.py"
   - "**/apps.py"
