@@ -517,6 +517,23 @@ All endpoints require requests to contain a header with key `Authorization` and 
 
 * `GET` to `/api/v1/incidents/<int:pk>/acks/<int:pk>/`: returns a specific acknowledgement of the specified incident
 
+* `/api/v1/incidents/sources/`:
+  * `GET`: Returns a list of all sources
+    <details>
+    <summary>Example response body:</summary>
+    [
+      {
+        "pk": 1,
+        "name": "argus",
+        "type": {
+            "name": "argus"
+        },
+        "user": 1,
+        "base_url": ""
+      }
+    ]
+    </details>
+
 * `GET` to `/api/v1/incidents/mine/`: behaves like `/api/v1/incidents/` except
   only showing the incidents added by the logged-in user, and no filtering on
   source or source type is possible.
