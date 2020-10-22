@@ -1,6 +1,5 @@
 python-dotenv
 black
-coverage
 ipython
 django-extensions
 Werkzeug  # for django-extensions:runserver_plus

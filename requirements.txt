@@ -1,4 +1,4 @@
--r requirements/django.txt
+-r requirements/django30.txt
 -r requirements/base.txt
 -r requirements/dev.txt
 -r requirements/websocket.txt
