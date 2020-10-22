@@ -240,7 +240,7 @@ All endpoints require requests to contain a header with key `Authorization` and 
     tags need match. If there are multiple keys, one of each key must match.</dd>
     </dl>
 
-    So: `/api/v1/incidents/?acked=false&open=true&stateful&true&source__id__in=1&tags=location=broomcloset,location=understairs,problem=onfire` will fetch incidents that are all of "open", "unacked", "stateful", from source number 1, with "location" either "broomcloset" or "understairs", and that is on fire (problem=onfire).
+    So: `/api/v1/incidents/?acked=false&open=true&stateful=true&source__id__in=1&tags=location=broomcloset,location=understairs,problem=onfire` will fetch incidents that are all of "open", "unacked", "stateful", from source number 1, with "location" either "broomcloset" or "understairs", and that is on fire (problem=onfire). If the boolean parameters are not given a value or are left out, that is interpreted as not filtering at all on that parameter, showing both true and false entries.
 
     Paginating parameters:
     <dl>
