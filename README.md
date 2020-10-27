@@ -81,7 +81,7 @@ subdomains of the same domain (ARGUS_COOKIE_DOMAIN).
 When running on localhost for dev and test, ARGUS_COOKIE_DOMAIN may be empty.
 
 ### Running tests
-* `python manage.py test src`
+* `python manage.py test tests`
 
 
 ### Mock data

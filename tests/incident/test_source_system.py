@@ -5,8 +5,8 @@ from rest_framework.test import APIClient, APITestCase
 
 from argus.auth.models import User
 from argus.auth.factories import AdminUserFactory
-from ..factories import SourceSystemTypeFactory
-from ..models import SourceSystem
+from argus.incident.factories import SourceSystemTypeFactory
+from argus.incident.models import SourceSystem
 
 
 class SourceSystemPostingTests(APITestCase):

@@ -6,8 +6,8 @@ from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient, APITestCase
 
-from .factories import AdminUserFactory, PersonUserFactory
-from .models import User
+from argus.auth.factories import AdminUserFactory, PersonUserFactory
+from argus.auth.models import User
 
 
 class APITests(APITestCase):

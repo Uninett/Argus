@@ -12,9 +12,9 @@ from rest_framework.test import APITestCase
 from argus.util import datetime_utils
 from argus.util.utils import duplicate
 from argus.util.testing import disconnect_signals, connect_signals
+from argus.incident.factories import IncidentFactory, SourceSystemFactory
+from argus.incident.models import Event, Incident
 from . import IncidentBasedAPITestCaseHelper
-from ..factories import IncidentFactory, SourceSystemFactory
-from ..models import Event, Incident
 
 
 class EventAPITests(APITestCase, IncidentBasedAPITestCaseHelper):
