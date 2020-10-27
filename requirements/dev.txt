@@ -1,5 +1,6 @@
 python-dotenv
 black
+pre-commit
 ipython
 django-extensions
 Werkzeug  # for django-extensions:runserver_plus
