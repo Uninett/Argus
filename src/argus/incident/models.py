@@ -31,7 +31,7 @@ def create_fake_incident(tags=None, description=None):
     source_incident_id = randint(MIN_ID, MAX_ID)
 
     if not description:
-        description=f'Incident #{source_incident_id} created via "create_fake_incident"'
+        description = f'Incident #{source_incident_id} created via "create_fake_incident"'
     incident = Incident.objects.create(
         start_time=timezone.now(),
         end_time=INFINITY_REPR,
@@ -40,8 +40,7 @@ def create_fake_incident(tags=None, description=None):
         description=description,
     )
 
-    taglist = [("location", "argus"), ("object", f"{incident.id}"),
-               ("problem_type", "test")]
+    taglist = [("location", "argus"), ("object", f"{incident.id}"), ("problem_type", "test")]
     if tags:
         tags = [tag.split("=", 1) for tag in tags]
         taglist.extend(tags)
@@ -70,7 +69,10 @@ class SourceSystem(models.Model):
     name = models.TextField()
     type = models.ForeignKey(to=SourceSystemType, on_delete=models.PROTECT, related_name="instances")
     user = models.OneToOneField(to=User, on_delete=models.PROTECT, related_name="source_system")
-    base_url = models.TextField(help_text="Base url to combine with an incident's relative url to point to more info in the source system.", blank=True)
+    base_url = models.TextField(
+        help_text="Base url to combine with an incident's relative url to point to more info in the source system.",
+        blank=True,
+    )
 
     class Meta:
         constraints = [
@@ -213,7 +215,8 @@ class Incident(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=["source_incident_id", "source"], name="%(class)s_unique_source_incident_id_per_source",
+                fields=["source_incident_id", "source"],
+                name="%(class)s_unique_source_incident_id_per_source",
             ),
         ]
         ordering = ["-start_time"]

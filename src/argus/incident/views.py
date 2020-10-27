@@ -34,8 +34,8 @@ from .serializers import (
 
 
 class IncidentPagination(CursorPagination):
-    ordering = '-start_time'
-    page_size_query_param = 'page_size'
+    ordering = "-start_time"
+    page_size_query_param = "page_size"
 
 
 class SourceSystemTypeList(generics.ListCreateAPIView):
@@ -128,12 +128,12 @@ class IncidentViewSet(
     def perform_update(self, serializer):
         serializer.save(user=self.request.user)
 
-    @action(detail=True, methods=['put'])
+    @action(detail=True, methods=["put"])
     def ticket_url(self, request, pk=None):
         incident = self.get_object()
         serializer = IncidentTicketUrlSerializer(data=request.data)
         if serializer.is_valid():
-            incident.ticket_url = serializer.data['ticket_url']
+            incident.ticket_url = serializer.data["ticket_url"]
             incident.save()
             # TODO: make argus stateless incident about the url being saved? event?
             return Response(serializer.data)

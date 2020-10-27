@@ -35,11 +35,15 @@ class IncidentAPITestCaseHelper(IncidentBasedAPITestCaseHelper):
 
         self.source_type2 = SourceSystemType.objects.create(name="type2")
         self.source2 = SourceSystem.objects.create(
-            name="System 2", type=self.source_type2, user=User.objects.create(username="system_2"),
+            name="System 2",
+            type=self.source_type2,
+            user=User.objects.create(username="system_2"),
         )
 
         self.incident1 = Incident.objects.create(
-            start_time=timezone.now(), source=self.source1, source_incident_id="123",
+            start_time=timezone.now(),
+            source=self.source1,
+            source_incident_id="123",
         )
         self.incident2 = duplicate(self.incident1, source=self.source2)
 
@@ -56,7 +60,10 @@ class IncidentAPITestCaseHelper(IncidentBasedAPITestCaseHelper):
 def set_time(timestamp: datetime, new_time: str):
     new_time = parse_time(new_time)
     return timestamp.replace(
-        hour=new_time.hour, minute=new_time.minute, second=new_time.second, microsecond=new_time.microsecond,
+        hour=new_time.hour,
+        minute=new_time.minute,
+        second=new_time.second,
+        microsecond=new_time.microsecond,
     )
 
 
@@ -91,12 +98,8 @@ class ModelTests(TestCase, IncidentAPITestCaseHelper):
 
     def test_time_recurrence(self):
         # Test set_time() helper function
-        self.assertEqual(
-            parse_datetime("2000-01-01 10:00"), set_time(parse_datetime("2000-01-01 00:00"), "10:00"),
-        )
-
+        self.assertEqual(parse_datetime("2000-01-01 10:00"), set_time(parse_datetime("2000-01-01 00:00"), "10:00"))
         self.assertEqual(self.monday_datetime.strftime("%A"), "Monday")
-
         self.assertFalse(self.recurrence1.timestamp_is_within(set_time(self.monday_datetime, "00:29:01")))
         self.assertTrue(self.recurrence1.timestamp_is_within(set_time(self.monday_datetime, "00:30:00")))
         self.assertTrue(self.recurrence1.timestamp_is_within(set_time(self.monday_datetime, "00:30:01")))
@@ -111,10 +114,14 @@ class ModelTests(TestCase, IncidentAPITestCaseHelper):
 
     def test_source_fits(self):
         filter1 = Filter.objects.create(
-            user=self.user1, name="Filter1", filter_string=f'{{"sourceSystemIds": [{self.source1.pk}]}}',
+            user=self.user1,
+            name="Filter1",
+            filter_string=f'{{"sourceSystemIds": [{self.source1.pk}]}}',
         )
         filter2 = Filter.objects.create(
-            user=self.user1, name="Filter2", filter_string=f'{{"sourceSystemIds": [{self.source2.pk}]}}',
+            user=self.user1,
+            name="Filter2",
+            filter_string=f'{{"sourceSystemIds": [{self.source2.pk}]}}',
         )
 
         self.assertTrue(filter1.source_system_fits(self.incident1))
@@ -131,10 +138,14 @@ class ModelTests(TestCase, IncidentAPITestCaseHelper):
 
     def test_filter(self):
         filter1 = Filter.objects.create(
-            user=self.user1, name="Filter1", filter_string=f'{{"sourceSystemIds": [{self.source1.pk}]}}',
+            user=self.user1,
+            name="Filter1",
+            filter_string=f'{{"sourceSystemIds": [{self.source1.pk}]}}',
         )
         filter2 = Filter.objects.create(
-            user=self.user1, name="Filter2", filter_string=f'{{"sourceSystemIds": [{self.source2.pk}]}}',
+            user=self.user1,
+            name="Filter2",
+            filter_string=f'{{"sourceSystemIds": [{self.source2.pk}]}}',
         )
 
         self.assertTrue(filter1.incident_fits(self.incident1))
@@ -158,7 +169,9 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
         self.timeslot1 = Timeslot.objects.create(user=self.user1, name="Never")
         self.timeslot2 = Timeslot.objects.create(user=self.user1, name="Never 2: Ever-expanding Void")
         filter1 = Filter.objects.create(
-            user=self.user1, name="Critical incidents", filter_string=f'{{"sourceSystemIds": [{self.source1.pk}]}}',
+            user=self.user1,
+            name="Critical incidents",
+            filter_string=f'{{"sourceSystemIds": [{self.source1.pk}]}}',
         )
         self.notification_profile1 = NotificationProfile.objects.create(user=self.user1, timeslot=self.timeslot1)
         self.notification_profile1.filters.add(filter1)

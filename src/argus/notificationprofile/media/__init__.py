@@ -27,15 +27,14 @@ __all__ = [
 # Poor mans's plugins
 MEDIA_CLASSES = {
     NotificationProfile.Media.EMAIL: getattr(
-        settings, "DEFAULT_EMAIL_MEDIA",
-        "argus.notificationprofile.media.email.EmailNotification"
+        settings, "DEFAULT_EMAIL_MEDIA", "argus.notificationprofile.media.email.EmailNotification"
     ),
     NotificationProfile.Media.SMS: getattr(settings, "DEFAULT_SMS_MEDIA", None),
 }
 
 
 def _import_class_from_dotted_path(dotted_path: str):
-    module_name, class_name = dotted_path.rsplit('.', 1)
+    module_name, class_name = dotted_path.rsplit(".", 1)
     module = importlib.import_module(module_name)
     class_ = getattr(module, class_name)
     return class_
@@ -87,11 +86,13 @@ def send_notification(profile: NotificationProfile, event: Event):
 
 def get_notification_media(model_representations: List[str]):
     # This will never be a long list
+    # fmt:off
     media = [
         MEDIA_CLASSES[representation]
         for representation in model_representations
         if MEDIA_CLASSES[representation]
     ]
+    # fmt: on
     if media:
         return media
     LOG.error("Notification: nowhere to send notifications!")

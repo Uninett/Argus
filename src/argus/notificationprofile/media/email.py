@@ -10,14 +10,14 @@ from .base import NotificationMedium
 LOG = logging.getLogger(__name__)
 
 __all__ = [
-    'send_email_safely',
-    'EmailNotification',
+    "send_email_safely",
+    "EmailNotification",
 ]
 
 
 def modelinstance_to_dict(obj):
     dict_ = vars(obj)
-    dict_.pop('_state')
+    dict_.pop("_state")
     return dict_
 
 
@@ -50,7 +50,7 @@ class EmailNotification(NotificationMedium):
 
         title = f"{event}"
         incident_dict = modelinstance_to_dict(event.incident)
-        for field in ('id', 'source_id'):
+        for field in ("id", "source_id"):
             incident_dict.pop(field)
 
         template_context = {

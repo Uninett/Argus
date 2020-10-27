@@ -22,7 +22,6 @@ class IncidentBasedAPITestCaseHelper:
 
 
 class IncidentFilterTestCase(IncidentBasedAPITestCaseHelper, TestCase):
-
     def setUp(self):
         disconnect_signals()
         super().init_test_objects()
@@ -37,73 +36,73 @@ class IncidentFilterTestCase(IncidentBasedAPITestCaseHelper, TestCase):
         connect_signals()
 
     def test_stateful_true(self):
-        qs = Incident.objects.order_by('pk')
+        qs = Incident.objects.order_by("pk")
         expected = qs.stateful()
-        result = IncidentFilter.incident_filter(qs, 'stateful', True)
-        self.assertEqual(list(expected), list(result.order_by('pk')))
+        result = IncidentFilter.incident_filter(qs, "stateful", True)
+        self.assertEqual(list(expected), list(result.order_by("pk")))
 
     def test_stateful_false(self):
-        qs = Incident.objects.order_by('pk')
+        qs = Incident.objects.order_by("pk")
         expected = qs.stateless()
-        result = IncidentFilter.incident_filter(qs, 'stateful', False)
-        self.assertEqual(list(expected), list(result.order_by('pk')))
+        result = IncidentFilter.incident_filter(qs, "stateful", False)
+        self.assertEqual(list(expected), list(result.order_by("pk")))
 
     def test_open_true(self):
-        qs = Incident.objects.order_by('pk')
+        qs = Incident.objects.order_by("pk")
         expected = qs.open()
-        result = IncidentFilter.incident_filter(qs, 'open', True)
-        self.assertEqual(list(expected), list(result.order_by('pk')))
+        result = IncidentFilter.incident_filter(qs, "open", True)
+        self.assertEqual(list(expected), list(result.order_by("pk")))
 
     def test_open_false(self):
-        qs = Incident.objects.order_by('pk')
+        qs = Incident.objects.order_by("pk")
         expected = qs.closed()
-        result = IncidentFilter.incident_filter(qs, 'open', False)
-        self.assertEqual(list(expected), list(result.order_by('pk')))
+        result = IncidentFilter.incident_filter(qs, "open", False)
+        self.assertEqual(list(expected), list(result.order_by("pk")))
 
     def test_tags_single(self):
         user = SourceUserFactory()
-        tag1 = TagFactory(key='testkey1', value='testvalue1')
-        tag2 = TagFactory(key='testkey2', value='testvalue2')
+        tag1 = TagFactory(key="testkey1", value="testvalue1")
+        tag2 = TagFactory(key="testkey2", value="testvalue2")
         incident5 = IncidentFactory(source=self.source1)
         for incident in (self.incident1, self.incident2, self.incident3):
             IncidentTagRelation.objects.get_or_create(tag=tag1, incident=incident, added_by=user)
         for incident in (self.incident3, self.incident4, incident5):
             IncidentTagRelation.objects.get_or_create(tag=tag1, incident=incident, added_by=user)
 
-        qs = Incident.objects.order_by('pk')
+        qs = Incident.objects.order_by("pk")
 
         expected = qs.from_tags(str(tag1))
-        result = IncidentFilter.incident_filter(qs, 'tags', str(tag1))
-        self.assertEqual(list(expected), list(result.order_by('pk')))
+        result = IncidentFilter.incident_filter(qs, "tags", str(tag1))
+        self.assertEqual(list(expected), list(result.order_by("pk")))
 
     def test_tags_multiple_same_key(self):
         user = SourceUserFactory()
-        tag1 = TagFactory(key='testkey', value='testvalue1')
-        tag2 = TagFactory(key='testkey', value='testvalue2')
+        tag1 = TagFactory(key="testkey", value="testvalue1")
+        tag2 = TagFactory(key="testkey", value="testvalue2")
         incident5 = IncidentFactory(source=self.source1)
         for incident in (self.incident1, self.incident2, self.incident3):
             IncidentTagRelation.objects.get_or_create(tag=tag1, incident=incident, added_by=user)
         for incident in (self.incident3, self.incident4, incident5):
             IncidentTagRelation.objects.get_or_create(tag=tag1, incident=incident, added_by=user)
 
-        qs = Incident.objects.order_by('pk')
+        qs = Incident.objects.order_by("pk")
 
         expected = qs.from_tags(str(tag1), str(tag2))
-        result = IncidentFilter.incident_filter(qs, 'tags', [str(tag1), str(tag2)])
-        self.assertEqual(list(expected), list(result.order_by('pk')))
+        result = IncidentFilter.incident_filter(qs, "tags", [str(tag1), str(tag2)])
+        self.assertEqual(list(expected), list(result.order_by("pk")))
 
     def test_tags_multiple_different_key(self):
         user = SourceUserFactory()
-        tag1 = TagFactory(key='testkey1', value='testvalue1')
-        tag2 = TagFactory(key='testkey2', value='testvalue2')
+        tag1 = TagFactory(key="testkey1", value="testvalue1")
+        tag2 = TagFactory(key="testkey2", value="testvalue2")
         incident5 = IncidentFactory(source=self.source1)
         for incident in (self.incident1, self.incident2, self.incident3):
             IncidentTagRelation.objects.get_or_create(tag=tag1, incident=incident, added_by=user)
         for incident in (self.incident3, self.incident4, incident5):
             IncidentTagRelation.objects.get_or_create(tag=tag1, incident=incident, added_by=user)
 
-        qs = Incident.objects.order_by('pk')
+        qs = Incident.objects.order_by("pk")
 
         expected = qs.from_tags(str(tag1), str(tag2))
-        result = IncidentFilter.incident_filter(qs, 'tags', [str(tag1), str(tag2)])
-        self.assertEqual(list(expected), list(result.order_by('pk')))
+        result = IncidentFilter.incident_filter(qs, "tags", [str(tag1), str(tag2)])
+        self.assertEqual(list(expected), list(result.order_by("pk")))

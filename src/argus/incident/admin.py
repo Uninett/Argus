@@ -148,6 +148,7 @@ class IncidentAdmin(TextWidgetsOverrideModelAdmin):
         if scheme and netloc:  # absolute url: linkify!
             return format_html('<a href="{}" title="{}">Link</a>', url, url)
         return url  # relative url
+
     get_details_url.short_description = "Details url"
 
     def get_ticket_url(self, incident: Incident):
@@ -155,6 +156,7 @@ class IncidentAdmin(TextWidgetsOverrideModelAdmin):
         if url:
             return format_html('<a href="{}" title="{}">Link</a>', url, url)
         return ""
+
     get_ticket_url.short_description = "Ticket url"
 
     def get_open(self, incident: Incident):
