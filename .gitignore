@@ -233,3 +233,4 @@ npm-debug.log
 cloc.xml
 pylint.txt
 *~
+src/argus/version.py
