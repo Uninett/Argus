@@ -23,8 +23,12 @@ Auth endpoints
 
    -  Note that this token will expire after 14 days, and can be
       replaced by posting to the same endpoint.
-   -  Example request body:
-      ``{ username: <username>, password: <password> }``
+
+   Example request body:
+
+   .. code::
+
+      { username: <username>, password: <password> }
 
 -  ``/oidc/login/dataporten_feide/``: redirects to Feide login
 
@@ -77,7 +81,6 @@ Auth endpoints
             "phone_number": "+4767676767"
           }
 
-
    -  ``PUT``: updates and returns one of the logged in user’s phone
       numbers by PK
 
@@ -90,9 +93,9 @@ Auth endpoints
    The phone number is validated with a python version of the Google
    library
    `libphonenumber <https://github.com/google/libphonenumber>`__. It
-   *will* check that the number is in a valid number series. Using a
+   will check that the number is in a valid number series. Using a
    random number with enough digits that is not in a valid series will
-   *not* work.
+   *not work*.
 
 
 Incident endpoints
@@ -110,52 +113,52 @@ Incident endpoints
 
       Filtering parameters:
 
-      acked=true|false
-        Fetch only acked (true) or unacked (false) incidents.
+      ``acked=true|false``
+        Fetch only acked (``true``) or unacked (``false``) incidents.
 
-      open=true|false
-        Fetch only open (true) or closed (false) incidents.
+      ``open=true|false``
+        Fetch only open (``true``) or closed (``false``) incidents.
 
-      stateful=true|false
-        Fetch only stateful (true) or stateless (false) incidents.
+      ``stateful=true|false``
+        Fetch only stateful (``true``) or stateless (``false``) incidents.
 
-      source__id__in=ID1[,ID2,..]
-        Fetch only incidents with a source with numeric id ID1 or ID2 or..
+      ``source__id__in=ID1[,ID2,..]``
+        Fetch only incidents with a source with numeric id ``ID1`` or ``ID2`` or..
 
-      source__name__in=NAME1[,NAME2,..]
-        Fetch only incidents with a source with name NAME1 or NAME2 or..
+      ``source__name__in=NAME1[,NAME2,..]``
+        Fetch only incidents with a source with name ``NAME1`` or ``NAME2`` or..
 
-      source_incident_id=ID
-        Fetch only incidents with source_incident_id set to ID.
+      ``source_incident_id=ID``
+        Fetch only incidents with ``source_incident_id`` set to ``ID``.
 
-      tags=key1=value1,key1=value2,key2=value
+      ``tags=key1=value1,key1=value2,key2=value``
         Fetch only incidents with one or more of the tags. Tag-format is
-        “key=value”. If there are multiple tags with the same key, only
+        “``key=value``”. If there are multiple tags with the same key, only
         one of the tags need match. If there are multiple keys, one of
-        each key must match.
+        each keys must match.
 
       So:
       ``/api/v1/incidents/?acked=false&open=true&stateful=true&source__id__in=1&tags=location=broomcloset,location=understairs,problem=onfire``
       will fetch incidents that are all of “open”, “unacked”,
       “stateful”, from source number 1, with “location” either
       “broomcloset” or “understairs”, and that is on fire
-      (problem=onfire). If the boolean parameters are not given a value
+      (``problem=onfire``). If the boolean parameters are not given a value
       or are left out, that is interpreted as not filtering at all on
       that parameter, showing both true and false entries.
 
       Paginating parameters:
 
-      cursor=LONG RANDOM STRING|null
+      ``cursor=LONG RANDOM STRING|null``
         Go to the page of that cursor. The cursor string for next and
-        previous page is part of the response body./dd>
+        previous page is part of the response body.
 
-      page_size=INTEGER
+      ``page_size=INTEGER``
         The number of rows to return. Default is 100.
 
       So:
       ``api/v1/incidents/?cursor=cD0yMDIwLTA5LTIzKzEzJTNBMDIlM0ExNi40NTU4MzIlMkIwMCUzQTAw&page_size=10``
       will go to the page indicated by
-      “cD0yMDIwLTA5LTIzKzEzJTNBMDIlM0ExNi40NTU4MzIlMkIwMCUzQTAw” and
+      ``cD0yMDIwLTA5LTIzKzEzJTNBMDIlM0ExNi40NTU4MzIlMkIwMCUzQTAw`` and
       show the next 10 rows from that point onward. Do not attempt to
       guess the cursor string. ``null`` means there is no more to fetch.
 
@@ -253,8 +256,8 @@ Incident endpoints
 -  ``/api/v1/incidents/<int:pk>/``:
 
    -  ``GET``: returns an incident by PK
-   -  ``PATCH``: modifies parts of an incident and returns it
 
+   -  ``PATCH``: modifies parts of an incident and returns it
 
       Example request body:
 
@@ -414,7 +417,7 @@ Incident endpoints
                           "username": "jp@example.org"
                       },
                       "timestamp": "2011-11-11T11:11:11.235877+02:00",
-                      received": "2011-11-11T11:11:11.235897+02:00",
+                      "received": "2011-11-11T11:11:11.235897+02:00",
                       "type": {
                           "value": "ACK",
                           "display": "Acknowledge"
@@ -473,8 +476,12 @@ Incident endpoints
 
    -  ``GET``: Returns a list of all sources
 
-      Example response body: [ { “pk”: 1, “name”: “argus”, “type”: {
-      “name”: “argus” }, “user”: 1, “base_url”: “” }]
+      Example response body:
+
+      .. code:: json
+
+      [ { "pk": 1, "name": "argus", "type": {
+      "name": "argus" }, "user": 1, "base_url": "" }]
 
 
 -  ``GET`` to ``/api/v1/incidents/mine/``: behaves like
@@ -541,7 +548,7 @@ Notification profile endpoints
       profiles by PK
 
 -  ``GET`` to ``/api/v1/notificationprofiles/<int:pk>/incidents/``:
-   returns all incidents - both open and historic - filtered by one of
+   returns all incidents - both open and historic  - filtered by one of
    the logged in user’s notification profiles by PK
 
 -  ``/api/v1/notificationprofiles/timeslots/``:
@@ -549,7 +556,6 @@ Notification profile endpoints
    -  ``GET``: returns the logged in user’s time slots
    -  ``POST``: creates and returns a time slot which is then connected
       to the logged in user
-
 
       Example request body:
 
@@ -571,10 +577,11 @@ Notification profile endpoints
               ]
           }
 
-      The optional key ``"all_day"`` indicates that Argus should use
-      ``Time.min`` and ``Time.max`` as ``"start"`` and ``"end"``
+
+      The optional key ``all_day`` indicates that Argus should use
+      ``Time.min`` and ``Time.max`` as ``start`` and ``end``
       respectively. This also overrides any provided values for
-      ``"start"`` and ``"end"``. An example request body:
+      ``start`` and ``end``. An example request body:
 
       .. code:: json
 
@@ -612,7 +619,7 @@ Notification profile endpoints
    -  ``PUT``: updates and returns one of the logged in user’s time
       slots by PK
 
-      -  Example request body: same as ``POST`` to
+      Example request body: same as ``POST`` to
          ``/notificationprofiles/timeslots/``
 
    -  ``DELETE``: deletes one of the logged in user’s time slots by PK
@@ -640,7 +647,7 @@ Notification profile endpoints
    -  ``PUT``: updates and returns one of the logged in user’s filters
       by PK
 
-      -  Example request body: same as ``POST`` to
+      Example request body: same as ``POST`` to
          ``/api/v1/notificationprofiles/filters/``
 
    -  ``DELETE``: deletes one of the logged in user’s filters by PK
@@ -652,7 +659,7 @@ Notification profile endpoints
 
    Example request body:
 
-   .. code:: json
+   .. code::
 
        {
            "sourceSystemIds": [<SourceSystem.pk>, ...]
