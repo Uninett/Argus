@@ -7,6 +7,33 @@ Argus is a platform for aggregating incidents across network management systems,
 
 This repository hosts the backend built with Django, while the frontend is hosted here: https://github.com/Uninett/Argus-frontend.
 
+## Installation
+
+In development, provided you have the code repository that this README-file is
+in, see **Project setup** or **Alternative setup using Docker Compose** under
+**Setup**.
+
+You can also install vith `pip` via PyPI. The package name is `argus-server`:
+
+```
+$ pip install argus-server
+```
+
+If you're going to run the frontend we also recommend you have redis running
+somewhere to back the websockets, in order to push realtime updates to the
+frontend.
+
+If you're using the PyPI package in production, the file `requirements.txt`
+contains the exact versions of dependencies that release was tested on. You can
+update all the dependencies for instance with `pip-compile`:
+
+```
+$ pip install pip-tools
+$ pip-compile -o your-updated-requirements.txt
+```
+
+.. then use `$ pip install --upgrade -r your-updated-requirements.txt` to
+upgrade all the dependencies at once.
 
 ## Setup
 

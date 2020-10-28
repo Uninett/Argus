@@ -1,3 +1,4 @@
+Sphinx>=2.2.0
 python-dotenv
 black
 pre-commit
