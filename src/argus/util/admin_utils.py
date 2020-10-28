@@ -37,7 +37,8 @@ class YesNoListFilter(admin.SimpleListFilter):
 
 
 def list_filter_factory(
-    title: str, filter_func: Callable[[QuerySet, bool], QuerySet],
+    title: str,
+    filter_func: Callable[[QuerySet, bool], QuerySet],
 ):
     title = title.lower()
     new_class_name = f"{title.title().replace(' ', '')}ListFilter"

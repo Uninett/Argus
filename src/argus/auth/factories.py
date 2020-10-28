@@ -16,7 +16,7 @@ class BaseUserFactory(factory.django.DjangoModelFactory):
 
     is_staff = False
     is_superuser = False
-    password = factory.PostGenerationMethodCall('set_password', 'defaultpassword')
+    password = factory.PostGenerationMethodCall("set_password", "defaultpassword")
 
 
 class PersonUserFactory(BaseUserFactory):

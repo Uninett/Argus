@@ -140,6 +140,16 @@ the entire logging-setup from "argus.site.settings.dev" to "localsettings.py"
 remember to set "disable_existing_loggers" to True or logentries will occur
 twice.
 
+This repository uses black as a code formatter. Black will automatically install
+with the [dev requirements](requirements/dev.txt).
+
+A pre-commit hook formats new code automatically before committing.
+To enable this pre-commit hook, please run
+
+```
+pre-commit install
+```
+
 ### Debugging tips
 
 To test/debug notifications as a whole, use the email subsystem (Media: Email in a NotificationProfile).

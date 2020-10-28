@@ -3,9 +3,9 @@ from django.core.exceptions import ValidationError
 
 
 __all__ = [
-    'validate_lowercase',
-    'validate_key',
-    'validate_key_value',
+    "validate_lowercase",
+    "validate_key",
+    "validate_key_value",
 ]
 
 
@@ -26,11 +26,11 @@ def validate_key(value):
     return key_validator(value)
 
 
-key_value_re = _lazy_re_compile(r'^[a-z0-9_]+=.+?\Z')
+key_value_re = _lazy_re_compile(r"^[a-z0-9_]+=.+?\Z")
 key_value_validator = RegexValidator(
     key_value_re,
     message='Enter a valid key-value construct: "key=value", where key and value are strings.',
-    code='invalid',
+    code="invalid",
 )
 
 

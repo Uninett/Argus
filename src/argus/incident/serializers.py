@@ -75,7 +75,6 @@ class IncidentTagRelationSerializer(serializers.ModelSerializer):
 
 
 class IncidentTicketUrlSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Incident
         fields = [

@@ -20,7 +20,9 @@ class EndTimeInfinityFieldTests(TestCase, IncidentBasedAPITestCaseHelper):
         super().init_test_objects()
 
         self.incident1 = Incident.objects.create(
-            start_time=make_aware(datetime(2000, 1, 1)), source=self.source1, source_incident_id="1",
+            start_time=make_aware(datetime(2000, 1, 1)),
+            source=self.source1,
+            source_incident_id="1",
         )
         self.incident2 = duplicate(self.incident1, source_incident_id="2")
         self.incident3 = duplicate(self.incident1, source_incident_id="3")
@@ -114,35 +116,34 @@ class EndTimeInfinityFieldTests(TestCase, IncidentBasedAPITestCaseHelper):
 
 
 class KeyValueFieldTest(TestCase):
-
     def test_key_value_must_not_be_empty(self):
         f = KeyValueField()
         with self.assertRaises(ValidationError):
-            result = f.clean('')
+            result = f.clean("")
 
     def test_key_value_must_not_be_just_equals(self):
         f = KeyValueField()
         with self.assertRaises(ValidationError):
-            result = f.clean('=')
+            result = f.clean("=")
 
     def test_key_value_must_contain_at_least_one_equals(self):
         f = KeyValueField()
         with self.assertRaises(ValidationError):
-            result = f.clean('boo')
+            result = f.clean("boo")
 
     def test_value_cannot_be_empty(self):
         f = KeyValueField()
         with self.assertRaises(ValidationError):
-            result = f.clean('a=')
+            result = f.clean("a=")
 
     def test_key_must_fit_regex(self):
         # [a-z0-9_]+
         f = KeyValueField()
         with self.assertRaises(ValidationError):
-            result = f.clean('=v')
+            result = f.clean("=v")
         with self.assertRaises(ValidationError):
-            result = f.clean(' =v')
+            result = f.clean(" =v")
         with self.assertRaises(ValidationError):
-            result = f.clean('A=v')
+            result = f.clean("A=v")
         with self.assertRaises(ValidationError):
-            result = f.clean('-=v')
+            result = f.clean("-=v")

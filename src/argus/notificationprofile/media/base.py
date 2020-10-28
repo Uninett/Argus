@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from argus.notificationprofile.models import NotificationProfile
 
 
-__all__ = ['NotificationMedium']
+__all__ = ["NotificationMedium"]
 
 
 class NotificationMedium(ABC):

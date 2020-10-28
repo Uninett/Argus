@@ -91,7 +91,7 @@ class TimeRecurrence(models.Model):
 
 
 class Filter(models.Model):
-    FILTER_NAMES = set(('sourceSystemIds', 'tags'))
+    FILTER_NAMES = set(("sourceSystemIds", "tags"))
     user = models.ForeignKey(to=User, on_delete=models.CASCADE, related_name="filters")
     name = models.CharField(max_length=40)
     filter_string = models.TextField()
@@ -112,6 +112,7 @@ class Filter(models.Model):
     def all_incidents(self):
         # Prevent cyclical import
         from argus.incident.models import Incident
+
         return Incident.objects.all()
 
     @property
@@ -161,7 +162,10 @@ class NotificationProfile(models.Model):
 
     user = models.ForeignKey(to=User, on_delete=models.CASCADE, related_name="notification_profiles")
     timeslot = models.OneToOneField(
-        to=Timeslot, on_delete=models.CASCADE, primary_key=True, related_name="notification_profile",
+        to=Timeslot,
+        on_delete=models.CASCADE,
+        primary_key=True,
+        related_name="notification_profile",
     )
     filters = models.ManyToManyField(to=Filter, related_name="notification_profiles")
 
