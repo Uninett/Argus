@@ -11,7 +11,10 @@ Welcome to Argus' documentation!
    Argus is.. (developer friendly introduction, one paragraph max)
 
 .. toctree::
+   models
+   api
    site-specific-settings
+   notifications
    writing-plugins
    :maxdepth: 2
    :caption: Contents:
