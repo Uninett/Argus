@@ -43,7 +43,7 @@ jobs:
       - name: Run Tests
         run: |
           python manage.py collectstatic --no-input
-          coverage run -p manage.py test src
+          coverage run -p manage.py test
 
       - name: Set up PostgreSQL
         uses: harmon758/postgresql-action@v1
@@ -58,7 +58,7 @@ jobs:
           DATABASE_URL: postgresql://argus:password@localhost/argus_db
         run: |
           python manage.py collectstatic --no-input
-          coverage run -p manage.py test src
+          coverage run -p manage.py test
           coverage combine
           coverage xml
 
