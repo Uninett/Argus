@@ -10,7 +10,10 @@ python-dataporten-auth
 python-social-auth
 pytz>=2020.1
 social-auth-app-django
-Sphinx>=2.2.0
-sqlparse>=0.3.0
 wheel>=0.24.0
 whitenoise
+
+# websockets
+channels
+channels-redis
+aioredis

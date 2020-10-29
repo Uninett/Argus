@@ -1,0 +1,29 @@
+# The following are automatically installed in a virtualenv even if not
+# mentioned anywhere else. pip-compile cannot find them, so pip-sync removes
+# them when run. This is a workaround until pip-tools issue #1213 is solved.
+# (https://github.com/jazzband/pip-tools/issues/1213)
+
+appdirs
+CacheControl
+certifi
+chardet
+colorama
+contextlib2
+distlib
+distro
+html5lib
+idna
+ipaddr
+lockfile
+msgpack
+packaging
+pep517
+progress
+pyparsing
+pytoml
+requests
+retrying
+six
+urllib3
+webencodings
+wheel

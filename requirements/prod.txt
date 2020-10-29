@@ -1,3 +1,2 @@
 -r ./django30.txt
 -r ./base.txt
--r ./websocket.txt
