@@ -30,17 +30,24 @@ class Command(BaseCommand):
         username = options_username or "admin"
         first_name = username.capitalize()
 
-        admin = User.objects.create_superuser(
-            username=username, email=email, first_name=first_name, last_name="", password=password
-        )
-        if options_password:
-            msg = f'Successfully created superuser "{admin.username}" with the chosen password'
-        else:
-            msg = (
-                f'Successfully created superuser "{admin.username}" with the generated password "{password}".\n'
-                "Please change the password via the admin."
+        try:
+            admin = User.objects.get(username=username)
+        except User.DoesNotExist:
+            admin = User.objects.create_superuser(
+                username=username, email=email, first_name=first_name, last_name="", password=password
             )
-        self.stdout.write(self.style.SUCCESS(msg))
+            if options_password:
+                msg = f'Successfully created superuser "{admin.username}" with the chosen password'
+            else:
+                msg = (
+                    f'Successfully created superuser "{admin.username}" with the generated password "{password}".\n'
+                    "Please change the password via the admin."
+                )
+            self.stdout.write(self.style.SUCCESS(msg))
+        else:
+            msg = f"The admin user {username} already exists, you might want to change the password"
+            self.stderr.write(self.style.WARNING(msg))
+
 
         # Create source for argus, also creates a user
         get_or_create_default_instances()
