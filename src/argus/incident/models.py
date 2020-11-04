@@ -23,18 +23,22 @@ def get_or_create_default_instances():
     return (argus_user, sst, ss)
 
 
-def create_fake_incident(tags=None, description=None):
+def create_fake_incident(tags=None, description=None, stateful=True):
     argus_user, _, source_system = get_or_create_default_instances()
+    end_time = INFINITY_REPR if stateful else None
 
     MAX_ID = 2 ** 32 - 1
     MIN_ID = 1
     source_incident_id = randint(MIN_ID, MAX_ID)
 
     if not description:
-        description = f'Incident #{source_incident_id} created via "create_fake_incident"'
+        if stateful:
+            description = f'Incident #{source_incident_id} created via "create_fake_incident"'
+        else:
+            description = f'Incident (stateless) #{source_incident_id} created via "create_fake_incident"'
     incident = Incident.objects.create(
         start_time=timezone.now(),
-        end_time=INFINITY_REPR,
+        end_time=end_time,
         source_incident_id=source_incident_id,
         source=source_system,
         description=description,
