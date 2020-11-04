@@ -25,9 +25,9 @@ class IncidentFilterTestCase(IncidentBasedAPITestCaseHelper, TestCase):
     def setUp(self):
         disconnect_signals()
         super().init_test_objects()
-        self.incident1 = IncidentFactory(source=self.source1, end_time=None)
-        self.incident2 = IncidentFactory(source=self.source1)
-        self.incident3 = IncidentFactory(source=self.source2)
+        self.incident1 = IncidentFactory(source=self.source1, end_time=None, ticket_url="")
+        self.incident2 = IncidentFactory(source=self.source1, ticket_url="")
+        self.incident3 = IncidentFactory(source=self.source2, ticket_url="")
         self.incident4 = IncidentFactory(source=self.source2)
         self.incident4.end_time = self.incident4.start_time
         self.incident4.save()
@@ -57,6 +57,18 @@ class IncidentFilterTestCase(IncidentBasedAPITestCaseHelper, TestCase):
         qs = Incident.objects.order_by("pk")
         expected = qs.closed()
         result = IncidentFilter.incident_filter(qs, "open", False)
+        self.assertEqual(list(expected), list(result.order_by("pk")))
+
+    def test_ticket_true(self):
+        qs = Incident.objects.order_by("pk")
+        expected = qs.has_ticket()
+        result = IncidentFilter.incident_filter(qs, "ticket", True)
+        self.assertEqual(list(expected), list(result.order_by("pk")))
+
+    def test_ticket_false(self):
+        qs = Incident.objects.order_by("pk")
+        expected = qs.lacks_ticket()
+        result = IncidentFilter.incident_filter(qs, "ticket", False)
         self.assertEqual(list(expected), list(result.order_by("pk")))
 
     def test_tags_single(self):

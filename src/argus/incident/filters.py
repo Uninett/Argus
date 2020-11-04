@@ -22,6 +22,7 @@ class IncidentFilter(filters.FilterSet):
     open = filters.BooleanFilter(label="Open", method="incident_filter")
     acked = filters.BooleanFilter(label="Acked", method="incident_filter")
     stateful = filters.BooleanFilter(label="Stateful", method="incident_filter")
+    ticket = filters.BooleanFilter(label="Ticket", method="incident_filter")
     tags = TagInFilter(label="Tags", method="incident_filter")
 
     @classmethod
@@ -46,6 +47,11 @@ class IncidentFilter(filters.FilterSet):
                 if isinstance(value, str):
                     value = [value]
                 return queryset.from_tags(*value)
+        elif name == "ticket":
+            if value:
+                return queryset.has_ticket()
+            else:
+                return queryset.lacks_ticket()
         return queryset
 
     class Meta:
