@@ -1,6 +1,5 @@
 import logging.config
 
-from django.utils.log import DEFAULT_LOGGING
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -58,46 +57,6 @@ SOCIAL_AUTH_DATAPORTEN_FEIDE_SECRET = SOCIAL_AUTH_DATAPORTEN_SECRET
 ## Logging setup
 
 LOGGING_CONFIG = None
-
-# fmt: off
-logging.config.dictConfig({
-    "version": 1,
-    "disable_existing_loggers": False,
-    "formatters": {
-        "console": {
-            # exact format is not important, this is the minimum information
-            "format": "%(asctime)s %(name)-12s %(levelname)-8s %(message)s",
-        },
-        "django.server": DEFAULT_LOGGING["formatters"]["django.server"],
-    },
-    "handlers": {
-        "null": {
-            "class": "logging.NullHandler",
-
-        },
-        "console": {
-            "class": "logging.StreamHandler",
-            "formatter": "console",
-        },
-        "django.server": DEFAULT_LOGGING["handlers"]["django.server"],
-    },
-    "loggers": {
-        # root logger
-        "": {
-            "level": "DEBUG",
-            "handlers": ["console"],
-        },
-        "django.db.backends": {
-            "handlers": ["null"],
-            "level": "NOTSET",
-            "propagate": False,
-        },
-        "django.utils.autoreload": {
-            "handlers": ["null"],
-            "level": "NOTSET",
-            "propagate": False,
-        },
-        #"django.server": DEFAULT_LOGGING["loggers"]["django.server"],
-    },
-})
-# fmt: on
+if not LOGGING_MODULE:
+    LOGGING_MODULE = "argus.site.logging.DEV"
+    DEV_LOGGING = setup_logging(LOGGING_MODULE)
