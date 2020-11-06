@@ -24,26 +24,33 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
+# fmt: off
+# fsck off, black
 INSTALLED_APPS = [
-    "channels",
+    "channels",  # Must be early
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+
+    # 3rd party apps
     "corsheaders",
     "social_django",
     "rest_framework",
     "rest_framework.authtoken",
-    'django_filters',
+    "django_filters",
     "phonenumber_field",
+
+    # Argus apps
     "argus.auth",
     "argus.incident",
     "argus.ws",
     "argus.notificationprofile",
     "argus.dev",
 ]
+# fmt: on
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -76,7 +83,7 @@ TEMPLATES = [
                 "social_django.context_processors.login_redirect",
             ],
         },
-    },
+    }
 ]
 
 WSGI_APPLICATION = "argus.site.wsgi.application"
@@ -208,6 +215,10 @@ COOKIE_DOMAIN = get_str_env("ARGUS_COOKIE_DOMAIN", None)
 
 # 3rd party settings
 
+# Python social auth
+
+# Copied and adapted from social_core.pipeline.DEFAULT_AUTH_PIPELINE
+# fmt: off
 SOCIAL_AUTH_PIPELINE = (
     # Get the information we can about the user and return it in a simple
     # format to create the user instance later. In some cases the details are
@@ -253,6 +264,7 @@ SOCIAL_AUTH_PIPELINE = (
     #'social_core.pipeline.user.user_details',
     'argus.auth.psa_pipeline.user_details',
 )
+# fmt: on
 
 SOCIAL_AUTH_ADMIN_USER_SEARCH_FIELDS = ["username", "first_name", "email"]
 SOCIAL_AUTH_LOGIN_REDIRECT_URL = "/"
