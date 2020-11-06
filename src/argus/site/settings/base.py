@@ -160,6 +160,12 @@ SILENCED_SYSTEM_CHECKS = [
     "rest_framework.W001",  # Turns off warning about PAGE_SIZE without DEFAULT_PAGINATION_CLASS
 ]
 
+# Logging
+
+LOGGING_MODULE = get_str_env("DJANGO_LOGGING_MODULE", None)
+if LOGGING_MODULE:
+    STARTUP_LOGGING = setup_logging(LOGGING_MODULE)
+
 
 # django-rest-framework
 
