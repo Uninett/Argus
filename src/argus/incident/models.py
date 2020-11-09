@@ -204,7 +204,7 @@ class Incident(models.Model):
         related_name="incidents",
         help_text="The source system that the incident originated in.",
     )
-    source_incident_id = models.TextField(verbose_name="source incident ID")
+    source_incident_id = models.TextField(blank=True, default="", verbose_name="source incident ID")
     details_url = models.TextField(blank=True, validators=[URLValidator], verbose_name="details URL")
     description = models.TextField(blank=True)
     ticket_url = models.TextField(
@@ -220,6 +220,7 @@ class Incident(models.Model):
         constraints = [
             models.UniqueConstraint(
                 fields=["source_incident_id", "source"],
+                condition=Q(source_incident_id__gt=""),
                 name="%(class)s_unique_source_incident_id_per_source",
             ),
         ]
