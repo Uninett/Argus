@@ -127,8 +127,8 @@ class Filter(models.Model):
             data = self.filter_json
         source_list = data.pop("sourceSystemIds", [])
         if source_list:
-            return self.all_incidents.filter(source__in=source_list)
-        return self.all_incidents
+            return self.all_incidents.filter(source__in=source_list).distinct()
+        return self.all_incidents.distinct()
 
     def source_system_fits(self, incident: Incident, data=None):
         if not data:
@@ -141,7 +141,7 @@ class Filter(models.Model):
         tags_list = data.pop("tags", [])
         if tags_list:
             return self.all_incidents.from_tags(*tags_list)
-        return self.all_incidents
+        return self.all_incidents.distinct()
 
     def tags_fit(self, incident: Incident, data=None):
         if not data:
