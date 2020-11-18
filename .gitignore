@@ -234,5 +234,3 @@ cloc.xml
 pylint.txt
 *~
 src/argus/version.py
-requirements-django30.txt
-requirements-django31.txt
