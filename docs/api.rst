@@ -131,6 +131,9 @@ Incident endpoints
       ``source_incident_id=ID``
         Fetch only incidents with ``source_incident_id`` set to ``ID``.
 
+      ``ticket``
+        Fetch only incidents with a ticket url (``true``) or without (``false``).
+
       ``tags=key1=value1,key1=value2,key2=value``
         Fetch only incidents with one or more of the tags. Tag-format is
         “``key=value``”. If there are multiple tags with the same key, only

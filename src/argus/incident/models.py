@@ -170,6 +170,12 @@ class IncidentQuerySet(models.QuerySet):
     def not_acked(self):
         return self.exclude(self._generate_acked_query())
 
+    def has_ticket(self):
+        return self.exclude(ticket_url="")
+
+    def lacks_ticket(self):
+        return self.filter(ticket_url="")
+
     def prefetch_default_related(self):
         return self.prefetch_related("incident_tag_relations__tag", "source__type")
 
