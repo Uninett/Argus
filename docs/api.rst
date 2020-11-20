@@ -2,21 +2,26 @@
 Endpoints
 =========
 
-``/admin/`` to access the project’s admin pages.
+Administration endpoint
+-----------------------
+Use ``/admin/`` to access the project’s admin pages.
+
+Authorization
+-------------
 
 All endpoints require requests to contain a header with key
 ``Authorization`` and value ``Token {token}``, where ``{token}`` is
-replaced by a registered auth token; these are generated per user by
+replaced by a registered auth token. These are generated per user by
 logging in through Feide, and can be found at
 ``/admin/authtoken/token/``.
-
 
 Auth endpoints
 --------------
 
 -  ``GET`` to ``/api/v1/auth/user/``: returns the logged in user
 
--  ``GET`` to ``/api/v1/auth/users/<int:pk>/``: returns a user by PK
+-  ``GET`` to ``/api/v1/auth/users/<int:pk>/``: returns a user by primary key
+   (``pk``)
 
 -  ``POST`` to ``/oidc/api-token-auth/``: returns an auth token for the
    posted user
@@ -24,11 +29,13 @@ Auth endpoints
    -  Note that this token will expire after 14 days, and can be
       replaced by posting to the same endpoint.
 
-   Example request body:
+   .. code-block:: json
+    :caption: Example request body
 
-   .. code::
-
-      { username: <username>, password: <password> }
+      {
+        "username": "alice",
+        "password": "secret"
+      }
 
 -  ``/oidc/login/dataporten_feide/``: redirects to Feide login
 
@@ -36,9 +43,8 @@ Auth endpoints
 
    -  ``GET``: returns the phone numbers of the logged in user
 
-      Example response body:
-
-      .. code:: json
+      .. code-block:: json
+        :caption: Example response body
 
           [
             {
@@ -57,9 +63,8 @@ Auth endpoints
    -  ``POST``: creates and returns the phone numbers of the logged in
       user
 
-      Example request body:
-
-      .. code:: json
+      .. code-block:: json
+        :caption: Example request body
 
           {
             "pk": 2,
@@ -71,9 +76,8 @@ Auth endpoints
 
    -  ``GET``: returns the specific phone number of the logged in user
 
-      Example response body:
-
-      .. code:: json
+      .. code-block:: json
+        :caption: Example response body
 
           {
             "pk": 2,
@@ -82,20 +86,20 @@ Auth endpoints
           }
 
    -  ``PUT``: updates and returns one of the logged in user’s phone
-      numbers by PK
+      numbers by primary key
 
       -  Example request body: same as ``POST`` to
          ``/api/v1/auth/phone-number/``
 
    -  ``DELETE``: deletes one of the logged in user’s phone numbers by
-      PK
+      primary key
 
-   The phone number is validated with a python version of the Google
-   library
-   `libphonenumber <https://github.com/google/libphonenumber>`__. It
-   will check that the number is in a valid number series. Using a
-   random number with enough digits that is not in a valid series will
-   *not work*.
+   .. note::
+
+     The phone number is validated using the python port of
+     `libphonenumber <https://github.com/google/libphonenumber>`__. It
+     will check that the phone number is in a valid number series. Using a
+     random number will not work.
 
 
 Incident endpoints
@@ -105,13 +109,13 @@ Incident endpoints
 
    -  ``GET``: returns all incidents - both open and historic
 
-      Query parameters: All query parameters are optional. If a query
+      **Query parameters**: All query parameters are optional. If a query
       parameter is not included or empty, for instance ``acked=``, then
       the rows returned are not affected by that filter and shows rows
       of all kinds of that value, for instance both “acked” and
       “unacked” in the case of ``acked=``.
 
-      Filtering parameters:
+      **Filtering parameters**:
 
       ``acked=true|false``
         Fetch only acked (``true``) or unacked (``false``) incidents.
@@ -141,15 +145,29 @@ Incident endpoints
         each keys must match.
 
       So:
-      ``/api/v1/incidents/?acked=false&open=true&stateful=true&source__id__in=1&tags=location=broomcloset,location=understairs,problem=onfire``
+
+      .. code-block::
+        :caption: URL reformatted for readability
+
+          /api/v1/incidents/?acked=false\
+                          &open=true\
+                          &stateful=true\
+                          &source__id__in=1\
+                          &tags=\
+                            location=broomcloset,\
+                            location=understairs,\
+                            problem=onfire
+
       will fetch incidents that are all of “open”, “unacked”,
       “stateful”, from source number 1, with “location” either
-      “broomcloset” or “understairs”, and that is on fire
-      (``problem=onfire``). If the boolean parameters are not given a value
-      or are left out, that is interpreted as not filtering at all on
-      that parameter, showing both true and false entries.
+      “broomcloset” or “understairs”, and that is on fire.
 
-      Paginating parameters:
+      .. note::
+        If the boolean parameters are not given a value
+        or are left out, that is interpreted as not filtering at all on
+        that parameter, showing both true and false entries.
+
+      **Paginating parameters**:
 
       ``cursor=LONG RANDOM STRING|null``
         Go to the page of that cursor. The cursor string for next and
@@ -159,15 +177,14 @@ Incident endpoints
         The number of rows to return. Default is 100.
 
       So:
-      ``api/v1/incidents/?cursor=cD0yMDIwLTA5LTIzKzEzJTNBMDIlM0ExNi40NTU4MzIlMkIwMCUzQTAw&page_size=10``
+      ``api/v1/incidents/?cursor=cD0yMDIw&page_size=10``
       will go to the page indicated by
-      ``cD0yMDIwLTA5LTIzKzEzJTNBMDIlM0ExNi40NTU4MzIlMkIwMCUzQTAw`` and
+      ``cD0yMDIw`` and
       show the next 10 rows from that point onward. Do not attempt to
       guess the cursor string. ``null`` means there is no more to fetch.
 
-      Example response body:
-
-      .. code:: json
+      .. code-block:: json
+        :caption: Example response body
 
           {
               "next": "http://localhost:8000/api/v1/incidents/?cursor=cD0yMDIwLTA5LTIzKzEzJTNBMDIlM0ExNi40NTU4MzIlMkIwMCUzQTAw&page_size=10",
@@ -225,7 +242,7 @@ Incident endpoints
         ``null`` if on the first page.
 
       ``results``
-        An array of the resulting subset of rows, or an empty array if no
+        An array of the resulting subset of rows, or an empty array if there are no
         results.
 
       Refer to the section :ref:`explanation-of-terms` for an
@@ -234,9 +251,8 @@ Incident endpoints
 
    -  ``POST``: creates and returns an incident
 
-      Example request body:
-
-      .. code:: json
+      .. code-block:: json
+        :caption: Example request body
 
           {
               "source": 11,
@@ -258,13 +274,12 @@ Incident endpoints
 
 -  ``/api/v1/incidents/<int:pk>/``:
 
-   -  ``GET``: returns an incident by PK
+   -  ``GET``: returns an incident by primary key
 
    -  ``PATCH``: modifies parts of an incident and returns it
 
-      Example request body:
-
-      .. code:: json
+      .. code-block:: json
+        :caption: Example request body
 
           {
               "ticket_url": "https://tickettracker.com/tickets/987654/",
@@ -286,9 +301,8 @@ Incident endpoints
    -  ``PUT``: modifies just the ticket url of an incident and returns
       it
 
-      Example request body:
-
-      .. code:: json
+      .. code-block:: json
+        :caption: Example request body
 
           {
               "ticket_url": "https://tickettracker.com/tickets/987654/",
@@ -301,9 +315,8 @@ Incident endpoints
 
    -  ``GET``: returns all events related to the specified incident
 
-      Example response body:
-
-      .. code:: json
+      .. code-block:: json
+        :caption: Example response body
 
           [
               {
@@ -338,18 +351,17 @@ Incident endpoints
               }
           ]
 
-          Note that `received` is set by argus on reception of an event. Normally,
-          this should be the same as, or a little later, than `timestamp`. If there
-          is a large gap (in minutes), or `received` is earlier `timestamp`, it
-          is likely something wrong with the internal clock either on the argus
-          server or the event source.
+      The ``received`` parameter is set by Argus upon reception of an event. Usually,
+      this is same as, or a little later, than ``timestamp`` of the incident. If there
+      is a large time gap between both, or ``received`` is earlier than ``timestamp``,
+      something may be wrong with the internal clock either on the argus
+      server or on the event source.
 
    -  ``POST``: creates and returns an event related to the specified
       incident
 
-      Example request body:
-
-      .. code:: json
+      .. code-block:: json
+        :caption: Example request body
 
           {
               "timestamp": "2020-02-20 20:02:20.202021",
@@ -357,45 +369,45 @@ Incident endpoints
               "description": "The investigation is still ongoing."
           }
 
-      If posted by an end user (a user with no associated source
-      system), the ``timestamp`` field is optional, and will be set to
-      the time the server received it if omitted.
+      If the event is posted by an end user (a user with no associated source
+      system), the ``timestamp`` field is optional. It will default to
+      the time the server received the event.
 
       The valid ``type``\ s are:
 
       -  ``STA`` - Incident start
 
-         -  An incident automatically creates an event of this type when
-            the incident is created, but cannot have more than one. In
-            other words, it’s never allowed to post an event of this
-            type.
+        An incident automatically creates an event of this type when
+        the incident is created, but cannot have more than one. In
+        other words, it’s never allowed to post an event of this
+        type.
 
       -  ``END`` - Incident end
 
-         -  Only source systems can post an event of this type, which is
-            the standard way of closing an indicent. An incident cannot
-            have more than one event of this type.
+        Only source systems can post an event of this type, which is
+        the standard way of closing an indicent. An incident cannot
+        have more than one event of this type.
 
       -  ``CLO`` - Close
 
-         -  Only end users can post an event of this type, which
-            manually closes the incident.
+        Only end users can post an event of this type, which
+        manually closes the incident.
 
       -  ``REO`` - Reopen
 
-         -  Only end users can post an event of this type, which reopens
-            the incident if it’s been closed (either manually or by a
-            source system).
+        Only end users can post an event of this type, which reopens
+        the incident if it has been closed (either manually or by a
+        source system).
 
       -  ``ACK`` - Acknowledge
 
-         -  Use the ``/api/v1/incidents/<int:pk>/acks/`` endpoint.
+        Use the ``/api/v1/incidents/<int:pk>/acks/`` endpoint.
 
       -  ``OTH`` - Other
 
-         -  Any other type of event, which simply provides information
-            on something that happened related to an incident, without
-            changing its state in any way.
+        Any other type of event, which simply provides information
+        on something that happened related to an incident, without
+        changing its state in any way.
 
 
 -  ``GET`` to ``/api/v1/incidents/<int:pk>/events/<int:pk>/``: returns a
@@ -405,9 +417,8 @@ Incident endpoints
 
    -  ``GET``: returns all acknowledgements of the specified incident
 
-      Example response body:
-
-      .. code:: json
+      .. code-block:: json
+        :caption: Example response body
 
           [
               {
@@ -454,9 +465,8 @@ Incident endpoints
    -  ``POST``: creates and returns an acknowledgement of the specified
       incident
 
-      Example request body:
-
-      .. code:: json
+      .. code-block:: json
+        :caption: Example request body
 
           {
               "event": {
@@ -468,8 +478,8 @@ Incident endpoints
 
       Only end users can post acknowledgements.
 
-      The ``timestamp`` field is optional, and will be set to the time
-      the server received it if omitted.
+      The ``timestamp`` field is optional. It will default to
+      the time the server received the event if omitted.
 
 
 -  ``GET`` to ``/api/v1/incidents/<int:pk>/acks/<int:pk>/``: returns a
@@ -479,16 +489,24 @@ Incident endpoints
 
    -  ``GET``: Returns a list of all sources
 
-      Example response body:
+      .. code-block:: json
+        :caption: Example response body
 
-      .. code:: json
+        [
+          {
+            "pk": 1,
+            "name": "argus",
+            "type": {
+              "name": "argus"
+              },
+            "user": 1,
+            "base_url": ""
+          }
+        ]
 
-      [ { "pk": 1, "name": "argus", "type": {
-      "name": "argus" }, "user": 1, "base_url": "" }]
 
-
--  ``GET`` to ``/api/v1/incidents/mine/``: behaves like
-   ``/api/v1/incidents/`` except only showing the incidents added by the
+-  ``GET`` to ``/api/v1/incidents/mine/``: behaves similar to
+   ``/api/v1/incidents/``, but will only show the incidents added by the
    logged-in user, and no filtering on source or source type is
    possible.
 
@@ -497,7 +515,7 @@ Incident endpoints
 -  ``GET`` to ``/api/v1/incidents/open+unacked/``: returns all open
    incidents that have not been acked
 
--  ``GET`` to ``/api/v1/incidents/metadata/``: returns relevant metadata
+-  ``GET`` to ``/api/v1/incidents/metadata/``: returns metadata
    for all incidents
 
 
@@ -511,9 +529,8 @@ Notification profile endpoints
    -  ``POST``: creates and returns a notification profile which is then
       connected to the logged in user
 
-      Example request body:
-
-      .. code:: json
+      .. code-block:: json
+        :caption: Example request body
 
           {
               "timeslot": 1,
@@ -529,30 +546,30 @@ Notification profile endpoints
               "active": true
           }
 
-      The phone number field is optional and may also be null.
+      The ``phone_number`` field is optional and may also be null.
 
 
 -  ``/api/v1/notificationprofiles/<int:pk>/``:
 
    -  ``GET``: returns one of the logged in user’s notification profiles
-      by PK
+      by primary key
 
    -  ``PUT``: updates and returns one of the logged in user’s
-      notification profiles by PK
+      notification profiles by primary key
 
       -  Note that if ``timeslot`` is changed, the notification
-         profile’s PK will also change. This consequently means that the
-         URL containing the previous PK will return a ``404 Not Found``
+         profile’s primary key will also change. This consequently means that the
+         URL containing the previous primary key will return a ``404 Not Found``
          status code.
       -  Example request body: same as ``POST`` to
          ``/api/v1/notificationprofiles/``
 
    -  ``DELETE``: deletes one of the logged in user’s notification
-      profiles by PK
+      profiles by primary key
 
 -  ``GET`` to ``/api/v1/notificationprofiles/<int:pk>/incidents/``:
    returns all incidents - both open and historic  - filtered by one of
-   the logged in user’s notification profiles by PK
+   the logged in user’s notification profiles by primary key
 
 -  ``/api/v1/notificationprofiles/timeslots/``:
 
@@ -560,9 +577,8 @@ Notification profile endpoints
    -  ``POST``: creates and returns a time slot which is then connected
       to the logged in user
 
-      Example request body:
-
-      .. code:: json
+      .. code-block:: json
+        :caption: Example request body
 
           {
               "name": "Weekdays",
@@ -618,14 +634,14 @@ Notification profile endpoints
 
 -  ``/api/v1/notificationprofiles/timeslots/<int:pk>/``:
 
-   -  ``GET``: returns one of the logged in user’s time slots by PK
+   -  ``GET``: returns one of the logged in user’s time slots by primary key
    -  ``PUT``: updates and returns one of the logged in user’s time
-      slots by PK
+      slots by primary key
 
       Example request body: same as ``POST`` to
          ``/notificationprofiles/timeslots/``
 
-   -  ``DELETE``: deletes one of the logged in user’s time slots by PK
+   -  ``DELETE``: deletes one of the logged in user’s time slots by primary key
 
 
 -  ``/api/v1/notificationprofiles/filters/``:
@@ -634,9 +650,8 @@ Notification profile endpoints
    -  ``POST``: creates and returns a filter which is then connected to
       the logged in user
 
-      Example request body:
-
-      .. code:: json
+      .. code-block:: json
+        :caption: Example request body
 
           {
               "name": "Critical incidents",
@@ -646,23 +661,22 @@ Notification profile endpoints
 
 -  ``/api/v1/notificationprofiles/filters/<int:pk>/``:
 
-   -  ``GET``: returns one of the logged in user’s filters by PK
+   -  ``GET``: returns one of the logged in user’s filters by primary key
    -  ``PUT``: updates and returns one of the logged in user’s filters
-      by PK
+      by primary key
 
       Example request body: same as ``POST`` to
          ``/api/v1/notificationprofiles/filters/``
 
-   -  ``DELETE``: deletes one of the logged in user’s filters by PK
+   -  ``DELETE``: deletes one of the logged in user’s filters by primary key
 
 
 -  ``POST`` to ``/api/v1/notificationprofiles/filterpreview/``: returns
    all incidents - both open and historic - filtered by the values in
    the body
 
-   Example request body:
-
-   .. code::
+   .. code-block::
+    :caption: Example request body
 
        {
            "sourceSystemIds": [<SourceSystem.pk>, ...]
