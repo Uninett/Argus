@@ -1,5 +1,10 @@
+from __future__ import annotations
+
+import logging.config
 from os import getenv
 from pathlib import Path
+
+from django.utils.module_loading import import_string
 
 
 __all__ = [
@@ -9,6 +14,8 @@ __all__ = [
     "get_bool_env",
     "get_str_env",
     "get_int_env",
+    "setup_logging",
+    "update_loglevels",
 ]
 
 
@@ -52,3 +59,30 @@ def get_int_env(envname, default=0, required=False):
         return default
     env = str(env).strip()
     return int(env)
+
+
+def setup_logging(dotted_path=None):
+    """Use the dictionary on the dotted path to set up logging
+
+    Returns the dictionary on success, otherwise None.
+    """
+    if dotted_path:
+        try:
+            class_or_attr = import_string(dotted_path)
+        except AttributeError:
+            return
+        logging.config.dictConfig(class_or_attr)
+        return class_or_attr
+
+
+def update_loglevels(loglevel: str = "INFO", loggers=(), handlers=()) -> None:
+    """Override specific loglevels in already setup loggers or handlers"""
+    loglevel = loglevel.upper()
+    for logger in loggers:
+        logging.getLogger(logger).setLevel(loglevel)
+    if handlers:
+        handlerdict = {}
+        for handler in handlers:
+            handlerdict["handler"] = {"level": loglevel}
+        logdict = {"version": 1, "disable_existing_loggers": False, "incremental": True, "handlers": handlerdict}
+        logging.config.dictConfig(logdict)
