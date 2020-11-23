@@ -89,7 +89,12 @@ class SourceSystem(models.Model):
 
 class TagQuerySet(models.QuerySet):
     def parse(self, *tags):
-        "Return a list of querysets that match `tags`"
+        """Return a list of querysets that matches `tags`
+
+        Tags with the same key are in the same list
+        """
+        if not tags:
+            return []
         set_dict = defaultdict(set)
         for k, v in (Tag.split(tag) for tag in tags):
             set_dict[k].add(v)
@@ -152,6 +157,11 @@ class IncidentQuerySet(models.QuerySet):
         """
         raise NotImplementedError()
 
+    def prefetch_default_related(self):
+        return self.prefetch_related("incident_tag_relations__tag", "source__type")
+
+    # BEGIN: Lookup helpers, for filter-logic
+
     def stateful(self):
         return self.filter(end_time__isnull=False)
 
@@ -176,19 +186,34 @@ class IncidentQuerySet(models.QuerySet):
     def lacks_ticket(self):
         return self.filter(ticket_url="")
 
-    def prefetch_default_related(self):
-        return self.prefetch_related("incident_tag_relations__tag", "source__type")
-
     def from_tags(self, *tags):
-        tag_qss = Tag.objects.parse(*tags)
-        qs = []
-        for tag_qs in tag_qss:
-            qs.append(self.filter(incident_tag_relations__tag__in=tag_qs))
-        qs = reduce(and_, qs)
+        """Filter incidents on tags
+
+        Incidents having tags with the same key are ORed together, different
+        keys are ANDed together.
+        """
+        tag_qs_list = Tag.objects.parse(*tags)
+        qs_list = []
+        for tag_qs in tag_qs_list:
+            qs_list.append(self.filter(incident_tag_relations__tag__in=tag_qs))
+        if not qs_list:
+            return self.none().distinct()
+        qs = reduce(and_, qs_list)
         return qs.distinct()
 
-    def filtered_by(self, value):
-        assert False, type(value)
+    def from_source_ids(self, *ids):
+        return self.filter(source__id__in=ids).distinct()
+
+    def filtered_by(self, filter_):
+        qs_set = set()
+        tag_qs = self.from_tags(*filter_.tags)
+        if tag_qs:
+            qs_set.add(tag_qs)
+        source_system_qs = self.from_source_ids(*filter_.source_system_ids)
+        if source_system_qs:
+            qs_set.add(source_system_qs)
+        qs = reduce(and_, qs_set)
+        return qs
 
     # Cannot be a constant, because `timezone.now()` would have been evaluated at compile time
     @staticmethod
@@ -196,6 +221,8 @@ class IncidentQuerySet(models.QuerySet):
         acks_query = Q(events__ack__isnull=False)
         acks_not_expired_query = Q(events__ack__expiration__isnull=True) | Q(events__ack__expiration__gt=timezone.now())
         return acks_query & acks_not_expired_query
+
+    # END: Lookup helpers, for filter-logic
 
 
 # TODO: review whether fields should be nullable, and on_delete modes
@@ -315,6 +342,21 @@ class Incident(models.Model):
         if base_url:
             return urljoin(base_url, path)
         return path  # Just show the relative url
+
+    # BEGIN: Lookup helpers, for filter-logic
+
+    def has_source_id(self, *source_ids):
+        "Check if incident has one of the sources, by id"
+        return self.source.id in source_ids
+
+    def has_tags(self, *tags):
+        "Check if incident has all tags"
+        if not tags:  # Sheer paranoia
+            return False
+        existing_tags = set(tag.representation for tag in self.tags)
+        return existing_tags.issuperset(tags)
+
+    # END: Lookup helpers, for filter-logic
 
 
 class IncidentRelationType(models.Model):

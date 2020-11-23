@@ -120,55 +120,45 @@ class Filter(models.Model):
         return Incident.objects.all()
 
     @property
+    def source_system_ids(self):
+        return self.filter_json.get("sourceSystemIds", [])
+
+    @property
+    def tags(self):
+        return self.filter_json.get("tags", [])
+
+    @property
     def filtered_incidents(self):
         if self.is_empty:
             return self.all_incidents.none().distinct()
-        data = self.filter_json
-        filtered_by_source = self.incidents_with_source_systems(data)
-        filtered_by_tags = self.incidents_with_tags(data)
-        return filtered_by_source & filtered_by_tags
+        return self.all_incidents.filtered_by(self)
 
-    def incidents_with_source_systems(self, data=None):
-        if not data:
-            data = self.filter_json
-        source_list = data.pop("sourceSystemIds", [])
-        if source_list:
-            return self.all_incidents.filter(source__in=source_list).distinct()
+    def incidents_with_source_systems(self):
+        if self.source_system_ids:
+            return self.all_incidents.from_source_ids(*self.source_system_ids)
         return self.all_incidents.distinct()
 
-    def source_system_fits(self, incident: Incident, data=None):
-        if not data:
-            data = self.filter_json
-        source_list = data.pop("sourceSystemIds", [])
-        if not source_list:
+    def source_system_fits(self, incident: Incident):
+        if not self.source_system_ids:
             # We're not limiting on sources!
             return None
-        return incident.source.id in source_list
+        return incident.source.id in self.source_system_ids
 
-    def incidents_with_tags(self, data=None):
-        if not data:
-            data = self.filter_json
-        tags_list = data.pop("tags", [])
-        if tags_list:
-            return self.all_incidents.from_tags(*tags_list)
+    def incidents_with_tags(self):
+        if self.tags:
+            return self.all_incidents.from_tags(*self.tags).distinct()
         return self.all_incidents.distinct()
 
-    def tags_fit(self, incident: Incident, data=None):
-        if not data:
-            data = self.filter_json
-        tags_list = data.pop("tags", [])
-        if not tags_list:
-            # We're not limiting on tags!
-            return None
-        tags = set(tag.representation for tag in incident.tags)
-        return tags.issuperset(tags_list)
+    def tags_fit(self, incident: Incident):
+        if self.tags:
+            return incident.has_tags(*self.tags)
+        return None
 
     def incident_fits(self, incident: Incident):
         if self.is_empty:
             return False  # Filter is empty!
-        data = self.filter_json
-        source_fits = self.source_system_fits(incident, data)
-        tags_fit = self.tags_fit(incident, data)
+        source_fits = self.source_system_fits(incident)
+        tags_fit = self.tags_fit(incident)
         # If False then one filter failed
         checks = set((source_fits, tags_fit))
         return not (False in checks)  # At least one filter failed
@@ -181,10 +171,7 @@ class NotificationProfile(models.Model):
 
     user = models.ForeignKey(to=User, on_delete=models.CASCADE, related_name="notification_profiles")
     timeslot = models.OneToOneField(
-        to=Timeslot,
-        on_delete=models.CASCADE,
-        primary_key=True,
-        related_name="notification_profile",
+        to=Timeslot, on_delete=models.CASCADE, primary_key=True, related_name="notification_profile"
     )
     filters = models.ManyToManyField(to=Filter, related_name="notification_profiles")
 
@@ -199,6 +186,7 @@ class NotificationProfile(models.Model):
     @property
     def filtered_incidents(self):
         qs = [filter_.filtered_incidents for filter_ in self.filters.all()]
+        # DISTINCT
         return reduce(or_, qs)
 
     def incident_fits(self, incident: Incident):
