@@ -128,12 +128,17 @@ use:
   way of sending SMS messages.
   See [Notifications and notification plugins](docs/notifications.rst).
 
-### Production gotchas
+### Domains
 
-The frontend and backend currently needs to be on either the same domain or be
-subdomains of the same domain (ARGUS_COOKIE_DOMAIN).
+In production, Argus requires the frontend and the backend to either be
+deployed on the same domain, or the frontend to be on a subdomain of the
+`ARGUS_COOKIE_DOMAIN`.
 
-When running on localhost for dev and test, ARGUS_COOKIE_DOMAIN may be empty.
+When running Argus on localhost for development and testing,
+`ARGUS_COOKIE_DOMAIN` can be empty.
+
+Refer to the section on [Environment variables](#environment-variables) for
+details.
 
 ### Running tests locally
 
