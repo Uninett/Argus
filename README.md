@@ -18,9 +18,17 @@ in the [Setup section](#setup).
 
 ## Setup
 
-### Prerequisites
+### Requirements
 * Python 3.7+
 * pip
+
+### Optional
+* Redis
+  If you are going to run the frontend we also recommend you have Redis running
+  to back the websockets, in order to push realtime updates to the frontend.
+* [Argus-frontend](https://github.com/Uninett/Argus-frontend/)
+* PostgreSQL
+* Docker and docker-compose
 
 ### Dataporten setup
 * Register a new application with the following redirect URL: `{server_url}/oidc/complete/dataporten_feide/`
