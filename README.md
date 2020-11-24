@@ -3,7 +3,7 @@
 [![codecov badge](https://codecov.io/gh/Uninett/Argus/branch/master/graph/badge.svg)](https://codecov.io/gh/Uninett/Argus)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-Argus is a platform for aggregating incidents across network management systems, and sending notifications to users. Users build notification profiles that define which incidents they subscribe to.
+Argus is a platform for aggregating incidents across network management systems, and sending notifications to users. Users create notification profiles that define which incidents they subscribe to.
 
 This repository hosts the backend built with Django, while the frontend is hosted here: https://github.com/Uninett/Argus-frontend.
 
