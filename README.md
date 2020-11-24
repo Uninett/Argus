@@ -11,11 +11,6 @@ This repository hosts the backend built with Django, while the frontend is hoste
 
 There are several ways to install Argus.
 
-In development, check out the code repository check out the code repository
-and refer to [Project setup](#project-setup) or
-[Alternative setup using Docker Compose](#alternative-setup-using-docker-compose)
-in the [Setup section](#setup).
-
 ## Setup
 
 ### Requirements
@@ -168,49 +163,77 @@ This creates the file `src/argus/incident/fixtures/incident/mock_data.json`.
 python manage.py loaddata incident/mock_data
 ```
 
-### Running in development
+### Running Argus in development
 
-The fastest is to use virtualenv or virtaulenvwrapper or similar to create
-a safe place to stash all the dependencies.
 
-1. Create the virtualenv
+#### Step 1: Installation
+
+Check out the code repository and refer to [Project setup](#project-setup) or
+[Alternative setup using Docker Compose](#alternative-setup-using-docker-compose)
+in the [Setup section](#setup).
+
+1. Create and activate a virtualenv (as described in
+  [Install Argus using pip](#install-argus-using-pip)).
 2. Fill the activated virtualenv with dependencies:
-
 ```
-$ pip install -r requirements/prod.txt
-$ pip install -r requirements/dev.txt
+pip install -r requirements/prod.txt
+pip install -r requirements/dev.txt
 ```
 
-Copy the `cmd.sh-template` to a new name ending with ".sh", make it executable
-and set the environment variables within. This file must not be checked in to
-version control, since it contains passwords. You *must* set DATABASE_URL,
-DJANGO_SETTINGS_MODULE and SECRET_KEY. If you want to test the frontend you
-must also set all the DATAPORTEN-settings. Get the values from
-https://dashboard.dataporten.no/ or create a new application there.
+#### Step 2: Setting environment variables and Django settings
 
-For the database we recommend postgres as we use a postgres-specific feature in
-the Incident-model.
+Copy the `cmd.sh-template` to `cmd.sh` and make it executable
+```
+$ cp cmd.sh-template cmd.sh
+$ chmod u+x cmd.sh
+```
+Now set the environment variables in the file using an editor.
 
-DJANGO_SETTINGS_MODULE can be set to "argus.site.settings.dev" but we recommend
-having a `localsettings.py` in the same directory as `manage.py` with any
-overrides. This file also does not belong in version control since it reflects
-a specific developer's preferences. Smart things first tested in
-a localsettings can be moved to the other settings-files later on. If you copy
-the entire logging-setup from "argus.site.settings.dev" to "localsettings.py"
-remember to set "disable_existing_loggers" to True or logentries will occur
-twice.
+Tip: You may find it useful to have several `cmd.sh` files for different
+purposes, for instance to invoke different databases.
+They can be named `cmd-local.sh`, `cmd-prod.sh` and `cmd-demo.sh`, to name
+a few.
 
-This repository uses black as a code formatter. Black will automatically install
+Do not check these files into version control, since they contain passwords and
+sensitive data.
+
+Required settings on `cmd.sh` are
+* `DATABASE_URL`,
+* `DJANGO_SETTINGS_MODULE` and
+* `SECRET_KEY`.
+
+The `DATAPORTEN` variables are required to test the frontend.
+Refer to https://dashboard.dataporten.no/ for more information or to create a
+new application.
+
+`DJANGO_SETTINGS_MODULE` can be set to "argus.site.settings.dev".
+We recommend having a `localsettings.py` in the same directory as `manage.py`
+with any overrides.
+
+This file also does not belong in version control since it reflects
+a specific developer's preferences.
+
+Settings can be tested in `localsettings.py` and moved to the other settings
+files later.
+
+Tip: If you copy the entire logging-setup from "argus.site.settings.dev" to
+`localsettings.py` remember to set `disable_existing_loggers` to `True`.
+Otherwise, logentries will appear twice.
+
+#### Coding style
+
+Argus uses black as a source code formatter. Black will automatically install
 with the [dev requirements](requirements/dev.txt).
 
-A pre-commit hook formats new code automatically before committing.
-To enable this pre-commit hook, please run
+A pre-commit hook will format new code automatically before committing.
+To enable this pre-commit hook, run
 
 ```
 pre-commit install
 ```
+inside your virtual env.
 
-### Debugging tips
+#### Debugging tips
 
 To test/debug notifications as a whole, use the email subsystem (Media: Email in a NotificationProfile).
 Set EMAIL_HOST to "localhost", EMAIL_PORT to "1025", and run a dummy mailserver:
