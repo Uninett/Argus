@@ -9,31 +9,12 @@ This repository hosts the backend built with Django, while the frontend is hoste
 
 ## Installation
 
-In development, provided you have the code repository that this README-file is
-in, see **Project setup** or **Alternative setup using Docker Compose** under
-**Setup**.
+There are several ways to install Argus.
 
-You can also install vith `pip` via PyPI. The package name is `argus-server`:
-
-```
-$ pip install argus-server
-```
-
-If you're going to run the frontend we also recommend you have redis running
-somewhere to back the websockets, in order to push realtime updates to the
-frontend.
-
-If you're using the PyPI package in production, the file `requirements.txt`
-contains the exact versions of dependencies that release was tested on. You can
-update all the dependencies for instance with `pip-compile`:
-
-```
-$ pip install pip-tools
-$ pip-compile -o your-updated-requirements.txt
-```
-
-.. then use `$ pip install --upgrade -r your-updated-requirements.txt` to
-upgrade all the dependencies at once.
+In development, check out the code repository check out the code repository
+and refer to [Project setup](#project-setup) or
+[Alternative setup using Docker Compose](#alternative-setup-using-docker-compose)
+in the [Setup section](#setup).
 
 ## Setup
 
@@ -49,19 +30,53 @@ upgrade all the dependencies at once.
   * `userid`
   * `userid-feide`
 
-### Project setup
-* Create a Python 3.7+ virtual environment
-* `pip install -r requirements.txt`
-* `python manage.py migrate`
-* `python manage.py initial_setup`
+### Install Argus using pip
 
-Start the server with `python manage.py runserver`.
+We recommend to use virtualenv or virtaulenvwrapper to create
+a place to stash all dependencies.
 
-#### Alternative setup using Docker Compose
+Create and activate a Python virtual environment.
+```
+python -m venv venv
+source venv/bin/activate
+```
+Install Argus' requirements into the virtual env.
+```
+$ pip install -r requirements.txt
+```
+Run the initial Argus setup, then start the server.
+```
+python manage.py initial_setup
+python manage.py runserver
+```
+Visit http://localhost:8000/.
 
-* `docker-compose up`
-* `docker-compose exec argus-api django-admin initial_setup`
-* Visit http://localhost:8000/
+### Setup Argus using Docker Compose
+
+```
+docker-compose up
+docker-compose exec argus-api django-admin initial_setup
+```
+Visit http://localhost:8000/
+
+###  Install Argus via PyPI
+
+You can also install Argus with `pip` via PyPI. The package name is `argus-server`:
+
+```
+$ pip install argus-server
+```
+
+If you are using the PyPI package in production, please note: The file
+`requirements.txt` contains the versions of dependencies that the release was
+tested on.
+To update all the dependencies to recent versions, use `pip-compile`:
+
+```
+$ pip install pip-tools
+$ pip-compile -o your-updated-requirements.txt
+$ pip install --upgrade -r your-updated-requirements.txt
+```
 
 ### Site- and deployment-specific settings
 
