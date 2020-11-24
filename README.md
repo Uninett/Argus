@@ -135,7 +135,7 @@ When running Argus on localhost for development and testing,
 Refer to the section on [Environment variables](#environment-variables) for
 details.
 
-### Running tests locally
+## Running tests locally
 
 This command is the most basic option to run the tests.
 ```
@@ -152,21 +152,21 @@ An [HTML coverage report](htmlcov/index.html) will be generated.
 Refer to [tox.ini] for further options.
 
 ### Mock data
-##### Generating
+#### Generating
 ```sh
 PYTHONPATH=src python src/argus/incident/fixtures/generate_fixtures.py
 ```
 This creates the file `src/argus/incident/fixtures/incident/mock_data.json`.
 
-##### Loading
+#### Loading
 ```sh
 python manage.py loaddata incident/mock_data
 ```
 
-### Running Argus in development
+## Running Argus in development
 
 
-#### Step 1: Installation
+### Step 1: Installation
 
 Check out the code repository and refer to [Project setup](#project-setup) or
 [Alternative setup using Docker Compose](#alternative-setup-using-docker-compose)
@@ -180,7 +180,7 @@ pip install -r requirements/prod.txt
 pip install -r requirements/dev.txt
 ```
 
-#### Step 2: Setting environment variables and Django settings
+### Step 2: Setting environment variables and Django settings
 
 Copy the `cmd.sh-template` to `cmd.sh` and make it executable
 ```
