@@ -27,7 +27,7 @@ There are several ways to install Argus.
 
 ### Dataporten setup
 * Register a new application with the following redirect URL: `{server_url}/oidc/complete/dataporten_feide/`
-  * `{server_url}` must be replaced with the URL to the server running this project, like `http://localhost:8000`
+  * Replace `{server_url}` with the URL to the server running this project, like `http://localhost:8000`
 * Add the following permission scopes:
   * `profile`
   * `userid`
