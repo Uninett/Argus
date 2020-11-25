@@ -15,6 +15,7 @@ Welcome to Argus' documentation!
    api
    site-specific-settings
    notifications
+   development
    writing-plugins
    :maxdepth: 2
    :caption: Contents:

@@ -115,15 +115,7 @@ $ chmod u+x cmd.sh
 ```
 Now set the environment variables in the file using an editor.
 
-Tip: You may find it useful to have several `cmd.sh` files for different
-purposes, for instance to invoke different databases.
-They can be named `cmd-local.sh`, `cmd-prod.sh` and `cmd-demo.sh`, to name
-a few.
-
-Do not check these files into version control, since they contain passwords and
-sensitive data.
-
-Required settings on `cmd.sh` are
+Required settings in `cmd.sh` are
 * `DATABASE_URL`,
 * `DJANGO_SETTINGS_MODULE` and
 * `SECRET_KEY`.
@@ -136,17 +128,10 @@ new application.
 We recommend having a `localsettings.py` in the same directory as `manage.py`
 with any overrides.
 
-This file also does not belong in version control since it reflects
-a specific developer's preferences.
+Refer to the [development notes](doc/development.rst) for further details and
+useful hints.
 
-Settings can be tested in `localsettings.py` and moved to the other settings
-files later.
-
-Tip: If you copy the entire logging-setup from "argus.site.settings.dev" to
-`localsettings.py` remember to set `disable_existing_loggers` to `True`.
-Otherwise, logentries will appear twice.
-
-#### Coding style
+### Code style
 
 Argus uses black as a source code formatter. Black will automatically install
 with the [dev requirements](requirements/dev.txt).
@@ -157,9 +142,8 @@ To enable this pre-commit hook, run
 ```
 pre-commit install
 ```
-inside your virtual env.
 
-#### Debugging tips
+### Debugging tips
 
 To test/debug notifications as a whole, use the email subsystem (Media: Email in a NotificationProfile).
 Set EMAIL_HOST to "localhost", EMAIL_PORT to "1025", and run a dummy mailserver:
