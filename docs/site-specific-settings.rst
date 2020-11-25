@@ -123,3 +123,8 @@ Debugging settings
 * ``DEBUG`` enables or disables debug-mode.
 * ``TEMPLATE_DEBUG`` (optional) provides a convenient way to turn debugging on and off
   for templates. If undefined, it will default to the value of ``DEBUG``.
+
+.. warning:: Environment variables and Argus settings may contain sensitive data, such
+  as login credentials, secrets and passwords.
+  Be mindful when setting these variables, and use appropriate safety precautions.
+  For example, do not check your ``settings.py`` files into version control.
