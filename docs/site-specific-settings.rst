@@ -88,6 +88,16 @@ same domain, or the frontend to be on a subdomain of the ``ARGUS_COOKIE_DOMAIN``
 When running Argus on localhost for development and testing, ``ARGUS_COOKIE_DOMAIN`` can
 be empty.
 
+Database settings
+-----------------
+
+* ``DATABASE_URL`` contains the URL and port, as well as username, password, and name
+  of the database to be used by Argus.
+
+A common value in development would be::
+
+  DATABASE_URL=postgresql://argus_user:superSecretPassword@localhost:5432/argus_db
+
 Notification settings
 ---------------------
 
