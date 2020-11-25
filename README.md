@@ -23,12 +23,12 @@ There are several ways to install Argus.
 
 #### Optional requirements
 
-* Redis
-  If you are going to run the frontend we also recommend you have Redis running
-  to back the websockets, in order to push realtime updates to the frontend.
+* **Redis**
+  is recommended if you are going to run the frontend.
+  Redis backs the websockets, in order to push realtime updates to the frontend.
 * [Argus-frontend](https://github.com/Uninett/Argus-frontend/)
 * PostgreSQL
-* Docker and docker-compose
+* Docker and docker-compose to run Argus in Docker
 
 #### Optional: Dataporten registration
 
@@ -38,8 +38,14 @@ about Dataporten registration, and how to set it up with Argus.
 
 ### Install Argus using pip
 
+Download the source code first.
+```
+git clone https://github.com/Uninett/Argus.git
+cd Argus
+```
+
 We recommend to use virtualenv or virtaulenvwrapper to create
-a place to stash all dependencies.
+a place to stash Argus' dependencies.
 
 Create and activate a Python virtual environment.
 ```
@@ -58,16 +64,23 @@ python manage.py initial_setup
 python manage.py runserver
 ```
 
-Visit http://localhost:8000/.
+You will find Argus running at http://localhost:8000/.
 
 ### Setup Argus using Docker Compose
 
-```
-docker-compose up
-docker-compose exec argus-api django-admin initial_setup
+Again, download the source code first.
+```console
+$ git clone https://github.com/Uninett/Argus.git
+$ cd Argus
 ```
 
-Visit http://localhost:8000/
+Running Argus with docker-compose is as simple as
+```console
+$ docker-compose up
+$ docker-compose exec argus-api django-admin initial_setup
+```
+
+You will find Argus running at http://localhost:8000/.
 
 ### Install Argus via PyPI
 
@@ -92,26 +105,26 @@ $ pip install --upgrade -r your-updated-requirements.txt
 Site-specific settings can either be set using environment variables, using a
 `settings.py` file, or a combination of both.
 
-For more information on both methods and a list of the variables, consult the
+For more information on both methods and a list of the settings, consult the
 documentation section on
-[Setting site-specific settings](docs/site-specific-settings.rst).
+[site-specific settings](docs/site-specific-settings.rst).
 
 
 ## Running Argus in development
 
 ### Step 1: Installation
 
-Check out the code repository and refer to [Project setup](#project-setup) or
-[Alternative setup using Docker Compose](#alternative-setup-using-docker-compose)
-in the [Setup section](#setup).
+Check out either [the installation instructions for pip](#install-argus-using-pip) or
+[use docker-compose](#setup-argus-using-docker-compose) to get Argus up and
+running.
 
-1. Create and activate a virtualenv (as described in
-  [Install Argus using pip](#install-argus-using-pip)).
-2. Fill the activated virtualenv with dependencies:
+When using pip, perform this step to install the dependencies into your virtual env:
 ```
 pip install -r requirements/prod.txt
 pip install -r requirements/dev.txt
 ```
+
+Docker-compose will do this automatically.
 
 ### Step 2: Setting environment variables and Django settings
 
@@ -133,11 +146,13 @@ Refer to the dataporten section of
 [setting site-specific settings](docs/site-specific-settings.rst) for details.
 
 `DJANGO_SETTINGS_MODULE` can be set to "argus.site.settings.dev".
-We recommend having a `localsettings.py` in the same directory as `manage.py`
-with any overrides.
+
+If you need more complex settings than environment variables and ``cmd.sh`` can provide,
+we recommend having a `localsettings.py` in the same directory as `manage.py` with any
+overrides.
 
 Refer to the [development notes](doc/development.rst) for further details and
-useful hints.
+useful hints on managing Argus in development mode.
 
 ### Code style
 
@@ -154,13 +169,14 @@ pre-commit install
 
 ## Running tests
 
-This command is the most basic option to run the tests.
+Given that Argus is installed and configured as described above,
+this command is the most basic option to run the tests.
 ```
 python manage.py test
 ```
 
 If you have installed `tox`, the following command will
-test several django versions, several python versions, and
+test Argus code against several Django versions, several Python versions, and
 automatically compute code coverage.
 ```
 tox
