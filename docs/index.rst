@@ -14,6 +14,7 @@ Welcome to Argus' documentation!
    models
    api
    site-specific-settings
+   dataporten
    notifications
    development
    writing-plugins

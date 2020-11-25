@@ -72,6 +72,8 @@ Dataporten
 * ``ARGUS_DATAPORTEN_KEY`` holds the id/key for using dataporten for authentication.
 * ``ARGUS_DATAPORTEN_SECRET`` holds the dataporten password.
 
+Refer to the section :ref:`dataporten` for more information.
+
 Domain settings
 ---------------
 

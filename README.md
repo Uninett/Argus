@@ -30,14 +30,11 @@ There are several ways to install Argus.
 * PostgreSQL
 * Docker and docker-compose
 
-#### Optional: Dataporten setup
+#### Optional: Dataporten registration
 
-* Register a new application with the following redirect URL: `{server_url}/oidc/complete/dataporten_feide/`
-  * Replace `{server_url}` with the URL to the server running this project, like `http://localhost:8000`
-* Add the following permission scopes:
-  * `profile`
-  * `userid`
-  * `userid-feide`
+Dataporten is required to use the Argus-frontend.
+Refer to the [Dataporten](doc/dataporten.rst) section of the documentation to learn
+about Dataporten registration, and how to set it up with Argus.
 
 ### Install Argus using pip
 
@@ -131,9 +128,9 @@ Required settings in `cmd.sh` are
 - `DJANGO_SETTINGS_MODULE` and
 - `SECRET_KEY`.
 
-The `DATAPORTEN` variables are required to test the frontend.
-Refer to https://dashboard.dataporten.no/ for more information or to create a
-new application.
+The `DATAPORTEN` variables are only required to test the frontend.
+Refer to the dataporten section of
+[setting site-specific settings](docs/site-specific-settings.rst) for details.
 
 `DJANGO_SETTINGS_MODULE` can be set to "argus.site.settings.dev".
 We recommend having a `localsettings.py` in the same directory as `manage.py`
