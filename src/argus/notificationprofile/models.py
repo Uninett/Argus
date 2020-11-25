@@ -21,9 +21,7 @@ class Timeslot(models.Model):
     name = models.CharField(max_length=40)
 
     class Meta:
-        constraints = [
-            models.UniqueConstraint(fields=["name", "user"], name="%(class)s_unique_name_per_user"),
-        ]
+        constraints = [models.UniqueConstraint(fields=["name", "user"], name="%(class)s_unique_name_per_user")]
         ordering = ["name"]
 
     def __str__(self):
@@ -97,9 +95,7 @@ class Filter(models.Model):
     filter_string = models.TextField()
 
     class Meta:
-        constraints = [
-            models.UniqueConstraint(fields=["name", "user"], name="%(class)s_unique_name_per_user"),
-        ]
+        constraints = [models.UniqueConstraint(fields=["name", "user"], name="%(class)s_unique_name_per_user")]
 
     def __str__(self):
         return f"{self.name} [{self.filter_string}]"
@@ -133,7 +129,10 @@ class Filter(models.Model):
     def source_system_fits(self, incident: Incident, data=None):
         if not data:
             data = self.filter_json
-        return self.incidents_with_source_systems(data).filter(id=incident.id).exists()
+        source_list = data.pop("sourceSystemIds", [])
+        if source_list:
+            return incident.source.id in source_list
+        return False
 
     def incidents_with_tags(self, data=None):
         if not data:
