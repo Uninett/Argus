@@ -39,29 +39,29 @@ about Dataporten registration, and how to set it up with Argus.
 ### Install Argus using pip
 
 Download the source code first.
-```
-git clone https://github.com/Uninett/Argus.git
-cd Argus
+```console
+$ git clone https://github.com/Uninett/Argus.git
+$ cd Argus
 ```
 
 We recommend to use virtualenv or virtaulenvwrapper to create
 a place to stash Argus' dependencies.
 
 Create and activate a Python virtual environment.
-```
-python -m venv venv
-source venv/bin/activate
+```console
+$ python -m venv venv
+$ source venv/bin/activate
 ```
 
 Install Argus' requirements into the virtual env.
-```
+```console
 $ pip install -r requirements.txt
 ```
 
 Run the initial Argus setup, then start the server.
-```
-python manage.py initial_setup
-python manage.py runserver
+```console
+$ python manage.py initial_setup
+$ python manage.py runserver
 ```
 
 You will find Argus running at http://localhost:8000/.
@@ -85,7 +85,7 @@ You will find Argus running at http://localhost:8000/.
 ### Install Argus via PyPI
 
 You can also install Argus with `pip` via PyPI. The package name is `argus-server`:
-```
+```console
 $ pip install argus-server
 ```
 
@@ -94,7 +94,7 @@ If you are using the PyPI package in production, please note: The file
 tested on.
 To update all the dependencies to recent versions, use `pip-compile`:
 
-```
+```console
 $ pip install pip-tools
 $ pip-compile -o your-updated-requirements.txt
 $ pip install --upgrade -r your-updated-requirements.txt
@@ -119,9 +119,9 @@ Check out either [the installation instructions for pip](#install-argus-using-pi
 running.
 
 When using pip, perform this step to install the dependencies into your virtual env:
-```
-pip install -r requirements/prod.txt
-pip install -r requirements/dev.txt
+```console
+$ pip install -r requirements/prod.txt
+$ pip install -r requirements/dev.txt
 ```
 
 Docker-compose will do this automatically.
@@ -129,7 +129,7 @@ Docker-compose will do this automatically.
 ### Step 2: Setting environment variables and Django settings
 
 Copy the `cmd.sh-template` to `cmd.sh` and make it executable
-```
+```console
 $ cp cmd.sh-template cmd.sh
 $ chmod u+x cmd.sh
 ```
@@ -145,7 +145,7 @@ The `DATAPORTEN` variables are only required to test the frontend.
 Refer to the dataporten section of
 [setting site-specific settings](docs/site-specific-settings.rst) for details.
 
-`DJANGO_SETTINGS_MODULE` can be set to "argus.site.settings.dev".
+`DJANGO_SETTINGS_MODULE` can be set to `argus.site.settings.dev`.
 
 If you need more complex settings than environment variables and ``cmd.sh`` can provide,
 we recommend having a `localsettings.py` in the same directory as `manage.py` with any
@@ -162,8 +162,8 @@ with the [dev requirements](requirements/dev.txt).
 A pre-commit hook will format new code automatically before committing.
 To enable this pre-commit hook, run
 
-```
-pre-commit install
+```console
+$ pre-commit install
 ```
 
 
@@ -171,15 +171,15 @@ pre-commit install
 
 Given that Argus is installed and configured as described above,
 this command is the most basic option to run the tests.
-```
-python manage.py test
+```console
+$ python manage.py test
 ```
 
 If you have installed `tox`, the following command will
 test Argus code against several Django versions, several Python versions, and
 automatically compute code coverage.
-```
-tox
+```console
+$ tox
 ```
 An [HTML coverage report](htmlcov/index.html) will be generated.
 Refer to [tox.ini] for further options.
