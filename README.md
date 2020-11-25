@@ -90,36 +90,7 @@ For more information on both methods and a list of the variables, consult the
 documentation section on
 [Setting site-specific settings](docs/site-specific-settings.rst).
 
-## Running tests locally
-
-This command is the most basic option to run the tests.
-```
-python manage.py test
-```
-
-If you have installed `tox`, the following command will
-test several django versions, several python versions, and
-automatically compute code coverage.
-```
-tox
-```
-An [HTML coverage report](htmlcov/index.html) will be generated.
-Refer to [tox.ini] for further options.
-
-### Mock data
-#### Generating
-```sh
-PYTHONPATH=src python src/argus/incident/fixtures/generate_fixtures.py
-```
-This creates the file `src/argus/incident/fixtures/incident/mock_data.json`.
-
-#### Loading
-```sh
-python manage.py loaddata incident/mock_data
-```
-
 ## Running Argus in development
-
 
 ### Step 1: Installation
 
@@ -198,3 +169,31 @@ $ python3 -m smtpd -n -c DebuggingServer localhost:1025
 ```
 
 Notifications sent will then be dumped to the console where the dummy server runs.
+
+## Running tests locally
+
+This command is the most basic option to run the tests.
+```
+python manage.py test
+```
+
+If you have installed `tox`, the following command will
+test several django versions, several python versions, and
+automatically compute code coverage.
+```
+tox
+```
+An [HTML coverage report](htmlcov/index.html) will be generated.
+Refer to [tox.ini] for further options.
+
+### Mock data
+#### Generating
+```sh
+PYTHONPATH=src python src/argus/incident/fixtures/generate_fixtures.py
+```
+This creates the file `src/argus/incident/fixtures/incident/mock_data.json`.
+
+#### Loading
+```sh
+python manage.py loaddata incident/mock_data
+```
