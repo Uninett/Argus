@@ -143,17 +143,6 @@ To enable this pre-commit hook, run
 pre-commit install
 ```
 
-### Debugging tips
-
-To test/debug notifications as a whole, use the email subsystem (Media: Email in a NotificationProfile).
-Set EMAIL_HOST to "localhost", EMAIL_PORT to "1025", and run a dummy mailserver:
-
-```
-$ python3 -m smtpd -n -c DebuggingServer localhost:1025
-```
-
-Notifications sent will then be dumped to the console where the dummy server runs.
-
 ## Running tests locally
 
 This command is the most basic option to run the tests.

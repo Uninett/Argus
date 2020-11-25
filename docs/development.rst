@@ -46,3 +46,16 @@ files later.
 
 .. warning:: Do not check your ``cmd.sh`` or ``settings.py`` files into version control,
         since they contain passwords and sensitive data.
+
+
+Debugging tips
+--------------
+
+To test/debug notifications as a whole, use the email subsystem (Media: Email in a
+NotificationProfile).
+Set ``EMAIL_HOST`` to ``localhost``, ``EMAIL_PORT`` to ``1025``, and run a dummy
+mailserver::
+
+    $ python -m smtpd -n -c DebuggingServer localhost:1025
+
+Sent notifications will then be dumped to the console on the dummy server.
