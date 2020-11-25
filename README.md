@@ -3,21 +3,26 @@
 [![codecov badge](https://codecov.io/gh/Uninett/Argus/branch/master/graph/badge.svg)](https://codecov.io/gh/Uninett/Argus)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-Argus is a platform for aggregating incidents across network management systems, and sending notifications to users. Users create notification profiles that define which incidents they subscribe to.
+Argus is a platform for aggregating incidents across network management systems, and
+sending notifications to users. Users create notification profiles that define which
+incidents they subscribe to.
 
-This repository hosts the backend built with Django, while the frontend is hosted here: https://github.com/Uninett/Argus-frontend.
+This repository hosts the backend built with Django, while the frontend is hosted here:
+https://github.com/Uninett/Argus-frontend.
 
 ## Installation
 
 There are several ways to install Argus.
 
-## Setup
+### Prerequisites
 
-### Requirements
+#### Requirements
+
 * Python 3.7+
 * pip
 
-### Optional
+#### Optional requirements
+
 * Redis
   If you are going to run the frontend we also recommend you have Redis running
   to back the websockets, in order to push realtime updates to the frontend.
@@ -25,7 +30,8 @@ There are several ways to install Argus.
 * PostgreSQL
 * Docker and docker-compose
 
-### Dataporten setup
+#### Optional: Dataporten setup
+
 * Register a new application with the following redirect URL: `{server_url}/oidc/complete/dataporten_feide/`
   * Replace `{server_url}` with the URL to the server running this project, like `http://localhost:8000`
 * Add the following permission scopes:
@@ -43,15 +49,18 @@ Create and activate a Python virtual environment.
 python -m venv venv
 source venv/bin/activate
 ```
+
 Install Argus' requirements into the virtual env.
 ```
 $ pip install -r requirements.txt
 ```
+
 Run the initial Argus setup, then start the server.
 ```
 python manage.py initial_setup
 python manage.py runserver
 ```
+
 Visit http://localhost:8000/.
 
 ### Setup Argus using Docker Compose
@@ -60,12 +69,12 @@ Visit http://localhost:8000/.
 docker-compose up
 docker-compose exec argus-api django-admin initial_setup
 ```
+
 Visit http://localhost:8000/
 
-###  Install Argus via PyPI
+### Install Argus via PyPI
 
 You can also install Argus with `pip` via PyPI. The package name is `argus-server`:
-
 ```
 $ pip install argus-server
 ```
@@ -81,7 +90,7 @@ $ pip-compile -o your-updated-requirements.txt
 $ pip install --upgrade -r your-updated-requirements.txt
 ```
 
-## Site- and deployment-specific settings
+## Site- and deployment-specific settings in Argus
 
 Site-specific settings can either be set using environment variables, using a
 `settings.py` file, or a combination of both.
@@ -89,6 +98,7 @@ Site-specific settings can either be set using environment variables, using a
 For more information on both methods and a list of the variables, consult the
 documentation section on
 [Setting site-specific settings](docs/site-specific-settings.rst).
+
 
 ## Running Argus in development
 
@@ -116,9 +126,10 @@ $ chmod u+x cmd.sh
 Now set the environment variables in the file using an editor.
 
 Required settings in `cmd.sh` are
-* `DATABASE_URL`,
-* `DJANGO_SETTINGS_MODULE` and
-* `SECRET_KEY`.
+
+- `DATABASE_URL`,
+- `DJANGO_SETTINGS_MODULE` and
+- `SECRET_KEY`.
 
 The `DATAPORTEN` variables are required to test the frontend.
 Refer to https://dashboard.dataporten.no/ for more information or to create a
@@ -143,7 +154,8 @@ To enable this pre-commit hook, run
 pre-commit install
 ```
 
-## Running tests locally
+
+## Running tests
 
 This command is the most basic option to run the tests.
 ```
@@ -160,13 +172,17 @@ An [HTML coverage report](htmlcov/index.html) will be generated.
 Refer to [tox.ini] for further options.
 
 ### Mock data
+
 #### Generating
+
 ```sh
 PYTHONPATH=src python src/argus/incident/fixtures/generate_fixtures.py
 ```
+
 This creates the file `src/argus/incident/fixtures/incident/mock_data.json`.
 
 #### Loading
+
 ```sh
 python manage.py loaddata incident/mock_data
 ```
