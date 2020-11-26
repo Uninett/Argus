@@ -3,187 +3,203 @@
 [![codecov badge](https://codecov.io/gh/Uninett/Argus/branch/master/graph/badge.svg)](https://codecov.io/gh/Uninett/Argus)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-Argus is a platform for aggregating incidents across network management systems, and sending notifications to users. Users build notification profiles that define which incidents they subscribe to.
+Argus is a platform for aggregating incidents across network management systems, and
+sending notifications to users. Users create notification profiles that define which
+incidents they subscribe to.
 
-This repository hosts the backend built with Django, while the frontend is hosted here: https://github.com/Uninett/Argus-frontend.
+This repository hosts the backend built with Django, while the frontend is hosted here:
+https://github.com/Uninett/Argus-frontend.
 
 ## Installation
 
-In development, provided you have the code repository that this README-file is
-in, see **Project setup** or **Alternative setup using Docker Compose** under
-**Setup**.
-
-You can also install vith `pip` via PyPI. The package name is `argus-server`:
-
-```
-$ pip install argus-server
-```
-
-If you're going to run the frontend we also recommend you have redis running
-somewhere to back the websockets, in order to push realtime updates to the
-frontend.
-
-If you're using the PyPI package in production, the file `requirements.txt`
-contains the exact versions of dependencies that release was tested on. You can
-update all the dependencies for instance with `pip-compile`:
-
-```
-$ pip install pip-tools
-$ pip-compile -o your-updated-requirements.txt
-```
-
-.. then use `$ pip install --upgrade -r your-updated-requirements.txt` to
-upgrade all the dependencies at once.
-
-## Setup
+There are several ways to install Argus.
 
 ### Prerequisites
+
+#### Requirements
+
 * Python 3.7+
 * pip
 
-### Dataporten setup
-* Register a new application with the following redirect URL: `{server_url}/oidc/complete/dataporten_feide/`
-  * `{server_url}` must be replaced with the URL to the server running this project, like `http://localhost:8000`
-* Add the following permission scopes:
-  * `profile`
-  * `userid`
-  * `userid-feide`
+#### Optional requirements
 
-### Project setup
-* Create a Python 3.7+ virtual environment
-* `pip install -r requirements.txt`
-* `python manage.py migrate`
-* `python manage.py initial_setup`
+* **Redis**
+  is recommended if you are going to run the frontend.
+  Redis backs the websockets, in order to push realtime updates to the frontend.
+* [Argus-frontend](https://github.com/Uninett/Argus-frontend/)
+* PostgreSQL
+* Docker and docker-compose to run Argus in Docker
 
-Start the server with `python manage.py runserver`.
+#### Optional: Dataporten registration
 
-#### Alternative setup using Docker Compose
+Dataporten authentication is supported by Argus and can be used to log into
+Argus-frontend.
+Refer to the [Dataporten](docs/dataporten.rst) section of the documentation to learn
+about Dataporten registration, and how to set it up with Argus.
 
-* `docker-compose up`
-* `docker-compose exec argus-api django-admin initial_setup`
-* Visit http://localhost:8000/
+### Install Argus using pip
 
-### Site- and deployment-specific settings
-
-Site-specific settings are set as per 12 factor, with environment variables. For more details, see the relevant section in the docs: [Setting site-specific settings](docs/site-specific-settings.rst).
-
-A recap of the environment variables that can be set by default follows.
-
-#### Environment variables
-
-* ARGUS_DATAPORTEN_KEY, which holds the id/key for using dataporten for
-  authentication.
-* ARGUS_DATAPORTEN_SECRET, which holds the password for using dataporten for
-  authentication.
-* ARGUS_COOKIE_DOMAIN, the domain the cookie is set for
-* ARGUS_FRONTEND_URL, for redirecting back to frontend after logging in through
-  Feide, and also CORS. Must either be a subdomain of or the same as
-  ARGUS_COOKIE_DOMAIN
-* ARGUS_SEND_NOTIFICATIONS, True in production and False by default, to allow supressing notifications
-* DEBUG, 1 for True, 0 for False
-* TEMPLATE_DEBUG. By default set to the same as DEBUG.
-* DEFAULT_FROM_EMAIL, the email From-address used for notifications sent via email
-* EMAIL_HOST, smarthost (domain name) to send email through
-* EMAIL_HOST_USER, (optional) if the host in EMAIL_HOST needs authentication
-* EMAIL_HOST_PASSWORD, (optional) password if the smarthost needs that
-* EMAIL_PORT, in production by default set to 587
-* SECRET_KEY, used internally by django, should be about 50 chars of ascii
-  noise (but avoid backspaces!)
-
-There are also settings (not env-variables) for which notification plugins to use:
-
-DEFAULT_SMS_MEDIA, which by default is unset, since there is no standardized
-way of sending SMSes. See **Notifications and notification plugins**.
-
-DEFAULT_EMAIL_MEDIA, which is included and uses Django's email backend. It is
-better to switch out the email backend than replcaing this plugin.
-
-*A Gmail account with "Allow less secure apps" turned on, was used in the development of this project.*
-
-### Production gotchas
-
-The frontend and backend currently needs to be on either the same domain or be
-subdomains of the same domain (ARGUS_COOKIE_DOMAIN).
-
-When running on localhost for dev and test, ARGUS_COOKIE_DOMAIN may be empty.
-
-### Running tests locally
-
-Either:
-
-* `python manage.py test`
-
-Or, if you have installed `tox`:
-
-* tox
-
-The latter will test several django version, several python versions, and
-automatically compute coverage. An [HTML coverage report](htmlcov/index.html)
-is also autogenerated.
-
-See `tox.ini` for what other things tox can do.
-
-### Mock data
-##### Generating
-```sh
-PYTHONPATH=src python src/argus/incident/fixtures/generate_fixtures.py
-```
-This creates the file `src/argus/incident/fixtures/incident/mock_data.json`.
-
-##### Loading
-```sh
-python manage.py loaddata incident/mock_data
+You can also install Argus with `pip` via PyPI. The package name is `argus-server`:
+```console
+$ pip install argus-server
 ```
 
-### Running in development
+If you are using the PyPI package in production, please note: The file
+`requirements.txt` contains the versions of dependencies that the release was
+tested on.
+To update all the dependencies to recent versions, use `pip-compile`:
 
-The fastest is to use virtualenv or virtaulenvwrapper or similar to create
-a safe place to stash all the dependencies.
-
-1. Create the virtualenv
-2. Fill the activated virtualenv with dependencies:
-
+```console
+$ pip install pip-tools
+$ pip-compile -o your-updated-requirements.txt
+$ pip install --upgrade -r your-updated-requirements.txt
 ```
+
+Now change and adapt [Argus' settings](#settings-in-argus) according to your needs.
+
+Run the initial Argus setup, then start the server.
+```console
+$ python manage.py initial_setup
+$ python manage.py runserver
+```
+
+### Setup Argus using Docker Compose
+
+Download the source code first.
+```console
+$ git clone https://github.com/Uninett/Argus.git
+$ cd Argus
+```
+
+Running Argus with docker-compose is as simple as
+```console
+$ docker-compose up
+$ docker-compose exec argus-api django-admin initial_setup
+```
+
+You will find Argus running at http://localhost:8000/.
+
+## Settings in Argus
+
+Site-specific settings can either be set using environment variables, using a
+`settings.py` file, or a combination of both.
+
+For more information on both methods and a list of the settings, consult the
+documentation section on
+[site-specific settings](docs/site-specific-settings.rst).
+
+
+## Running Argus in development
+
+### Step 1: Installation
+
+You can use docker-compose to conveniently setup a complete dev environment for Argus,
+including PostgreSQL. Instructions
+[are provided above](#setup-argus-using-docker-compose).
+
+To do a manual install instead, follow these steps.
+
+Download the source code first.
+```console
+$ git clone https://github.com/Uninett/Argus.git
+$ cd Argus
+```
+
+We recommend using virtualenv or virtaulenvwrapper to create
+a place to stash Argus' dependencies.
+
+Create and activate a Python virtual environment.
+```console
+$ python -m venv venv
+$ source venv/bin/activate
+```
+
+Install Argus' requirements into the virtual env.
+```console
+$ pip install -r requirements.txt
 $ pip install -r requirements/prod.txt
 $ pip install -r requirements/dev.txt
 ```
 
-Copy the `cmd.sh-template` to a new name ending with ".sh", make it executable
-and set the environment variables within. This file must not be checked in to
-version control, since it contains passwords. You *must* set DATABASE_URL,
-DJANGO_SETTINGS_MODULE and SECRET_KEY. If you want to test the frontend you
-must also set all the DATAPORTEN-settings. Get the values from
-https://dashboard.dataporten.no/ or create a new application there.
+### Step 2: Setting environment variables and Django settings
 
-For the database we recommend postgres as we use a postgres-specific feature in
-the Incident-model.
+Copy the `cmd.sh-template` to `cmd.sh` and make it executable
+```console
+$ cp cmd.sh-template cmd.sh
+$ chmod u+x cmd.sh
+```
+Now set the environment variables in the file using an editor.
 
-DJANGO_SETTINGS_MODULE can be set to "argus.site.settings.dev" but we recommend
-having a `localsettings.py` in the same directory as `manage.py` with any
-overrides. This file also does not belong in version control since it reflects
-a specific developer's preferences. Smart things first tested in
-a localsettings can be moved to the other settings-files later on. If you copy
-the entire logging-setup from "argus.site.settings.dev" to "localsettings.py"
-remember to set "disable_existing_loggers" to True or logentries will occur
-twice.
+Required settings in `cmd.sh` are
 
-This repository uses black as a code formatter. Black will automatically install
+- `DATABASE_URL`,
+- `DJANGO_SETTINGS_MODULE` and
+- `SECRET_KEY`.
+
+The `DATAPORTEN` variables are optional. Refer to the dataporten section of
+[setting site-specific settings](docs/site-specific-settings.rst) for details.
+
+`DJANGO_SETTINGS_MODULE` can be set to `argus.site.settings.dev`.
+
+If you need more complex settings than environment variables and ``cmd.sh`` can provide,
+we recommend having a `localsettings.py` in the same directory as `manage.py` with any
+overrides.
+
+Refer to the [development notes](docs/development.rst) for further details and
+useful hints on managing Argus in development mode.
+
+### Step 3: Run Argus in development
+
+Afterwards, run the initial Argus setup and start the server.
+```console
+$ python manage.py initial_setup
+$ python manage.py runserver
+```
+
+You will find Argus running at http://localhost:8000/.
+
+### Code style
+
+Argus uses black as a source code formatter. Black will automatically install
 with the [dev requirements](requirements/dev.txt).
 
-A pre-commit hook formats new code automatically before committing.
-To enable this pre-commit hook, please run
+A pre-commit hook will format new code automatically before committing.
+To enable this pre-commit hook, run
 
-```
-pre-commit install
-```
-
-### Debugging tips
-
-To test/debug notifications as a whole, use the email subsystem (Media: Email in a NotificationProfile).
-Set EMAIL_HOST to "localhost", EMAIL_PORT to "1025", and run a dummy mailserver:
-
-```
-$ python3 -m smtpd -n -c DebuggingServer localhost:1025
+```console
+$ pre-commit install
 ```
 
-Notifications sent will then be dumped to the console where the dummy server runs.
+
+## Running tests
+
+Given that Argus is installed and configured as described above,
+this command is the most basic option to run the tests.
+```console
+$ python manage.py test
+```
+
+If you have installed `tox`, the following command will
+test Argus code against several Django versions, several Python versions, and
+automatically compute code coverage.
+```console
+$ tox
+```
+An [HTML coverage report](htmlcov/index.html) will be generated.
+Refer to the [tox.ini](tox.ini) file for further options.
+
+### Mock data
+
+#### Generating
+
+```sh
+PYTHONPATH=src python src/argus/incident/fixtures/generate_fixtures.py
+```
+
+This creates the file `src/argus/incident/fixtures/incident/mock_data.json`.
+
+#### Loading
+
+```sh
+python manage.py loaddata incident/mock_data
+```
