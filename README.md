@@ -33,7 +33,7 @@ There are several ways to install Argus.
 #### Optional: Dataporten registration
 
 Dataporten is required to use the Argus-frontend.
-Refer to the [Dataporten](doc/dataporten.rst) section of the documentation to learn
+Refer to the [Dataporten](docs/dataporten.rst) section of the documentation to learn
 about Dataporten registration, and how to set it up with Argus.
 
 ### Install Argus using pip
@@ -93,7 +93,7 @@ documentation section on
 ### Step 1: Installation
 
 You can use docker-compose to conveniently setup a complete dev environment for Argus,
-including PostgresQL. Instructions
+including PostgreSQL. Instructions
 [are provided above](#setup-argus-using-docker-compose).
 
 To do a manual install instead, follow these steps.
@@ -145,7 +145,7 @@ If you need more complex settings than environment variables and ``cmd.sh`` can 
 we recommend having a `localsettings.py` in the same directory as `manage.py` with any
 overrides.
 
-Refer to the [development notes](doc/development.rst) for further details and
+Refer to the [development notes](docs/development.rst) for further details and
 useful hints on managing Argus in development mode.
 
 ### Step 3: Run Argus in development
@@ -186,7 +186,7 @@ automatically compute code coverage.
 $ tox
 ```
 An [HTML coverage report](htmlcov/index.html) will be generated.
-Refer to [tox.ini] for further options.
+Refer to the [tox.ini](tox.ini) file for further options.
 
 ### Mock data
 

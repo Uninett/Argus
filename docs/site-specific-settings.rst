@@ -101,7 +101,7 @@ A common value in development would be::
 Notification settings
 ---------------------
 
-* ``ARGUS_SEND_NOTIFICATIONS`` allows sending or supressing notifications.
+* ``ARGUS_SEND_NOTIFICATIONS`` allows sending or suppressing notifications.
   Default values are ``1`` in production and ``0`` otherwise.
 * ``DEFAULT_FROM_EMAIL`` the email address Argus uses as sender of email notifications.
 * ``EMAIL_HOST`` contains the smarthost (domain name) to send email through.
