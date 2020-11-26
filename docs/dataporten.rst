@@ -26,3 +26,4 @@ Now add the following permission scopes:
  * ``profile``
  * ``userid``
  * ``userid-feide``
+ * ``email``

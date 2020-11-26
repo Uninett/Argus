@@ -38,52 +38,6 @@ about Dataporten registration, and how to set it up with Argus.
 
 ### Install Argus using pip
 
-Download the source code first.
-```console
-$ git clone https://github.com/Uninett/Argus.git
-$ cd Argus
-```
-
-We recommend to use virtualenv or virtaulenvwrapper to create
-a place to stash Argus' dependencies.
-
-Create and activate a Python virtual environment.
-```console
-$ python -m venv venv
-$ source venv/bin/activate
-```
-
-Install Argus' requirements into the virtual env.
-```console
-$ pip install -r requirements.txt
-```
-
-Run the initial Argus setup, then start the server.
-```console
-$ python manage.py initial_setup
-$ python manage.py runserver
-```
-
-You will find Argus running at http://localhost:8000/.
-
-### Setup Argus using Docker Compose
-
-Again, download the source code first.
-```console
-$ git clone https://github.com/Uninett/Argus.git
-$ cd Argus
-```
-
-Running Argus with docker-compose is as simple as
-```console
-$ docker-compose up
-$ docker-compose exec argus-api django-admin initial_setup
-```
-
-You will find Argus running at http://localhost:8000/.
-
-### Install Argus via PyPI
-
 You can also install Argus with `pip` via PyPI. The package name is `argus-server`:
 ```console
 $ pip install argus-server
@@ -100,7 +54,31 @@ $ pip-compile -o your-updated-requirements.txt
 $ pip install --upgrade -r your-updated-requirements.txt
 ```
 
-## Site- and deployment-specific settings in Argus
+Now change and adapt [Argus' settings](#settings-in-argus) according to your needs.
+
+Run the initial Argus setup, then start the server.
+```console
+$ python manage.py initial_setup
+$ python manage.py runserver
+```
+
+### Setup Argus using Docker Compose
+
+Download the source code first.
+```console
+$ git clone https://github.com/Uninett/Argus.git
+$ cd Argus
+```
+
+Running Argus with docker-compose is as simple as
+```console
+$ docker-compose up
+$ docker-compose exec argus-api django-admin initial_setup
+```
+
+You will find Argus running at http://localhost:8000/.
+
+## Settings in Argus
 
 Site-specific settings can either be set using environment variables, using a
 `settings.py` file, or a combination of both.
@@ -114,17 +92,33 @@ documentation section on
 
 ### Step 1: Installation
 
-Check out either [the installation instructions for pip](#install-argus-using-pip) or
-[use docker-compose](#setup-argus-using-docker-compose) to get Argus up and
-running.
+You can use docker-compose to conveniently setup a complete dev environment for Argus,
+including PostgresQL. Instructions
+[are provided above](#setup-argus-using-docker-compose).
 
-When using pip, perform this step to install the dependencies into your virtual env:
+To do a manual install instead, follow these steps.
+
+Download the source code first.
 ```console
+$ git clone https://github.com/Uninett/Argus.git
+$ cd Argus
+```
+
+We recommend using virtualenv or virtaulenvwrapper to create
+a place to stash Argus' dependencies.
+
+Create and activate a Python virtual environment.
+```console
+$ python -m venv venv
+$ source venv/bin/activate
+```
+
+Install Argus' requirements into the virtual env.
+```console
+$ pip install -r requirements.txt
 $ pip install -r requirements/prod.txt
 $ pip install -r requirements/dev.txt
 ```
-
-Docker-compose will do this automatically.
 
 ### Step 2: Setting environment variables and Django settings
 
@@ -153,6 +147,16 @@ overrides.
 
 Refer to the [development notes](doc/development.rst) for further details and
 useful hints on managing Argus in development mode.
+
+### Step 3: Run Argus in development
+
+Afterwards, run the initial Argus setup and start the server.
+```console
+$ python manage.py initial_setup
+$ python manage.py runserver
+```
+
+You will find Argus running at http://localhost:8000/.
 
 ### Code style
 

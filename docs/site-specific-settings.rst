@@ -41,7 +41,7 @@ A settings file will override any environment variables.
 for development and production environment. You can use and/or override them by
 importing them to your ``localsettings.py`` as follows::
 
-  from argus.site.settings.dev import *
+  from argus.site.settings.prod import *
 
 Now define variables like::
 
@@ -78,7 +78,7 @@ Domain settings
 ---------------
 
 * ``ARGUS_COOKIE_DOMAIN`` holds the domain of the Argus instance. This is the domain
-  that the cookie is set for.
+  that the cookie is set for. It is needed to log into the frontend.
 * ``ARGUS_FRONTEND_URL`` is used for redirecting back to frontend after logging in
   through Feide and CORS. Must either be a subdomain of or the same as
   ``ARGUS_COOKIE_DOMAIN``.
@@ -86,7 +86,7 @@ Domain settings
 In production, Argus requires the frontend and the backend to either be deployed on the
 same domain, or the frontend to be on a subdomain of the ``ARGUS_COOKIE_DOMAIN``.
 When running Argus on localhost for development and testing, ``ARGUS_COOKIE_DOMAIN`` can
-be empty.
+be empty (and will default to localhost).
 
 Database settings
 -----------------
@@ -112,9 +112,10 @@ Notification settings
 In the settings file, there are also settings for which notification plugins to
 use:
 
-* ``DEFAULT_EMAIL_MEDIA`` is enabled by default and uses Django's email backend. It is
-  better to switch out the email backend than replcaing this plugin.
-* ``DEFAULT_SMS_MEDIA``, is disabled by default, since there is no standardized way of
+* ``DEFAULT_EMAIL_MEDIA`` is enabled by default and uses Django's email backend. There
+  are multiple email backends available that Argus' plugin supports. It is recommended
+  to simply switch out the email backend instead of replacing this plugin.
+* ``DEFAULT_SMS_MEDIA`` is disabled by default, since there is no standardized way of
   sending SMS messages.
 
 Debugging settings
@@ -127,4 +128,4 @@ Debugging settings
 .. warning:: Environment variables and Argus settings may contain sensitive data, such
   as login credentials, secrets and passwords.
   Be mindful when setting these variables, and use appropriate safety precautions.
-  For example, do not check your ``settings.py`` files into version control.
+  For example, do not check your ``localsettings.py`` files into version control.
