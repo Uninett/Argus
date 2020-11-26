@@ -32,7 +32,8 @@ There are several ways to install Argus.
 
 #### Optional: Dataporten registration
 
-Dataporten is required to use the Argus-frontend.
+Dataporten authentication is supported by Argus and can be used to log into
+Argus-frontend.
 Refer to the [Dataporten](docs/dataporten.rst) section of the documentation to learn
 about Dataporten registration, and how to set it up with Argus.
 
@@ -135,8 +136,7 @@ Required settings in `cmd.sh` are
 - `DJANGO_SETTINGS_MODULE` and
 - `SECRET_KEY`.
 
-The `DATAPORTEN` variables are only required to test the frontend.
-Refer to the dataporten section of
+The `DATAPORTEN` variables are optional. Refer to the dataporten section of
 [setting site-specific settings](docs/site-specific-settings.rst) for details.
 
 `DJANGO_SETTINGS_MODULE` can be set to `argus.site.settings.dev`.
