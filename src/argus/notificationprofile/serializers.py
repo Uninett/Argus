@@ -1,7 +1,9 @@
 from django.db import IntegrityError
 from rest_framework import fields, serializers
 
-from .fields import FilterManyToManyField, PhoneNumberForeignKeyField, TimeslotForeignKeyField
+from argus.auth.serializers import PhoneNumberSerializer
+from argus.incident.models import SourceSystem, Tag
+
 from .models import Filter, NotificationProfile, TimeRecurrence, Timeslot
 from .validators import validate_filter_string
 
@@ -100,10 +102,32 @@ class FilterSerializer(serializers.ModelSerializer):
         ]
 
 
-class NotificationProfileSerializer(serializers.ModelSerializer):
-    timeslot = TimeslotForeignKeyField()
-    filters = FilterManyToManyField(many=True)
-    phone_number = PhoneNumberForeignKeyField(allow_null=True, required=False)
+class FilterPreviewSerializer(serializers.Serializer):
+    sourceSystemIds = serializers.ListField(serializers.IntegerField(min_value=1), allow_empty=True)
+    tags = serializers.ListField(serializers.CharField(), allow_empty=True)
+
+
+class ResponseNotificationProfileSerializer(serializers.ModelSerializer):
+    timeslot = TimeslotSerializer()
+    filters = FilterSerializer(many=True)
+    phone_number = PhoneNumberSerializer(allow_null=True, required=False)
+    media = fields.MultipleChoiceField(choices=NotificationProfile.Media.choices)
+
+    class Meta:
+        model = NotificationProfile
+        fields = [
+            "pk",
+            "timeslot",
+            "filters",
+            "media",
+            "phone_number",
+            "active",
+        ]
+        # "pk" needs to be listed, as "timeslot" is the actual primary key
+        read_only_fields = ["pk"]
+
+
+class RequestNotificationProfileSerializer(serializers.ModelSerializer):
     media = fields.MultipleChoiceField(choices=NotificationProfile.Media.choices)
 
     class Meta:

@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "social_django",
     "rest_framework",
     "rest_framework.authtoken",
+    "drf_spectacular",
     "django_filters",
     "phonenumber_field",
 
@@ -190,6 +191,7 @@ REST_FRAMEWORK = {
         "rest_framework.parsers.FormParser",
         "rest_framework.parsers.MultiPartParser",
     ),
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "TEST_REQUEST_DEFAULT_FORMAT": "json",
     "PAGE_SIZE": 100,
 }

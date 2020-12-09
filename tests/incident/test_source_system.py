@@ -27,7 +27,7 @@ class SourceSystemPostingTests(APITestCase):
         self.base_admin_url = f"admin:{SourceSystem._meta.app_label}_{SourceSystem._meta.model_name}"
         self.add_url = reverse(f"{self.base_admin_url}_add")
         self.change_url = lambda source_system: reverse(f"{self.base_admin_url}_change", args=[source_system.pk])
-        self.sources_url = reverse("incident:sources")
+        self.sources_url = reverse("incident:sourcesystem-list")
 
     def _post_source1_dict(self, url: str, client: Client):
         self.source1_dict = {
