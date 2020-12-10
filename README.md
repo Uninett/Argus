@@ -57,9 +57,18 @@ $ pip install --upgrade -r your-updated-requirements.txt
 
 Now change and adapt [Argus' settings](#settings-in-argus) according to your needs.
 
-Run the initial Argus setup, then start the server.
+Run the initial Argus setup, and make note of the admin password that is generated:
+
 ```console
 $ python manage.py initial_setup
+Successfully created superuser "admin" with the generated password "2S0qJbjVEew0GunL".
+Please change the password via the admin.
+Ensured the existence of the source, source type and user "argus"```
+```
+
+Then run the Argus API server:
+
+```console
 $ python manage.py runserver
 ```
 
@@ -74,8 +83,17 @@ $ cd Argus
 Running Argus with docker-compose is as simple as
 ```console
 $ docker-compose up
-$ docker-compose exec argus-api django-admin initial_setup
 ```
+
+Run the initial Argus setup, and make note of the admin password that is generated:
+
+```console
+$ docker-compose exec argus-api django-admin initial_setup
+Successfully created superuser "admin" with the generated password "2S0qJbjVEew0GunL".
+Please change the password via the admin.
+Ensured the existence of the source, source type and user "argus"
+```
+
 
 You will find Argus running at http://localhost:8000/.
 
