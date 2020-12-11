@@ -208,16 +208,25 @@ Refer to the [tox.ini](tox.ini) file for further options.
 
 ### Mock data
 
-#### Generating
+Fill the database with mock data with the management command `create_fake_incidents`:
 
 ```sh
-PYTHONPATH=src python src/argus/incident/fixtures/generate_fixtures.py
+$ python manage.py create_fake_incidents
 ```
 
-This creates the file `src/argus/incident/fixtures/incident/mock_data.json`.
-
-#### Loading
+See the inbuilt help for flags and toggles:
 
 ```sh
-python manage.py loaddata incident/mock_data
+$ python manage.py create_fake_incidents --help
 ```
+
+Since the current default number of shown incidents in the frintend is 10, you
+might want to create just more than 10 incidents in one go, with the `-n`-flag:
+
+```sh
+$ python manage.py create_fake_incidents -n 15
+```
+
+(The same command is well-suited to manually test the notification system: Make
+a filter that matches fake incidents, for instance by setting `source` to
+`argus`, and create a single fake incident by omitting the `-n`-flag.)
