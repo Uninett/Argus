@@ -3,6 +3,8 @@ from urllib.parse import urlsplit
 from django.contrib import admin
 from django.contrib.admin import widgets as admin_widgets
 from django.db.models.functions import Concat
+from django.http import HttpResponseRedirect
+from django.urls import path
 from django.utils.html import format_html_join, format_html
 from django.utils.safestring import mark_safe
 
@@ -21,6 +23,7 @@ from .models import (
     SourceSystem,
     SourceSystemType,
     Tag,
+    create_fake_incident,
 )
 
 
@@ -91,6 +94,8 @@ class IncidentAdmin(TextWidgetsOverrideModelAdmin):
         readonly_fields = ("added_time",)
         raw_id_fields = ("tag", "added_by")
         extra = 0
+
+    change_list_template = "incident/incident_change_list.html"
 
     inlines = [IncidentTagRelationInline]
 
@@ -170,6 +175,17 @@ class IncidentAdmin(TextWidgetsOverrideModelAdmin):
 
     get_shown.short_description = "Shown"
     get_shown.boolean = True
+
+    def send_fake(self, request):
+        create_fake_incident()
+        return HttpResponseRedirect("../")
+
+    def get_urls(self):
+        orig_urls = super().get_urls()
+        urls = [
+            path("fake/", self.send_fake),
+        ]
+        return urls + orig_urls
 
     def get_form(self, request, obj: Incident = None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
