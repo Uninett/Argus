@@ -8,7 +8,7 @@ services:
       - postgres
     environment:
       - TIME_ZONE=Europe/Oslo
-      - DJANGO_SETTINGS_MODULE=argus.site.settings.dev
+      - DJANGO_SETTINGS_MODULE=argus.site.settings.docker
       - DATABASE_URL=postgresql://argus:HahF9araeKoo@postgres/argus
     volumes:
       - ${PWD}:/argus
