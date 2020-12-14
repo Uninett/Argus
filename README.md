@@ -61,9 +61,13 @@ Run the initial Argus setup, and make note of the admin password that is generat
 
 ```console
 $ python manage.py initial_setup
-Successfully created superuser "admin" with the generated password "2S0qJbjVEew0GunL".
-Please change the password via the admin.
-Ensured the existence of the source, source type and user "argus"```
+******************************************************************************
+
+  Created Argus superuser "admin" with password "2S0qJbjVEew0GunL".
+
+   Please change the password via the admin interface.
+
+******************************************************************************
 ```
 
 Then run the Argus API server:
@@ -89,11 +93,14 @@ Run the initial Argus setup, and make note of the admin password that is generat
 
 ```console
 $ docker-compose exec argus-api django-admin initial_setup
-Successfully created superuser "admin" with the generated password "2S0qJbjVEew0GunL".
-Please change the password via the admin.
-Ensured the existence of the source, source type and user "argus"
-```
+******************************************************************************
 
+  Created Argus superuser "admin" with password "ns6bfoKquW12koIP".
+
+   Please change the password via the admin interface.
+
+******************************************************************************
+```
 
 You will find Argus running at http://localhost:8000/.
 

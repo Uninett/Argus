@@ -37,17 +37,18 @@ class Command(BaseCommand):
                 username=username, email=email, first_name=first_name, last_name="", password=password
             )
             if options_password:
-                msg = f'Successfully created superuser "{admin.username}" with the chosen password'
+                msg = f'Successfully created Argus superuser "{admin.username}" with the chosen password'
             else:
                 msg = (
-                    f'Successfully created superuser "{admin.username}" with the generated password "{password}".\n'
-                    "Please change the password via the admin."
+                    "******************************************************************************\n\n"
+                    f'  Created Argus superuser "{admin.username}" with password "{password}".\n\n'
+                    "   Please change the password via the admin interface.\n\n"
+                    "******************************************************************************"
                 )
             self.stdout.write(self.style.SUCCESS(msg))
         else:
-            msg = f"The admin user {username} already exists, you might want to change the password"
+            msg = f"Argus superuser {username} already exists!"
             self.stderr.write(self.style.WARNING(msg))
-
 
         # Create source for argus, also creates a user
         get_or_create_default_instances()
