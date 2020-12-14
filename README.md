@@ -92,7 +92,7 @@ $ docker-compose up
 Run the initial Argus setup, and make note of the admin password that is generated:
 
 ```console
-$ docker-compose exec argus-api django-admin initial_setup
+$ docker-compose exec api django-admin initial_setup
 ******************************************************************************
 
   Created Argus superuser "admin" with password "ns6bfoKquW12koIP".
