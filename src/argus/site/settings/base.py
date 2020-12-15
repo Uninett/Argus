@@ -9,6 +9,8 @@ https://docs.djangoproject.com/en/2.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.2/ref/settings/
 """
+from urllib.parse import urlsplit
+
 import dj_database_url
 
 # Import some helpers
@@ -201,11 +203,12 @@ AUTH_TOKEN_EXPIRES_AFTER_DAYS = 14
 ASGI_APPLICATION = "argus.ws.routing.application"
 
 # fmt: off
+_REDIS = urlsplit("//" + get_str_env("ARGUS_REDIS_SERVER", "127.0.0.1:6379"))
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("127.0.0.1", 6379)],
+            "hosts": [(_REDIS.hostname, _REDIS.port or 6379)],
         },
     },
 }

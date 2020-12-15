@@ -118,6 +118,20 @@ use:
 * ``DEFAULT_SMS_MEDIA`` is disabled by default, since there is no standardized way of
   sending SMS messages.
 
+Realtime updates
+----------------
+
+The Argus API can notify the frontend about changes in the list of open
+incidents in realtime, using a websocket (implemented using Django
+Channels). The realtime interface requires access to a Redis server for message
+passing.
+
+By default, Argus will look for a Redis server on ``localhost:6379``. To use a
+different server, set the ``ARGUS_REDIS_SERVER`` environment variable, e.g::
+
+  ARGUS_REDIS_SERVER=my-redis-server.example.org:6379
+
+
 Debugging settings
 ------------------
 
