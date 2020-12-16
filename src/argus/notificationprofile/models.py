@@ -105,6 +105,14 @@ class Filter(models.Model):
         return json.loads(self.filter_string)
 
     @property
+    def is_empty(self):
+        data = self.filter_json
+        for value in data.values():
+            if value:
+                return False
+        return True
+
+    @property
     def all_incidents(self):
         # Prevent cyclical import
         from argus.incident.models import Incident
@@ -113,6 +121,8 @@ class Filter(models.Model):
 
     @property
     def filtered_incidents(self):
+        if self.is_empty:
+            return self.all_incidents.none().distinct()
         data = self.filter_json
         filtered_by_source = self.incidents_with_source_systems(data)
         filtered_by_tags = self.incidents_with_tags(data)
@@ -130,9 +140,10 @@ class Filter(models.Model):
         if not data:
             data = self.filter_json
         source_list = data.pop("sourceSystemIds", [])
-        if source_list:
-            return incident.source.id in source_list
-        return False
+        if not source_list:
+            # We're not limiting on sources!
+            return None
+        return incident.source.id in source_list
 
     def incidents_with_tags(self, data=None):
         if not data:
@@ -145,13 +156,22 @@ class Filter(models.Model):
     def tags_fit(self, incident: Incident, data=None):
         if not data:
             data = self.filter_json
-        return self.incidents_with_tags(data).filter(id=incident.id).exists()
+        tags_list = data.pop("tags", [])
+        if not tags_list:
+            # We're not limiting on tags!
+            return None
+        tags = set(tag.representation for tag in incident.tags)
+        return tags.issuperset(tags_list)
 
     def incident_fits(self, incident: Incident):
+        if self.is_empty:
+            return False  # Filter is empty!
         data = self.filter_json
         source_fits = self.source_system_fits(incident, data)
         tags_fit = self.tags_fit(incident, data)
-        return source_fits and tags_fit
+        # If False then one filter failed
+        checks = set((source_fits, tags_fit))
+        return not (False in checks)  # At least one filter failed
 
 
 class NotificationProfile(models.Model):
