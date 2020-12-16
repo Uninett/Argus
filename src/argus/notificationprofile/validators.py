@@ -30,4 +30,5 @@ def validate_filter_string(value: Union[str, dict]):
     if unknown:
         pp_unknown = ", ".join(unknown)
         errors.append(serializers.ValidationError(f"Unknown fieldname(s) in filterstring: {pp_unknown}", "unknown"))
-    raise serializers.ValidationError(errors)
+    if errors:
+        raise serializers.ValidationError(errors)

@@ -1,4 +1,5 @@
 from django.contrib.auth import logout
+from drf_spectacular.utils import extend_schema
 from rest_framework import generics
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
@@ -28,7 +29,9 @@ class ObtainNewAuthToken(ObtainAuthToken):
 class LogoutView(APIView):
     permission_classes = []
 
+    @extend_schema(request=None, responses={"200": None})
     def post(self, request, *args, **kwargs):
+        "Log out the logged in user"
         user = request.user
         if hasattr(user, "auth_token"):
             user_token = request.user.auth_token
@@ -41,9 +44,10 @@ class LogoutView(APIView):
 
 class CurrentUserView(APIView):
     permission_classes = [IsAuthenticated]
+    serializer_class = UserSerializer
 
     def get(self, request, *args, **kwargs):
-        serializer = UserSerializer(request.user)
+        serializer = self.serializer_class(request.user)
         return Response(serializer.data)
 
 

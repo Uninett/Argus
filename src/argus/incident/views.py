@@ -4,16 +4,19 @@ from django.db import IntegrityError
 from django.urls import reverse
 
 from django_filters import rest_framework as filters
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter
 from rest_framework import generics, mixins, serializers, status, viewsets
-from rest_framework.decorators import api_view, action
+from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 from rest_framework.pagination import CursorPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from argus.auth.models import User
-from argus.drf.permissions import IsOwnerOrReadOnly, IsSuperuserOrReadOnly
+from argus.drf.permissions import IsSuperuserOrReadOnly
 from argus.util.datetime_utils import INFINITY_REPR
+
 from .forms import AddSourceSystemForm
 from .filters import IncidentFilter, SourceLockedIncidentFilter
 from .models import (
@@ -30,7 +33,12 @@ from .serializers import (
     IncidentTicketUrlSerializer,
     SourceSystemSerializer,
     SourceSystemTypeSerializer,
+    MetadataSerializer,
 )
+
+
+# Used in OpenApiParameter
+BooleanStringOAEnum = ("true", "false")
 
 
 class IncidentPagination(CursorPagination):
@@ -38,13 +46,21 @@ class IncidentPagination(CursorPagination):
     page_size_query_param = "page_size"
 
 
-class SourceSystemTypeList(generics.ListCreateAPIView):
+class SourceSystemTypeViewSet(
+    mixins.CreateModelMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet
+):
     permission_classes = [IsAuthenticated]
     serializer_class = SourceSystemTypeSerializer
     queryset = SourceSystemType.objects.all()
 
 
-class SourceSystemList(generics.ListCreateAPIView):
+class SourceSystemViewSet(
+    mixins.CreateModelMixin,
+    mixins.UpdateModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.ListModelMixin,
+    viewsets.GenericViewSet,
+):
     permission_classes = [IsSuperuserOrReadOnly]
     queryset = SourceSystem.objects.all()
     serializer_class = SourceSystemSerializer
@@ -74,12 +90,69 @@ class SourceSystemList(generics.ListCreateAPIView):
             raise serializers.ValidationError(form.errors)
 
 
-class SourceSystemDetail(generics.RetrieveUpdateAPIView):
-    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
-    queryset = SourceSystem.objects.all()
-    serializer_class = SourceSystemSerializer
-
-
+@extend_schema_view(
+    list=extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="acked",
+                description="Fetch acked (`true`) or unacked (`false`) incidents.",
+                enum=BooleanStringOAEnum,
+            ),
+            OpenApiParameter(name="cursor", description="The pagination cursor value.", type=str),
+            OpenApiParameter(
+                name="end_time__gte",
+                description="Fetch incidents that ended on or after `END_TIME`",
+                type=OpenApiTypes.DATETIME,
+            ),
+            OpenApiParameter(
+                name="end_time__isnull",
+                description='Fetch incidents that have `end_time` set to None (`true`), a datetime or "infinity" (`false`).',
+                enum=BooleanStringOAEnum,
+            ),
+            OpenApiParameter(
+                name="end_time__lte",
+                description="Fetch incidents that ended on or before `END_TIME`",
+                type=OpenApiTypes.DATETIME,
+            ),
+            OpenApiParameter(
+                name="open",
+                description="Fetch open (`true`) or closed (`false`) incidents.",
+                enum=BooleanStringOAEnum,
+            ),
+            OpenApiParameter(
+                name="source__id__in",
+                description="Fetch incidents with a source with numeric id `ID1` or `ID2` or..",
+            ),
+            OpenApiParameter(
+                name="source_incident_id",
+                description="Fetch incidents with the specific source incident id.",
+            ),
+            OpenApiParameter(
+                name="source__name__in",
+                description="Fetch incidents with a source with name ``NAME1`` or ``NAME2`` or..",
+            ),
+            OpenApiParameter(
+                name="source__type__in",
+                description="Fetch incidents with a source of a type with numeric id `ID1` or `ID2` or..",
+            ),
+            OpenApiParameter(
+                name="start_time__gte",
+                description="Fetch incidents that started on or after `START_TIME`",
+                type=OpenApiTypes.DATETIME,
+            ),
+            OpenApiParameter(
+                name="start_time__lte",
+                description="Fetch incidents that started on or before `START_TIME`",
+                type=OpenApiTypes.DATETIME,
+            ),
+            OpenApiParameter(
+                name="stateful",
+                description="Fetch stateful (`true`) or stateless (`false`) incidents.",
+                enum=BooleanStringOAEnum,
+            ),
+        ]
+    )
+)
 class IncidentViewSet(
     mixins.ListModelMixin,
     mixins.CreateModelMixin,
@@ -87,6 +160,11 @@ class IncidentViewSet(
     mixins.UpdateModelMixin,
     viewsets.GenericViewSet,
 ):
+    """All incidents
+
+    Paged using a cursor
+    """
+
     pagination_class = IncidentPagination
     permission_classes = [IsAuthenticated]
     queryset = Incident.objects.prefetch_default_related().prefetch_related("source")
@@ -128,6 +206,7 @@ class IncidentViewSet(
     def perform_update(self, serializer):
         serializer.save(user=self.request.user)
 
+    @extend_schema(request=IncidentTicketUrlSerializer, responses=IncidentTicketUrlSerializer)
     @action(detail=True, methods=["put"])
     def ticket_url(self, request, pk=None):
         incident = self.get_object()
@@ -140,8 +219,21 @@ class IncidentViewSet(
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    @extend_schema(responses=MetadataSerializer)
+    @action(detail=False, methods=["get"])
+    def metadata(self, request, **_):
+        source_systems = SourceSystemSerializer(SourceSystem.objects.select_related("type"), many=True)
+        data = {
+            "sourceSystems": source_systems.data,
+        }
+        return Response(data)
+
 
 class SourceLockedIncidentViewSet(IncidentViewSet):
+    """All incidents added by the currently logged in user
+
+    Paged using a cursor"""
+
     filter_backends = [filters.DjangoFilterBackend]
     filterset_class = SourceLockedIncidentFilter
 
@@ -150,6 +242,12 @@ class SourceLockedIncidentViewSet(IncidentViewSet):
 
 
 class OpenUnAckedIncidentList(generics.ListAPIView):
+    """All incidents that are open and unacked
+
+    open: stateful, end_time is "infinity"
+    unacked: no acknowledgements are currently in play
+    """
+
     serializer_class = IncidentSerializer
 
     def get_queryset(self):
@@ -157,6 +255,11 @@ class OpenUnAckedIncidentList(generics.ListAPIView):
 
 
 class OpenIncidentList(generics.ListAPIView):
+    """All incidents that are open
+
+    open: stateful, end_time is "infinity"
+    """
+
     serializer_class = IncidentSerializer
 
     def get_queryset(self):
@@ -164,6 +267,7 @@ class OpenIncidentList(generics.ListAPIView):
 
 
 class EventViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
+    queryset = Incident.objects.none()  # For OpenAPI
     permission_classes = [IsAuthenticated]
     serializer_class = EventSerializer
 
@@ -242,6 +346,7 @@ class EventViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, mixins.Retrie
 class AcknowledgementViewSet(
     mixins.ListModelMixin, mixins.CreateModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet
 ):
+    queryset = Incident.objects.none()  # For OpenAPI
     permission_classes = [IsAuthenticated]
     serializer_class = AcknowledgementSerializer
 
@@ -257,12 +362,3 @@ class AcknowledgementViewSet(
 
         incident = Incident.objects.get(pk=self.kwargs["incident_pk"])
         serializer.save(incident=incident, actor=user)
-
-
-@api_view(["GET"])
-def get_all_meta_data_view(request):
-    source_systems = SourceSystemSerializer(SourceSystem.objects.select_related("type"), many=True)
-    data = {
-        "sourceSystems": source_systems.data,
-    }
-    return Response(data)

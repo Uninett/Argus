@@ -3,6 +3,7 @@ from typing import List
 
 from django.core.validators import URLValidator
 from django.utils import timezone
+
 from rest_framework import serializers
 
 from argus.auth.models import User
@@ -32,6 +33,11 @@ class SourceSystemSerializer(serializers.ModelSerializer):
         model = SourceSystem
         fields = ["pk", "name", "type", "user", "base_url"]
         read_only_fields = ["type", "user", "base_url"]
+
+
+# Get rid of this!
+class MetadataSerializer(serializers.Serializer):
+    sourceSystems = SourceSystemSerializer(many=True)
 
 
 class IncidentTagRelationSerializer(serializers.ModelSerializer):
