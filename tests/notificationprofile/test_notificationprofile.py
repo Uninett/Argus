@@ -113,6 +113,11 @@ class ModelTests(TestCase, IncidentAPITestCaseHelper):
         self.assertTrue(self.timeslot1.timestamp_is_within_time_recurrences(set_time(self.monday_datetime, "00:30:03")))
 
     def test_source_fits(self):
+        filter0 = Filter.objects.create(
+            user=self.user1,
+            name="Filter no source",
+            filter_string='{"sourceSystemIds": []}',
+        )
         filter1 = Filter.objects.create(
             user=self.user1,
             name="Filter1",
@@ -124,38 +129,71 @@ class ModelTests(TestCase, IncidentAPITestCaseHelper):
             filter_string=f'{{"sourceSystemIds": [{self.source2.pk}]}}',
         )
 
+        self.assertEqual(filter0.tags_fit(self.incident1), None)
         self.assertTrue(filter1.source_system_fits(self.incident1))
         self.assertFalse(filter2.source_system_fits(self.incident1))
 
     def test_tags_fit(self):
-        filter1 = Filter.objects.create(user=self.user1, name="Filter1", filter_string='{"tags": []}')
-        filter2 = Filter.objects.create(user=self.user1, name="Filter2", filter_string=f'{{"tags": ["{self.tag1}"]}}')
-        filter3 = Filter.objects.create(user=self.user1, name="Filter3", filter_string=f'{{"tags": ["{self.tag2}"]}}')
+        filter0 = Filter.objects.create(user=self.user1, name="Filter no tags", filter_string='{"tags": []}')
+        filter1 = Filter.objects.create(user=self.user1, name="Filter1", filter_string=f'{{"tags": ["{self.tag1}"]}}')
+        filter2 = Filter.objects.create(user=self.user1, name="Filter2", filter_string=f'{{"tags": ["{self.tag2}"]}}')
 
+        self.assertEqual(filter0.tags_fit(self.incident1), None)
         self.assertTrue(filter1.tags_fit(self.incident1))
-        self.assertTrue(filter2.tags_fit(self.incident1))
-        self.assertFalse(filter3.tags_fit(self.incident1))
+        self.assertFalse(filter2.tags_fit(self.incident1))
 
-    def test_filter(self):
+    def test_incident_fits(self):
+        filter0 = Filter.objects.create(
+            user=self.user1,
+            name="Filter empty",
+            filter_string='{"sourceSystemIds": [], "tags": []}',
+        )
+        self.assertFalse(filter0.incident_fits(self.incident1))
         filter1 = Filter.objects.create(
             user=self.user1,
             name="Filter1",
             filter_string=f'{{"sourceSystemIds": [{self.source1.pk}]}}',
         )
+        self.assertTrue(filter1.incident_fits(self.incident1))
+        self.assertFalse(filter1.incident_fits(self.incident2))
+        filter3 = Filter.objects.create(user=self.user1, name="Filter3", filter_string=f'{{"tags": ["{self.tag1}"]}}')
+        self.assertTrue(filter3.incident_fits(self.incident1))
+        self.assertFalse(filter3.incident_fits(self.incident2))
+        filter4 = Filter.objects.create(
+            user=self.user1,
+            name="Filter4",
+            filter_string=f'{{"sourceSystemIds": [{self.source1.pk}], "tags": ["{self.tag1}"]}}',
+        )
+        self.assertTrue(filter4.incident_fits(self.incident1))
+        self.assertFalse(filter4.incident_fits(self.incident2))
+
+    def test_filtered_incidents(self):
+        filter0 = Filter.objects.create(
+            user=self.user1,
+            name="Filter empty",
+            filter_string='{"sourceSystemIds": [], "tags": []}',
+        )
+        self.assertEqual(set(filter0.filtered_incidents), set())
+        filter1 = Filter.objects.create(
+            user=self.user1,
+            name="Filter1",
+            filter_string=f'{{"sourceSystemIds": [{self.source1.pk}]}}',
+        )
+        self.assertEqual(set(filter1.filtered_incidents), {self.incident1})
         filter2 = Filter.objects.create(
             user=self.user1,
             name="Filter2",
             filter_string=f'{{"sourceSystemIds": [{self.source2.pk}]}}',
         )
-
-        self.assertTrue(filter1.incident_fits(self.incident1))
-        self.assertFalse(filter1.incident_fits(self.incident2))
-
-        self.assertFalse(filter2.incident_fits(self.incident1))
-        self.assertTrue(filter2.incident_fits(self.incident2))
-
-        self.assertEqual(set(filter1.filtered_incidents), {self.incident1})
         self.assertEqual(set(filter2.filtered_incidents), {self.incident2})
+        filter3 = Filter.objects.create(user=self.user1, name="Filter3", filter_string=f'{{"tags": ["{self.tag1}"]}}')
+        self.assertEqual(set(filter1.filtered_incidents), {self.incident1})
+        filter4 = Filter.objects.create(
+            user=self.user1,
+            name="Filter4",
+            filter_string=f'{{"sourceSystemIds": [{self.source1.pk}], "tags": ["{self.tag1}"]}}',
+        )
+        self.assertEqual(set(filter1.filtered_incidents), {self.incident1})
 
 
 class ViewTests(APITestCase, IncidentAPITestCaseHelper):
