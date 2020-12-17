@@ -2,6 +2,7 @@
 [![build badge](https://github.com/Uninett/Argus/workflows/build/badge.svg)](https://github.com/Uninett/Argus/actions)
 [![codecov badge](https://codecov.io/gh/Uninett/Argus/branch/master/graph/badge.svg)](https://codecov.io/gh/Uninett/Argus)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![docs badge](https://readthedocs.org/projects/pip/badge/?version=latest&style=flat)](http://argus-server.rtfd.io/en/latest/)
 
 Argus is a platform for aggregating incidents across network management systems, and
 sending notifications to users. Users create notification profiles that define which
@@ -34,7 +35,7 @@ There are several ways to install Argus.
 
 Dataporten authentication is supported by Argus and can be used to log into
 Argus-frontend.
-Refer to the [Dataporten](docs/dataporten.rst) section of the documentation to learn
+Refer to the [Dataporten](http://argus-server.rtfd.io/en/latest/dataporten.html) section of the documentation to learn
 about Dataporten registration, and how to set it up with Argus.
 
 ### Install Argus using pip
@@ -112,7 +113,7 @@ Site-specific settings can either be set using environment variables, using a
 
 For more information on both methods and a list of the settings, consult the
 documentation section on
-[site-specific settings](docs/site-specific-settings.rst).
+[site-specific settings](http://argus-server.rtfd.io/en/latest/site-specific-settings.html).
 
 
 ## Running Argus in development
@@ -163,7 +164,7 @@ Required settings in `cmd.sh` are
 - `SECRET_KEY`.
 
 The `DATAPORTEN` variables are optional. Refer to the dataporten section of
-[setting site-specific settings](docs/site-specific-settings.rst) for details.
+[setting site-specific settings](http://argus-server.rtfd.io/en/latest/site-specific-settings.html) for details.
 
 `DJANGO_SETTINGS_MODULE` can be set to `argus.site.settings.dev`.
 
@@ -171,7 +172,7 @@ If you need more complex settings than environment variables and ``cmd.sh`` can 
 we recommend having a `localsettings.py` in the same directory as `manage.py` with any
 overrides.
 
-Refer to the [development notes](docs/development.rst) for further details and
+Refer to the [development notes](http://argus-server.rtfd.io/en/latest/development.html) for further details and
 useful hints on managing Argus in development mode.
 
 ### Step 3: Run Argus in development
