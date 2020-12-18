@@ -101,9 +101,11 @@ Auth endpoints
      will check that the phone number is in a valid number series. Using a
      random number will not work.
 
+.. _api-incident-endpoints:
 
 Incident endpoints
 ------------------
+
 
 -  ``/api/v1/incidents/``:
 

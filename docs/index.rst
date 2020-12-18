@@ -18,6 +18,8 @@ Welcome to Argus' documentation!
    notifications
    development
    writing-plugins
+   integrating-monitoring-systems
+   writing-glueservices
    :maxdepth: 2
    :caption: Contents:
 
