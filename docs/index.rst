@@ -11,6 +11,7 @@ Welcome to Argus' documentation!
    Argus is.. (developer friendly introduction, one paragraph max)
 
 .. toctree::
+   what-is-argus
    models
    api
    site-specific-settings
