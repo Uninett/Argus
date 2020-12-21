@@ -115,8 +115,27 @@ use:
 * ``DEFAULT_EMAIL_MEDIA`` is enabled by default and uses Django's email backend. There
   are multiple email backends available that Argus' plugin supports. It is recommended
   to simply switch out the email backend instead of replacing this plugin.
-* ``DEFAULT_SMS_MEDIA`` is disabled by default, since there is no standardized way of
-  sending SMS messages.
+* ``DEFAULT_SMS_MEDIA`` is disabled by default, since there is no standardized
+  way of sending SMS messages. The only supported media at the moment is
+  Uninett's internal email-to-SMS gateway.
+
+Enabling the email-to-SMS gateway
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Argus supports sending SMS text messages via an email-to-SMS gateway, provided
+that this gateway conforms to the following interface:
+
+The gateway receives email sent to a specific address. The email must contain
+the recipient's phone number in the subject line. The body of the email will be
+sent as a text message to this number.
+
+Argus comes with an SMS notification class that supports this kind of
+interface.  To enable it:
+
+* Set ``DEFAULT_SMS_MEDIA="argus.notificationprofile.media.sms_as_email.SMSNotification"``.
+* Set ``SMS_GATEWAY_ADDRESS`` to the email address of the gateway.
+
+
 
 Debugging settings
 ------------------
