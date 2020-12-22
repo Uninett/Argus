@@ -6,11 +6,10 @@
 Welcome to Argus' documentation!
 ================================
 
-.. todo::
-
-   Argus is.. (developer friendly introduction, one paragraph max)
+   Argus is an alert aggregator for monitoring systems.
 
 .. toctree::
+   about-argus
    models
    api
    site-specific-settings
