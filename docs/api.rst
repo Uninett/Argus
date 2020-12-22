@@ -23,7 +23,7 @@ Auth endpoints
 -  ``GET`` to ``/api/v1/auth/users/<int:pk>/``: returns a user by primary key
    (``pk``)
 
--  ``POST`` to ``/oidc/api-token-auth/``: returns an auth token for the
+-  ``POST`` to ``/api/v1/token-auth/``: returns an auth token for the
    posted user
 
    -  Note that this token will expire after 14 days, and can be
