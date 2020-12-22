@@ -28,7 +28,7 @@ all currently active incidents across all services to our first line of
 support, the Uninett Service Center. It serves as a single place to manage
 notification profiles for both the first and second line support teams.
 
-Argus adheres to the principle of *single responsibility*, i.e. it does not
+Argus follows the principle of *single responsibility*, i.e. it does not
 perform any monitoring itself. It acts as an aggregator of current and past
 incidents in IT infrastructure. It dispatches notifications when incidents
 are opened and closed. Argus does not actively retrieve incidents from third
