@@ -6,6 +6,8 @@ Models
 Explanation of terms
 ~~~~~~~~~~~~~~~~~~~~
 
+Terms used in Argus are loosely based on the `ITIL standard`_ for IT service management.
+
 -  ``incident``: an unplanned interruption in the source system.
 -  ``event``: something that happened related to an incident.
 -  ``acknowledgement``: an acknowledgement of an incident by a user,
@@ -53,3 +55,5 @@ ER diagram
    :alt: ER diagram
 
    ER diagram
+
+.. _`ITIL standard`: https://en.wikipedia.org/wiki/ITIL
