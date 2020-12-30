@@ -8,8 +8,6 @@
 # Run the script without arguments to get a list of all available commands.
 
 export DEBUG=1
-export ARGUS_DATAPORTEN_SECRET=UUID
-export ARGUS_DATAPORTEN_KEY=
 export EMAIL_HOST=localhost
 export EMAIL_PORT=25
 export SECRET_KEY=  # 50 random charcaters, I use pwgen -s 50
