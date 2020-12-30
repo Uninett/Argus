@@ -17,4 +17,4 @@ export DJANGO_SETTINGS_MODULE=
 # I use: postgresql://argus:<LOCAL DB PASSWORD>@localhost:5432/argus
 export DATABASE_URL=
 
-python3.8 manage.py "$@"
+python manage.py "$@"
