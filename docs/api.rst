@@ -137,7 +137,7 @@ Incident endpoints
       ``source_incident_id=ID``
         Fetch only incidents with ``source_incident_id`` set to ``ID``.
 
-      ``ticket``
+      ``ticket=true|false``
         Fetch only incidents with a ticket url (``true``) or without (``false``).
 
       ``tags=key1=value1,key1=value2,key2=value``
