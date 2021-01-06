@@ -19,7 +19,8 @@ export ARGUS_DATAPORTEN_SECRET=UUID  # Get one at dataporten
 export ARGUS_DATAPORTEN_KEY=  # Get one at dataporten
 export EMAIL_HOST=localhost
 export EMAIL_PORT=25  # Needs to be 587 if on AWS
-export SECRET_KEY=  # 50 random charcaters, I use pwgen -s 50
+# Run `python manage.py gen_secret_key` to create a SECRET_KEY
+export SECRET_KEY=
 
 export DJANGO_SETTINGS_MODULE=  # Start out with copy of argus.site.settings.dev, or start-import from it
 export DATABASE_URL=  # I use: postgresql://argus:<LOCAL DB PASSWORD>@localhost:5432/argus
