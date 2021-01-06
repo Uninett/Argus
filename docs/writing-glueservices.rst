@@ -128,9 +128,11 @@ Optionally, you may want to provide these attributes as well:
 Describing an incident through tags
 -----------------------------------
 
-Using tags to describe your incidents is a good idea. Incident tags are of the
-form ``key=value``, and can be used to describe any manner of incident
-metadata not covered by the standard incident attributes, like:
+Using tags to describe your incidents is a good idea. Tags can be used to
+describe almost any structured or unstructed incident metadata not covered by
+the standard incident attributes.
+
+Examples include:
 
 * The hostname of an affected device.
 * A reference to an affected customer.
@@ -148,6 +150,15 @@ This kind of metadata will enable:
   services, devices or customers they care about.
 * Generating reports and statistics on the number and duration of incidents per
   service, per customer, per device and so forth.
+
+Tag syntax
+~~~~~~~~~~
+
+Incident tags are defined syntactically as ``key=value``. This syntax is
+employed by the API both when posting and retrieving incident tags. Any
+alphanumeric string (excluding spaces and the ``=`` character itself) can be
+used as a tag *key*, whereas the value can be any string.
+
 
 On the importance of tag conventions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
