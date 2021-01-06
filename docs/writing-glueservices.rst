@@ -168,8 +168,11 @@ Once the source system reports an incident as resolved, the glue service
 needs to close the corresponding Argus incident. But, how can it keep track of
 which Argus incident maps to the resolved problem?
 
-There are various approaches to this, but the simplest scenario is when the
-source system already keeps track of its own state.
+There could be a multitude of approaches to this, but in essence, there are two
+distinct scenarios that come into play:
+
+- The source system already keeps track of its own state.
+- The source system does not keep track of state.
 
 When the source system already tracks state
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
