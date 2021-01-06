@@ -1,5 +1,6 @@
 from django_filters import rest_framework as filters
 
+from argus.notificationprofile.models import Filter
 from .fields import KeyValueField
 from .models import Incident
 
@@ -24,7 +25,10 @@ class IncidentFilter(filters.FilterSet):
     stateful = filters.BooleanFilter(label="Stateful", method="incident_filter")
     ticket = filters.BooleanFilter(label="Ticket", method="incident_filter")
     tags = TagInFilter(label="Tags", method="incident_filter")
+    filter = filters.ModelChoiceFilter(label="Filter", queryset=Filter.objects.all(), method="incident_filter")
 
+    # For some reason, multiple such methods on the same class does not seem to
+    # work
     @classmethod
     def incident_filter(cls, queryset, name, value):
         if name == "open":
@@ -52,6 +56,9 @@ class IncidentFilter(filters.FilterSet):
                 return queryset.has_ticket()
             else:
                 return queryset.lacks_ticket()
+        elif name == "filter" and value:
+            if value:
+                return queryset.filtered_by(value)
         return queryset
 
     class Meta:

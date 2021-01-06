@@ -187,6 +187,9 @@ class IncidentQuerySet(models.QuerySet):
         qs = reduce(and_, qs)
         return qs.distinct()
 
+    def filtered_by(self, value):
+        assert False, type(value)
+
     # Cannot be a constant, because `timezone.now()` would have been evaluated at compile time
     @staticmethod
     def _generate_acked_query():
