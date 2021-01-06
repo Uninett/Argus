@@ -12,9 +12,9 @@ export EMAIL_HOST=localhost
 export EMAIL_PORT=25
 export SECRET_KEY=  # 50 random charcaters, I use pwgen -s 50
 
-# Start out with copy of argus.site.settings.dev, or start-import from it
+# Use argus.site.settings.dev for defaults, or a local settings.py file (see docs)
 export DJANGO_SETTINGS_MODULE=
-# I use: postgresql://argus:<LOCAL DB PASSWORD>@localhost:5432/argus
+# Syntax: postgresql://argus:<LOCAL DB PASSWORD>@localhost:5432/argus
 export DATABASE_URL=
 
 python manage.py "$@"
