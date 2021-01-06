@@ -62,7 +62,8 @@ Argus models **Incidents**. An incident will, in most cases, be stateful,
 meaning it's either open or closed, and has both a **start timestamp** and an
 **end timestamp**. An open, stateful incident is represented by a value of
 ``infinity`` in its end timestamp. Stateless incidents are also supported by
-Argus, but are not given much focus.
+Argus, but are not the main focus of the API and UI (See `On stateful
+incidents vs. stateless incidents`_ for details).
 
 An incident has a **description**, which is a string of text, usually derived
 from the source system, to describe a problem that happened.
@@ -234,3 +235,61 @@ An incident with the id ``27`` can be closed by **POST**-ing a new event to
 You should only ever use the ``END`` event type to indicate that the incident
 was resolved from the source system.  :ref:`The available types
 <api-incident-event-types>` are documented in the API endpoint documentation.
+
+
+On stateful incidents vs. stateless incidents
+=============================================
+
+Argus incidents are primarily *stateful*, but the concept of *stateless*
+incidents is also supported. The difference may not be immediately obvious, and
+depending on your needs, stateless incidents may seem useless.
+
+Stateful incidents
+------------------
+
+A stateful incident, by definition, has an extent in time. The incident began
+at some point in time, and ended (or *will* end) at a later point in time. The
+*state* of an such an incident is therefore either *open* or *closed*.
+
+An incident must always have a ``start_time`` value. If a definite ``end_time``
+value has not been set for it yet, its state is considered **open**. Once a
+definite ``end_time`` value is set, it is considered **closed**.
+
+Stateless incidents
+-------------------
+
+A stateless incident only represents something that happened at a single point
+in time, and otherwise has *no extent in time*. It can never be considered to
+be *open* nor *closed*.
+
+Whether stateless incidents are useful to you, depends on your needs and the
+source systems you want to integrate with Argud. Some source systems will
+generate alerts that are just one-off notifications, and are not considered to
+represent a state or an ongoing problem.
+
+One such example is from *Network Administration Visualized* (NAV), which will
+send one-off early warnings that devices have stopped responding to ICMP ping
+requests. These are sent a few minutes in advance of NAV actually declaring the
+device to be down/non-responsive. If several such warnings messages are sent,
+while the device is never actually declared to be down, this may indicate that
+there is a problem with "flapping", even though the device appears to be
+responding most of the time.
+
+Stateless incidents can be matched by notification profiles, if so desired. The
+Argus API incidents endpoint (and the Argus UI) will, by default, only show
+open/stateful incidents unless explicitly instructed to also include stateless
+incidents. Normally, open stateful incidents are the ones you want to act on.
+
+
+Representation
+--------------
+
+Internally, to represent a stateful incident that is still open, the special
+value ``infinity`` is used as the value of ``end_time``. This signals that the
+incident is expected to end at some unknown point in the future, and is quite
+useful when doing time-based queries on stateful incidents.
+
+Conversely, stateless incidents will never have a ``end_time`` value, which
+means that these incidents explicitly set this to a ``null`` value.
+
+These special values are also exposed through the API.
