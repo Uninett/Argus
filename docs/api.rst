@@ -375,6 +375,8 @@ Incident endpoints
       system), the ``timestamp`` field is optional. It will default to
       the time the server received the event.
 
+.. _api-incident-event-types:
+
       The valid ``type``\ s are:
 
       -  ``STA`` - Incident start

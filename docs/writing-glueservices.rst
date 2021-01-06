@@ -4,13 +4,12 @@ Writing your own glue services
 
 Writing a glue service has a few requirements:
 
-1. Knowing how to program.
-2. Knowing how to integrate with your monitoring system so that your glue
+1. Knowing how to integrate with your monitoring system so that your glue
    service will be notified of all alerts.
-3. Knowing how to use the Argus API.
+2. Knowing how to use the Argus API.
 
-We can't help you with number 1 on this list, and we can only provide hints for
-number 2. This guide will therefore mostly focus on number 3.
+We can only provide hints for how to think about number 1. This guide will
+therefore mostly focus on the second requirement.
 
 How to get alerts from your monitoring system
 =============================================
@@ -32,7 +31,7 @@ Things you need to consider:
   system, from before your integration with Argus, or do you only care about
   new incidents?
 * What happens if the communication between your glue service and Argus
-  temporarily breaks down? How will synchronize the Argus incident database
+  temporarily breaks down? How will you synchronize the Argus incident database
   with everything that happened in your source system during this outage?
   Strategies may include:
 
@@ -59,9 +58,9 @@ library to help you access and consume the Argus API, called `PyArgus`_
 Incidents and the Argus API
 ===========================
 
-Argus models **Incidents**. An incident will, in most cases, be stateful. I.e.,
-is either open or closed, and has both a **start timestamp** and an **end
-timestamp**. An open, stateful incident is represented by a value of
+Argus models **Incidents**. An incident will, in most cases, be stateful,
+meaning it's either open or closed, and has both a **start timestamp** and an
+**end timestamp**. An open, stateful incident is represented by a value of
 ``infinity`` in its end timestamp. Stateless incidents are also supported by
 Argus, but are not given much focus.
 
@@ -75,8 +74,8 @@ dashboard or in a user's notification profile.
 A glue service mainly concerns itself with:
 
 * Creating new incidents in Argus whenever a source system reports a problem.
-* How to describe and tag any incident it creates, so that the incident is made
-  meaningful to Argus users.
+* Describing and tagging created incidents in an expressive, meaningful way for
+  the users' consumption.
 * Closing existing Argus incidents it has created, when the source system
   reports that a problem has been resolved.
 
@@ -108,20 +107,22 @@ Optionally, you may want to provide these attributes as well:
   system's web-based user interface, which will give more details about this
   specific incident.
 
-A complete example::
 
- {
-     "description": "foobar-sw.example.org stopped responding to ping requests",
-     "source_incident_id": "42",
-     "details_url": "/alerts/detail/42/",
-     "start_time": "2020-12-11 15:50:42",
-     "end_time": "infinity",
-     "tags": [
-       {"tag": "host=foobar-sw.example.org"},
-       {"tag": "location=Campus Rotvoll"},
-       {"tag": "customer=himunkholmen.no"}
-     ]
- }
+.. code-block:: json
+   :caption: Complete example of an incident JSON payload
+
+   {
+       "description": "foobar-sw.example.org stopped responding to ping requests",
+       "source_incident_id": "42",
+       "details_url": "/alerts/detail/42/",
+       "start_time": "2020-12-11 15:50:42",
+       "end_time": "infinity",
+       "tags": [
+	 {"tag": "host=foobar-sw.example.org"},
+	 {"tag": "location=Campus Rotvoll"},
+	 {"tag": "customer=himunkholmen.no"}
+       ]
+   }
 
 Describing an incident through tags
 -----------------------------------
@@ -163,17 +164,17 @@ hands.
 Closing incidents that have been resolved
 -----------------------------------------
 
-Once your source system reports an incident as resolved, your glue service
-needs to close the corresponding Argus incident. But, how do you keep track of
+Once the source system reports an incident as resolved, the glue service
+needs to close the corresponding Argus incident. But, how can it keep track of
 which Argus incident maps to the resolved problem?
 
-There are various approaches for this, but the simplest scenario is when your
+There are various approaches to this, but the simplest scenario is when the
 source system already keeps track of its own state.
 
 When the source system already tracks state
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In this scenario, you source system should already have some identifier for the
+In this scenario, the source system should already have some identifier for the
 resolved state, and you should already have posted this value in the
 ``source_incident_id`` when you first created the Argus incident.
 
@@ -186,8 +187,8 @@ If your source system reports that it resolved a problem whose identifier was
 ``42``, you can simply find the corresponding Argus incident by issuing a
 **GET** request for ``/api/v1/incidents/mine/?source_incident_id=42``.
 
-When the source system doesn't track internal state
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+When the source system does not track internal state
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In this case, things immediately become more involved. Your glue service needs
 a strategy to track state itself. Suggested strategies may be:
@@ -203,8 +204,8 @@ a strategy to track state itself. Suggested strategies may be:
   custom algorithm as necessary to determine which of these Incidents match up
   with the resolving event it is currently processing.
 
-Performing the actual close operation
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Performing the close operation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Closing an open Argus incident normally entails changing the incident's
 ``end_time`` attribute to a proper timestamp (representing the time the source
@@ -213,15 +214,20 @@ simply allow you to set this value on an existing incident.
 
 Instead, Argus keeps *a log of events for each incident* it tracks. When you
 created the original incident, a creation event was implicitly logged alongside
-it. To actually close the incident, you must post a closing event to the
-incident's event log. The closing event can contain its own description, if
-need be.
+it. An Argus incident is closed by posting a closing event to the incident's
+event log. The closing event can contain its own description, if need be.
 
 An incident with the id ``27`` can be closed by **POST**-ing a new event to
-``/api/v1/incidents/27/events/``::
+``/api/v1/incidents/27/events/``:
 
- {
-   "timestamp": "2020-12-11 15:57:00",
-   "type": "END",
-   "description": "Foobar was resolved somehow"
- }
+.. code-block:: json
+
+   {
+     "timestamp": "2020-12-11 15:57:00",
+     "type": "END",
+     "description": "Foobar was resolved somehow"
+   }
+
+You should only ever use the ``END`` event type to indicate that the incident
+was resolved from the source system.  :ref:`The available types
+<api-incident-event-types>` are documented in the API endpoint documentation.
