@@ -101,9 +101,11 @@ Auth endpoints
      will check that the phone number is in a valid number series. Using a
      random number will not work.
 
+.. _api-incident-endpoints:
 
 Incident endpoints
 ------------------
+
 
 -  ``/api/v1/incidents/``:
 
@@ -372,6 +374,8 @@ Incident endpoints
       If the event is posted by an end user (a user with no associated source
       system), the ``timestamp`` field is optional. It will default to
       the time the server received the event.
+
+.. _api-incident-event-types:
 
       The valid ``type``\ s are:
 
