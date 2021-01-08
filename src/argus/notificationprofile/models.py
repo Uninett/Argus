@@ -202,8 +202,9 @@ class NotificationProfile(models.Model):
         return reduce(or_, qs)
 
     def incident_fits(self, incident: Incident):
+        assert incident.source, "incident does not have a source -2"
         if not self.active:
             return False
-        return self.timeslot.timestamp_is_within_time_recurrences(incident.start_time) and any(
-            f.incident_fits(incident) for f in self.filters.all()
-        )
+        is_selected_by_time = self.timeslot.timestamp_is_within_time_recurrences(incident.start_time)
+        is_selected_by_filters = any(f.incident_fits(incident) for f in self.filters.all())
+        return is_selected_by_time and is_selected_by_filters
