@@ -22,7 +22,7 @@ https://github.com/Uninett/Argus/issues/236
 """
 
 
-class FooTest(TestCase):
+class SendingNotificationTest(TestCase):
     def setUp(self):
         disconnect_signals()
 
@@ -48,10 +48,10 @@ class FooTest(TestCase):
     def tearDown(self):
         connect_signals()
 
-    def test_sending_event_to_multiple_profiles_of_the_same_user_should_work(self):
+    def test_sending_event_to_multiple_profiles_of_the_same_user_should_not_raise_exception(self):
         LOG_PREFIX = "INFO:argus.notificationprofile.media:"
         # Send a test event
-        self.incident = create_fake_incident(tags=["test=#236"])
+        self.incident = create_fake_incident()
         event = self.incident.events.get(type="STA")
         with self.settings(SEND_NOTIFICATIONS=True):
             try:
