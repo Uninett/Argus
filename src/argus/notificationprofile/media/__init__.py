@@ -56,9 +56,11 @@ def send_notifications_to_users(event: Event):
     LOG.info('Notification: sending event "%s"', event)
     sent = False
     for profile in NotificationProfile.objects.select_related("user"):
+        LOG.debug('Notification: checking profile "%s"', profile)
         if profile.incident_fits(event.incident):
             send_notification(profile, event)
             sent = True
+        LOG.debug('Notification: sent? %s: profile "%s", event "%s"', sent, profile, event)
     if not sent:
         LOG.info('Notification: no listeners for "%s"', event)
         return
