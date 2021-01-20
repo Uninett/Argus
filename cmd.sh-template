@@ -10,7 +10,8 @@
 export DEBUG=1
 export EMAIL_HOST=localhost
 export EMAIL_PORT=25
-export SECRET_KEY=  # 50 random charcaters, I use pwgen -s 50
+# Run `python manage.py gen_secret_key` to create a SECRET_KEY
+export SECRET_KEY=
 
 # Use argus.site.settings.dev for defaults, or a local settings.py file (see docs)
 export DJANGO_SETTINGS_MODULE=

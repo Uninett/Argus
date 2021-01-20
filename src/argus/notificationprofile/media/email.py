@@ -16,7 +16,7 @@ __all__ = [
 
 
 def modelinstance_to_dict(obj):
-    dict_ = vars(obj)
+    dict_ = vars(obj).copy()
     dict_.pop("_state")
     return dict_
 
