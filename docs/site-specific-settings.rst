@@ -61,6 +61,10 @@ List of settings and environment variables
 Django-specific settings
 ------------------------
 
+* ``DJANGO_SETTINGS_MODULE`` is the environment variable to invoke the Django settings
+  module, or settings file. For a development environment, reasonable defaults are
+  provided in ``argus.site.settings.dev``. In production, a ``settings.py`` file should
+  be created and invoked here.
 * ``SECRET_KEY`` is the Django secret key for this particular Argus instance.
   It contains a minimum of 50 random characters.
   The recommended way to generate this key is calling the command::
