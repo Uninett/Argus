@@ -4,5 +4,5 @@ Development
 
 
 .. toctree::
-   development/tips
+   development/notes
    development/release-checklist
