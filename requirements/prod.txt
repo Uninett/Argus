@@ -1,2 +1,0 @@
--r ./django30.txt
--r ./base.txt
