@@ -18,7 +18,7 @@ channels-redis==3.2.0     # via -r requirements/base.txt
 channels==3.0.1           # via -r requirements/base.txt, channels-redis
 chardet==3.0.4            # via requests
 constantly==15.1.0        # via twisted
-cryptography==3.2.1       # via autobahn, pyopenssl, service-identity, social-auth-core
+cryptography==3.3.2       # via autobahn, pyopenssl, service-identity, social-auth-core
 daphne==3.0.0             # via channels
 defusedxml==0.6.0         # via python3-openid, social-auth-core
 dj-database-url==0.5.0    # via -r requirements/base.txt
