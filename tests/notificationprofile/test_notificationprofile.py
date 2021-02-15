@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, time
 
 from django.test import TestCase
 from django.urls import reverse
@@ -18,7 +18,9 @@ from argus.incident.models import (
     Tag,
 )
 from argus.incident.serializers import IncidentSerializer
-from ..incident import IncidentBasedAPITestCaseHelper
+from argus.notificationprofile.factories import (
+    TimeRecurrenceFactory,
+)
 from argus.notificationprofile.models import (
     Filter,
     NotificationProfile,
@@ -27,6 +29,8 @@ from argus.notificationprofile.models import (
 )
 from argus.util.utils import duplicate
 from argus.util.testing import disconnect_signals, connect_signals
+
+from ..incident import IncidentBasedAPITestCaseHelper
 
 
 class IncidentAPITestCaseHelper(IncidentBasedAPITestCaseHelper):
@@ -65,6 +69,69 @@ def set_time(timestamp: datetime, new_time: str):
         second=new_time.second,
         microsecond=new_time.microsecond,
     )
+
+
+class TimeRecurrenceTimestampIsWithinTests(TestCase):
+    def setUp(self):
+        disconnect_signals()
+        time1 = parse_time("08:00:00")
+        time2 = parse_time("15:00:00")
+        self.tr_all_within_one_day = TimeRecurrenceFactory(
+            start=time1,
+            end=time2,
+            days={1},
+        )
+        self.tr_all_within_two_days = TimeRecurrenceFactory(
+            start=time2,
+            end=time1,
+            days={1},
+        )
+        self.tr_within_two_days = TimeRecurrenceFactory(
+            start=time2,
+            end=time1,
+            days={1, 2},
+        )
+
+    def teardown(self):
+        connect_signals()
+
+    def test_timestamp_within_is_true_during_one_day_timerecurrence(self):
+        test_time = make_aware(parse_datetime("2021-02-01 11:00"))
+        result = self.tr_all_within_one_day.timestamp_is_within(test_time)
+        self.assertTrue(result)
+
+    def test_timestamp_within_is_false_before_and_after_one_day_timerecurrence(self):
+        test_time = make_aware(parse_datetime("2021-02-01 04:00"))
+        result = self.tr_all_within_one_day.timestamp_is_within(test_time)
+        self.assertFalse(result)
+        test_time = make_aware(parse_datetime("2021-02-01 18:00"))
+        result = self.tr_all_within_one_day.timestamp_is_within(test_time)
+        self.assertFalse(result)
+
+    def test_timestamp_within_is_true_during_one_day_same_day(self):
+        test_time = make_aware(parse_datetime("2021-02-01 18:00"))
+        result = self.tr_all_within_two_days.timestamp_is_within(test_time)
+        self.assertTrue(result)
+
+    def test_timestamp_within_is_false_before_one_day_same_day(self):
+        test_time = make_aware(parse_datetime("2021-02-01 04:00"))
+        result = self.tr_all_within_two_days.timestamp_is_within(test_time)
+        self.assertFalse(result)
+
+    def test_timestamp_within_is_false_during_one_day_next_day(self):
+        test_time = make_aware(parse_datetime("2021-02-02 04:00"))
+        result = self.tr_all_within_two_days.timestamp_is_within(test_time)
+        self.assertFalse(result)
+
+    def test_timestamp_within_is_false_before_two_days_same_day(self):
+        test_time = make_aware(parse_datetime("2021-02-01 04:00"))
+        result = self.tr_within_two_days.timestamp_is_within(test_time)
+        self.assertFalse(result)
+
+    def test_timestamp_within_is_false_after_two_days_next_day(self):
+        test_time = make_aware(parse_datetime("2021-02-03 12:00"))
+        result = self.tr_within_two_days.timestamp_is_within(test_time)
+        self.assertFalse(result)
 
 
 class ModelTests(TestCase, IncidentAPITestCaseHelper):

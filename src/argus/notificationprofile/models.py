@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime, time
+from datetime import datetime, date, time, timedelta
 from functools import reduce
 from operator import or_
 from typing import TYPE_CHECKING
@@ -79,17 +79,24 @@ class TimeRecurrence(models.Model):
 
     def timestamp_is_within(self, timestamp: datetime):
         # FIXME: Might affect performance negatively if calling this method frequently
-        lookup_time = timestamp.astimezone(timezone.get_current_timezone()).time()
+        current_tz = timezone.get_current_timezone()
+        lookup_datetime = timestamp.astimezone(current_tz)
+        lookup_date = lookup_datetime.date()
+        lookup_time = lookup_datetime.time()
         isoweekdaynumber = timestamp.isoweekday()
         in_today = isoweekdaynumber in self.isoweekdays
-        if self.start < self.end:
-            return in_today and self.start <= lookup_time <= self.end
-        if in_today and self.start <= lookup_time <= self.DAY_END:
-            return True
+        if in_today:
+            if self.start < self.end:
+                return self.start <= lookup_time <= self.end
+            return self.start <= lookup_time <= self.DAY_END
+
+        start_of_next_day = datetime.combine(lookup_date + timedelta(days=1), datetime.min.time())
+        start_of_next_day_tz = start_of_next_day.replace(tzinfo=current_tz)
+        duration_after_midnight = datetime.combine(date.min, self.end) - datetime.min
         # In the case where weekday is Friday and Saturday is not in self.isoweekdays,
         # this will not succeed on Saturday.
         in_tomorrow = isoweekdaynumber + 1 in self.isoweekdays
-        if in_tomorrow and self.DAY_START <= lookup_time <= self.end:
+        if in_tomorrow and timestamp <= (start_of_next_day_tz + duration_after_midnight):
             return True
         return False
 
