@@ -93,9 +93,11 @@ class TimeRecurrence(models.Model):
         start_of_next_day = datetime.combine(lookup_date + timedelta(days=1), datetime.min.time())
         start_of_next_day_tz = start_of_next_day.replace(tzinfo=current_tz)
         duration_after_midnight = datetime.combine(date.min, self.end) - datetime.min
+        # Sunday (7) + 1 is Monday (1)
+        tomorrow_isoweekdaynumber = max(1, (isoweekdaynumber + 1) % 7)
         # In the case where weekday is Friday and Saturday is not in self.isoweekdays,
         # this will not succeed on Saturday.
-        in_tomorrow = isoweekdaynumber + 1 in self.isoweekdays
+        in_tomorrow = tomorrow_isoweekdaynumber in self.isoweekdays
         if in_tomorrow and timestamp <= (start_of_next_day_tz + duration_after_midnight):
             return True
         return False
