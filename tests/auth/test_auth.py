@@ -37,7 +37,7 @@ class APITests(APITestCase):
         token.save()
 
     def test_logout_deletes_token(self):
-        logout_path = reverse("auth:logout")
+        logout_path = reverse("v1:auth:logout")
 
         def assert_token_is_deleted(token: Token, user: User, client: APIClient):
             self.assertTrue(hasattr(user, "auth_token"))
@@ -52,7 +52,7 @@ class APITests(APITestCase):
         assert_token_is_deleted(self.superuser1_token, self.superuser1, self.superuser1_client)
 
     def _successfully_get_auth_token(self, user: User, user_password: str, client: APIClient):
-        auth_token_path = reverse("api-token-auth")
+        auth_token_path = reverse("v1:api-token-auth")
         response = client.post(auth_token_path, {"username": user.username, "password": user_password})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         return response
@@ -78,7 +78,7 @@ class APITests(APITestCase):
         )
 
     def test_auth_token_expires_and_is_deleted(self):
-        some_auth_required_path = reverse("auth:current-user")
+        some_auth_required_path = reverse("v1:auth:current-user")
 
         def assert_token_expires_and_is_deleted(user: User, token: Token, client: APIClient):
             self.assertEqual(client.get(some_auth_required_path).status_code, status.HTTP_200_OK)
@@ -95,8 +95,8 @@ class APITests(APITestCase):
         assert_token_expires_and_is_deleted(self.superuser1, self.superuser1_token, self.superuser1_client)
 
     def test_can_get_auth_token_after_deletion_or_expiration(self):
-        logout_path = reverse("auth:logout")
-        some_auth_required_path = reverse("auth:current-user")
+        logout_path = reverse("v1:auth:logout")
+        some_auth_required_path = reverse("v1:auth:current-user")
 
         def assert_unauthorized_until_getting_auth_token(user: User, user_password: str, client: APIClient):
             self.assertEqual(client.get(some_auth_required_path).status_code, status.HTTP_401_UNAUTHORIZED)
@@ -122,7 +122,7 @@ class APITests(APITestCase):
         )
 
     def test_get_current_user_returns_correct_user(self):
-        current_user_path = reverse("auth:current-user")
+        current_user_path = reverse("v1:auth:current-user")
 
         response = self.superuser1_client.get(current_user_path)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -133,7 +133,7 @@ class APITests(APITestCase):
         self.assertEqual(response.data["username"], self.normal_user1.username)
 
     def test_get_user_returns_the_correct_fields(self):
-        user_path = lambda user: reverse("auth:user", args=[user.pk])
+        user_path = lambda user: reverse("v1:auth:user", args=[user.pk])
 
         def assert_correct_fields_for_user(user: User):
             response = self.normal_user1_client.get(user_path(user))
