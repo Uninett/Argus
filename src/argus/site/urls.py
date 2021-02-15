@@ -23,13 +23,6 @@ from argus.auth.views import ObtainNewAuthToken
 from argus.dataporten import views as dataporten_views
 
 
-api_urls = [
-    path("auth/", include("argus.auth.urls")),
-    path("incidents/", include("argus.incident.urls")),
-    path("notificationprofiles/", include("argus.notificationprofile.urls")),
-    path("token-auth/", ObtainNewAuthToken.as_view(), name="api-token-auth"),
-]
-
 psa_urls = [
     # Overrides social_django's `complete` view
     re_path(fr"^complete/(?P<backend>[^/]+){extra}$", dataporten_views.login_wrapper, name="complete"),
@@ -39,7 +32,8 @@ psa_urls = [
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("oidc/", include(psa_urls)),
-    path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
-    path("api/schema/swagger-ui/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),
-    path("api/v1/", include(api_urls)),
+    path("api/schema/", SpectacularAPIView.as_view(api_version="v1"), name="schema-v1-old"),
+    path("api/schema/swagger-ui/", SpectacularSwaggerView.as_view(url_name="schema-v1-old"), name="swagger-ui-v1-old"),
+    path("api/v1/", include(("argus.site.api_v1_urls", "api"), namespace="v1")),
+    path("api/v2/", include(("argus.site.api_v2_urls", "api"), namespace="v2")),
 ]
