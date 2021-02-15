@@ -21,11 +21,6 @@ class TimeRecurrenceSerializer(serializers.ModelSerializer):
             "end",
         ]
 
-    def validate(self, attrs: dict):
-        if attrs["start"] >= attrs["end"]:
-            raise serializers.ValidationError("'start' must be before 'end'.")
-        return attrs
-
     def to_internal_value(self, data: dict):
         if data.get(self.ALL_DAY_KEY):
             data["start"] = TimeRecurrence.DAY_START

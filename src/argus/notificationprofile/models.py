@@ -74,12 +74,24 @@ class TimeRecurrence(models.Model):
     @property
     def isoweekdays(self):
         # `days` are stored as strings in the db
+        # XXX: Might be better to use JSONField or postgres.ArrayField.
         return {int(day) for day in self.days}
 
     def timestamp_is_within(self, timestamp: datetime):
         # FIXME: Might affect performance negatively if calling this method frequently
-        timestamp = timestamp.astimezone(timezone.get_current_timezone())
-        return timestamp.isoweekday() in self.isoweekdays and self.start <= timestamp.time() <= self.end
+        lookup_time = timestamp.astimezone(timezone.get_current_timezone()).time()
+        isoweekdaynumber = timestamp.isoweekday()
+        in_today = isoweekdaynumber in self.isoweekdays
+        if self.start < self.end:
+            return in_today and self.start <= lookup_time <= self.end
+        if in_today and self.start <= lookup_time <= self.DAY_END:
+            return True
+        # In the case where weekday is Friday and Saturday is not in self.isoweekdays,
+        # this will not succeed on Saturday.
+        in_tomorrow = isoweekdaynumber + 1 in self.isoweekdays
+        if in_tomorrow and self.DAY_START <= lookup_time <= self.end:
+            return True
+        return False
 
     def save(self, *args, **kwargs):
         # Ensure that the days are always sorted, for a nicer display
