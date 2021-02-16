@@ -77,6 +77,16 @@ class TimeRecurrence(models.Model):
         # XXX: Might be better to use JSONField or postgres.ArrayField.
         return {int(day) for day in self.days}
 
+    @staticmethod
+    def tomorrow_isoweekdaynumber(isoweekdaynumber):
+        # Sunday (7) + 1 is Monday (1)
+        return ((isoweekdaynumber + 1) % 7) or 7
+
+    @staticmethod
+    def yesterday_isoweekdaynumber(isoweekdaynumber):
+        # Monday (1) - 1 is Sunday (7)
+        return ((isoweekdaynumber - 1) % 7) or 7
+
     def timestamp_is_within(self, timestamp: datetime):
         # FIXME: Might affect performance negatively if calling this method frequently
         current_tz = timezone.get_current_timezone()
@@ -90,16 +100,24 @@ class TimeRecurrence(models.Model):
                 return self.start <= lookup_time <= self.end
             return self.start <= lookup_time <= self.DAY_END
 
-        start_of_next_day = datetime.combine(lookup_date + timedelta(days=1), datetime.min.time())
-        start_of_next_day_tz = start_of_next_day.replace(tzinfo=current_tz)
         duration_after_midnight = datetime.combine(date.min, self.end) - datetime.min
-        # Sunday (7) + 1 is Monday (1)
-        tomorrow_isoweekdaynumber = max(1, (isoweekdaynumber + 1) % 7)
-        # In the case where weekday is Friday and Saturday is not in self.isoweekdays,
-        # this will not succeed on Saturday.
+        tomorrow_isoweekdaynumber = self.tomorrow_isoweekdaynumber(isoweekdaynumber)
         in_tomorrow = tomorrow_isoweekdaynumber in self.isoweekdays
-        if in_tomorrow and timestamp <= (start_of_next_day_tz + duration_after_midnight):
-            return True
+        if in_tomorrow:
+            start_of_next_day = datetime.combine(lookup_date + timedelta(days=1), datetime.min.time())
+            start_of_next_day_tz = start_of_next_day.replace(tzinfo=current_tz)
+            # In the case where weekday is Friday and Saturday is not in self.isoweekdays,
+            # this will not succeed on Saturday.
+            if start_of_next_day_tz <= timestamp <= (start_of_next_day_tz + duration_after_midnight):
+                return True
+
+        yesterday_isoweekdaynumber = self.yesterday_isoweekdaynumber(isoweekdaynumber)
+        in_yesterday = yesterday_isoweekdaynumber in self.isoweekdays
+        if in_yesterday:
+            start_of_today = datetime.combine(lookup_date, datetime.min.time())
+            start_of_today_tz = start_of_today.replace(tzinfo=current_tz)
+            if start_of_today_tz <= timestamp <= (start_of_today_tz + duration_after_midnight):
+                return True
         return False
 
     def save(self, *args, **kwargs):
