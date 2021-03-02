@@ -23,7 +23,7 @@ Auth endpoints
 -  ``GET`` to ``/api/v1/auth/users/<int:pk>/``: returns a user by primary key
    (``pk``)
 
--  ``POST`` to ``/oidc/api-token-auth/``: returns an auth token for the
+-  ``POST`` to ``/api/v1/token-auth/``: returns an auth token for the
    posted user
 
    -  Note that this token will expire after 14 days, and can be
@@ -137,7 +137,7 @@ Incident endpoints
       ``source_incident_id=ID``
         Fetch only incidents with ``source_incident_id`` set to ``ID``.
 
-      ``ticket``
+      ``ticket=true|false``
         Fetch only incidents with a ticket url (``true``) or without (``false``).
 
       ``tags=key1=value1,key1=value2,key2=value``
