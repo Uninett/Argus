@@ -90,8 +90,28 @@ class TimeslotSerializer(serializers.ModelSerializer):
         return timeslot
 
 
+class FilterBlobSerializer(serializers.Serializer):
+    sourceSystemIds = serializers.ListField(
+        child=serializers.IntegerField(min_value=1),
+        allow_empty=True,
+        required=False,
+    )
+    tags = serializers.ListField(
+        child=serializers.CharField(min_length=3),
+        allow_empty=True,
+        required=False,
+    )
+    open = serializers.BooleanField(required=False, allow_null=True)
+    acked = serializers.BooleanField(required=False, allow_null=True)
+    stateful = serializers.BooleanField(required=False, allow_null=True)
+
+
 class FilterSerializer(serializers.ModelSerializer):
-    filter_string = serializers.CharField(validators=[validate_filter_string])
+    filter_string = serializers.CharField(
+        validators=[validate_filter_string],
+        help_text='Deprecated: Use "filter" instead',
+    )
+    filter = FilterBlobSerializer(required=False)
 
     class Meta:
         model = Filter
@@ -99,12 +119,13 @@ class FilterSerializer(serializers.ModelSerializer):
             "pk",
             "name",
             "filter_string",
+            "filter",
         ]
 
 
 class FilterPreviewSerializer(serializers.Serializer):
     sourceSystemIds = serializers.ListField(serializers.IntegerField(min_value=1), allow_empty=True)
-    tags = serializers.ListField(serializers.CharField(), allow_empty=True)
+    tags = serializers.ListField(serializers.CharField(min_length=3), allow_empty=True)
 
 
 class ResponseNotificationProfileSerializer(serializers.ModelSerializer):
