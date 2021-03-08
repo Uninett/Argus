@@ -1,10 +1,13 @@
 from datetime import datetime
+import unittest
+from unittest.mock import Mock
 
-from django.test import TestCase
+from django.test import TestCase, tag
 from django.utils.dateparse import parse_datetime, parse_time
 from django.utils.timezone import make_aware
 
 from argus.notificationprofile.models import (
+    FilterWrapper,
     Filter,
     TimeRecurrence,
     Timeslot,
@@ -22,6 +25,54 @@ def set_time(timestamp: datetime, new_time: str):
         second=new_time.second,
         microsecond=new_time.microsecond,
     )
+
+
+@tag("unittest")
+class FilterWrapperTests(unittest.TestCase):
+    def test_are_tristates_empty_ignores_garbage(self):
+        garbage_filter = FilterWrapper({"unknown-state": True})
+        result = garbage_filter.are_tristates_empty()
+        self.assertTrue(result)
+
+    def test_are_tristates_empty_is_false(self):
+        empty_filter = FilterWrapper({})
+        result = empty_filter.are_tristates_empty()
+        self.assertTrue(result)
+        empty_filter2 = FilterWrapper({"open": None})
+        result = empty_filter2.are_tristates_empty()
+        self.assertTrue(result)
+
+    def test_are_tristates_empty_is_true(self):
+        filter = FilterWrapper({"open": False})
+        result = filter.are_tristates_empty()
+        self.assertFalse(result)
+        filter2 = FilterWrapper({"open": True})
+        result = filter2.are_tristates_empty()
+        self.assertFalse(result)
+
+    def test_incident_fits_tristates_no_tristates_set(self):
+        incident = Mock()
+        empty_filter = FilterWrapper({})
+        result = empty_filter.incident_fits_tristates(incident)
+        self.assertEqual(result, None)
+
+    def test_incident_fits_tristates_is_true(self):
+        incident = Mock()
+        incident.open = True
+        incident.acked = False
+        incident.stateful = True
+        empty_filter = FilterWrapper({"open": True, "acked": False})
+        result = empty_filter.incident_fits_tristates(incident)
+        self.assertTrue(result)
+
+    def test_incident_fits_tristates_is_false(self):
+        incident = Mock()
+        incident.open = True
+        incident.acked = False
+        incident.stateful = True
+        empty_filter = FilterWrapper({"open": False, "acked": False})
+        result = empty_filter.incident_fits_tristates(incident)
+        self.assertFalse(result)
 
 
 @tag("database")
