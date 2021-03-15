@@ -21,6 +21,7 @@ from social_django.urls import extra
 
 from argus.auth.views import ObtainNewAuthToken
 from argus.dataporten import views as dataporten_views
+from argus.site.views import error
 
 
 api_urls = [
@@ -37,6 +38,7 @@ psa_urls = [
 ]
 
 urlpatterns = [
+    # path(".error/", error),  # Only needed when testing error pages and error behavior
     path("admin/", admin.site.urls),
     path("oidc/", include(psa_urls)),
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
