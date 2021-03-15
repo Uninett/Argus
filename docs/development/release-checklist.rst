@@ -31,11 +31,11 @@ Release checklist
 
         $ git tag -m 'Post release bugfixes' v1.0.1
 
-#. Push the tag
+#. Push the tag (given that `origin` is the correct remote):
 
     .. code formatting:: console
 
-        $ git tag -m 'Post release bugfixes' v1.0.1
+        $ git push origin v1.0.1
 
 #. Create the python wheel:
 
@@ -72,5 +72,6 @@ Release checklist
 #. Turn the tag into a release on Github. (On the "Code" tab, find the column
    to the right of the list of files and scroll until you find "Releases".
    Click on "Releases". To the right, find the button "Draft new release".
-   Click. Select the tag in the box night to the '@', and copy the tag where it
-   says "Release file". Then click the "Publish release"-button.)
+   Click. Type in the tag in the box that says "Tag version" left of the '@',
+   and copy the tag where it says "Release title". Then click the "Publish
+   release"-button.)
