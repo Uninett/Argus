@@ -8,6 +8,8 @@ from typing import TYPE_CHECKING
 
 from django.db import models
 from django.utils import timezone
+from django.contrib.postgres.fields import JSONField
+
 from multiselectfield import MultiSelectField
 
 from argus.auth.models import User
@@ -88,14 +90,57 @@ class TimeRecurrence(models.Model):
         super().save(*args, **kwargs)
 
 
+class FilterWrapper:
+    TRINARY_FILTERS = ("open", "acked", "stateful")
+
+    def __init__(self, filterblob):
+        self.filter = filterblob
+
+    def _get_tristate(self, tristate):
+        return self.filter.get(tristate, None)
+
+    def are_tristates_empty(self):
+        for tristate in self.TRINARY_FILTERS:
+            if self._get_tristate(tristate) is not None:
+                return False
+        return True
+
+    @property
+    def is_empty(self):
+        return self.are_tristates_empty()
+
+    def _incident_is_tristate(self, tristate, incident):
+        return getattr(incident, tristate, None)
+
+    def incident_fits_tristates(self, incident):
+        if self.are_tristates_empty():
+            return None
+        fits_tristates = []
+        for tristate in self.TRINARY_FILTERS:
+            filter_tristate = self._get_tristate(tristate)
+            if filter_tristate is None:
+                continue
+            incident_tristate = self._incident_is_tristate(tristate, incident)
+            fits_tristates.append(filter_tristate == incident_tristate)
+        return all(fits_tristates)
+
+    def incident_fits(self, incident):
+        return self.incident_fits_tristates(incident)
+
+
 class Filter(models.Model):
     FILTER_NAMES = set(("sourceSystemIds", "tags"))
     user = models.ForeignKey(to=User, on_delete=models.CASCADE, related_name="filters")
     name = models.CharField(max_length=40)
     filter_string = models.TextField()
+    filter = JSONField(default=dict)
 
     class Meta:
         constraints = [models.UniqueConstraint(fields=["name", "user"], name="%(class)s_unique_name_per_user")]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.filter_wrapper = FilterWrapper(self.filter)
 
     def __str__(self):
         return f"{self.name} [{self.filter_string}]"
@@ -104,13 +149,18 @@ class Filter(models.Model):
     def filter_json(self):
         return json.loads(self.filter_string)
 
-    @property
-    def is_empty(self):
+    def _old_is_empty(self):
         data = self.filter_json
         for value in data.values():
             if value:
                 return False
         return True
+
+    @property
+    def is_empty(self):
+        old = self._old_is_empty()
+        new = self.filter_wrapper.is_empty
+        return all((old, new))
 
     @property
     def all_incidents(self):
@@ -169,8 +219,9 @@ class Filter(models.Model):
         data = self.filter_json
         source_fits = self.source_system_fits(incident, data)
         tags_fit = self.tags_fit(incident, data)
+        tristates_fit = self.filter_wrapper.incident_fits(incident)
         # If False then one filter failed
-        checks = set((source_fits, tags_fit))
+        checks = set((source_fits, tags_fit, tristates_fit))
         return not (False in checks)  # At least one filter failed
 
 

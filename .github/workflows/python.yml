@@ -36,7 +36,6 @@ jobs:
         echo "POSTGRES_DB=argus_db" >> $GITHUB_ENV
         echo "POSTGRES_USER=argus" >> $GITHUB_ENV
         echo "POSTGRES_PASSWORD=password" >> $GITHUB_ENV
-        echo "DATABASE_URL=sqlite://argus.db" >> $GITHUB_ENV
 
     - name: Install dependencies
       # if: steps.cache.outputs.cache-hit != 'true'
@@ -47,13 +46,6 @@ jobs:
         python -m pip install --upgrade pip "setuptools<46" wheel
         python -m pip install --upgrade virtualenv tox tox-gh-actions coverage
 
-    - name: Run Tests with Sqlite3
-      env:
-        POSTGRES: false
-        DATABASE_URL: "sqlite://:memory:"
-      run: |
-        python -m tox
-
     - name: Set up PostgreSQL
       uses: harmon758/postgresql-action@v1
       with:
@@ -63,7 +55,6 @@ jobs:
 
     - name: Run Tests with PostgreSQL
       env:
-        POSTGRES: true
         DATABASE_URL: "postgresql://${{ env.POSTGRES_USER }}:${{ env.POSTGRES_PASSWORD }}@localhost/${{ env.POSTGRES_DB }}"
       run: |
         python -m tox

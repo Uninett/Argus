@@ -1,60 +1,20 @@
 from datetime import datetime
+import unittest
+from unittest.mock import Mock
 
-from django.test import TestCase
-from django.urls import reverse
-from django.utils import timezone
+from django.test import TestCase, tag
 from django.utils.dateparse import parse_datetime, parse_time
 from django.utils.timezone import make_aware
-from rest_framework import status
-from rest_framework.renderers import JSONRenderer
-from rest_framework.test import APITestCase
 
-from argus.auth.models import User
-from argus.incident.models import (
-    Incident,
-    IncidentTagRelation,
-    SourceSystem,
-    SourceSystemType,
-    Tag,
-)
-from argus.incident.serializers import IncidentSerializer
-from ..incident import IncidentBasedAPITestCaseHelper
 from argus.notificationprofile.models import (
+    FilterWrapper,
     Filter,
-    NotificationProfile,
     TimeRecurrence,
     Timeslot,
 )
-from argus.util.utils import duplicate
 from argus.util.testing import disconnect_signals, connect_signals
 
-
-class IncidentAPITestCaseHelper(IncidentBasedAPITestCaseHelper):
-    def init_test_objects(self):
-        super().init_test_objects()
-
-        self.source_type2 = SourceSystemType.objects.create(name="type2")
-        self.source2 = SourceSystem.objects.create(
-            name="System 2",
-            type=self.source_type2,
-            user=User.objects.create(username="system_2"),
-        )
-
-        self.incident1 = Incident.objects.create(
-            start_time=timezone.now(),
-            source=self.source1,
-            source_incident_id="123",
-        )
-        self.incident2 = duplicate(self.incident1, source=self.source2)
-
-        self.tag1 = Tag.objects.create_from_tag("object=1")
-        self.tag2 = Tag.objects.create_from_tag("object=2")
-        self.tag3 = Tag.objects.create_from_tag("location=Oslo")
-
-        IncidentTagRelation.objects.create(tag=self.tag1, incident=self.incident1, added_by=self.user1)
-        IncidentTagRelation.objects.create(tag=self.tag3, incident=self.incident1, added_by=self.user1)
-        IncidentTagRelation.objects.create(tag=self.tag2, incident=self.incident2, added_by=self.user1)
-        IncidentTagRelation.objects.create(tag=self.tag3, incident=self.incident2, added_by=self.user1)
+from . import IncidentAPITestCaseHelper
 
 
 def set_time(timestamp: datetime, new_time: str):
@@ -67,6 +27,55 @@ def set_time(timestamp: datetime, new_time: str):
     )
 
 
+@tag("unittest")
+class FilterWrapperTests(unittest.TestCase):
+    def test_are_tristates_empty_ignores_garbage(self):
+        garbage_filter = FilterWrapper({"unknown-state": True})
+        result = garbage_filter.are_tristates_empty()
+        self.assertTrue(result)
+
+    def test_are_tristates_empty_is_false(self):
+        empty_filter = FilterWrapper({})
+        result = empty_filter.are_tristates_empty()
+        self.assertTrue(result)
+        empty_filter2 = FilterWrapper({"open": None})
+        result = empty_filter2.are_tristates_empty()
+        self.assertTrue(result)
+
+    def test_are_tristates_empty_is_true(self):
+        filter = FilterWrapper({"open": False})
+        result = filter.are_tristates_empty()
+        self.assertFalse(result)
+        filter2 = FilterWrapper({"open": True})
+        result = filter2.are_tristates_empty()
+        self.assertFalse(result)
+
+    def test_incident_fits_tristates_no_tristates_set(self):
+        incident = Mock()
+        empty_filter = FilterWrapper({})
+        result = empty_filter.incident_fits_tristates(incident)
+        self.assertEqual(result, None)
+
+    def test_incident_fits_tristates_is_true(self):
+        incident = Mock()
+        incident.open = True
+        incident.acked = False
+        incident.stateful = True
+        empty_filter = FilterWrapper({"open": True, "acked": False})
+        result = empty_filter.incident_fits_tristates(incident)
+        self.assertTrue(result)
+
+    def test_incident_fits_tristates_is_false(self):
+        incident = Mock()
+        incident.open = True
+        incident.acked = False
+        incident.stateful = True
+        empty_filter = FilterWrapper({"open": False, "acked": False})
+        result = empty_filter.incident_fits_tristates(incident)
+        self.assertFalse(result)
+
+
+@tag("database")
 class ModelTests(TestCase, IncidentAPITestCaseHelper):
     def setUp(self):
         disconnect_signals()
@@ -194,61 +203,3 @@ class ModelTests(TestCase, IncidentAPITestCaseHelper):
             filter_string=f'{{"sourceSystemIds": [{self.source1.pk}], "tags": ["{self.tag1}"]}}',
         )
         self.assertEqual(set(filter1.filtered_incidents), {self.incident1})
-
-
-class ViewTests(APITestCase, IncidentAPITestCaseHelper):
-    def setUp(self):
-        disconnect_signals()
-        super().init_test_objects()
-
-        incident1_json = IncidentSerializer([self.incident1], many=True).data
-        self.incident1_json = JSONRenderer().render(incident1_json)
-
-        self.timeslot1 = Timeslot.objects.create(user=self.user1, name="Never")
-        self.timeslot2 = Timeslot.objects.create(user=self.user1, name="Never 2: Ever-expanding Void")
-        filter1 = Filter.objects.create(
-            user=self.user1,
-            name="Critical incidents",
-            filter_string=f'{{"sourceSystemIds": [{self.source1.pk}]}}',
-        )
-        self.notification_profile1 = NotificationProfile.objects.create(user=self.user1, timeslot=self.timeslot1)
-        self.notification_profile1.filters.add(filter1)
-
-    def teardown(self):
-        connect_signals()
-
-    def test_incidents_filtered_by_notification_profile_view(self):
-        response = self.user1_rest_client.get(
-            reverse("notification-profile:notificationprofile-incidents", args=[self.notification_profile1.pk])
-        )
-        response.render()
-        self.assertEqual(response.content, self.incident1_json)
-
-    def test_notification_profile_can_properly_change_timeslot(self):
-        profile1_pk = self.notification_profile1.pk
-        profile1_path = reverse("notification-profile:notificationprofile-detail", args=[profile1_pk])
-
-        self.assertEqual(self.user1.notification_profiles.get(pk=profile1_pk).timeslot, self.timeslot1)
-        self.assertEqual(self.user1_rest_client.get(profile1_path).status_code, status.HTTP_200_OK)
-        response = self.user1_rest_client.put(
-            profile1_path,
-            {
-                "timeslot": self.timeslot2.pk,
-                "filters": [f.pk for f in self.notification_profile1.filters.all()],
-                "media": self.notification_profile1.media,
-                "phone_number": self.notification_profile1.phone_number_id,
-                "active": self.notification_profile1.active,
-            },
-        )
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        new_profile1_pk = response.data["pk"]
-
-        self.assertEqual(self.user1_rest_client.get(profile1_path).status_code, status.HTTP_404_NOT_FOUND)
-        with self.assertRaises(NotificationProfile.DoesNotExist):
-            self.notification_profile1.refresh_from_db()
-        self.assertTrue(self.user1.notification_profiles.filter(pk=new_profile1_pk).exists())
-        self.assertEqual(self.user1.notification_profiles.get(pk=new_profile1_pk).timeslot, self.timeslot2)
-        new_profile1_path = reverse("notification-profile:notificationprofile-detail", args=[new_profile1_pk])
-        self.assertEqual(self.user1_rest_client.get(new_profile1_path).status_code, status.HTTP_200_OK)
-
-    # TODO: test more endpoints
