@@ -1,7 +1,6 @@
 import secrets
 
 from django.db import IntegrityError
-from django.urls import reverse
 
 from django_filters import rest_framework as filters
 from drf_spectacular.types import OpenApiTypes
@@ -12,6 +11,7 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.pagination import CursorPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.reverse import reverse
 
 from argus.auth.models import User
 from argus.drf.permissions import IsSuperuserOrReadOnly
@@ -323,7 +323,7 @@ class EventViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, mixins.Retrie
                 self._raise_type_validation_error("Cannot change the state of a stateless incident.")
 
         if event_type == Event.Type.ACKNOWLEDGE:
-            acks_endpoint = reverse("incident:incident-acks", args=[incident.pk])
+            acks_endpoint = reverse("incident:incident-acks", args=[incident.pk], request=self.request)
             self._raise_type_validation_error(
                 f"Acknowledgements of this incidents should be posted through {acks_endpoint}."
             )
