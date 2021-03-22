@@ -10,10 +10,10 @@ from django.http import (
 from django.shortcuts import render
 
 
-ERROR_TEMPLATE = """<http>
+ERROR_TEMPLATE = """<html>
 <head><title>{code} {reason}</title></head>
 <body><h1>{code} {reason}</h1></body>
-</http>
+</html>
 """
 
 LOG = logging.getLogger(__name__)
