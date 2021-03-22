@@ -1,5 +1,7 @@
 from .base import *
 
+from django.core.exceptions import ImproperlyConfigured
+
 DEBUG = False
 TEMPLATES[0]["OPTIONS"]["debug"] = False
 
@@ -16,13 +18,10 @@ ALLOWED_HOSTS = [
     "localhost",
 ]
 
-FRONTEND_URL = get_str_env("ARGUS_FRONTEND_URL", required=True)
+if not CORS_ALLOWED_ORIGINS:
+    raise ImproperlyConfigured('"FRONTEND_URL" has not been set in production!')
+
 COOKIE_DOMAIN = get_str_env("ARGUS_COOKIE_DOMAIN", required=True)
-
-CORS_ORIGIN_WHITELIST = []
-if FRONTEND_URL:
-    CORS_ORIGIN_WHITELIST.append(FRONTEND_URL)
-
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = get_str_env("EMAIL_HOST", required=True)

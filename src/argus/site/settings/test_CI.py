@@ -22,13 +22,6 @@ ALLOWED_HOSTS = [
     "localhost",
 ]
 
-FRONTEND_URL = get_str_env("ARGUS_FRONTEND_URL")
-
-CORS_ORIGIN_WHITELIST = []
-if FRONTEND_URL:
-    CORS_ORIGIN_WHITELIST.append(FRONTEND_URL)
-
-
 # Prints sent emails to the console
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 EMAIL_HOST = get_str_env("EMAIL_HOST", "localhost")
