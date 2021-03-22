@@ -34,7 +34,7 @@ cffi==1.14.3
     # via cryptography
 channels-redis==3.2.0
     # via -r requirements/base.txt
-channels==3.0.1
+channels==3.0.3
     # via
     #   -r requirements/base.txt
     #   channels-redis
