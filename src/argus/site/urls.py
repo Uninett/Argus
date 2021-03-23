@@ -35,5 +35,5 @@ urlpatterns = [
     path("api/schema/", SpectacularAPIView.as_view(api_version="v1"), name="schema-v1-old"),
     path("api/schema/swagger-ui/", SpectacularSwaggerView.as_view(url_name="schema-v1-old"), name="swagger-ui-v1-old"),
     path("api/v1/", include(("argus.site.api_v1_urls", "api"), namespace="v1")),
-    path("api/v2/", include(("argus.site.api_v2_urls", "api"), namespace="v2")),
+    # path("api/v2/", include(("argus.site.api_v2_urls", "api"), namespace="v2")),
 ]
