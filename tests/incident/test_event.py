@@ -31,7 +31,7 @@ class EventAPITests(APITestCase, IncidentBasedAPITestCaseHelper):
         )
         self.stateless_incident1 = duplicate(self.stateful_incident1, end_time=None, source_incident_id="2")
 
-        self.events_url = lambda incident: reverse("incident:incident-events", args=[incident.pk])
+        self.events_url = lambda incident: reverse("v1:incident:incident-events", args=[incident.pk])
 
     def tearDown(self):
         connect_signals()
