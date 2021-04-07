@@ -10,7 +10,7 @@ COPY requirements.txt /argus
 COPY requirements/*.txt /argus/requirements/
 
 WORKDIR /argus
-RUN pip install gunicorn -r requirements.txt -r /argus/requirements/dev.txt
+RUN pip install -r requirements.txt -r /argus/requirements/dev.txt
 
 ENV PYTHONPATH=/argus/src
 ENV PYTHONDONTWRITEBYTECODE=1
