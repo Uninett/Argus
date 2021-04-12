@@ -4,8 +4,6 @@
 #
 #    pip-compile --output-file=requirements-django31.txt requirements/base.txt requirements/django31.txt requirements/forced-upgrade.txt
 #
---index-url https://pypi.python.org/simple/
-
 aioredis==1.3.1
     # via
     #   -r requirements/base.txt
