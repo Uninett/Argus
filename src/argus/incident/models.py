@@ -197,6 +197,29 @@ class IncidentQuerySet(models.QuerySet):
 
 # TODO: review whether fields should be nullable, and on_delete modes
 class Incident(models.Model):
+    LEVELS = (
+        (
+            1,
+            "1",
+        ),
+        (
+            2,
+            "2",
+        ),
+        (
+            3,
+            "3",
+        ),
+        (
+            4,
+            "4",
+        ),
+        (
+            5,
+            "5",
+        ),
+    )
+
     start_time = models.DateTimeField(help_text="The time the incident was created.")
     end_time = DateTimeInfinityField(
         null=True,
@@ -213,6 +236,7 @@ class Incident(models.Model):
     source_incident_id = models.TextField(blank=True, default="", verbose_name="source incident ID")
     details_url = models.TextField(blank=True, validators=[URLValidator], verbose_name="details URL")
     description = models.TextField(blank=True)
+    level = models.IntegerField(choices=LEVELS, default=5)
     ticket_url = models.TextField(
         blank=True,
         validators=[URLValidator],
