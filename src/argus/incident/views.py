@@ -115,6 +115,9 @@ class SourceSystemViewSet(
                 type=OpenApiTypes.DATETIME,
             ),
             OpenApiParameter(
+                name="level__lte", description="Fetch incidents with levels in `LEVEL`", enum=Incident.LEVELS
+            ),
+            OpenApiParameter(
                 name="open",
                 description="Fetch open (`true`) or closed (`false`) incidents.",
                 enum=BooleanStringOAEnum,

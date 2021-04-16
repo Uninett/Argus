@@ -1,8 +1,9 @@
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter
 
-from ..views import IncidentViewSet, BooleanStringOAEnum
+from ..models import Incident
 from ..serializers import IncidentPureDeserializer
+from ..views import IncidentViewSet, BooleanStringOAEnum
 from .serializers import IncidentSerializerV1
 
 
@@ -29,6 +30,11 @@ from .serializers import IncidentSerializerV1
                 name="end_time__lte",
                 description="Fetch incidents that ended on or before `END_TIME`",
                 type=OpenApiTypes.DATETIME,
+            ),
+            OpenApiParameter(
+                name="level__lte",
+                description="Fetch incidents with levels less than or equal to `LEVEL`",
+                enum=Incident.LEVELS,
             ),
             OpenApiParameter(
                 name="open",
