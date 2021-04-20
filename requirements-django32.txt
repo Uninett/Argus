@@ -22,7 +22,7 @@ attrs==20.3.0
     #   jsonschema
     #   service-identity
     #   twisted
-autobahn==21.3.1
+autobahn==20.12.3
     # via daphne
 automat==20.2.0
     # via twisted
