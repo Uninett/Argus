@@ -244,31 +244,6 @@ class SourceLockedIncidentViewSet(IncidentViewSet):
         return Incident.objects.filter(source__user=self.request.user).prefetch_default_related()
 
 
-class OpenUnAckedIncidentList(generics.ListAPIView):
-    """All incidents that are open and unacked
-
-    open: stateful, end_time is "infinity"
-    unacked: no acknowledgements are currently in play
-    """
-
-    serializer_class = IncidentSerializer
-
-    def get_queryset(self):
-        return Incident.objects.open().not_acked().prefetch_default_related()
-
-
-class OpenIncidentList(generics.ListAPIView):
-    """All incidents that are open
-
-    open: stateful, end_time is "infinity"
-    """
-
-    serializer_class = IncidentSerializer
-
-    def get_queryset(self):
-        return Incident.objects.open().prefetch_default_related()
-
-
 class EventViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
     queryset = Incident.objects.none()  # For OpenAPI
     permission_classes = [IsAuthenticated]

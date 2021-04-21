@@ -1,6 +1,9 @@
+from django_filters import rest_framework as filters
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter
+from rest_framework import generics
 
+from ..filters import SourceLockedIncidentFilter
 from ..models import Incident
 from ..serializers import IncidentPureDeserializer
 from ..views import IncidentViewSet, BooleanStringOAEnum
@@ -80,3 +83,53 @@ class IncidentViewSetV1(IncidentViewSet):
         if self.request.method in {"PUT", "PATCH"}:
             return IncidentPureDeserializer
         return IncidentSerializerV1
+
+
+class SourceLockedIncidentViewSetV1(IncidentViewSetV1):
+    """All incidents added by the currently logged in user
+
+    Paged using a cursor"""
+
+    filter_backends = [filters.DjangoFilterBackend]
+    filterset_class = SourceLockedIncidentFilter
+
+    def get_queryset(self):
+        return Incident.objects.filter(source__user=self.request.user).prefetch_default_related()
+
+
+# DEPRECATED: The following views will be deprecated in V2
+
+
+@extend_schema_view(list=extend_schema(deprecated=True))
+class OpenUnAckedIncidentListV1(generics.ListAPIView):
+    """All incidents that are open and unacked
+
+    open: stateful, end_time is "infinity"
+    unacked: no acknowledgements are currently in play
+
+    Deprecated: This endpoint will be removed in API version 2.
+    Use query parameters ``open=true&acked=false`` with the other Incident list
+    endpoints instead.
+    """
+
+    serializer_class = IncidentSerializerV1
+
+    def get_queryset(self):
+        return Incident.objects.open().not_acked().prefetch_default_related()
+
+
+@extend_schema_view(list=extend_schema(deprecated=True))
+class OpenIncidentListV1(generics.ListAPIView):
+    """All incidents that are open
+
+    open: stateful, end_time is "infinity"
+
+    Deprecated: This endpoint will be removed in API version 2.
+    Use query parameter ``open=true`` with the other Incident list endpoints
+    instead.
+    """
+
+    serializer_class = IncidentSerializerV1
+
+    def get_queryset(self):
+        return Incident.objects.open().prefetch_default_related()

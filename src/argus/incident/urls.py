@@ -26,6 +26,4 @@ urlpatterns = [
     path("<int:incident_pk>/events/<int:pk>/", event_detail, name="incident-event"),
     path("<int:incident_pk>/acks/", ack_list, name="incident-acks"),
     path("<int:incident_pk>/acks/<int:pk>/", ack_detail, name="incident-ack"),
-    path("open/", views.OpenIncidentList.as_view(), name="incidents-open"),
-    path("open+unacked/", views.OpenUnAckedIncidentList.as_view(), name="incidents-open-unacked"),
 ] + router.urls
