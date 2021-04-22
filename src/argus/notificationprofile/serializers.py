@@ -2,7 +2,7 @@ from django.db import IntegrityError
 from rest_framework import fields, serializers
 
 from argus.auth.serializers import PhoneNumberSerializer
-from argus.incident.models import SourceSystem, Tag
+from argus.incident.models import SourceSystem, Tag, Incident
 
 from .models import Filter, NotificationProfile, TimeRecurrence, Timeslot
 from .validators import validate_filter_string
@@ -104,6 +104,9 @@ class FilterBlobSerializer(serializers.Serializer):
     open = serializers.BooleanField(required=False, allow_null=True)
     acked = serializers.BooleanField(required=False, allow_null=True)
     stateful = serializers.BooleanField(required=False, allow_null=True)
+    maxlevel = serializers.IntegerField(
+        required=False, allow_null=True, max_value=max(Incident.LEVELS), min_value=min(Incident.LEVELS)
+    )
 
 
 class FilterSerializer(serializers.ModelSerializer):

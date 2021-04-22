@@ -1,4 +1,4 @@
-import factory
+import factory, factory.fuzzy
 import pytz
 
 from argus.auth.factories import SourceUserFactory
@@ -51,4 +51,5 @@ class IncidentFactory(factory.django.DjangoModelFactory):
     source_incident_id = factory.Faker("md5")
     details_url = factory.Faker("uri")
     description = factory.Faker("sentence")
+    level = factory.fuzzy.FuzzyChoice(models.Incident.LEVELS)  # Random valid level
     ticket_url = factory.Faker("uri")

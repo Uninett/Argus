@@ -103,6 +103,7 @@ class IncidentSerializer(serializers.ModelSerializer):
             "source_incident_id",
             "details_url",
             "description",
+            "level",
             "ticket_url",
             "tags",
         ]

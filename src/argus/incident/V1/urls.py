@@ -2,15 +2,16 @@ from django.urls import path
 
 from rest_framework import routers
 
-from . import views
+from . import views as views_V1
+from .. import views
 
 
 router = routers.SimpleRouter()
 router.register(r"sources", views.SourceSystemViewSet)
 router.register(r"source-types", views.SourceSystemTypeViewSet)
-router.register(r"", views.IncidentViewSet)
+router.register(r"", views_V1.IncidentViewSetV1)
 
-sourced_incident_list = views.SourceLockedIncidentViewSet.as_view({"get": "list", "post": "create"})
+sourced_incident_list = views_V1.SourceLockedIncidentViewSetV1.as_view({"get": "list", "post": "create"})
 
 event_list = views.EventViewSet.as_view({"get": "list", "post": "create"})
 event_detail = views.EventViewSet.as_view({"get": "retrieve"})
@@ -26,4 +27,6 @@ urlpatterns = [
     path("<int:incident_pk>/events/<int:pk>/", event_detail, name="incident-event"),
     path("<int:incident_pk>/acks/", ack_list, name="incident-acks"),
     path("<int:incident_pk>/acks/<int:pk>/", ack_detail, name="incident-ack"),
+    path("open/", views_V1.OpenIncidentListV1.as_view(), name="incidents-open"),
+    path("open+unacked/", views_V1.OpenUnAckedIncidentListV1.as_view(), name="incidents-open-unacked"),
 ] + router.urls

@@ -1,4 +1,5 @@
 from datetime import datetime
+from random import choice
 import unittest
 from unittest.mock import Mock
 
@@ -6,6 +7,7 @@ from django.test import TestCase, tag
 from django.utils.dateparse import parse_datetime, parse_time
 from django.utils.timezone import make_aware
 
+from argus.incident.models import Incident
 from argus.notificationprofile.models import (
     FilterWrapper,
     Filter,
@@ -28,7 +30,11 @@ def set_time(timestamp: datetime, new_time: str):
 
 
 @tag("unittest")
-class FilterWrapperTests(unittest.TestCase):
+class FilterWrapperTristatesTests(unittest.TestCase):
+    # Validation is handled before the data gets to FilterWrapper
+    # A tristate must be one of True, False, None
+    # "None" is equivalent to the tristate not being mentioned in the filter at all
+
     def test_are_tristates_empty_ignores_garbage(self):
         garbage_filter = FilterWrapper({"unknown-state": True})
         result = garbage_filter.are_tristates_empty()
@@ -73,6 +79,37 @@ class FilterWrapperTests(unittest.TestCase):
         empty_filter = FilterWrapper({"open": False, "acked": False})
         result = empty_filter.incident_fits_tristates(incident)
         self.assertFalse(result)
+
+
+@tag("unittest")
+class FilterWrapperMaxlevelTests(unittest.TestCase):
+    # Validation is handled before the data gets to FilterWrapper
+    # A maxlevel must be one of the integers in Incident.LEVELS if it is set at all.
+
+    def test_is_maxlevel_empty_is_false(self):
+        empty_filter = FilterWrapper({})
+        result = empty_filter.is_maxlevel_empty()
+        self.assertTrue(result)
+
+    def test_is_maxlevel_empty_is_true(self):
+        empty_filter = FilterWrapper({"maxlevel": "whatever"})
+        result = empty_filter.is_maxlevel_empty()
+        self.assertFalse(result)
+
+    def test_incident_fits_maxlevel_no_maxlevel_set(self):
+        incident = Mock()
+        empty_filter = FilterWrapper({})
+        result = empty_filter.incident_fits_maxlevel(incident)
+        self.assertEqual(result, None)
+
+    def test_incident_fits_maxlevel(self):
+        incident = Mock()
+        level = choice(Incident.LEVELS)
+        maxlevel = choice(Incident.LEVELS)
+        incident.level = level
+        filter = FilterWrapper({"maxlevel": maxlevel})
+        result = filter.incident_fits_maxlevel(incident)
+        self.assertEqual(result, level <= maxlevel)
 
 
 @tag("database")

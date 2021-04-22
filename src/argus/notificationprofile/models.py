@@ -105,9 +105,12 @@ class FilterWrapper:
                 return False
         return True
 
+    def is_maxlevel_empty(self):
+        return not self.filter.get("maxlevel", None)
+
     @property
     def is_empty(self):
-        return self.are_tristates_empty()
+        return self.are_tristates_empty() and self.is_maxlevel_empty()
 
     def _incident_is_tristate(self, tristate, incident):
         return getattr(incident, tristate, None)
@@ -124,8 +127,13 @@ class FilterWrapper:
             fits_tristates.append(filter_tristate == incident_tristate)
         return all(fits_tristates)
 
+    def incident_fits_maxlevel(self, incident):
+        if self.is_maxlevel_empty():
+            return None
+        return incident.level <= self.filter["maxlevel"]
+
     def incident_fits(self, incident):
-        return self.incident_fits_tristates(incident)
+        return self.incident_fits_tristates(incident) and self.incident_fits_maxlevel(incident)
 
 
 class Filter(models.Model):
@@ -219,9 +227,9 @@ class Filter(models.Model):
         data = self.filter_json
         source_fits = self.source_system_fits(incident, data)
         tags_fit = self.tags_fit(incident, data)
-        tristates_fit = self.filter_wrapper.incident_fits(incident)
+        new_filters_fit = self.filter_wrapper.incident_fits(incident)
         # If False then one filter failed
-        checks = set((source_fits, tags_fit, tristates_fit))
+        checks = set((source_fits, tags_fit, new_filters_fit))
         return not (False in checks)  # At least one filter failed
 
 
