@@ -24,6 +24,7 @@ from .models import (
     Incident,
     SourceSystem,
     SourceSystemType,
+    Tag,
 )
 from .serializers import (
     AcknowledgementSerializer,
@@ -34,6 +35,8 @@ from .serializers import (
     SourceSystemSerializer,
     SourceSystemTypeSerializer,
     MetadataSerializer,
+    TagSerializer,
+    IncidentTagRelation,
 )
 
 
@@ -230,6 +233,62 @@ class IncidentViewSet(
             "sourceSystems": source_systems.data,
         }
         return Response(data)
+
+
+class IncidentTagViewSet(
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.CreateModelMixin,
+    mixins.DestroyModelMixin,
+    viewsets.GenericViewSet,
+):
+    queryset = Tag.objects.prefetch_related("incident_tag_relations")
+    serializer_class = TagSerializer
+    lookup_url_kwarg = "tag"
+    lookup_field = lookup_url_kwarg
+
+    def _get_incident(self):
+        incident_pk = self.kwargs.get("incident_pk")
+        try:
+            incident = Incident.objects.get(pk=incident_pk)
+        except Incident.DoesNotExist:
+            raise NotFound("An incident with this id does not exist")
+        return incident
+
+    def get_object(self):
+        queryset = self.filter_queryset(self.get_queryset())
+        lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
+        assert lookup_url_kwarg in self.kwargs, (
+            "Expected view %s to be called with a URL keyword argument "
+            'named "%s". Fix your URL conf, or set the `.lookup_field` '
+            "attribute on the view correctly." % (self.__class__.__name__, lookup_url_kwarg)
+        )
+        key, value = Tag.split(self.kwargs[lookup_url_kwarg])
+        filter_kwargs = {"key": key, "value": value}
+        obj = get_object_or_404(queryset, **filter_kwargs)
+
+        self.check_object_permissions(self.request, obj)
+        return obj
+
+    def get_queryset(self, *args, **kwargs):
+        incident = self._get_incident()
+        return self.queryset.filter(incident_tag_relations__incident=incident)
+
+    def perform_create(self, serializer):
+        data = serializer.validated_data
+        tag, _ = Tag.objects.get_or_create(**data)
+        incident = self._get_incident()
+        IncidentTagRelation.objects.get_or_create(incident=incident, tag=tag, defaults={"added_by": self.request.user})
+
+    def perform_destroy(self, instance):
+        incident = self._get_incident()
+        # Delete the connection between tag and incident
+        itrs = IncidentTagRelation.objects.filter(incident=incident, tag=instance)
+        if itrs.exists():
+            itrs.delete()
+            # If the tag is now unused, delete it
+            if not IncidentTagRelation.objects.filter(tag=instance).exists():
+                instance.delete()
 
 
 class SourceLockedIncidentViewSet(IncidentViewSet):
