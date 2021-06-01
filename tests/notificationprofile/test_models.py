@@ -3,7 +3,7 @@ from random import choice
 import unittest
 from unittest.mock import Mock
 
-from django.test import TestCase, tag
+from django.test import TestCase, tag, override_settings
 from django.utils.dateparse import parse_datetime, parse_time
 from django.utils.timezone import make_aware
 
@@ -41,12 +41,24 @@ class FilterWrapperTristatesTests(unittest.TestCase):
         self.assertTrue(result)
 
     def test_are_tristates_empty_is_false(self):
+        # tristate == None is equivalent to tristate missing from dict
         empty_filter = FilterWrapper({})
         result = empty_filter.are_tristates_empty()
         self.assertTrue(result)
         empty_filter2 = FilterWrapper({"open": None})
         result = empty_filter2.are_tristates_empty()
         self.assertTrue(result)
+
+    @override_settings(ARGUS_FALLBACK_FILTER={"acked": False})
+    def test_are_tristates_empty_with_fallback(self):
+        from django.conf import settings
+
+        self.assertEqual(
+            {"acked": False}, getattr(settings, "ARGUS_FALLBACK_FILTER", {}), "Test hasn't updated settings"
+        )
+        empty_filter = FilterWrapper({})
+        result = empty_filter.are_tristates_empty()
+        self.assertFalse(result)
 
     def test_are_tristates_empty_is_true(self):
         filter = FilterWrapper({"open": False})
@@ -61,6 +73,20 @@ class FilterWrapperTristatesTests(unittest.TestCase):
         empty_filter = FilterWrapper({})
         result = empty_filter.incident_fits_tristates(incident)
         self.assertEqual(result, None)
+
+    @override_settings(ARGUS_FALLBACK_FILTER={"acked": True})
+    def test_incident_fits_tristates_no_tristates_set_with_fallback(self):
+        incident = Mock()
+        # Shouldn't match
+        incident.acked = False
+        empty_filter = FilterWrapper({})
+        result = empty_filter.incident_fits_tristates(incident)
+        self.assertEqual(result, False)
+        # Should match
+        incident.acked = True
+        empty_filter = FilterWrapper({})
+        result = empty_filter.incident_fits_tristates(incident)
+        self.assertEqual(result, True)
 
     def test_incident_fits_tristates_is_true(self):
         incident = Mock()
@@ -79,6 +105,15 @@ class FilterWrapperTristatesTests(unittest.TestCase):
         empty_filter = FilterWrapper({"open": False, "acked": False})
         result = empty_filter.incident_fits_tristates(incident)
         self.assertFalse(result)
+
+    @override_settings(ARGUS_FALLBACK_FILTER={"acked": True})
+    def test_incident_fits_tristates_fallback_should_not_override(self):
+        incident = Mock()
+        # Should match
+        incident.acked = False
+        filter = FilterWrapper({"acked": False})
+        result = filter.incident_fits_tristates(incident)
+        self.assertEqual(result, True)
 
 
 @tag("unittest")
