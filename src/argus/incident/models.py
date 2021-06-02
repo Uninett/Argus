@@ -12,6 +12,7 @@ from django.utils import timezone
 
 from argus.auth.models import User
 from argus.util.datetime_utils import INFINITY_REPR, get_infinity_repr
+from .constants import INCIDENT_LEVELS, INCIDENT_LEVEL_CHOICES
 from .fields import DateTimeInfinityField
 from .validators import validate_lowercase, validate_key
 
@@ -197,8 +198,9 @@ class IncidentQuerySet(models.QuerySet):
 
 # TODO: review whether fields should be nullable, and on_delete modes
 class Incident(models.Model):
-    LEVELS = (1, 2, 3, 4, 5)
-    LEVEL_CHOICES = zip(LEVELS, map(str, LEVELS))
+    # Prevent import loop
+    LEVELS = INCIDENT_LEVELS
+    LEVEL_CHOICES = INCIDENT_LEVEL_CHOICES
 
     start_time = models.DateTimeField(help_text="The time the incident was created.")
     end_time = DateTimeInfinityField(
