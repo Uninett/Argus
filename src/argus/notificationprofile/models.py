@@ -15,6 +15,8 @@ from multiselectfield import MultiSelectField
 
 from argus.auth.models import User
 
+from .constants import DEPRECATED_FILTER_NAMES
+
 if TYPE_CHECKING:
     from argus.incident.models import Incident
 
@@ -142,7 +144,7 @@ class FilterWrapper:
 
 
 class Filter(models.Model):
-    FILTER_NAMES = set(("sourceSystemIds", "tags"))
+    FILTER_NAMES = set(DEPRECATED_FILTER_NAMES)
     user = models.ForeignKey(to=User, on_delete=models.CASCADE, related_name="filters")
     name = models.CharField(max_length=40)
     filter_string = models.TextField()

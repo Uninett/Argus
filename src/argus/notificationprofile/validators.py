@@ -3,7 +3,7 @@ from typing import Union
 
 from rest_framework import serializers
 
-from .models import Filter
+from .constants import DEPRECATED_FILTER_NAMES
 
 
 def validate_filter_string(value: Union[str, dict]):
@@ -19,14 +19,15 @@ def validate_filter_string(value: Union[str, dict]):
 
     errors = []
     keys_in_filterstring = set(json_dict.keys())
-    found = Filter.FILTER_NAMES.intersection(keys_in_filterstring)
+    filter_names = set(DEPRECATED_FILTER_NAMES)
+    found = filter_names.intersection(keys_in_filterstring)
     if not found:
         errors.append(serializers.ValidationError("No known fieldnames in filterstring.", "none_found"))
-    missing = Filter.FILTER_NAMES.difference(keys_in_filterstring)
+    missing = filter_names.difference(keys_in_filterstring)
     if missing:
         pp_missing = ", ".join(missing)
         errors.append(serializers.ValidationError(f"Filterstring is missing fieldname(s): {pp_missing}", "missing"))
-    unknown = keys_in_filterstring.difference(Filter.FILTER_NAMES)
+    unknown = keys_in_filterstring.difference(filter_names)
     if unknown:
         pp_unknown = ", ".join(unknown)
         errors.append(serializers.ValidationError(f"Unknown fieldname(s) in filterstring: {pp_unknown}", "unknown"))
