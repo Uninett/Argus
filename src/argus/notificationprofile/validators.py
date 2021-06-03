@@ -41,7 +41,7 @@ def validate_jsonfilter(value: dict):
         raise serializers.ValidationError("Filter is not a dict")
     if not value:
         return True
-    serializer = FilterBlobSerializer(value)
+    serializer = FilterBlobSerializer(data=value)
     if serializer.is_valid():
         return True
     raise serializers.ValidationError("Filter is not valid")

@@ -281,10 +281,12 @@ class AcknowledgementSerializer(serializers.ModelSerializer):
         assert "actor" in validated_data
         incident = validated_data.pop("incident")
         actor = validated_data.pop("actor")
-
+        expiration = validated_data.get("expiration", None)
         event_data = validated_data.pop("event")
-        event = Event.objects.create(incident=incident, actor=actor, **event_data)
-        return Acknowledgement.objects.create(event=event, **validated_data)
+        timestamp = event_data.pop("timestamp")
+        description = event_data.get("description", "")
+        ack = incident.create_ack(actor, timestamp=timestamp, description=description, expiration=expiration)
+        return ack
 
     def to_internal_value(self, data: dict):
         if "type" not in data["event"]:

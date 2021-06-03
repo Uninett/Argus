@@ -310,6 +310,14 @@ class Incident(models.Model):
         self.save(update_fields=["end_time"])
         Event.objects.create(incident=self, actor=actor, timestamp=self.end_time, type=Event.Type.CLOSE)
 
+    def create_ack(self, actor: User, timestamp=None, description="", expiration=None):
+        timestamp = timestamp if timestamp else timezone.now()
+        event = Event.objects.create(
+            incident=self, actor=actor, timestamp=timestamp, type=Event.Type.ACKNOWLEDGE, description=description
+        )
+        ack = Acknowledgement.objects.create(event=event, expiration=expiration)
+        return ack
+
     def pp_details_url(self):
         "Merge Incident.details_url with Source.base_url"
         path = self.details_url.strip()
