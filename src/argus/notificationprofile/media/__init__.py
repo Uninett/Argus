@@ -54,6 +54,7 @@ def send_notifications_to_users(event: Event):
         return
     # TODO: only send one notification per medium per user
     LOG.info('Notification: sending event "%s"', event)
+    LOG.debug('Fallback filter set to "%s"', getattr(settings, "ARGUS_FALLBACK_FILTER", {}))
     sent = False
     for profile in NotificationProfile.objects.select_related("user"):
         LOG.debug('Notification: checking profile "%s"', profile)
