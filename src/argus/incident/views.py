@@ -7,6 +7,7 @@ from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter
 from rest_framework import generics, mixins, serializers, status, viewsets
 from rest_framework.decorators import action
+from rest_framework.exceptions import NotFound
 from rest_framework.generics import get_object_or_404
 from rest_framework.pagination import CursorPagination
 from rest_framework.permissions import IsAuthenticated
@@ -263,7 +264,11 @@ class IncidentTagViewSet(
             'named "%s". Fix your URL conf, or set the `.lookup_field` '
             "attribute on the view correctly." % (self.__class__.__name__, lookup_url_kwarg)
         )
-        key, value = Tag.split(self.kwargs[lookup_url_kwarg])
+        try:
+            key, value = Tag.split(self.kwargs[lookup_url_kwarg])
+        except ValueError:
+            # Not a valid tag. Misses the delimiter, or multiple delimiters
+            raise NotFound("A tag like this does not exist for this incident")
         filter_kwargs = {"key": key, "value": value}
         obj = get_object_or_404(queryset, **filter_kwargs)
 
