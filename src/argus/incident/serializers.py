@@ -35,11 +35,6 @@ class SourceSystemSerializer(serializers.ModelSerializer):
         read_only_fields = ["type", "user", "base_url"]
 
 
-# Get rid of this!
-class MetadataSerializer(serializers.Serializer):
-    sourceSystems = SourceSystemSerializer(many=True)
-
-
 class TagSerializer(serializers.Serializer):
     tag = serializers.CharField()
 
