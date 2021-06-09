@@ -19,6 +19,8 @@ event_detail = views.EventViewSet.as_view({"get": "retrieve"})
 ack_list = views.AcknowledgementViewSet.as_view({"get": "list", "post": "create"})
 ack_detail = views.AcknowledgementViewSet.as_view({"get": "retrieve"})
 
+tag_list = views.IncidentTagViewSet.as_view({"get": "list", "post": "create"})
+tag_detail = views.IncidentTagViewSet.as_view({"get": "retrieve", "delete": "destroy"})
 
 app_name = "incident"
 urlpatterns = [
@@ -27,6 +29,8 @@ urlpatterns = [
     path("<int:incident_pk>/events/<int:pk>/", event_detail, name="incident-event"),
     path("<int:incident_pk>/acks/", ack_list, name="incident-acks"),
     path("<int:incident_pk>/acks/<int:pk>/", ack_detail, name="incident-ack"),
+    path("<int:incident_pk>/tags/", tag_list, name="incident-tags"),
+    path("<int:incident_pk>/tags/<str:tag>/", tag_detail, name="incident-tag"),
     path("open/", views_V1.OpenIncidentListV1.as_view(), name="incidents-open"),
     path("open+unacked/", views_V1.OpenUnAckedIncidentListV1.as_view(), name="incidents-open-unacked"),
 ] + router.urls
