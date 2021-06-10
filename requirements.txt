@@ -64,7 +64,7 @@ django-multiselectfield==0.1.12
     # via -r requirements/base.txt
 django-phonenumber-field[phonenumberslite]==5.0.0
     # via -r requirements/base.txt
-django==3.2
+django==3.2.2
     # via
     #   -r requirements/django32.txt
     #   channels
