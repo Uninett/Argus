@@ -6,6 +6,7 @@ from functools import reduce
 from operator import or_
 from typing import TYPE_CHECKING
 
+from django.conf import settings
 from django.db import models
 from django.utils import timezone
 from django.contrib.postgres.fields import JSONField
@@ -13,6 +14,8 @@ from django.contrib.postgres.fields import JSONField
 from multiselectfield import MultiSelectField
 
 from argus.auth.models import User
+
+from .constants import DEPRECATED_FILTER_NAMES
 
 if TYPE_CHECKING:
     from argus.incident.models import Incident
@@ -94,10 +97,12 @@ class FilterWrapper:
     TRINARY_FILTERS = ("open", "acked", "stateful")
 
     def __init__(self, filterblob):
+        self.fallback_filter = getattr(settings, "ARGUS_FALLBACK_FILTER", {})
         self.filter = filterblob
 
     def _get_tristate(self, tristate):
-        return self.filter.get(tristate, None)
+        fallback_filter = self.fallback_filter.get(tristate, None)
+        return self.filter.get(tristate, fallback_filter)
 
     def are_tristates_empty(self):
         for tristate in self.TRINARY_FILTERS:
@@ -106,7 +111,8 @@ class FilterWrapper:
         return True
 
     def is_maxlevel_empty(self):
-        return not self.filter.get("maxlevel", None)
+        fallback_filter = self.fallback_filter.get("maxlevel", None)
+        return not self.filter.get("maxlevel", fallback_filter)
 
     @property
     def is_empty(self):
@@ -130,14 +136,15 @@ class FilterWrapper:
     def incident_fits_maxlevel(self, incident):
         if self.is_maxlevel_empty():
             return None
-        return incident.level <= self.filter["maxlevel"]
+        fallback_filter = self.fallback_filter.get("maxlevel", None)
+        return incident.level <= min(filter(None, (self.filter["maxlevel"], fallback_filter)))
 
     def incident_fits(self, incident):
         return self.incident_fits_tristates(incident) and self.incident_fits_maxlevel(incident)
 
 
 class Filter(models.Model):
-    FILTER_NAMES = set(("sourceSystemIds", "tags"))
+    FILTER_NAMES = set(DEPRECATED_FILTER_NAMES)
     user = models.ForeignKey(to=User, on_delete=models.CASCADE, related_name="filters")
     name = models.CharField(max_length=40)
     filter_string = models.TextField()

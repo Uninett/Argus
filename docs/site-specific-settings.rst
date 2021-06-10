@@ -143,7 +143,25 @@ interface.  To enable it:
 * Set ``DEFAULT_SMS_MEDIA="argus.notificationprofile.media.sms_as_email.SMSNotification"``.
 * Set ``SMS_GATEWAY_ADDRESS`` to the email address of the gateway.
 
+Using the fallback notification filter
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+The setting ``ARGUS_FALLBACK_FILTER`` is a dict, by default undefined. You can
+set this to ensure a systemwide fallback filter for everyone:
+
+Examples:
+
+Do not send notifications on ACKED events::
+
+    ARGUS_FALLBACK_FILTER = {"acked": False}
+
+Ignore low priority incidents by default::
+
+    ARGUS_FALLBACK_FILTER = {"maxlevel": 3}
+
+Do both::
+
+    ARGUS_FALLBACK_FILTER = {"acked": False, "maxlevel": 3}
 
 Realtime updates
 ----------------

@@ -4,6 +4,7 @@ from rest_framework import fields, serializers
 from argus.auth.serializers import PhoneNumberSerializer
 from argus.incident.models import SourceSystem, Tag, Incident
 
+from .primitive_serializers import FilterBlobSerializer, FilterPreviewSerializer
 from .models import Filter, NotificationProfile, TimeRecurrence, Timeslot
 from .validators import validate_filter_string
 
@@ -90,25 +91,6 @@ class TimeslotSerializer(serializers.ModelSerializer):
         return timeslot
 
 
-class FilterBlobSerializer(serializers.Serializer):
-    sourceSystemIds = serializers.ListField(
-        child=serializers.IntegerField(min_value=1),
-        allow_empty=True,
-        required=False,
-    )
-    tags = serializers.ListField(
-        child=serializers.CharField(min_length=3),
-        allow_empty=True,
-        required=False,
-    )
-    open = serializers.BooleanField(required=False, allow_null=True)
-    acked = serializers.BooleanField(required=False, allow_null=True)
-    stateful = serializers.BooleanField(required=False, allow_null=True)
-    maxlevel = serializers.IntegerField(
-        required=False, allow_null=True, max_value=max(Incident.LEVELS), min_value=min(Incident.LEVELS)
-    )
-
-
 class FilterSerializer(serializers.ModelSerializer):
     filter_string = serializers.CharField(
         validators=[validate_filter_string],
@@ -124,11 +106,6 @@ class FilterSerializer(serializers.ModelSerializer):
             "filter_string",
             "filter",
         ]
-
-
-class FilterPreviewSerializer(serializers.Serializer):
-    sourceSystemIds = serializers.ListField(serializers.IntegerField(min_value=1), allow_empty=True)
-    tags = serializers.ListField(serializers.CharField(min_length=3), allow_empty=True)
 
 
 class ResponseNotificationProfileSerializer(serializers.ModelSerializer):
