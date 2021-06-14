@@ -40,6 +40,36 @@ class MetadataSerializer(serializers.Serializer):
     sourceSystems = SourceSystemSerializer(many=True)
 
 
+class TagSerializer(serializers.Serializer):
+    tag = serializers.CharField()
+
+    def validate_tag(self, value: str):
+        if not "=" in value:
+            raise serializers.ValidationError(f"The tag must contain an equality sign ({Tag.TAG_DELIMITER}) delimiter.")
+
+        key, value = Tag.split(value, 1)
+        key = key.strip()
+        if not key:  # Django doesn't attempt validating empty values
+            raise serializers.ValidationError("The tag's key must not be empty")
+        Tag._meta.get_field("key").run_validators(key)
+        # Reassemble tag, to enforce key without leading or trailing whitespace (by calling `strip()` above)
+        return Tag.join(key, value_)
+
+    def to_internal_value(self, data: dict):
+        if "tag" in data:
+            key, value = Tag.split(data.pop("tag"))
+            return {"key": key, "value": value}
+        return data
+
+    def to_representation(self, instance):
+        if isinstance(instance, Tag):
+            tagstr = instance.representation
+        else:
+            tagstr = "{key}={value}".format(**instance)
+        tag_repr = {"tag": tagstr}
+        return tag_repr
+
+
 class IncidentTagRelationSerializer(serializers.ModelSerializer):
     tag = serializers.CharField(write_only=True)
 
