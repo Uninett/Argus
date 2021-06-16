@@ -117,7 +117,7 @@ class SourceLockedIncidentViewSetV1(IncidentViewSetV1):
 # DEPRECATED: The following views will be removed in V2
 
 
-@extend_schema_view(list=extend_schema(deprecated=True))
+@extend_schema_view(get=extend_schema(deprecated=True))
 class OpenUnAckedIncidentListV1(generics.ListAPIView):
     """All incidents that are open and unacked
 
@@ -135,7 +135,7 @@ class OpenUnAckedIncidentListV1(generics.ListAPIView):
         return Incident.objects.open().not_acked().prefetch_default_related()
 
 
-@extend_schema_view(list=extend_schema(deprecated=True))
+@extend_schema_view(get=extend_schema(deprecated=True))
 class OpenIncidentListV1(generics.ListAPIView):
     """All incidents that are open
 
