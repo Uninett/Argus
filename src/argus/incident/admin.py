@@ -140,7 +140,9 @@ class IncidentAdmin(TextWidgetsOverrideModelAdmin):
         html_open_tag = '<div style="display: inline-block; white-space: nowrap;">'
         html_bullet = "<b>&bull;</b>"
         return format_html_join(
-            mark_safe("<br />"), f"{html_open_tag}{html_bullet} {{}}</div>", ((tag,) for tag in incident.tags)
+            mark_safe("<br />"),
+            f"{html_open_tag}{html_bullet} {{}}</div>",
+            ((tag,) for tag in incident.deprecated_tags),
         )
 
     get_tags.short_description = "Tags"
