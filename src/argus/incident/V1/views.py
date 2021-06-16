@@ -87,7 +87,7 @@ class IncidentViewSetV1(IncidentViewSet):
             return IncidentPureDeserializer
         return IncidentSerializerV1
 
-    # DEPRECATED: This view will be deprecated in V2
+    # DEPRECATED: This view will be removed in V2
     @extend_schema(
         responses=MetadataSerializer,
         description=("Metadata used by incidents.\n\nDeprecated, use the individual endpoints instead"),
@@ -114,7 +114,7 @@ class SourceLockedIncidentViewSetV1(IncidentViewSetV1):
         return Incident.objects.filter(source__user=self.request.user).prefetch_default_related()
 
 
-# DEPRECATED: The following views will be deprecated in V2
+# DEPRECATED: The following views will be removed in V2
 
 
 @extend_schema_view(list=extend_schema(deprecated=True))
