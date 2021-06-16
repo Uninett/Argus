@@ -194,4 +194,4 @@ class EventSignalTests(APITestCase):
         event_start = incident.events.filter(type=Event.Type.INCIDENT_START)
 
         self.assertTrue(event_start)
-        self.assertEquals(incident.description, incident.events.get(type="STA").description)
+        self.assertEqual(incident.description, incident.events.get(type="STA").description)
