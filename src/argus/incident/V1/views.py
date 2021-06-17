@@ -2,12 +2,15 @@ from django_filters import rest_framework as filters
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter
 from rest_framework import generics
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
 from ..filters import SourceLockedIncidentFilter
-from ..models import Incident
-from ..serializers import IncidentPureDeserializer
+from ..models import Incident, SourceSystem
+from ..serializers import IncidentPureDeserializer, SourceSystemSerializer
+
 from ..views import IncidentViewSet, BooleanStringOAEnum
-from .serializers import IncidentSerializerV1
+from .serializers import IncidentSerializerV1, MetadataSerializer
 
 
 @extend_schema_view(
@@ -84,6 +87,20 @@ class IncidentViewSetV1(IncidentViewSet):
             return IncidentPureDeserializer
         return IncidentSerializerV1
 
+    # DEPRECATED: This view will be removed in V2
+    @extend_schema(
+        responses=MetadataSerializer,
+        description=("Metadata used by incidents.\n\nDeprecated, use the individual endpoints instead"),
+        deprecated=True,
+    )
+    @action(detail=False, methods=["get"])
+    def metadata(self, request, **_):
+        source_systems = SourceSystemSerializer(SourceSystem.objects.select_related("type"), many=True)
+        data = {
+            "sourceSystems": source_systems.data,
+        }
+        return Response(data)
+
 
 class SourceLockedIncidentViewSetV1(IncidentViewSetV1):
     """All incidents added by the currently logged in user
@@ -97,10 +114,10 @@ class SourceLockedIncidentViewSetV1(IncidentViewSetV1):
         return Incident.objects.filter(source__user=self.request.user).prefetch_default_related()
 
 
-# DEPRECATED: The following views will be deprecated in V2
+# DEPRECATED: The following views will be removed in V2
 
 
-@extend_schema_view(list=extend_schema(deprecated=True))
+@extend_schema_view(get=extend_schema(deprecated=True))
 class OpenUnAckedIncidentListV1(generics.ListAPIView):
     """All incidents that are open and unacked
 
@@ -118,7 +135,7 @@ class OpenUnAckedIncidentListV1(generics.ListAPIView):
         return Incident.objects.open().not_acked().prefetch_default_related()
 
 
-@extend_schema_view(list=extend_schema(deprecated=True))
+@extend_schema_view(get=extend_schema(deprecated=True))
 class OpenIncidentListV1(generics.ListAPIView):
     """All incidents that are open
 

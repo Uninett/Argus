@@ -1,5 +1,7 @@
+from rest_framework import serializers
+
 from ..models import Incident
-from ..serializers import IncidentSerializer
+from ..serializers import IncidentSerializer, SourceSystemSerializer
 
 
 class IncidentSerializerV1(IncidentSerializer):
@@ -19,3 +21,8 @@ class IncidentSerializerV1(IncidentSerializer):
         ]
         read_only_fields = ["source"]
         extra_kwargs = {"level": {"required": False}}
+
+
+# Get rid of this!
+class MetadataSerializer(serializers.Serializer):
+    sourceSystems = SourceSystemSerializer(many=True)

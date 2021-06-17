@@ -35,7 +35,6 @@ from .serializers import (
     IncidentTicketUrlSerializer,
     SourceSystemSerializer,
     SourceSystemTypeSerializer,
-    MetadataSerializer,
     TagSerializer,
     IncidentTagRelation,
 )
@@ -225,15 +224,6 @@ class IncidentViewSet(
             return Response(serializer.data)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    @extend_schema(responses=MetadataSerializer)
-    @action(detail=False, methods=["get"])
-    def metadata(self, request, **_):
-        source_systems = SourceSystemSerializer(SourceSystem.objects.select_related("type"), many=True)
-        data = {
-            "sourceSystems": source_systems.data,
-        }
-        return Response(data)
 
 
 class IncidentTagViewSet(
