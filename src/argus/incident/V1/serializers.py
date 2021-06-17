@@ -1,10 +1,15 @@
 from rest_framework import serializers
 
+from ..fields import DateTimeInfinitySerializerField
 from ..models import Incident
-from ..serializers import IncidentSerializer, SourceSystemSerializer
+from ..serializers import IncidentSerializer, SourceSystemSerializer, IncidentTagRelationSerializer
 
 
 class IncidentSerializerV1(IncidentSerializer):
+    end_time = DateTimeInfinitySerializerField(required=False, allow_null=True)
+    source = SourceSystemSerializer(read_only=True)
+    tags = IncidentTagRelationSerializer(many=True, write_only=True, source="deprecated_tags")
+
     class Meta:
         model = Incident
         fields = [

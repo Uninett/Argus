@@ -225,7 +225,7 @@ class Filter(models.Model):
         if not tags_list:
             # We're not limiting on tags!
             return None
-        tags = set(tag.representation for tag in incident.tags)
+        tags = set(tag.representation for tag in incident.deprecated_tags)
         return tags.issuperset(tags_list)
 
     def incident_fits(self, incident: Incident):

@@ -1,5 +1,6 @@
 from collections import defaultdict
 from functools import reduce
+import logging
 from operator import and_
 from random import randint
 from urllib.parse import urljoin
@@ -15,6 +16,9 @@ from argus.util.datetime_utils import INFINITY_REPR, get_infinity_repr
 from .constants import INCIDENT_LEVELS, INCIDENT_LEVEL_CHOICES
 from .fields import DateTimeInfinityField
 from .validators import validate_lowercase, validate_key
+
+
+LOG = logging.getLogger(__name__)
 
 
 def get_or_create_default_instances():
@@ -260,9 +264,18 @@ class Incident(models.Model):
         return self.stateful and self.end_time > timezone.now()
 
     @property
-    def tags(self):
+    def deprecated_tags(self):
         # Don't do `Tag.objects.filter()`, which ignores prefetched data
         return [relation.tag for relation in self.incident_tag_relations.all()]
+
+    @property
+    def tags(self):
+        # In preparation for making a tags-field on the model
+        try:
+            raise Exception("Nothing should use this label directly")
+        except Exception:
+            LOG.exception("Deprecated label: Incident.tags")
+        return self.deprecated_tags
 
     @property
     def incident_relations(self):

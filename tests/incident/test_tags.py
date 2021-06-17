@@ -31,9 +31,9 @@ class IncidentTagViewSetTests(APITestCase, IncidentBasedAPITestCaseHelper):
     def tearDown(self):
         connect_signals()
 
-    def test_view_incident_tags_when_no_tags(self):
+    def test_view_V1_incident_tags_when_no_tags(self):
         incident = IncidentFactory()
-        self.assertFalse(incident.tags)
+        self.assertFalse(incident.deprecated_tags)
         response = self.user1_rest_client.get(reverse("v1:incident:incident-tags", kwargs={"incident_pk": incident.pk}))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, [])
