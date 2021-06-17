@@ -9,7 +9,6 @@ from typing import TYPE_CHECKING
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
-from django.contrib.postgres.fields import JSONField
 
 from multiselectfield import MultiSelectField
 
@@ -148,7 +147,7 @@ class Filter(models.Model):
     user = models.ForeignKey(to=User, on_delete=models.CASCADE, related_name="filters")
     name = models.CharField(max_length=40)
     filter_string = models.TextField()
-    filter = JSONField(default=dict)
+    filter = models.JSONField(default=dict)
 
     class Meta:
         constraints = [models.UniqueConstraint(fields=["name", "user"], name="%(class)s_unique_name_per_user")]
