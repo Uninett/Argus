@@ -16,6 +16,6 @@ wheel>=0.24.0
 whitenoise
 
 # websockets
-channels
+channels>=3,<4
 channels-redis
 aioredis

@@ -211,7 +211,7 @@ AUTH_TOKEN_EXPIRES_AFTER_DAYS = 14
 
 # django-channels
 
-ASGI_APPLICATION = "argus.ws.routing.application"
+ASGI_APPLICATION = "argus.ws.asgi.application"
 
 # fmt: off
 _REDIS = urlsplit("//" + get_str_env("ARGUS_REDIS_SERVER", "127.0.0.1:6379"))
