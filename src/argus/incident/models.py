@@ -13,7 +13,7 @@ from django.utils import timezone
 
 from argus.auth.models import User
 from argus.util.datetime_utils import INFINITY_REPR, get_infinity_repr
-from .constants import INCIDENT_LEVELS, INCIDENT_LEVEL_CHOICES
+from .constants import INCIDENT_LEVELS, INCIDENT_LEVEL_CHOICES, MIN_INCIDENT_LEVEL, MAX_INCIDENT_LEVEL
 from .fields import DateTimeInfinityField
 from .validators import validate_lowercase, validate_key
 
@@ -28,7 +28,7 @@ def get_or_create_default_instances():
     return (argus_user, sst, ss)
 
 
-def create_fake_incident(tags=None, description=None, stateful=True):
+def create_fake_incident(tags=None, description=None, stateful=True, level=None):
     argus_user, _, source_system = get_or_create_default_instances()
     end_time = INFINITY_REPR if stateful else None
 
@@ -47,6 +47,7 @@ def create_fake_incident(tags=None, description=None, stateful=True):
         source_incident_id=source_incident_id,
         source=source_system,
         description=description,
+        level=level or randint(MIN_INCIDENT_LEVEL, MAX_INCIDENT_LEVEL),
     )
 
     taglist = [("location", "argus"), ("object", f"{incident.id}"), ("problem_type", "test")]
