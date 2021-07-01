@@ -8,21 +8,22 @@ https://channels.readthedocs.io/en/latest/deploying.html#run-protocol-servers
 
 import os
 
-from channels.auth import AuthMiddlewareStack
-from channels.routing import ProtocolTypeRouter, URLRouter
 from django.core.asgi import get_asgi_application
 from django.urls import path
-import django
-
-from .consumers import OpenIncidentConsumer
-
-
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "argus.site.settings.dev")
-django.setup()
 
 # fmt: off
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "argus.site.settings.dev")
+
+django_http = get_asgi_application()  # Sets up Django. DO NOT REORDER
+from .consumers import OpenIncidentConsumer
+
+# MAGIC! DO NOT MOVE THESE BEFORE ANY OTHER IMPORT
+from channels.routing import ProtocolTypeRouter, URLRouter
+from channels.auth import AuthMiddlewareStack
+
+
 application = ProtocolTypeRouter({
-    "http": get_asgi_application(),
+    "http": django_http,
     "websocket": AuthMiddlewareStack(
         URLRouter([
             path("ws/open/", OpenIncidentConsumer.as_asgi()),
