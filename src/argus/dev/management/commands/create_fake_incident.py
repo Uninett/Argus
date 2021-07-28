@@ -44,7 +44,7 @@ class Command(BaseCommand):
         tags = options.get("tags") or []
         description = options.get("description") or None
         batch_size = options.get("batch_size") or 1
-        level = options.get("level") or randint(MIN_INCIDENT_LEVEL, MAX_INCIDENT_LEVEL)
+        level = options.get("level") or None
         stateful = False if options.get("stateless") else True
         for i in range(batch_size):
-            create_fake_incident(tags=tags, description=description, stateful=stateful)
+            create_fake_incident(tags=tags, description=description, stateful=stateful, level=level)
