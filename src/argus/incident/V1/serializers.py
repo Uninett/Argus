@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from ..fields import DateTimeInfinitySerializerField
-from ..models import Incident
+from ..models import Incident, Tag, IncidentTagRelation
 from ..serializers import IncidentSerializer, SourceSystemSerializer, IncidentTagRelationSerializer
 
 
@@ -26,6 +26,19 @@ class IncidentSerializerV1(IncidentSerializer):
         ]
         read_only_fields = ["source"]
         extra_kwargs = {"level": {"required": False}}
+
+    def create(self, validated_data: dict):
+        assert "user" in validated_data
+        user = validated_data.pop("user")
+
+        tags_data = validated_data.pop("deprecated_tags")
+        tags = {Tag.objects.get_or_create(**tag_data)[0] for tag_data in tags_data}
+
+        incident = Incident.objects.create(**validated_data)
+        for tag in tags:
+            IncidentTagRelation.objects.create(tag=tag, incident=incident, added_by=user)
+
+        return incident
 
 
 # Get rid of this!
