@@ -21,7 +21,7 @@ from social_django.urls import extra
 
 from argus.auth.views import ObtainNewAuthToken
 from argus.dataporten import views as dataporten_views
-from argus.site.views import error
+from argus.site.views import error, MetadataView
 
 
 psa_urls = [
@@ -38,4 +38,5 @@ urlpatterns = [
     path("api/schema/swagger-ui/", SpectacularSwaggerView.as_view(url_name="schema-v1-old"), name="swagger-ui-v1-old"),
     path("api/v1/", include(("argus.site.api_v1_urls", "api"), namespace="v1")),
     path("api/v2/", include(("argus.site.api_v2_urls", "api"), namespace="v2")),
+    path("api/", MetadataView.as_view(), name="metadata"),
 ]
