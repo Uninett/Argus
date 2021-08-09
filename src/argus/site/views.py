@@ -7,7 +7,11 @@ from django.http import (
     HttpResponseNotFound,
     HttpResponseServerError,
 )
-from django.shortcuts import render
+from django.shortcuts import render, reverse
+
+from rest_framework.views import APIView
+from rest_framework import permissions
+from rest_framework.response import Response
 
 
 ERROR_TEMPLATE = """<html>
@@ -64,3 +68,31 @@ def error(request):
         LOG.error(errormsg)
     content = render_error_page(status_code, "Generated error page")
     return ERROR_MAP[status_code](content=content)
+
+
+class MetadataView(APIView):
+    http_method_names = ["get", "head", "options", "trace"]
+    authentication_classes = []
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request, format=None):
+        try:
+            from argus.version import __version__
+        except (ModuleNotFoundError, ImportError):
+            import pkg_resources
+
+            __version__ = pkg_resources.get_distribution("argus-server").version
+
+        metadata = {
+            "server-version": __version__,
+            "api-version": {
+                "stable": "v1",
+                "unstable": "v2",
+            },
+            "jsonapi-schema": {
+                "stable": reverse("schema-v1-old"),
+                "v1": "/api/v1/schema/",
+                "v2": "/api/v2/schema/",
+            },
+        }
+        return Response(metadata)
