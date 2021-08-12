@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from django.contrib.admin import widgets as admin_widgets
-from django.forms import widgets
+from django import forms
 
 from argus.util.datetime_utils import get_infinity_repr
 
@@ -10,8 +10,9 @@ class AdminSplitDateTimeInfinity(admin_widgets.AdminSplitDateTime):
     template_name = "incident/admin/widgets/split_datetime_infinity.html"
 
     def __init__(self, initial_value: datetime, attrs=None):
-        super().__init__(attrs)
-        self.widgets = [*self.widgets, widgets.CheckboxInput()]
+        # Pointless to use super() here since we always need to init forms.MultiWidget
+        widgets = [admin_widgets.AdminDateWidget, admin_widgets.AdminTimeWidget, forms.CheckboxInput]
+        forms.MultiWidget.__init__(self, widgets, attrs)
         self.initial_infinity_repr = get_infinity_repr(initial_value, str_repr=True)
 
     def decompress(self, value):
