@@ -171,10 +171,10 @@ class IncidentQuerySet(models.QuerySet):
         return self.filter(end_time__lte=timezone.now())
 
     def acked(self):
-        return self.filter(self._generate_acked_query()).distinct()
+        return self.filter(id__in=self._get_acked_incident_ids())
 
     def not_acked(self):
-        return self.exclude(self._generate_acked_query())
+        return self.exclude(id__in=self._get_acked_incident_ids())
 
     def has_ticket(self):
         return self.exclude(ticket_url="")
@@ -195,10 +195,9 @@ class IncidentQuerySet(models.QuerySet):
 
     # Cannot be a constant, because `timezone.now()` would have been evaluated at compile time
     @staticmethod
-    def _generate_acked_query():
-        acks_query = Q(events__ack__isnull=False)
-        acks_not_expired_query = Q(events__ack__expiration__isnull=True) | Q(events__ack__expiration__gt=timezone.now())
-        return acks_query & acks_not_expired_query
+    def _get_acked_incident_ids():
+        current_acks = Acknowledgement.objects.active().prefetch_related("event__incident")
+        return current_acks.values_list("event__incident", flat=True).distinct()
 
 
 # TODO: review whether fields should be nullable, and on_delete modes
@@ -390,9 +389,21 @@ class Event(models.Model):
         return f"'{self.get_type_display()}': {self.incident.description}, {self.actor} @ {self.timestamp}"
 
 
+class AcknowledgementQuerySet(models.QuerySet):
+    def expired(self, timestamp=None):
+        timestamp = timestamp if timestamp else timezone.now()
+        return self.filter(expiration__lte=timestamp)
+
+    def active(self, timestamp=None):
+        timestamp = timestamp if timestamp else timezone.now()
+        return self.exclude(expiration__lte=timestamp)
+
+
 class Acknowledgement(models.Model):
     event = models.OneToOneField(to=Event, on_delete=models.PROTECT, primary_key=True, related_name="ack")
     expiration = models.DateTimeField(null=True, blank=True)
+
+    objects = AcknowledgementQuerySet.as_manager()
 
     class Meta:
         ordering = ["-event__timestamp"]
