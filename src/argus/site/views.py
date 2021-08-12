@@ -109,11 +109,21 @@ class MetadataView(APIView):
     )
     def get(self, request, format=None):
         try:
-            from argus.version import __version__
-        except (ModuleNotFoundError, ImportError):
-            import pkg_resources
+            # Run from source-dir
+            import argus.version
 
-            __version__ = pkg_resources.get_distribution("argus-server").version
+            __version__ = argus.version.version
+        except (AttributeError, ModuleNotFoundError, ImportError):
+            # Installed from package
+            try:
+                from importlib.metadata import version
+
+                __version__ = version("wheel")
+            except ImportError:
+                # Python < 3.8
+                import pkg_resources
+
+                __version__ = pkg_resources.get_distribution("argus-server").version
 
         metadata = {
             "server-version": __version__,
