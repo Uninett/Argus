@@ -10,9 +10,11 @@ from django.http import (
 )
 from django.shortcuts import render, reverse
 
-from rest_framework.views import APIView
+from drf_spectacular.utils import extend_schema, inline_serializer
 from rest_framework import permissions
+from rest_framework import serializers
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 
 ERROR_TEMPLATE = """<html>
@@ -80,6 +82,31 @@ class MetadataView(APIView):
     authentication_classes = []
     permission_classes = [permissions.AllowAny]
 
+    @extend_schema(
+        responses={
+            200: inline_serializer(
+                name="Metadata",
+                fields={
+                    "server-version": serializers.CharField(),
+                    "api-version": inline_serializer(
+                        name="APIVersion",
+                        fields={
+                            "stable": serializers.CharField(),
+                            "unstable": serializers.CharField(),
+                        },
+                    ),
+                    "jsonapi-schema": inline_serializer(
+                        name="OpenAPISchemaLocation",
+                        fields={
+                            "stable": serializers.URLField(),
+                            "v1": serializers.URLField(),
+                            "v2": serializers.URLField(),
+                        },
+                    ),
+                },
+            )
+        }
+    )
     def get(self, request, format=None):
         try:
             from argus.version import __version__
