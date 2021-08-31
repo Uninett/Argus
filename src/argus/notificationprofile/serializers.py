@@ -58,19 +58,23 @@ class TimeslotSerializer(serializers.ModelSerializer):
             "name",
             "time_recurrences",
         ]
+        # "user" isn't in the list of fields so we can't use a UniqueTogetherValidator
+
+    def validate_name(self, name):
+        owner = self.context["request"].user
+        qs = Timeslot.objects.filter(user=owner, name=name)
+        if not qs.exists():  # create
+            return name
+        instance = getattr(self, "instance", None)  # update
+        if instance and qs.filter(pk=instance.pk).exists():
+            return name
+        raise serializers.ValidationError(
+            f'The name "{name}" is already in use for a another timeslot owned by user {owner}.'
+        )
 
     def create(self, validated_data: dict):
         time_recurrences_data = validated_data.pop("time_recurrences")
-        try:
-            timeslot = Timeslot.objects.create(**validated_data)
-        except IntegrityError as e:
-            name = validated_data["name"]
-            if Timeslot.objects.filter(name=name).exists():
-                raise serializers.ValidationError(
-                    f"Timeslot with the name '{name}' already exists for the user {validated_data['user']}."
-                )
-            else:
-                raise e
+        timeslot = Timeslot.objects.create(**validated_data)
 
         for time_recurrence_data in time_recurrences_data:
             TimeRecurrence.objects.create(timeslot=timeslot, **time_recurrence_data)
@@ -79,8 +83,8 @@ class TimeslotSerializer(serializers.ModelSerializer):
 
     def update(self, timeslot: Timeslot, validated_data: dict):
         time_recurrences_data = validated_data.pop("time_recurrences")
-
-        timeslot.name = validated_data["name"]
+        name = validated_data["name"]
+        timeslot.name = name
         timeslot.save()
 
         # Replace existing time recurrences with posted time recurrences
