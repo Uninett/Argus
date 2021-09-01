@@ -298,13 +298,16 @@ class UpdateAcknowledgementSerializer(serializers.ModelSerializer):
         ]
 
     def update(self, instance, validated_data):
+        now = self.__class__._later_than_func()
+        if instance.expiration and instance.expiration < now:  # expired are readonly
+            raise serializers.ValidationError(f"Cannot change expired Acknowledgement")
         expiration = validated_data.get("expiration")
         instance.expiration = expiration
         instance.save()
         return instance
 
     def validate_expiration(self, expiration):
-        now = self._later_than_func()
+        now = self.__class__._later_than_func()
         if expiration and expiration <= now:
             raise serializers.ValidationError(f"'expiration' must be later than current moment ({now}) or null.")
         return expiration

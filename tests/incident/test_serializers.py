@@ -65,3 +65,12 @@ class UpdateAcknowledgementSerializerTests(TestCase):
         updated_ack = serializer.update(ack, validated_data)
         self.assertEqual(ack, updated_ack)
         self.assertTrue(updated_ack.expiration)
+
+    def test_update_expired_ack_should_fail(self):
+        incident = IncidentFactory()
+        timestamp_in_the_past = timezone.now() - datetime.timedelta(days=30)
+        ack = incident.create_ack(self.user, expiration=timestamp_in_the_past)
+        validated_data = {"expiration": None}
+        serializer = UpdateAcknowledgementSerializer()
+        with self.assertRaises(serializers.ValidationError) as e:
+            updated_ack = serializer.update(ack, validated_data)
