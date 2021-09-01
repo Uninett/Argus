@@ -28,6 +28,7 @@ from .models import (
     Tag,
 )
 from .serializers import (
+    UpdateAcknowledgementSerializer,
     AcknowledgementSerializer,
     EventSerializer,
     IncidentPureDeserializer,
@@ -375,12 +376,31 @@ class EventViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, mixins.Retrie
         raise serializers.ValidationError({"type": message})
 
 
+@extend_schema_view(
+    update=extend_schema(
+        request=UpdateAcknowledgementSerializer,
+        responses={"200": AcknowledgementSerializer},
+    ),
+    partial_update=extend_schema(
+        request=UpdateAcknowledgementSerializer,
+        responses={"200": AcknowledgementSerializer},
+    ),
+)
 class AcknowledgementViewSet(
-    mixins.ListModelMixin, mixins.CreateModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
+    viewsets.GenericViewSet,
 ):
     queryset = Incident.objects.none()  # For OpenAPI
     permission_classes = [IsAuthenticated]
     serializer_class = AcknowledgementSerializer
+
+    def get_serializer_class(self):
+        if self.action in ("partial_update", "update"):
+            return UpdateAcknowledgementSerializer
+        return self.serializer_class
 
     def get_incident(self):
         incident_pk = self.kwargs["incident_pk"]
