@@ -28,6 +28,7 @@ from .models import (
     Tag,
 )
 from .serializers import (
+    UpdateAcknowledgementSerializer,
     AcknowledgementSerializer,
     EventSerializer,
     IncidentPureDeserializer,
@@ -375,22 +376,43 @@ class EventViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, mixins.Retrie
         raise serializers.ValidationError({"type": message})
 
 
+@extend_schema_view(
+    update=extend_schema(
+        request=UpdateAcknowledgementSerializer,
+        responses={"200": AcknowledgementSerializer},
+    ),
+    partial_update=extend_schema(
+        request=UpdateAcknowledgementSerializer,
+        responses={"200": AcknowledgementSerializer},
+    ),
+)
 class AcknowledgementViewSet(
-    mixins.ListModelMixin, mixins.CreateModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
+    viewsets.GenericViewSet,
 ):
     queryset = Incident.objects.none()  # For OpenAPI
     permission_classes = [IsAuthenticated]
     serializer_class = AcknowledgementSerializer
 
-    def get_queryset(self):
+    def get_serializer_class(self):
+        if self.action in ("partial_update", "update"):
+            return UpdateAcknowledgementSerializer
+        return self.serializer_class
+
+    def get_incident(self):
         incident_pk = self.kwargs["incident_pk"]
-        incident = get_object_or_404(Incident.objects.all(), pk=incident_pk)
-        return incident.acks
+        return get_object_or_404(Incident.objects.all(), pk=incident_pk)
+
+    def get_queryset(self):
+        return self.get_incident().acks
 
     def perform_create(self, serializer: AcknowledgementSerializer):
         user = self.request.user
         if user.is_source_system:
             EventViewSet._raise_type_validation_error("A source system cannot post acknowledgements.")
 
-        incident = Incident.objects.get(pk=self.kwargs["incident_pk"])
+        incident = self.get_incident()
         serializer.save(incident=incident, actor=user)

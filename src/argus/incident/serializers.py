@@ -48,7 +48,7 @@ class TagSerializer(serializers.Serializer):
             raise serializers.ValidationError("The tag's key must not be empty")
         Tag._meta.get_field("key").run_validators(key)
         # Reassemble tag, to enforce key without leading or trailing whitespace (by calling `strip()` above)
-        return Tag.join(key, value_)
+        return Tag.join(key, value)
 
     def to_internal_value(self, data: dict):
         if "tag" in data:
@@ -288,6 +288,35 @@ class EventSerializer(serializers.ModelSerializer):
         return event_repr
 
 
+class UpdateAcknowledgementSerializer(serializers.ModelSerializer):
+    _later_than_func = timezone.now
+
+    class Meta:
+        model = Acknowledgement
+        fields = [
+            "expiration",
+        ]
+
+    def update(self, instance, validated_data):
+        now = self.__class__._later_than_func()
+        if instance.expiration and instance.expiration < now:  # expired are readonly
+            raise serializers.ValidationError(f"Cannot change expired Acknowledgement")
+        expiration = validated_data.get("expiration")
+        instance.expiration = expiration
+        instance.save()
+        return instance
+
+    def validate_expiration(self, expiration):
+        now = self.__class__._later_than_func()
+        if expiration and expiration <= now:
+            raise serializers.ValidationError(f"'expiration' must be later than current moment ({now}) or null.")
+        return expiration
+
+    def to_representation(self, instance):
+        serializer = AcknowledgementSerializer(instance=instance)
+        return serializer.data
+
+
 class AcknowledgementSerializer(serializers.ModelSerializer):
     event = EventSerializer()
 
@@ -302,8 +331,8 @@ class AcknowledgementSerializer(serializers.ModelSerializer):
         read_only_fields = ["pk"]
 
     def create(self, validated_data: dict):
-        assert "incident" in validated_data
-        assert "actor" in validated_data
+        assert "incident" in validated_data, '"incident" not in input'
+        assert "actor" in validated_data, '"actor" not in input'
         incident = validated_data.pop("incident")
         actor = validated_data.pop("actor")
         expiration = validated_data.get("expiration", None)
@@ -314,8 +343,7 @@ class AcknowledgementSerializer(serializers.ModelSerializer):
         return ack
 
     def to_internal_value(self, data: dict):
-        if "type" not in data["event"]:
-            data["event"]["type"] = Event.Type.ACKNOWLEDGE
+        data["event"]["type"] = Event.Type.ACKNOWLEDGE
         return super().to_internal_value(data)
 
     def validate_event(self, value: dict):
@@ -330,5 +358,5 @@ class AcknowledgementSerializer(serializers.ModelSerializer):
     def validate(self, attrs: dict):
         expiration = attrs.get("expiration")
         if expiration and expiration <= attrs["event"]["timestamp"]:
-            raise serializers.ValidationError("'expiration' must be after 'event.timestamp'.")
+            raise serializers.ValidationError("'expiration' is earlier than creation timestamp.")
         return attrs
