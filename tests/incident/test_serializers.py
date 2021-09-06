@@ -9,7 +9,7 @@ from rest_framework.test import APIRequestFactory
 from rest_framework import serializers
 
 from argus.auth.factories import PersonUserFactory
-from argus.incident.factories import IncidentFactory
+from argus.incident.factories import StatefulIncidentFactory
 from argus.incident.serializers import AcknowledgementSerializer
 from argus.incident.serializers import UpdateAcknowledgementSerializer
 from argus.util.testing import disconnect_signals, connect_signals
@@ -27,7 +27,7 @@ class AcknowledgementSerializerTests(TestCase):
     def test_create_golden_path(self):
         request = self.request_factory.post("/")
         request.user = self.user
-        incident = IncidentFactory()
+        incident = StatefulIncidentFactory()
         timestamp = timezone.now()
         data = {
             "event": {
@@ -57,7 +57,7 @@ class UpdateAcknowledgementSerializerTests(TestCase):
         connect_signals()
 
     def test_update_golden_path(self):
-        incident = IncidentFactory()
+        incident = StatefulIncidentFactory()
         ack = incident.create_ack(self.user, expiration=None)
         self.assertFalse(ack.expiration)
         validated_data = {"expiration": timezone.now()}
@@ -67,7 +67,7 @@ class UpdateAcknowledgementSerializerTests(TestCase):
         self.assertTrue(updated_ack.expiration)
 
     def test_update_expired_ack_should_fail(self):
-        incident = IncidentFactory()
+        incident = StatefulIncidentFactory()
         timestamp_in_the_past = timezone.now() - datetime.timedelta(days=30)
         ack = incident.create_ack(self.user, expiration=timestamp_in_the_past)
         validated_data = {"expiration": None}

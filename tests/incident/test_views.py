@@ -4,7 +4,7 @@ from rest_framework import serializers, versioning
 from rest_framework.test import APITestCase
 
 from argus.auth.factories import SourceUserFactory
-from argus.incident.factories import SourceSystemTypeFactory, SourceSystemFactory, IncidentFactory
+from argus.incident.factories import SourceSystemTypeFactory, SourceSystemFactory, StatefulIncidentFactory
 from argus.incident.models import Event, Incident, Tag
 from argus.incident.views import EventViewSet
 from argus.util.testing import disconnect_signals, connect_signals
@@ -21,7 +21,7 @@ class EventViewSetTestCase(TestCase):
         connect_signals()
 
     def test_validate_event_type_for_incident_acknowledge_raises_validation_error(self):
-        incident = IncidentFactory(source=self.source)
+        incident = StatefulIncidentFactory(source=self.source)
         viewfactory = RequestFactory()
         request = viewfactory.get(f"/api/v1/incidents/{incident.pk}/events/")
         request.versioning_scheme = versioning.NamespaceVersioning()

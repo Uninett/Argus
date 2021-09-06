@@ -3,7 +3,7 @@ from django.utils import timezone
 
 from argus.auth.factories import PersonUserFactory
 from argus.util.testing import disconnect_signals, connect_signals
-from argus.incident.factories import IncidentFactory
+from argus.incident.factories import StatefulIncidentFactory, StatelessIncidentFactory
 from argus.incident.models import Incident
 
 
@@ -12,10 +12,10 @@ class IncidentQuerySetTestCase(TestCase):
         disconnect_signals()
         # Lock in timestamps
         self.timestamp = timezone.now()
-        self.incident1 = IncidentFactory(start_time=self.timestamp, end_time=None, ticket_url="")
-        self.incident2 = IncidentFactory(start_time=self.timestamp, ticket_url="")
-        self.incident3 = IncidentFactory(start_time=self.timestamp, ticket_url="")
-        self.incident4 = IncidentFactory(start_time=self.timestamp)
+        self.incident1 = StatelessIncidentFactory(start_time=self.timestamp, ticket_url="")
+        self.incident2 = StatefulIncidentFactory(start_time=self.timestamp, ticket_url="")
+        self.incident3 = StatefulIncidentFactory(start_time=self.timestamp, ticket_url="")
+        self.incident4 = StatefulIncidentFactory(start_time=self.timestamp)
         self.incident4.end_time = self.timestamp
         self.incident4.save()
 
@@ -39,14 +39,14 @@ class IncidentQuerySetTestCase(TestCase):
         self.assertEqual(result.get(), self.incident4)
 
     def test_acked(self):
-        incident_acked = IncidentFactory()
+        incident_acked = StatefulIncidentFactory()
         user = PersonUserFactory()
         incident_acked.create_ack(user)
         result = Incident.objects.acked()
         self.assertEqual(result.get(), incident_acked)
 
     def test_not_acked(self):
-        incident_acked = IncidentFactory()
+        incident_acked = StatefulIncidentFactory()
         user = PersonUserFactory()
         # Create an expired ack
         incident_acked.create_ack(user, expiration=self.timestamp)
