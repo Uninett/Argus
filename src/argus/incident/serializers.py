@@ -8,6 +8,7 @@ from rest_framework import serializers
 
 from argus.auth.models import User
 from argus.auth.serializers import UsernameSerializer
+from argus.util.datetime_utils import INFINITY_REPR
 from . import fields
 from .models import (
     Acknowledgement,
@@ -172,8 +173,10 @@ class IncidentSerializer(serializers.ModelSerializer):
         return value
 
     def validate(self, attrs: dict):
-        end_time = attrs.get("end_time")
-        if end_time and end_time < attrs["start_time"]:
+        end_time = attrs.get("end_time", INFINITY_REPR)
+        if end_time == INFINITY_REPR:
+            attrs["end_time"] = INFINITY_REPR
+        elif end_time and end_time < attrs["start_time"]:
             raise serializers.ValidationError("'end_time' cannot be before 'start_time'.")
         return attrs
 

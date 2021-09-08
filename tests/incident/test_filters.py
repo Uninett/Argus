@@ -25,10 +25,10 @@ class IncidentFilterTestCase(IncidentBasedAPITestCaseHelper, TestCase):
     def setUp(self):
         disconnect_signals()
         super().init_test_objects()
-        self.incident1 = IncidentFactory(source=self.source1, end_time=None, ticket_url="")
-        self.incident2 = IncidentFactory(source=self.source1, ticket_url="")
-        self.incident3 = IncidentFactory(source=self.source2, ticket_url="")
-        self.incident4 = IncidentFactory(source=self.source2)
+        self.incident1 = StatelessIncidentFactory(source=self.source1, ticket_url="")
+        self.incident2 = StatefulIncidentFactory(source=self.source1, ticket_url="")
+        self.incident3 = StatefulIncidentFactory(source=self.source2, ticket_url="")
+        self.incident4 = StatefulIncidentFactory(source=self.source2)
         self.incident4.end_time = self.incident4.start_time
         self.incident4.save()
 
@@ -75,7 +75,7 @@ class IncidentFilterTestCase(IncidentBasedAPITestCaseHelper, TestCase):
         user = SourceUserFactory()
         tag1 = TagFactory(key="testkey1", value="testvalue1")
         tag2 = TagFactory(key="testkey2", value="testvalue2")
-        incident5 = IncidentFactory(source=self.source1)
+        incident5 = StatefulIncidentFactory(source=self.source1)
         for incident in (self.incident1, self.incident2, self.incident3):
             IncidentTagRelation.objects.get_or_create(tag=tag1, incident=incident, added_by=user)
         for incident in (self.incident3, self.incident4, incident5):
@@ -91,7 +91,7 @@ class IncidentFilterTestCase(IncidentBasedAPITestCaseHelper, TestCase):
         user = SourceUserFactory()
         tag1 = TagFactory(key="testkey", value="testvalue1")
         tag2 = TagFactory(key="testkey", value="testvalue2")
-        incident5 = IncidentFactory(source=self.source1)
+        incident5 = StatefulIncidentFactory(source=self.source1)
         for incident in (self.incident1, self.incident2, self.incident3):
             IncidentTagRelation.objects.get_or_create(tag=tag1, incident=incident, added_by=user)
         for incident in (self.incident3, self.incident4, incident5):
@@ -107,7 +107,7 @@ class IncidentFilterTestCase(IncidentBasedAPITestCaseHelper, TestCase):
         user = SourceUserFactory()
         tag1 = TagFactory(key="testkey1", value="testvalue1")
         tag2 = TagFactory(key="testkey2", value="testvalue2")
-        incident5 = IncidentFactory(source=self.source1)
+        incident5 = StatefulIncidentFactory(source=self.source1)
         for incident in (self.incident1, self.incident2, self.incident3):
             IncidentTagRelation.objects.get_or_create(tag=tag1, incident=incident, added_by=user)
         for incident in (self.incident3, self.incident4, incident5):
