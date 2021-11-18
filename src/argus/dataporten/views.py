@@ -21,5 +21,5 @@ def login_wrapper(request, backend, *args, **kwargs):
 
     token, _created = Token.objects.get_or_create(user=user)
     response = redirect(settings.FRONTEND_URL, permanent=True)
-    response.set_cookie("token", token.key, domain=settings.COOKIE_DOMAIN)
+    response.set_cookie(settings.ARGUS_TOKEN_COOKIE_NAME, token.key, domain=settings.COOKIE_DOMAIN)
     return response

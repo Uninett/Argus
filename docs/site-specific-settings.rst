@@ -184,6 +184,18 @@ Debugging settings
 * ``TEMPLATE_DEBUG`` (optional) provides a convenient way to turn debugging on and off
   for templates. If undefined, it will default to the value of ``DEBUG``.
 
+Other settings
+--------------
+
+Normally, you shouldn't need to ever change these. If you do need to touch
+them, do it via a new settings file containing overrides.
+
+* ``ARGUS_TOKEN_COOKIE_NAME`` is to control the name of the cookie that
+  contains a copy of the authentication token which is used when logging in via
+  the frontend. The default is ``token``, and you can change this to
+  something else if something you cannot change in the same system also creates
+  a cookie with the name ``token``.
+
 .. warning:: Environment variables and Argus settings may contain sensitive data, such
   as login credentials, secrets and passwords.
   Be mindful when setting these variables, and use appropriate safety precautions.
