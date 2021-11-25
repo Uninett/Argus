@@ -1,4 +1,6 @@
 from django.contrib.auth import logout
+from django.conf import settings
+
 from drf_spectacular.utils import extend_schema
 from rest_framework import generics
 from rest_framework.authtoken.models import Token
@@ -39,7 +41,9 @@ class LogoutView(APIView):
         # Log out from session
         logout(request)
 
-        return Response()
+        response = Response()
+        response.delete_cookie(settings.ARGUS_TOKEN_COOKIE_NAME)
+        return response
 
 
 class CurrentUserView(APIView):
