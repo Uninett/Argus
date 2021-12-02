@@ -2,7 +2,7 @@
 [![build badge](https://github.com/Uninett/Argus/workflows/build/badge.svg)](https://github.com/Uninett/Argus/actions)
 [![codecov badge](https://codecov.io/gh/Uninett/Argus/branch/master/graph/badge.svg)](https://codecov.io/gh/Uninett/Argus)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![docs badge](https://readthedocs.org/projects/pip/badge/?version=latest&style=flat)](http://argus-server.rtfd.io/en/latest/)
+[![docs badge](https://readthedocs.org/projects/argus-server/badge/?version=latest&style=flat)](http://argus-server.rtfd.io/en/latest/)
 
 Argus is a platform for aggregating incidents across network management systems, and
 sending notifications to users. Users create notification profiles that define which
