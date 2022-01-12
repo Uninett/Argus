@@ -13,7 +13,7 @@ from argus.notificationprofile.models import (
 )
 from argus.util.testing import disconnect_signals, connect_signals
 
-from . import IncidentAPITestCaseHelper
+from .. import IncidentAPITestCaseHelper
 
 
 @tag("API", "integration")
@@ -40,14 +40,14 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
 
     def test_incidents_filtered_by_notification_profile_view(self):
         response = self.user1_rest_client.get(
-            reverse("v2:notification-profile:notificationprofile-incidents", args=[self.notification_profile1.pk])
+            reverse("v1:notification-profile:notificationprofile-incidents", args=[self.notification_profile1.pk])
         )
         response.render()
         self.assertEqual(response.content, self.incident1_json)
 
     def test_notification_profile_can_properly_change_timeslot(self):
         profile1_pk = self.notification_profile1.pk
-        profile1_path = reverse("v2:notification-profile:notificationprofile-detail", args=[profile1_pk])
+        profile1_path = reverse("v1:notification-profile:notificationprofile-detail", args=[profile1_pk])
 
         self.assertEqual(self.user1.notification_profiles.get(pk=profile1_pk).timeslot, self.timeslot1)
         self.assertEqual(self.user1_rest_client.get(profile1_path).status_code, status.HTTP_200_OK)
@@ -56,7 +56,7 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
             {
                 "timeslot": self.timeslot2.pk,
                 "filters": [f.pk for f in self.notification_profile1.filters.all()],
-                "media": self.notification_profile1.media,
+                "media": self.notification_profile1.media_v1,
                 "phone_number": self.notification_profile1.phone_number_id,
                 "active": self.notification_profile1.active,
             },
@@ -69,7 +69,7 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
             self.notification_profile1.refresh_from_db()
         self.assertTrue(self.user1.notification_profiles.filter(pk=new_profile1_pk).exists())
         self.assertEqual(self.user1.notification_profiles.get(pk=new_profile1_pk).timeslot, self.timeslot2)
-        new_profile1_path = reverse("v2:notification-profile:notificationprofile-detail", args=[new_profile1_pk])
+        new_profile1_path = reverse("v1:notification-profile:notificationprofile-detail", args=[new_profile1_pk])
         self.assertEqual(self.user1_rest_client.get(new_profile1_path).status_code, status.HTTP_200_OK)
 
     # TODO: test more endpoints
