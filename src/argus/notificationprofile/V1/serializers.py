@@ -3,7 +3,7 @@ from rest_framework import fields, serializers
 
 from argus.auth.serializers import PhoneNumberSerializer
 
-from ..models import NotificationProfile
+from ..models import NotificationMedia, NotificationProfile
 from ..serializers import (
     TimeslotSerializer,
     FilterSerializer,
@@ -14,7 +14,6 @@ class ResponseNotificationProfileSerializerV1(serializers.ModelSerializer):
     timeslot = TimeslotSerializer()
     filters = FilterSerializer(many=True)
     phone_number = PhoneNumberSerializer(allow_null=True, required=False)
-    media = fields.MultipleChoiceField(choices=NotificationProfile.Media.choices, source="media_v1")
 
     class Meta:
         model = NotificationProfile
@@ -29,10 +28,17 @@ class ResponseNotificationProfileSerializerV1(serializers.ModelSerializer):
         # "pk" needs to be listed, as "timeslot" is the actual primary key
         read_only_fields = ["pk"]
 
+    def to_representation(self, instance: NotificationProfile):
+        profile_dict = super().to_representation(instance)
+        media_v1 = []
+        for media in profile_dict["media"]:
+            if media in ("sms", "email"):
+                media_v1.append(media[:2].upper())
+            profile_dict["media"] = ",".join(media_v1)
+        return profile_dict
+
 
 class RequestNotificationProfileSerializerV1(serializers.ModelSerializer):
-    media = fields.MultipleChoiceField(choices=NotificationProfile.Media.choices, source="media_v1")
-
     class Meta:
         model = NotificationProfile
         fields = [
@@ -74,3 +80,13 @@ class RequestNotificationProfileSerializerV1(serializers.ModelSerializer):
         if attrs["timeslot"].user != self.context["request"].user:
             raise serializers.ValidationError("The user of 'timeslot' must be the same as the requesting user.")
         return attrs
+
+    def to_internal_value(self, data: dict):
+        if data.get("media") == ["EM", "SM"] or data.get("media") == ["SM", "EM"]:
+            data["media"] = ["email", "sms"]
+        elif data.get("media") == ["EM"]:
+            data["media"] = ["email"]
+        elif data.get("media") == ["SM"]:
+            data["media"] = ["sms"]
+
+        return super().to_internal_value(data)
