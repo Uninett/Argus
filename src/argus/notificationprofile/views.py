@@ -11,10 +11,11 @@ from drf_rw_serializers import viewsets as rw_viewsets
 
 from argus.drf.permissions import IsOwner
 from argus.incident.serializers import IncidentSerializer
-from .models import Filter, NotificationProfile, Timeslot
+from .models import Filter, NotificationMedia, NotificationProfile, Timeslot
 from .serializers import (
     FilterSerializer,
     FilterPreviewSerializer,
+    NotificationMediaSerializer,
     ResponseNotificationProfileSerializer,
     RequestNotificationProfileSerializer,
     TimeslotSerializer,
@@ -92,6 +93,16 @@ class NotificationProfileViewSet(rw_viewsets.ModelViewSet):
         mock_filter = Filter(filter_string=filter_string_json)
         serializer = IncidentSerializer(mock_filter.filtered_incidents, many=True)
         return Response(serializer.data)
+
+
+class NotificationMediaViewSet(viewsets.ModelViewSet):
+    serializer_class = NotificationMediaSerializer
+    read_serializer_class = NotificationMediaSerializer
+    queryset = NotificationMedia.objects.none()
+    http_method_names = ["get", "head"]
+
+    def get_queryset(self):
+        return NotificationMedia.objects.all()
 
 
 class TimeslotViewSet(viewsets.ModelViewSet):

@@ -253,6 +253,7 @@ class NotificationMedia(models.Model):
         super(NotificationMedia, self).save(*args, **kwargs)
 
 
+# This class is deprecated
 class NotificationProfile(models.Model):
     class Media(models.TextChoices):
         EMAIL = "EM", "Email"

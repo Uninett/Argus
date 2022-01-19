@@ -12,7 +12,7 @@ from argus.notificationprofile.factories import (
     MinimalTimeRecurrenceFactory,
 )
 from argus.notificationprofile.media import send_notifications_to_users
-from argus.notificationprofile.models import Timeslot, NotificationProfile, Filter
+from argus.notificationprofile.models import NotificationMedia, Timeslot, NotificationProfile, Filter
 from argus.util.testing import disconnect_signals, connect_signals
 
 
@@ -39,11 +39,16 @@ class SendingNotificationTest(TestCase):
         filter_string = json.dumps(filter_dict)
         filter = FilterFactory(user=user, filter_string=filter_string)
 
+        # Get the notification medium email
+        email = NotificationMedia.objects.get(slug="email")
+
         # Create two notification profiles that match this filter, but attached to each their timeslot
         self.np1 = NotificationProfileFactory(user=user, timeslot=timeslot1, active=True)
         self.np1.filters.add(filter)
+        self.np1.media.add(email)
         self.np2 = NotificationProfileFactory(user=user, timeslot=timeslot2, active=True)
         self.np2.filters.add(filter)
+        self.np2.media.add(email)
 
     def tearDown(self):
         connect_signals()

@@ -5,7 +5,7 @@ from argus.auth.serializers import PhoneNumberSerializer
 from argus.incident.models import SourceSystem, Tag, Incident
 
 from .primitive_serializers import FilterBlobSerializer, FilterPreviewSerializer
-from .models import Filter, NotificationProfile, TimeRecurrence, Timeslot
+from .models import Filter, NotificationMedia, NotificationProfile, TimeRecurrence, Timeslot
 from .validators import validate_filter_string
 
 
@@ -112,11 +112,20 @@ class FilterSerializer(serializers.ModelSerializer):
         ]
 
 
+class NotificationMediaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = NotificationMedia
+        fields = [
+            "slug",
+            "name",
+        ]
+
+
 class ResponseNotificationProfileSerializer(serializers.ModelSerializer):
     timeslot = TimeslotSerializer()
     filters = FilterSerializer(many=True)
     phone_number = PhoneNumberSerializer(allow_null=True, required=False)
-    media = fields.MultipleChoiceField(choices=NotificationProfile.Media.choices)
+    media = NotificationMediaSerializer(many=True)
 
     class Meta:
         model = NotificationProfile
@@ -133,8 +142,6 @@ class ResponseNotificationProfileSerializer(serializers.ModelSerializer):
 
 
 class RequestNotificationProfileSerializer(serializers.ModelSerializer):
-    media = fields.MultipleChoiceField(choices=NotificationProfile.Media.choices)
-
     class Meta:
         model = NotificationProfile
         fields = [

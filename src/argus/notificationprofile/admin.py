@@ -3,7 +3,7 @@ from django.db.models.functions import Concat
 from django.utils.html import format_html_join
 
 from argus.util.admin_utils import list_filter_factory
-from .models import Filter, NotificationProfile, TimeRecurrence, Timeslot
+from .models import Filter, NotificationMedia, NotificationProfile, TimeRecurrence, Timeslot
 
 
 class TimeslotAdmin(admin.ModelAdmin):
@@ -45,6 +45,11 @@ class FilterAdmin(admin.ModelAdmin):
     raw_id_fields = ("user",)
 
 
+class NotificationMediaAdmin(admin.ModelAdmin):
+    list_display = ("slug", "name")
+    fields = ("name",)
+
+
 class NotificationProfileAdmin(admin.ModelAdmin):
     list_display = ("get_str", "get_filters", "get_media", "active")
     list_filter = (
@@ -61,7 +66,10 @@ class NotificationProfileAdmin(admin.ModelAdmin):
     )
 
     raw_id_fields = ("user", "timeslot")
-    filter_horizontal = ("filters",)
+    filter_horizontal = (
+        "filters",
+        "media",
+    )
 
     def get_str(self, notification_profile: NotificationProfile):
         return f"[{notification_profile.timeslot.user}] {notification_profile.timeslot}"
@@ -75,7 +83,7 @@ class NotificationProfileAdmin(admin.ModelAdmin):
     get_filters.short_description = "Filters"
 
     def get_media(self, notification_profile: NotificationProfile):
-        return notification_profile.get_media_display()
+        return notification_profile.media.all()
 
     get_media.short_description = "Notification media"
     get_media.admin_order_field = "media"
@@ -88,4 +96,5 @@ class NotificationProfileAdmin(admin.ModelAdmin):
 
 admin.site.register(Timeslot, TimeslotAdmin)
 admin.site.register(Filter, FilterAdmin)
+admin.site.register(NotificationMedia, NotificationMediaAdmin)
 admin.site.register(NotificationProfile, NotificationProfileAdmin)

@@ -61,7 +61,6 @@ class NotificationProfileFactory(factory.django.DjangoModelFactory):
 
     user = factory.SubFactory(PersonUserFactory, user=factory.SelfAttribute("..timeslot"))
     timeslot = factory.SubFactory(TimeslotFactory)
-    media = models.NotificationProfile.Media.EMAIL
     active = factory.Faker("boolean")
 
 
