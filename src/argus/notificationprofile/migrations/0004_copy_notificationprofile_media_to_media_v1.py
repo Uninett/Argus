@@ -11,6 +11,13 @@ def copy_media_to_media_v1(apps, schema_editor):
         notification_profile.save()
 
 
+def copy_media_v1_to_media(apps, schema_editor):
+    NotificationProfile = apps.get_model("argus_notificationprofile", "NotificationProfile")
+    for notification_profile in NotificationProfile.objects.all():
+        notification_profile.media = notification_profile.media_v1
+        notification_profile.save()
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -25,5 +32,5 @@ class Migration(migrations.Migration):
                 choices=[("EM", "Email"), ("SM", "SMS")], default=["EM"], max_length=5
             ),
         ),
-        migrations.RunPython(copy_media_to_media_v1),
+        migrations.RunPython(copy_media_to_media_v1, copy_media_v1_to_media),
     ]
