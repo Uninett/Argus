@@ -77,7 +77,7 @@ def background_send_notifications_to_users(event: Event):
 
 
 def send_notification(profile: NotificationProfile, event: Event):
-    media = get_notification_media(profile.media)
+    media = get_notification_media(profile.media_v1)
     sent = False
     for medium in media:
         if medium is not None:
