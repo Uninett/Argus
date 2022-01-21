@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
+from django.utils.text import slugify
 
 from multiselectfield import MultiSelectField
 
@@ -239,6 +240,33 @@ class Filter(models.Model):
         return not (False in checks)  # At least one filter failed
 
 
+class Media(models.Model):
+    MEDIA_NAME_LENGTH = 20
+    slug = models.SlugField(max_length=MEDIA_NAME_LENGTH, blank=True, primary_key=True)
+    name = models.CharField(max_length=MEDIA_NAME_LENGTH)
+
+    def __str__(self) -> str:
+        return f"{self.slug}"
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        return super(Media, self).save(*args, **kwargs)
+
+
+class DestinationConfig(models.Model):
+    user = models.ForeignKey(to=User, on_delete=models.CASCADE, related_name="destination_configs")
+    media = models.ForeignKey(
+        to=Media,
+        on_delete=models.CASCADE,
+        related_name="destination_configs",
+    )
+    settings = models.JSONField()
+
+    def __str__(self):
+        return f"{self.media.name}: {list(self.settings.values())}"
+
+
 class NotificationProfile(models.Model):
     class Media(models.TextChoices):
         EMAIL = "EM", "Email"
@@ -253,11 +281,16 @@ class NotificationProfile(models.Model):
     )
     filters = models.ManyToManyField(to=Filter, related_name="notification_profiles")
 
-    # TODO: support for multiple email addresses / phone numbers / etc.
     media = MultiSelectField(choices=Media.choices, min_choices=1, default=[Media.EMAIL])
     media_v1 = MultiSelectField(choices=Media.choices, min_choices=1, default=[Media.EMAIL])
     active = models.BooleanField(default=True)
     phone_number = models.ForeignKey("argus_auth.PhoneNumber", on_delete=models.SET_NULL, blank=True, null=True)
+    destinations = models.ManyToManyField(
+        to=DestinationConfig,
+        related_name="notification_profile",
+        blank=True,
+        null=True,
+    )
 
     def __str__(self):
         return f"{self.timeslot}: {', '.join(str(f) for f in self.filters.all())}"
