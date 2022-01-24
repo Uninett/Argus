@@ -1,7 +1,7 @@
 from django.apps import AppConfig
 from django.conf import settings
 from django.core.checks import register
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
 
 
 class NotificationprofileConfig(AppConfig):

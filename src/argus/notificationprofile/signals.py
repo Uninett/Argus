@@ -1,5 +1,5 @@
 from argus.auth.models import User
-from .models import TimeRecurrence, Timeslot
+from .models import DestinationConfig, TimeRecurrence, Timeslot
 
 __all__ = [
     "create_default_timeslot",

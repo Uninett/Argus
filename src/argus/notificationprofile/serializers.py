@@ -1,11 +1,10 @@
 from django.db import IntegrityError
 from rest_framework import fields, serializers
 
-from argus.auth.serializers import PhoneNumberSerializer
 from argus.incident.models import SourceSystem, Tag, Incident
 
 from .primitive_serializers import FilterBlobSerializer, FilterPreviewSerializer
-from .models import Filter, NotificationProfile, TimeRecurrence, Timeslot
+from .models import DestinationConfig, Filter, Media, NotificationProfile, TimeRecurrence, Timeslot
 from .validators import validate_filter_string
 
 
@@ -112,11 +111,41 @@ class FilterSerializer(serializers.ModelSerializer):
         ]
 
 
+class MediaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Media
+        fields = [
+            "slug",
+            "name",
+        ]
+
+
+class ResponseDestinationConfigSerializer(serializers.ModelSerializer):
+    media = MediaSerializer()
+
+    class Meta:
+        model = DestinationConfig
+        fields = [
+            "media",
+            "label",
+            "settings",
+        ]
+
+
+class RequestDestinationConfigSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DestinationConfig
+        fields = [
+            "media",
+            "label",
+            "settings",
+        ]
+
+
 class ResponseNotificationProfileSerializer(serializers.ModelSerializer):
     timeslot = TimeslotSerializer()
     filters = FilterSerializer(many=True)
-    phone_number = PhoneNumberSerializer(allow_null=True, required=False)
-    media = fields.MultipleChoiceField(choices=NotificationProfile.Media.choices)
+    destinations = ResponseDestinationConfigSerializer(many=True)
 
     class Meta:
         model = NotificationProfile
@@ -124,8 +153,7 @@ class ResponseNotificationProfileSerializer(serializers.ModelSerializer):
             "pk",
             "timeslot",
             "filters",
-            "media",
-            "phone_number",
+            "destinations",
             "active",
         ]
         # "pk" needs to be listed, as "timeslot" is the actual primary key
@@ -133,16 +161,13 @@ class ResponseNotificationProfileSerializer(serializers.ModelSerializer):
 
 
 class RequestNotificationProfileSerializer(serializers.ModelSerializer):
-    media = fields.MultipleChoiceField(choices=NotificationProfile.Media.choices)
-
     class Meta:
         model = NotificationProfile
         fields = [
             "pk",
             "timeslot",
             "filters",
-            "media",
-            "phone_number",
+            "destinations",
             "active",
         ]
         # "pk" needs to be listed, as "timeslot" is the actual primary key

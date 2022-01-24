@@ -11,6 +11,7 @@ __all__ = [
     "TimeRecurrenceFactory",
     "MinimalTimeRecurrenceFactory",
     "MaximalTimeRecurrenceFactory",
+    "DestinationConfigFactory",
     "NotificationProfileFactory",
     "FilterFactory",
 ]
@@ -55,13 +56,28 @@ class MaximalTimeRecurrenceFactory(TimeRecurrenceFactory):
     days = list(range(1, 7 + 1))
 
 
+class MediaFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = models.Media
+
+    slug = factory.Faker("word")
+    name = factory.LazyAttribute(lambda obj: obj.slug.capitalize())
+
+
+class DestinationConfigFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = models.DestinationConfig
+
+    user = factory.SubFactory(PersonUserFactory)
+    media = factory.SubFactory(MediaFactory)
+
+
 class NotificationProfileFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.NotificationProfile
 
     user = factory.SubFactory(PersonUserFactory, user=factory.SelfAttribute("..timeslot"))
     timeslot = factory.SubFactory(TimeslotFactory)
-    media = models.NotificationProfile.Media.EMAIL
     active = factory.Faker("boolean")
 
 
