@@ -3,7 +3,7 @@ from django.db.models.functions import Concat
 from django.utils.html import format_html_join
 
 from argus.util.admin_utils import list_filter_factory
-from .models import Filter, NotificationProfile, TimeRecurrence, Timeslot
+from .models import DestinationConfig, Filter, Media, NotificationProfile, TimeRecurrence, Timeslot
 
 
 class TimeslotAdmin(admin.ModelAdmin):
@@ -45,8 +45,38 @@ class FilterAdmin(admin.ModelAdmin):
     raw_id_fields = ("user",)
 
 
+class MediaAdmin(admin.ModelAdmin):
+    list_display = (
+        "slug",
+        "name",
+    )
+    fields = ("name",)
+
+
+class DestinationConfigAdmin(admin.ModelAdmin):
+    list_display = (
+        "user",
+        "media",
+        "label",
+        "settings",
+    )
+    list_filter = ("media__name",)
+    search_fields = (
+        "user__first_name",
+        "user__last_name",
+        "user__username",
+        "label",
+    )
+    raw_id_fields = ("user",)
+    ordering = ("user",)
+
+
+class DestinationConfigInline(admin.TabularInline):
+    model = NotificationProfile.destinations.through
+
+
 class NotificationProfileAdmin(admin.ModelAdmin):
-    list_display = ("get_str", "get_filters", "get_media", "active")
+    list_display = ("get_str", "get_filters", "get_destination_media", "active")
     list_filter = (
         "active",
         list_filter_factory("has phone number", lambda qs, yes_filter: qs.exclude(phone_number__isnull=yes_filter)),
@@ -59,9 +89,15 @@ class NotificationProfileAdmin(admin.ModelAdmin):
         "user__last_name",
         "user__username",
     )
+    ordering = ("user",)
 
     raw_id_fields = ("user", "timeslot")
     filter_horizontal = ("filters",)
+
+    inlines = [
+        DestinationConfigInline,
+    ]
+    exclude = ("destinations",)
 
     def get_str(self, notification_profile: NotificationProfile):
         return f"[{notification_profile.timeslot.user}] {notification_profile.timeslot}"
@@ -74,11 +110,10 @@ class NotificationProfileAdmin(admin.ModelAdmin):
 
     get_filters.short_description = "Filters"
 
-    def get_media(self, notification_profile: NotificationProfile):
-        return notification_profile.get_media_display()
+    def get_destination_media(self, notification_profile: NotificationProfile):
+        return f"{set([destination.media.name for destination in notification_profile.destinations.all()])}"
 
-    get_media.short_description = "Notification media"
-    get_media.admin_order_field = "media"
+    get_destination_media.short_description = "Media"
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
@@ -88,4 +123,6 @@ class NotificationProfileAdmin(admin.ModelAdmin):
 
 admin.site.register(Timeslot, TimeslotAdmin)
 admin.site.register(Filter, FilterAdmin)
+admin.site.register(Media, MediaAdmin)
+admin.site.register(DestinationConfig, DestinationConfigAdmin)
 admin.site.register(NotificationProfile, NotificationProfileAdmin)
