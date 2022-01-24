@@ -11,10 +11,13 @@ from drf_rw_serializers import viewsets as rw_viewsets
 
 from argus.drf.permissions import IsOwner
 from argus.incident.serializers import IncidentSerializer
-from .models import Filter, NotificationProfile, Timeslot
+from .models import DestinationConfig, Filter, Media, NotificationProfile, Timeslot
 from .serializers import (
     FilterSerializer,
     FilterPreviewSerializer,
+    MediaSerializer,
+    ResponseDestinationConfigSerializer,
+    RequestDestinationConfigSerializer,
     ResponseNotificationProfileSerializer,
     RequestNotificationProfileSerializer,
     TimeslotSerializer,
@@ -92,6 +95,43 @@ class NotificationProfileViewSet(rw_viewsets.ModelViewSet):
         mock_filter = Filter(filter_string=filter_string_json)
         serializer = IncidentSerializer(mock_filter.filtered_incidents, many=True)
         return Response(serializer.data)
+
+
+class MediaViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated, IsOwner]
+    serializer_class = MediaSerializer
+    queryset = Media.objects.none()
+    http_method_names = ["get", "head"]
+
+    def get_queryset(self):
+        return Media.objects.all()
+
+
+@extend_schema_view(
+    create=extend_schema(
+        request=RequestDestinationConfigSerializer,
+        responses={201: ResponseDestinationConfigSerializer},
+    ),
+    update=extend_schema(
+        request=RequestDestinationConfigSerializer,
+    ),
+    partial_update=extend_schema(
+        request=RequestDestinationConfigSerializer,
+    ),
+)
+class DestinationConfigViewSet(rw_viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated, IsOwner]
+    serializer_class = ResponseDestinationConfigSerializer
+    read_serializer_class = ResponseDestinationConfigSerializer
+    write_serializer_class = RequestDestinationConfigSerializer
+    queryset = DestinationConfig.objects.none()
+    http_method_names = ["get", "head", "post", "patch", "delete"]
+
+    def get_queryset(self):
+        return self.request.user.destination_configs.all()
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
 
 class TimeslotViewSet(viewsets.ModelViewSet):
