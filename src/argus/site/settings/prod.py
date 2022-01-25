@@ -33,6 +33,11 @@ DEFAULT_FROM_EMAIL = get_str_env("DEFAULT_FROM_EMAIL", required=True)
 
 SEND_NOTIFICATIONS = get_bool_env("ARGUS_SEND_NOTIFICATIONS", default=True)
 
+# Paths to plugins
+MEDIA_PLUGINS = [
+    "argus.notificationprofile.media.email.EmailNotification",
+]
+
 # PSA for login
 
 SOCIAL_AUTH_DATAPORTEN_KEY = get_str_env("ARGUS_DATAPORTEN_KEY", required=True)
