@@ -33,6 +33,12 @@ DEFAULT_FROM_EMAIL = get_str_env("DEFAULT_FROM_EMAIL", "argus@localhost")
 
 SEND_NOTIFICATIONS = get_bool_env("ARGUS_SEND_NOTIFICATIONS", default=False)
 
+# Dotted paths for media
+MEDIA_PATHS = [
+    "argus.notificationprofile.media.email.EmailNotification",
+    "argus.notificationprofile.media.sms_as_email.SMSNotification",
+]
+
 # PSA for login
 
 SOCIAL_AUTH_DATAPORTEN_KEY = get_str_env("ARGUS_DATAPORTEN_KEY")
