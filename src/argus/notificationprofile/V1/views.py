@@ -5,6 +5,7 @@ from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from drf_rw_serializers import viewsets as rw_viewsets
 
 from argus.drf.permissions import IsOwner
 from argus.incident.serializers import IncidentSerializer
@@ -15,7 +16,6 @@ from .serializers import (
 )
 from ..serializers import FilterPreviewSerializer
 from ..validators import validate_filter_string
-from ..views import NotificationProfileViewSet
 
 
 @extend_schema_view(
@@ -30,7 +30,7 @@ from ..views import NotificationProfileViewSet
         request=RequestNotificationProfileSerializerV1,
     ),
 )
-class NotificationProfileViewSetV1(NotificationProfileViewSet):
+class NotificationProfileViewSetV1(rw_viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated, IsOwner]
     serializer_class = ResponseNotificationProfileSerializerV1
     read_serializer_class = ResponseNotificationProfileSerializerV1
