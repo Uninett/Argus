@@ -5,6 +5,7 @@ import json
 from argus.auth.factories import PersonUserFactory
 from argus.incident.models import create_fake_incident, get_or_create_default_instances
 from argus.notificationprofile.factories import (
+    DestinationConfigFactory,
     TimeslotFactory,
     NotificationProfileFactory,
     FilterFactory,
@@ -12,7 +13,7 @@ from argus.notificationprofile.factories import (
     MinimalTimeRecurrenceFactory,
 )
 from argus.notificationprofile.media import send_notifications_to_users
-from argus.notificationprofile.models import Timeslot, NotificationProfile, Filter
+from argus.notificationprofile.models import Timeslot, NotificationProfile, Media, Filter
 from argus.util.testing import disconnect_signals, connect_signals
 
 
@@ -39,11 +40,22 @@ class SendingNotificationTest(TestCase):
         filter_string = json.dumps(filter_dict)
         filter = FilterFactory(user=user, filter_string=filter_string)
 
-        # Create two notification profiles that match this filter, but attached to each their timeslot
+        # A default destinationconfig for user.email should already exist
+        # at this point, so we reuse it instead of making another
+        destination = DestinationConfigFactory(
+            user=user,
+            media=Media.objects.get(slug="email"),
+            settings={"email_address": user.email},
+        )
+
+        # Create two notification profiles that match this filter,
+        # but attached to different timeslots
         self.np1 = NotificationProfileFactory(user=user, timeslot=timeslot1, active=True)
         self.np1.filters.add(filter)
+        self.np1.destinations.add(destination)
         self.np2 = NotificationProfileFactory(user=user, timeslot=timeslot2, active=True)
         self.np2.filters.add(filter)
+        self.np2.destinations.add(destination)
 
     def tearDown(self):
         connect_signals()
