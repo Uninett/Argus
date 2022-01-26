@@ -7,6 +7,7 @@ from rest_framework.test import APITestCase
 
 from argus.incident.serializers import IncidentSerializer
 from argus.notificationprofile.models import (
+    DestinationConfig,
     Filter,
     NotificationProfile,
     Timeslot,
@@ -34,6 +35,7 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
         )
         self.notification_profile1 = NotificationProfile.objects.create(user=self.user1, timeslot=self.timeslot1)
         self.notification_profile1.filters.add(filter1)
+        self.notification_profile1.destinations.set(DestinationConfig.objects.filter(user=self.user1))
 
     def teardown(self):
         connect_signals()
@@ -57,8 +59,8 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
                 "timeslot": self.timeslot2.pk,
                 "filters": [f.pk for f in self.notification_profile1.filters.all()],
                 "media": self.notification_profile1.media,
-                "phone_number": self.notification_profile1.phone_number_id,
                 "active": self.notification_profile1.active,
+                "destinations": [destination.pk for destination in self.notification_profile1.destinations.all()],
             },
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)

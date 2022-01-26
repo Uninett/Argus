@@ -3,7 +3,7 @@ from __future__ import annotations
 import importlib
 import logging
 from multiprocessing import Process
-from typing import List, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 from django.conf import settings
 from django.db import connections
@@ -11,7 +11,11 @@ from django.db import connections
 from ..models import NotificationProfile
 
 if TYPE_CHECKING:
+    from typing import List
+
     from argus.incident.models import Event  # noqa: Break circular import
+
+    from ..models import DestinationConfig
 
 LOG = logging.getLogger(__name__)
 
@@ -23,16 +27,7 @@ __all__ = [
     "get_notification_media",
 ]
 
-
-# Poor mans's plugins
-MEDIA_CLASSES = {
-    NotificationProfile.Media.EMAIL: getattr(
-        settings, "DEFAULT_EMAIL_MEDIA", "argus.notificationprofile.media.email.EmailNotification"
-    ),
-    NotificationProfile.Media.SMS: getattr(settings, "DEFAULT_SMS_MEDIA", None),
-}
-
-
+# Import media classes
 def _import_class_from_dotted_path(dotted_path: str):
     module_name, class_name = dotted_path.rsplit(".", 1)
     module = importlib.import_module(module_name)
@@ -40,12 +35,10 @@ def _import_class_from_dotted_path(dotted_path: str):
     return class_
 
 
-for media_type, media_class in MEDIA_CLASSES.items():
-    if not media_class or not isinstance(media_class, str):
-        continue
-    # Dotted paths here!
-    # TODO: Raise Incident if media_class not importable
-    MEDIA_CLASSES[media_type] = _import_class_from_dotted_path(media_class)
+# TODO: Raise Incident if media_class not importable?
+MEDIA_PATHS = getattr(settings, "MEDIA_PATHS")
+MEDIA_CLASSES = [_import_class_from_dotted_path(media_path) for media_path in MEDIA_PATHS]
+MEDIA_CLASSES_DICT = {media_class.MEDIA_SLUG: media_class for media_class in MEDIA_CLASSES}
 
 
 def send_notifications_to_users(event: Event):
@@ -59,7 +52,7 @@ def send_notifications_to_users(event: Event):
     for profile in NotificationProfile.objects.select_related("user"):
         LOG.debug('Notification: checking profile "%s"', profile)
         if profile.incident_fits(event.incident):
-            send_notification(profile, event)
+            send_notification(profile.destinations.all(), event)
             sent = True
         LOG.debug('Notification: sent? %s: profile "%s", event "%s"', sent, profile, event)
     if not sent:
@@ -76,28 +69,22 @@ def background_send_notifications_to_users(event: Event):
     return p
 
 
-def send_notification(profile: NotificationProfile, event: Event):
-    media = get_notification_media(profile.media_v1)
+def send_notification(destinations: List[DestinationConfig], event: Event):
     sent = False
+    media = get_notification_media(destinations)
     for medium in media:
-        if medium is not None:
-            medium.send(event, profile)
-            sent = True
+        sent = medium.send(event, destinations) or sent
     if not sent:
         LOG.warn("Notification: Could not send notification, nowhere to send it to")
+        # TODO Store error as incident
 
 
-def get_notification_media(model_representations: List[str]):
-    # This will never be a long list
-    # fmt:off
-    media = [
-        MEDIA_CLASSES[representation]
-        for representation in model_representations
-        if MEDIA_CLASSES[representation]
-    ]
-    # fmt: on
-    if media:
-        return media
-    LOG.error("Notification: nowhere to send notifications!")
-    # TODO: Store error as incident
-    return ()
+def get_notification_media(destinations: List[DestinationConfig]):
+    destination_slugs = set([destination.media.slug for destination in destinations])
+    media = []
+    for slug in destination_slugs:
+        if slug in MEDIA_CLASSES_DICT.keys():
+            media.append(MEDIA_CLASSES_DICT[slug])
+        else:
+            raise ValueError("Medium %s was not found in imported media.", slug)
+    return media
