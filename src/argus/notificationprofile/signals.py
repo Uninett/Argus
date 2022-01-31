@@ -1,5 +1,5 @@
 from argus.auth.models import User
-from .models import DestinationConfig, TimeRecurrence, Timeslot
+from .models import DestinationConfig, Media, TimeRecurrence, Timeslot
 
 __all__ = [
     "create_default_timeslot",
@@ -28,3 +28,41 @@ def add_synced_flag(sender, instance: DestinationConfig, raw, *args, **kwargs):
             instance.settings["synced"] = True
         else:
             instance.settings["synced"] = False
+
+
+# Create default DestinationConfig when a user is created
+def create_default_destination_config(sender, instance: User, created, raw, *args, **kwargs):
+    if raw or not created or not instance.email:
+        return
+
+    if instance.destination_configs.exists():
+        email_destinations = instance.destination_configs.filter(media__slug="email")
+        for destination in email_destinations:
+            if destination.settings["synced"] and not destination.settings["email_address"] == instance.email:
+                destination.settings["email_address"] = instance.email
+                destination.save(update_fields=["settings"])
+    else:
+        DestinationConfig.objects.create(
+            user=instance,
+            media=Media.objects.get(slug="email"),
+            settings={"email_address": instance.email},
+        )
+
+
+# Update default Destination if necessary when User logs in
+def update_default_destination_config(sender, request, user, *args, **kwargs):
+    if not user.email:
+        return
+
+    if user.destination_configs.exists():
+        email_destinations = user.destination_configs.filter(media__slug="email")
+        for destination in email_destinations:
+            if destination.settings["synced"] and not destination.settings["email_address"] == user.email:
+                destination.settings["email_address"] = user.email
+                destination.save(update_fields=["settings"])
+    else:
+        DestinationConfig.objects.create(
+            user=user,
+            media=Media.objects.get(slug="email"),
+            settings={"email_address": user.email},
+        )
