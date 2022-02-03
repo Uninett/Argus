@@ -3,7 +3,7 @@ django-cors-headers>=3.2
 django-filter
 django-multiselectfield
 django-phonenumber-field[phonenumberslite]
-djangorestframework<3.13
+djangorestframework>=3.13,<3.14
 drf-spectacular>=0.17
 drf-rw-serializers
 factory_boy
