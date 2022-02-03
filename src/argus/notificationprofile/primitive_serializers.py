@@ -23,5 +23,5 @@ class FilterBlobSerializer(serializers.Serializer):
 
 
 class FilterPreviewSerializer(serializers.Serializer):
-    sourceSystemIds = serializers.ListField(serializers.IntegerField(min_value=1), allow_empty=True)
-    tags = serializers.ListField(serializers.CharField(min_length=3), allow_empty=True)
+    sourceSystemIds = serializers.ListField(child=serializers.IntegerField(min_value=1), allow_empty=True)
+    tags = serializers.ListField(child=serializers.CharField(min_length=3), allow_empty=True)
