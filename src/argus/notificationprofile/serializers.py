@@ -4,6 +4,7 @@ from rest_framework import fields, serializers
 from argus.incident.models import SourceSystem, Tag, Incident
 
 from .primitive_serializers import FilterBlobSerializer, FilterPreviewSerializer
+from .media import MEDIA_CLASSES_DICT
 from .models import DestinationConfig, Filter, Media, NotificationProfile, TimeRecurrence, Timeslot
 from .validators import validate_filter_string
 
@@ -138,6 +139,14 @@ class RequestDestinationConfigSerializer(serializers.ModelSerializer):
             "media",
             "settings",
         ]
+
+    def validate(self, attrs: dict):
+        if self.instance and not attrs["media"].slug == self.instance.media.slug:
+            raise serializers.ValidationError("Media cannot be updated, only settings.")
+
+        attrs["settings"] = MEDIA_CLASSES_DICT[attrs["media"].slug].validate(self, attrs)
+
+        return attrs
 
 
 class ResponseNotificationProfileSerializer(serializers.ModelSerializer):
