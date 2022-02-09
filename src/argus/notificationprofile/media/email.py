@@ -5,6 +5,7 @@ from argus.incident.models import Event
 from django.conf import settings
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
+from rest_framework.exceptions import ValidationError
 
 from ..models import DestinationConfig
 from .base import NotificationMedium
@@ -43,6 +44,15 @@ def send_email_safely(function, additional_error=None, *args, **kwargs):
 
 class EmailNotification(NotificationMedium):
     MEDIA_SLUG = "email"
+
+    @staticmethod
+    def validate(email_dict, instance, context):
+        if instance.settings["synced"]:
+            raise ValidationError("Cannot change the default destination.")
+        if not list(email_dict["settings"].keys()) == ["email_address"]:
+            raise ValidationError("Incorrect settings format. Only enter an email address.")
+        if email_dict["settings"]["email_address"] == context["request"].user.email:
+            raise ValidationError("This email address is already saved in the default destination of this user.")
 
     @staticmethod
     def send(event: Event, destinations: List[DestinationConfig], **_):
