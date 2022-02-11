@@ -39,7 +39,7 @@ def create_and_link_default_destinations(apps, schema_editor):
             user=phone_number.user,
             media=sms,
             settings={
-                "phone_number": phone_number.phone_number,
+                "phone_number": str(phone_number.phone_number),
             },
         )
 
