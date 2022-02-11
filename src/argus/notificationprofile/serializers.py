@@ -144,7 +144,7 @@ class RequestDestinationConfigSerializer(serializers.ModelSerializer):
         if self.instance and not attrs["media"].slug == self.instance.media.slug:
             raise serializers.ValidationError("Media cannot be updated, only settings.")
 
-        MEDIA_CLASSES_DICT[attrs["media"].slug].validate(attrs, self.instance, self.context)
+        MEDIA_CLASSES_DICT[attrs["media"].slug].validate(self, attrs)
 
         return attrs
 

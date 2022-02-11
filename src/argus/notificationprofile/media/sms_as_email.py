@@ -22,7 +22,7 @@ class SMSNotification(NotificationMedium):
     MEDIA_SLUG = "sms"
 
     @staticmethod
-    def validate(sms_dict, instance, context):
+    def validate(instance, sms_dict):
         if not list(sms_dict["settings"].keys()) == ["phone_number"]:
             raise ValidationError("Incorrect settings format. Only enter a phone number.")
 

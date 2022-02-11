@@ -51,13 +51,13 @@ class EmailNotification(NotificationMedium):
         email_address = forms.EmailField()
 
     @classmethod
-    def validate(cls, email_dict, instance, context):
-        if instance.settings["synced"]:
+    def validate(cls, instance, email_dict):
+        if instance.instance.settings["synced"]:
             raise ValidationError("Cannot change the default destination.")
         form = cls.Form(email_dict["settings"])
         if not form.is_valid():
             raise ValidationError(form.errors)
-        if form.cleaned_data["email_address"] == context["request"].user.email:
+        if form.cleaned_data["email_address"] == instance.context["request"].user.email:
             raise ValidationError("This email address is already saved in the default destination of this user.")
 
     @staticmethod
