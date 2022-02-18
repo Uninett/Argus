@@ -56,8 +56,7 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
             {
                 "timeslot": self.timeslot2.pk,
                 "filters": [f.pk for f in self.notification_profile1.filters.all()],
-                "media": self.notification_profile1.media_v1,
-                "phone_number": self.notification_profile1.phone_number_id,
+                # "media": self.notification_profile1.media_v1,
                 "active": self.notification_profile1.active,
             },
         )

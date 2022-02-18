@@ -64,10 +64,7 @@ class DestinationConfigInline(admin.TabularInline):
 
 class NotificationProfileAdmin(admin.ModelAdmin):
     list_display = ("get_str", "get_filters", "get_destination_media", "active")
-    list_filter = (
-        "active",
-        list_filter_factory("has phone number", lambda qs, yes_filter: qs.exclude(phone_number__isnull=yes_filter)),
-    )
+    list_filter = ("active",)
     search_fields = (
         "timeslot__name",
         "filters__name",
