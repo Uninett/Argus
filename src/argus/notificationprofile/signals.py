@@ -1,8 +1,9 @@
 from argus.auth.models import User
-from .models import DestinationConfig, Media, TimeRecurrence, Timeslot
+from .models import DestinationConfig, TimeRecurrence, Timeslot
 
 __all__ = [
     "create_default_timeslot",
+    "sync_email_destination_config",
 ]
 
 
@@ -19,50 +20,31 @@ def create_default_timeslot(sender, instance: User, created, raw, *args, **kwarg
     )
 
 
-# Add synced flag to DestinationConfig settings before saving
-def add_synced_flag(sender, instance: DestinationConfig, raw, *args, **kwargs):
-    if raw:
+# Sync user.email to DestinationConfig
+def sync_email_destination_config(sender, instance: User, created, raw, *args, **kwargs):
+    if raw or not instance.email:
         return
-    if instance.media.slug == "email":
-        if instance.settings["email_address"] == instance.user.email:
-            instance.settings["synced"] = True
+
+    email_destinations = instance.destination_configs.filter(media_id="email")
+    found_synced_address = None
+    changed_destinations = []
+    for destination in email_destinations:
+        settings = destination.settings.copy()
+        if settings["email_address"] == instance.email:
+            found_synced_address = True
+            settings["synced"] = True
         else:
-            instance.settings["synced"] = False
-
-
-# Create default DestinationConfig when a user is created
-def create_default_destination_config(sender, instance: User, created, raw, *args, **kwargs):
-    if raw or not created or not instance.email:
-        return
-
-    if instance.destination_configs.exists():
-        email_destinations = instance.destination_configs.filter(media__slug="email")
-        for destination in email_destinations:
-            if destination.settings["synced"] and not destination.settings["email_address"] == instance.email:
-                destination.settings["email_address"] = instance.email
-                destination.save(update_fields=["settings"])
-    else:
-        DestinationConfig.objects.create(
+            settings["synced"] = False
+        if settings != destination.settings:
+            destination.settings = settings
+            changed_destinations.append(destination)
+    if not found_synced_address:  # Add new DestinationConfig
+        new_destination = DestinationConfig(
             user=instance,
-            media=Media.objects.get(slug="email"),
-            settings={"email_address": instance.email},
+            media_id="email",
+            settings={"email_address": instance.email, "synced": True},
         )
-
-
-# Update default Destination if necessary when User logs in
-def update_default_destination_config(sender, request, user, *args, **kwargs):
-    if not user.email:
-        return
-
-    if user.destination_configs.exists():
-        email_destinations = user.destination_configs.filter(media__slug="email")
-        for destination in email_destinations:
-            if destination.settings["synced"] and not destination.settings["email_address"] == user.email:
-                destination.settings["email_address"] = user.email
-                destination.save(update_fields=["settings"])
-    else:
-        DestinationConfig.objects.create(
-            user=user,
-            media=Media.objects.get(slug="email"),
-            settings={"email_address": user.email},
-        )
+        # Triggers no signals
+        DestinationConfig.objects.bulk_create([new_destination])
+    if changed_destinations:  # Single query, triggers no signals
+        DestinationConfig.objects.bulk_update(changed_destinations)

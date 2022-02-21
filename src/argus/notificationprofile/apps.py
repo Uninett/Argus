@@ -11,16 +11,12 @@ class NotificationprofileConfig(AppConfig):
     def ready(self):
         # Signals
         from .signals import (
-            add_synced_flag,
-            create_default_destination_config,
             create_default_timeslot,
-            update_default_destination_config,
+            sync_email_destination_config,
         )
 
-        pre_save.connect(add_synced_flag, "argus_notificationprofile.DestinationConfig")
         post_save.connect(create_default_timeslot, "argus_auth.User")
-        post_save.connect(create_default_destination_config, "argus_auth.User")
-        user_logged_in.connect(update_default_destination_config, "argus_auth.User")
+        post_save.connect(sync_email_destination_config, "argus_auth.User")
 
         # Settings validation
         from .checks import fallback_filter_check
