@@ -9,11 +9,9 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from rest_framework.views import APIView
-from rest_framework.viewsets import ModelViewSet
 
-from argus.drf.permissions import IsOwner
-from .models import PhoneNumber, User
-from .serializers import BasicUserSerializer, PhoneNumberSerializer, UserSerializer
+from .models import User
+from .serializers import BasicUserSerializer, UserSerializer
 from .utils import get_psa_authentication_names
 
 
@@ -61,21 +59,6 @@ class BasicUserDetail(generics.RetrieveAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = BasicUserSerializer
     queryset = User.objects.all()
-
-
-class PhoneNumberViewSet(ModelViewSet):
-    permission_classes = [IsAuthenticated, IsOwner]
-    serializer_class = PhoneNumberSerializer
-    queryset = PhoneNumber.objects.none()  # For basename-detection in router
-
-    def get_queryset(self):
-        return self.request.user.phone_numbers.all()
-
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
-
-    def perform_update(self, serializer):
-        serializer.save(user=self.request.user)
 
 
 class AuthMethodListView(APIView):

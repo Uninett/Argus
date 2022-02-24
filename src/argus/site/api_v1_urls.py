@@ -15,7 +15,7 @@ tokenauth_urls = [
 
 urlpatterns = [
     path("schema/", include((openapi_urls, "openapi"))),
-    path("auth/", include("argus.auth.urls")),
+    path("auth/", include("argus.auth.V1.urls")),
     path("incidents/", include("argus.incident.V1.urls")),
     path("notificationprofiles/", include("argus.notificationprofile.V1.urls")),
     path("token-auth/", include(tokenauth_urls)),
