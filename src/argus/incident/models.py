@@ -7,7 +7,7 @@ from urllib.parse import urljoin
 
 from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
-from django.db import models
+from django.db import models, transaction
 from django.db.models import Q
 from django.utils import timezone
 
@@ -294,6 +294,10 @@ class Incident(models.Model):
         return self.events.filter(type__in=(Event.Type.CLOSE, Event.Type.INCIDENT_END)).order_by("timestamp").last()
 
     @property
+    def latest_change_event(self):
+        return self.events.filter(type=Event.Type.INCIDENT_CHANGE).order_by("timestamp").last()
+
+    @property
     def acks(self):
         return Acknowledgement.objects.filter(event__incident=self)
 
@@ -303,6 +307,7 @@ class Incident(models.Model):
         acks_not_expired_query = Q(ack__expiration__isnull=True) | Q(ack__expiration__gt=timezone.now())
         return self.events.filter(acks_query & acks_not_expired_query).exists()
 
+    @transaction.atomic
     def set_open(self, actor: User):
         if not self.stateful:
             raise ValidationError("Cannot set a stateless incident as open")
@@ -313,6 +318,7 @@ class Incident(models.Model):
         self.save(update_fields=["end_time"])
         Event.objects.create(incident=self, actor=actor, timestamp=timezone.now(), type=Event.Type.REOPEN)
 
+    @transaction.atomic
     def set_closed(self, actor: User):
         if not self.stateful:
             raise ValidationError("Cannot set a stateless incident as closed")
@@ -323,6 +329,7 @@ class Incident(models.Model):
         self.save(update_fields=["end_time"])
         Event.objects.create(incident=self, actor=actor, timestamp=self.end_time, type=Event.Type.CLOSE)
 
+    @transaction.atomic
     def create_ack(self, actor: User, timestamp=None, description="", expiration=None):
         timestamp = timestamp if timestamp else timezone.now()
         event = Event.objects.create(
@@ -330,6 +337,13 @@ class Incident(models.Model):
         )
         ack = Acknowledgement.objects.create(event=event, expiration=expiration)
         return ack
+
+    @transaction.atomic
+    def change_level(self, actor, new_level, timestamp=None):
+        self.level = new_level
+        self.save(update_fields=["level"])
+        event = ChangeEvent.change_level(self, actor, new_level, timestamp)
+        return event
 
     def pp_details_url(self):
         "Merge Incident.details_url with Source.base_url"
@@ -367,12 +381,13 @@ class Event(models.Model):
     class Type(models.TextChoices):
         INCIDENT_START = "STA", "Incident start"
         INCIDENT_END = "END", "Incident end"
+        INCIDENT_CHANGE = "CHI", "Incident change"
         CLOSE = "CLO", "Close"
         REOPEN = "REO", "Reopen"
         ACKNOWLEDGE = "ACK", "Acknowledge"
         OTHER = "OTH", "Other"
 
-    ALLOWED_TYPES_FOR_SOURCE_SYSTEMS = {Type.INCIDENT_START, Type.INCIDENT_END, Type.OTHER}
+    ALLOWED_TYPES_FOR_SOURCE_SYSTEMS = {Type.INCIDENT_START, Type.INCIDENT_END, Type.OTHER, Type.INCIDENT_CHANGE}
     ALLOWED_TYPES_FOR_END_USERS = {Type.CLOSE, Type.REOPEN, Type.ACKNOWLEDGE, Type.OTHER}
 
     incident = models.ForeignKey(to=Incident, on_delete=models.PROTECT, related_name="events")
@@ -387,6 +402,23 @@ class Event(models.Model):
 
     def __str__(self):
         return f"'{self.get_type_display()}': {self.incident.description}, {self.actor} @ {self.timestamp}"
+
+
+class ChangeEvent(Event):
+    class Meta:
+        proxy = True
+
+    def save(self, *args, **kwargs):
+        self.type = self.Type.INCIDENT_CHANGE
+        super().save(*args, **kwargs)
+
+    @classmethod
+    def change_level(cls, incident, actor, new_level, timestamp=None):
+        timestamp = timestamp if timestamp else timezone.now()
+        description = f"Change: level {incident.level} → {new_level}"
+        event = cls(incident=incident, actor=actor, timestamp=timestamp, description=description)
+        event.save()
+        return event
 
 
 class AcknowledgementQuerySet(models.QuerySet):

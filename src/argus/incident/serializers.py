@@ -190,6 +190,7 @@ class IncidentPureDeserializer(serializers.ModelSerializer):
             "tags",
             "details_url",
             "ticket_url",
+            "level",
         ]
 
     def update(self, instance: Incident, validated_data: dict):
