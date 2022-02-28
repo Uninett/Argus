@@ -183,6 +183,13 @@ class IncidentViewSet(
             return IncidentPureDeserializer
         return IncidentSerializer
 
+    def list(self, request, *args, **kwargs):
+        if "count" in request.query_params:
+            count = self.filter_queryset(self.get_queryset()).count()
+            response_dict = {"count": count, "params": request.query_params}
+            return Response(response_dict)
+        return super().list(request, *args, **kwargs)
+
     def perform_create(self, serializer):
         user = self.request.user
 
