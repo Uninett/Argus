@@ -298,6 +298,10 @@ class Incident(models.Model):
         return self.events.filter(type=Event.Type.INCIDENT_CHANGE).order_by("timestamp").last()
 
     @property
+    def stateless_event(self):
+        return self.events.filter(type=Event.Type.STATELESS).order_by("timestamp").first()
+
+    @property
     def acks(self):
         return Acknowledgement.objects.filter(event__incident=self)
 
