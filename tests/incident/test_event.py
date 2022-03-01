@@ -6,6 +6,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 from django.utils.timezone import make_aware
+from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -195,3 +196,23 @@ class EventSignalTests(APITestCase):
 
         self.assertTrue(event_start)
         self.assertEqual(incident.description, incident.events.get(type="STA").description)
+
+
+class StatelessEventTests(TestCase):
+    def setUp(self):
+        disconnect_signals()
+
+    def tearDown(self):
+        connect_signals()
+
+    def test_new_stateless_incident_has_stateless_event(self):
+        source_incident_id = "abcknekkebrod"
+        incident = Incident.objects.create(
+            start_time=timezone.now(),
+            end_time=None,
+            source_incident_id=source_incident_id,
+            source=SourceSystemFactory(),
+            description=f"Incident #{source_incident_id} created for testing",
+        )
+        event_stateless = incident.events.filter(type=Event.Type.STATELESS)
+        self.assertEqual(1, event_stateless.count())
