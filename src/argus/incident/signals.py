@@ -4,7 +4,7 @@ from .models import SourceSystem, Incident, Event, Acknowledgement
 
 __all__ = [
     "delete_associated_user",
-    "create_start_event",
+    "create_first_event",
     "send_notification",
     "delete_associated_event",
 ]
@@ -15,15 +15,16 @@ def delete_associated_user(sender, instance: SourceSystem, *args, **kwargs):
         instance.user.delete()
 
 
-def create_start_event(sender, instance: Incident, created, raw, *args, **kwargs):
+def create_first_event(sender, instance: Incident, created, raw, *args, **kwargs):
     if raw or not created:
         return
-    if not instance.start_event:
+    if not instance.start_event and not instance.stateless_event:
+        event_type = Event.Type.INCIDENT_START if instance.stateful else Event.Type.STATELESS
         Event.objects.create(
             incident=instance,
             actor=instance.source.user,
             timestamp=instance.start_time,
-            type=Event.Type.INCIDENT_START,
+            type=event_type,
             description=instance.description,
         )
 
