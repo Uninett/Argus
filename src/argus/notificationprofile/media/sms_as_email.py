@@ -37,6 +37,10 @@ class SMSNotification(NotificationMedium):
 
         return form.cleaned_data
 
+    @classmethod
+    def get_label(self, destination):
+        return destination.settings.get("phone_number")
+
     @staticmethod
     def send(event: Event, destinations: QuerySet[DestinationConfig], **kwargs):
         recipient = getattr(settings, "SMS_GATEWAY_ADDRESS", None)
