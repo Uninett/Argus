@@ -1,10 +1,11 @@
 # This Dockerfile is designed to run a development environment for Argus,
 # with the Argus source code tree mounted at /argus
 #
-FROM python:3.8
+FROM python:3.10
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update && apt-get install -y --no-install-recommends tini build-essential
+RUN apt-get update && apt-get install -y --no-install-recommends tini \
+    build-essential libpq-dev libffi-dev libssl-dev
 RUN mkdir -p /argus
 COPY requirements.txt /argus
 COPY requirements/*.txt /argus/requirements/
