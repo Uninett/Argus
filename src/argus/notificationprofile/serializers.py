@@ -123,14 +123,19 @@ class MediaSerializer(serializers.ModelSerializer):
 
 class ResponseDestinationConfigSerializer(serializers.ModelSerializer):
     media = MediaSerializer()
+    suggested_label = serializers.SerializerMethodField("get_suggested_label")
 
     class Meta:
         model = DestinationConfig
         fields = [
             "media",
             "label",
+            "suggested_label",
             "settings",
         ]
+
+    def get_suggested_label(self, destination: DestinationConfig) -> str:
+        return f"{destination.media.name}: {MEDIA_CLASSES_DICT[destination.media.slug].get_label(destination)}"
 
 
 class RequestDestinationConfigSerializer(serializers.ModelSerializer):

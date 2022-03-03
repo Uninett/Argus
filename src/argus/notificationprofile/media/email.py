@@ -63,6 +63,10 @@ class EmailNotification(NotificationMedium):
 
         return form.cleaned_data
 
+    @classmethod
+    def get_label(self, destination):
+        return destination.settings.get("email_address")
+
     @staticmethod
     def send(event: Event, destinations: QuerySet[DestinationConfig], **_):
         email_destinations = destinations.filter(media__slug=EmailNotification.MEDIA_SLUG)
