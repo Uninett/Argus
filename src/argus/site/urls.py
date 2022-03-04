@@ -19,7 +19,7 @@ from django.urls import include, path, re_path
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from social_django.urls import extra
 
-from argus.auth.views import ObtainNewAuthToken
+from argus.auth.views import ObtainNewAuthToken, AuthMethodListView
 from argus.dataporten import views as dataporten_views
 from argus.site.views import error, MetadataView
 
@@ -34,6 +34,7 @@ urlpatterns = [
     # path(".error/", error),  # Only needed when testing error pages and error behavior
     path("admin/", admin.site.urls),
     path("oidc/", include(psa_urls)),
+    path("login-methods/", AuthMethodListView.as_view(), name="login-methods"),
     path("api/schema/", SpectacularAPIView.as_view(api_version="v1"), name="schema-v1-old"),
     path("api/schema/swagger-ui/", SpectacularSwaggerView.as_view(url_name="schema-v1-old"), name="swagger-ui-v1-old"),
     path("api/v1/", include(("argus.site.api_v1_urls", "api"), namespace="v1")),

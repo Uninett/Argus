@@ -13,7 +13,7 @@ Welcome to Argus' documentation!
    models
    api
    site-specific-settings
-   dataporten
+   authentication
    notifications
    development
    writing-plugins
