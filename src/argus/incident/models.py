@@ -250,6 +250,7 @@ class Incident(models.Model):
     def save(self, *args, **kwargs):
         # Parse and replace `end_time`, to avoid having to call `refresh_from_db()`
         self.end_time = self._meta.get_field("end_time").to_python(self.end_time)
+        self.search_text = self.generate_search_text()
         super().save(*args, **kwargs)
 
     @property
@@ -359,6 +360,12 @@ class Incident(models.Model):
         if base_url:
             return urljoin(base_url, path)
         return path  # Just show the relative url
+
+    def generate_search_text(self):
+        search_fields = []
+        for event in self.events.all():
+            search_fields.append(event.description)
+        return " ".join(search_fields)
 
 
 class IncidentRelationType(models.Model):
