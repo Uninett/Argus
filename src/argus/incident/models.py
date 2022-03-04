@@ -229,6 +229,7 @@ class Incident(models.Model):
         verbose_name="ticket URL",
         help_text="URL to existing ticket in a ticketing system.",
     )
+    search_text = models.TextField(blank=True, default="", verbose_name="Search Text")
 
     objects = IncidentQuerySet.as_manager()
 
@@ -392,7 +393,13 @@ class Event(models.Model):
         OTHER = "OTH", "Other"
         STATELESS = "LES", "Stateless"
 
-    ALLOWED_TYPES_FOR_SOURCE_SYSTEMS = {Type.INCIDENT_START, Type.INCIDENT_END, Type.OTHER, Type.INCIDENT_CHANGE, Type.STATELESS}
+    ALLOWED_TYPES_FOR_SOURCE_SYSTEMS = {
+        Type.INCIDENT_START,
+        Type.INCIDENT_END,
+        Type.OTHER,
+        Type.INCIDENT_CHANGE,
+        Type.STATELESS,
+    }
     ALLOWED_TYPES_FOR_END_USERS = {Type.CLOSE, Type.REOPEN, Type.ACKNOWLEDGE, Type.OTHER}
 
     incident = models.ForeignKey(to=Incident, on_delete=models.PROTECT, related_name="events")
