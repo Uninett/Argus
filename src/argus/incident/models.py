@@ -298,6 +298,10 @@ class Incident(models.Model):
         return self.events.filter(type=Event.Type.INCIDENT_CHANGE).order_by("timestamp").last()
 
     @property
+    def stateless_event(self):
+        return self.events.filter(type=Event.Type.STATELESS).order_by("timestamp").first()
+
+    @property
     def acks(self):
         return Acknowledgement.objects.filter(event__incident=self)
 
@@ -386,8 +390,9 @@ class Event(models.Model):
         REOPEN = "REO", "Reopen"
         ACKNOWLEDGE = "ACK", "Acknowledge"
         OTHER = "OTH", "Other"
+        STATELESS = "LES", "Stateless"
 
-    ALLOWED_TYPES_FOR_SOURCE_SYSTEMS = {Type.INCIDENT_START, Type.INCIDENT_END, Type.OTHER, Type.INCIDENT_CHANGE}
+    ALLOWED_TYPES_FOR_SOURCE_SYSTEMS = {Type.INCIDENT_START, Type.INCIDENT_END, Type.OTHER, Type.INCIDENT_CHANGE, Type.STATELESS}
     ALLOWED_TYPES_FOR_END_USERS = {Type.CLOSE, Type.REOPEN, Type.ACKNOWLEDGE, Type.OTHER}
 
     incident = models.ForeignKey(to=Incident, on_delete=models.PROTECT, related_name="events")
