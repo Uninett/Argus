@@ -155,7 +155,6 @@ STATICFILES_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesSto
 
 AUTHENTICATION_BACKENDS = (
     "argus.dataporten.social.DataportenFeideOAuth2",
-    "argus.dataporten.social.DataportenOAuth2",
     "django.contrib.auth.backends.ModelBackend",
 )
 
