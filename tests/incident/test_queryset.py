@@ -3,7 +3,7 @@ from django.utils import timezone
 
 from argus.auth.factories import PersonUserFactory
 from argus.util.testing import disconnect_signals, connect_signals
-from argus.incident.factories import StatefulIncidentFactory, StatelessIncidentFactory
+from argus.incident.factories import StatefulIncidentFactory, StatelessIncidentFactory, SourceFactory
 from argus.incident.models import Incident
 
 
@@ -12,10 +12,12 @@ class IncidentQuerySetTestCase(TestCase):
         disconnect_signals()
         # Lock in timestamps
         self.timestamp = timezone.now()
-        self.incident1 = StatelessIncidentFactory(start_time=self.timestamp, ticket_url="")
-        self.incident2 = StatefulIncidentFactory(start_time=self.timestamp, ticket_url="")
-        self.incident3 = StatefulIncidentFactory(start_time=self.timestamp, ticket_url="")
-        self.incident4 = StatefulIncidentFactory(start_time=self.timestamp)
+        # We don't care about source but let's ensure it is unique
+        source = SourceFactory()
+        self.incident1 = StatelessIncidentFactory(source=source, start_time=self.timestamp, ticket_url="")
+        self.incident2 = StatefulIncidentFactory(source=source, start_time=self.timestamp, ticket_url="")
+        self.incident3 = StatefulIncidentFactory(source=source, start_time=self.timestamp, ticket_url="")
+        self.incident4 = StatefulIncidentFactory(source=source, start_time=self.timestamp)
         self.incident4.end_time = self.timestamp
         self.incident4.save()
 
