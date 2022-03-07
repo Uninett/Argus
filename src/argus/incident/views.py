@@ -3,6 +3,7 @@ import secrets
 from django.db import IntegrityError
 
 from django_filters import rest_framework as filters
+from rest_framework.filters import SearchFilter
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter
 from rest_framework import generics, mixins, serializers, status, viewsets
@@ -175,8 +176,9 @@ class IncidentViewSet(
     pagination_class = IncidentPagination
     permission_classes = [IsAuthenticated]
     queryset = Incident.objects.prefetch_default_related().prefetch_related("source")
-    filter_backends = [filters.DjangoFilterBackend]
+    filter_backends = [filters.DjangoFilterBackend, SearchFilter]
     filterset_class = IncidentFilter
+    search_fields = ["description", "search_text"]
 
     def get_serializer_class(self):
         if self.request.method in {"PUT", "PATCH"}:
