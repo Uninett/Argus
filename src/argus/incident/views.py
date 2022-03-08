@@ -308,6 +308,15 @@ class SourceLockedIncidentViewSet(IncidentViewSet):
         return Incident.objects.filter(source__user=self.request.user).prefetch_default_related()
 
 
+class AllEventsViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+    queryset = Event.objects.none()
+    permission_classes = [IsAuthenticated]
+    serializer_class = EventSerializer
+
+    def get_queryset(self):
+        return Event.objects.all()
+
+
 class EventViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
     queryset = Incident.objects.none()  # For OpenAPI
     permission_classes = [IsAuthenticated]
