@@ -419,6 +419,11 @@ class Event(models.Model):
     class Meta:
         ordering = ["-timestamp"]
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        # update incident.search_text
+        self.incident.save()
+
     def __str__(self):
         return f"'{self.get_type_display()}': {self.incident.description}, {self.actor} @ {self.timestamp}"
 
