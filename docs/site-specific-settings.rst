@@ -125,7 +125,7 @@ use:
   to simply switch out the email backend instead of replacing this plugin.
 * ``DEFAULT_SMS_MEDIA`` is disabled by default, since there is no standardized
   way of sending SMS messages. The only supported media at the moment is
-  Uninett's internal email-to-SMS gateway.
+  Sikt's internal email-to-SMS gateway.
 
 Enabling the email-to-SMS gateway
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

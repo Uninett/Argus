@@ -198,7 +198,7 @@ Incident endpoints
                       "end_time": "2011-11-11T11:11:12+02:00",
                       "source": {
                           "pk": 11,
-                          "name": "Uninett GW 3",
+                          "name": "Sikt GW 3",
                           "type": {
                               "name": "nav"
                           },
@@ -206,7 +206,7 @@ Incident endpoints
                           "base_url": "https://somenav.somewhere.com"
                       },
                       "source_incident_id": "12345",
-                      "details_url": "https://uninett.no/api/alerts/12345/",
+                      "details_url": "https://sikt.no/api/alerts/12345/",
                       "description": "Netbox 11 <12345> down.",
                       "ticket_url": "https://tickettracker.com/tickets/987654/",
                       "tags": [
@@ -261,7 +261,7 @@ Incident endpoints
               "start_time": "2011-11-11 11:11:11.11111",
               "end_time": null,
               "source_incident_id": "12345",
-              "details_url": "https://uninett.no/api/alerts/12345/",
+              "details_url": "https://sikt.no/api/alerts/12345/",
               "description": "Netbox 11 <12345> down.",
               "ticket_url": "https://tickettracker.com/tickets/987654/",
               "tags": [
@@ -326,7 +326,7 @@ Incident endpoints
                   "incident": 10101,
                   "actor": {
                       "pk": 12,
-                      "username": "nav.oslo.uninett.no"
+                      "username": "nav.oslo.sikt.no"
                   },
                   "timestamp": "2011-11-11T11:11:11+02:00",
                   "received": "2011-11-11T11:12:11+02:00",
@@ -341,7 +341,7 @@ Incident endpoints
                   "incident": 10101,
                   "actor": {
                       "pk": 12,
-                      "username": "nav.oslo.uninett.no"
+                      "username": "nav.oslo.sikt.no"
                   },
                   "timestamp": "2011-11-11T11:11:12+02:00",
                   "received": "2011-11-11T11:11:13+02:00",
