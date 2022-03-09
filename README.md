@@ -218,25 +218,25 @@ Refer to the [tox.ini](tox.ini) file for further options.
 
 ### Mock data
 
-Fill the database with mock data with the management command `create_fake_incidents`:
+Fill the database with mock data with the management command `create_fake_incident`:
 
 ```sh
-$ python manage.py create_fake_incidents
+$ python manage.py create_fake_incident
 ```
 
 See the inbuilt help for flags and toggles:
 
 ```sh
-$ python manage.py create_fake_incidents --help
+$ python manage.py create_fake_incident --help
 ```
 
-Since the current default number of shown incidents in the frintend is 10, you
-might want to create just more than 10 incidents in one go, with the `-n`-flag:
+Since the current default number of shown incidents in the frontend is 10, you
+might want to create just more than 10 incidents in one go, with the `-b`-flag:
 
 ```sh
-$ python manage.py create_fake_incidents -n 15
+$ python manage.py create_fake_incident -b 15
 ```
 
 (The same command is well-suited to manually test the notification system: Make
 a filter that matches fake incidents, for instance by setting `source` to
-`argus`, and create a single fake incident by omitting the `-n`-flag.)
+`argus`, and create a single fake incident by omitting the `-b`-flag.)
