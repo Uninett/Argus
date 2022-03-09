@@ -1,5 +1,6 @@
 import json
 
+from django.views.generic import DetailView
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import generics, viewsets
 from rest_framework.decorators import api_view, action
@@ -100,6 +101,17 @@ class NotificationProfileViewSet(rw_viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
+class SchemaView(DetailView):
+    template_name = "schemawrapper.html"
+    model = Media
+
+    def get_context_data(self, **kwargs):
+        kwargs = super().get_context_data(**kwargs)
+        media_slug = self.object.slug
+        kwargs["schema_info"] = MEDIA_CLASSES_DICT[media_slug].MEDIA_JSON_SCHEMA
+        return kwargs
+
+
 class MediaViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated, IsOwner]
     serializer_class = MediaSerializer
@@ -115,8 +127,8 @@ class MediaViewSet(viewsets.ModelViewSet):
         try:
             schema = MEDIA_CLASSES_DICT[pk].MEDIA_JSON_SCHEMA
             schema["$id"] = reverse(
-                "admin:app_list",
-                kwargs={"app_label": "argus_notificationprofile"},
+                "json-schema",
+                kwargs={"slug": pk},
                 request=request,
             )
         except KeyError:

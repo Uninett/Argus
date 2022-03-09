@@ -31,7 +31,7 @@ class SMSNotification(NotificationMedium):
             "phone_number": {
                 "type": "string",
                 "title": "Phone number",
-                "description": "The phone number is validated using the python port of libphonenumber. The country code needs to be given.",
+                "description": "The phone number is validated and the country code needs to be given.",
             }
         },
     }
