@@ -121,6 +121,10 @@ class MediaSerializer(serializers.ModelSerializer):
         ]
 
 
+class JSONSchemaSerializer(serializers.Serializer):
+    json_schema = serializers.JSONField()
+
+
 class ResponseDestinationConfigSerializer(serializers.ModelSerializer):
     media = MediaSerializer()
     suggested_label = serializers.SerializerMethodField("get_suggested_label")

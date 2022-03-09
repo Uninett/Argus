@@ -46,6 +46,14 @@ def send_email_safely(function, additional_error=None, *args, **kwargs):
 
 class EmailNotification(NotificationMedium):
     MEDIA_SLUG = "email"
+    MEDIA_JSON_SCHEMA = {
+        "title": "EmailDestinationConfig",
+        "type": "object",
+        "properties": {"media": {"type": "string"}, "label": {"type": "string"}},
+        "settings": {"type": "object"},
+        "properties": {"email_address": {"type": "string"}},
+        "required": ["media", "settings"],
+    }
 
     class Form(forms.Form):
         synced = forms.BooleanField(disabled=True, required=False, initial=False)

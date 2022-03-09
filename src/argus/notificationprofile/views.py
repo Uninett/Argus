@@ -6,15 +6,18 @@ from rest_framework.decorators import api_view, action
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.reverse import reverse
 from rest_framework.views import APIView
 from drf_rw_serializers import viewsets as rw_viewsets
 
 from argus.drf.permissions import IsOwner
 from argus.incident.serializers import IncidentSerializer
+from argus.notificationprofile.media import MEDIA_CLASSES_DICT
 from .models import DestinationConfig, Filter, Media, NotificationProfile, Timeslot
 from .serializers import (
     FilterSerializer,
     FilterPreviewSerializer,
+    JSONSchemaSerializer,
     MediaSerializer,
     ResponseDestinationConfigSerializer,
     RequestDestinationConfigSerializer,
@@ -105,6 +108,21 @@ class MediaViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Media.objects.all()
+
+    @extend_schema(responses={"200": JSONSchemaSerializer})
+    @action(methods=["get"], detail=True)
+    def json_schema(self, request, pk, *args, **kwargs):
+        try:
+            schema = MEDIA_CLASSES_DICT[pk].MEDIA_JSON_SCHEMA
+            schema["$id"] = reverse(
+                "admin:app_list",
+                kwargs={"app_label": "argus_notificationprofile"},
+                request=request,
+            )
+        except KeyError:
+            raise ValidationError(f"Medium with pk={pk} does not exist.")
+        serializer = JSONSchemaSerializer({"json_schema": schema})
+        return Response(serializer.data)
 
 
 @extend_schema_view(
