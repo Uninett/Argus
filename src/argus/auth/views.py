@@ -5,14 +5,16 @@ from drf_spectacular.utils import extend_schema
 from rest_framework import generics
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
+from rest_framework.reverse import reverse
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 
 from argus.drf.permissions import IsOwner
 from .models import PhoneNumber, User
 from .serializers import BasicUserSerializer, PhoneNumberSerializer, UserSerializer
+from .utils import get_psa_authentication_names
 
 
 class ObtainNewAuthToken(ObtainAuthToken):
@@ -74,3 +76,13 @@ class PhoneNumberViewSet(ModelViewSet):
 
     def perform_update(self, serializer):
         serializer.save(user=self.request.user)
+
+
+class AuthMethodListView(APIView):
+    http_method_names = ["get", "head", "options", "trace"]
+    permission_classes = [AllowAny]
+
+    def get(self, request, *args, **kwargs):
+        names = get_psa_authentication_names()
+        data = {name: reverse("social:begin", kwargs={"backend": name}, request=request) for name in names}
+        return Response(data)
