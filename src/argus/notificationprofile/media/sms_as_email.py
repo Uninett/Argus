@@ -23,17 +23,17 @@ LOG = logging.getLogger(__name__)
 class SMSNotification(NotificationMedium):
     MEDIA_SLUG = "sms"
     MEDIA_JSON_SCHEMA = {
-        "title": "SMSDestinationConfig",
+        "title": "SMS Settings",
+        "description": "Settings for a DestinationConfig using SMS.",
         "type": "object",
-        "properties": {"media": {"type": "string"}, "label": {"type": "string"}},
-        "settings": {"type": "object"},
+        "required": ["phone_number"],
         "properties": {
             "phone_number": {
-                "description": "The phone number is validated using the python port of libphonenumber.",
                 "type": "string",
+                "title": "Phone number",
+                "description": "The phone number is validated using the python port of libphonenumber. The country code needs to be given.",
             }
         },
-        "required": ["media", "settings"],
     }
 
     class PhoneNumberForm(forms.Form):

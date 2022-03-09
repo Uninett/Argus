@@ -47,12 +47,11 @@ def send_email_safely(function, additional_error=None, *args, **kwargs):
 class EmailNotification(NotificationMedium):
     MEDIA_SLUG = "email"
     MEDIA_JSON_SCHEMA = {
-        "title": "EmailDestinationConfig",
+        "title": "Email Settings",
+        "description": "Settings for a DestinationConfig using email.",
         "type": "object",
-        "properties": {"media": {"type": "string"}, "label": {"type": "string"}},
-        "settings": {"type": "object"},
-        "properties": {"email_address": {"type": "string"}},
-        "required": ["media", "settings"],
+        "required": ["email_address"],
+        "properties": {"email_address": {"type": "string", "title": "Email address"}},
     }
 
     class Form(forms.Form):
