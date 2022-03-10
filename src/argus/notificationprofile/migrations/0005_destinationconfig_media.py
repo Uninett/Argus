@@ -43,7 +43,7 @@ def create_sms_destinations(apps, schema_editor):
         try:
             sms = Media.objects.using(db_alias).get(slug="sms")
         except Media.DoesNotExist:
-            raise APIException("SMS plugin is not registered in MEDIA_PATHS")
+            raise APIException("SMS plugin is not registered in MEDIA_PLUGINS")
 
         for phone_number in PhoneNumber.objects.all():
             DestinationConfig.objects.using(db_alias).create(
@@ -67,7 +67,7 @@ def copy_notificationprofiles_to_destinations(apps, schema_editor):
         try:
             sms = Media.objects.get(slug="sms")
         except Media.DoesNotExist:
-            raise APIException("SMS plugin is not registered in MEDIA_PATHS")
+            raise APIException("SMS plugin is not registered in MEDIA_PLUGINS")
 
     for profile in NotificationProfile.objects.all():
         if profile.user.email and profile.media_v1 in [["EM", "SM"], ["SM", "EM"], ["EM"]]:
