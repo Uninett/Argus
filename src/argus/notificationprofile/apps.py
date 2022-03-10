@@ -6,6 +6,31 @@ from django.db.utils import ProgrammingError
 from rest_framework.exceptions import APIException
 
 
+def sync_media():
+    from .media import MEDIA_CLASSES, MEDIA_CLASSES_DICT
+
+    try:
+        from .models import Media
+    except ImportError:
+        return
+
+    try:
+        for medium in Media.objects.all():
+            if not medium.slug in MEDIA_CLASSES_DICT.keys():
+                raise APIException("".join([medium.name, " plugin is not registered in MEDIA_PATHS"]))
+    except ProgrammingError:
+        return
+
+    # Check if all media plugins are also saved in Media
+    new_media = [
+        Media(slug=media_class.MEDIA_SLUG, name=media_class.MEDIA_NAME)
+        for media_class in MEDIA_CLASSES
+        if not Media.objects.filter(slug=media_class.MEDIA_SLUG)
+    ]
+    if new_media:
+        Media.objects.bulk_create(new_media)
+
+
 class NotificationprofileConfig(AppConfig):
     name = "argus.notificationprofile"
     label = "argus_notificationprofile"
@@ -26,21 +51,4 @@ class NotificationprofileConfig(AppConfig):
         register(fallback_filter_check)
 
         # Check if all media in Media has a respective class
-        try:
-            from .media import MEDIA_CLASSES, MEDIA_CLASSES_DICT
-            from .models import Media
-
-            for medium in Media.objects.all():
-                if not medium.slug in MEDIA_CLASSES_DICT.keys():
-                    raise APIException("".join([medium.name, " plugin is not registered in MEDIA_PATHS"]))
-
-            # Check if all media plugins are also saved in Media
-            new_media = [
-                Media(slug=media_class.MEDIA_SLUG, name=media_class.MEDIA_NAME)
-                for media_class in MEDIA_CLASSES
-                if not Media.objects.filter(slug=media_class.MEDIA_SLUG)
-            ]
-            if new_media:
-                Media.objects.bulk_create(new_media)
-        except ProgrammingError:
-            pass
+        sync_media()
