@@ -3,27 +3,24 @@
 import django.db.models.deletion
 from django.conf import settings
 from django.db import migrations, models
+from rest_framework.exceptions import APIException
+
+from argus.notificationprofile.media import MEDIA_CLASSES
 
 
 def create_default_media(apps, schema_editor):
     Media = apps.get_model("argus_notificationprofile", "Media")
     db_alias = schema_editor.connection.alias
-    Media.objects.using(db_alias).bulk_create(
-        [
-            Media(slug="email", name="Email"),
-            Media(slug="sms", name="SMS"),
-        ]
-    )
+    media = [Media(slug=medium.MEDIA_SLUG, name=medium.MEDIA_NAME) for medium in MEDIA_CLASSES]
+    Media.objects.using(db_alias).bulk_create(media)
 
 
-def create_and_link_default_destinations(apps, schema_editor):
+def create_and_link_default_email_destinations(apps, schema_editor):
     Users = apps.get_model("argus_auth", "User")
-    PhoneNumber = apps.get_model("argus_auth", "PhoneNumber")
     DestinationConfig = apps.get_model("argus_notificationprofile", "DestinationConfig")
     Media = apps.get_model("argus_notificationprofile", "Media")
     db_alias = schema_editor.connection.alias
     email = Media.objects.using(db_alias).get(slug="email")
-    sms = Media.objects.using(db_alias).get(slug="sms")
 
     for user in Users.objects.exclude(email=""):
         DestinationConfig.objects.using(db_alias).create(
@@ -35,14 +32,27 @@ def create_and_link_default_destinations(apps, schema_editor):
             },
         )
 
-    for phone_number in PhoneNumber.objects.all():
-        DestinationConfig.objects.using(db_alias).create(
-            user=phone_number.user,
-            media=sms,
-            settings={
-                "phone_number": str(phone_number.phone_number),
-            },
-        )
+
+def create_sms_destinations(apps, schema_editor):
+    PhoneNumber = apps.get_model("argus_auth", "PhoneNumber")
+    DestinationConfig = apps.get_model("argus_notificationprofile", "DestinationConfig")
+    Media = apps.get_model("argus_notificationprofile", "Media")
+    db_alias = schema_editor.connection.alias
+
+    if PhoneNumber.objects.exists():
+        try:
+            sms = Media.objects.using(db_alias).get(slug="sms")
+        except Media.DoesNotExist:
+            raise APIException("SMS plugin is not registered in MEDIA_PATHS")
+
+        for phone_number in PhoneNumber.objects.all():
+            DestinationConfig.objects.using(db_alias).create(
+                user=phone_number.user,
+                media=sms,
+                settings={
+                    "phone_number": str(phone_number.phone_number),
+                },
+            )
 
 
 def copy_notificationprofiles_to_destinations(apps, schema_editor):
@@ -50,7 +60,14 @@ def copy_notificationprofiles_to_destinations(apps, schema_editor):
     Media = apps.get_model("argus_notificationprofile", "Media")
     NotificationProfile = apps.get_model("argus_notificationprofile", "NotificationProfile")
     email = Media.objects.get(slug="email")
-    sms = Media.objects.get(slug="sms")
+    if (
+        NotificationProfile.objects.filter(media_v1=["EM", "SM"]).exists()
+        or NotificationProfile.objects.filter(media_v1=["SM"]).exists()
+    ):
+        try:
+            sms = Media.objects.get(slug="sms")
+        except Media.DoesNotExist:
+            raise APIException("SMS plugin is not registered in MEDIA_PATHS")
 
     for profile in NotificationProfile.objects.all():
         if profile.user.email and profile.media_v1 in [["EM", "SM"], ["SM", "EM"], ["EM"]]:
@@ -139,6 +156,7 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.RunPython(create_default_media, migrations.RunPython.noop),
-        migrations.RunPython(create_and_link_default_destinations, migrations.RunPython.noop),
+        migrations.RunPython(create_and_link_default_email_destinations, migrations.RunPython.noop),
+        migrations.RunPython(create_sms_destinations, migrations.RunPython.noop),
         migrations.RunPython(copy_notificationprofiles_to_destinations, migrations.RunPython.noop),
     ]

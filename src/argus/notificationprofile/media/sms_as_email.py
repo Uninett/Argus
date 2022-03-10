@@ -22,6 +22,7 @@ LOG = logging.getLogger(__name__)
 
 class SMSNotification(NotificationMedium):
     MEDIA_SLUG = "sms"
+    MEDIA_NAME = "SMS"
     MEDIA_JSON_SCHEMA = {
         "title": "SMS Settings",
         "description": "Settings for a DestinationConfig using SMS.",

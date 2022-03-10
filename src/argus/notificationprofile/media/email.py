@@ -46,6 +46,7 @@ def send_email_safely(function, additional_error=None, *args, **kwargs):
 
 class EmailNotification(NotificationMedium):
     MEDIA_SLUG = "email"
+    MEDIA_NAME = "Email"
     MEDIA_JSON_SCHEMA = {
         "title": "Email Settings",
         "description": "Settings for a DestinationConfig using email.",
