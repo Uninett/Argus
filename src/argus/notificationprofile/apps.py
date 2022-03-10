@@ -32,7 +32,7 @@ class NotificationprofileConfig(AppConfig):
 
             for medium in Media.objects.all():
                 if not medium.slug in MEDIA_CLASSES_DICT.keys():
-                    raise APIException("".join([medium.name, " plugin is not registered in MEDIA_PATHS"]))
+                    raise APIException("".join([medium.name, " plugin is not registered in MEDIA_PLUGINS"]))
 
             # Check if all media plugins are also saved in Media
             new_media = [
