@@ -126,6 +126,7 @@ class IncidentAdmin(TextWidgetsOverrideModelAdmin):
         "source",
         "source__type",
     )
+    exclude = ("search_text",)
 
     text_input_form_fields = ("source_incident_id",)
     url_input_form_fields = ("details_url", "ticket_url")

@@ -229,6 +229,7 @@ class Incident(models.Model):
         verbose_name="ticket URL",
         help_text="URL to existing ticket in a ticketing system.",
     )
+    search_text = models.TextField(blank=True, default="", verbose_name="Search Text")
 
     objects = IncidentQuerySet.as_manager()
 
@@ -249,6 +250,7 @@ class Incident(models.Model):
     def save(self, *args, **kwargs):
         # Parse and replace `end_time`, to avoid having to call `refresh_from_db()`
         self.end_time = self._meta.get_field("end_time").to_python(self.end_time)
+        self.search_text = self.generate_search_text()
         super().save(*args, **kwargs)
 
     @property
@@ -359,6 +361,12 @@ class Incident(models.Model):
             return urljoin(base_url, path)
         return path  # Just show the relative url
 
+    def generate_search_text(self):
+        search_fields = []
+        for event in self.events.all():
+            search_fields.append(event.description)
+        return " ".join(search_fields)
+
 
 class IncidentRelationType(models.Model):
     name = models.TextField()
@@ -392,7 +400,13 @@ class Event(models.Model):
         OTHER = "OTH", "Other"
         STATELESS = "LES", "Stateless"
 
-    ALLOWED_TYPES_FOR_SOURCE_SYSTEMS = {Type.INCIDENT_START, Type.INCIDENT_END, Type.OTHER, Type.INCIDENT_CHANGE, Type.STATELESS}
+    ALLOWED_TYPES_FOR_SOURCE_SYSTEMS = {
+        Type.INCIDENT_START,
+        Type.INCIDENT_END,
+        Type.OTHER,
+        Type.INCIDENT_CHANGE,
+        Type.STATELESS,
+    }
     ALLOWED_TYPES_FOR_END_USERS = {Type.CLOSE, Type.REOPEN, Type.ACKNOWLEDGE, Type.OTHER}
 
     incident = models.ForeignKey(to=Incident, on_delete=models.PROTECT, related_name="events")
@@ -404,6 +418,11 @@ class Event(models.Model):
 
     class Meta:
         ordering = ["-timestamp"]
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        # update incident.search_text
+        self.incident.save()
 
     def __str__(self):
         return f"'{self.get_type_display()}': {self.incident.description}, {self.actor} @ {self.timestamp}"
