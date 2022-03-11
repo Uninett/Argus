@@ -21,6 +21,7 @@ from social_django.urls import extra
 
 from argus.auth.views import ObtainNewAuthToken, AuthMethodListView
 from argus.dataporten import views as dataporten_views
+from argus.notificationprofile.views import SchemaView
 from argus.site.views import error, MetadataView
 
 
@@ -40,4 +41,5 @@ urlpatterns = [
     path("api/v1/", include(("argus.site.api_v1_urls", "api"), namespace="v1")),
     path("api/v2/", include(("argus.site.api_v2_urls", "api"), namespace="v2")),
     path("api/", MetadataView.as_view(), name="metadata"),
+    path("json-schema/<slug:slug>", SchemaView.as_view(), name="json-schema"),
 ]

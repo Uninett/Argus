@@ -1,22 +1,9 @@
 from rest_framework import serializers
 
-from .models import PhoneNumber, User
-
-
-class PhoneNumberSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = PhoneNumber
-        fields = [
-            "pk",
-            "user",
-            "phone_number",
-        ]
-        read_only_fields = ["pk", "user"]
+from .models import User
 
 
 class UserSerializer(serializers.ModelSerializer):
-    phone_numbers = PhoneNumberSerializer(many=True)
-
     class Meta:
         model = User
         fields = [
@@ -24,7 +11,6 @@ class UserSerializer(serializers.ModelSerializer):
             "first_name",
             "last_name",
             "email",
-            "phone_numbers",
         ]
 
 
