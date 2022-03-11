@@ -1,16 +1,20 @@
-import logging
-from typing import List
+from __future__ import annotations
 
-from argus.incident.models import Event
+import logging
+from typing import List, TYPE_CHECKING
+
 from django import forms
 from django.conf import settings
 from django.core.mail import send_mail
-from django.db.models.query import QuerySet
 from django.template.loader import render_to_string
 from rest_framework.exceptions import ValidationError
 
-from ..models import DestinationConfig
+from argus.incident.models import Event
 from .base import NotificationMedium
+
+if TYPE_CHECKING:
+    from django.db.models.query import QuerySet
+    from ..models import DestinationConfig
 
 LOG = logging.getLogger(__name__)
 

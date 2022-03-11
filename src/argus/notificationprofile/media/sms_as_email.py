@@ -3,19 +3,24 @@
 This SMS gateway has an email specific interface. The email subject must contain the
 recipient's phone number. The email body must contain the message text.
 """
+from __future__ import annotations
+
 import logging
+from typing import TYPE_CHECKING
 
 from django import forms
 from django.conf import settings
 from django.core.mail import send_mail
-from django.db.models.query import QuerySet
 from phonenumber_field.formfields import PhoneNumberField
 from rest_framework.exceptions import ValidationError
 
 from ...incident.models import Event
-from ..models import DestinationConfig
 from .base import NotificationMedium
 from .email import send_email_safely
+
+if TYPE_CHECKING:
+    from django.db.models.query import QuerySet
+    from ..models import DestinationConfig
 
 LOG = logging.getLogger(__name__)
 
