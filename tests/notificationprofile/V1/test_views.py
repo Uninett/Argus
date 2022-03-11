@@ -34,6 +34,19 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
         )
         self.notification_profile1 = NotificationProfile.objects.create(user=self.user1, timeslot=self.timeslot1)
         self.notification_profile1.filters.add(filter1)
+        self.notification_profile1.destinations.set(self.user1.destinations.all())
+        self.media_v1 = []
+        self.phone_number = None
+        if self.notification_profile1.destinations.filter(media__slug="email").exists():
+            self.media_v1.append("EM")
+        if self.notification_profile1.destinations.filter(media__slug="sms").exists():
+            self.media_v1.append("SM")
+            self.phone_number = (
+                self.notification_profile1.destinations.filter(media__slug="sms")
+                .order_by("pk")
+                .first()
+                .settings["phone_number"]
+            )
 
     def teardown(self):
         connect_signals()
@@ -56,8 +69,8 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
             {
                 "timeslot": self.timeslot2.pk,
                 "filters": [f.pk for f in self.notification_profile1.filters.all()],
-                "media": self.notification_profile1.media_v1,
-                "phone_number": self.notification_profile1.phone_number_id,
+                "media": self.media_v1,
+                "phone_number": self.phone_number,
                 "active": self.notification_profile1.active,
             },
         )

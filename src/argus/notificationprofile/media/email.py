@@ -1,11 +1,20 @@
-import json
+from __future__ import annotations
+
 import logging
+from typing import List, TYPE_CHECKING
 
+from django import forms
 from django.conf import settings
+from django.core.mail import send_mail
 from django.template.loader import render_to_string
+from rest_framework.exceptions import ValidationError
 
+from argus.incident.models import Event
 from .base import NotificationMedium
 
+if TYPE_CHECKING:
+    from django.db.models.query import QuerySet
+    from ..models import DestinationConfig
 
 LOG = logging.getLogger(__name__)
 
@@ -40,14 +49,43 @@ def send_email_safely(function, additional_error=None, *args, **kwargs):
 
 
 class EmailNotification(NotificationMedium):
-    @staticmethod
-    def send(event, profile, **_):
-        user = profile.user
-        if not user.email:
-            logging.getLogger("django.request").warning(
-                f"Cannot send email notification to user '{user}', as they have not set an email address."
-            )
+    MEDIA_SLUG = "email"
+    MEDIA_NAME = "Email"
+    MEDIA_JSON_SCHEMA = {
+        "title": "Email Settings",
+        "description": "Settings for a DestinationConfig using email.",
+        "type": "object",
+        "required": ["email_address"],
+        "properties": {"email_address": {"type": "string", "title": "Email address"}},
+    }
 
+    class Form(forms.Form):
+        synced = forms.BooleanField(disabled=True, required=False, initial=False)
+        email_address = forms.EmailField()
+
+    @classmethod
+    def validate(cls, instance, email_dict):
+        if instance.instance and instance.instance.settings["synced"]:
+            raise ValidationError("Cannot change the settings of the default destination.")
+        form = cls.Form(email_dict["settings"])
+        if not form.is_valid():
+            raise ValidationError(form.errors)
+        if form.cleaned_data["email_address"] == instance.context["request"].user.email:
+            raise ValidationError("This email address is already saved in the default destination of this user.")
+
+        return form.cleaned_data
+
+    @classmethod
+    def get_label(self, destination):
+        return destination.settings.get("email_address")
+
+    @staticmethod
+    def send(event: Event, destinations: QuerySet[DestinationConfig], **_):
+        email_destinations = destinations.filter(media__slug=EmailNotification.MEDIA_SLUG)
+        if not email_destinations:
+            return False
+
+        recipient_list = [destination.settings["email_address"] for destination in email_destinations]
         title = f"{event}"
         incident_dict = modelinstance_to_dict(event.incident)
         for field in ("id", "source_id"):
@@ -61,4 +99,13 @@ class EmailNotification(NotificationMedium):
         subject = f"{settings.NOTIFICATION_SUBJECT_PREFIX}{title}"
         message = render_to_string("notificationprofile/email.txt", template_context)
         html_message = render_to_string("notificationprofile/email.html", template_context)
-        send_email_safely(user.email_user, subject=subject, message=message, html_message=html_message)
+        send_email_safely(
+            send_mail,
+            subject=subject,
+            message=message,
+            from_email=None,
+            recipient_list=recipient_list,
+            html_message=html_message,
+        )
+
+        return True
