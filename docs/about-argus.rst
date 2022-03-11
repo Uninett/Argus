@@ -25,7 +25,7 @@ monitoring as a service for customers, we often have multiple instances of the
 same monitoring systems. Our aim was to aggregate all alerts into a single,
 coherent dashboard system. This dashboard provides a comprehensive overview of
 all currently active incidents across all services to our first line of
-support, the Sikt Servicecenter. It serves as a single place to manage
+support, the Sikt Service Center. It serves as a single place to manage
 notification profiles for both the first and second line support teams.
 
 Argus follows the principle of *single responsibility*, i.e. it does not
