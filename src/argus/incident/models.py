@@ -413,7 +413,7 @@ class Event(models.Model):
     actor = models.ForeignKey(to=User, on_delete=models.PROTECT, related_name="caused_events")
     timestamp = models.DateTimeField()
     received = models.DateTimeField(default=timezone.now)
-    type = models.CharField(choices=Type.choices, max_length=3)
+    type = models.TextField(choices=Type.choices)
     description = models.TextField(blank=True)
 
     class Meta:
