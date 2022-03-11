@@ -117,11 +117,15 @@ Notification settings
 * ``EMAIL_HOST_PASSWORD`` (optional) password for the email host (if required).
 * ``EMAIL_PORT`` (optional) email port. Defaults to 587 in production.
 
-In the settings file, there is also the variable ``MEDIA_PLUGINS``, which holds the paths to the media classes and determines which notification plugins are available to send notifications by:
+In the settings file, there is also the variable ``MEDIA_PLUGINS``, which holds the paths
+to the media classes and determines which notification plugins are available to send notifications by.
 
-Email is enabled by default and uses Django's email backend. There are multiple email backends available that Argus' plugin supports. It is recommended to simply switch out the email backend instead of replacing this plugin.
+Email is enabled by default and uses Django's email backend. There are multiple email
+backends available that Argus' plugin supports. It is recommended to simply switch out
+the email backend instead of replacing this plugin.
 
-SMS is disabled by default, since there is no standardized way of sending SMS messages. The only supported way at the moment is Uninett's internal email-to-SMS gateway.
+SMS is disabled by default, since there is no standardized way of sending SMS messages.
+The only supported way at the moment is Uninett's internal email-to-SMS gateway.
 
 Enabling the email-to-SMS gateway
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
