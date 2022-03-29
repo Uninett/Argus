@@ -1,0 +1,32 @@
+digraph overview {
+    compound=true;
+
+    subgraph cluster_server {
+        style = rounded;
+        label = "server"
+        destination1[label="destination 1"];
+        destination2[label="destination 2"];
+        destination3[label="destination 3"];
+    }
+
+    glueservice1[label="glue service 1"];
+    source1[label="source 1"];
+
+    source1 -> glueservice1 -> destination2 [lhead=cluster_server];
+
+    subgraph cluster_source2 {
+        style = rounded;
+        label = "source 2"
+        glueservice2[label="glue service 2"];
+    }
+
+    glueservice2 -> destination2 [lhead=cluster_server];
+
+    exterior1[shape="none"][style="invis"][label=""];
+    exterior2[shape="none"][style="invis"][label=""];
+    exterior3[shape="none"][style="invis"][label=""];
+
+    destination1 -> exterior1;
+    destination2 -> exterior2;
+    destination3 -> exterior3;
+}
