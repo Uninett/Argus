@@ -18,7 +18,7 @@ repos:
     rev: 24.8.0
     hooks:
     -   id: black
-        exclude: migrations/
+        exclude: ^(src/.*/migrations|docs/conf.py)
 -   repo: https://github.com/twisted/towncrier
     rev: 24.8.0
     hooks:
