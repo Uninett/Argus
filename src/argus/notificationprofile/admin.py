@@ -108,7 +108,7 @@ class NotificationProfileAdmin(admin.ModelAdmin):
     get_filters.short_description = "Filters"
 
     def get_destination_media(self, notification_profile: NotificationProfile):
-        return f"{set([destination.media.name for destination in notification_profile.destinations.all()])}"
+        return f'{" ".join(str(x) for x in set([destination.media.name for destination in notification_profile.destinations.all()]))}'
 
     get_destination_media.short_description = "Media"
 
