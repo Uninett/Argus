@@ -59,7 +59,6 @@ class PhoneNumberViewV1(viewsets.ViewSet):
     def retrieve(self, request, pk=None):
         destination = get_object_or_404(self.queryset.filter(media__slug="sms"), pk=pk)
         serializer = self.serializer_class(destination)
-        breakpoint()
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def update(self, request, pk=None):
