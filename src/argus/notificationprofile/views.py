@@ -2,8 +2,8 @@ import json
 
 from django.views.generic import DetailView
 from drf_spectacular.utils import extend_schema, extend_schema_view
-from rest_framework import generics, viewsets
-from rest_framework.decorators import api_view, action
+from rest_framework import status, viewsets
+from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -186,6 +186,24 @@ class FilterViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+    def destroy(self, request, *args, **kwargs):
+        filter = self.get_queryset().get(pk=self.kwargs["pk"])
+        connected_profiles = filter.notification_profiles.all()
+        if connected_profiles:
+            profiles = ", ".join([str(profile) for profile in connected_profiles])
+            return Response(
+                data="".join(
+                    [
+                        "Cannot delete this filter since it is in use in the notification profile(s): ",
+                        profiles,
+                        ".",
+                    ]
+                ),
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        self.perform_destroy(filter)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 # TODO: change HTTP method to GET, and get query data from URL
