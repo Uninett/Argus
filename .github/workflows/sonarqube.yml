@@ -3,6 +3,7 @@ on: push
 jobs:
   sonarQubeTrigger:
     name: SonarQube Trigger
+    if: github.repository_owner == 'Uninett'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
