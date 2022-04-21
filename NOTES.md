@@ -9,7 +9,9 @@
 This allows searching for incidents that contain given keywords.
 The result is a list of incidents where each given keyword exists
 in the incident description and/or in any event descriptions that belongs to the incident.
-- New query parameter `count` for the incident endpoint to be used along with a filter. This will make the endpoint return a count of how many incident matches the given filter along with the filter itself.
+- New query parameter `count` for the incident endpoint to be used along with a filter.
+This will make the endpoint return a count of how many incident matches the given filter
+along with the filter itself.
 - The `level` attribute for incidents can now be updated via the incident endpoint.
 - External authentication supported via REMOTE_USER environment variable.
 
