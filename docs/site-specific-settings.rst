@@ -6,11 +6,11 @@ Site-specific settings
 
 There are several settings that need to be defined within Argus, for example:
 
-* ``SECRET_KEY``
+* :setting:`SECRET_KEY`
 * Any API keys, for instance OIDC keys and secrets
-* ``DEBUG``
-* ``DATABASE``-settings
-* ``EMAIL``-settings
+* :setting:`DEBUG`
+* :setting:`DATABASE_URL`
+* :setting:`DEFAULT_FROM_EMAIL`
 
 Two ways to define these site-specific settings are explained as follows.
 
