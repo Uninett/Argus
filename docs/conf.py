@@ -44,6 +44,7 @@ extensions = [
     'sphinx.ext.todo',
     'sphinx.ext.coverage',
     'sphinx.ext.viewcode',
+    'sphinx.ext.intersphinx',
     'djangodocs',
 ]
 
@@ -185,3 +186,12 @@ epub_exclude_files = ['search.html']
 
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = True
+
+# -- Intersphinx configuration -----------------------------------------------
+
+intersphinx_mapping = {
+    'django': (
+        'http://docs.djangoproject.com/en/3.2/',
+        'http://docs.djangoproject.com/en/3.2/_objects/',
+    ),
+}
