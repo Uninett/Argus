@@ -15,6 +15,7 @@
 import os
 import sys
 sys.path.insert(0, os.path.abspath('../src'))
+sys.path.insert(0, os.path.abspath("_exts"))
 
 
 # -- Project information -----------------------------------------------------
@@ -43,6 +44,7 @@ extensions = [
     'sphinx.ext.todo',
     'sphinx.ext.coverage',
     'sphinx.ext.viewcode',
+    'djangodocs',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
