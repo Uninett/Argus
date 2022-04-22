@@ -51,6 +51,11 @@ class IncidentPagination(CursorPagination):
     page_size_query_param = "page_size"
 
 
+class EventPagination(CursorPagination):
+    ordering = "-timestamp"
+    page_size_query_param = "page_size"
+
+
 class SourceSystemTypeViewSet(
     mixins.CreateModelMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet
 ):
@@ -306,6 +311,23 @@ class SourceLockedIncidentViewSet(IncidentViewSet):
 
     def get_queryset(self):
         return Incident.objects.filter(source__user=self.request.user).prefetch_default_related()
+
+
+@extend_schema_view(
+    list=extend_schema(
+        parameters=[
+            OpenApiParameter(name="cursor", description="The pagination cursor value.", type=str),
+        ]
+    )
+)
+class AllEventsViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+    pagination_class = EventPagination
+    queryset = Event.objects.none()
+    permission_classes = [IsAuthenticated]
+    serializer_class = EventSerializer
+
+    def get_queryset(self):
+        return Event.objects.all()
 
 
 class EventViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):

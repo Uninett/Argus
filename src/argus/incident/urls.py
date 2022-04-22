@@ -12,6 +12,7 @@ router.register(r"", views.IncidentViewSet)
 
 sourced_incident_list = views.SourceLockedIncidentViewSet.as_view({"get": "list", "post": "create"})
 
+all_events_list = views.AllEventsViewSet.as_view({"get": "list"})
 event_list = views.EventViewSet.as_view({"get": "list", "post": "create"})
 event_detail = views.EventViewSet.as_view({"get": "retrieve"})
 
@@ -24,6 +25,7 @@ tag_detail = views.IncidentTagViewSet.as_view({"get": "retrieve", "delete": "des
 app_name = "incident"
 urlpatterns = [
     path("mine/", sourced_incident_list, name="source_locked_incidents"),
+    path("all-events/", all_events_list, name="events"),
     path("<int:incident_pk>/events/", event_list, name="incident-events"),
     path("<int:incident_pk>/events/<int:pk>/", event_detail, name="incident-event"),
     path("<int:incident_pk>/acks/", ack_list, name="incident-acks"),
