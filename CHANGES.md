@@ -19,8 +19,6 @@
 - Update README documentation for using create_fake_incident. PR #369
 - Add feature for searching through incident and event descriptions. PR #362
 - Add support for multiple emails and phone numbers per user. PR #333
-- Update commit hooks to ensure that non-empty files end with a newline. PR #384
 - Allow any length for event type keys. PR #370
 - Rebrand from Uninett to Sikt. PR #364
 - Add endpoint for getting all events. PR #365
-- Add SonarQube to github workflows.
