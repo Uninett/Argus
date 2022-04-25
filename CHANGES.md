@@ -5,28 +5,28 @@ This file documents all changes to Argus. This file is primarily meant to be rea
 
 ### Added
 - Force djangorestframework dependency to be older than 3.13.
-- Add endpoint to incident API for counting results of a filter. PR #345
-- Allow updating level attribute for incidents. PR #319
-- Add support for python 3.10. PR #348
-- Add new event type "LES". PR #352
-- Add new API endpoint for listing all login endpoints. PR #358
+- (PR #345) Add endpoint to incident API for counting results of a filter.
+- (PR #319) Allow updating level attribute for incidents.
+- (PR #348) Add support for python 3.10.
+- (PR #352) Add new event type "LES".
+- (PR #358) Add new API endpoint for listing all login endpoints.
 - Ensure unique source for incidents in incident queryset tests.
-- Support external authentication via REMOTE_USER environment variable. PR #366
-- Add feature for searching through incident and event descriptions. PR #362
-- Add support for multiple emails and phone numbers per user. PR #333
-- Add endpoint for getting all events. PR #365
+- (PR #366) Support external authentication via REMOTE_USER environment variable.
+- (PR #362) Add feature for searching through incident and event descriptions.
+- (PR #333) Add support for multiple emails and phone numbers per user.
+- (PR #365) Add endpoint for getting all events.
 
 ### Changed
 - Upgrade from django 3.2.11 to 3.2.12.
-- Update README documentation for using create_fake_incident. PR #369
-- Allow any length for event type keys instead of limiting it to
- a lenght of 3. PR #370
-- Replace references to Uninett with Sikt. PR #364
-- Make initial events for stateless incidents be of type "LES" instead of "STA". PR #352
+- (PR #369) Update README documentation for using create_fake_incident.
+- (PR #370) Allow any length for event type keys instead of limiting it to
+ a lenght of 3.
+- (PR #364) Replace references to Uninett with Sikt.
+- (PR #352) Make initial events for stateless incidents be of type "LES" instead of "STA".
 
 ### Removed
-- Remove unsupported authentication backend. PR #358
+- (PR #358) Remove unsupported authentication backend.
 
 ### Fixed
-- Stop NotificationProfileViewV1 from appearing in API v2. PR #331
+- (PR #331) Stop NotificationProfileViewV1 from appearing in API v2.
 - Fix signatures for ListFields.
