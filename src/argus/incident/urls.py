@@ -24,8 +24,8 @@ tag_detail = views.IncidentTagViewSet.as_view({"get": "retrieve", "delete": "des
 
 app_name = "incident"
 urlpatterns = [
+    path("events/", all_events_list, name="events"),
     path("mine/", sourced_incident_list, name="source_locked_incidents"),
-    path("all-events/", all_events_list, name="events"),
     path("<int:incident_pk>/events/", event_list, name="incident-events"),
     path("<int:incident_pk>/events/<int:pk>/", event_detail, name="incident-event"),
     path("<int:incident_pk>/acks/", ack_list, name="incident-acks"),
