@@ -15,8 +15,8 @@ incident by adding an event.
 Glue-service
 ------------
 
-A glue-service runs independently of argus server. It sits between a source and
-the argus server and translates an incident from the source to the API. The
+A glue-service runs independently of the argus server. It sits between a source
+and the argus server and translates an incident from the source to the API. The
 ``incident_source_id`` for the incident is copied from the source if available
 or otherwise handled by the glue-service.
 
