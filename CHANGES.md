@@ -1,5 +1,7 @@
 # Changes
 
+## [Unreleased]
+
 ### Added
 - Stop NotificationProfileViewV1 from appearing in API v2. PR #331
 - Force djangorestframework dependency to be older than 3.13.
