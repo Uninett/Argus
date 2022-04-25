@@ -19,7 +19,7 @@ along with the filter itself.
 
 ### Changed
 - The initial event for stateless incidents will now be labeled as "Stateless" instead of "Incident start". Stateful incidents are still labeled "Incident start".
-- All mentions of Uninett has been replaced with Sikt.
+- All mentions of Uninett has been replaced with Sikt. This is because Uninett was a merged into Sikt – Norwegian Agency for Shared Services in Education and Research on January 1st 2022.
 
 ### Steps for upgrading
 
