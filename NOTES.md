@@ -1,8 +1,8 @@
 # Release Notes
 
-## Next release
+## [Unreleased]
 
-### New features
+### Added
 - New API endpoint `/login-endpoints/` for listing all login endpoints.
 - New API endpoint `/incidents/all-events/` for listing all events.
 - New query parameter `search` for the incident endpoint.
@@ -16,7 +16,7 @@ along with the filter itself.
 - External authentication supported via REMOTE_USER environment variable.
 - Users can now have multiple emails and phone numbers
 
-### Changes
+### Changed
 - The initial event for stateless incidents will now be labeled as "Stateless" instead of "Incident start". Stateful incidents are still labeled "Incident start".
 - All mentions of Uninett has been replaced with Sikt.
 
