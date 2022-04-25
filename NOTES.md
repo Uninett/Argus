@@ -24,3 +24,8 @@ along with the filter itself.
 ### Steps for upgrading
 
 This update includes changes to the database model, requiring a migration of the database.
+
+## [1.3.6] - 2022-04-21
+
+### Fixed
+- NotificationProfileViewV1 should no longer appear in API v2.
