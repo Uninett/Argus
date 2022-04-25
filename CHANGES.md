@@ -4,7 +4,6 @@ This file documents all changes to Argus. This file is primarily meant to be rea
 ## [Unreleased]
 
 ### Added
-- (354a997) Force djangorestframework dependency to be older than 3.13.
 - (PR #345) Add endpoint to incident API for counting results of a filter.
 - (PR #319) Allow updating level attribute for incidents.
 - (PR #348) Add support for python 3.10.
@@ -27,6 +26,13 @@ This file documents all changes to Argus. This file is primarily meant to be rea
 - (PR #358) Remove unsupported authentication backend.
 
 ### Fixed
+- (14dccbb, 68ea69) Ensure unique source for incidents in incident queryset tests.
+
+## [1.3.6] - 2022-04-21
+
+### Added
+- (354a997) Force djangorestframework dependency to be older than 3.13.
+
+### Fixed
 - (PR #331) Stop NotificationProfileViewV1 from appearing in API v2.
 - (da49115) Fix signatures for ListFields.
-- (14dccbb, 68ea69) Ensure unique source for incidents in incident queryset tests.
