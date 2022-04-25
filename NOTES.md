@@ -1,4 +1,5 @@
 # Release Notes
+This file documents changes to Argus that are relevant for the users to know.
 
 ## [Unreleased]
 
