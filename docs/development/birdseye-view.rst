@@ -7,8 +7,8 @@ A bird's eye view
 Sources
 =======
 
-A source pushes incidents to the argus server via the API. Changes to those
-incidents are done via pushing events. An incident has a field
+A source pushes incidents to the argus server via the API. Subsequent changes
+to those incidents are made by posting events to them. An incident has a field
 ``incident_source_id`` for storing an id, for changing an already existing
 incident by adding an event.
 
