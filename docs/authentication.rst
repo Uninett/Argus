@@ -17,7 +17,7 @@ OAuth2
 ======
 
 For support of OAuth2/OIDC-logins, the library `python-social-auth (PSA)`_ is
-used. By adding a new backend to the setting ``AUTHENTICATION_BACKENDS`` it is
+used. By adding a new backend to the setting :django:setting:`AUTHENTICATION_BACKENDS` it is
 possible to support all that PSA supports, and it is also not too hard to write
 your own.
 
