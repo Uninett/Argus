@@ -14,6 +14,12 @@ This will make the endpoint return a count of how many incident matches the give
 along with the filter itself.
 - The `level` attribute for incidents can now be updated via the incident endpoint.
 - External authentication supported via REMOTE_USER environment variable.
+- Users can now have multiple emails and phone numbers
 
 ### Changes
 - The initial event for stateless incidents will now be labeled as "Stateless" instead of "Incident start". Stateful incidents are still labeled "Incident start".
+- All mentions of Uninett has been replaced with Sikt.
+
+### Steps for upgrading
+
+This update includes changes to the database model, requiring a migration of the database.
