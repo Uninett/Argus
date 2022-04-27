@@ -281,14 +281,24 @@ class DestinationConfig(models.Model):
 
 
 class NotificationProfile(models.Model):
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["user", "name"], name="unique_name_per_user"),
+        ]
+
+    id = models.AutoField(primary_key=True)
     user = models.ForeignKey(to=User, on_delete=models.CASCADE, related_name="notification_profiles")
-    timeslot = models.OneToOneField(
+    timeslot = models.ForeignKey(
         to=Timeslot,
         on_delete=models.CASCADE,
-        primary_key=True,
-        related_name="notification_profile",
+        related_name="notification_profiles",
     )
     filters = models.ManyToManyField(to=Filter, related_name="notification_profiles")
+    name = models.CharField(
+        max_length=40,
+        blank=True,
+        null=True,
+    )
     active = models.BooleanField(default=True)
     destinations = models.ManyToManyField(
         to=DestinationConfig,
@@ -297,6 +307,8 @@ class NotificationProfile(models.Model):
     )
 
     def __str__(self):
+        if self.name:
+            return f"{self.name}"
         return f"{self.timeslot}: {', '.join(str(f) for f in self.filters.all())}"
 
     @property
