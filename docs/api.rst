@@ -590,10 +590,6 @@ Notification profile endpoints
    -  ``PUT``: updates and returns one of the logged in user’s
       notification profiles by primary key
 
-      -  Note that if ``timeslot`` is changed, the notification
-         profile’s primary key will also change. This consequently means that the
-         URL containing the previous primary key will return a ``404 Not Found``
-         status code.
       -  Example request body: same as ``POST`` to
          ``/api/v1/notificationprofiles/``
 
@@ -1225,10 +1221,6 @@ Notification profile endpoints
    -  ``PUT``: updates and returns one of the logged in user’s
       notification profiles by primary key
 
-      -  Note that if ``timeslot`` is changed, the notification
-         profile’s primary key will also change. This consequently means that the
-         URL containing the previous primary key will return a ``404 Not Found``
-         status code.
       -  Example request body: same as ``POST`` to
          ``/api/v2/notificationprofiles/``
 
