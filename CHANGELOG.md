@@ -5,35 +5,43 @@ read by developers.
 ## [Unreleased]
 
 ### Added
-- Add endpoint to incident API for counting results of a filter.
-- Allow updating level attribute for incidents.
-- Add support for python 3.10.
-- Add new event type "LES".
-- Add new API endpoint for listing all login endpoints.
 - Support external authentication via REMOTE_USER environment variable.
 - Add feature for searching through incident and event descriptions.
 - Add support for multiple emails and phone numbers per user.
 - Add endpoint for getting all events.
 
 ### Changed
-- Upgrade from django 3.2.11 to 3.2.12.
+- Replace references to Uninett with Sikt.
+
+## [1.4.0] - 2022-04-28
+
+### Added
+- Add new API endpoint for listing all login endpoints.
+- Add new event type "LES" for stateless events.
+- Add debugging endpoint to incident API for counting results of a filter.
+- Allow changing level via incident endpoint
+
+### Changed
+- Make initial events for stateless incidents be of type "LES" instead of "STA".
 - Update README documentation for using create_fake_incident.
 - Allow any length for event type keys instead of limiting it to
- a 3.
-- Replace references to Uninett with Sikt.
-- Make initial events for stateless incidents be of type "LES" instead of "STA".
-
-### Removed
-- Remove unsupported authentication backend.
+ a lenght of 3.
 
 ### Fixed
 - Ensure unique source for incidents in incident queryset tests.
 
-## [1.3.6] - 2022-04-21
+### Removed
+- Remove unsupported authentication backend.
 
-### Added
-- Force djangorestframework dependency to be older than 3.13.
+### Dependencies
+- Add support for python 3.10.
+- Upgrade from django 3.2.11 to 3.2.12.
+
+## [1.3.6] - 2022-04-21
 
 ### Fixed
 - Stop NotificationProfileViewV1 from appearing in API v2.
 - Fix signatures for ListFields.
+
+### Dependencies
+- Force djangorestframework dependency to be older than 3.13.
