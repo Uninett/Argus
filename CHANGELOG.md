@@ -5,10 +5,16 @@ read by developers.
 ## [Unreleased]
 
 ### Added
-- Support external authentication via REMOTE_USER environment variable.
-- Add feature for searching through incident and event descriptions.
-- Add support for multiple emails and phone numbers per user.
 - Add endpoint for getting all events.
+- Add support for multiple emails and phone numbers per user.
+
+## [1.5.0] - unreleased
+
+### Added
+- Github actions: Add support for SonarQube (for Géant) and prevent CodeCov on
+  3rd party forks
+- Add feature for searching through incident and event descriptions.
+- Support external authentication via REMOTE_USER environment variable.
 
 ### Changed
 - Replace references to Uninett with Sikt.
