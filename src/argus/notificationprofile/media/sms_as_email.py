@@ -66,7 +66,7 @@ class SMSNotification(NotificationMedium):
             LOG.error("SMS_GATEWAY_ADDRESS is not set, cannot dispatch SMS notifications using this plugin")
             return
 
-        sms_destinations = destinations.filter(media__slug=SMSNotification.MEDIA_SLUG)
+        sms_destinations = destinations.filter(media_id=SMSNotification.MEDIA_SLUG)
         if not sms_destinations:
             return False
         phone_numbers = [destination.settings["phone_numbers"] for destination in sms_destinations]

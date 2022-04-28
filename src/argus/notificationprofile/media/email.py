@@ -110,7 +110,7 @@ class EmailNotification(NotificationMedium):
 
     @staticmethod
     def send(event: Event, destinations: QuerySet[DestinationConfig], **_):
-        email_destinations = destinations.filter(media__slug=EmailNotification.MEDIA_SLUG)
+        email_destinations = destinations.filter(media_id=EmailNotification.MEDIA_SLUG)
         if not email_destinations:
             return False
 

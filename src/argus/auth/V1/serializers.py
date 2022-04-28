@@ -40,5 +40,5 @@ class UserSerializerV1(serializers.ModelSerializer):
     def get_phone_numbers(self, user: User) -> List[dict]:
         return [
             {"pk": destination.pk, "user": user.pk, "phone_number": destination.settings["phone_number"]}
-            for destination in user.destinations.filter(media__slug="sms")
+            for destination in user.destinations.filter(media_id="sms")
         ]

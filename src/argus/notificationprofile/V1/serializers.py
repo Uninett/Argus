@@ -10,7 +10,7 @@ from ..serializers import FilterSerializer, RequestDestinationConfigSerializer, 
 
 def _switch_phone_numbers(first_sms_destination, new_phone_number, instance):
     current_sms_destination = (
-        instance.user.destinations.filter(media__slug="sms")
+        instance.user.destinations.filter(media_id="sms")
         .filter(settings__phone_number=new_phone_number.as_e164)
         .first()
     )
@@ -54,15 +54,15 @@ class ResponseNotificationProfileSerializerV1(serializers.ModelSerializer):
 
     def get_media_v1(self, profile: NotificationProfile) -> List[str]:
         media_v1 = []
-        if profile.destinations.filter(media__slug="email").exists():
+        if profile.destinations.filter(media_id="email").exists():
             media_v1.append("EM")
-        if profile.destinations.filter(media__slug="sms").exists():
+        if profile.destinations.filter(media_id="sms").exists():
             media_v1.append("SM")
         return media_v1
 
     def get_phone_number(self, profile: NotificationProfile) -> str:
-        if profile.destinations.filter(media__slug="sms").exists():
-            return profile.destinations.filter(media__slug="sms").order_by("pk").first().settings["phone_number"]
+        if profile.destinations.filter(media_id="sms").exists():
+            return profile.destinations.filter(media_id="sms").order_by("pk").first().settings["phone_number"]
         return None
 
 
@@ -92,7 +92,7 @@ class RequestNotificationProfileSerializerV1(serializers.ModelSerializer):
             if not phone_number:
                 raise serializers.ValidationError({"phone_number": ["This field may not be null."]})
             sms_destination = (
-                user.destinations.filter(media__slug="sms").filter(settings__phone_number=phone_number.as_e164).first()
+                user.destinations.filter(media_id="sms").filter(settings__phone_number=phone_number.as_e164).first()
             )
             if sms_destination:
                 destinations.append(sms_destination)
@@ -108,7 +108,7 @@ class RequestNotificationProfileSerializerV1(serializers.ModelSerializer):
                 raise serializers.ValidationError(
                     {"media_v1": ["User email is not set, therefore this field cannot include email."]}
                 )
-            destinations.append(user.destinations.filter(media__slug="email").get(settings__email_address=user.email))
+            destinations.append(user.destinations.filter(media_id="email").get(settings__email_address=user.email))
 
         try:
             profile = super().create(validated_data)
@@ -137,8 +137,8 @@ class RequestNotificationProfileSerializerV1(serializers.ModelSerializer):
         phone_number = validated_data.pop("phone_number", None)
         media_v1 = validated_data.pop("media_v1", None)
         # Update phone number without updating media_v1
-        if phone_number and not media_v1 and instance.destinations.filter(media__slug="sms").exists():
-            first_sms_destination = instance.destinations.filter(media__slug="sms").order_by("pk").first()
+        if phone_number and not media_v1 and instance.destinations.filter(media_id="sms").exists():
+            first_sms_destination = instance.destinations.filter(media_id="sms").order_by("pk").first()
             if not first_sms_destination.settings["phone_number"] == phone_number.as_e164:
                 _switch_phone_numbers(first_sms_destination, phone_number, instance)
 
@@ -146,9 +146,9 @@ class RequestNotificationProfileSerializerV1(serializers.ModelSerializer):
         if media_v1:
             if "SM" in media_v1:
                 if "EM" not in media_v1:
-                    email_destinations = instance.destinations.filter(media__slug="email")
+                    email_destinations = instance.destinations.filter(media_id="email")
                     instance.destinations.remove(*email_destinations)
-                first_sms_destination = instance.destinations.filter(media__slug="sms").order_by("pk").first()
+                first_sms_destination = instance.destinations.filter(media_id="sms").order_by("pk").first()
                 if first_sms_destination:
                     if phone_number and not first_sms_destination.settings["phone_number"] == phone_number.as_e164:
                         _switch_phone_numbers(first_sms_destination, phone_number, instance)
@@ -163,14 +163,14 @@ class RequestNotificationProfileSerializerV1(serializers.ModelSerializer):
                         instance.destinations.add(sms_serializer.instance)
             if "EM" in media_v1:
                 if "SM" not in media_v1:
-                    sms_destinations = instance.destinations.filter(media__slug="sms")
+                    sms_destinations = instance.destinations.filter(media_id="sms")
                     instance.destinations.remove(*sms_destinations)
-                if not instance.user.email and not instance.destinations.filter(media__slug="email").exists():
+                if not instance.user.email and not instance.destinations.filter(media_id="email").exists():
                     raise serializers.ValidationError(
                         {"media_v1": ["User email is not set, therefore this field cannot include email."]}
                     )
                 if instance.user.email:
-                    default_email_destination = instance.user.destinations.filter(media__slug="email").get(
+                    default_email_destination = instance.user.destinations.filter(media_id="email").get(
                         settings__email_address=instance.user.email
                     )
                     if not default_email_destination in instance.destinations.all():
