@@ -75,8 +75,8 @@ class EmailNotification(NotificationMedium):
 
         return form.cleaned_data
 
-    @classmethod
-    def get_label(self, destination):
+    @staticmethod
+    def get_label(destination):
         return destination.settings.get("email_address")
 
     @staticmethod

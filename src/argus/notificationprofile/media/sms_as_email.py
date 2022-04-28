@@ -55,8 +55,8 @@ class SMSNotification(NotificationMedium):
 
         return form.cleaned_data
 
-    @classmethod
-    def get_label(self, destination):
+    @staticmethod
+    def get_label(destination):
         return destination.settings.get("phone_number")
 
     @staticmethod
