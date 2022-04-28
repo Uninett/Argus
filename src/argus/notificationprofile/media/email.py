@@ -11,10 +11,10 @@ from rest_framework.exceptions import ValidationError
 
 from argus.incident.models import Event
 from .base import NotificationMedium
+from ..models import DestinationConfig
 
 if TYPE_CHECKING:
     from django.db.models.query import QuerySet
-    from ..models import DestinationConfig
 
 LOG = logging.getLogger(__name__)
 
@@ -65,13 +65,11 @@ class EmailNotification(NotificationMedium):
 
     @classmethod
     def validate(cls, instance, email_dict):
-        if instance.instance and instance.instance.settings["synced"]:
-            raise ValidationError("Cannot change the settings of the default destination.")
         form = cls.Form(email_dict["settings"])
         if not form.is_valid():
             raise ValidationError(form.errors)
         if form.cleaned_data["email_address"] == instance.context["request"].user.email:
-            raise ValidationError("This email address is already saved in the default destination of this user.")
+            raise ValidationError("This email address is already registered in another destination.")
 
         return form.cleaned_data
 
@@ -90,6 +88,20 @@ class EmailNotification(NotificationMedium):
                     ".",
                 ]
             )
+        return None
+
+    @staticmethod
+    def update(destination, validated_data):
+        if destination.settings["synced"]:
+            new_synced_destination = DestinationConfig(
+                user=destination.user,
+                media_id=destination.media_id,
+                settings=destination.settings,
+            )
+            destination.settings = validated_data["settings"]
+            DestinationConfig.objects.bulk_update([destination], fields=["settings"])
+            new_synced_destination.save()
+            return destination
         return None
 
     @staticmethod

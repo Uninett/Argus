@@ -30,3 +30,7 @@ class NotificationMedium(ABC):
     @staticmethod
     def is_deletable(destination: DestinationConfig):
         return None
+
+    @staticmethod
+    def update(destination, validated_data):
+        return None
