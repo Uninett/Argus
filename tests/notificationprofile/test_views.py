@@ -6,7 +6,9 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework.test import APITestCase
 
 from argus.incident.serializers import IncidentSerializer
+from argus.notificationprofile.media import MEDIA_CLASSES_DICT
 from argus.notificationprofile.models import (
+    DestinationConfig,
     Filter,
     NotificationProfile,
     Timeslot,
@@ -71,5 +73,81 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
         self.assertEqual(self.user1.notification_profiles.get(pk=new_profile1_pk).timeslot, self.timeslot2)
         new_profile1_path = reverse("v2:notification-profile:notificationprofile-detail", args=[new_profile1_pk])
         self.assertEqual(self.user1_rest_client.get(new_profile1_path).status_code, status.HTTP_200_OK)
+
+    def test_can_delete_sms_destination(self):
+        if not "sms" in MEDIA_CLASSES_DICT.keys():
+            self.skipTest("No sms plugin available")
+
+        self.sms_destination = DestinationConfig.objects.create(
+            user=self.user1,
+            media_id="sms",
+            settings={"phone_number": "+4747474747"},
+        )
+
+        sms_destination_pk = self.sms_destination.pk
+        sms_destination_path = reverse("v2:notification-profile:destinationconfig-detail", args=[sms_destination_pk])
+
+        self.assertEqual(self.user1.destinations.get(pk=sms_destination_pk), self.sms_destination)
+        self.assertEqual(self.user1_rest_client.get(sms_destination_path).status_code, status.HTTP_200_OK)
+        response = self.user1_rest_client.delete(sms_destination_path)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        self.assertEqual(self.user1_rest_client.get(sms_destination_path).status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_can_delete_unsynced_unconnected_email_destination(self):
+        self.email_destination = DestinationConfig.objects.create(
+            user=self.user1,
+            media_id="email",
+            settings={"email_address": "test@example.com", "synced": False},
+        )
+
+        email_destination_pk = self.email_destination.pk
+        email_destination_path = reverse(
+            "v2:notification-profile:destinationconfig-detail", args=[email_destination_pk]
+        )
+
+        self.assertEqual(self.user1.destinations.get(pk=email_destination_pk), self.email_destination)
+        self.assertEqual(self.user1_rest_client.get(email_destination_path).status_code, status.HTTP_200_OK)
+        response = self.user1_rest_client.delete(email_destination_path)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        self.assertEqual(self.user1_rest_client.get(email_destination_path).status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_cannot_delete_synced_email_destination(self):
+        self.email_destination = (
+            DestinationConfig.objects.filter(media_id="email").filter(settings__synced=True).first()
+        )
+
+        email_destination_pk = self.email_destination.pk
+        email_destination_path = reverse(
+            "v2:notification-profile:destinationconfig-detail", args=[email_destination_pk]
+        )
+
+        self.assertEqual(self.user1.destinations.get(pk=email_destination_pk), self.email_destination)
+        self.assertEqual(self.user1_rest_client.get(email_destination_path).status_code, status.HTTP_200_OK)
+        response = self.user1_rest_client.delete(email_destination_path)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        self.assertEqual(self.user1_rest_client.get(email_destination_path).status_code, status.HTTP_200_OK)
+
+    def test_cannot_delete_connected_email_destination(self):
+        self.email_destination = DestinationConfig.objects.create(
+            user=self.user1,
+            media_id="email",
+            settings={"email_address": "test@example.com", "synced": False},
+        )
+        self.notification_profile1.destinations.add(self.email_destination)
+
+        email_destination_pk = self.email_destination.pk
+        email_destination_path = reverse(
+            "v2:notification-profile:destinationconfig-detail", args=[email_destination_pk]
+        )
+
+        self.assertEqual(self.user1.destinations.get(pk=email_destination_pk), self.email_destination)
+        self.assertEqual(self.user1_rest_client.get(email_destination_path).status_code, status.HTTP_200_OK)
+        response = self.user1_rest_client.delete(email_destination_path)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        self.assertEqual(self.user1_rest_client.get(email_destination_path).status_code, status.HTTP_200_OK)
 
     # TODO: test more endpoints

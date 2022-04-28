@@ -26,3 +26,7 @@ class NotificationMedium(ABC):
     @abstractmethod
     def send(event: Event, profile: NotificationProfile, **kwargs):
         pass
+
+    @staticmethod
+    def is_deletable(destination: DestinationConfig):
+        return None

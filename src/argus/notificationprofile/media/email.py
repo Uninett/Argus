@@ -76,6 +76,23 @@ class EmailNotification(NotificationMedium):
         return form.cleaned_data
 
     @staticmethod
+    def is_deletable(destination: DestinationConfig):
+        if destination.settings["synced"]:
+            return "Cannot delete this email destination since it was defined by an outside source."
+
+        connected_profiles = destination.notification_profiles.all()
+        if connected_profiles:
+            profiles = ", ".join([str(profile) for profile in connected_profiles])
+            return "".join(
+                [
+                    "Cannot delete this destination since it is in use in the notification profile(s): ",
+                    profiles,
+                    ".",
+                ]
+            )
+        return None
+
+    @staticmethod
     def get_label(destination):
         return destination.settings.get("email_address")
 
