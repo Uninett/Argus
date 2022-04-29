@@ -19,6 +19,9 @@ read by developers.
 ### Changed
 - Replace references to Uninett with Sikt.
 
+### Dependencies
+- Upgrade from django 3.2.12 to 3.2.13
+
 ## [1.4.0] - 2022-04-28
 
 ### Added
