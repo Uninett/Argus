@@ -31,9 +31,9 @@ class SourceSystemPostingTests(APITestCase):
 
     def _post_source1_dict(self, url: str, client: Client):
         self.source1_dict = {
-            "name": "gw1.uninett",
+            "name": "gw1.sikt",
             "type": self.type1.pk,
-            "username": "gw1.uninett",
+            "username": "gw1.sikt",
         }
         client.post(url, self.source1_dict)
 
@@ -61,7 +61,7 @@ class SourceSystemPostingTests(APITestCase):
         source1_duplicate_name = {
             "name": self.source1_dict["name"],
             "type": self.source1_dict["type"],
-            "username": "gw2.uninett",
+            "username": "gw2.sikt",
         }
         self.assertEqual(SourceSystem.objects.count(), 1)
         self.assertEqual(User.objects.count(), 2)
@@ -78,7 +78,7 @@ class SourceSystemPostingTests(APITestCase):
     def _test_posting_duplicate_source_system_username(self, url: str, client: Client):
         self._post_source1_dict(url, client)
         self.source1_duplicate_username_dict = {
-            "name": "gw2.uninett",
+            "name": "gw2.sikt",
             "type": self.type2.pk,
             "username": self.source1_dict["username"],
         }
@@ -107,7 +107,7 @@ class SourceSystemPostingTests(APITestCase):
     def _test_posting_empty_source_system_username_should_use_source_system_name_as_username(
         self, url: str, client: Client
     ):
-        source_name = "gw.uninett"
+        source_name = "gw.sikt"
         source_no_username_dict = {
             "name": source_name,
             "type": self.type1.pk,
@@ -132,12 +132,12 @@ class SourceSystemPostingTests(APITestCase):
         )
 
     def test_admin_change_form_should_change_fields(self):
-        source1_user = User.objects.create_user(username="gw1.uninett")
-        source1_user2 = User.objects.create_user(username="new.gw1.uninett")
-        source1 = SourceSystem.objects.create(name="gw1.uninett", type=self.type1, user=source1_user)
+        source1_user = User.objects.create_user(username="gw1.sikt")
+        source1_user2 = User.objects.create_user(username="new.gw1.sikt")
+        source1 = SourceSystem.objects.create(name="gw1.sikt", type=self.type1, user=source1_user)
 
         source1_dict = {
-            "name": "new.gw1.uninett",
+            "name": "new.gw1.sikt",
             "type": self.type2,
             "user": source1_user2.pk,
         }
