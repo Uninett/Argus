@@ -8,7 +8,14 @@ read by developers.
 - Add endpoint for getting all events.
 - Add support for multiple emails and phone numbers per user.
 
-## [1.5.0] - unreleased
+
+## [1.5.1] - 2022-05-03
+
+### Fixed
+- Acknowledging incidents works again, thanks to a workaround.
+
+
+## [1.5.0] - 2022-05-03
 
 ### Added
 - Github actions: Add support for SonarQube (for Géant) and prevent CodeCov on

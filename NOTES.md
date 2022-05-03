@@ -27,7 +27,13 @@ MEDIA_PLUGINS = [
 ]
 ```
 
-## [1.5.0] - Unreleased
+## [1.5.1] - 2022-05-03
+
+### Fixed
+- Acking an incident when notifications were turned on was broken, this is
+  a workaround.
+
+## [1.5.0] - 2022-05-03
 
 ### Added
 - New query parameter `search` for the incident endpoint. This allows searching
