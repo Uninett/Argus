@@ -313,7 +313,7 @@ class Incident(models.Model):
         acks_not_expired_query = Q(ack__expiration__isnull=True) | Q(ack__expiration__gt=timezone.now())
         return self.events.filter(acks_query & acks_not_expired_query).exists()
 
-    @transaction.atomic
+    # @transaction.atomic
     def set_open(self, actor: User):
         if not self.stateful:
             raise ValidationError("Cannot set a stateless incident as open")
@@ -324,7 +324,7 @@ class Incident(models.Model):
         self.save(update_fields=["end_time"])
         Event.objects.create(incident=self, actor=actor, timestamp=timezone.now(), type=Event.Type.REOPEN)
 
-    @transaction.atomic
+    # @transaction.atomic
     def set_closed(self, actor: User):
         if not self.stateful:
             raise ValidationError("Cannot set a stateless incident as closed")
@@ -335,7 +335,7 @@ class Incident(models.Model):
         self.save(update_fields=["end_time"])
         Event.objects.create(incident=self, actor=actor, timestamp=self.end_time, type=Event.Type.CLOSE)
 
-    @transaction.atomic
+    # @transaction.atomic
     def create_ack(self, actor: User, timestamp=None, description="", expiration=None):
         timestamp = timestamp if timestamp else timezone.now()
         event = Event.objects.create(
@@ -344,7 +344,7 @@ class Incident(models.Model):
         ack = Acknowledgement.objects.create(event=event, expiration=expiration)
         return ack
 
-    @transaction.atomic
+    # @transaction.atomic
     def change_level(self, actor, new_level, timestamp=None):
         self.level = new_level
         self.save(update_fields=["level"])
