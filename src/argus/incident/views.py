@@ -108,6 +108,11 @@ class SourceSystemViewSet(
                 description="Fetch acked (`true`) or unacked (`false`) incidents.",
                 enum=BooleanStringOAEnum,
             ),
+            OpenApiParameter(
+                name="duration__gte",
+                description="Fetch incidents with a duration longer of equal to `DURATION` minutes",
+                type=int,
+            ),
             OpenApiParameter(name="cursor", description="The pagination cursor value.", type=str),
             OpenApiParameter(
                 name="end_time__gte",
