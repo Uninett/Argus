@@ -1,6 +1,7 @@
+from django.urls import reverse
 from django.test import TestCase, RequestFactory
 
-from rest_framework import serializers, versioning
+from rest_framework import serializers, status, versioning
 from rest_framework.test import APITestCase
 
 from argus.auth.factories import SourceUserFactory
@@ -47,6 +48,18 @@ class IncidentViewSetV1TestCase(APITestCase):
     def tearDownClass(cls):
         connect_signals()
 
+    def add_incident(self, description="incident"):
+        data = {
+            "start_time": "2022-05-24T13:07:29.254Z",
+            "end_time": "2022-05-24T13:07:29.254Z",
+            "description": description,
+            "level": 1,
+            "tags": [{"tag": "a=b"}],
+        }
+        response = self.client.post("/api/v1/incidents/", data, format="json")
+        self.assertEqual(response.status_code, 201)  # Created
+        return response.data["pk"]
+
     def test_no_incidents_returns_empty_list(self):
         response = self.client.get("/api/v1/incidents/")
         self.assertFalse(Incident.objects.exists())
@@ -78,6 +91,19 @@ class IncidentViewSetV1TestCase(APITestCase):
         tag = Tag.objects.get()
         self.assertEqual(obj.tags, [tag])
         self.assertEqual(str(tag), data["tags"][0]["tag"])
+
+    def test_incident_can_properly_change_level(self):
+        incident_pk = self.add_incident("incident1")
+        incident_path = reverse("v1:incident:incident-detail", args=[incident_pk])
+        response = self.client.put(
+            incident_path,
+            {
+                "tags": [{"tag": "a=b"}],
+                "level": 2,
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(Incident.objects.get(pk=incident_pk).level, 2)
 
 
 class IncidentViewSetTestCase(APITestCase):
