@@ -11,7 +11,7 @@ from rest_framework.reverse import reverse
 from rest_framework.views import APIView
 
 from .models import User
-from .serializers import BasicUserSerializer, UserSerializer
+from .serializers import BasicUserSerializer, RefreshTokenSerializer, UserSerializer
 from .utils import get_psa_authentication_names
 
 
@@ -69,3 +69,16 @@ class AuthMethodListView(APIView):
         names = get_psa_authentication_names()
         data = {name: reverse("social:begin", kwargs={"backend": name}, request=request) for name in names}
         return Response(data)
+
+
+class RefreshTokenView(ObtainAuthToken):
+    serializer_class = RefreshTokenSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data, context={"request": request})
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data["user"]
+        key = serializer.validated_data["old_token"]
+        Token.objects.get(key=key).delete()
+        token = Token.objects.create(user=user)
+        return Response({"token": token.key})
