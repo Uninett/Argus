@@ -147,3 +147,23 @@ class APITests(APITestCase):
 
         assert_correct_fields_for_user(self.normal_user1)
         assert_correct_fields_for_user(self.superuser1)
+
+    def test_refresh_token_returns_correct_new_token(self):
+        auth_token_path = reverse("v2:auth:refresh-token")
+        response = self.normal_user1_client.post(auth_token_path, {"old_token": self.normal_user1_token.key})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertNotEqual(response.data["token"], self.normal_user1_token.key)
+        self.assertEqual(response.data["token"], Token.objects.get(user=self.normal_user1).key)
+
+    def test_refresh_token_does_not_accept_wrong_old_token(self):
+        auth_token_path = reverse("v2:auth:refresh-token")
+        response = self.normal_user1_client.post(auth_token_path, {"old_token": "wrong token"})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_refresh_token_does_not_refresh_token_for_inactive_user(self):
+        self.normal_user1.is_active = False
+        self.normal_user1.save(update_fields=["is_active"])
+        auth_token_path = reverse("v2:auth:refresh-token")
+        # Need to use active user for the request itself
+        response = self.superuser1_client.post(auth_token_path, {"old_token": self.normal_user1_token.key})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
