@@ -116,6 +116,7 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
             },
         )
         response.render()
+        self.assertEqual(response.status_code, 201)
         self.assertTrue(NotificationProfile.objects.filter(pk=response.data.get("pk")))
 
     def test_new_notificaton_profile_has_correct_media(self):
@@ -131,6 +132,7 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
             },
         )
         response.render()
+        self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data["media"], self.media_v1)
 
     def test_delete_notification_profile(self):
@@ -140,6 +142,7 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
             reverse("v1:notification-profile:notificationprofile-detail", args=[profile_pk])
         )
         response.render()
+        self.assertEqual(response.status_code, 204)
         self.assertFalse(NotificationProfile.objects.filter(pk=profile_pk).first())
 
     def test_get_timeslots(self):
@@ -161,6 +164,7 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
             },
         )
         response.render()
+        self.assertEqual(response.status_code, 201)
         self.assertTrue(Timeslot.objects.filter(user=self.user1, name="test-timeslot").first())
 
     def test_create_new_timeslot_end_before_start(self):
@@ -173,7 +177,7 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
             },
         )
         response.render()
-        self.assertTrue(response.data["time_recurrences"][0]["non_field_errors"])
+        self.assertEqual(response.status_code, 400)
         self.assertFalse(Timeslot.objects.filter(user=self.user1, name="test-timeslot").first())
 
     def test_get_timeslot_by_pk(self):
@@ -192,6 +196,7 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
             {"name": new_name, "time_recurrences": [{"days": [1, 2, 3], "start": "10:00:00", "end": "20:00:00"}]},
         )
         response.render()
+        self.assertEqual(response.status_code, 200)
         self.assertEqual(Timeslot.objects.filter(pk=timeslot_pk).first().name, new_name)
 
     def test_update_timeslot_end_to_before_start(self):
@@ -205,13 +210,14 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
             },
         )
         response.render()
-        self.assertTrue(response.data["time_recurrences"][0]["non_field_errors"])
+        self.assertEqual(response.status_code, 400)
 
     def test_delete_timeslot(self):
         timeslot_pk = self.timeslot1.pk
         # /api/v1/notificationprofiles/timeslots/<int:pk>/
         response = self.user1_rest_client.delete(reverse("v1:notification-profile:timeslot-detail", args=[timeslot_pk]))
         response.render()
+        self.assertEqual(response.status_code, 204)
         self.assertFalse(Timeslot.objects.filter(pk=timeslot_pk).first())
 
     def test_get_filters(self):
@@ -231,6 +237,7 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
             },
         )
         response.render()
+        self.assertEqual(response.status_code, 201)
         self.assertTrue(Filter.objects.filter(user=self.user1, name="test-filter").first())
 
     def test_get_filter_by_pk(self):
@@ -252,6 +259,7 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
             },
         )
         response.render()
+        self.assertEqual(response.status_code, 200)
         self.assertEqual(Filter.objects.filter(pk=filter_pk).first().name, new_name)
 
     def test_delete_unused_filter_is_deleted(self):
@@ -259,6 +267,7 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
         # /api/v1/notificationprofiles/filters/<int:pk>/
         response = self.user1_rest_client.delete(reverse("v1:notification-profile:filter-detail", args=[filter_pk]))
         response.render()
+        self.assertEqual(response.status_code, 204)
         self.assertFalse(Filter.objects.filter(pk=filter_pk).first())
 
     def test_delete_used_filter_is_not_deleted(self):
@@ -266,6 +275,7 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
         # /api/v1/notificationprofiles/filters/<int:pk>/
         response = self.user1_rest_client.delete(reverse("v1:notification-profile:filter-detail", args=[filter_pk]))
         response.render()
+        self.assertEqual(response.status_code, 400)
         self.assertTrue(Filter.objects.filter(pk=filter_pk).first())
 
     def test_get_filterpreview(self):
