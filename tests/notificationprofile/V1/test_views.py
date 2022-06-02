@@ -118,6 +118,21 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
         response.render()
         self.assertTrue(NotificationProfile.objects.filter(pk=response.data.get("pk")))
 
+    def test_new_notificaton_profile_has_correct_media(self):
+        # /api/v1/notificationprofiles/
+        response = self.user1_rest_client.post(
+            reverse("v1:notification-profile:notificationprofile-list"),
+            {
+                "timeslot": self.timeslot2.pk,
+                "filters": [f.pk for f in self.notification_profile1.filters.all()],
+                "media": self.media_v1,
+                "phone_number": self.phone_number,
+                "active": self.notification_profile1.active,
+            },
+        )
+        response.render()
+        self.assertEqual(response.data["media"], self.media_v1)
+
     def test_delete_notification_profile(self):
         profile_pk = self.notification_profile1.pk
         # /api/v1/notificationprofiles/<int:pk>/
