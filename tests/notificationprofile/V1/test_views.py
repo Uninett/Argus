@@ -163,6 +163,19 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
         response.render()
         self.assertTrue(Timeslot.objects.filter(user=self.user1, name="test-timeslot").first())
 
+    def test_create_new_timeslot_end_before_start(self):
+        # /api/v1/notificationprofiles/timeslots/
+        response = self.user1_rest_client.post(
+            reverse("v1:notification-profile:timeslot-list"),
+            {
+                "name": "test-timeslot",
+                "time_recurrences": [{"days": [1, 2, 3], "start": "20:00:00", "end": "10:00:00"}],
+            },
+        )
+        response.render()
+        self.assertTrue(response.data["time_recurrences"][0]["non_field_errors"])
+        self.assertFalse(Timeslot.objects.filter(user=self.user1, name="test-timeslot").first())
+
     def test_get_timeslot_by_pk(self):
         timeslot_pk = self.timeslot1.pk
         # /api/v1/notificationprofiles/timeslots/<int:pk>/
@@ -180,6 +193,19 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
         )
         response.render()
         self.assertEqual(Timeslot.objects.filter(pk=timeslot_pk).first().name, new_name)
+
+    def test_update_timeslot_end_to_before_start(self):
+        timeslot_pk = self.timeslot1.pk
+        # /api/v1/notificationprofiles/timeslots/<int:pk>/
+        response = self.user1_rest_client.put(
+            reverse("v1:notification-profile:timeslot-detail", args=[timeslot_pk]),
+            {
+                "name": self.timeslot1.name,
+                "time_recurrences": [{"days": [1, 2, 3], "start": "20:00:00", "end": "10:00:00"}],
+            },
+        )
+        response.render()
+        self.assertTrue(response.data["time_recurrences"][0]["non_field_errors"])
 
     def test_delete_timeslot(self):
         timeslot_pk = self.timeslot1.pk
