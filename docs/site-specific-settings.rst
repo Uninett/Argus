@@ -218,6 +218,11 @@ different server, set the :setting:`ARGUS_REDIS_SERVER` environment variable, e.
 
   ARGUS_REDIS_SERVER=my-redis-server.example.org:6379
 
+Token settings
+------------------
+.. setting:: AUTH_TOKEN_EXPIRES_AFTER_DAYS
+* :setting:`AUTH_TOKEN_EXPIRES_AFTER_DAYS`  determines how long an authentication token is valid.
+    If undefined it will default to the value of 14 days.
 
 Debugging settings
 ------------------

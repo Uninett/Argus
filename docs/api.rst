@@ -26,8 +26,10 @@ Auth endpoints
 -  ``POST`` to ``/api/v1/token-auth/``: returns an auth token for the
    posted user
 
-   -  Note that this token will expire after 14 days, and can be
-      replaced by posting to the same endpoint.
+   -  Note that this token will expire after a certain amout of days that is
+      set in the variable ``AUTH_TOKEN_EXPIRES_AFTER_DAYS`` in
+      :ref:`site-specific-settings` (by default 14 days), and can be replaced
+      by posting to the same endpoint.
 
    .. code-block:: json
     :caption: Example request body
@@ -704,8 +706,10 @@ Auth endpoints
 -  ``POST`` to ``/api/v2/token-auth/``: returns an auth token for the
    posted user
 
-   -  Note that this token will expire after 14 days, and can be
-      replaced by posting to the same endpoint.
+   -  Note that this token will expire after a certain amout of days that is
+      set in the variable ``AUTH_TOKEN_EXPIRES_AFTER_DAYS`` in
+      :ref:`site-specific-settings` (by default 14 days), and can be replaced
+      by posting to the same endpoint.
 
    .. code-block:: json
     :caption: Example request body
