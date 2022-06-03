@@ -40,7 +40,7 @@ The API and the user interface
 ------------------------------
 
 In keeping with the single responsibility principle, a complete Argus setup
-consists two separate components, with separate concerns: The Argus API server,
+consists of two separate components, with separate concerns: The Argus API server,
 and the Argus frontend.
 
 The Argus server provides a REST API to interact with the incident database and
@@ -49,7 +49,7 @@ received from source systems, and allows viewing and processing them via the
 REST API.
 It also supports setting up user-specific notification profiles, and sends
 notifications to users based on said profiles.
-Argus server does not provide a user interface targeted at end users.
+The Argus server does not provide a user interface targeted at end users.
 
 Conversely, the `Argus frontend application`_ acts as a client to provide end
 users with a web-based user interface to the Argus API server. Using the
@@ -64,7 +64,7 @@ The frontend application documentation is provided separately.
 The Argus server admin interface
 --------------------------------
 
-Besides the REST API, Argus server has an administration interface.
+Besides the REST API, the Argus server has an administration interface.
 It can be used to perform low-level administration tasks on a running Argus
 server, such as:
 
