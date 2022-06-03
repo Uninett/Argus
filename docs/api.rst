@@ -126,6 +126,18 @@ Incident endpoints
       ``acked=true|false``
         Fetch only acked (``true``) or unacked (``false``) incidents.
 
+      ``end_time__gte=end-time``
+        Fetch only incidents that ended on or later than (``end-time``).
+
+      ``end_time__isnull=true|false``
+        Fetch only stateless (``true``) or stateful (``false``) incidents.
+
+      ``end_time__lte=end-time``
+        Fetch only incidents that ended on or earlier than (``end-time``).
+
+      ``level__lte=1|2|3|4|5``
+        Fetch only incidents that have a level less or equal than (``level``).
+
       ``open=true|false``
         Fetch only open (``true``) or closed (``false``) incidents.
 
@@ -138,8 +150,21 @@ Incident endpoints
       ``source__name__in=NAME1[,NAME2,..]``
         Fetch only incidents with a source with name ``NAME1`` or ``NAME2`` or..
 
+      ``source__type__in=NAME1[,NAME2,..]``
+        Fetch only incidents with a source of a type with numeric id
+        ``ID1`` or ``ID2`` or..
+
       ``source_incident_id=ID``
         Fetch only incidents with ``source_incident_id`` set to ``ID``.
+
+      ``start_time__gte=start-time``
+        Fetch only incidents that started on or later than (``start-time``).
+
+      ``start_time__lte=start-time``
+        Fetch only incidents that started on or earlier than (``start-time``).
+
+      ``stateful=true|false``
+        Fetch only stateful (``true``) or stateless (``false``) incidents.
 
       ``ticket=true|false``
         Fetch only incidents with a ticket url (``true``) or without (``false``).
@@ -747,6 +772,18 @@ Incident endpoints
       ``acked=true|false``
         Fetch only acked (``true``) or unacked (``false``) incidents.
 
+      ``end_time__gte=end-time``
+        Fetch only incidents that ended on or later than (``end-time``).
+
+      ``end_time__isnull=true|false``
+        Fetch only stateless (``true``) or stateful (``false``) incidents.
+
+      ``end_time__lte=end-time``
+        Fetch only incidents that ended on or earlier than (``end-time``).
+
+      ``level__lte=1|2|3|4|5``
+        Fetch only incidents that have a level less or equal than (``level``).
+
       ``open=true|false``
         Fetch only open (``true``) or closed (``false``) incidents.
 
@@ -759,8 +796,21 @@ Incident endpoints
       ``source__name__in=NAME1[,NAME2,..]``
         Fetch only incidents with a source with name ``NAME1`` or ``NAME2`` or..
 
+      ``source__type__in=NAME1[,NAME2,..]``
+        Fetch only incidents with a source of a type with numeric id
+        ``ID1`` or ``ID2`` or..
+
       ``source_incident_id=ID``
         Fetch only incidents with ``source_incident_id`` set to ``ID``.
+
+      ``start_time__gte=start-time``
+        Fetch only incidents that started on or later than (``start-time``).
+
+      ``start_time__lte=start-time``
+        Fetch only incidents that started on or earlier than (``start-time``).
+
+      ``stateful=true|false``
+        Fetch only stateful (``true``) or stateless (``false``) incidents.
 
       ``ticket=true|false``
         Fetch only incidents with a ticket url (``true``) or without (``false``).
