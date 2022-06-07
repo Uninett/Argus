@@ -50,6 +50,16 @@ class IncidentPagination(CursorPagination):
     ordering = "-start_time"
     page_size_query_param = "page_size"
 
+    def get_paginated_response(self, data):
+        return Response(
+            {
+                "next": self.get_next_link(),
+                "previous": self.get_previous_link(),
+                "estimated_count": Incident.fuzzycount_manager.count(),
+                "results": data,
+            }
+        )
+
 
 class EventPagination(CursorPagination):
     ordering = "-timestamp"
