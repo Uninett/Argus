@@ -1,5 +1,6 @@
 from django.contrib.auth import logout
 from django.conf import settings
+from django.db import transaction
 
 from drf_spectacular.utils import extend_schema
 from rest_framework import generics
@@ -74,6 +75,7 @@ class AuthMethodListView(APIView):
 class RefreshTokenView(ObtainAuthToken):
     serializer_class = RefreshTokenSerializer
 
+    @transaction.atomic
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data, context={"request": request})
         serializer.is_valid(raise_exception=True)
