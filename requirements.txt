@@ -64,6 +64,7 @@ django==3.2.13
     #   django-filter
     #   django-multiselectfield
     #   django-phonenumber-field
+    #   django-postgres-fuzzycount
     #   djangorestframework
     #   drf-rw-serializers
     #   drf-spectacular
@@ -74,6 +75,8 @@ django-filter==2.4.0
 django-multiselectfield==0.1.12
     # via -r requirements/base.txt
 django-phonenumber-field[phonenumberslite]==5.0.0
+    # via -r requirements/base.txt
+django-postgres-fuzzycount==0.1.7
     # via -r requirements/base.txt
 djangorestframework==3.12.4
     # via
@@ -163,6 +166,8 @@ social-auth-core==4.2.0
     #   -r requirements/base.txt
     #   python-dataporten-auth
     #   social-auth-app-django
+sphinx-me==0.3
+    # via django-postgres-fuzzycount
 sqlparse==0.4.2
     # via django
 text-unidecode==1.3
