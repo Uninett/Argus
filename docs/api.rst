@@ -243,6 +243,9 @@ Incident endpoints
         The link to the previous page, according to the cursor, or
         ``null`` if on the first page.
 
+      ``estimated_count``
+        An estimation of the total number of incidents.
+
       ``results``
         An array of the resulting subset of rows, or an empty array if there are no
         results.
