@@ -1,7 +1,10 @@
+from django.db.models import Q
 from django.utils import timezone
+from rest_framework.authtoken.models import Token
 
+from argus.incident.models import get_or_create_default_instances, Incident
 from argus.notificationprofile.media import background_send_notifications_to_users
-from .models import Acknowledgement, ChangeEvent, Event, Incident, SourceSystem
+from .models import Acknowledgement, ChangeEvent, Event, Incident, SourceSystem, Tag
 
 
 __all__ = [
@@ -9,6 +12,7 @@ __all__ = [
     "create_first_event",
     "send_notification",
     "delete_associated_event",
+    "close_token_incident",
 ]
 
 
@@ -38,6 +42,28 @@ def send_notification(sender, instance: Event, *args, **kwargs):
 def delete_associated_event(sender, instance: Acknowledgement, *args, **kwargs):
     if hasattr(instance, "event") and instance.event:
         instance.event.delete()
+
+
+def close_token_incident(instance: Token, **kwargs):
+    if not hasattr(instance.user, "source_system"):
+        return
+
+    open_expiry_incidents = Incident.objects.open().token_expiry()
+
+    if not open_expiry_incidents:
+        return
+
+    argus_user, _, _ = get_or_create_default_instances()
+    source_system_tag = Tag.objects.filter(
+        (Q(key="source_system_id") & Q(value=instance.user.source_system.id))
+    ).first()
+
+    token_expiry_incident = open_expiry_incidents.filter(incident_tag_relations__tag=source_system_tag).first()
+
+    if not token_expiry_incident:
+        return
+
+    token_expiry_incident.set_end(actor=argus_user)
 
 
 def detect_changes(sender, instance: Incident, raw, *args, **kwargs):
