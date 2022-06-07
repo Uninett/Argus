@@ -49,8 +49,8 @@ class RefreshTokenSerializer(serializers.Serializer):
         try:
             token = Token.objects.select_related("user").get(key=key)
         except Token.DoesNotExist:
-            raise serializers.ValidationError("Incorrect token.", code="authorization")
+            raise serializers.ValidationError("Incorrect token, cannot refresh.", code="authorization")
         if not token.user.is_active:
-            raise serializers.ValidationError("User inactive or deleted.", code="authorization")
+            raise serializers.ValidationError("User inactive or deleted, cannot refresh token.", code="authorization")
 
         return token.user
