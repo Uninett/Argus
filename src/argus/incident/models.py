@@ -5,6 +5,8 @@ from operator import and_
 from random import randint
 from urllib.parse import urljoin
 
+from fuzzycount import FuzzyCountManager
+
 from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
 from django.db import models, transaction
@@ -232,6 +234,7 @@ class Incident(models.Model):
     search_text = models.TextField(blank=True, default="", verbose_name="Search Text")
 
     objects = IncidentQuerySet.as_manager()
+    fuzzycount_manager = FuzzyCountManager()
 
     class Meta:
         constraints = [
