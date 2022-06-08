@@ -444,8 +444,5 @@ class AcknowledgementViewSet(
 
     def perform_create(self, serializer: AcknowledgementSerializer):
         user = self.request.user
-        if user.is_source_system:
-            EventViewSet._raise_type_validation_error("A source system cannot post acknowledgements.")
-
         incident = self.get_incident()
         serializer.save(incident=incident, actor=user)
