@@ -6,10 +6,11 @@
 
 Argus is a platform for aggregating incidents across network management systems, and
 sending notifications to users. Users create notification profiles that define which
-incidents they subscribe to.
+incidents they subscribe to. See [Argus docs](http://argus-server.rtfd.io/en/latest/) for more details.
 
 This repository hosts the backend built with Django. There is also a
 [REACT SPA frontend](https://github.com/Uninett/Argus-frontend).
+
 
 See also the the [Python client library](https://github.com/Uninett/pyargus).
 
