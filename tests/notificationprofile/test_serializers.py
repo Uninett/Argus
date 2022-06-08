@@ -239,7 +239,11 @@ class DestinationConfigSerializerTests(TestCase):
         )
 
     def test_update_existing_email_destination(self):
-        destination = DestinationConfigFactory(user=self.user, settings={"email_address": "user@example.com"})
+        destination = DestinationConfigFactory(
+            user=self.user,
+            media_id="email",
+            settings={"email_address": "user@example.com", "synced": False},
+        )
 
         request = self.request_factory.post("/")
         request.user = self.user
@@ -372,7 +376,11 @@ class DestinationConfigSerializerTests(TestCase):
     def test_update_existing_sms_destination(self):
         if not "sms" in MEDIA_CLASSES_DICT.keys():
             self.skipTest("No sms plugin available")
-        destination = DestinationConfigFactory(user=self.user, settings={"phone_number": "+4747474747"})
+        destination = DestinationConfigFactory(
+            user=self.user,
+            media_id="sms",
+            settings={"phone_number": "+4747474747"},
+        )
 
         request = self.request_factory.post("/")
         request.user = self.user

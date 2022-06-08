@@ -11,10 +11,10 @@ from rest_framework.exceptions import ValidationError
 
 from argus.incident.models import Event
 from .base import NotificationMedium
+from ..models import DestinationConfig
 
 if TYPE_CHECKING:
     from django.db.models.query import QuerySet
-    from ..models import DestinationConfig
 
 LOG = logging.getLogger(__name__)
 
@@ -65,23 +65,52 @@ class EmailNotification(NotificationMedium):
 
     @classmethod
     def validate(cls, instance, email_dict):
-        if instance.instance and instance.instance.settings["synced"]:
-            raise ValidationError("Cannot change the settings of the default destination.")
         form = cls.Form(email_dict["settings"])
         if not form.is_valid():
             raise ValidationError(form.errors)
         if form.cleaned_data["email_address"] == instance.context["request"].user.email:
-            raise ValidationError("This email address is already saved in the default destination of this user.")
+            raise ValidationError("This email address is already registered in another destination.")
 
         return form.cleaned_data
 
-    @classmethod
-    def get_label(self, destination):
+    @staticmethod
+    def is_deletable(destination: DestinationConfig):
+        if destination.settings["synced"]:
+            return "Cannot delete this email destination since it was defined by an outside source."
+
+        connected_profiles = destination.notification_profiles.all()
+        if connected_profiles:
+            profiles = ", ".join([str(profile) for profile in connected_profiles])
+            return "".join(
+                [
+                    "Cannot delete this destination since it is in use in the notification profile(s): ",
+                    profiles,
+                    ".",
+                ]
+            )
+        return None
+
+    @staticmethod
+    def update(destination, validated_data):
+        if destination.settings["synced"]:
+            new_synced_destination = DestinationConfig(
+                user=destination.user,
+                media_id=destination.media_id,
+                settings=destination.settings,
+            )
+            destination.settings = validated_data["settings"]
+            DestinationConfig.objects.bulk_update([destination], fields=["settings"])
+            new_synced_destination.save()
+            return destination
+        return None
+
+    @staticmethod
+    def get_label(destination):
         return destination.settings.get("email_address")
 
     @staticmethod
     def send(event: Event, destinations: QuerySet[DestinationConfig], **_):
-        email_destinations = destinations.filter(media__slug=EmailNotification.MEDIA_SLUG)
+        email_destinations = destinations.filter(media_id=EmailNotification.MEDIA_SLUG)
         if not email_destinations:
             return False
 

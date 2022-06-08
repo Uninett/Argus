@@ -163,6 +163,19 @@ class DestinationConfigViewSet(rw_viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
+    def destroy(self, request, *args, **kwargs):
+        pk = self.kwargs["pk"]
+        try:
+            destination = self.get_queryset().get(pk=pk)
+        except DestinationConfig.DoesNotExist:
+            raise ValidationError(f"Destination with pk={pk} does not exist.")
+
+        error_message = MEDIA_CLASSES_DICT[destination.media.slug].is_deletable(destination)
+        if not error_message:
+            return super().destroy(destination)
+        else:
+            raise ValidationError(error_message)
+
 
 class TimeslotViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated, IsOwner]

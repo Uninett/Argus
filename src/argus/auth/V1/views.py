@@ -35,15 +35,15 @@ class PhoneNumberViewV1(viewsets.ViewSet):
     permission_classes = [IsAuthenticated, IsOwner]
     serializer_class = ResponsePhoneNumberSerializerV1
     write_serializer_class = RequestDestinationConfigSerializer
-    queryset = DestinationConfig.objects.all()
+    queryset = DestinationConfig.objects.filter(media_id="sms").all()
 
     def list(self, request):
-        serializer = self.serializer_class(self.queryset.filter(media__slug="sms"), many=True)
+        serializer = self.serializer_class(self.queryset.filter(user=request.user), many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def create(self, request, pk=None):
         if pk:
-            destination = get_object_or_404(self.queryset.filter(media__slug="sms"), pk=pk)
+            destination = get_object_or_404(self.queryset.filter(user=request.user), pk=pk)
             serializer = self.write_serializer_class(destination, data={"media": "sms", "settings": request.data})
         else:
             serializer = self.write_serializer_class(data={"media": "sms", "settings": request.data})
@@ -57,16 +57,15 @@ class PhoneNumberViewV1(viewsets.ViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def retrieve(self, request, pk=None):
-        destination = get_object_or_404(self.queryset.filter(media__slug="sms"), pk=pk)
+        destination = get_object_or_404(self.queryset.filter(user=request.user), pk=pk)
         serializer = self.serializer_class(destination)
-        breakpoint()
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def update(self, request, pk=None):
         if request.stream.method == "PUT":
-            destination = self.queryset.filter(media__slug="sms").filter(pk=pk).first()
+            destination = self.queryset.filter(user=request.user).filter(pk=pk).first()
         elif request.stream.method == "PATCH":
-            destination = get_object_or_404(self.queryset.filter(media__slug="sms"), pk=pk)
+            destination = get_object_or_404(self.queryset.filter(user=request.user), pk=pk)
         serializer = self.write_serializer_class(destination, data={"media": "sms", "settings": request.data})
         if serializer.is_valid():
             serializer.save(user=request.user)
@@ -78,7 +77,7 @@ class PhoneNumberViewV1(viewsets.ViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def partial_update(self, request, pk=None):
-        destination = get_object_or_404(self.queryset.filter(media__slug="sms"), pk=pk)
+        destination = get_object_or_404(self.queryset.filter(user=request.user), pk=pk)
         serializer = self.write_serializer_class(
             destination, data={"media": "sms", "settings": request.data}, partial=True
         )
@@ -92,6 +91,6 @@ class PhoneNumberViewV1(viewsets.ViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request, pk=None):
-        destination = get_object_or_404(self.queryset.filter(media__slug="sms"), pk=pk)
+        destination = get_object_or_404(self.queryset.filter(user=request.user), pk=pk)
         destination.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

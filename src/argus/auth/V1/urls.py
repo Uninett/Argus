@@ -6,7 +6,7 @@ from .. import views
 
 
 router = routers.SimpleRouter()
-router.register(r"phone_number", views_V1.PhoneNumberViewV1, basename="phone_number")
+router.register(r"phone-number", views_V1.PhoneNumberViewV1, basename="phone_number")
 
 
 app_name = "auth"
