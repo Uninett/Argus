@@ -110,7 +110,7 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
             {
                 "timeslot": self.timeslot2.pk,
                 "filters": [f.pk for f in self.notification_profile1.filters.all()],
-                "media": self.media_v1,
+                "media": self.media,
                 "phone_number": self.sms_destination.pk,
                 "active": self.notification_profile1.active,
             },
@@ -126,14 +126,14 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
             {
                 "timeslot": self.timeslot2.pk,
                 "filters": [f.pk for f in self.notification_profile1.filters.all()],
-                "media": self.media_v1,
-                "phone_number": self.phone_number,
+                "media": self.media,
+                "phone_number": self.sms_destination.pk,
                 "active": self.notification_profile1.active,
             },
         )
         response.render()
         self.assertEqual(response.status_code, 201)
-        self.assertEqual(response.data["media"], self.media_v1)
+        self.assertEqual(response.data["media"], self.media)
 
     def test_delete_notification_profile(self):
         profile_pk = self.notification_profile1.pk
