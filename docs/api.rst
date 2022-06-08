@@ -15,6 +15,8 @@ replaced by a registered auth token. These are generated per user by
 logging in through Feide, and can be found at
 ``/admin/authtoken/token/``.
 
+.. _api-auth-endpoints:
+
 Auth endpoints
 --------------
 
@@ -26,8 +28,10 @@ Auth endpoints
 -  ``POST`` to ``/api/v1/token-auth/``: returns an auth token for the
    posted user
 
-   -  Note that this token will expire after 14 days, and can be
-      replaced by posting to the same endpoint.
+   -  Note that this token will expire after a certain amout of days that is
+      set in the variable ``AUTH_TOKEN_EXPIRES_AFTER_DAYS`` in
+      :ref:`site-specific-settings` (by default 14 days), and can be replaced
+      by posting to the same endpoint.
 
    .. code-block:: json
     :caption: Example request body
@@ -122,6 +126,18 @@ Incident endpoints
       ``acked=true|false``
         Fetch only acked (``true``) or unacked (``false``) incidents.
 
+      ``end_time__gte=end-time``
+        Fetch only incidents that ended on or later than (``end-time``).
+
+      ``end_time__isnull=true|false``
+        Fetch only stateless (``true``) or stateful (``false``) incidents.
+
+      ``end_time__lte=end-time``
+        Fetch only incidents that ended on or earlier than (``end-time``).
+
+      ``level__lte=1|2|3|4|5``
+        Fetch only incidents that have a level less or equal than (``level``).
+
       ``open=true|false``
         Fetch only open (``true``) or closed (``false``) incidents.
 
@@ -134,8 +150,21 @@ Incident endpoints
       ``source__name__in=NAME1[,NAME2,..]``
         Fetch only incidents with a source with name ``NAME1`` or ``NAME2`` or..
 
+      ``source__type__in=NAME1[,NAME2,..]``
+        Fetch only incidents with a source of a type with numeric id
+        ``ID1`` or ``ID2`` or..
+
       ``source_incident_id=ID``
         Fetch only incidents with ``source_incident_id`` set to ``ID``.
+
+      ``start_time__gte=start-time``
+        Fetch only incidents that started on or later than (``start-time``).
+
+      ``start_time__lte=start-time``
+        Fetch only incidents that started on or earlier than (``start-time``).
+
+      ``stateful=true|false``
+        Fetch only stateful (``true``) or stateless (``false``) incidents.
 
       ``ticket=true|false``
         Fetch only incidents with a ticket url (``true``) or without (``false``).
@@ -143,8 +172,8 @@ Incident endpoints
       ``tags=key1=value1,key1=value2,key2=value``
         Fetch only incidents with one or more of the tags. Tag-format is
         “``key=value``”. If there are multiple tags with the same key, only
-        one of the tags need match. If there are multiple keys, one of
-        each keys must match.
+        one of the tags needs to match. If there are multiple keys, one of
+        each key must match.
 
       So:
 
@@ -161,7 +190,7 @@ Incident endpoints
                             problem=onfire
 
       will fetch incidents that are all of “open”, “unacked”,
-      “stateful”, from source number 1, with “location” either
+      “stateful”, from source number 1, with “location” either being
       “broomcloset” or “understairs”, and that is on fire.
 
       .. note::
@@ -511,7 +540,7 @@ Incident endpoints
 
 -  ``GET`` to ``/api/v1/incidents/mine/``: behaves similar to
    ``/api/v1/incidents/``, but will only show the incidents added by the
-   logged-in user, and no filtering on source or source type is
+   logged in user, and no filtering on source or source type is
    possible.
 
 -  ``GET`` to ``/api/v1/incidents/open/``: returns all open incidents
@@ -530,7 +559,7 @@ Notification profile endpoints
 
    -  ``GET``: returns the logged in user’s notification profiles
 
-   -  ``POST``: creates and returns a notification profile which is then
+   -  ``POST``: creates and returns a notification profile, which is then
       connected to the logged in user
 
       .. code-block:: json
@@ -578,7 +607,7 @@ Notification profile endpoints
 -  ``/api/v1/notificationprofiles/timeslots/``:
 
    -  ``GET``: returns the logged in user’s time slots
-   -  ``POST``: creates and returns a time slot which is then connected
+   -  ``POST``: creates and returns a time slot, which is then connected
       to the logged in user
 
       .. code-block:: json
@@ -651,7 +680,7 @@ Notification profile endpoints
 -  ``/api/v1/notificationprofiles/filters/``:
 
    -  ``GET``: returns the logged in user’s filters
-   -  ``POST``: creates and returns a filter which is then connected to
+   -  ``POST``: creates and returns a filter, which is then connected to
       the logged in user
 
       .. code-block:: json
@@ -693,6 +722,8 @@ Endpoints v2 API
      v2 of the API is not stable yet.
 
 
+.. _api-auth-endpoints-v2:
+
 Auth endpoints
 ==============================
 
@@ -704,8 +735,10 @@ Auth endpoints
 -  ``POST`` to ``/api/v2/token-auth/``: returns an auth token for the
    posted user
 
-   -  Note that this token will expire after 14 days, and can be
-      replaced by posting to the same endpoint.
+   -  Note that this token will expire after a certain amout of days that is
+      set in the variable ``AUTH_TOKEN_EXPIRES_AFTER_DAYS`` in
+      :ref:`site-specific-settings` (by default 14 days), and can be replaced
+      by posting to the same endpoint.
 
    .. code-block:: json
     :caption: Example request body
@@ -717,6 +750,8 @@ Auth endpoints
 
 -  ``/oidc/login/dataporten_feide/``: redirects to Feide login
 
+
+.. _api-incident-endpoints-v2:
 
 Incident endpoints
 ==============================
@@ -737,6 +772,18 @@ Incident endpoints
       ``acked=true|false``
         Fetch only acked (``true``) or unacked (``false``) incidents.
 
+      ``end_time__gte=end-time``
+        Fetch only incidents that ended on or later than (``end-time``).
+
+      ``end_time__isnull=true|false``
+        Fetch only stateless (``true``) or stateful (``false``) incidents.
+
+      ``end_time__lte=end-time``
+        Fetch only incidents that ended on or earlier than (``end-time``).
+
+      ``level__lte=1|2|3|4|5``
+        Fetch only incidents that have a level less or equal than (``level``).
+
       ``open=true|false``
         Fetch only open (``true``) or closed (``false``) incidents.
 
@@ -749,8 +796,21 @@ Incident endpoints
       ``source__name__in=NAME1[,NAME2,..]``
         Fetch only incidents with a source with name ``NAME1`` or ``NAME2`` or..
 
+      ``source__type__in=NAME1[,NAME2,..]``
+        Fetch only incidents with a source of a type with numeric id
+        ``ID1`` or ``ID2`` or..
+
       ``source_incident_id=ID``
         Fetch only incidents with ``source_incident_id`` set to ``ID``.
+
+      ``start_time__gte=start-time``
+        Fetch only incidents that started on or later than (``start-time``).
+
+      ``start_time__lte=start-time``
+        Fetch only incidents that started on or earlier than (``start-time``).
+
+      ``stateful=true|false``
+        Fetch only stateful (``true``) or stateless (``false``) incidents.
 
       ``ticket=true|false``
         Fetch only incidents with a ticket url (``true``) or without (``false``).
@@ -758,8 +818,8 @@ Incident endpoints
       ``tags=key1=value1,key1=value2,key2=value``
         Fetch only incidents with one or more of the tags. Tag-format is
         “``key=value``”. If there are multiple tags with the same key, only
-        one of the tags need match. If there are multiple keys, one of
-        each keys must match.
+        one of the tags needs to match. If there are multiple keys, one of
+        each key must match.
 
       So:
 
@@ -776,7 +836,7 @@ Incident endpoints
                             problem=onfire
 
       will fetch incidents that are all of “open”, “unacked”,
-      “stateful”, from source number 1, with “location” either
+      “stateful”, from source number 1, with “location” either being
       “broomcloset” or “understairs”, and that is on fire.
 
       .. note::
@@ -990,7 +1050,7 @@ Incident endpoints
       system), the ``timestamp`` field is optional. It will default to
       the time the server received the event.
 
-.. _api-incident-event-types:
+.. _api-incident-event-types-v2:
 
       The valid ``type``\ s are:
 
@@ -1126,7 +1186,7 @@ Incident endpoints
 
 -  ``GET`` to ``/api/v2/incidents/mine/``: behaves similar to
    ``/api/v2/incidents/``, but will only show the incidents added by the
-   logged-in user, and no filtering on source or source type is
+   logged in user, and no filtering on source or source type is
    possible.
 
 
@@ -1137,7 +1197,7 @@ Notification profile endpoints
 
    -  ``GET``: returns the logged in user’s notification profiles
 
-   -  ``POST``: creates and returns a notification profile which is then
+   -  ``POST``: creates and returns a notification profile, which is then
       connected to the logged in user
 
       .. code-block:: json
@@ -1183,7 +1243,7 @@ Notification profile endpoints
 
    -  ``GET``: returns the logged in user’s destination-configs
 
-   -  ``POST``: creates and returns a destination-config which is then
+   -  ``POST``: creates and returns a destination-config, which is then
       connected to the logged in user
 
       .. code-block:: json
@@ -1235,7 +1295,7 @@ Notification profile endpoints
 -  ``/api/v2/notificationprofiles/timeslots/``:
 
    -  ``GET``: returns the logged in user’s time slots
-   -  ``POST``: creates and returns a time slot which is then connected
+   -  ``POST``: creates and returns a time slot, which is then connected
       to the logged in user
 
       .. code-block:: json
@@ -1308,7 +1368,7 @@ Notification profile endpoints
 -  ``/api/v2/notificationprofiles/filters/``:
 
    -  ``GET``: returns the logged in user’s filters
-   -  ``POST``: creates and returns a filter which is then connected to
+   -  ``POST``: creates and returns a filter, which is then connected to
       the logged in user
 
       .. code-block:: json
