@@ -11,6 +11,7 @@ __all__ = [
     "SourceSystemFactory",
     "TagFactory",
     "IncidentFactory",
+    "IncidentTagRelationFactory",
     "StatefulIncidentFactory",
     "StatelessIncidentFactory",
 ]
@@ -64,3 +65,13 @@ class StatefulIncidentFactory(IncidentFactory):
 
 class StatelessIncidentFactory(IncidentFactory):
     end_time = None
+
+
+class IncidentTagRelationFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = models.IncidentTagRelation
+
+    tag = factory.SubFactory(TagFactory)
+    incident = factory.SubFactory(IncidentFactory)
+    added_by = factory.SubFactory(SourceUserFactory)
+    added_time = factory.Faker("date_time_between", start_date="-1d", end_date="+1d", tzinfo=pytz.UTC)
