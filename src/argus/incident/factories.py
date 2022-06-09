@@ -58,7 +58,8 @@ class IncidentFactory(factory.django.DjangoModelFactory):
     ticket_url = factory.Faker("uri")
 
 
-StatefulIncidentFactory = IncidentFactory
+class StatefulIncidentFactory(IncidentFactory):
+    pass
 
 
 class StatelessIncidentFactory(IncidentFactory):
