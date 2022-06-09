@@ -271,10 +271,10 @@ class ModelTests(TestCase, IncidentAPITestCaseHelper):
         )
         self.assertEqual(set(filter2.filtered_incidents), {self.incident2})
         filter3 = FilterFactory(user=self.user1, name="Filter3", filter_string=f'{{"tags": ["{self.tag1}"]}}')
-        self.assertEqual(set(filter1.filtered_incidents), {self.incident1})
+        self.assertEqual(set(filter3.filtered_incidents), {self.incident1})
         filter4 = FilterFactory(
             user=self.user1,
             name="Filter4",
             filter_string=f'{{"sourceSystemIds": [{self.source1.pk}], "tags": ["{self.tag1}"]}}',
         )
-        self.assertEqual(set(filter1.filtered_incidents), {self.incident1})
+        self.assertEqual(set(filter4.filtered_incidents), {self.incident1})
