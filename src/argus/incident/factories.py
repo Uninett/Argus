@@ -61,15 +61,5 @@ class IncidentFactory(factory.django.DjangoModelFactory):
 StatefulIncidentFactory = IncidentFactory
 
 
-class StatelessIncidentFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = models.Incident
-
-    start_time = factory.Faker("date_time_between", start_date="-1d", end_date="+1d", tzinfo=pytz.UTC)
+class StatelessIncidentFactory(IncidentFactory):
     end_time = None
-    source = factory.SubFactory(SourceSystemFactory)
-    source_incident_id = factory.Faker("md5")
-    details_url = factory.Faker("uri")
-    description = factory.Faker("sentence")
-    level = factory.fuzzy.FuzzyChoice(models.Incident.LEVELS)  # Random valid level
-    ticket_url = factory.Faker("uri")
