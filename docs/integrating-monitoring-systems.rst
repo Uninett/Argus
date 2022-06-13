@@ -71,3 +71,13 @@ the Argus API server, reachable at
      this when configuring Argus API access in your glue service. Any incident
      posted to the Argus API using this token will be associated with this
      source system. **Keep the token a secret!**
+
+   .. note::
+
+     It is very important to ensure that the token is always valid. This can
+     be ensured by using the management command :ref:`check-token-expiry`,
+     which makes argus post an incident if there are any tokens that will
+     expire soon.
+
+     If a token is not valid it will currently lead to the source system
+     not being able to report incidents without any warnings.
