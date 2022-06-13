@@ -15,11 +15,13 @@ class Command(BaseCommand):
     help = "Post incident if token is close to expiry"
 
     def add_arguments(self, parser):
-        parser.add_argument("-d", "--days", type=int, help="Post incident if token expires in less than <number> days")
+        parser.add_argument(
+            "-d", "--days", default=7, type=int, help="Post incident if token expires in less than <number> days"
+        )
 
     def handle(self, *args, **options):
         expiration_duration = timedelta(days=settings.AUTH_TOKEN_EXPIRES_AFTER_DAYS)
-        remind_before = timedelta(days=options.get("days") or 7)
+        remind_before = timedelta(days=options.get("days"))
         _, _, source_system = get_or_create_default_instances()
 
         for token in Token.objects.select_related("user", "user__source_system").all():
