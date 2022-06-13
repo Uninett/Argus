@@ -2,7 +2,8 @@ from django.db.models import Q
 from django.utils import timezone
 from rest_framework.authtoken.models import Token
 
-from argus.incident.models import get_or_create_default_instances, Incident, Tag
+from argus.dev.management.commands.check_token_expiry import get_token_expiry_incident_tags
+from argus.incident.models import get_or_create_default_instances, Incident
 from argus.notificationprofile.media import background_send_notifications_to_users
 from .models import SourceSystem, Incident, Event, Acknowledgement
 
@@ -49,10 +50,7 @@ def close_token_incident(sender, instance: Token, *args, **kwargs):
         return
 
     argus_user, _, source_system = get_or_create_default_instances()
-    tags = Tag.objects.filter(
-        (Q(key="problem_type") & Q(value="token_expiry"))
-        | (Q(key="source_system") & Q(value=instance.user.source_system))
-    )
+    tags = get_token_expiry_incident_tags(instance)
     open_incidents = Incident.objects.open().filter(source_id=source_system.id)
     for tag in tags:
         open_incidents = open_incidents.filter(incident_tag_relations__tag=tag)
