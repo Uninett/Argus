@@ -80,7 +80,7 @@ def create_token_expiry_incident(token, expiry_date, level=2):
         ("location", "argus"),
         ("object", f"{incident.id}"),
         ("problem_type", "token_expiry"),
-        ("source_system", f"{token.user.source_system}"),
+        ("source_system_id", f"{token.user.source_system.id}"),
     ]
     for k, v in taglist:
         tag, _ = Tag.objects.get_or_create(key=k, value=v)
