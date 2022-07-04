@@ -6,6 +6,7 @@ from drf_spectacular.utils import extend_schema
 from rest_framework import generics
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
@@ -72,15 +73,19 @@ class AuthMethodListView(APIView):
         return Response(data)
 
 
-class RefreshTokenView(ObtainAuthToken):
+class RefreshTokenView(APIView):
+    http_method_names = ["get", "head", "options", "trace"]
+    permission_classes = [IsAuthenticated]
     serializer_class = RefreshTokenSerializer
 
     @transaction.atomic
-    def post(self, request, *args, **kwargs):
-        serializer = self.serializer_class(data=request.data, context={"request": request})
-        serializer.is_valid(raise_exception=True)
-        user = serializer.validated_data["user"]
-        key = serializer.validated_data["old_token"]
-        Token.objects.get(key=key).delete()
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        try:
+            Token.objects.get(user=user).delete()
+        except Token.DoesNotExist:
+            raise ValidationError(
+                f"No token for the user '{user}' exists, one needs to be created in the admin interface."
+            )
         token = Token.objects.create(user=user)
         return Response({"token": token.key})
