@@ -3,6 +3,8 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
+from django.db.models.query import QuerySet
+
 if TYPE_CHECKING:
     from argus.incident.models import Event
     from argus.notificationprofile.models import DestinationConfig, NotificationProfile
@@ -15,6 +17,15 @@ class NotificationMedium(ABC):
     @classmethod
     @abstractmethod
     def validate(cls, instance, dict):
+        pass
+
+    @classmethod
+    @abstractmethod
+    def check_for_duplicate(self, queryset: QuerySet, settings: dict) -> bool:
+        """
+        Returns True if a destination with the given settings already exists
+        in the given queryset
+        """
         pass
 
     @staticmethod

@@ -108,6 +108,14 @@ class EmailNotification(NotificationMedium):
     def get_label(destination):
         return destination.settings.get("email_address")
 
+    @classmethod
+    def check_for_duplicate(self, queryset: QuerySet, settings: dict) -> bool:
+        """
+        Returns True if an email destination with the same email address
+        already exists in the given queryset
+        """
+        return queryset.filter(settings__email_address=settings["email_address"]).exists()
+
     @staticmethod
     def send(event: Event, destinations: QuerySet[DestinationConfig], **_):
         email_destinations = destinations.filter(media_id=EmailNotification.MEDIA_SLUG)
