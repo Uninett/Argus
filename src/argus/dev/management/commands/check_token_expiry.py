@@ -1,6 +1,4 @@
 from datetime import timedelta
-from functools import reduce
-from operator import and_
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
