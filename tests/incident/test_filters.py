@@ -6,7 +6,6 @@ from django.utils import timezone
 from django.utils.timezone import is_aware, make_aware
 
 from argus.auth.factories import SourceUserFactory
-from argus.util.testing import disconnect_signals, connect_signals
 from argus.incident.factories import (
     SourceSystemFactory,
     SourceSystemTypeFactory,
@@ -14,8 +13,9 @@ from argus.incident.factories import (
     StatelessIncidentFactory,
     TagFactory,
 )
-from argus.incident.models import Incident, IncidentTagRelation
+from argus.incident.models import Incident, IncidentTagRelation, get_or_create_default_instances
 from argus.incident.views import IncidentFilter
+from argus.util.testing import disconnect_signals, connect_signals
 
 
 class IncidentBasedAPITestCaseHelper:
@@ -151,4 +151,16 @@ class IncidentFilterTestCase(IncidentBasedAPITestCaseHelper, TestCase):
 
         expected = qs.from_tags(str(tag1), str(tag2))
         result = IncidentFilter.incident_filter(qs, "tags", [str(tag1), str(tag2)])
+        self.assertEqual(list(expected), list(result.order_by("pk")))
+
+    def test_token_expiry_returns_all_token_expiry_incidents(self):
+        argus_user, _, argus_source_system = get_or_create_default_instances()
+        token_expiry_tag = TagFactory(key="problem_type", value="token_expiry")
+        incident5 = StatefulIncidentFactory(source=argus_source_system)
+        IncidentTagRelation.objects.get_or_create(tag=token_expiry_tag, incident=incident5, added_by=argus_user)
+
+        qs = Incident.objects.order_by("pk")
+
+        expected = qs.token_expiry()
+        result = IncidentFilter.incident_filter(queryset=qs, name="token_expiry", value=None)
         self.assertEqual(list(expected), list(result.order_by("pk")))
