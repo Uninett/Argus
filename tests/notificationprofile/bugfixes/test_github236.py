@@ -6,7 +6,6 @@ from argus.auth.factories import PersonUserFactory
 from argus.incident.models import create_fake_incident, get_or_create_default_instances
 from argus.notificationprofile import factories
 from argus.notificationprofile.media import send_notifications_to_users
-from argus.notificationprofile.models import DestinationConfig
 from argus.util.testing import disconnect_signals, connect_signals
 
 
