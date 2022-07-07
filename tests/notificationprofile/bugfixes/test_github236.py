@@ -1,5 +1,5 @@
 from django.core import mail
-from django.test import TestCase
+from django.test import TestCase, tag
 import json
 
 from argus.auth.factories import PersonUserFactory
@@ -15,6 +15,7 @@ https://github.com/Uninett/Argus/issues/236
 """
 
 
+@tag("regression")
 class SendingNotificationTest(TestCase):
     def setUp(self):
         disconnect_signals()
