@@ -121,16 +121,12 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
         self.assertEqual(self.user1_rest_client.get(email_destination_path).status_code, status.HTTP_404_NOT_FOUND)
 
     def test_cannot_delete_synced_email_destination(self):
-        self.email_destination = (
-            DestinationConfig.objects.filter(media_id="email").filter(settings__synced=True).first()
-        )
+        self.email_destination = self.user1.destinations.filter(media_id="email").filter(settings__synced=True).first()
 
-        email_destination_pk = self.email_destination.pk
         email_destination_path = reverse(
-            "v2:notification-profile:destinationconfig-detail", args=[email_destination_pk]
+            "v2:notification-profile:destinationconfig-detail", args=[self.email_destination.pk]
         )
 
-        self.assertEqual(self.user1.destinations.get(pk=email_destination_pk), self.email_destination)
         self.assertEqual(self.user1_rest_client.get(email_destination_path).status_code, status.HTTP_200_OK)
         response = self.user1_rest_client.delete(email_destination_path)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
