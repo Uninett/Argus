@@ -131,7 +131,7 @@ class IncidentViewSetV1TestCase(APITestCase):
         self.assertEqual(response.data["pk"], incident_pk)
 
     def test_incident_can_properly_change_level(self):
-        incident_pk = self.add_incident("incident1")
+        incident_pk = self.add_incident()
         incident_path = reverse("v1:incident:incident-detail", args=[incident_pk])
         response = self.client.put(
             path=incident_path,
