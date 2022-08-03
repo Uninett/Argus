@@ -6,7 +6,15 @@ from rest_framework.test import APITestCase
 
 from argus.auth.factories import AdminUserFactory, SourceUserFactory
 from argus.incident.factories import SourceSystemTypeFactory, SourceSystemFactory, StatefulIncidentFactory
-from argus.incident.models import Acknowledgement, Event, Incident, SourceSystem, SourceSystemType, Tag
+from argus.incident.models import (
+    Acknowledgement,
+    Event,
+    Incident,
+    IncidentTagRelation,
+    SourceSystem,
+    SourceSystemType,
+    Tag,
+)
 from argus.incident.views import EventViewSet
 from argus.util.testing import disconnect_signals, connect_signals
 
@@ -116,12 +124,13 @@ class IncidentViewSetV1TestCase(APITestCase):
         # Check that we have made the correct Incident
         self.assertEqual(response.data["description"], data["description"])
         self.assertTrue(Incident.objects.exists())
-        obj = Incident.objects.get()
-        self.assertEqual(obj.description, data["description"])
+        incident = Incident.objects.get()
+        incident_tags = [relation.tag for relation in IncidentTagRelation.objects.filter(incident=incident)]
+        self.assertEqual(incident.description, data["description"])
         # Check that we have made the correct Tag
         self.assertTrue(Tag.objects.exists())
         tag = Tag.objects.get()
-        self.assertEqual(obj.tags, [tag])
+        self.assertEqual(incident_tags, [tag])
         self.assertEqual(str(tag), data["tags"][0]["tag"])
 
     def test_get_incident_by_pk_returns_correct_incident(self):
@@ -275,12 +284,13 @@ class IncidentViewSetV1TestCase(APITestCase):
         # Check that we have made the correct Incident
         self.assertEqual(response.data["description"], data["description"])
         self.assertTrue(Incident.objects.exists())
-        obj = Incident.objects.get()
-        self.assertEqual(obj.description, data["description"])
+        incident = Incident.objects.get()
+        incident_tags = [relation.tag for relation in IncidentTagRelation.objects.filter(incident=incident)]
+        self.assertEqual(incident.description, data["description"])
         # Check that we have made the correct Tag
         self.assertTrue(Tag.objects.exists())
         tag = Tag.objects.get()
-        self.assertEqual(obj.tags, [tag])
+        self.assertEqual(incident_tags, [tag])
         self.assertEqual(str(tag), data["tags"][0]["tag"])
 
     def test_incident_source_types_returns_correct_source_types(self):
@@ -463,12 +473,13 @@ class IncidentViewSetTestCase(APITestCase):
         # Check that we have made the correct Incident
         self.assertEqual(response.data["description"], data["description"])
         self.assertTrue(Incident.objects.exists())
-        obj = Incident.objects.get()
-        self.assertEqual(obj.description, data["description"])
+        incident = Incident.objects.get()
+        incident_tags = [relation.tag for relation in IncidentTagRelation.objects.filter(incident=incident)]
+        self.assertEqual(incident.description, data["description"])
         # Check that we have made the correct Tag
         self.assertTrue(Tag.objects.exists())
         tag = Tag.objects.get()
-        self.assertEqual(obj.tags, [tag])
+        self.assertEqual(incident_tags, [tag])
         self.assertEqual(str(tag), data["tags"][0]["tag"])
 
     def test_get_incident_by_pk_returns_correct_incident(self):
