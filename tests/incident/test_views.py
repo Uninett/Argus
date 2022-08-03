@@ -366,10 +366,28 @@ class IncidentViewSetTestCase(APITestCase):
         self.assertEqual(response.status_code, 201)  # Created
         return response.data["pk"]
 
-    def add_event(self, incident_pk, description="event"):
-        event_data = {"timestamp": "2021-08-04T09:14:55.908Z", "type": "OTH", "description": description}
-        response = self.client.post(f"/api/v2/incidents/{incident_pk}/events/", event_data, format="json")
+    def add_acknowledgement(self, incident_pk, description="acknowledgement"):
+        data = {
+            "event": {
+                "timestamp": "2022-08-02T13:04:03.529Z",
+                "type": "STA",
+                "description": description,
+            },
+            "expiration": "2022-08-03T13:04:03.529Z",
+        }
+        response = self.client.post(f"/api/v1/incidents/{incident_pk}/acks/", data, format="json")
         self.assertEqual(response.status_code, 201)  # Created
+        return response.data["pk"]
+
+    def add_event(self, incident_pk, description="event"):
+        data = {
+            "timestamp": "2022-08-02T13:04:03.529Z",
+            "type": "OTH",
+            "description": description,
+        }
+        response = self.client.post(f"/api/v2/incidents/{incident_pk}/events/", data, format="json")
+        self.assertEqual(response.status_code, 201)  # Created
+        return response.data["pk"]
 
     def test_incident_search_existing_incident_description(self):
         pk = self.add_incident("incident1")
