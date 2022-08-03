@@ -24,13 +24,13 @@ class EventViewSetTestCase(TestCase):
     def test_validate_event_type_for_incident_acknowledge_raises_validation_error(self):
         incident = StatefulIncidentFactory(source=self.source)
         viewfactory = RequestFactory()
-        request = viewfactory.get(f"/api/v1/incidents/{incident.pk}/events/")
+        request = viewfactory.get(path=f"/api/v1/incidents/{incident.pk}/events/")
         request.versioning_scheme = versioning.NamespaceVersioning()
         request.version = "v1"
         view = EventViewSet()
         view.request = request
         with self.assertRaises(serializers.ValidationError):
-            view.validate_event_type_for_incident(Event.Type.ACKNOWLEDGE, incident)
+            view.validate_event_type_for_incident(event_type=Event.Type.ACKNOWLEDGE, incident=incident)
 
 
 class IncidentViewSetV1TestCase(APITestCase):
@@ -57,7 +57,7 @@ class IncidentViewSetV1TestCase(APITestCase):
             "level": 1,
             "tags": [{"tag": "a=b"}],
         }
-        response = self.client.post("/api/v1/incidents/", data, format="json")
+        response = self.client.post(path="/api/v1/incidents/", data=data, format="json")
         self.assertEqual(response.status_code, 201)  # Created
         return response.data["pk"]
 
@@ -70,7 +70,7 @@ class IncidentViewSetV1TestCase(APITestCase):
             },
             "expiration": "2022-08-03T13:04:03.529Z",
         }
-        response = self.client.post(f"/api/v1/incidents/{incident_pk}/acks/", data, format="json")
+        response = self.client.post(path=f"/api/v1/incidents/{incident_pk}/acks/", data=data, format="json")
         self.assertEqual(response.status_code, 201)  # Created
         return response.data["pk"]
 
@@ -80,12 +80,12 @@ class IncidentViewSetV1TestCase(APITestCase):
             "type": "OTH",
             "description": description,
         }
-        response = self.client.post(f"/api/v1/incidents/{incident_pk}/events/", data, format="json")
+        response = self.client.post(path=f"/api/v1/incidents/{incident_pk}/events/", data=data, format="json")
         self.assertEqual(response.status_code, 201)  # Created
         return response.data["pk"]
 
     def test_no_incidents_returns_empty_list(self):
-        response = self.client.get("/api/v1/incidents/")
+        response = self.client.get(path="/api/v1/incidents/")
         self.assertFalse(Incident.objects.exists())
         self.assertEqual(response.status_code, 200)
         # Paging, so check "results"
@@ -93,7 +93,7 @@ class IncidentViewSetV1TestCase(APITestCase):
 
     def test_get_incident_returns_all_incidents(self):
         incident_pk = self.add_incident()
-        response = self.client.get("/api/v1/incidents/")
+        response = self.client.get(path="/api/v1/incidents/")
         self.assertTrue(Incident.objects.exists())
         self.assertEqual(response.status_code, 200)
         # Paging, so check "results"
@@ -111,7 +111,7 @@ class IncidentViewSetV1TestCase(APITestCase):
             "level": 1,
             "tags": [{"tag": "a=b"}],
         }
-        response = self.client.post("/api/v1/incidents/", data, format="json")
+        response = self.client.post(path="/api/v1/incidents/", data=data, format="json")
         self.assertEqual(response.status_code, 201)  # Created
         # Check that we have made the correct Incident
         self.assertEqual(response.data["description"], data["description"])
@@ -126,7 +126,7 @@ class IncidentViewSetV1TestCase(APITestCase):
 
     def test_get_incident_by_pk_returns_correct_incident(self):
         incident_pk = self.add_incident()
-        response = self.client.get(f"/api/v1/incidents/{incident_pk}/")
+        response = self.client.get(path=f"/api/v1/incidents/{incident_pk}/")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["pk"], incident_pk)
 
@@ -134,8 +134,8 @@ class IncidentViewSetV1TestCase(APITestCase):
         incident_pk = self.add_incident("incident1")
         incident_path = reverse("v1:incident:incident-detail", args=[incident_pk])
         response = self.client.put(
-            incident_path,
-            {
+            path=incident_path,
+            data={
                 "tags": [{"tag": "a=b"}],
                 "level": 2,
             },
@@ -145,8 +145,8 @@ class IncidentViewSetV1TestCase(APITestCase):
 
     def test_incident_acks_returns_correct_acks(self):
         incident_pk = self.add_incident()
-        ack_pk = self.add_acknowledgement(incident_pk)
-        response = self.client.get(f"/api/v1/incidents/{incident_pk}/acks/")
+        ack_pk = self.add_acknowledgement(incident_pk=incident_pk)
+        response = self.client.get(path=f"/api/v1/incidents/{incident_pk}/acks/")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data[0]["event"]["pk"], ack_pk)
         self.assertEqual(response.data[0]["event"]["type"]["value"], "ACK")
@@ -162,23 +162,23 @@ class IncidentViewSetV1TestCase(APITestCase):
             },
             "expiration": "2022-08-03T13:04:03.529Z",
         }
-        response = self.client.post(f"/api/v1/incidents/{incident_pk}/acks/", data, format="json")
+        response = self.client.post(path=f"/api/v1/incidents/{incident_pk}/acks/", data=data, format="json")
         self.assertEqual(response.status_code, 201)  # Created
         self.assertEqual(response.data["event"]["type"]["value"], "ACK")
         self.assertEqual(response.data["event"]["description"], data["event"]["description"])
 
     def test_get_acknowledgement_by_pk_returns_correct_acknowledgement(self):
         incident_pk = self.add_incident()
-        ack_pk = self.add_acknowledgement(incident_pk)
-        response = self.client.get(f"/api/v1/incidents/{incident_pk}/acks/{ack_pk}/")
+        ack_pk = self.add_acknowledgement(incident_pk=incident_pk)
+        response = self.client.get(path=f"/api/v1/incidents/{incident_pk}/acks/{ack_pk}/")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["event"]["pk"], ack_pk)
         self.assertEqual(response.data["event"]["type"]["value"], "ACK")
 
     def test_incident_events_returns_correct_events_of_incident(self):
         incident_pk = self.add_incident()
-        event_pk = self.add_event(incident_pk)
-        response = self.client.get(f"/api/v1/incidents/{incident_pk}/events/")
+        event_pk = self.add_event(incident_pk=incident_pk)
+        response = self.client.get(path=f"/api/v1/incidents/{incident_pk}/events/")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data[0]["pk"], event_pk)
         self.assertEqual(response.data[0]["type"]["value"], "OTH")
@@ -191,15 +191,15 @@ class IncidentViewSetV1TestCase(APITestCase):
             "type": "OTH",
             "description": "event",
         }
-        response = self.client.post(f"/api/v1/incidents/{incident_pk}/events/", data, format="json")
+        response = self.client.post(path=f"/api/v1/incidents/{incident_pk}/events/", data=data, format="json")
         self.assertEqual(response.status_code, 201)  # Created
         self.assertEqual(response.data["type"]["value"], "OTH")
         self.assertEqual(response.data["description"], data["description"])
 
     def test_get_event_by_pk_returns_correct_event(self):
         incident_pk = self.add_incident()
-        event_pk = self.add_event(incident_pk)
-        response = self.client.get(f"/api/v1/incidents/{incident_pk}/events/{event_pk}/")
+        event_pk = self.add_event(incident_pk=incident_pk)
+        response = self.client.get(path=f"/api/v1/incidents/{incident_pk}/events/{event_pk}/")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["pk"], event_pk)
         self.assertEqual(response.data["type"]["value"], "OTH")
@@ -207,7 +207,7 @@ class IncidentViewSetV1TestCase(APITestCase):
     def test_incident_tags_returns_correct_tags(self):
         # Automatically creates tag
         incident_pk = self.add_incident()
-        response = self.client.get(f"/api/v1/incidents/{incident_pk}/tags/")
+        response = self.client.get(path=f"/api/v1/incidents/{incident_pk}/tags/")
         tag = str(Tag.objects.first())
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data[0]["tag"], tag)
@@ -219,7 +219,7 @@ class IncidentViewSetV1TestCase(APITestCase):
         data = {
             "tag": "c=d",
         }
-        response = self.client.post(f"/api/v1/incidents/{incident_pk}/tags/", data, format="json")
+        response = self.client.post(path=f"/api/v1/incidents/{incident_pk}/tags/", data=data, format="json")
         self.assertEqual(response.status_code, 201)  # Created
         self.assertEqual(response.data["tag"], data["tag"])
         self.assertEqual(Tag.objects.count(), 2)
@@ -228,7 +228,7 @@ class IncidentViewSetV1TestCase(APITestCase):
         # Automatically creates tag
         incident_pk = self.add_incident()
         tag = str(Tag.objects.first())
-        response = self.client.get(f"/api/v1/incidents/{incident_pk}/tags/{tag}/")
+        response = self.client.get(path=f"/api/v1/incidents/{incident_pk}/tags/{tag}/")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["tag"], tag)
 
@@ -236,7 +236,7 @@ class IncidentViewSetV1TestCase(APITestCase):
         # Automatically creates tag
         incident_pk = self.add_incident()
         tag = str(Tag.objects.first())
-        response = self.client.delete(f"/api/v1/incidents/{incident_pk}/tags/{tag}/")
+        response = self.client.delete(path=f"/api/v1/incidents/{incident_pk}/tags/{tag}/")
         self.assertEqual(response.status_code, 204)
         self.assertEqual(Tag.objects.count(), 0)
 
@@ -245,14 +245,14 @@ class IncidentViewSetV1TestCase(APITestCase):
         data = {
             "ticket_url": "www.example.com",
         }
-        response = self.client.put(f"/api/v1/incidents/{incident_pk}/ticket_url/", data, format="json")
+        response = self.client.put(path=f"/api/v1/incidents/{incident_pk}/ticket_url/", data=data, format="json")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["ticket_url"], data["ticket_url"])
         self.assertEqual(Incident.objects.get(id=incident_pk).ticket_url, data["ticket_url"])
 
     def test_get_my_incidents_returns_my_incidents(self):
         incident_pk = self.add_incident()
-        response = self.client.get("/api/v1/incidents/mine/")
+        response = self.client.get(path="/api/v1/incidents/mine/")
         self.assertTrue(Incident.objects.exists())
         self.assertEqual(response.status_code, 200)
         # Paging, so check "results"
@@ -270,7 +270,7 @@ class IncidentViewSetV1TestCase(APITestCase):
             "level": 1,
             "tags": [{"tag": "a=b"}],
         }
-        response = self.client.post("/api/v1/incidents/mine/", data, format="json")
+        response = self.client.post(path="/api/v1/incidents/mine/", data=data, format="json")
         self.assertEqual(response.status_code, 201)  # Created
         # Check that we have made the correct Incident
         self.assertEqual(response.data["description"], data["description"])
@@ -284,7 +284,7 @@ class IncidentViewSetV1TestCase(APITestCase):
         self.assertEqual(str(tag), data["tags"][0]["tag"])
 
     def test_incident_source_types_returns_correct_source_types(self):
-        response = self.client.get(f"/api/v1/incidents/source-types/")
+        response = self.client.get(path=f"/api/v1/incidents/source-types/")
         self.assertEqual(response.status_code, 200)
         source_types = set([type.name for type in SourceSystemType.objects.all()])
         response_types = set([type["name"] for type in response.data])
@@ -294,18 +294,18 @@ class IncidentViewSetV1TestCase(APITestCase):
         data = {
             "name": "test",
         }
-        response = self.client.post(f"/api/v1/incidents/source-types/", data, format="json")
+        response = self.client.post(path=f"/api/v1/incidents/source-types/", data=data, format="json")
         self.assertEqual(response.status_code, 201)  # Created
         self.assertEqual(response.data["name"], data["name"])
         self.assertTrue(SourceSystemType.objects.filter(name=data["name"]).exists())
 
     def test_get_source_type_by_name_returns_correct_source_type(self):
-        response = self.client.get(f"/api/v1/incidents/source-types/{self.source.type.name}/")
+        response = self.client.get(path=f"/api/v1/incidents/source-types/{self.source.type.name}/")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["name"], self.source.type.name)
 
     def test_incident_sources_returns_correct_sources(self):
-        response = self.client.get(f"/api/v1/incidents/sources/")
+        response = self.client.get(path=f"/api/v1/incidents/sources/")
         self.assertEqual(response.status_code, 200)
         source_pks = set([source.pk for source in SourceSystem.objects.all()])
         response_source_pks = set([source["pk"] for source in response.data])
@@ -318,13 +318,13 @@ class IncidentViewSetV1TestCase(APITestCase):
             "name": "newtest",
             "type": self.source.type.name,
         }
-        response = self.client.post(f"/api/v1/incidents/sources/", data, format="json")
+        response = self.client.post(path=f"/api/v1/incidents/sources/", data=data, format="json")
         self.assertEqual(response.status_code, 201)  # Created
         self.assertEqual(response.data["name"], data["name"])
         self.assertTrue(SourceSystem.objects.filter(name=data["name"]).exists())
 
     def test_get_source_by_pk_returns_correct_source(self):
-        response = self.client.get(f"/api/v1/incidents/sources/{self.source.pk}/")
+        response = self.client.get(path=f"/api/v1/incidents/sources/{self.source.pk}/")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["pk"], self.source.pk)
 
@@ -334,7 +334,7 @@ class IncidentViewSetV1TestCase(APITestCase):
         data = {
             "name": "newname",
         }
-        response = self.client.put(f"/api/v1/incidents/sources/{self.source.pk}/", data, format="json")
+        response = self.client.put(path=f"/api/v1/incidents/sources/{self.source.pk}/", data=data, format="json")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["name"], data["name"])
 
@@ -362,7 +362,7 @@ class IncidentViewSetTestCase(APITestCase):
             "level": 1,
             "tags": [{"tag": "a=b"}],
         }
-        response = self.client.post("/api/v2/incidents/", data, format="json")
+        response = self.client.post(path="/api/v2/incidents/", data=data, format="json")
         self.assertEqual(response.status_code, 201)  # Created
         return response.data["pk"]
 
@@ -375,7 +375,7 @@ class IncidentViewSetTestCase(APITestCase):
             },
             "expiration": "2022-08-03T13:04:03.529Z",
         }
-        response = self.client.post(f"/api/v1/incidents/{incident_pk}/acks/", data, format="json")
+        response = self.client.post(path=f"/api/v1/incidents/{incident_pk}/acks/", data=data, format="json")
         self.assertEqual(response.status_code, 201)  # Created
         return response.data["pk"]
 
@@ -385,47 +385,47 @@ class IncidentViewSetTestCase(APITestCase):
             "type": "OTH",
             "description": description,
         }
-        response = self.client.post(f"/api/v2/incidents/{incident_pk}/events/", data, format="json")
+        response = self.client.post(path=f"/api/v2/incidents/{incident_pk}/events/", data=data, format="json")
         self.assertEqual(response.status_code, 201)  # Created
         return response.data["pk"]
 
     def test_incident_search_existing_incident_description(self):
-        pk = self.add_incident("incident1")
-        response = self.client.get("/api/v2/incidents/?search=incident1")
+        pk = self.add_incident(description="incident1")
+        response = self.client.get(path="/api/v2/incidents/?search=incident1")
         self.assertEqual(response.data["results"][0]["pk"], pk)
 
     def test_incident_search_existing_event_description(self):
-        pk = self.add_incident("incident1")
-        self.add_event(pk, "event1")
-        response = self.client.get("/api/v2/incidents/?search=event1")
-        self.assertEqual(response.data["results"][0]["pk"], pk)
+        incident_pk = self.add_incident(description="incident1")
+        self.add_event(incident_pk=incident_pk, description="event1")
+        response = self.client.get(path="/api/v2/incidents/?search=event1")
+        self.assertEqual(response.data["results"][0]["pk"], incident_pk)
 
     def test_incident_search_nonexisting_description(self):
-        pk = self.add_incident("incident1")
-        self.add_event(pk, "event1")
-        response = self.client.get("/api/v2/incidents/?search=not_a_description")
+        incident_pk = self.add_incident(description="incident1")
+        self.add_event(incident_pk=incident_pk, description="event1")
+        response = self.client.get(path="/api/v2/incidents/?search=not_a_description")
         self.assertEqual(response.data["results"], [])
 
     def test_incident_search_existing_descriptions(self):
-        pk = self.add_incident("incident1")
-        self.add_event(pk, "event")
-        pk2 = self.add_incident("incident2")
-        self.add_event(pk2, "event")
-        response = self.client.get("/api/v2/incidents/?search=incident1,event")
-        self.assertEqual(response.data["results"][0]["pk"], pk)
+        incident_pk = self.add_incident(description="incident1")
+        self.add_event(incident_pk=incident_pk, description="event")
+        self.add_incident(description="incident2")
+        self.add_event(incident_pk=incident_pk, description="event")
+        response = self.client.get(path="/api/v2/incidents/?search=incident1,event")
+        self.assertEqual(response.data["results"][0]["pk"], incident_pk)
 
     def test_incident_search_multiple_incidents(self):
-        pk1 = self.add_incident("incident1")
-        pk2 = self.add_incident("incident2")
-        self.add_event(pk1, "event1")
-        self.add_event(pk2, "event2")
-        response = self.client.get("/api/v2/incidents/?search=incident")
+        incident_pk1 = self.add_incident(description="incident1")
+        incident_pk2 = self.add_incident(description="incident2")
+        self.add_event(incident_pk=incident_pk1, description="event1")
+        self.add_event(incident_pk=incident_pk2, description="event2")
+        response = self.client.get(path="/api/v2/incidents/?search=incident")
         self.assertEqual(len(response.data["results"]), 2)
 
     def test_incident_search_incident_and_event(self):
-        pk1 = self.add_incident("target_incident")
-        pk2 = self.add_incident("incident2")
-        self.add_event(pk1, "event1")
-        self.add_event(pk2, "target_event")
-        response = self.client.get("/api/v2/incidents/?search=target")
+        incident_pk1 = self.add_incident(description="target_incident")
+        incident_pk2 = self.add_incident(description="incident2")
+        self.add_event(incident_pk=incident_pk1, description="event1")
+        self.add_event(incident_pk=incident_pk2, description="target_event")
+        response = self.client.get(path="/api/v2/incidents/?search=target")
         self.assertEqual(len(response.data["results"]), 2)
