@@ -5,7 +5,15 @@ from rest_framework import serializers, status, versioning
 from rest_framework.test import APITestCase
 
 from argus.auth.factories import AdminUserFactory, SourceUserFactory
-from argus.incident.factories import SourceSystemTypeFactory, SourceSystemFactory, StatefulIncidentFactory
+from argus.incident.factories import (
+    AcknowledgementFactory,
+    EventFactory,
+    IncidentTagRelationFactory,
+    SourceSystemTypeFactory,
+    SourceSystemFactory,
+    StatefulIncidentFactory,
+    TagFactory,
+)
 from argus.incident.models import (
     Acknowledgement,
     Event,
@@ -54,39 +62,17 @@ class IncidentViewSetV1TestCase(APITestCase):
         connect_signals()
 
     def add_incident(self, description="incident"):
-        data = {
-            "start_time": "2022-05-24T13:07:29.254Z",
-            "end_time": "2022-05-24T13:07:29.254Z",
-            "description": description,
-            "level": 1,
-            "tags": [{"tag": "a=b"}],
-        }
-        response = self.client.post(path="/api/v1/incidents/", data=data, format="json")
-        self.assertEqual(response.status_code, 201)  # Created
-        return response.data["pk"]
+        incident = StatefulIncidentFactory(source=self.source, description=description)
+        tag = TagFactory(key="a", value="b")
+        IncidentTagRelationFactory(incident=incident, tag=tag)
+        return incident.pk
 
-    def add_acknowledgement(self, incident_pk, description="acknowledgement"):
-        data = {
-            "event": {
-                "timestamp": "2022-08-02T13:04:03.529Z",
-                "type": "STA",
-                "description": description,
-            },
-            "expiration": "2022-08-03T13:04:03.529Z",
-        }
-        response = self.client.post(path=f"/api/v1/incidents/{incident_pk}/acks/", data=data, format="json")
-        self.assertEqual(response.status_code, 201)  # Created
-        return response.data["pk"]
+    def add_event(self, incident_pk, description="event", type=Event.Type.OTHER):
+        return EventFactory(incident_id=incident_pk, description=description, type=type).pk
 
-    def add_event(self, incident_pk, description="event"):
-        data = {
-            "timestamp": "2022-08-02T13:04:03.529Z",
-            "type": "OTH",
-            "description": description,
-        }
-        response = self.client.post(path=f"/api/v1/incidents/{incident_pk}/events/", data=data, format="json")
-        self.assertEqual(response.status_code, 201)  # Created
-        return response.data["pk"]
+    def add_acknowledgement(self, incident_pk):
+        event_pk = self.add_event(incident_pk=incident_pk, type=Event.Type.ACKNOWLEDGE)
+        return AcknowledgementFactory(event_id=event_pk).pk
 
     def test_no_incidents_returns_empty_list(self):
         response = self.client.get(path="/api/v1/incidents/")
@@ -154,7 +140,7 @@ class IncidentViewSetV1TestCase(APITestCase):
         ack_pk = self.add_acknowledgement(incident_pk=incident_pk)
         response = self.client.get(path=f"/api/v1/incidents/{incident_pk}/acks/")
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data[0]["event"]["pk"], ack_pk)
+        self.assertEqual(response.data[0]["pk"], ack_pk)
         self.assertEqual(response.data[0]["event"]["type"]["value"], "ACK")
 
     def test_posting_acknowledgement_creates_acknowledgement(self):
@@ -380,28 +366,12 @@ class IncidentViewSetTestCase(APITestCase):
         self.assertEqual(response.status_code, 201)  # Created
         return response.data["pk"]
 
-    def add_acknowledgement(self, incident_pk, description="acknowledgement"):
-        data = {
-            "event": {
-                "timestamp": "2022-08-02T13:04:03.529Z",
-                "type": "STA",
-                "description": description,
-            },
-            "expiration": "2022-08-03T13:04:03.529Z",
-        }
-        response = self.client.post(path=f"/api/v1/incidents/{incident_pk}/acks/", data=data, format="json")
-        self.assertEqual(response.status_code, 201)  # Created
-        return response.data["pk"]
+    def add_event(self, incident_pk, description="event", type=Event.Type.OTHER):
+        return EventFactory(incident_id=incident_pk, description=description, type=type).pk
 
-    def add_event(self, incident_pk, description="event"):
-        data = {
-            "timestamp": "2022-08-02T13:04:03.529Z",
-            "type": "OTH",
-            "description": description,
-        }
-        response = self.client.post(path=f"/api/v2/incidents/{incident_pk}/events/", data=data, format="json")
-        self.assertEqual(response.status_code, 201)  # Created
-        return response.data["pk"]
+    def add_acknowledgement(self, incident_pk):
+        event_pk = self.add_event(incident_pk=incident_pk, type=Event.Type.ACKNOWLEDGE)
+        return AcknowledgementFactory(event_id=event_pk).pk
 
     def test_no_incidents_returns_empty_list(self):
         response = self.client.get(path="/api/v2/incidents/")
@@ -510,7 +480,7 @@ class IncidentViewSetTestCase(APITestCase):
         ack_pk = self.add_acknowledgement(incident_pk=incident_pk)
         response = self.client.get(path=f"/api/v2/incidents/{incident_pk}/acks/")
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data[0]["event"]["pk"], ack_pk)
+        self.assertEqual(response.data[0]["pk"], ack_pk)
         self.assertEqual(response.data[0]["event"]["type"]["value"], "ACK")
 
     def test_posting_acknowledgement_creates_acknowledgement(self):
