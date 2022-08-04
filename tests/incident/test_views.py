@@ -42,19 +42,15 @@ class EventViewSetTestCase(TestCase):
 
 
 class IncidentViewSetV1TestCase(APITestCase):
-    @classmethod
-    def setUpClass(cls):
+    def setUp(self):
         disconnect_signals()
         source_type = SourceSystemTypeFactory()
-        cls.user = SourceUserFactory()
-        cls.source = SourceSystemFactory(type=source_type, user=cls.user)
-        cls.admin = AdminUserFactory()
-
-    def setUp(self):
+        self.user = SourceUserFactory()
+        self.source = SourceSystemFactory(type=source_type, user=self.user)
+        self.admin = AdminUserFactory()
         self.client.force_authenticate(user=self.user)
 
-    @classmethod
-    def tearDownClass(cls):
+    def teardown(self):
         connect_signals()
 
     def add_incident(self, description="incident"):
@@ -350,19 +346,15 @@ class IncidentViewSetV1TestCase(APITestCase):
 
 
 class IncidentViewSetTestCase(APITestCase):
-    @classmethod
-    def setUpClass(cls):
+    def setUp(self):
         disconnect_signals()
         source_type = SourceSystemTypeFactory()
-        cls.user = SourceUserFactory()
-        cls.source = SourceSystemFactory(type=source_type, user=cls.user)
-        cls.admin = AdminUserFactory()
-
-    def setUp(self):
+        self.user = SourceUserFactory()
+        self.source = SourceSystemFactory(type=source_type, user=self.user)
+        self.admin = AdminUserFactory()
         self.client.force_authenticate(user=self.user)
 
-    @classmethod
-    def tearDownClass(cls):
+    def teardown(self):
         connect_signals()
 
     def add_incident(self, description="incident"):
