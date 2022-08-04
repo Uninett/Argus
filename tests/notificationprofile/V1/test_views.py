@@ -124,7 +124,7 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
         profile_pk = self.notification_profile1.pk
         response = self.user1_rest_client.delete(f"/api/v1/notificationprofiles/{profile_pk}/")
         self.assertEqual(response.status_code, 204)
-        self.assertFalse(NotificationProfile.objects.filter(pk=profile_pk).first())
+        self.assertFalse(NotificationProfile.objects.filter(pk=profile_pk).exists())
 
     def test_get_all_timeslots(self):
         response = self.user1_rest_client.get("/api/v1/notificationprofiles/timeslots/")
@@ -142,7 +142,7 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
             },
         )
         self.assertEqual(response.status_code, 201)
-        self.assertTrue(Timeslot.objects.filter(user=self.user1, name="test-timeslot").first())
+        self.assertTrue(Timeslot.objects.filter(user=self.user1, name="test-timeslot").exists())
 
     def test_can_not_create_new_timeslot_with_end_time_before_start_time(self):
         response = self.user1_rest_client.post(
@@ -153,7 +153,7 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
             },
         )
         self.assertEqual(response.status_code, 400)
-        self.assertFalse(Timeslot.objects.filter(user=self.user1, name="test-timeslot").first())
+        self.assertFalse(Timeslot.objects.filter(user=self.user1, name="test-timeslot").exists())
 
     def test_get_timeslot_by_pk(self):
         timeslot_pk = self.timeslot1.pk
@@ -185,7 +185,7 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
         timeslot_pk = self.timeslot1.pk
         response = self.user1_rest_client.delete(f"/api/v1/notificationprofiles/timeslots/{timeslot_pk}/")
         self.assertEqual(response.status_code, 204)
-        self.assertFalse(Timeslot.objects.filter(pk=timeslot_pk).first())
+        self.assertFalse(Timeslot.objects.filter(pk=timeslot_pk).exists())
 
     def test_get_all_filters(self):
         response = self.user1_rest_client.get("/api/v1/notificationprofiles/filters/")
@@ -201,7 +201,7 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
             },
         )
         self.assertEqual(response.status_code, 201)
-        self.assertTrue(Filter.objects.filter(user=self.user1, name="test-filter").first())
+        self.assertTrue(Filter.objects.filter(user=self.user1, name="test-filter").exists())
 
     def test_get_filter_by_pk(self):
         filter_pk = self.filter1.pk
@@ -225,13 +225,13 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
         filter_pk = self.filter2.pk
         response = self.user1_rest_client.delete(f"/api/v1/notificationprofiles/filters/{filter_pk}/")
         self.assertEqual(response.status_code, 204)
-        self.assertFalse(Filter.objects.filter(pk=filter_pk).first())
+        self.assertFalse(Filter.objects.filter(pk=filter_pk).exists())
 
     def test_can_not_delete_used_filter(self):
         filter_pk = self.filter1.pk
         response = self.user1_rest_client.delete(f"/api/v1/notificationprofiles/filters/{filter_pk}/")
         self.assertEqual(response.status_code, 400)
-        self.assertTrue(Filter.objects.filter(pk=filter_pk).first())
+        self.assertTrue(Filter.objects.filter(pk=filter_pk).exists())
 
     def test_filterpreview_returns_correct_incidents(self):
         response = self.user1_rest_client.post(
