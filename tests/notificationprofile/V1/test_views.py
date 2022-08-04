@@ -128,7 +128,7 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
 
     def test_get_all_timeslots(self):
         response = self.user1_rest_client.get("/api/v1/notificationprofiles/timeslots/")
-        default_timeslot = Timeslot.objects.filter(user=self.user1, name="All the time").first()
+        default_timeslot = self.user1.timeslots.filter(name="All the time").first()
         timeslot_pks = set([default_timeslot.pk, self.timeslot1.pk, self.timeslot2.pk])
         response_pks = set([timeslot["pk"] for timeslot in response.data])
         self.assertEqual(timeslot_pks, response_pks)
