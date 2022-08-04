@@ -6,11 +6,12 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework.test import APITestCase
 
 from argus.incident.serializers import IncidentSerializer
-from argus.notificationprofile.models import (
-    Filter,
-    NotificationProfile,
-    Timeslot,
+from argus.notificationprofile.factories import (
+    TimeslotFactory,
+    FilterFactory,
+    NotificationProfileFactory,
 )
+from argus.notificationprofile.models import NotificationProfile
 from argus.util.testing import disconnect_signals, connect_signals
 
 from .. import IncidentAPITestCaseHelper
@@ -25,14 +26,14 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
         incident1_json = IncidentSerializer([self.incident1], many=True).data
         self.incident1_json = JSONRenderer().render(incident1_json)
 
-        self.timeslot1 = Timeslot.objects.create(user=self.user1, name="Never")
-        self.timeslot2 = Timeslot.objects.create(user=self.user1, name="Never 2: Ever-expanding Void")
-        filter1 = Filter.objects.create(
+        self.timeslot1 = TimeslotFactory(user=self.user1, name="Never")
+        self.timeslot2 = TimeslotFactory(user=self.user1, name="Never 2: Ever-expanding Void")
+        filter1 = FilterFactory(
             user=self.user1,
             name="Critical incidents",
             filter_string=f'{{"sourceSystemIds": [{self.source1.pk}]}}',
         )
-        self.notification_profile1 = NotificationProfile.objects.create(user=self.user1, timeslot=self.timeslot1)
+        self.notification_profile1 = NotificationProfileFactory(user=self.user1, timeslot=self.timeslot1)
         self.notification_profile1.filters.add(filter1)
         self.notification_profile1.destinations.set(self.user1.destinations.all())
         self.media = []

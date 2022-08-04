@@ -6,12 +6,16 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework.test import APITestCase
 
 from argus.incident.serializers import IncidentSerializer
+from argus.notificationprofile.factories import (
+    TimeslotFactory,
+    FilterFactory,
+    NotificationProfileFactory,
+    DestinationConfigFactory,
+)
 from argus.notificationprofile.media import MEDIA_CLASSES_DICT
 from argus.notificationprofile.models import (
     DestinationConfig,
-    Filter,
     NotificationProfile,
-    Timeslot,
 )
 from argus.util.testing import disconnect_signals, connect_signals
 
@@ -27,19 +31,26 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
         incident1_json = IncidentSerializer([self.incident1], many=True).data
         self.incident1_json = JSONRenderer().render(incident1_json)
 
-        self.timeslot1 = Timeslot.objects.create(user=self.user1, name="Never")
-        self.timeslot2 = Timeslot.objects.create(user=self.user1, name="Never 2: Ever-expanding Void")
-        filter1 = Filter.objects.create(
+        self.timeslot1 = TimeslotFactory(user=self.user1, name="Never")
+        self.timeslot2 = TimeslotFactory(user=self.user1, name="Never 2: Ever-expanding Void")
+        filter1 = FilterFactory(
             user=self.user1,
             name="Critical incidents",
             filter_string=f'{{"sourceSystemIds": [{self.source1.pk}]}}',
         )
-        self.notification_profile1 = NotificationProfile.objects.create(user=self.user1, timeslot=self.timeslot1)
+        self.notification_profile1 = NotificationProfileFactory(user=self.user1, timeslot=self.timeslot1)
         self.notification_profile1.filters.add(filter1)
         self.notification_profile1.destinations.set(self.user1.destinations.all())
 
     def teardown(self):
         connect_signals()
+
+    def create_email_destination(self):
+        return DestinationConfigFactory(
+            user=self.user1,
+            media_id="email",
+            settings={"email_address": "test@example.com", "synced": False},
+        )
 
     def test_incidents_filtered_by_notification_profile_view(self):
         response = self.user1_rest_client.get(
@@ -78,7 +89,7 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
         if not "sms" in MEDIA_CLASSES_DICT.keys():
             self.skipTest("No sms plugin available")
 
-        self.sms_destination = DestinationConfig.objects.create(
+        self.sms_destination = DestinationConfigFactory(
             user=self.user1,
             media_id="sms",
             settings={"phone_number": "+4747474747"},
@@ -95,11 +106,7 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
         self.assertEqual(self.user1_rest_client.get(sms_destination_path).status_code, status.HTTP_404_NOT_FOUND)
 
     def test_can_delete_unsynced_unconnected_email_destination(self):
-        self.email_destination = DestinationConfig.objects.create(
-            user=self.user1,
-            media_id="email",
-            settings={"email_address": "test@example.com", "synced": False},
-        )
+        self.email_destination = self.create_email_destination()
 
         email_destination_pk = self.email_destination.pk
         email_destination_path = reverse(
@@ -131,11 +138,7 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
         self.assertEqual(self.user1_rest_client.get(email_destination_path).status_code, status.HTTP_200_OK)
 
     def test_cannot_delete_connected_email_destination(self):
-        self.email_destination = DestinationConfig.objects.create(
-            user=self.user1,
-            media_id="email",
-            settings={"email_address": "test@example.com", "synced": False},
-        )
+        self.email_destination = self.create_email_destination()
         self.notification_profile1.destinations.add(self.email_destination)
 
         email_destination_pk = self.email_destination.pk
