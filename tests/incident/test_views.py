@@ -67,12 +67,8 @@ class IncidentViewSetV1TestCase(APITestCase):
         IncidentTagRelationFactory(incident=incident, tag=tag)
         return incident
 
-    def add_event(self, incident_pk, description="event", type=Event.Type.OTHER):
-        return EventFactory(incident_id=incident_pk, description=description, type=type)
-
-    def add_acknowledgement(self, incident_pk):
-        event_pk = self.add_event(incident_pk=incident_pk, type=Event.Type.ACKNOWLEDGE)
-        return AcknowledgementFactory(event_id=event_pk)
+    def add_acknowledgement(self):
+        return AcknowledgementFactory()
 
     def test_no_incidents_returns_empty_list(self):
         response = self.client.get(path="/api/v1/incidents/")
@@ -136,11 +132,11 @@ class IncidentViewSetV1TestCase(APITestCase):
         self.assertEqual(Incident.objects.get(pk=incident_pk).level, 2)
 
     def test_incident_acks_returns_correct_acks(self):
-        incident_pk = self.add_incident().pk
-        ack_pk = self.add_acknowledgement(incident_pk=incident_pk).pk
+        ack = self.add_acknowledgement()
+        incident_pk = ack.event.incident.pk
         response = self.client.get(path=f"/api/v1/incidents/{incident_pk}/acks/")
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data[0]["pk"], ack_pk)
+        self.assertEqual(response.data[0]["pk"], ack.pk)
         self.assertEqual(response.data[0]["event"]["type"]["value"], "ACK")
 
     def test_posting_acknowledgement_creates_acknowledgement(self):
@@ -161,11 +157,11 @@ class IncidentViewSetV1TestCase(APITestCase):
         self.assertTrue(Acknowledgement.objects.exists())
 
     def test_get_acknowledgement_by_pk_returns_correct_acknowledgement(self):
-        incident_pk = self.add_incident().pk
-        ack_pk = self.add_acknowledgement(incident_pk=incident_pk).pk
-        response = self.client.get(path=f"/api/v1/incidents/{incident_pk}/acks/{ack_pk}/")
+        ack = self.add_acknowledgement()
+        incident_pk = ack.event.incident.pk
+        response = self.client.get(path=f"/api/v1/incidents/{incident_pk}/acks/{ack.pk}/")
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data["event"]["pk"], ack_pk)
+        self.assertEqual(response.data["event"]["pk"], ack.pk)
         self.assertEqual(response.data["event"]["type"]["value"], "ACK")
 
     def test_incident_events_returns_correct_events_of_incident(self):
@@ -363,9 +359,8 @@ class IncidentViewSetTestCase(APITestCase):
     def add_event(self, incident_pk, description="event", type=Event.Type.OTHER):
         return EventFactory(incident_id=incident_pk, description=description, type=type)
 
-    def add_acknowledgement(self, incident_pk):
-        event_pk = self.add_event(incident_pk=incident_pk, type=Event.Type.ACKNOWLEDGE)
-        return AcknowledgementFactory(event_id=event_pk)
+    def add_acknowledgement(self):
+        return AcknowledgementFactory()
 
     def test_no_incidents_returns_empty_list(self):
         response = self.client.get(path="/api/v2/incidents/")
@@ -470,11 +465,11 @@ class IncidentViewSetTestCase(APITestCase):
         self.assertEqual(Incident.objects.get(pk=incident_pk).level, 2)
 
     def test_incident_acks_returns_correct_acks(self):
-        incident_pk = self.add_incident().pk
-        ack_pk = self.add_acknowledgement(incident_pk=incident_pk).pk
-        response = self.client.get(path=f"/api/v2/incidents/{incident_pk}/acks/")
+        ack = self.add_acknowledgement()
+        incident_pk = ack.event.incident.pk
+        response = self.client.get(path=f"/api/v1/incidents/{incident_pk}/acks/")
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data[0]["pk"], ack_pk)
+        self.assertEqual(response.data[0]["pk"], ack.pk)
         self.assertEqual(response.data[0]["event"]["type"]["value"], "ACK")
 
     def test_posting_acknowledgement_creates_acknowledgement(self):
@@ -495,11 +490,11 @@ class IncidentViewSetTestCase(APITestCase):
         self.assertTrue(Acknowledgement.objects.exists())
 
     def test_get_acknowledgement_by_pk_returns_correct_acknowledgement(self):
-        incident_pk = self.add_incident().pk
-        ack_pk = self.add_acknowledgement(incident_pk=incident_pk).pk
-        response = self.client.get(path=f"/api/v2/incidents/{incident_pk}/acks/{ack_pk}/")
+        ack = self.add_acknowledgement()
+        incident_pk = ack.event.incident.pk
+        response = self.client.get(path=f"/api/v2/incidents/{incident_pk}/acks/{ack.pk}/")
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data["event"]["pk"], ack_pk)
+        self.assertEqual(response.data["event"]["pk"], ack.pk)
         self.assertEqual(response.data["event"]["type"]["value"], "ACK")
 
     def test_incident_events_returns_correct_events_of_incident(self):
