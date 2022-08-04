@@ -98,7 +98,6 @@ class IncidentViewSetV1TestCase(APITestCase):
     def test_get_incident_returns_all_incidents(self):
         incident_pk = self.add_incident()
         response = self.client.get(path="/api/v1/incidents/")
-        self.assertTrue(Incident.objects.exists())
         self.assertEqual(response.status_code, 200)
         # Paging, so check "results"
         self.assertEqual(response.data["results"][0]["pk"], incident_pk)
@@ -218,7 +217,7 @@ class IncidentViewSetV1TestCase(APITestCase):
         # Automatically creates tag
         incident_pk = self.add_incident()
         response = self.client.get(path=f"/api/v1/incidents/{incident_pk}/tags/")
-        tag = str(Tag.objects.first())
+        tag = str(Tag.objects.get())
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data[0]["tag"], tag)
 
@@ -237,7 +236,7 @@ class IncidentViewSetV1TestCase(APITestCase):
     def test_get_tag_by_tag_returns_correct_tag(self):
         # Automatically creates tag
         incident_pk = self.add_incident()
-        tag = str(Tag.objects.first())
+        tag = str(Tag.objects.get())
         response = self.client.get(path=f"/api/v1/incidents/{incident_pk}/tags/{tag}/")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["tag"], tag)
@@ -245,7 +244,7 @@ class IncidentViewSetV1TestCase(APITestCase):
     def test_delete_tag_deletes_tag(self):
         # Automatically creates tag
         incident_pk = self.add_incident()
-        tag = str(Tag.objects.first())
+        tag = str(Tag.objects.get())
         response = self.client.delete(path=f"/api/v1/incidents/{incident_pk}/tags/{tag}/")
         self.assertEqual(response.status_code, 204)
         self.assertEqual(Tag.objects.count(), 0)
@@ -263,7 +262,6 @@ class IncidentViewSetV1TestCase(APITestCase):
     def test_get_my_incidents_returns_my_incidents(self):
         incident_pk = self.add_incident()
         response = self.client.get(path="/api/v1/incidents/mine/")
-        self.assertTrue(Incident.objects.exists())
         self.assertEqual(response.status_code, 200)
         # Paging, so check "results"
         self.assertEqual(response.data["results"][0]["pk"], incident_pk)
@@ -415,7 +413,6 @@ class IncidentViewSetTestCase(APITestCase):
     def test_get_incident_returns_all_incidents(self):
         incident_pk = self.add_incident()
         response = self.client.get(path="/api/v2/incidents/")
-        self.assertTrue(Incident.objects.exists())
         self.assertEqual(response.status_code, 200)
         # Paging, so check "results"
         self.assertEqual(response.data["results"][0]["pk"], incident_pk)
@@ -576,7 +573,7 @@ class IncidentViewSetTestCase(APITestCase):
         # Automatically creates tag
         incident_pk = self.add_incident()
         response = self.client.get(path=f"/api/v2/incidents/{incident_pk}/tags/")
-        tag = str(Tag.objects.first())
+        tag = str(Tag.objects.get())
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data[0]["tag"], tag)
 
@@ -595,7 +592,7 @@ class IncidentViewSetTestCase(APITestCase):
     def test_get_tag_by_tag_returns_correct_tag(self):
         # Automatically creates tag
         incident_pk = self.add_incident()
-        tag = str(Tag.objects.first())
+        tag = str(Tag.objects.get())
         response = self.client.get(path=f"/api/v2/incidents/{incident_pk}/tags/{tag}/")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["tag"], tag)
@@ -603,7 +600,7 @@ class IncidentViewSetTestCase(APITestCase):
     def test_delete_tag_deletes_tag(self):
         # Automatically creates tag
         incident_pk = self.add_incident()
-        tag = str(Tag.objects.first())
+        tag = str(Tag.objects.get())
         response = self.client.delete(path=f"/api/v2/incidents/{incident_pk}/tags/{tag}/")
         self.assertEqual(response.status_code, 204)
         self.assertFalse(Tag.objects.exists())
