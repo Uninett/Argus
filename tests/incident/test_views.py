@@ -183,8 +183,9 @@ class IncidentViewSetV1TestCase(APITestCase):
         self.assertEqual(response.data["event"]["type"]["value"], "ACK")
 
     def test_incident_events_returns_correct_events_of_incident(self):
+        # Automatically creates incident start event
         incident_pk = self.add_incident()
-        event_pk = self.add_event(incident_pk=incident_pk)
+        event_pk = Event.objects.get(incident_id=incident_pk).pk
         response = self.client.get(path=f"/api/v1/incidents/{incident_pk}/events/")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data[0]["pk"], event_pk)
@@ -206,8 +207,9 @@ class IncidentViewSetV1TestCase(APITestCase):
         self.assertEqual(Event.objects.count(), 2)
 
     def test_get_event_by_pk_returns_correct_event(self):
+        # Automatically creates incident start event
         incident_pk = self.add_incident()
-        event_pk = self.add_event(incident_pk=incident_pk)
+        event_pk = Event.objects.get(incident_id=incident_pk).pk
         response = self.client.get(path=f"/api/v1/incidents/{incident_pk}/events/{event_pk}/")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["pk"], event_pk)
@@ -539,8 +541,9 @@ class IncidentViewSetTestCase(APITestCase):
         self.assertEqual(response.data["event"]["type"]["value"], "ACK")
 
     def test_incident_events_returns_correct_events_of_incident(self):
+        # Automatically creates incident start event
         incident_pk = self.add_incident()
-        event_pk = self.add_event(incident_pk=incident_pk)
+        event_pk = Event.objects.get(incident_id=incident_pk).pk
         response = self.client.get(path=f"/api/v2/incidents/{incident_pk}/events/")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data[0]["pk"], event_pk)
@@ -562,8 +565,9 @@ class IncidentViewSetTestCase(APITestCase):
         self.assertEqual(Event.objects.count(), 2)
 
     def test_get_event_by_pk_returns_correct_event(self):
+        # Automatically creates incident start event
         incident_pk = self.add_incident()
-        event_pk = self.add_event(incident_pk=incident_pk)
+        event_pk = Event.objects.get(incident_id=incident_pk).pk
         response = self.client.get(path=f"/api/v2/incidents/{incident_pk}/events/{event_pk}/")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["pk"], event_pk)
@@ -616,8 +620,9 @@ class IncidentViewSetTestCase(APITestCase):
         self.assertEqual(Incident.objects.get(id=incident_pk).ticket_url, data["ticket_url"])
 
     def test_incident_events_returns_correct_events(self):
+        # Automatically creates incident start event
         incident_pk = self.add_incident()
-        event_pk = self.add_event(incident_pk=incident_pk)
+        event_pk = Event.objects.get(incident_id=incident_pk).pk
         response = self.client.get(path=f"/api/v2/incidents/events/")
         self.assertEqual(response.status_code, 200)
         # Paging, so check "results"
