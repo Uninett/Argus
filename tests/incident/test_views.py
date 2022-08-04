@@ -189,7 +189,6 @@ class IncidentViewSetV1TestCase(APITestCase):
         response = self.client.get(path=f"/api/v1/incidents/{incident_pk}/events/")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data[0]["pk"], event_pk)
-        self.assertEqual(response.data[0]["type"]["value"], "OTH")
 
     def test_posting_event_creates_event(self):
         # Automatically creates incident start event
@@ -213,7 +212,6 @@ class IncidentViewSetV1TestCase(APITestCase):
         response = self.client.get(path=f"/api/v1/incidents/{incident_pk}/events/{event_pk}/")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["pk"], event_pk)
-        self.assertEqual(response.data["type"]["value"], "OTH")
 
     def test_incident_tags_returns_correct_tags(self):
         # Automatically creates tag
@@ -547,7 +545,6 @@ class IncidentViewSetTestCase(APITestCase):
         response = self.client.get(path=f"/api/v2/incidents/{incident_pk}/events/")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data[0]["pk"], event_pk)
-        self.assertEqual(response.data[0]["type"]["value"], "OTH")
 
     def test_posting_event_creates_event(self):
         # Automatically creates incident start event
@@ -571,7 +568,6 @@ class IncidentViewSetTestCase(APITestCase):
         response = self.client.get(path=f"/api/v2/incidents/{incident_pk}/events/{event_pk}/")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["pk"], event_pk)
-        self.assertEqual(response.data["type"]["value"], "OTH")
 
     def test_incident_tags_returns_correct_tags(self):
         # Automatically creates tag
@@ -627,7 +623,6 @@ class IncidentViewSetTestCase(APITestCase):
         self.assertEqual(response.status_code, 200)
         # Paging, so check "results"
         self.assertEqual(response.data["results"][0]["pk"], event_pk)
-        self.assertEqual(response.data["results"][0]["type"]["value"], "OTH")
 
     def test_incident_source_types_returns_correct_source_types(self):
         response = self.client.get(path=f"/api/v2/incidents/source-types/")
