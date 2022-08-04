@@ -107,6 +107,7 @@ class IncidentViewSetV1TestCase(APITestCase):
         # Start with no incidents or tags
         self.assertFalse(Incident.objects.exists())
         self.assertFalse(Tag.objects.exists())
+        self.assertFalse(IncidentTagRelation.objects.exists())
         # Minimal data to post that has tags
         data = {
             "start_time": "2021-08-04T09:13:55.908Z",
@@ -124,6 +125,7 @@ class IncidentViewSetV1TestCase(APITestCase):
         incident_tags = [relation.tag for relation in IncidentTagRelation.objects.filter(incident=incident)]
         self.assertEqual(incident.description, data["description"])
         # Check that we have made the correct Tag
+        self.assertTrue(IncidentTagRelation.objects.exists())
         self.assertTrue(Tag.objects.exists())
         tag = Tag.objects.get()
         self.assertEqual(incident_tags, [tag])
@@ -171,6 +173,7 @@ class IncidentViewSetV1TestCase(APITestCase):
         self.assertEqual(response.status_code, 201)  # Created
         self.assertEqual(response.data["event"]["type"]["value"], "ACK")
         self.assertEqual(response.data["event"]["description"], data["event"]["description"])
+        self.assertTrue(Acknowledgement.objects.exists())
 
     def test_get_acknowledgement_by_pk_returns_correct_acknowledgement(self):
         incident_pk = self.add_incident()
@@ -189,8 +192,9 @@ class IncidentViewSetV1TestCase(APITestCase):
         self.assertEqual(response.data[0]["type"]["value"], "OTH")
 
     def test_posting_event_creates_event(self):
+        # Automatically creates incident start event
         incident_pk = self.add_incident()
-        self.assertFalse(Acknowledgement.objects.exists())
+        self.assertEqual(Event.objects.count(), 1)
         data = {
             "timestamp": "2022-08-02T13:45:44.056Z",
             "type": "OTH",
@@ -200,6 +204,7 @@ class IncidentViewSetV1TestCase(APITestCase):
         self.assertEqual(response.status_code, 201)  # Created
         self.assertEqual(response.data["type"]["value"], "OTH")
         self.assertEqual(response.data["description"], data["description"])
+        self.assertEqual(Event.objects.count(), 2)
 
     def test_get_event_by_pk_returns_correct_event(self):
         incident_pk = self.add_incident()
@@ -267,6 +272,7 @@ class IncidentViewSetV1TestCase(APITestCase):
         # Start with no incidents or tags
         self.assertFalse(Incident.objects.exists())
         self.assertFalse(Tag.objects.exists())
+        self.assertFalse(IncidentTagRelation.objects.exists())
         # Minimal data to post that has tags
         data = {
             "start_time": "2021-08-04T09:13:55.908Z",
@@ -284,6 +290,7 @@ class IncidentViewSetV1TestCase(APITestCase):
         incident_tags = [relation.tag for relation in IncidentTagRelation.objects.filter(incident=incident)]
         self.assertEqual(incident.description, data["description"])
         # Check that we have made the correct Tag
+        self.assertTrue(IncidentTagRelation.objects.exists())
         self.assertTrue(Tag.objects.exists())
         tag = Tag.objects.get()
         self.assertEqual(incident_tags, [tag])
@@ -297,12 +304,15 @@ class IncidentViewSetV1TestCase(APITestCase):
         self.assertEqual(response_types, source_types)
 
     def test_posting_source_type_creates_source_type(self):
+        # One source system type is created on setup
+        self.assertEqual(SourceSystemType.objects.count(), 1)
         data = {
             "name": "test",
         }
         response = self.client.post(path=f"/api/v1/incidents/source-types/", data=data, format="json")
         self.assertEqual(response.status_code, 201)  # Created
         self.assertEqual(response.data["name"], data["name"])
+        self.assertEqual(SourceSystemType.objects.count(), 2)
         self.assertTrue(SourceSystemType.objects.filter(name=data["name"]).exists())
 
     def test_get_source_type_by_name_returns_correct_source_type(self):
@@ -320,6 +330,8 @@ class IncidentViewSetV1TestCase(APITestCase):
     def test_posting_source_creates_source(self):
         # Only admins can create sources
         self.client.force_authenticate(user=self.admin)
+        # One source system is created on setup
+        self.assertEqual(SourceSystem.objects.count(), 1)
         data = {
             "name": "newtest",
             "type": self.source.type.name,
@@ -327,6 +339,7 @@ class IncidentViewSetV1TestCase(APITestCase):
         response = self.client.post(path=f"/api/v1/incidents/sources/", data=data, format="json")
         self.assertEqual(response.status_code, 201)  # Created
         self.assertEqual(response.data["name"], data["name"])
+        self.assertEqual(SourceSystem.objects.count(), 2)
         self.assertTrue(SourceSystem.objects.filter(name=data["name"]).exists())
 
     def test_get_source_by_pk_returns_correct_source(self):
@@ -452,6 +465,7 @@ class IncidentViewSetTestCase(APITestCase):
         # Start with no incidents or tags
         self.assertFalse(Incident.objects.exists())
         self.assertFalse(Tag.objects.exists())
+        self.assertFalse(IncidentTagRelation.objects.exists())
         # Minimal data to post that has tags
         data = {
             "start_time": "2021-08-04T09:13:55.908Z",
@@ -469,6 +483,7 @@ class IncidentViewSetTestCase(APITestCase):
         incident_tags = [relation.tag for relation in IncidentTagRelation.objects.filter(incident=incident)]
         self.assertEqual(incident.description, data["description"])
         # Check that we have made the correct Tag
+        self.assertTrue(IncidentTagRelation.objects.exists())
         self.assertTrue(Tag.objects.exists())
         tag = Tag.objects.get()
         self.assertEqual(incident_tags, [tag])
@@ -516,6 +531,7 @@ class IncidentViewSetTestCase(APITestCase):
         self.assertEqual(response.status_code, 201)  # Created
         self.assertEqual(response.data["event"]["type"]["value"], "ACK")
         self.assertEqual(response.data["event"]["description"], data["event"]["description"])
+        self.assertTrue(Acknowledgement.objects.exists())
 
     def test_get_acknowledgement_by_pk_returns_correct_acknowledgement(self):
         incident_pk = self.add_incident()
@@ -534,8 +550,9 @@ class IncidentViewSetTestCase(APITestCase):
         self.assertEqual(response.data[0]["type"]["value"], "OTH")
 
     def test_posting_event_creates_event(self):
+        # Automatically creates incident start event
         incident_pk = self.add_incident()
-        self.assertFalse(Acknowledgement.objects.exists())
+        self.assertEqual(Event.objects.count(), 1)
         data = {
             "timestamp": "2022-08-02T13:45:44.056Z",
             "type": "OTH",
@@ -545,6 +562,7 @@ class IncidentViewSetTestCase(APITestCase):
         self.assertEqual(response.status_code, 201)  # Created
         self.assertEqual(response.data["type"]["value"], "OTH")
         self.assertEqual(response.data["description"], data["description"])
+        self.assertEqual(Event.objects.count(), 2)
 
     def test_get_event_by_pk_returns_correct_event(self):
         incident_pk = self.add_incident()
@@ -588,7 +606,7 @@ class IncidentViewSetTestCase(APITestCase):
         tag = str(Tag.objects.first())
         response = self.client.delete(path=f"/api/v2/incidents/{incident_pk}/tags/{tag}/")
         self.assertEqual(response.status_code, 204)
-        self.assertEqual(Tag.objects.count(), 0)
+        self.assertFalse(Tag.objects.exists())
 
     def test_putting_ticket_url_creates_ticket_url(self):
         incident_pk = self.add_incident()
@@ -617,12 +635,15 @@ class IncidentViewSetTestCase(APITestCase):
         self.assertEqual(response_types, source_types)
 
     def test_posting_source_type_creates_source_type(self):
+        # One source system type is created on setup
+        self.assertEqual(SourceSystemType.objects.count(), 1)
         data = {
             "name": "test",
         }
         response = self.client.post(path=f"/api/v2/incidents/source-types/", data=data, format="json")
         self.assertEqual(response.status_code, 201)  # Created
         self.assertEqual(response.data["name"], data["name"])
+        self.assertEqual(SourceSystemType.objects.count(), 2)
         self.assertTrue(SourceSystemType.objects.filter(name=data["name"]).exists())
 
     def test_get_source_type_by_name_returns_correct_source_type(self):
@@ -640,6 +661,8 @@ class IncidentViewSetTestCase(APITestCase):
     def test_posting_source_creates_source(self):
         # Only admins can create sources
         self.client.force_authenticate(user=self.admin)
+        # One source system is created on setup
+        self.assertEqual(SourceSystem.objects.count(), 1)
         data = {
             "name": "newtest",
             "type": self.source.type.name,
@@ -647,6 +670,7 @@ class IncidentViewSetTestCase(APITestCase):
         response = self.client.post(path=f"/api/v2/incidents/sources/", data=data, format="json")
         self.assertEqual(response.status_code, 201)  # Created
         self.assertEqual(response.data["name"], data["name"])
+        self.assertEqual(SourceSystem.objects.count(), 2)
         self.assertTrue(SourceSystem.objects.filter(name=data["name"]).exists())
 
     def test_get_source_by_pk_returns_correct_source(self):
