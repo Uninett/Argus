@@ -104,7 +104,7 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
                 "active": self.notification_profile1.active,
             },
         )
-        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertTrue(NotificationProfile.objects.filter(pk=response.data.get("pk")))
 
     def test_created_notificaton_profile_has_correct_media(self):
@@ -118,13 +118,13 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
                 "active": self.notification_profile1.active,
             },
         )
-        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data["media"], self.media)
 
     def test_can_delete_notification_profile(self):
         profile_pk = self.notification_profile1.pk
         response = self.user1_rest_client.delete(f"/api/v1/notificationprofiles/{profile_pk}/")
-        self.assertEqual(response.status_code, 204)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(NotificationProfile.objects.filter(pk=profile_pk).exists())
 
     def test_get_all_timeslots(self):
@@ -142,7 +142,7 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
                 "time_recurrences": [{"days": [1, 2, 3], "start": "10:00:00", "end": "20:00:00"}],
             },
         )
-        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertTrue(Timeslot.objects.filter(user=self.user1, name="test-timeslot").exists())
 
     def test_can_not_create_new_timeslot_with_end_time_before_start_time(self):
@@ -153,7 +153,7 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
                 "time_recurrences": [{"days": [1, 2, 3], "start": "20:00:00", "end": "10:00:00"}],
             },
         )
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertFalse(Timeslot.objects.filter(user=self.user1, name="test-timeslot").exists())
 
     def test_get_timeslot_by_pk(self):
@@ -168,7 +168,7 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
             f"/api/v1/notificationprofiles/timeslots/{timeslot_pk}/",
             {"name": new_name, "time_recurrences": [{"days": [1, 2, 3], "start": "10:00:00", "end": "20:00:00"}]},
         )
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(Timeslot.objects.filter(pk=timeslot_pk).first().name, new_name)
 
     def test_can_not_update_timeslot_end_time_to_before_start_time(self):
@@ -180,12 +180,12 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
                 "time_recurrences": [{"days": [1, 2, 3], "start": "20:00:00", "end": "10:00:00"}],
             },
         )
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_can_delete_timeslot(self):
         timeslot_pk = self.timeslot1.pk
         response = self.user1_rest_client.delete(f"/api/v1/notificationprofiles/timeslots/{timeslot_pk}/")
-        self.assertEqual(response.status_code, 204)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(Timeslot.objects.filter(pk=timeslot_pk).exists())
 
     def test_get_all_filters(self):
@@ -201,7 +201,7 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
                 "filter_string": f'{{"sourceSystemIds": [{self.source1.pk}], "tags": ["key1=value"]}}',
             },
         )
-        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertTrue(Filter.objects.filter(user=self.user1, name="test-filter").exists())
 
     def test_get_filter_by_pk(self):
@@ -219,19 +219,19 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
                 "filter_string": f'{{"sourceSystemIds": [{self.source1.pk}], "tags": ["key1=value"]}}',
             },
         )
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(Filter.objects.filter(pk=filter_pk).first().name, new_name)
 
     def test_can_delete_unused_filter(self):
         filter_pk = self.filter2.pk
         response = self.user1_rest_client.delete(f"/api/v1/notificationprofiles/filters/{filter_pk}/")
-        self.assertEqual(response.status_code, 204)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(Filter.objects.filter(pk=filter_pk).exists())
 
     def test_can_not_delete_used_filter(self):
         filter_pk = self.filter1.pk
         response = self.user1_rest_client.delete(f"/api/v1/notificationprofiles/filters/{filter_pk}/")
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertTrue(Filter.objects.filter(pk=filter_pk).exists())
 
     def test_filterpreview_returns_correct_incidents(self):
