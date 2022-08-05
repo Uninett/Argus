@@ -132,7 +132,7 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
         default_timeslot = self.user1.timeslots.get(name="All the time")
         timeslot_pks = set([default_timeslot.pk, self.timeslot1.pk, self.timeslot2.pk])
         response_pks = set([timeslot["pk"] for timeslot in response.data])
-        self.assertEqual(timeslot_pks, response_pks)
+        self.assertEqual(response_pks, timeslot_pks)
 
     def test_can_create_new_timeslot_with_correct_values(self):
         response = self.user1_rest_client.post(
