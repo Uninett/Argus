@@ -129,7 +129,7 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
 
     def test_get_all_timeslots(self):
         response = self.user1_rest_client.get("/api/v1/notificationprofiles/timeslots/")
-        default_timeslot = self.user1.timeslots.filter(name="All the time").first()
+        default_timeslot = self.user1.timeslots.get(name="All the time")
         timeslot_pks = set([default_timeslot.pk, self.timeslot1.pk, self.timeslot2.pk])
         response_pks = set([timeslot["pk"] for timeslot in response.data])
         self.assertEqual(timeslot_pks, response_pks)
@@ -169,7 +169,7 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
             {"name": new_name, "time_recurrences": [{"days": [1, 2, 3], "start": "10:00:00", "end": "20:00:00"}]},
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(Timeslot.objects.filter(pk=timeslot_pk).first().name, new_name)
+        self.assertEqual(Timeslot.objects.get(pk=timeslot_pk).name, new_name)
 
     def test_can_not_update_timeslot_end_time_to_before_start_time(self):
         timeslot_pk = self.timeslot1.pk
@@ -220,7 +220,7 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
             },
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(Filter.objects.filter(pk=filter_pk).first().name, new_name)
+        self.assertEqual(Filter.objects.get(pk=filter_pk).name, new_name)
 
     def test_can_delete_unused_filter(self):
         filter_pk = self.filter2.pk
