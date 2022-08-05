@@ -36,18 +36,8 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
         self.notification_profile1 = NotificationProfileFactory(user=self.user1, timeslot=self.timeslot1)
         self.notification_profile1.filters.add(filter1)
         self.notification_profile1.destinations.set(self.user1.destinations.all())
-        self.media = []
-        self.phone_number = None
-        if self.notification_profile1.destinations.filter(media_id="email").exists():
-            self.media.append("EM")
-        if self.notification_profile1.destinations.filter(media_id="sms").exists():
-            self.media.append("SM")
-            self.phone_number = (
-                self.notification_profile1.destinations.filter(media_id="sms")
-                .order_by("pk")
-                .first()
-                .settings["phone_number"]
-            )
+        self.media = ["EM", "SM"]
+        self.phone_number = "+4747474700"
 
     def teardown(self):
         connect_signals()
