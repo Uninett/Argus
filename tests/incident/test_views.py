@@ -58,7 +58,7 @@ class IncidentViewSetV1TestCase(APITestCase):
             "tags": [{"tag": "a=b"}],
         }
         response = self.client.post("/api/v1/incidents/", data, format="json")
-        self.assertEqual(response.status_code, 201)  # Created
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         return response.data["pk"]
 
     def add_open_incident(self, description="open_incident"):
@@ -73,7 +73,7 @@ class IncidentViewSetV1TestCase(APITestCase):
     def test_no_incidents_returns_empty_list(self):
         response = self.client.get("/api/v1/incidents/")
         self.assertFalse(Incident.objects.exists())
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         # Paging, so check "results"
         self.assertEqual(response.data["results"], [])
 
@@ -90,7 +90,7 @@ class IncidentViewSetV1TestCase(APITestCase):
             "tags": [{"tag": "a=b"}],
         }
         response = self.client.post("/api/v1/incidents/", data, format="json")
-        self.assertEqual(response.status_code, 201)  # Created
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         # Check that we have made the correct Incident
         self.assertEqual(response.data["description"], data["description"])
         self.assertTrue(Incident.objects.exists())
@@ -204,13 +204,13 @@ class IncidentViewSetTestCase(APITestCase):
             "tags": [{"tag": "a=b"}],
         }
         response = self.client.post("/api/v2/incidents/", data, format="json")
-        self.assertEqual(response.status_code, 201)  # Created
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         return response.data["pk"]
 
     def add_event(self, incident_pk, description="event"):
         event_data = {"timestamp": "2021-08-04T09:14:55.908Z", "type": "OTH", "description": description}
         response = self.client.post(f"/api/v2/incidents/{incident_pk}/events/", event_data, format="json")
-        self.assertEqual(response.status_code, 201)  # Created
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_incident_search_existing_incident_description(self):
         pk = self.add_incident("incident1")
