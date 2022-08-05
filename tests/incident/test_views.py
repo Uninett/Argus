@@ -5,7 +5,12 @@ from rest_framework import serializers, status, versioning
 from rest_framework.test import APITestCase
 
 from argus.auth.factories import SourceUserFactory
-from argus.incident.factories import SourceSystemTypeFactory, SourceSystemFactory, StatefulIncidentFactory
+from argus.incident.factories import (
+    SourceSystemTypeFactory,
+    SourceSystemFactory,
+    StatefulIncidentFactory,
+    StatelessIncidentFactory,
+)
 from argus.incident.models import Event, Incident, Tag
 from argus.incident.views import EventViewSet
 from argus.util.testing import disconnect_signals, connect_signals
@@ -49,26 +54,14 @@ class IncidentViewSetV1TestCase(APITestCase):
     def tearDownClass(cls):
         connect_signals()
 
-    def add_incident(self, description, end_time):
-        data = {
-            "start_time": "2022-05-24T13:07:29.254Z",
-            "end_time": end_time,
-            "description": description,
-            "level": 1,
-            "tags": [{"tag": "a=b"}],
-        }
-        response = self.client.post("/api/v1/incidents/", data, format="json")
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        return response.data["pk"]
-
     def add_open_incident(self, description="open_incident"):
-        return self.add_incident(description=description, end_time=INFINITY_REPR)
+        return StatefulIncidentFactory(description=description).pk
 
     def add_closed_incident(self, description="closed_incident"):
-        return self.add_incident(description=description, end_time="2022-05-24T13:07:29.254Z")
+        return StatefulIncidentFactory(description=description, end_time="2022-05-24T13:07:29.254Z").pk
 
     def add_stateless_incident(self, description="stateless_incident"):
-        return self.add_incident(description=description, end_time=None)
+        return StatelessIncidentFactory(description=description).pk
 
     def test_no_incidents_returns_empty_list(self):
         response = self.client.get("/api/v1/incidents/")
