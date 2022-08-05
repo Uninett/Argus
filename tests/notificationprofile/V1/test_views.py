@@ -68,6 +68,7 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
     def test_notification_profile_can_update_timeslot_without_changing_pk(self):
         profile1_pk = self.notification_profile1.pk
         profile1_path = f"/api/v1/notificationprofiles/{profile1_pk}/"
+
         response = self.user1_rest_client.put(
             profile1_path,
             {
