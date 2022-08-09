@@ -33,7 +33,7 @@ def set_time(timestamp: datetime, new_time: str):
 
 
 @tag("unittest")
-class FilterWrapperTristatesTests(unittest.TestCase):
+class FilterWrapperTristatesEmptyTests(unittest.TestCase):
     # Validation is handled before the data gets to FilterWrapper
     # A tristate must be one of True, False, None
     # "None" is equivalent to the tristate not being mentioned in the filter at all
@@ -70,6 +70,13 @@ class FilterWrapperTristatesTests(unittest.TestCase):
         filter2 = FilterWrapper({"open": True})
         result = filter2.are_tristates_empty()
         self.assertFalse(result)
+
+
+@tag("unittest")
+class FilterWrapperIncidentFitsTristatesTests(unittest.TestCase):
+    # Validation is handled before the data gets to FilterWrapper
+    # A tristate must be one of True, False, None
+    # "None" is equivalent to the tristate not being mentioned in the filter at all
 
     def test_incident_fits_tristates_no_tristates_set(self):
         incident = Mock()
@@ -120,7 +127,7 @@ class FilterWrapperTristatesTests(unittest.TestCase):
 
 
 @tag("unittest")
-class FilterWrapperMaxlevelTests(unittest.TestCase):
+class FilterWrapperMaxlevelEmptyTests(unittest.TestCase):
     # Validation is handled before the data gets to FilterWrapper
     # A maxlevel must be one of the integers in Incident.LEVELS if it is set at all.
 
@@ -133,6 +140,12 @@ class FilterWrapperMaxlevelTests(unittest.TestCase):
         empty_filter = FilterWrapper({"maxlevel": "whatever"})
         result = empty_filter.is_maxlevel_empty()
         self.assertFalse(result)
+
+
+@tag("unittest")
+class FilterWrapperIncidentFitsMaxlevelTests(unittest.TestCase):
+    # Validation is handled before the data gets to FilterWrapper
+    # A maxlevel must be one of the integers in Incident.LEVELS if it is set at all.
 
     def test_incident_fits_maxlevel_no_maxlevel_set(self):
         incident = Mock()
