@@ -163,6 +163,15 @@ class FilterWrapperIncidentFitsMaxlevelTests(unittest.TestCase):
         self.assertEqual(result, level <= maxlevel)
 
 
+@tag("unittest")
+class HelperTimeFunctionsTests(TestCase):
+    def test_set_time_works(self):
+        self.assertEqual(parse_datetime("2000-01-01 10:00"), set_time(parse_datetime("2000-01-01 00:00"), "10:00"))
+
+    def test_make_aware_function_works(self):
+        self.assertEqual(make_aware(parse_datetime("2019-11-25 00:00")).strftime("%A"), "Monday")
+
+
 @tag("database")
 class TimeRecurrenceTests(TestCase, IncidentAPITestCaseHelper):
     def setUp(self):
@@ -185,9 +194,6 @@ class TimeRecurrenceTests(TestCase, IncidentAPITestCaseHelper):
         connect_signals()
 
     def test_time_recurrence(self):
-        # Test set_time() helper function
-        self.assertEqual(parse_datetime("2000-01-01 10:00"), set_time(parse_datetime("2000-01-01 00:00"), "10:00"))
-        self.assertEqual(self.monday_datetime.strftime("%A"), "Monday")
         self.assertFalse(self.recurrence1.timestamp_is_within(set_time(self.monday_datetime, "00:29:01")))
         self.assertTrue(self.recurrence1.timestamp_is_within(set_time(self.monday_datetime, "00:30:00")))
         self.assertTrue(self.recurrence1.timestamp_is_within(set_time(self.monday_datetime, "00:30:01")))
