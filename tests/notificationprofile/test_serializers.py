@@ -409,7 +409,7 @@ class SMSDestinationConfigSerializerTests(TestCase):
         validated_data = {
             "media_id": "sms",
             "settings": {
-                "phone_number": "+4747474747",
+                "phone_number": "+4711111111",
             },
             "user": self.user,
         }
@@ -417,7 +417,7 @@ class SMSDestinationConfigSerializerTests(TestCase):
             context={"request": request},
         )
         obj = serializer.update(destination, validated_data)
-        self.assertEqual(obj.settings["phone_number"], "+4747474747")
+        self.assertEqual(obj.settings["phone_number"], "+4711111111")
 
     def test_sms_destination_serializer_is_invalid_with_different_medium(self):
         request = self.request_factory.post("/")
