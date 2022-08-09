@@ -261,6 +261,35 @@ class EmailDestinationConfigSerializerTests(TestCase):
         obj = serializer.update(destination, validated_data)
         self.assertEqual(obj.settings["email_address"], "new.email@example.com")
 
+    def test_email_destination_serializer_is_invalid_with_different_medium(self):
+        request = self.request_factory.post("/")
+        request.user = self.user
+        data = {
+            "media": "email",
+            "settings": {
+                "email_address": "user@example.com",
+            },
+        }
+        serializer = RequestDestinationConfigSerializer(
+            data=data,
+            context={"request": request},
+        )
+        serializer.is_valid()
+        destination = serializer.save(user=self.user)
+        data = {
+            "media": "sms",
+            "settings": {
+                "phone_number": "+4747474747",
+            },
+        }
+        second_serializer = RequestDestinationConfigSerializer(
+            instance=destination,
+            data=data,
+            context={"request": request},
+        )
+        self.assertFalse(second_serializer.is_valid())
+        self.assertTrue(second_serializer.errors)
+
 
 class SMSDestinationConfigSerializerTests(TestCase):
     def setUp(self):
@@ -389,3 +418,32 @@ class SMSDestinationConfigSerializerTests(TestCase):
         )
         obj = serializer.update(destination, validated_data)
         self.assertEqual(obj.settings["phone_number"], "+4747474747")
+
+    def test_sms_destination_serializer_is_invalid_with_different_medium(self):
+        request = self.request_factory.post("/")
+        request.user = self.user
+        data = {
+            "media": "sms",
+            "settings": {
+                "phone_number": "+4747474747",
+            },
+        }
+        serializer = RequestDestinationConfigSerializer(
+            data=data,
+            context={"request": request},
+        )
+        serializer.is_valid()
+        destination = serializer.save(user=self.user)
+        data = {
+            "media": "email",
+            "settings": {
+                "email_address": "user@example.com",
+            },
+        }
+        second_serializer = RequestDestinationConfigSerializer(
+            instance=destination,
+            data=data,
+            context={"request": request},
+        )
+        self.assertFalse(second_serializer.is_valid())
+        self.assertTrue(second_serializer.errors)
