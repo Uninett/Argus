@@ -2,7 +2,7 @@ from collections import OrderedDict
 import datetime
 
 from django.db import IntegrityError
-from django.test import TestCase
+from django.test import tag, TestCase
 
 from rest_framework.test import APIRequestFactory
 
@@ -13,6 +13,7 @@ from argus.notificationprofile.models import Timeslot
 from argus.notificationprofile.serializers import RequestDestinationConfigSerializer, TimeslotSerializer
 
 
+@tag("integration")
 class TimeslotSerializerTests(TestCase):
     def setUp(self):
         self.user = PersonUserFactory()
@@ -130,6 +131,7 @@ class TimeslotSerializerTests(TestCase):
             obj = serializer.update(timeslot, validated_data)
 
 
+@tag("integration")
 class EmailDestinationConfigSerializerTests(TestCase):
     def setUp(self):
         self.user = PersonUserFactory()
@@ -291,6 +293,7 @@ class EmailDestinationConfigSerializerTests(TestCase):
         self.assertTrue(second_serializer.errors)
 
 
+@tag("integration")
 class SMSDestinationConfigSerializerTests(TestCase):
     def setUp(self):
         self.user = PersonUserFactory()
