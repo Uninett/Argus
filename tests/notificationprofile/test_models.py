@@ -193,10 +193,14 @@ class TimeRecurrenceTests(TestCase, IncidentAPITestCaseHelper):
     def teardown(self):
         connect_signals()
 
-    def test_time_recurrence(self):
+    def test_timestamp_is_within_false_if_before_recurrence(self):
         self.assertFalse(self.recurrence1.timestamp_is_within(set_time(self.monday_datetime, "00:29:01")))
+
+    def test_timestamp_is_within_true_if_within_recurrence(self):
         self.assertTrue(self.recurrence1.timestamp_is_within(set_time(self.monday_datetime, "00:30:00")))
         self.assertTrue(self.recurrence1.timestamp_is_within(set_time(self.monday_datetime, "00:30:01")))
+
+    def test_timestamp_is_within_false_if_after_recurrence(self):
         self.assertFalse(self.recurrence1.timestamp_is_within(set_time(self.monday_datetime, "00:30:02")))
 
 
@@ -233,12 +237,14 @@ class TimeslotTests(TestCase, IncidentAPITestCaseHelper):
     def teardown(self):
         connect_signals()
 
-    def test_timeslot(self):
+    def test_timestamp_is_within_recurrences_true_if_within_recurrences(self):
         self.assertTrue(self.timeslot1.timestamp_is_within_time_recurrences(set_time(self.monday_datetime, "00:30:01")))
+        self.assertTrue(self.timeslot1.timestamp_is_within_time_recurrences(set_time(self.monday_datetime, "00:30:03")))
+
+    def test_timestamp_is_within_recurrences_false_if_not_within_recurrences(self):
         self.assertFalse(
             self.timeslot1.timestamp_is_within_time_recurrences(set_time(self.monday_datetime, "00:30:02"))
         )
-        self.assertTrue(self.timeslot1.timestamp_is_within_time_recurrences(set_time(self.monday_datetime, "00:30:03")))
 
 
 @tag("database")
@@ -307,29 +313,37 @@ class FilterTests(TestCase, IncidentAPITestCaseHelper):
     def teardown(self):
         connect_signals()
 
-    def test_source_fits(self):
-        self.assertFalse(self.filter_no_source.source_system_fits(self.incident1))
+    def test_source_fits_true_if_incident_fits_source(self):
         self.assertTrue(self.filter_source1.source_system_fits(self.incident1))
+
+    def test_source_fits_false_if_incident_does_not_fit_source(self):
+        self.assertFalse(self.filter_no_source.source_system_fits(self.incident1))
         self.assertFalse(self.filter_source2.source_system_fits(self.incident1))
 
-    def test_tags_fit(self):
-        self.assertFalse(self.filter_no_tags.tags_fit(self.incident1))
+    def test_tags_fit_true_if_incident_fits_tags(self):
         self.assertTrue(self.filter_tags1.tags_fit(self.incident1))
+
+    def test_source_fits_false_if_incident_does_not_fit_tags(self):
+        self.assertFalse(self.filter_no_tags.tags_fit(self.incident1))
         self.assertFalse(self.filter_tags2.tags_fit(self.incident1))
 
-    def test_incident_fits(self):
-        self.assertFalse(self.filter_no_source_no_tags.incident_fits(self.incident1))
+    def test_tags_fit_true_if_incident_fits_source_and_tags(self):
         self.assertTrue(self.filter_source1_tags1.incident_fits(self.incident1))
+
+    def test_tags_fit_false_if_incident_does_not_fit_source_and_tags(self):
+        self.assertFalse(self.filter_no_source_no_tags.incident_fits(self.incident1))
         self.assertFalse(self.filter_source1_tags1.incident_fits(self.incident2))
 
-    def test_filtered_incidents(self):
+    def test_filtered_incidents_returns_empty_if_no_incident_fits_filter(self):
         self.assertEqual(set(self.filter_no_source.filtered_incidents), set())
+        self.assertEqual(set(self.filter_no_tags.filtered_incidents), set())
+        self.assertEqual(set(self.filter_no_source_no_tags.filtered_incidents), set())
+
+    def test_filtered_incidents_returns_incident_if_incident_fits_filter(self):
         self.assertEqual(set(self.filter_source1.filtered_incidents), {self.incident1})
         self.assertEqual(set(self.filter_source2.filtered_incidents), {self.incident2})
 
-        self.assertEqual(set(self.filter_no_tags.filtered_incidents), set())
         self.assertEqual(set(self.filter_tags1.filtered_incidents), {self.incident1})
         self.assertEqual(set(self.filter_tags2.filtered_incidents), {self.incident2})
 
-        self.assertEqual(set(self.filter_no_source_no_tags.filtered_incidents), set())
         self.assertEqual(set(self.filter_source1_tags1.filtered_incidents), {self.incident1})
