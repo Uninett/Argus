@@ -17,6 +17,7 @@ class SignalTests(APITestCase):
         connect_signals()
 
     def test_default_email_destination_should_be_created_if_user_has_email(self):
+        # PersonUserFactory creates user with email address
         default_destination = self.user1.destinations.first()
         self.assertTrue(default_destination)
         self.assertTrue(default_destination.settings["synced"])
