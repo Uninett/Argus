@@ -244,7 +244,10 @@ class EmailDestinationConfigSerializerTests(TestCase):
         destination = DestinationConfigFactory(
             user=self.user,
             media_id="email",
-            settings={"email_address": "user@example.com", "synced": False},
+            settings={
+                "email_address": "user@example.com",
+                "synced": False,
+            },
         )
 
         request = self.request_factory.post("/")
