@@ -164,13 +164,47 @@ class FilterWrapperIncidentFitsMaxlevelTests(unittest.TestCase):
 
 
 @tag("database")
-class ModelTests(TestCase, IncidentAPITestCaseHelper):
+class TimeRecurrenceTests(TestCase, IncidentAPITestCaseHelper):
     def setUp(self):
         disconnect_signals()
         super().init_test_objects()
         self.monday_datetime = make_aware(parse_datetime("2019-11-25 00:00"))
 
-        self.timeslot1 = TimeslotFactory(user=self.user1, name="Test")
+        self.timeslot1 = TimeslotFactory(
+            user=self.user1,
+            name="Test",
+        )
+        self.recurrence1 = TimeRecurrenceFactory(
+            timeslot=self.timeslot1,
+            days={TimeRecurrence.Day.MONDAY},
+            start=parse_time("00:30:00"),
+            end=parse_time("00:30:01"),
+        )
+
+    def teardown(self):
+        connect_signals()
+
+    def test_time_recurrence(self):
+        # Test set_time() helper function
+        self.assertEqual(parse_datetime("2000-01-01 10:00"), set_time(parse_datetime("2000-01-01 00:00"), "10:00"))
+        self.assertEqual(self.monday_datetime.strftime("%A"), "Monday")
+        self.assertFalse(self.recurrence1.timestamp_is_within(set_time(self.monday_datetime, "00:29:01")))
+        self.assertTrue(self.recurrence1.timestamp_is_within(set_time(self.monday_datetime, "00:30:00")))
+        self.assertTrue(self.recurrence1.timestamp_is_within(set_time(self.monday_datetime, "00:30:01")))
+        self.assertFalse(self.recurrence1.timestamp_is_within(set_time(self.monday_datetime, "00:30:02")))
+
+
+@tag("database")
+class TimeslotTests(TestCase, IncidentAPITestCaseHelper):
+    def setUp(self):
+        disconnect_signals()
+        super().init_test_objects()
+        self.monday_datetime = make_aware(parse_datetime("2019-11-25 00:00"))
+
+        self.timeslot1 = TimeslotFactory(
+            user=self.user1,
+            name="Test",
+        )
         self.recurrence1 = TimeRecurrenceFactory(
             timeslot=self.timeslot1,
             days={TimeRecurrence.Day.MONDAY},
@@ -193,21 +227,46 @@ class ModelTests(TestCase, IncidentAPITestCaseHelper):
     def teardown(self):
         connect_signals()
 
-    def test_time_recurrence(self):
-        # Test set_time() helper function
-        self.assertEqual(parse_datetime("2000-01-01 10:00"), set_time(parse_datetime("2000-01-01 00:00"), "10:00"))
-        self.assertEqual(self.monday_datetime.strftime("%A"), "Monday")
-        self.assertFalse(self.recurrence1.timestamp_is_within(set_time(self.monday_datetime, "00:29:01")))
-        self.assertTrue(self.recurrence1.timestamp_is_within(set_time(self.monday_datetime, "00:30:00")))
-        self.assertTrue(self.recurrence1.timestamp_is_within(set_time(self.monday_datetime, "00:30:01")))
-        self.assertFalse(self.recurrence1.timestamp_is_within(set_time(self.monday_datetime, "00:30:02")))
-
     def test_timeslot(self):
         self.assertTrue(self.timeslot1.timestamp_is_within_time_recurrences(set_time(self.monday_datetime, "00:30:01")))
         self.assertFalse(
             self.timeslot1.timestamp_is_within_time_recurrences(set_time(self.monday_datetime, "00:30:02"))
         )
         self.assertTrue(self.timeslot1.timestamp_is_within_time_recurrences(set_time(self.monday_datetime, "00:30:03")))
+
+
+@tag("database")
+class FilterTests(TestCase, IncidentAPITestCaseHelper):
+    def setUp(self):
+        disconnect_signals()
+        super().init_test_objects()
+        self.monday_datetime = make_aware(parse_datetime("2019-11-25 00:00"))
+
+        self.timeslot1 = TimeslotFactory(
+            user=self.user1,
+            name="Test",
+        )
+        self.recurrence1 = TimeRecurrenceFactory(
+            timeslot=self.timeslot1,
+            days={TimeRecurrence.Day.MONDAY},
+            start=parse_time("00:30:00"),
+            end=parse_time("00:30:01"),
+        )
+        self.recurrence2 = TimeRecurrenceFactory(
+            timeslot=self.timeslot1,
+            days={TimeRecurrence.Day.MONDAY},
+            start=parse_time("00:30:03"),
+            end=parse_time("00:31"),
+        )
+        self.recurrence_all_day = TimeRecurrenceFactory(
+            timeslot=self.timeslot1,
+            days={TimeRecurrence.Day.TUESDAY},
+            start=TimeRecurrence.DAY_START,
+            end=TimeRecurrence.DAY_END,
+        )
+
+    def teardown(self):
+        connect_signals()
 
     def test_source_fits(self):
         filter0 = FilterFactory(
@@ -231,9 +290,21 @@ class ModelTests(TestCase, IncidentAPITestCaseHelper):
         self.assertFalse(filter2.source_system_fits(self.incident1))
 
     def test_tags_fit(self):
-        filter0 = FilterFactory(user=self.user1, name="Filter no tags", filter_string='{"tags": []}')
-        filter1 = FilterFactory(user=self.user1, name="Filter1", filter_string=f'{{"tags": ["{self.tag1}"]}}')
-        filter2 = FilterFactory(user=self.user1, name="Filter2", filter_string=f'{{"tags": ["{self.tag2}"]}}')
+        filter0 = FilterFactory(
+            user=self.user1,
+            name="Filter no tags",
+            filter_string='{"tags": []}',
+        )
+        filter1 = FilterFactory(
+            user=self.user1,
+            name="Filter1",
+            filter_string=f'{{"tags": ["{self.tag1}"]}}',
+        )
+        filter2 = FilterFactory(
+            user=self.user1,
+            name="Filter2",
+            filter_string=f'{{"tags": ["{self.tag2}"]}}',
+        )
 
         self.assertEqual(filter0.tags_fit(self.incident1), None)
         self.assertTrue(filter1.tags_fit(self.incident1))
@@ -253,7 +324,11 @@ class ModelTests(TestCase, IncidentAPITestCaseHelper):
         )
         self.assertTrue(filter1.incident_fits(self.incident1))
         self.assertFalse(filter1.incident_fits(self.incident2))
-        filter3 = FilterFactory(user=self.user1, name="Filter3", filter_string=f'{{"tags": ["{self.tag1}"]}}')
+        filter3 = FilterFactory(
+            user=self.user1,
+            name="Filter3",
+            filter_string=f'{{"tags": ["{self.tag1}"]}}',
+        )
         self.assertTrue(filter3.incident_fits(self.incident1))
         self.assertFalse(filter3.incident_fits(self.incident2))
         filter4 = FilterFactory(
