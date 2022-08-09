@@ -20,7 +20,7 @@ class TimeslotSerializerTests(TestCase):
         self.default_timeslot = Timeslot.objects.get(user=self.user)
         self.request_factory = APIRequestFactory()
 
-    def test_validate_new_timeslot(self):
+    def test_timeslot_serializer_is_valid_with_correct_input(self):
         request = self.request_factory.post("/")
         request.user = self.user
         data = {
@@ -39,7 +39,7 @@ class TimeslotSerializerTests(TestCase):
         )
         self.assertTrue(serializer.is_valid(), serializer.errors)
 
-    def test_validate_new_timeslot_with_duplicate_name(self):
+    def test_timeslot_serializer_is_invalid_with_duplicate_name(self):
         request = self.request_factory.post("/")
         request.user = self.user
         data = {
@@ -59,7 +59,7 @@ class TimeslotSerializerTests(TestCase):
         self.assertFalse(serializer.is_valid())
         self.assertTrue(serializer.errors)
 
-    def test_create_new_timeslot(self):
+    def test_can_create_timeslot(self):
         request = self.request_factory.post("/")
         request.user = self.user
         validated_data = {
@@ -75,7 +75,7 @@ class TimeslotSerializerTests(TestCase):
         obj = serializer.create(validated_data)
         self.assertEqual(obj.name, "vfrgthj")
 
-    def test_create_new_timeslot_with_duplicate_name(self):
+    def test_cannot_create_timeslot_with_duplicate_name(self):
         request = self.request_factory.post("/")
         request.user = self.user
         # Reuse the name of the default timeslot
@@ -93,7 +93,7 @@ class TimeslotSerializerTests(TestCase):
         with self.assertRaises(IntegrityError):
             obj = serializer.create(validated_data)
 
-    def test_update_existing_timeslot(self):
+    def test_can_update_timeslot(self):
         timeslot = TimeslotFactory(name="existing name", user=self.user)
         request = self.request_factory.post("/")
         request.user = self.user
@@ -110,7 +110,7 @@ class TimeslotSerializerTests(TestCase):
         obj = serializer.update(timeslot, validated_data)
         self.assertEqual(obj.name, "new name")
 
-    def test_update_existing_timeslot_with_duplicate_name(self):
+    def test_cannot_update_timeslot_with_duplicate_name(self):
         timeslot = TimeslotFactory(name="existing name", user=self.user)
         request = self.request_factory.post("/")
         request.user = self.user
@@ -130,12 +130,12 @@ class TimeslotSerializerTests(TestCase):
             obj = serializer.update(timeslot, validated_data)
 
 
-class DestinationConfigSerializerTests(TestCase):
+class EmailDestinationConfigSerializerTests(TestCase):
     def setUp(self):
         self.user = PersonUserFactory()
         self.request_factory = APIRequestFactory()
 
-    def test_validate_new_email_destination(self):
+    def test_email_destination_serializer_is_valid_with_correct_input(self):
         request = self.request_factory.post("/")
         request.user = self.user
         data = {
@@ -150,7 +150,7 @@ class DestinationConfigSerializerTests(TestCase):
         )
         self.assertTrue(serializer.is_valid(), serializer.errors)
 
-    def test_validate_new_email_destination_with_empty_settings(self):
+    def test_email_destination_serializer_is_invalid_with_empty_settings(self):
         request = self.request_factory.post("/")
         request.user = self.user
         data = {
@@ -164,7 +164,7 @@ class DestinationConfigSerializerTests(TestCase):
         self.assertFalse(serializer.is_valid())
         self.assertTrue(serializer.errors)
 
-    def test_validate_new_email_destination_with_invalid_settings(self):
+    def test_email_destination_serializer_is_invalid_with_missing_key(self):
         request = self.request_factory.post("/")
         request.user = self.user
         data = {
@@ -178,7 +178,7 @@ class DestinationConfigSerializerTests(TestCase):
         self.assertFalse(serializer.is_valid())
         self.assertTrue(serializer.errors)
 
-    def test_validate_new_email_destination_with_invalid_email_address(self):
+    def test_email_destination_serializer_is_invalid_with_invalid_email_address(self):
         request = self.request_factory.post("/")
         request.user = self.user
         data = {
@@ -192,7 +192,7 @@ class DestinationConfigSerializerTests(TestCase):
         self.assertFalse(serializer.is_valid())
         self.assertTrue(serializer.errors)
 
-    def test_validate_new_email_destination_with_additional_settings(self):
+    def test_email_destination_serializer_is_valid_with_additional_arguments(self):
         request = self.request_factory.post("/")
         request.user = self.user
         data = {
@@ -215,7 +215,7 @@ class DestinationConfigSerializerTests(TestCase):
             },
         )
 
-    def test_create_new_email_destination(self):
+    def test_can_create_email_destination(self):
         request = self.request_factory.post("/")
         request.user = self.user
         validated_data = {
@@ -238,7 +238,7 @@ class DestinationConfigSerializerTests(TestCase):
             },
         )
 
-    def test_update_existing_email_destination(self):
+    def test_can_update_email_destination(self):
         destination = DestinationConfigFactory(
             user=self.user,
             media_id="email",
@@ -261,7 +261,13 @@ class DestinationConfigSerializerTests(TestCase):
         obj = serializer.update(destination, validated_data)
         self.assertEqual(obj.settings["email_address"], "new.email@example.com")
 
-    def test_validate_new_sms_destination(self):
+
+class SMSDestinationConfigSerializerTests(TestCase):
+    def setUp(self):
+        self.user = PersonUserFactory()
+        self.request_factory = APIRequestFactory()
+
+    def test_sms_destination_serializer_is_valid_with_correct_input(self):
         request = self.request_factory.post("/")
         request.user = self.user
         data = {
@@ -276,7 +282,7 @@ class DestinationConfigSerializerTests(TestCase):
         )
         self.assertTrue(serializer.is_valid(), serializer.errors)
 
-    def test_validate_new_sms_destination_with_empty_settings(self):
+    def test_sms_destination_serializer_is_invalid_with_empty_settings(self):
         request = self.request_factory.post("/")
         request.user = self.user
         data = {
@@ -290,7 +296,7 @@ class DestinationConfigSerializerTests(TestCase):
         self.assertFalse(serializer.is_valid())
         self.assertTrue(serializer.errors)
 
-    def test_validate_new_sms_destination_with_invalid_settings(self):
+    def test_sms_destination_serializer_is_invalid_with_missing_key(self):
         request = self.request_factory.post("/")
         request.user = self.user
         data = {
@@ -304,7 +310,7 @@ class DestinationConfigSerializerTests(TestCase):
         self.assertFalse(serializer.is_valid())
         self.assertTrue(serializer.errors)
 
-    def test_validate_new_sms_destination_with_invalid_phone_number(self):
+    def test_email_destination_serializer_is_invalid_with_invalid_phone_number(self):
         request = self.request_factory.post("/")
         request.user = self.user
         data = {
@@ -318,7 +324,7 @@ class DestinationConfigSerializerTests(TestCase):
         self.assertFalse(serializer.is_valid())
         self.assertTrue(serializer.errors)
 
-    def test_validate_new_sms_destination_with_additional_settings(self):
+    def test_email_destination_serializer_is_valid_with_additional_arguments(self):
         request = self.request_factory.post("/")
         request.user = self.user
         data = {
@@ -340,7 +346,7 @@ class DestinationConfigSerializerTests(TestCase):
             },
         )
 
-    def test_create_new_sms_destination(self):
+    def test_can_create_sms_destination(self):
         request = self.request_factory.post("/")
         request.user = self.user
         validated_data = {
@@ -361,7 +367,8 @@ class DestinationConfigSerializerTests(TestCase):
             },
         )
 
-    def test_update_existing_sms_destination(self):
+    def test_can_update_sms_destination(self):
+
         destination = DestinationConfigFactory(
             user=self.user,
             media_id="sms",
