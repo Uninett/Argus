@@ -301,3 +301,9 @@ SOCIAL_AUTH_NEW_USER_REDIRECT_URL = SOCIAL_AUTH_LOGIN_REDIRECT_URL
 #
 # SOCIAL_AUTH_DATAPORTEN_FEIDE_KEY = SOCIAL_AUTH_DATAPORTEN_KEY
 # SOCIAL_AUTH_DATAPORTEN_FEIDE_SECRET = SOCIAL_AUTH_DATAPORTEN_SECRET
+
+# Link to the desired repository, in which issues should be created
+ISSUE_ENDPOINT = ""
+# Path to issue plugin
+# Gitlab plugin: "argus.incident.issue.gitlab.GitlabPlugin"
+ISSUE_PLUGIN = ""

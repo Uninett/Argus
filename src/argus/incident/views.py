@@ -17,6 +17,7 @@ from rest_framework.reverse import reverse
 
 from argus.auth.models import User
 from argus.drf.permissions import IsSuperuserOrReadOnly
+from argus.incident.issue import ISSUE_CLASS
 from argus.util.datetime_utils import INFINITY_REPR
 
 from .forms import AddSourceSystemForm
@@ -239,6 +240,29 @@ class IncidentViewSet(
             return Response(serializer.data)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @extend_schema(responses={})
+    @action(detail=True, methods=["get"])
+    def issue(self, request, pk=None):
+        incident = get_object_or_404(self.queryset, pk=pk)
+        if not ISSUE_CLASS:
+            return Response(
+                data="No path to issue plugin can be found in the settings. Please update the setting 'ISSUE_PLUGIN'.",
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        try:
+            url = ISSUE_CLASS.generate_issue_url(incident)
+        except ValueError:
+            return Response(
+                data="No endpoint to issue system can be found in the settings. Please update the setting 'ISSUE_ENDPOINT'.",
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        if url:
+            return Response({"url": url})
+        return Response(
+            data="No url could be generated. Please check that the issue plugin provides a function to generate issue urls.",
+            status=status.HTTP_400_BAD_REQUEST,
+        )
 
 
 class IncidentTagViewSet(
