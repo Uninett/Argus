@@ -5,3 +5,5 @@ pre-commit
 ipython
 django-extensions
 Werkzeug  # for django-extensions:runserver_plus
+graphviz  # for django-extensions:graph_models
+pygraphviz  # for django-extensions:graph_models
