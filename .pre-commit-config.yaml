@@ -17,3 +17,12 @@ repos:
     hooks:
     -   id: black
         exclude: migrations/
+-   repo: local
+    hooks:
+    -   id: create-er-model
+        name: create_ER_model
+        entry: create_ER_model.sh
+        language: script
+        types: [python]
+        pass_filenames: false
+        always_run: true
