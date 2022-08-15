@@ -15,6 +15,7 @@ from argus.notificationprofile.factories import (
 from argus.notificationprofile.media import MEDIA_CLASSES_DICT
 from argus.notificationprofile.models import (
     DestinationConfig,
+    Media,
     NotificationProfile,
 )
 from argus.util.testing import disconnect_signals, connect_signals
@@ -40,17 +41,22 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
         )
         self.notification_profile1 = NotificationProfileFactory(user=self.user1, timeslot=self.timeslot1)
         self.notification_profile1.filters.add(filter1)
-        self.notification_profile1.destinations.set(self.user1.destinations.all())
+        # Default email destination is automatically created with user
+        self.synced_email_destination = self.user1.destinations.get()
+        self.non_synced_email_destination = DestinationConfigFactory(
+            user=self.user1,
+            media=Media.objects.get(slug="email"),
+            settings={"email_address": "test@example.com", "synced": False},
+        )
+        self.sms_destination = DestinationConfigFactory(
+            user=self.user1,
+            media=Media.objects.get(slug="sms"),
+            settings={"phone_number": "+4747474747"},
+        )
+        self.notification_profile1.destinations.set([self.synced_email_destination])
 
     def teardown(self):
         connect_signals()
-
-    def create_email_destination(self):
-        return DestinationConfigFactory(
-            user=self.user1,
-            media_id="email",
-            settings={"email_address": "test@example.com", "synced": False},
-        )
 
     def test_incidents_filtered_by_notification_profile_view(self):
         response = self.user1_rest_client.get(
@@ -89,12 +95,6 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
         if not "sms" in MEDIA_CLASSES_DICT.keys():
             self.skipTest("No sms plugin available")
 
-        self.sms_destination = DestinationConfigFactory(
-            user=self.user1,
-            media_id="sms",
-            settings={"phone_number": "+4747474747"},
-        )
-
         sms_destination_pk = self.sms_destination.pk
         sms_destination_path = reverse("v2:notification-profile:destinationconfig-detail", args=[sms_destination_pk])
 
@@ -106,9 +106,7 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
         self.assertEqual(self.user1_rest_client.get(sms_destination_path).status_code, status.HTTP_404_NOT_FOUND)
 
     def test_can_delete_unsynced_unconnected_email_destination(self):
-        self.email_destination = self.create_email_destination()
-
-        email_destination_pk = self.email_destination.pk
+        email_destination_pk = self.non_synced_email_destination.pk
         email_destination_path = reverse(
             "v2:notification-profile:destinationconfig-detail", args=[email_destination_pk]
         )
@@ -121,10 +119,8 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
         self.assertEqual(self.user1_rest_client.get(email_destination_path).status_code, status.HTTP_404_NOT_FOUND)
 
     def test_cannot_delete_synced_email_destination(self):
-        self.email_destination = self.user1.destinations.filter(media_id="email").filter(settings__synced=True).first()
-
         email_destination_path = reverse(
-            "v2:notification-profile:destinationconfig-detail", args=[self.email_destination.pk]
+            "v2:notification-profile:destinationconfig-detail", args=[self.synced_email_destination.pk]
         )
 
         self.assertEqual(self.user1_rest_client.get(email_destination_path).status_code, status.HTTP_200_OK)
@@ -134,10 +130,9 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
         self.assertEqual(self.user1_rest_client.get(email_destination_path).status_code, status.HTTP_200_OK)
 
     def test_cannot_delete_connected_email_destination(self):
-        self.email_destination = self.create_email_destination()
-        self.notification_profile1.destinations.add(self.email_destination)
+        self.notification_profile1.destinations.add(self.non_synced_email_destination)
 
-        email_destination_pk = self.email_destination.pk
+        email_destination_pk = self.non_synced_email_destination.pk
         email_destination_path = reverse(
             "v2:notification-profile:destinationconfig-detail", args=[email_destination_pk]
         )
