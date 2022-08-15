@@ -29,9 +29,6 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
         disconnect_signals()
         super().init_test_objects()
 
-        incident1_json = IncidentSerializer([self.incident1], many=True).data
-        self.incident1_json = JSONRenderer().render(incident1_json)
-
         self.timeslot1 = TimeslotFactory(user=self.user1, name="Never")
         self.timeslot2 = TimeslotFactory(user=self.user1, name="Never 2: Ever-expanding Void")
         filter1 = FilterFactory(
@@ -58,12 +55,13 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
     def teardown(self):
         connect_signals()
 
-    def test_incidents_filtered_by_notification_profile_view(self):
+    def test_can_get_all_incidents_of_notification_profile(self):
         response = self.user1_rest_client.get(
-            reverse("v2:notification-profile:notificationprofile-incidents", args=[self.notification_profile1.pk])
+            path=f"/api/v2/notificationprofiles/{self.notification_profile1.pk}/incidents/"
         )
-        response.render()
-        self.assertEqual(response.content, self.incident1_json)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]["pk"], self.incident1.pk)
 
     def test_notification_profile_can_properly_change_timeslot(self):
         profile1_pk = self.notification_profile1.pk
