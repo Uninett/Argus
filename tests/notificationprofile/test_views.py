@@ -90,9 +90,6 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
         self.assertEqual(self.user1_rest_client.get(new_profile1_path).status_code, status.HTTP_200_OK)
 
     def test_can_delete_sms_destination(self):
-        if not "sms" in MEDIA_CLASSES_DICT.keys():
-            self.skipTest("No sms plugin available")
-
         self.assertTrue(DestinationConfig.objects.filter(media_id="sms").exists())
         response = self.user1_rest_client.delete(
             path=f"/api/v2/notificationprofiles/destinations/{self.sms_destination.pk}/"
