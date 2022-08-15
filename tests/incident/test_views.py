@@ -138,9 +138,8 @@ class IncidentViewSetV1TestCase(APITestCase):
         self.add_stateless_incident()
         response = self.client.get("/api/v1/incidents/?stateful=true")
         self.assertEqual(len(response.data["results"]), 2)
-        response_pks = [result["pk"] for result in response.data["results"]]
-        self.assertTrue(open_pk in response_pks)
-        self.assertTrue(closed_pk in response_pks)
+        response_pks = set([result["pk"] for result in response.data["results"]])
+        self.assertEqual(response_pks, set([open_pk, closed_pk]))
 
     def test_open_true_and_stateful_true_returns_only_open_incidents(self):
         open_pk = self.add_open_incident()
