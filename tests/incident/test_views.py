@@ -58,7 +58,7 @@ class IncidentViewSetV1TestCase(APITestCase):
         return StatefulIncidentFactory(description=description).pk
 
     def add_closed_incident(self, description="closed_incident"):
-        return StatefulIncidentFactory(description=description, end_time="2022-05-24T13:07:29.254Z").pk
+        return StatefulIncidentFactory(description=description, start_time="2022-05-23T13:07:29.254Z", end_time="2022-05-24T13:07:29.254Z").pk
 
     def add_stateless_incident(self, description="stateless_incident"):
         return StatelessIncidentFactory(description=description).pk
