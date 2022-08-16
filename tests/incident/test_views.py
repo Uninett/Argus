@@ -75,6 +75,7 @@ class IncidentViewSetV1TestCase(APITestCase):
         response = self.client.get(path="/api/v1/incidents/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         # Paging, so check "results"
+        self.assertEqual(len(response.data["results"]), 1)
         self.assertEqual(response.data["results"][0]["pk"], incident_pk)
 
     def test_can_get_incident(self):
@@ -129,6 +130,7 @@ class IncidentViewSetV1TestCase(APITestCase):
         incident_pk = ack.event.incident.pk
         response = self.client.get(path=f"/api/v1/incidents/{incident_pk}/acks/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data[0]["pk"], ack.pk)
         self.assertEqual(response.data[0]["event"]["type"]["value"], "ACK")
 
@@ -163,6 +165,7 @@ class IncidentViewSetV1TestCase(APITestCase):
         event_pk = Event.objects.get(incident_id=incident_pk).pk
         response = self.client.get(path=f"/api/v1/incidents/{incident_pk}/events/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data[0]["pk"], event_pk)
 
     def test_can_get_event_of_incident(self):
@@ -194,6 +197,7 @@ class IncidentViewSetV1TestCase(APITestCase):
         response = self.client.get(path=f"/api/v1/incidents/{incident_pk}/tags/")
         tag = str(Tag.objects.get())
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data[0]["tag"], tag)
 
     def test_can_get_tag_of_incident(self):
@@ -239,6 +243,7 @@ class IncidentViewSetV1TestCase(APITestCase):
         response = self.client.get(path="/api/v1/incidents/mine/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         # Paging, so check "results"
+        self.assertEqual(len(response.data["results"]), 1)
         self.assertEqual(response.data["results"][0]["pk"], incident_pk)
 
     def test_can_create_my_incident_with_tag(self):
@@ -272,6 +277,8 @@ class IncidentViewSetV1TestCase(APITestCase):
     def test_can_get_all_source_types(self):
         response = self.client.get(path=f"/api/v1/incidents/source-types/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+
         source_types = set([type.name for type in SourceSystemType.objects.all()])
         response_types = set([type["name"] for type in response.data])
         self.assertEqual(response_types, source_types)
@@ -296,6 +303,8 @@ class IncidentViewSetV1TestCase(APITestCase):
     def test_can_get_all_source_systems(self):
         response = self.client.get(path=f"/api/v1/incidents/sources/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+
         source_pks = set([source.pk for source in SourceSystem.objects.all()])
         response_source_pks = set([source["pk"] for source in response.data])
         self.assertEqual(response_source_pks, source_pks)
@@ -360,6 +369,7 @@ class IncidentViewSetTestCase(APITestCase):
         response = self.client.get(path="/api/v2/incidents/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         # Paging, so check "results"
+        self.assertEqual(len(response.data["results"]), 1)
         self.assertEqual(response.data["results"][0]["pk"], incident_pk)
 
     def test_can_get_incident_by_incident_description(self):
@@ -469,6 +479,7 @@ class IncidentViewSetTestCase(APITestCase):
         incident_pk = ack.event.incident.pk
         response = self.client.get(path=f"/api/v1/incidents/{incident_pk}/acks/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data[0]["pk"], ack.pk)
         self.assertEqual(response.data[0]["event"]["type"]["value"], "ACK")
 
@@ -503,6 +514,7 @@ class IncidentViewSetTestCase(APITestCase):
         event_pk = Event.objects.get(incident_id=incident_pk).pk
         response = self.client.get(path=f"/api/v2/incidents/{incident_pk}/events/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data[0]["pk"], event_pk)
 
     def test_can_get_event_of_incident(self):
@@ -534,6 +546,7 @@ class IncidentViewSetTestCase(APITestCase):
         response = self.client.get(path=f"/api/v2/incidents/{incident_pk}/tags/")
         tag = str(Tag.objects.get())
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data[0]["tag"], tag)
 
     def test_can_get_tag_of_incident(self):
@@ -581,11 +594,14 @@ class IncidentViewSetTestCase(APITestCase):
         response = self.client.get(path=f"/api/v2/incidents/events/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         # Paging, so check "results"
+        self.assertEqual(len(response.data["results"]), 1)
         self.assertEqual(response.data["results"][0]["pk"], event_pk)
 
     def test_can_get_all_source_types(self):
         response = self.client.get(path=f"/api/v2/incidents/source-types/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+
         source_types = set([type.name for type in SourceSystemType.objects.all()])
         response_types = set([type["name"] for type in response.data])
         self.assertEqual(response_types, source_types)
@@ -610,6 +626,8 @@ class IncidentViewSetTestCase(APITestCase):
     def test_can_get_all_source_systems(self):
         response = self.client.get(path=f"/api/v2/incidents/sources/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+
         source_pks = set([source.pk for source in SourceSystem.objects.all()])
         response_source_pks = set([source["pk"] for source in response.data])
         self.assertEqual(response_source_pks, source_pks)
