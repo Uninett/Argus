@@ -15,6 +15,7 @@ from argus.notificationprofile.factories import (
 from argus.notificationprofile.media import MEDIA_CLASSES_DICT
 from argus.notificationprofile.models import (
     DestinationConfig,
+    Media,
     NotificationProfile,
 )
 from argus.util.testing import disconnect_signals, connect_signals
@@ -28,9 +29,6 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
         disconnect_signals()
         super().init_test_objects()
 
-        incident1_json = IncidentSerializer([self.incident1], many=True).data
-        self.incident1_json = JSONRenderer().render(incident1_json)
-
         self.timeslot1 = TimeslotFactory(user=self.user1, name="Never")
         self.timeslot2 = TimeslotFactory(user=self.user1, name="Never 2: Ever-expanding Void")
         filter1 = FilterFactory(
@@ -40,24 +38,30 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
         )
         self.notification_profile1 = NotificationProfileFactory(user=self.user1, timeslot=self.timeslot1)
         self.notification_profile1.filters.add(filter1)
-        self.notification_profile1.destinations.set(self.user1.destinations.all())
+        # Default email destination is automatically created with user
+        self.synced_email_destination = self.user1.destinations.get()
+        self.non_synced_email_destination = DestinationConfigFactory(
+            user=self.user1,
+            media=Media.objects.get(slug="email"),
+            settings={"email_address": "test@example.com", "synced": False},
+        )
+        self.sms_destination = DestinationConfigFactory(
+            user=self.user1,
+            media=Media.objects.get(slug="sms"),
+            settings={"phone_number": "+4747474747"},
+        )
+        self.notification_profile1.destinations.set([self.synced_email_destination])
 
     def teardown(self):
         connect_signals()
 
-    def create_email_destination(self):
-        return DestinationConfigFactory(
-            user=self.user1,
-            media_id="email",
-            settings={"email_address": "test@example.com", "synced": False},
-        )
-
-    def test_incidents_filtered_by_notification_profile_view(self):
+    def test_can_get_all_incidents_of_notification_profile(self):
         response = self.user1_rest_client.get(
-            reverse("v2:notification-profile:notificationprofile-incidents", args=[self.notification_profile1.pk])
+            path=f"/api/v2/notificationprofiles/{self.notification_profile1.pk}/incidents/"
         )
-        response.render()
-        self.assertEqual(response.content, self.incident1_json)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]["pk"], self.incident1.pk)
 
     def test_notification_profile_can_properly_change_timeslot(self):
         profile1_pk = self.notification_profile1.pk
@@ -86,67 +90,37 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
         self.assertEqual(self.user1_rest_client.get(new_profile1_path).status_code, status.HTTP_200_OK)
 
     def test_can_delete_sms_destination(self):
-        if not "sms" in MEDIA_CLASSES_DICT.keys():
-            self.skipTest("No sms plugin available")
-
-        self.sms_destination = DestinationConfigFactory(
-            user=self.user1,
-            media_id="sms",
-            settings={"phone_number": "+4747474747"},
+        self.assertTrue(DestinationConfig.objects.filter(media_id="sms").exists())
+        response = self.user1_rest_client.delete(
+            path=f"/api/v2/notificationprofiles/destinations/{self.sms_destination.pk}/"
         )
-
-        sms_destination_pk = self.sms_destination.pk
-        sms_destination_path = reverse("v2:notification-profile:destinationconfig-detail", args=[sms_destination_pk])
-
-        self.assertEqual(self.user1.destinations.get(pk=sms_destination_pk), self.sms_destination)
-        self.assertEqual(self.user1_rest_client.get(sms_destination_path).status_code, status.HTTP_200_OK)
-        response = self.user1_rest_client.delete(sms_destination_path)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-
-        self.assertEqual(self.user1_rest_client.get(sms_destination_path).status_code, status.HTTP_404_NOT_FOUND)
+        self.assertFalse(DestinationConfig.objects.filter(media_id="sms").exists())
 
     def test_can_delete_unsynced_unconnected_email_destination(self):
-        self.email_destination = self.create_email_destination()
-
-        email_destination_pk = self.email_destination.pk
-        email_destination_path = reverse(
-            "v2:notification-profile:destinationconfig-detail", args=[email_destination_pk]
+        self.assertTrue(DestinationConfig.objects.filter(media_id="email").filter(settings__synced=False).exists())
+        response = self.user1_rest_client.delete(
+            path=f"/api/v2/notificationprofiles/destinations/{self.non_synced_email_destination.pk}/"
         )
-
-        self.assertEqual(self.user1.destinations.get(pk=email_destination_pk), self.email_destination)
-        self.assertEqual(self.user1_rest_client.get(email_destination_path).status_code, status.HTTP_200_OK)
-        response = self.user1_rest_client.delete(email_destination_path)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-
-        self.assertEqual(self.user1_rest_client.get(email_destination_path).status_code, status.HTTP_404_NOT_FOUND)
+        self.assertFalse(DestinationConfig.objects.filter(media_id="email").filter(settings__synced=False).exists())
 
     def test_cannot_delete_synced_email_destination(self):
-        self.email_destination = self.user1.destinations.filter(media_id="email").filter(settings__synced=True).first()
-
-        email_destination_path = reverse(
-            "v2:notification-profile:destinationconfig-detail", args=[self.email_destination.pk]
+        self.assertTrue(DestinationConfig.objects.filter(media_id="email").filter(settings__synced=True).exists())
+        response = self.user1_rest_client.delete(
+            path=f"/api/v2/notificationprofiles/destinations/{self.synced_email_destination.pk}/"
         )
-
-        self.assertEqual(self.user1_rest_client.get(email_destination_path).status_code, status.HTTP_200_OK)
-        response = self.user1_rest_client.delete(email_destination_path)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-
-        self.assertEqual(self.user1_rest_client.get(email_destination_path).status_code, status.HTTP_200_OK)
+        self.assertTrue(DestinationConfig.objects.filter(media_id="email").filter(settings__synced=True).exists())
 
     def test_cannot_delete_connected_email_destination(self):
-        self.email_destination = self.create_email_destination()
-        self.notification_profile1.destinations.add(self.email_destination)
+        self.notification_profile1.destinations.add(self.non_synced_email_destination)
 
-        email_destination_pk = self.email_destination.pk
-        email_destination_path = reverse(
-            "v2:notification-profile:destinationconfig-detail", args=[email_destination_pk]
+        self.assertTrue(DestinationConfig.objects.filter(media_id="email").filter(settings__synced=False).exists())
+        response = self.user1_rest_client.delete(
+            path=f"/api/v2/notificationprofiles/destinations/{self.non_synced_email_destination.pk}/"
         )
-
-        self.assertEqual(self.user1.destinations.get(pk=email_destination_pk), self.email_destination)
-        self.assertEqual(self.user1_rest_client.get(email_destination_path).status_code, status.HTTP_200_OK)
-        response = self.user1_rest_client.delete(email_destination_path)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-
-        self.assertEqual(self.user1_rest_client.get(email_destination_path).status_code, status.HTTP_200_OK)
+        self.assertTrue(DestinationConfig.objects.filter(media_id="email").filter(settings__synced=False).exists())
 
     # TODO: test more endpoints
