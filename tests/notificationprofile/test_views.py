@@ -126,8 +126,6 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
         )
 
     def test_can_create_sms_destination_with_valid_values(self):
-        if not "sms" in MEDIA_CLASSES_DICT.keys():
-            self.skipTest("No sms plugin available")
         response = self.user1_rest_client.post(
             path="/api/v2/notificationprofiles/destinations/",
             data={
