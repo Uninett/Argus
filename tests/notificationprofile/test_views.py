@@ -89,6 +89,101 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
         new_profile1_path = reverse("v2:notification-profile:notificationprofile-detail", args=[new_profile1_pk])
         self.assertEqual(self.user1_rest_client.get(new_profile1_path).status_code, status.HTTP_200_OK)
 
+    def test_can_get_all_destinations(self):
+        response = self.user1_rest_client.get(path="/api/v2/notificationprofiles/destinations/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 3)
+        response_settings = [destination["settings"] for destination in response.data]
+        self.assertTrue(self.synced_email_destination.settings in response_settings)
+        self.assertTrue(self.non_synced_email_destination.settings in response_settings)
+        self.assertTrue(self.sms_destination.settings in response_settings)
+
+    def test_can_get_destination(self):
+        response = self.user1_rest_client.get(
+            path=f"/api/v2/notificationprofiles/destinations/{self.synced_email_destination.pk}/"
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["settings"], self.synced_email_destination.settings)
+
+    def test_can_create_email_destination_with_valid_values(self):
+        response = self.user1_rest_client.post(
+            path="/api/v2/notificationprofiles/destinations/",
+            data={
+                "media": "email",
+                "settings": {
+                    "email_address": "test2@example.com",
+                },
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertTrue(
+            DestinationConfig.objects.filter(
+                settings={
+                    "email_address": "test2@example.com",
+                    "synced": False,
+                },
+            ).exists()
+        )
+
+    def test_can_create_sms_destination_with_valid_values(self):
+        if not "sms" in MEDIA_CLASSES_DICT.keys():
+            self.skipTest("No sms plugin available")
+        response = self.user1_rest_client.post(
+            path="/api/v2/notificationprofiles/destinations/",
+            data={
+                "media": "sms",
+                "settings": {
+                    "phone_number": "+4747474740",
+                },
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertTrue(
+            DestinationConfig.objects.filter(
+                settings={
+                    "phone_number": "+4747474740",
+                },
+            ).exists()
+        )
+
+    def test_can_update_email_destination_with_same_medium(self):
+        email_destination = self.non_synced_email_destination
+        new_settings = {
+            "email_address": "test2@example.com",
+        }
+        response = self.user1_rest_client.patch(
+            path=f"/api/v2/notificationprofiles/destinations/{email_destination.pk}/",
+            data={
+                "media": "email",
+                "settings": new_settings,
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        email_destination.refresh_from_db()
+        self.assertEqual(
+            email_destination.settings["email_address"],
+            new_settings["email_address"],
+        )
+
+    def test_can_update_sms_destination_with_same_medium(self):
+        sms_destination = self.sms_destination
+        new_settings = {
+            "phone_number": "+4747474746",
+        }
+        response = self.user1_rest_client.patch(
+            path=f"/api/v2/notificationprofiles/destinations/{sms_destination.pk}/",
+            data={
+                "media": "sms",
+                "settings": new_settings,
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        sms_destination.refresh_from_db()
+        self.assertEqual(
+            sms_destination.settings,
+            new_settings,
+        )
+
     def test_can_delete_sms_destination(self):
         self.assertTrue(DestinationConfig.objects.filter(media_id="sms").exists())
         response = self.user1_rest_client.delete(
