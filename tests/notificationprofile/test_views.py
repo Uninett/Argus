@@ -2,17 +2,14 @@ from django.urls import reverse
 from django.test import tag
 
 from rest_framework import status
-from rest_framework.renderers import JSONRenderer
 from rest_framework.test import APITestCase
 
-from argus.incident.serializers import IncidentSerializer
 from argus.notificationprofile.factories import (
     TimeslotFactory,
     FilterFactory,
     NotificationProfileFactory,
     DestinationConfigFactory,
 )
-from argus.notificationprofile.media import MEDIA_CLASSES_DICT
 from argus.notificationprofile.models import (
     DestinationConfig,
     Media,
