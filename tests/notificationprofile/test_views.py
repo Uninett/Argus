@@ -218,4 +218,52 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertTrue(DestinationConfig.objects.filter(media_id="email").filter(settings__synced=False).exists())
 
-    # TODO: test more endpoints
+    def test_can_get_all_media(self):
+        response = self.user1_rest_client.get(path=f"/api/v2/notificationprofiles/media/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 2)
+        self.assertEqual(set([medium["slug"] for medium in response.data]), set(["sms", "email"]))
+
+    def test_can_get_medium(self):
+        response = self.user1_rest_client.get(path=f"/api/v2/notificationprofiles/media/email/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["name"], "Email")
+        response = self.user1_rest_client.get(path=f"/api/v2/notificationprofiles/media/sms/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["name"], "SMS")
+
+    def test_can_get_json_schema_of_medium(self):
+        sms_schema = {
+            "json_schema": {
+                "title": "SMS Settings",
+                "description": "Settings for a DestinationConfig using SMS.",
+                "type": "object",
+                "required": ["phone_number"],
+                "properties": {
+                    "phone_number": {
+                        "type": "string",
+                        "title": "Phone number",
+                        "description": "The phone number is validated and the country code needs to be given.",
+                    }
+                },
+                "$id": "http://testserver/json-schema/sms",
+            }
+        }
+        email_schema = {
+            "json_schema": {
+                "title": "Email Settings",
+                "description": "Settings for a DestinationConfig using email.",
+                "type": "object",
+                "required": ["email_address"],
+                "properties": {"email_address": {"type": "string", "title": "Email address"}},
+                "$id": "http://testserver/json-schema/email",
+            }
+        }
+
+        response = self.user1_rest_client.get(path=f"/api/v2/notificationprofiles/media/email/json_schema/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, email_schema)
+
+        response = self.user1_rest_client.get(path=f"/api/v2/notificationprofiles/media/sms/json_schema/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, sms_schema)
