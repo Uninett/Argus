@@ -365,18 +365,24 @@ class IncidentViewSetTestCase(APITestCase):
     def test_can_get_incident_by_incident_description(self):
         pk = self.add_incident(description="incident1").pk
         response = self.client.get(path="/api/v2/incidents/?search=incident1")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data["results"]), 1)
         self.assertEqual(response.data["results"][0]["pk"], pk)
 
     def test_can_get_incident_by_event_description(self):
         incident_pk = self.add_incident(description="incident1").pk
         self.add_event(incident_pk=incident_pk, description="event1")
         response = self.client.get(path="/api/v2/incidents/?search=event1")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data["results"]), 1)
         self.assertEqual(response.data["results"][0]["pk"], incident_pk)
 
     def test_cannot_get_incident_by_nonexisting_description(self):
         incident_pk = self.add_incident(description="incident1").pk
         self.add_event(incident_pk=incident_pk, description="event1")
         response = self.client.get(path="/api/v2/incidents/?search=not_a_description")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data["results"]), 0)
         self.assertEqual(response.data["results"], [])
 
     def test_can_get_incident_by_incident_description_and_event_description(self):
@@ -385,6 +391,8 @@ class IncidentViewSetTestCase(APITestCase):
         self.add_incident(description="incident2")
         self.add_event(incident_pk=incident_pk, description="event")
         response = self.client.get(path="/api/v2/incidents/?search=incident1,event")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data["results"]), 1)
         self.assertEqual(response.data["results"][0]["pk"], incident_pk)
 
     def test_can_get_multiple_incidents_by_incident_description(self):
@@ -393,7 +401,10 @@ class IncidentViewSetTestCase(APITestCase):
         self.add_event(incident_pk=incident_pk1, description="event1")
         self.add_event(incident_pk=incident_pk2, description="event2")
         response = self.client.get(path="/api/v2/incidents/?search=incident")
+        response_pks = set([incident["pk"] for incident in response.data["results"]])
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["results"]), 2)
+        self.assertEqual(response_pks, set([incident_pk1, incident_pk2]))
 
     def test_can_get_multiple_incidents_by_incident_description_and_event_description(self):
         incident_pk1 = self.add_incident(description="target_incident").pk
@@ -401,7 +412,10 @@ class IncidentViewSetTestCase(APITestCase):
         self.add_event(incident_pk=incident_pk1, description="event1")
         self.add_event(incident_pk=incident_pk2, description="target_event")
         response = self.client.get(path="/api/v2/incidents/?search=target")
+        response_pks = set([incident["pk"] for incident in response.data["results"]])
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["results"]), 2)
+        self.assertEqual(response_pks, set([incident_pk1, incident_pk2]))
 
     def test_can_get_incident(self):
         incident_pk = self.add_incident().pk
