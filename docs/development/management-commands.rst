@@ -120,6 +120,38 @@ a filter that matches fake incidents, for instance by setting `source` to
 `argus`, and create a single fake incident.)
 
 
+.. _create-source:
+
+Create source
+-------------
+
+To create a new source system in the database for testing purposes one can use
+the command `create_source`:
+
+    .. code:: console
+
+        $ python manage.py create_source
+
+See the inbuilt help for flags and toggles:
+
+    .. code:: console
+
+        $ python manage.py create_source --help
+
+This command takes the name for the new source as an argument, if none is
+given, the name will be `argus`:
+
+    .. code:: console
+
+        $ python manage.py create_source "Source name"
+
+To add a custom source system type, instead of the default `argus`, add the
+`-t` flag to the command as such:
+
+    .. code:: console
+
+        $ python manage.py create_source -t "Custom type"
+
 .. _check-token-expiry:
 
 Check for token expiry
