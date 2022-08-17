@@ -6,6 +6,45 @@ Management commands
 
 This section will talk about all available management commands that Argus offers.
 
+.. _initial-setup:
+
+Initial setup
+-------------
+
+To create the standard instances and fill any lookup tables one can use
+the command `initial_setup`:
+
+    .. code:: console
+
+        $ python manage.py initial_setup
+
+See the inbuilt help for flags and toggles:
+
+    .. code:: console
+
+        $ python manage.py initial_setup --help
+
+To set the email address of the created admin user, which by default is not
+set, add the `-e` flag to the command as such:
+
+    .. code:: console
+
+        $ python manage.py initial_setup -e "admin@example.com"
+
+To set the user name of the created admin user, which by default is `admin`,
+add the `-u` flag to the command as such:
+
+    .. code:: console
+
+        $ python manage.py initial_setup -u "Name"
+
+To set the password of the created admin user add the `-e` flag to the command
+as such:
+
+    .. code:: console
+
+        $ python manage.py initial_setup -p "secure-password"
+
 .. _create-fake-incident:
 
 Create fake incidents
