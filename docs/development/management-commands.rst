@@ -45,6 +45,22 @@ as such:
 
         $ python manage.py initial_setup -p "secure-password"
 
+.. _generate-secret-key:
+
+Generate a secret key
+---------------------
+
+To generate a secret key to be used in the `cmd.sh` file one can use
+the command `gen_secret_key`:
+
+    .. code:: console
+
+        $ python manage.py gen_secret_key
+
+.. warning:: Keep the :setting:`SECRET_KEY` secret, as it is relevant to the
+    security and integrity of your Argus instance.
+
+
 .. _create-fake-incident:
 
 Create fake incidents
