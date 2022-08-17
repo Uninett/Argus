@@ -14,13 +14,13 @@ Check for token expiry
 One can check if any of the tokens that are connected to a source system will
 expire soon with the management command `check_token_expiry`:
 
-    .. code formatting:: console
+    .. code:: console
 
         $ python manage.py check_token_expiry
 
 See the inbuilt help for flags and toggles:
 
-    .. code formatting:: console
+    .. code:: console
 
         $ python manage.py check_token_expiry --help
 
@@ -28,7 +28,7 @@ By default `check_token_expiry` checks if any token will expire within in the
 next 7 days. To change that default one can use the `-d`-flag and give a
 different number of days:
 
-    .. code formatting:: console
+    .. code:: console
 
         $ python manage.py check_token_expiry -d 14
 
