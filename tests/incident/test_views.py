@@ -14,7 +14,6 @@ from argus.incident.factories import (
 from argus.incident.models import Event, Incident, Tag
 from argus.incident.views import EventViewSet
 from argus.util.testing import disconnect_signals, connect_signals
-from argus.util.datetime_utils import INFINITY_REPR
 
 
 class EventViewSetTestCase(TestCase):
