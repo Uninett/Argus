@@ -39,7 +39,7 @@ class EventViewSetTestCase(TestCase):
             view.validate_event_type_for_incident(Event.Type.ACKNOWLEDGE, incident)
 
 
-class IncidentViewSetV1TestCase(APITestCase):
+class IncidentAPITestCase(APITestCase):
     @classmethod
     def setUpClass(cls):
         disconnect_signals()
@@ -54,6 +54,8 @@ class IncidentViewSetV1TestCase(APITestCase):
     def tearDownClass(cls):
         connect_signals()
 
+
+class IncidentViewSetV1TestCase(IncidentAPITestCase):
     def add_closed_incident(self, description="closed_incident"):
         return StatefulIncidentFactory(
             description=description, start_time="2022-05-23T13:07:29.254Z", end_time="2022-05-24T13:07:29.254Z"
@@ -105,25 +107,14 @@ class IncidentViewSetV1TestCase(APITestCase):
         self.assertEqual(Incident.objects.get(pk=incident_pk).level, 2)
 
 
-class IncidentFilterByOpenAndStatefulV1TestCase(APITestCase):
-    @classmethod
-    def setUpClass(cls):
-        disconnect_signals()
-        source_type = SourceSystemTypeFactory()
-        cls.user = SourceUserFactory()
-        cls.source = SourceSystemFactory(type=source_type, user=cls.user)
-
+class IncidentFilterByOpenAndStatefulV1TestCase(IncidentAPITestCase):
     def setUp(self):
-        self.client.force_authenticate(user=self.user)
+        super().setUp()
         self.open_pk = StatefulIncidentFactory().pk
         self.closed_pk = StatefulIncidentFactory(
             start_time="2022-05-23T13:07:29.254Z", end_time="2022-05-24T13:07:29.254Z"
         ).pk
         self.stateless_pk = StatelessIncidentFactory().pk
-
-    @classmethod
-    def tearDownClass(cls):
-        connect_signals()
 
     def test_open_true_returns_only_open_incidents(self):
         response = self.client.get("/api/v1/incidents/?open=true")
@@ -165,21 +156,7 @@ class IncidentFilterByOpenAndStatefulV1TestCase(APITestCase):
         self.assertEqual(len(response.data["results"]), 0, msg=response.data)
 
 
-class IncidentViewSetTestCase(APITestCase):
-    @classmethod
-    def setUpClass(cls):
-        disconnect_signals()
-        source_type = SourceSystemTypeFactory()
-        cls.user = SourceUserFactory()
-        cls.source = SourceSystemFactory(type=source_type, user=cls.user)
-
-    def setUp(self):
-        self.client.force_authenticate(user=self.user)
-
-    @classmethod
-    def tearDownClass(cls):
-        connect_signals()
-
+class IncidentViewSetTestCase(IncidentAPITestCase):
     def add_incident(self, description="incident"):
         data = {
             "start_time": "2021-08-04T09:13:55.908Z",
