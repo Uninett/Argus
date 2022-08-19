@@ -54,14 +54,10 @@ class IncidentViewSetV1TestCase(APITestCase):
     def tearDownClass(cls):
         connect_signals()
 
-    def add_open_incident(self, description="open_incident"):
-        return StatefulIncidentFactory(description=description).pk
-
     def add_closed_incident(self, description="closed_incident"):
-        return StatefulIncidentFactory(description=description, start_time="2022-05-23T13:07:29.254Z", end_time="2022-05-24T13:07:29.254Z").pk
-
-    def add_stateless_incident(self, description="stateless_incident"):
-        return StatelessIncidentFactory(description=description).pk
+        return StatefulIncidentFactory(
+            description=description, start_time="2022-05-23T13:07:29.254Z", end_time="2022-05-24T13:07:29.254Z"
+        ).pk
 
     def test_no_incidents_returns_empty_list(self):
         response = self.client.get("/api/v1/incidents/")
@@ -108,66 +104,63 @@ class IncidentViewSetV1TestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(Incident.objects.get(pk=incident_pk).level, 2)
 
+
+class IncidentFilterByOpenAndStatefulV1TestCase(APITestCase):
+    @classmethod
+    def setUpClass(cls):
+        disconnect_signals()
+        source_type = SourceSystemTypeFactory()
+        cls.user = SourceUserFactory()
+        cls.source = SourceSystemFactory(type=source_type, user=cls.user)
+
+    def setUp(self):
+        self.client.force_authenticate(user=self.user)
+        self.open_pk = StatefulIncidentFactory().pk
+        self.closed_pk = StatefulIncidentFactory(
+            start_time="2022-05-23T13:07:29.254Z", end_time="2022-05-24T13:07:29.254Z"
+        ).pk
+        self.stateless_pk = StatelessIncidentFactory().pk
+
+    @classmethod
+    def tearDownClass(cls):
+        connect_signals()
+
     def test_open_true_returns_only_open_incidents(self):
-        open_pk = self.add_open_incident()
-        self.add_closed_incident()
-        self.add_stateless_incident()
         response = self.client.get("/api/v1/incidents/?open=true")
         self.assertEqual(len(response.data["results"]), 1)
-        self.assertEqual(response.data["results"][0]["pk"], open_pk)
+        self.assertEqual(response.data["results"][0]["pk"], self.open_pk)
 
     def test_open_false_returns_only_closed_incidents(self):
-        self.add_open_incident()
-        closed_pk = self.add_closed_incident()
-        self.add_stateless_incident()
         response = self.client.get("/api/v1/incidents/?open=false")
         self.assertEqual(len(response.data["results"]), 1)
-        self.assertEqual(response.data["results"][0]["pk"], closed_pk)
+        self.assertEqual(response.data["results"][0]["pk"], self.closed_pk)
 
     def test_stateful_false_returns_only_stateless_incidents(self):
-        self.add_open_incident()
-        self.add_closed_incident()
-        stateless_pk = self.add_stateless_incident()
         response = self.client.get("/api/v1/incidents/?stateful=false")
         self.assertEqual(len(response.data["results"]), 1)
-        self.assertEqual(response.data["results"][0]["pk"], stateless_pk)
+        self.assertEqual(response.data["results"][0]["pk"], self.stateless_pk)
 
     def test_stateful_true_returns_only_stateful_incidents(self):
-        open_pk = self.add_open_incident()
-        closed_pk = self.add_closed_incident()
-        self.add_stateless_incident()
         response = self.client.get("/api/v1/incidents/?stateful=true")
         self.assertEqual(len(response.data["results"]), 2)
         response_pks = set([result["pk"] for result in response.data["results"]])
-        self.assertEqual(response_pks, set([open_pk, closed_pk]))
+        self.assertEqual(response_pks, set([self.open_pk, self.closed_pk]))
 
     def test_open_true_and_stateful_true_returns_only_open_incidents(self):
-        open_pk = self.add_open_incident()
-        self.add_closed_incident()
-        self.add_stateless_incident()
         response = self.client.get("/api/v1/incidents/?open=true&stateful=true")
         self.assertEqual(len(response.data["results"]), 1)
-        self.assertEqual(response.data["results"][0]["pk"], open_pk)
+        self.assertEqual(response.data["results"][0]["pk"], self.open_pk)
 
     def test_open_true_and_stateful_false_returns_no_incidents(self):
-        self.add_open_incident()
-        self.add_closed_incident()
-        self.add_stateless_incident()
         response = self.client.get("/api/v1/incidents/?stateful=false&open=true")
         self.assertEqual(len(response.data["results"]), 0, msg=response.data)
 
     def test_open_false_and_stateful_true_returns_only_closed_incidents(self):
-        self.add_open_incident()
-        closed_pk = self.add_closed_incident()
-        self.add_stateless_incident()
         response = self.client.get("/api/v1/incidents/?open=false&stateful=true")
         self.assertEqual(len(response.data["results"]), 1)
-        self.assertEqual(response.data["results"][0]["pk"], closed_pk)
+        self.assertEqual(response.data["results"][0]["pk"], self.closed_pk)
 
     def test_open_false_and_stateful_false_returns_no_incidents(self):
-        self.add_open_incident()
-        self.add_closed_incident()
-        self.add_stateless_incident()
         response = self.client.get("/api/v1/incidents/?stateful=false&open=false")
         self.assertEqual(len(response.data["results"]), 0, msg=response.data)
 
