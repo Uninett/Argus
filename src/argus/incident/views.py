@@ -240,7 +240,6 @@ class IncidentViewSet(
         if serializer.is_valid():
             incident.ticket_url = serializer.data["ticket_url"]
             incident.save()
-            # TODO: make argus stateless incident about the url being saved? event?
             return Response(serializer.data)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
