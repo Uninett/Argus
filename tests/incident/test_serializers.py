@@ -9,10 +9,17 @@ from rest_framework.test import APIRequestFactory
 from rest_framework import serializers
 
 from argus.auth.factories import PersonUserFactory
-from argus.incident.factories import StatefulIncidentFactory
-from argus.incident.serializers import AcknowledgementSerializer
-from argus.incident.serializers import UpdateAcknowledgementSerializer
-from argus.incident.serializers import IncidentSerializer
+from argus.incident.factories import IncidentTagRelationFactory, StatefulIncidentFactory
+from argus.incident.models import IncidentTagRelation
+from argus.incident.serializers import (
+    AcknowledgementSerializer,
+    EventSerializer,
+    IncidentPureDeserializer,
+    IncidentSerializer,
+    IncidentTagRelationSerializer,
+    TagSerializer,
+    UpdateAcknowledgementSerializer,
+)
 from argus.util.datetime_utils import INFINITY_REPR
 from argus.util.testing import disconnect_signals, connect_signals
 
@@ -127,3 +134,14 @@ class IncidentSerializerTests(TestCase):
         serializer = IncidentSerializer(data=data)
         self.assertFalse(serializer.is_valid())
         self.assertIn("end_time", serializer.errors)
+
+    def test_incident_serializer_is_invalid_with_incorrect_ticket_url(self):
+        data = {
+            "start_time": "2021-09-06T09:12:17.059Z",
+            "level": 3,
+            "tags": [],
+            "ticket_url": "invalid",
+        }
+        serializer = IncidentSerializer(data=data)
+        self.assertFalse(serializer.is_valid())
+        self.assertIn("ticket_url", serializer.errors)
