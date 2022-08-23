@@ -178,3 +178,39 @@ class IncidentTagRelationSerializerTests(TestCase):
         serializer = IncidentTagRelationSerializer(data=data)
         self.assertFalse(serializer.is_valid())
         self.assertIn("tag", serializer.errors)
+
+
+class EventSerializerTests(TestCase):
+    def setUp(self):
+        disconnect_signals()
+
+        self.user = PersonUserFactory()
+        self.request_factory = APIRequestFactory()
+
+    def tearDown(self):
+        connect_signals()
+
+    def test_event_serializer_valid_with_correct_values(self):
+        request = self.request_factory.post("/")
+        request.user = self.user
+        timestamp = timezone.now()
+        data = {
+            "actor": {},  # Forced to request.user
+            "timestamp": timestamp.isoformat(),
+            "type": "STA",  # Forced to ACK
+            "description": "string",
+        }
+        serializer = EventSerializer(data=data, context={"request": request})
+        self.assertTrue(serializer.is_valid())
+
+    def test_event_serializer_sets_timestamp_if_not_set(self):
+        request = self.request_factory.post("/")
+        request.user = self.user
+        data = {
+            "actor": {},  # Forced to request.user
+            "type": "STA",  # Forced to ACK
+            "description": "string",
+        }
+        serializer = EventSerializer(data=data, context={"request": request})
+        self.assertTrue(serializer.is_valid())
+        self.assertTrue(serializer.validated_data["timestamp"])
