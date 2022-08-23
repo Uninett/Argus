@@ -28,9 +28,6 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
         disconnect_signals()
         super().init_test_objects()
 
-        incident1_json = IncidentSerializer([self.incident1], many=True).data
-        self.incident1_json = JSONRenderer().render(incident1_json)
-
         self.timeslot1 = TimeslotFactory(user=self.user1, name="Never")
         self.timeslot2 = TimeslotFactory(user=self.user1, name="Never 2: Ever-expanding Void")
         self.filter1 = FilterFactory(
@@ -59,7 +56,7 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
             f"/api/v1/notificationprofiles/{self.notification_profile1.pk}/incidents/"
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.content, self.incident1_json)
+        self.assertEqual(response.data[0]["pk"], self.incident1.pk)
 
     def test_can_update_timeslot_for_notification_profile_with_valid_values(self):
         profile1_pk = self.notification_profile1.pk
@@ -69,7 +66,7 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
             profile1_path,
             {
                 "timeslot": self.timeslot2.pk,
-                "filters": [f.pk for f in self.notification_profile1.filters.all()],
+                "filters": [self.filter1.pk],
                 "media": self.media,
                 "phone_number": self.sms_destination.pk,
                 "active": self.notification_profile1.active,
@@ -96,7 +93,7 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
             "/api/v1/notificationprofiles/",
             {
                 "timeslot": self.timeslot2.pk,
-                "filters": [f.pk for f in self.notification_profile1.filters.all()],
+                "filters": [self.filter1.pk],
                 "media": self.media,
                 "phone_number": self.sms_destination.pk,
                 "active": self.notification_profile1.active,
@@ -110,7 +107,7 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
             "/api/v1/notificationprofiles/",
             {
                 "timeslot": self.timeslot2.pk,
-                "filters": [f.pk for f in self.notification_profile1.filters.all()],
+                "filters": [self.filter1.pk],
                 "media": self.media,
                 "phone_number": self.sms_destination.pk,
                 "active": self.notification_profile1.active,
