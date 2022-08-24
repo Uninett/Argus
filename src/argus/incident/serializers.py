@@ -43,7 +43,7 @@ class TagSerializer(serializers.Serializer):
         if not "=" in value:
             raise serializers.ValidationError(f"The tag must contain an equality sign ({Tag.TAG_DELIMITER}) delimiter.")
 
-        key, value = Tag.split(value, 1)
+        key, value = Tag.split(value)
         key = key.strip()
         if not key:  # Django doesn't attempt validating empty values
             raise serializers.ValidationError("The tag's key must not be empty")
@@ -53,7 +53,15 @@ class TagSerializer(serializers.Serializer):
 
     def to_internal_value(self, data: dict):
         if "tag" in data:
+            if not "=" in data["tag"]:
+                raise serializers.ValidationError(
+                    f"The tag must contain an equality sign ({Tag.TAG_DELIMITER}) delimiter."
+                )
             key, value = Tag.split(data.pop("tag"))
+            key = key.strip()
+            if not key:  # Django doesn't attempt validating empty values
+                raise serializers.ValidationError("The tag's key must not be empty")
+            Tag._meta.get_field("key").run_validators(key)
             return {"key": key, "value": value}
         return data
 
@@ -75,17 +83,16 @@ class IncidentTagRelationSerializer(serializers.ModelSerializer):
         read_only_fields = ["added_by", "added_time"]
 
     def validate_tag(self, value: str):
-        split_tag = Tag.split(value)
-        if len(split_tag) < 2:
+        if not "=" in value:
             raise serializers.ValidationError(f"The tag must contain an equality sign ({Tag.TAG_DELIMITER}) delimiter.")
 
-        key, value_ = split_tag
+        key, value = Tag.split(value)
         key = key.strip()
         if not key:  # Django doesn't attempt validating empty values
             raise serializers.ValidationError("The tag's key must not be empty")
         Tag._meta.get_field("key").run_validators(key)
         # Reassemble tag, to enforce key without leading or trailing whitespace (by calling `strip()` above)
-        return Tag.join(key, value_)
+        return Tag.join(key, value)
 
     def create(self, validated_data: dict):
         tag = validated_data.pop("tag")
@@ -93,12 +100,18 @@ class IncidentTagRelationSerializer(serializers.ModelSerializer):
         return Tag.objects.create(key=key, value=value, **validated_data)
 
     def to_internal_value(self, data: dict):
-        tag_dict = super().to_internal_value(data)
-        if "tag" in tag_dict:
-            key, value = Tag.split(tag_dict.pop("tag"))
-            tag_dict["key"] = key
-            tag_dict["value"] = value
-        return tag_dict
+        if "tag" in data:
+            if not "=" in data["tag"]:
+                raise serializers.ValidationError(
+                    f"The tag must contain an equality sign ({Tag.TAG_DELIMITER}) delimiter."
+                )
+            key, value = Tag.split(data.pop("tag"))
+            key = key.strip()
+            if not key:  # Django doesn't attempt validating empty values
+                raise serializers.ValidationError("The tag's key must not be empty")
+            Tag._meta.get_field("key").run_validators(key)
+            return {"key": key, "value": value}
+        return data
 
     def to_representation(self, instance: IncidentTagRelation):
         tag_repr = super().to_representation(instance)
