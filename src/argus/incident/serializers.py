@@ -40,7 +40,7 @@ class TagSerializer(serializers.Serializer):
     tag = serializers.CharField()
 
     def validate_tag(self, value: str):
-        if not "=" in value:
+        if not Tag.TAG_DELIMITER in value:
             raise serializers.ValidationError(f"The tag must contain an equality sign ({Tag.TAG_DELIMITER}) delimiter.")
 
         key, value = Tag.split(value)
@@ -53,7 +53,7 @@ class TagSerializer(serializers.Serializer):
 
     def to_internal_value(self, data: dict):
         if "tag" in data:
-            if not "=" in data["tag"]:
+            if not Tag.TAG_DELIMITER in data["tag"]:
                 raise serializers.ValidationError(
                     f"The tag must contain an equality sign ({Tag.TAG_DELIMITER}) delimiter."
                 )
@@ -83,7 +83,7 @@ class IncidentTagRelationSerializer(serializers.ModelSerializer):
         read_only_fields = ["added_by", "added_time"]
 
     def validate_tag(self, value: str):
-        if not "=" in value:
+        if not Tag.TAG_DELIMITER in value:
             raise serializers.ValidationError(f"The tag must contain an equality sign ({Tag.TAG_DELIMITER}) delimiter.")
 
         key, value = Tag.split(value)
@@ -101,7 +101,7 @@ class IncidentTagRelationSerializer(serializers.ModelSerializer):
 
     def to_internal_value(self, data: dict):
         if "tag" in data:
-            if not "=" in data["tag"]:
+            if not Tag.TAG_DELIMITER in data["tag"]:
                 raise serializers.ValidationError(
                     f"The tag must contain an equality sign ({Tag.TAG_DELIMITER}) delimiter."
                 )

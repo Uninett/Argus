@@ -52,7 +52,7 @@ def create_fake_incident(tags=None, description=None, stateful=True, level=None)
 
     taglist = [("location", "argus"), ("object", f"{incident.id}"), ("problem_type", "test")]
     if tags:
-        tags = [tag.split("=", 1) for tag in tags]
+        tags = [Tag.split(tag) for tag in tags]
         taglist.extend(tags)
     for k, v in taglist:
         tag, _ = Tag.objects.get_or_create(key=k, value=v)
