@@ -147,6 +147,39 @@ class IncidentSerializerTests(TestCase):
         self.assertIn("ticket_url", serializer.errors)
 
 
+class TagSerializerTests(TestCase):
+    def setUp(self):
+        disconnect_signals()
+
+    def tearDown(self):
+        connect_signals()
+
+    def test_tag_serializer_is_valid_with_correct_input(self):
+        data = {
+            "tag": "a=b",
+        }
+        serializer = TagSerializer(data=data)
+        self.assertTrue(serializer.is_valid())
+        self.assertEqual(serializer.validated_data["key"], "a")
+        self.assertEqual(serializer.validated_data["value"], "b")
+
+    def test_tag_serializer_is_invalid_with_wrong_form(self):
+        data = {
+            "tag": "a",
+        }
+        serializer = TagSerializer(data=data)
+        self.assertFalse(serializer.is_valid())
+        self.assertIn("tag", serializer.errors)
+
+    def test_tag_serializer_is_invalid_with_empty_key(self):
+        data = {
+            "tag": "=b",
+        }
+        serializer = IncidentTagRelationSerializer(data=data)
+        self.assertFalse(serializer.is_valid())
+        self.assertIn("tag", serializer.errors)
+
+
 class IncidentTagRelationSerializerTests(TestCase):
     def setUp(self):
         disconnect_signals()
