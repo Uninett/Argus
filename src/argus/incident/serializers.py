@@ -55,12 +55,12 @@ class TagSerializer(serializers.Serializer):
         if "tag" in data:
             if not Tag.TAG_DELIMITER in data["tag"]:
                 raise serializers.ValidationError(
-                    f"The tag must contain an equality sign ({Tag.TAG_DELIMITER}) delimiter."
+                    {"tag": f"The tag must contain an equality sign ({Tag.TAG_DELIMITER}) delimiter."}
                 )
             key, value = Tag.split(data.pop("tag"))
             key = key.strip()
             if not key:  # Django doesn't attempt validating empty values
-                raise serializers.ValidationError("The tag's key must not be empty")
+                raise serializers.ValidationError({"tag": "The tag's key must not be empty"})
             Tag._meta.get_field("key").run_validators(key)
             return {"key": key, "value": value}
         return data
@@ -103,12 +103,12 @@ class IncidentTagRelationSerializer(serializers.ModelSerializer):
         if "tag" in data:
             if not Tag.TAG_DELIMITER in data["tag"]:
                 raise serializers.ValidationError(
-                    f"The tag must contain an equality sign ({Tag.TAG_DELIMITER}) delimiter."
+                    {"tag": f"The tag must contain an equality sign ({Tag.TAG_DELIMITER}) delimiter."}
                 )
             key, value = Tag.split(data.pop("tag"))
             key = key.strip()
             if not key:  # Django doesn't attempt validating empty values
-                raise serializers.ValidationError("The tag's key must not be empty")
+                raise serializers.ValidationError({"tag": "The tag's key must not be empty"})
             Tag._meta.get_field("key").run_validators(key)
             return {"key": key, "value": value}
         return data
