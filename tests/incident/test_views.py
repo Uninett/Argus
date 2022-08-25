@@ -1,3 +1,5 @@
+from django.core.exceptions import ValidationError
+from django.core.validators import URLValidator
 from django.urls import reverse
 from django.test import TestCase, RequestFactory
 
@@ -178,3 +180,14 @@ class IncidentViewSetTestCase(APITestCase):
         self.add_event(pk2, "target_event")
         response = self.client.get("/api/v2/incidents/?search=target")
         self.assertEqual(len(response.data["results"]), 2)
+
+    def test_incident_incident_url_generates_valid_url(self):
+        pk = self.add_incident()
+        response = self.client.get(path=f"/api/v2/incidents/{pk}/issue/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        validator = URLValidator()
+        try:
+            validator(response.data["url"])
+        except ValidationError:
+            url = response.data["url"]
+            self.fail(msg=f"Generated url '{url}' is not a valid url.")

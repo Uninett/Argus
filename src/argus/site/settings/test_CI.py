@@ -39,6 +39,11 @@ MEDIA_PLUGINS = [
     "argus.notificationprofile.media.sms_as_email.SMSNotification",
 ]
 
+# Example link to issue system
+ISSUE_ENDPOINT = "https://gitlab.com/gitlab-examples/gitlab-examples.gitlab.io/"
+# Path to Gitlab plugin
+ISSUE_PLUGIN = "argus.incident.issue.gitlab.GitlabPlugin"
+
 # PSA for login
 
 SOCIAL_AUTH_DATAPORTEN_KEY = get_str_env("ARGUS_DATAPORTEN_KEY")
