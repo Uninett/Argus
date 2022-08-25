@@ -11,6 +11,7 @@ __all__ = [
     "SourceSystemFactory",
     "TagFactory",
     "IncidentFactory",
+    "IncidentTagRelationFactory",
     "StatefulIncidentFactory",
     "StatelessIncidentFactory",
 ]
@@ -58,18 +59,19 @@ class IncidentFactory(factory.django.DjangoModelFactory):
     ticket_url = factory.Faker("uri")
 
 
-StatefulIncidentFactory = IncidentFactory
+class StatefulIncidentFactory(IncidentFactory):
+    pass
 
 
-class StatelessIncidentFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = models.Incident
-
-    start_time = factory.Faker("date_time_between", start_date="-1d", end_date="+1d", tzinfo=pytz.UTC)
+class StatelessIncidentFactory(IncidentFactory):
     end_time = None
-    source = factory.SubFactory(SourceSystemFactory)
-    source_incident_id = factory.Faker("md5")
-    details_url = factory.Faker("uri")
-    description = factory.Faker("sentence")
-    level = factory.fuzzy.FuzzyChoice(models.Incident.LEVELS)  # Random valid level
-    ticket_url = factory.Faker("uri")
+
+
+class IncidentTagRelationFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = models.IncidentTagRelation
+
+    tag = factory.SubFactory(TagFactory)
+    incident = factory.SubFactory(IncidentFactory)
+    added_by = factory.SubFactory(SourceUserFactory)
+    added_time = factory.Faker("date_time_between", start_date="-1d", end_date="+1d", tzinfo=pytz.UTC)
