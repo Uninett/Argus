@@ -155,9 +155,20 @@ class RequestDestinationConfigSerializer(serializers.ModelSerializer):
         if self.instance and "media" in attrs.keys() and not attrs["media"].slug == self.instance.media.slug:
             raise serializers.ValidationError("Media cannot be updated, only settings.")
         if "settings" in attrs.keys():
-            attrs["settings"] = MEDIA_CLASSES_DICT[attrs["media"].slug].validate(self, attrs)
+            if self.instance:
+                attrs["settings"] = MEDIA_CLASSES_DICT[self.instance.media.slug].validate(self, attrs)
+            else:
+                attrs["settings"] = MEDIA_CLASSES_DICT[attrs["media"].slug].validate(self, attrs)
 
         return attrs
+
+    def update(self, destination: DestinationConfig, validated_data: dict):
+        updated_destination = MEDIA_CLASSES_DICT[destination.media.slug].update(destination, validated_data)
+
+        if updated_destination:
+            return updated_destination
+
+        return super().update(destination, validated_data)
 
 
 class ResponseNotificationProfileSerializer(serializers.ModelSerializer):

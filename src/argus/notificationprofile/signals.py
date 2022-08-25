@@ -20,35 +20,41 @@ def create_default_timeslot(sender, instance: User, created, raw, *args, **kwarg
     )
 
 
-# Sync user.email to DestinationConfig
 def sync_email_destination(sender, instance: User, created, raw, *args, **kwargs):
-    if raw or (not instance.email and not instance.destinations.exists()):
+    """
+    Sync user.email to DestinationConfig
+    """
+    if raw:
         return
 
     email_destinations = instance.destinations.filter(media_id="email")
-    found_synced_address = None
-    changed_destinations = []
-    for destination in email_destinations:
-        settings = destination.settings.copy()
-        if settings["email_address"] == instance.email:
-            found_synced_address = True
-            settings["synced"] = True
-        else:
-            settings["synced"] = False
-        if settings != destination.settings:
-            destination.settings = settings
-            changed_destinations.append(destination)
-    if not found_synced_address:  # Add new DestinationConfig
-        new_destination = DestinationConfig(
+    synced_email_destination = email_destinations.filter(settings__synced=True).first()
+    user_email_destination = email_destinations.filter(settings__email_address=instance.email).first()
+
+    if not instance.email and not synced_email_destination:
+        return
+
+    if not instance.email and synced_email_destination:
+        synced_email_destination.delete()
+        return
+
+    # There exists a destination with email_address == user.email
+    if user_email_destination:
+        if not user_email_destination == synced_email_destination:
+            if synced_email_destination:
+                synced_email_destination.settings["synced"] = False
+                DestinationConfig.objects.bulk_update(objs=[synced_email_destination], fields=["settings"])
+            user_email_destination.settings["synced"] = True
+            DestinationConfig.objects.bulk_update(objs=[user_email_destination], fields=["settings"])
+
+    # We need to create a destination with email_address=user.email
+    else:
+        if synced_email_destination:
+            synced_email_destination.settings["synced"] = False
+            DestinationConfig.objects.bulk_update(objs=[synced_email_destination], fields=["settings"])
+        new_synced_destination = DestinationConfig(
             user=instance,
             media_id="email",
             settings={"email_address": instance.email, "synced": True},
         )
-        # Triggers no signals
-        DestinationConfig.objects.bulk_create([new_destination])
-    if changed_destinations:  # Single query, triggers no signals
-        DestinationConfig.objects.bulk_update(objs=changed_destinations, fields=["settings"])
-    if not instance.email:
-        current_default = email_destinations.filter(settings__synced=True).first()
-        current_default.settings["synced"] = False
-        DestinationConfig.objects.bulk_update(objs=[current_default], fields=["settings"])
+        DestinationConfig.objects.bulk_create([new_synced_destination])

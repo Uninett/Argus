@@ -77,7 +77,7 @@ A glue service mainly concerns itself with:
 * Creating new incidents in Argus whenever a source system reports a problem.
 * Describing and tagging created incidents in an expressive, meaningful way for
   the users' consumption.
-* Closing existing Argus incidents it has created, when the source system
+* Closing existing Argus incidents it has created when the source system
   reports that a problem has been resolved.
 
 Creating a new incident
@@ -177,10 +177,10 @@ Closing incidents that have been resolved
 -----------------------------------------
 
 Once the source system reports an incident as resolved, the glue service
-needs to close the corresponding Argus incident. But, how can it keep track of
+needs to close the corresponding Argus incident. But how can it keep track of
 which Argus incident maps to the resolved problem?
 
-There could be a multitude of approaches to this, but in essence, there are two
+There could be a multitude of approaches to this, but in essence there are two
 distinct scenarios that come into play:
 
 - The source system already keeps track of its own state.
@@ -244,8 +244,8 @@ An incident with the id ``27`` can be closed by **POST**-ing a new event to
    }
 
 You should only ever use the ``END`` event type to indicate that the incident
-was resolved from the source system.  :ref:`The available types
-<api-incident-event-types>` are documented in the API endpoint documentation.
+was resolved from the source system.  The available types of events are
+documented in :ref:`api-incident-event-types`.
 
 
 On stateful incidents vs. stateless incidents
@@ -273,8 +273,8 @@ A stateless incident only represents something that happened at a single point
 in time, and otherwise has *no extent in time*. It can never be considered to
 be *open* nor *closed*.
 
-Whether stateless incidents are useful to you, depends on your needs and the
-source systems you want to integrate with Argud. Some source systems will
+Whether stateless incidents are useful to you depends on your needs and the
+source systems you want to integrate with Argus. Some source systems will
 generate alerts that are just one-off notifications, and are not considered to
 represent a state or an ongoing problem.
 
@@ -300,7 +300,7 @@ value ``infinity`` is used as the value of ``end_time``. This signals that the
 incident is expected to end at some unknown point in the future, and is quite
 useful when doing time-based queries on stateful incidents.
 
-Conversely, stateless incidents will never have a ``end_time`` value, which
+Conversely, stateless incidents will never have an ``end_time`` value, which
 means that these incidents explicitly set this to a ``null`` value.
 
 These special values are also exposed through the API.

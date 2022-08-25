@@ -300,7 +300,7 @@ class NotificationProfile(models.Model):
     phone_number = models.ForeignKey("argus_auth.PhoneNumber", on_delete=models.SET_NULL, blank=True, null=True)
     destinations = models.ManyToManyField(
         to=DestinationConfig,
-        related_name="notification_profile",
+        related_name="notification_profiles",
         blank=True,
     )
 

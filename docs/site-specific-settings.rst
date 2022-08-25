@@ -34,7 +34,7 @@ Variant 2: Using a ``settings.py`` file
 =======================================
 
 A settings file is a regular python file.
-This allows the use more complex Python data types than environment variables.
+This allows the use of more complex Python data types than environment variables.
 A settings file will override any environment variables.
 
 ``argus.site.settings.dev`` and ``argus.site.settings.prod`` provide reasonable defaults
@@ -153,7 +153,7 @@ Notification settings
 
 .. setting:: MEDIA_PLUGINS
 
-In the settings file, there is also the variable :setting:`MEDIA_PLUGINS`, which holds the paths
+In the settings file there is also the variable :setting:`MEDIA_PLUGINS`, which holds the paths
 to the media classes and determines which notification plugins are available to send notifications by.
 
 Email is enabled by default and uses Django's email backend. There are multiple email
@@ -161,7 +161,7 @@ backends available that Argus' plugin supports. It is recommended to simply swit
 the email backend instead of replacing this plugin.
 
 SMS is disabled by default, since there is no standardized way of sending SMS messages.
-The only supported way at the moment is Uninett's internal email-to-SMS gateway.
+The only supported way at the moment is Sikt's internal email-to-SMS gateway.
 
 Enabling the email-to-SMS gateway
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -209,7 +209,7 @@ Realtime updates
 .. setting:: ARGUS_REDIS_SERVER
 
 The Argus API can notify the frontend about changes in the list of open
-incidents in realtime, using a websocket (implemented using Django
+incidents in realtime using a websocket (implemented using Django
 Channels). The realtime interface requires access to a Redis server for message
 passing.
 
@@ -218,6 +218,11 @@ different server, set the :setting:`ARGUS_REDIS_SERVER` environment variable, e.
 
   ARGUS_REDIS_SERVER=my-redis-server.example.org:6379
 
+Token settings
+------------------
+.. setting:: AUTH_TOKEN_EXPIRES_AFTER_DAYS
+* :setting:`AUTH_TOKEN_EXPIRES_AFTER_DAYS`  determines how long an authentication token is valid.
+    If undefined it will default to the value of 14 days.
 
 Debugging settings
 ------------------
@@ -229,7 +234,7 @@ Debugging settings
 .. setting:: TEMPLATE_DEBUG
 
 * :setting:`TEMPLATE_DEBUG` (optional) provides a convenient way to turn debugging on and off
-  for templates. If undefined, it will default to the value of :setting:`DEBUG`.
+  for templates. If undefined it will default to the value of :setting:`DEBUG`.
 
 Other settings
 --------------
