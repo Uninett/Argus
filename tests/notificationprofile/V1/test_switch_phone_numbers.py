@@ -24,9 +24,6 @@ class SwitchPhoneNumberTests(TestCase):
         self.new_phone_number = PhoneNumber.from_string("+4747474747")
 
     def test_switch_phone_number(self):
-        if not "sms" in MEDIA_CLASSES_DICT.keys():
-            self.skipTest("No sms plugin available")
-
         _switch_phone_numbers(self.destination, self.new_phone_number, self.profile)
 
         self.assertEqual(

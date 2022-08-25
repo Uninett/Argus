@@ -115,7 +115,7 @@ class SchemaView(DetailView):
 
 
 class MediaViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated, IsOwner]
+    permission_classes = [IsAuthenticated]
     serializer_class = MediaSerializer
     queryset = Media.objects.none()
     http_method_names = ["get", "head"]
