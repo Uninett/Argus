@@ -262,8 +262,6 @@ class DestinationConfigSerializerTests(TestCase):
         self.assertEqual(obj.settings["email_address"], "new.email@example.com")
 
     def test_validate_new_sms_destination(self):
-        if not "sms" in MEDIA_CLASSES_DICT.keys():
-            self.skipTest("No sms plugin available")
         request = self.request_factory.post("/")
         request.user = self.user
         data = {
@@ -279,8 +277,6 @@ class DestinationConfigSerializerTests(TestCase):
         self.assertTrue(serializer.is_valid(), serializer.errors)
 
     def test_validate_new_sms_destination_with_empty_settings(self):
-        if not "sms" in MEDIA_CLASSES_DICT.keys():
-            self.skipTest("No sms plugin available")
         request = self.request_factory.post("/")
         request.user = self.user
         data = {
@@ -295,8 +291,6 @@ class DestinationConfigSerializerTests(TestCase):
         self.assertTrue(serializer.errors)
 
     def test_validate_new_sms_destination_with_invalid_settings(self):
-        if not "sms" in MEDIA_CLASSES_DICT.keys():
-            self.skipTest("No sms plugin available")
         request = self.request_factory.post("/")
         request.user = self.user
         data = {
@@ -311,8 +305,6 @@ class DestinationConfigSerializerTests(TestCase):
         self.assertTrue(serializer.errors)
 
     def test_validate_new_sms_destination_with_invalid_phone_number(self):
-        if not "sms" in MEDIA_CLASSES_DICT.keys():
-            self.skipTest("No sms plugin available")
         request = self.request_factory.post("/")
         request.user = self.user
         data = {
@@ -327,8 +319,6 @@ class DestinationConfigSerializerTests(TestCase):
         self.assertTrue(serializer.errors)
 
     def test_validate_new_sms_destination_with_additional_settings(self):
-        if not "sms" in MEDIA_CLASSES_DICT.keys():
-            self.skipTest("No sms plugin available")
         request = self.request_factory.post("/")
         request.user = self.user
         data = {
@@ -351,8 +341,6 @@ class DestinationConfigSerializerTests(TestCase):
         )
 
     def test_create_new_sms_destination(self):
-        if not "sms" in MEDIA_CLASSES_DICT.keys():
-            self.skipTest("No sms plugin available")
         request = self.request_factory.post("/")
         request.user = self.user
         validated_data = {
@@ -374,8 +362,6 @@ class DestinationConfigSerializerTests(TestCase):
         )
 
     def test_update_existing_sms_destination(self):
-        if not "sms" in MEDIA_CLASSES_DICT.keys():
-            self.skipTest("No sms plugin available")
         destination = DestinationConfigFactory(
             user=self.user,
             media_id="sms",
