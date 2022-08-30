@@ -40,7 +40,7 @@ MEDIA_PLUGINS = [
 ]
 
 # Example link to issue system
-ISSUE_ENDPOINT = "https://gitlab.com/gitlab-examples/gitlab-examples.gitlab.io/"
+ISSUE_ENDPOINT = "https://example.com/organization/issue-location/"
 # Path to Gitlab plugin
 ISSUE_PLUGIN = "argus.incident.issue.gitlab.GitlabPlugin"
 
