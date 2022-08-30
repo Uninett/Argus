@@ -45,7 +45,7 @@ def send_notifications_to_users(event: Event):
     sent = False
     for profile in NotificationProfile.objects.select_related("user"):
         LOG.debug('Notification: checking profile "%s"', profile)
-        if profile.incident_fits(event.incident):
+        if profile.incident_fits(event.incident) and profile.event_fits(event):
             send_notification(profile.destinations.all(), event)
             sent = True
         LOG.debug('Notification: sent? %s: profile "%s", event "%s"', sent, profile, event)
