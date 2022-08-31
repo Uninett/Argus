@@ -1,3 +1,7 @@
+import datetime
+import pytz
+
+from django.conf import settings
 from django.urls import reverse
 from django.test import TestCase, RequestFactory
 
@@ -25,6 +29,8 @@ from argus.incident.models import (
 )
 from argus.incident.views import EventViewSet
 from argus.util.testing import disconnect_signals, connect_signals
+
+TIME_ZONE = getattr(settings, "TIME_ZONE")
 
 
 class EventViewSetTestCase(TestCase):
@@ -158,6 +164,16 @@ class IncidentViewSetV1TestCase(APITestCase):
         self.assertEqual(response.data["event"]["type"]["value"], "ACK")
         self.assertEqual(response.data["event"]["description"], data["event"]["description"])
         self.assertTrue(Acknowledgement.objects.exists())
+
+    def test_can_update_acknowledgement_of_incident(self):
+        ack = self.add_acknowledgement()
+        incident_pk = ack.event.incident.pk
+        data = {
+            "expiration": (datetime.datetime.now(tz=pytz.timezone(TIME_ZONE)) + datetime.timedelta(days=3)).isoformat(),
+        }
+        response = self.client.put(path=f"/api/v1/incidents/{incident_pk}/acks/{ack.pk}/", data=data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["expiration"], data["expiration"])
 
     def test_can_get_all_events_of_incident(self):
         incident_pk = self.add_incident_with_start_event_and_tag().pk
@@ -500,6 +516,16 @@ class IncidentViewSetTestCase(APITestCase):
         self.assertEqual(response.data["event"]["type"]["value"], "ACK")
         self.assertEqual(response.data["event"]["description"], data["event"]["description"])
         self.assertTrue(Acknowledgement.objects.exists())
+
+    def test_can_update_acknowledgement_of_incident(self):
+        ack = self.add_acknowledgement()
+        incident_pk = ack.event.incident.pk
+        data = {
+            "expiration": (datetime.datetime.now(tz=pytz.timezone(TIME_ZONE)) + datetime.timedelta(days=3)).isoformat(),
+        }
+        response = self.client.put(path=f"/api/v2/incidents/{incident_pk}/acks/{ack.pk}/", data=data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["expiration"], data["expiration"])
 
     def test_can_get_all_events_of_incident(self):
         incident_pk = self.add_incident_with_start_event_and_tag().pk
