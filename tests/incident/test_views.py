@@ -599,6 +599,42 @@ class IncidentViewSetTestCase(APITestCase):
         self.assertEqual(response.data["ticket_url"], data["ticket_url"])
         self.assertEqual(Incident.objects.get(id=incident_pk).ticket_url, data["ticket_url"])
 
+    def test_can_get_my_incidents(self):
+        incident_pk = self.add_incident_with_start_event_and_tag().pk
+        response = self.client.get(path="/api/v2/incidents/mine/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # Paging, so check "results"
+        self.assertEqual(len(response.data["results"]), 1)
+        self.assertEqual(response.data["results"][0]["pk"], incident_pk)
+
+    def test_can_create_my_incident_with_tag(self):
+        # Start with no incidents or tags
+        self.assertFalse(Incident.objects.exists())
+        self.assertFalse(Tag.objects.exists())
+        self.assertFalse(IncidentTagRelation.objects.exists())
+        # Minimal data to post that has tags
+        data = {
+            "start_time": "2021-08-04T09:13:55.908Z",
+            "end_time": "2021-08-04T09:13:55.908Z",
+            "description": "incident",
+            "level": 1,
+            "tags": [{"tag": "a=b"}],
+        }
+        response = self.client.post(path="/api/v2/incidents/mine/", data=data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        # Check that we have made the correct Incident
+        self.assertEqual(response.data["description"], data["description"])
+        self.assertTrue(Incident.objects.exists())
+        incident = Incident.objects.get()
+        incident_tags = [relation.tag for relation in IncidentTagRelation.objects.filter(incident=incident)]
+        self.assertEqual(incident.description, data["description"])
+        # Check that we have made the correct Tag
+        self.assertTrue(IncidentTagRelation.objects.exists())
+        self.assertTrue(Tag.objects.exists())
+        tag = Tag.objects.get()
+        self.assertEqual(incident_tags, [tag])
+        self.assertEqual(str(tag), data["tags"][0]["tag"])
+
     def test_can_get_all_events(self):
         incident = self.add_incident_with_start_event_and_tag()
         event_pk = incident.events.get().pk
