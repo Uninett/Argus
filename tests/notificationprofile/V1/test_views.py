@@ -1,10 +1,8 @@
 from django.test import tag
 
 from rest_framework import status
-from rest_framework.renderers import JSONRenderer
 from rest_framework.test import APITestCase
 
-from argus.incident.serializers import IncidentSerializer
 from argus.notificationprofile.factories import (
     DestinationConfigFactory,
     FilterFactory,
