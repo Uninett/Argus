@@ -30,3 +30,15 @@ class IssueUrlTestCase(TestCase):
             validator(issue_url)
         except ValidationError:
             self.fail(msg=f"Generated url '{issue_url}' is not a valid url.")
+
+    def test_github_plugin_generates_valid_url(self):
+        try:
+            github_class = _import_class_from_dotted_path("argus.incident.issue.github.GithubPlugin")
+        except:
+            self.skipTest()
+        issue_url = github_class.generate_issue_url(self.incident)
+        validator = URLValidator()
+        try:
+            validator(issue_url)
+        except ValidationError:
+            self.fail(msg=f"Generated url '{issue_url}' is not a valid url.")
