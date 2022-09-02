@@ -281,10 +281,6 @@ class DestinationConfig(models.Model):
 
 
 class NotificationProfile(models.Model):
-    class Media(models.TextChoices):
-        EMAIL = "EM", "Email"
-        SMS = "SM", "SMS"
-
     user = models.ForeignKey(to=User, on_delete=models.CASCADE, related_name="notification_profiles")
     timeslot = models.OneToOneField(
         to=Timeslot,
@@ -293,11 +289,7 @@ class NotificationProfile(models.Model):
         related_name="notification_profile",
     )
     filters = models.ManyToManyField(to=Filter, related_name="notification_profiles")
-
-    media = MultiSelectField(choices=Media.choices, min_choices=1, default=[Media.EMAIL])
-    media_v1 = MultiSelectField(choices=Media.choices, min_choices=1, default=[Media.EMAIL])
     active = models.BooleanField(default=True)
-    phone_number = models.ForeignKey("argus_auth.PhoneNumber", on_delete=models.SET_NULL, blank=True, null=True)
     destinations = models.ManyToManyField(
         to=DestinationConfig,
         related_name="notification_profiles",
