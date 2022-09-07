@@ -22,6 +22,10 @@ ISSUE_ENDPOINT = getattr(settings, "ISSUE_ENDPOINT")
 
 class GitlabPlugin(IssuePlugin):
     def generate_issue_url(incident: Incident):
+        """
+        Returns an url to a new Gitlab issue with pre-filled values for a
+        given incident
+        """
         if not ISSUE_ENDPOINT:
             raise ValueError(
                 "No endpoint to issue system can be found in the settings. Please update the setting 'ISSUE_ENDPOINT'."
@@ -30,7 +34,7 @@ class GitlabPlugin(IssuePlugin):
         parameter_str = "new?"
         # Title
         if incident.description:
-            parameter_str += f"issue[title]={quote(incident.description)}&"
+            parameter_str += f"issue[title]={quote(str(incident))}&"
         # Description
-        parameter_str += f"issue[description]={quote(str(incident))}"
+        parameter_str += f"issue[description]={quote(incident.description)}"
         return urljoin(base_url, parameter_str)

@@ -8,5 +8,5 @@ __all__ = ["IssuePlugin"]
 class IssuePlugin(ABC):
     @classmethod
     @abstractmethod
-    def generate_issue_url(cls, incident):
+    def generate_issue_url(incident):
         return None

@@ -251,7 +251,7 @@ class IncidentViewSet(
                 status=status.HTTP_400_BAD_REQUEST,
             )
         try:
-            url = ISSUE_CLASS.generate_issue_url(incident)
+            url = ISSUE_CLASS.generate_issue_url(incident=incident)
         except ValueError:
             return Response(
                 data="No endpoint to issue system can be found in the settings. Please update the setting 'ISSUE_ENDPOINT'.",
