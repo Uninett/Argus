@@ -23,8 +23,8 @@ ISSUE_ENDPOINT = getattr(settings, "ISSUE_ENDPOINT")
 class GitlabPlugin(IssuePlugin):
     def generate_issue_url(incident: Incident):
         """
-        Generate and return an url to a new Gitlab issue with pre-filled
-        values from a given incident
+        Returns an url to a new Gitlab issue with pre-filled values for a
+        given incident
         """
         if not ISSUE_ENDPOINT:
             raise ValueError(
