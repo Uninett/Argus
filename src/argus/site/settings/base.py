@@ -306,4 +306,5 @@ SOCIAL_AUTH_NEW_USER_REDIRECT_URL = SOCIAL_AUTH_LOGIN_REDIRECT_URL
 ISSUE_ENDPOINT = ""
 # Path to issue plugin
 # Gitlab plugin: "argus.incident.issue.gitlab.GitlabPlugin"
+# Gitlab plugin: "argus.incident.issue.request_tracker.RequestTrackerPlugin"
 ISSUE_PLUGIN = ""

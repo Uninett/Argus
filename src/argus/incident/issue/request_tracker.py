@@ -22,6 +22,10 @@ ISSUE_ENDPOINT = getattr(settings, "ISSUE_ENDPOINT")
 
 class RequestTrackerPlugin(IssuePlugin):
     def generate_issue_url(incident: Incident):
+        """
+        Returns an url to a new Request Tracker ticket with pre-filled values
+        for a given incident
+        """
         if not ISSUE_ENDPOINT:
             raise ValueError(
                 "No endpoint to issue system can be found in the settings. Please update the setting 'ISSUE_ENDPOINT'."
@@ -31,7 +35,7 @@ class RequestTrackerPlugin(IssuePlugin):
         parameter_str = "Create.html?"
         # Title
         if incident.description:
-            parameter_str += f"Subject={quote(incident.description)}&"
+            parameter_str += f"Subject={quote(str(incident))}&"
         # Body
         parameter_str += f"Content={quote(incident.description)}"
         return urljoin(base_url, parameter_str)
