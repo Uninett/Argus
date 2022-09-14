@@ -79,6 +79,7 @@ class NotificationProfileAdmin(admin.ModelAdmin):
     list_display = ("get_str", "get_filters", "get_destination_media", "active")
     list_filter = ("active",)
     search_fields = (
+        "name",
         "timeslot__name",
         "filters__name",
         "filters__filter_string",
@@ -97,10 +98,12 @@ class NotificationProfileAdmin(admin.ModelAdmin):
     exclude = ("destinations",)
 
     def get_str(self, notification_profile: NotificationProfile):
+        if notification_profile.name:
+            return f"{notification_profile.name}"
         return f"[{notification_profile.timeslot.user}] {notification_profile.timeslot}"
 
-    get_str.short_description = "[User] Time slot"
-    get_str.admin_order_field = Concat("timeslot__user", "timeslot__name")
+    get_str.short_description = "Name"
+    get_str.admin_order_field = Concat("name", "timeslot__user", "timeslot__name")
 
     def get_filters(self, notification_profile: NotificationProfile):
         return format_html_join("", "<div>{}</div>", ((f,) for f in notification_profile.filters.all()))
