@@ -15,6 +15,7 @@ def copy_id_to_timeslot(apps, schema_editor):
 
 def fix_multi_use_timeslot_profiles(apps, schema_editor):
     Timeslot = apps.get_model("argus_notificationprofile", "Timeslot")
+    TimeRecurrence = apps.get_model("argus_notificationprofile", "TimeRecurrence")
 
     timeslots = Timeslot.objects.prefetch_related("notification_profiles").annotate(
         num_profiles=models.Count("notification_profiles")
@@ -23,30 +24,32 @@ def fix_multi_use_timeslot_profiles(apps, schema_editor):
         profiles = timeslot.notification_profiles.order_by("pk").all()
         first_profile_id = profiles[0].id
         for i, profile in enumerate(profiles.exclude(id=first_profile_id)):
-            new_timeslot = Timeslot.objects.get_or_create(user=timeslot.user, name="".join([timeslot.name, str(i)]))
-            new_timeslot.time_recurrences.add(timeslot.time_recurrences)
-            new_timeslot.save()
+            new_timeslot, _ = Timeslot.objects.get_or_create(user=timeslot.user, name="".join([timeslot.name, str(i)]))
+            for time_recurrence in timeslot.time_recurrences.all():
+                new_time_recurrence, _ = TimeRecurrence.objects.get_or_create(
+                    timeslot=new_timeslot,
+                    days=time_recurrence.days,
+                    start=time_recurrence.start,
+                    end=time_recurrence.end,
+                )
+                new_timeslot.time_recurrences.add(new_time_recurrence)
             profile.timeslot_id = new_timeslot.id
             profile.save()
 
 
-def copy_timeslot_to_timeslot_copy(apps, schema_editor):
+def copy_timeslot_to_id(apps, schema_editor):
     NotificationProfile = apps.get_model("argus_notificationprofile", "NotificationProfile")
 
-    profiles = NotificationProfile.objects.all()
+    profiles = NotificationProfile.objects.exclude(id=models.F("timeslot_id"))
+    old_ids = []
+
     for profile in profiles:
-        profile.timeslot_copy = profile.timeslot_id
-
-    NotificationProfile.objects.bulk_update(objs=profiles, fields=["timeslot_copy"])
-
-
-def copy_timeslot_copy_to_timeslot(apps, schema_editor):
-    NotificationProfile = apps.get_model("argus_notificationprofile", "NotificationProfile")
-
-    profiles = NotificationProfile.objects.all()
-    for profile in profiles:
-        profile.id = profile.timeslot_copy
+        old_ids.append(profile.id)
+        profile.id = profile.timeslot_id
         profile.save()
+
+    # Django creates new object when changing pk
+    NotificationProfile.objects.filter(id__in=old_ids).delete()
 
 
 class Migration(migrations.Migration):
@@ -56,9 +59,8 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(migrations.RunPython.noop, copy_timeslot_copy_to_timeslot),
+        migrations.RunPython(migrations.RunPython.noop, copy_timeslot_to_id),
         migrations.RunPython(copy_id_to_timeslot, fix_multi_use_timeslot_profiles),
-        migrations.RunPython(migrations.RunPython.noop, copy_timeslot_to_timeslot_copy),
         migrations.AlterField(
             model_name="notificationprofile",
             name="timeslot",
@@ -68,8 +70,17 @@ class Migration(migrations.Migration):
                 to="argus_notificationprofile.timeslot",
             ),
         ),
-        migrations.RemoveField(
+        migrations.AddField(
             model_name="notificationprofile",
-            name="timeslot_copy",
+            name="name",
+            field=models.CharField(
+                blank=True,
+                max_length=40,
+                null=True,
+            ),
+        ),
+        migrations.AddConstraint(
+            model_name="notificationprofile",
+            constraint=models.UniqueConstraint(fields=("user", "name"), name="unique_name_per_user"),
         ),
     ]
