@@ -7,10 +7,12 @@ from rest_framework.test import APITestCase
 
 from argus.incident.serializers import IncidentSerializer
 from argus.notificationprofile.factories import (
-    TimeslotFactory,
+    DestinationConfigFactory,
     FilterFactory,
     NotificationProfileFactory,
+    TimeslotFactory,
 )
+from argus.notificationprofile.models import Media, NotificationProfile
 from argus.notificationprofile.models import NotificationProfile
 from argus.util.testing import disconnect_signals, connect_signals
 
@@ -35,9 +37,15 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
         )
         self.notification_profile1 = NotificationProfileFactory(user=self.user1, timeslot=self.timeslot1)
         self.notification_profile1.filters.add(filter1)
+
+        self.sms_destination = DestinationConfigFactory(
+            user=self.user1,
+            media=Media.objects.get(slug="sms"),
+            settings={"phone_number": "+4747474700"},
+        )
+
         self.notification_profile1.destinations.set(self.user1.destinations.all())
         self.media = ["EM", "SM"]
-        self.phone_number = "+4747474700"
 
     def teardown(self):
         connect_signals()
@@ -61,7 +69,7 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
                 "timeslot": self.timeslot2.pk,
                 "filters": [f.pk for f in self.notification_profile1.filters.all()],
                 "media": self.media,
-                "phone_number": self.phone_number,
+                "phone_number": self.sms_destination.pk,
                 "active": self.notification_profile1.active,
             },
         )
