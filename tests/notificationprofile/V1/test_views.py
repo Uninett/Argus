@@ -49,15 +49,14 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
         response.render()
         self.assertEqual(response.content, self.incident1_json)
 
-    def test_notification_profile_can_properly_change_timeslot(self):
+    def test_notification_profile_can_update_timeslot_without_changing_pk(self):
+        # Originally timeslot was the pk of notification profile
         profile1_pk = self.notification_profile1.pk
-        profile1_path = reverse("v1:notification-profile:notificationprofile-detail", args=[profile1_pk])
+        profile1_path = f"/api/v1/notificationprofiles/{profile1_pk}/"
 
-        self.assertEqual(self.user1.notification_profiles.get(pk=profile1_pk).timeslot, self.timeslot1)
-        self.assertEqual(self.user1_rest_client.get(profile1_path).status_code, status.HTTP_200_OK)
         response = self.user1_rest_client.put(
-            profile1_path,
-            {
+            path=profile1_path,
+            data={
                 "timeslot": self.timeslot2.pk,
                 "filters": [f.pk for f in self.notification_profile1.filters.all()],
                 "media": self.media,
@@ -66,14 +65,7 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
             },
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        new_profile1_pk = response.data["pk"]
-
-        self.assertEqual(self.user1_rest_client.get(profile1_path).status_code, status.HTTP_404_NOT_FOUND)
-        with self.assertRaises(NotificationProfile.DoesNotExist):
-            self.notification_profile1.refresh_from_db()
-        self.assertTrue(self.user1.notification_profiles.filter(pk=new_profile1_pk).exists())
-        self.assertEqual(self.user1.notification_profiles.get(pk=new_profile1_pk).timeslot, self.timeslot2)
-        new_profile1_path = reverse("v1:notification-profile:notificationprofile-detail", args=[new_profile1_pk])
-        self.assertEqual(self.user1_rest_client.get(new_profile1_path).status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["pk"], profile1_pk)
+        self.assertEqual(NotificationProfile.objects.get(pk=profile1_pk).timeslot.pk, self.timeslot2.pk)
 
     # TODO: test more endpoints
