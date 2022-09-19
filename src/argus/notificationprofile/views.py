@@ -182,7 +182,7 @@ class DestinationConfigViewSet(rw_viewsets.ModelViewSet):
         other_destinations = DestinationConfig.objects.filter(media=destination.media).filter(
             ~Q(user_id=destination.user.id)
         )
-        destination_in_use = MEDIA_CLASSES_DICT[destination.media_id].check_for_duplicate(
+        destination_in_use = MEDIA_CLASSES_DICT[destination.media_id].has_duplicate(
             other_destinations, destination.settings
         )
         return destination_in_use

@@ -21,7 +21,7 @@ class NotificationMedium(ABC):
 
     @classmethod
     @abstractmethod
-    def check_for_duplicate(self, queryset: QuerySet, settings: dict) -> bool:
+    def has_duplicate(self, queryset: QuerySet, settings: dict) -> bool:
         """
         Returns True if a destination with the given settings already exists
         in the given queryset

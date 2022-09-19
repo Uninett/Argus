@@ -60,7 +60,7 @@ class SMSNotification(NotificationMedium):
         return destination.settings.get("phone_number")
 
     @classmethod
-    def check_for_duplicate(self, queryset: QuerySet, settings: dict) -> bool:
+    def has_duplicate(self, queryset: QuerySet, settings: dict) -> bool:
         """
         Returns True if a sms destination with the same phone number
         already exists in the given queryset

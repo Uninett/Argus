@@ -109,7 +109,7 @@ class EmailNotification(NotificationMedium):
         return destination.settings.get("email_address")
 
     @classmethod
-    def check_for_duplicate(self, queryset: QuerySet, settings: dict) -> bool:
+    def has_duplicate(self, queryset: QuerySet, settings: dict) -> bool:
         """
         Returns True if an email destination with the same email address
         already exists in the given queryset
