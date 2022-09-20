@@ -7,6 +7,7 @@ djangorestframework<3.13
 drf-spectacular>=0.17
 drf-rw-serializers
 factory_boy
+jira
 psycopg2-binary
 python-dataporten-auth
 social-auth-core>=4.1
