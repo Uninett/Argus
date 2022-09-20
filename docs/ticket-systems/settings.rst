@@ -26,3 +26,19 @@ be created in.
 
 To enable an integration with a ticket plugin these settings MUST be added
 to Argus.
+
+Jira
+----
+
+* ``TICKET_PLUGIN``: ``"argus.incident.ticket.jira.JiraPlugin"``
+* ``TICKET_ENDPOINT``: ``"https://jira.atlassian.net"`` or link to cloud- or self-hosted instance
+* ``TICKET_AUTHENTICATION_SECRET``:
+    - create an `API token <https://id.atlassian.com/manage-profile/security/api-tokens>`_
+    - add it like this: ``{"token": API token}``
+    - if you're using a cloud-hosted instance, also add your email address like this: ``{"token": API token, "email": email address}``
+* ``TICKET_INFORMATION``:
+    - to know which project to create the ticket in the Jira API needs to know the project key or id of it
+    - to figure out the project key visit the section Project Key of the `Jira ticket documentation <https://support.atlassian.com/jira-software-cloud/docs/what-is-an-issue/>`_
+    - to figure out the project id visit this `guide on how to get the project id <https://confluence.atlassian.com/jirakb/how-to-get-project-id-from-the-jira-user-interface-827341414.html/>`_
+    - fill the dictionary like this: ``{"project_key_or_id": project key/id}``
+    - in case the tickets should have a different type than ``Task``, add it to the dictionary like this: ``{"project_key_or_id": project key/id, "type": "Epic"|"Story"|"Task"|"Bug"|"Subtask"|any other ticket type}``

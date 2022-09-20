@@ -11,6 +11,8 @@ Ticket systems
 It is possible to automatically create a ticket from an Argus incident with
 a pre-filled title and body.
 
+Currently Argus supports an integration with Jira.
+
 How to write a plugin for a desired ticket system is detailed in
 :ref:`writing-ticket-system-plugins`.
 
