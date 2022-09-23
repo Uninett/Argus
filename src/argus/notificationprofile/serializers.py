@@ -131,6 +131,7 @@ class ResponseDestinationConfigSerializer(serializers.ModelSerializer):
     class Meta:
         model = DestinationConfig
         fields = [
+            "pk",
             "media",
             "label",
             "suggested_label",
