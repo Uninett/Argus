@@ -245,7 +245,7 @@ An incident with the id ``27`` can be closed by **POST**-ing a new event to
 
 You should only ever use the ``END`` event type to indicate that the incident
 was resolved from the source system.  The available types of events are
-documented in :ref:`api-incident-event-types`.
+documented in :ref:`api-incident-endpoints`.
 
 
 On stateful incidents vs. stateless incidents
