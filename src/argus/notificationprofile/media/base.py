@@ -6,8 +6,12 @@ from typing import TYPE_CHECKING
 from django.db.models.query import QuerySet
 
 if TYPE_CHECKING:
+    from types import NoneType
+    from typing import Union
+    from django.db.models.query import QuerySet
     from argus.incident.models import Event
-    from argus.notificationprofile.models import DestinationConfig, NotificationProfile
+    from ..models import DestinationConfig
+    from ..serializers import RequestDestinationConfigSerializer
 
 
 __all__ = ["NotificationMedium"]
@@ -16,7 +20,11 @@ __all__ = ["NotificationMedium"]
 class NotificationMedium(ABC):
     @classmethod
     @abstractmethod
-    def validate(cls, instance, dict):
+    def validate(cls, instance: RequestDestinationConfigSerializer, dict: dict) -> dict:
+        """
+        Validates the settings of destination and returns a dict with
+        validated and cleaned data
+        """
         pass
 
     @classmethod
@@ -30,18 +38,31 @@ class NotificationMedium(ABC):
 
     @staticmethod
     @abstractmethod
-    def get_label(destination: DestinationConfig):
+    def get_label(destination: DestinationConfig) -> str:
+        """
+        Returns a descriptive label for this destination.
+        """
         pass
 
     @staticmethod
     @abstractmethod
-    def send(event: Event, profile: NotificationProfile, **kwargs):
+    def send(event: Event, destinations: QuerySet[DestinationConfig], **kwargs) -> bool:
+        """Sends message about a given event to the given destinations"""
         pass
 
     @staticmethod
-    def is_deletable(destination: DestinationConfig):
+    def is_deletable(destination: DestinationConfig) -> Union[str, NoneType]:
+        """
+        Returns None if the given destination is able to be deleted and
+        returns an error message if not
+        """
         return None
 
     @staticmethod
-    def update(destination, validated_data):
+    def update(destination: DestinationConfig, validated_data: dict) -> Union[DestinationConfig, NoneType]:
+        """
+        Updates a destination in case the normal update function is not
+        sufficient and returns the updated destination in that case,
+        returns None otherwise
+        """
         return None
