@@ -3,6 +3,14 @@ This file documents changes to Argus that are relevant for the users to know.
 
 ## [Unreleased]
 
+## filter-duration
+
+## Added
+
+- Add a filter to find incidents with a duration longer than a given amount of
+ minutes.
+
+
 ## [1.8.0] - 2022-10-06
 
 ### Added
