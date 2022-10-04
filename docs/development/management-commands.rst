@@ -38,7 +38,7 @@ add the `-u` flag to the command as such:
 
         $ python manage.py initial_setup -u "Name"
 
-To set the password of the created admin user add the `-e` flag to the command
+To set the password of the created admin user add the `-p` flag to the command
 as such:
 
     .. code:: console
