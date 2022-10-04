@@ -122,7 +122,7 @@ pyasn1-modules==0.2.8
     # via service-identity
 pycparser==2.20
     # via cffi
-pyjwt==2.0.1
+pyjwt==2.4.0
     # via social-auth-core
 pyopenssl==20.0.1
     # via twisted
