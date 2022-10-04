@@ -8,6 +8,16 @@ read by developers.
 - Add endpoint for getting all events.
 - Add support for multiple emails and phone numbers per user.
 
+- Allow source systems to post acknowledgements.
+- Added clearer directions to the Argus documentation in the README.
+
+### Fixed
+- Rename the `media_v1` key in the notificationprofile endpoint back to `media`, as changing it to `media_v1` broke the frontend.
+- Fix a notification profile test running duplicate asserts against one filter instead of actually testing the other defined filters.
+
+### Changed
+- Use more factories for notificationprofile tests.
+
 
 ## [1.5.1] - 2022-05-03
 
