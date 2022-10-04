@@ -3,6 +3,8 @@ This file documents changes to Argus that are relevant for the users to know.
 
 ## [Unreleased]
 
+## [1.6.0] - 2022-10-04
+
 ### Added
 - New API endpoint `/incidents/all-events/` for listing all events.
 - Users can now have multiple emails and phone numbers

@@ -4,10 +4,11 @@ read by developers.
 
 ## [Unreleased]
 
+## [1.6.0] - 2022-10-04
+
 ### Added
 - Add endpoint for getting all events.
 - Add support for multiple emails and phone numbers per user.
-
 - Allow source systems to post acknowledgements.
 - Added clearer directions to the Argus documentation in the README.
 
@@ -18,12 +19,10 @@ read by developers.
 ### Changed
 - Use more factories for notificationprofile tests.
 
-
 ## [1.5.1] - 2022-05-03
 
 ### Fixed
 - Acknowledging incidents works again, thanks to a workaround.
-
 
 ## [1.5.0] - 2022-05-03
 
