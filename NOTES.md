@@ -3,6 +3,8 @@ This file documents changes to Argus that are relevant for the users to know.
 
 ## [Unreleased]
 
+## [1.6.0] - 2022-10-04
+
 ### Added
 - New API endpoint `/incidents/all-events/` for listing all events.
 - Users can now have multiple emails and phone numbers
@@ -27,7 +29,13 @@ MEDIA_PLUGINS = [
 ]
 ```
 
-## [1.5.0] - Unreleased
+## [1.5.1] - 2022-05-03
+
+### Fixed
+- Acking an incident when notifications were turned on was broken, this is
+  a workaround.
+
+## [1.5.0] - 2022-05-03
 
 ### Added
 - New query parameter `search` for the incident endpoint. This allows searching
