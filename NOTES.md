@@ -3,6 +3,12 @@ This file documents changes to Argus that are relevant for the users to know.
 
 ## [Unreleased]
 
+## [1.7.0] - 2022-10-04
+
+### Steps for upgrading
+
+Running migrate will complete the changes that started with 1.6.0.
+
 ## [1.6.0] - 2022-10-04
 
 ### Added

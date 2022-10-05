@@ -4,6 +4,12 @@ read by developers.
 
 ## [Unreleased]
 
+## [1.7.0]
+
+### Changed
+
+- Clean away database tables rendered unnecessary due to changes in 1.6.0
+
 ## [1.6.0] - 2022-10-04
 
 ### Added
