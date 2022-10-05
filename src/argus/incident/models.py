@@ -7,7 +7,7 @@ from urllib.parse import urljoin
 
 from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
-from django.db import models
+from django.db import models, transaction
 from django.db.models import Q
 from django.utils import timezone
 
@@ -54,34 +54,6 @@ def create_fake_incident(tags=None, description=None, stateful=True, level=None)
     if tags:
         tags = [tag.split("=", 1) for tag in tags]
         taglist.extend(tags)
-    for k, v in taglist:
-        tag, _ = Tag.objects.get_or_create(key=k, value=v)
-        IncidentTagRelation.objects.create(tag=tag, incident=incident, added_by=argus_user)
-    return incident
-
-
-def create_token_expiry_incident(token, expiry_date, level=2):
-    if not token:
-        raise ValueError("Token must be not None")
-
-    argus_user, _, source_system = get_or_create_default_instances()
-    end_time = INFINITY_REPR
-    description = f"Token for source system {str(token.user.source_system)} will expire on {expiry_date.date()}"
-
-    incident = Incident.objects.create(
-        start_time=timezone.now(),
-        end_time=end_time,
-        source=source_system,
-        description=description,
-        level=level,
-    )
-
-    taglist = [
-        ("location", "argus"),
-        ("object", f"{incident.id}"),
-        ("problem_type", "token_expiry"),
-        ("source_system_id", f"{token.user.source_system.id}"),
-    ]
     for k, v in taglist:
         tag, _ = Tag.objects.get_or_create(key=k, value=v)
         IncidentTagRelation.objects.create(tag=tag, incident=incident, added_by=argus_user)
