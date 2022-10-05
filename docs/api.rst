@@ -1268,6 +1268,12 @@ Notification profile endpoints
 
    -  ``DELETE``: deletes one of the logged in user’s destination-configs by primary key
 
+-  ``/api/v2/notificationprofiles/destinations/<int:pk>/duplicate/``:
+
+   -  ``GET``: returns True if another user has a destination with the same
+      medium and settings as the destination with the given primary key
+
+
 -  ``/api/v2/notificationprofiles/media/``:
 
    -  ``GET``: returns media
