@@ -9,6 +9,8 @@ read by developers.
 ### Changed
 
 - Clean away database tables rendered unnecessary due to changes in 1.6.0
+- Modernize packaging. Package-building is all in pyproject.toml, tools are
+  configured either there or in tox.ini.
 
 ## [1.6.0] - 2022-10-04
 

@@ -5,6 +5,10 @@ This file documents changes to Argus that are relevant for the users to know.
 
 ## [1.7.0] - 2022-10-04
 
+### Added
+
+- Documentation for our own management commands (CLI-scripts)
+
 ### Steps for upgrading
 
 Running migrate will complete the changes that started with 1.6.0.
