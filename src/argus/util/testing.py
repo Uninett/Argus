@@ -12,6 +12,7 @@ __all__ = [
 
 # Signals that close the database connection, interferes with some tests
 
+
 def disconnect_signals():
     post_save.disconnect(send_notification, Event, dispatch_uid="send_notification")
 
