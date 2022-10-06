@@ -40,6 +40,7 @@ SEND_NOTIFICATIONS = get_bool_env("ARGUS_SEND_NOTIFICATIONS", default=False)
 # Paths to plugins
 MEDIA_PLUGINS = [
     "argus.notificationprofile.media.email.EmailNotification",
+    "argus.notificationprofile.media.sms_as_email.SMSNotification",
 ]
 
 # PSA for login
