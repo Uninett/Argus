@@ -4,11 +4,35 @@ read by developers.
 
 ## [Unreleased]
 
+## [1.7.0]
+
+### Changed
+
+- Clean away database tables rendered unnecessary due to changes in 1.6.0
+- Modernize packaging. Package-building is all in pyproject.toml, tools are
+  configured either there or in tox.ini.
+
+## [1.6.0] - 2022-10-04
+
 ### Added
 - Add endpoint for getting all events.
 - Add support for multiple emails and phone numbers per user.
+- Allow source systems to post acknowledgements.
+- Added clearer directions to the Argus documentation in the README.
 
-## [1.5.0] - unreleased
+### Fixed
+- Rename the `media_v1` key in the notificationprofile endpoint back to `media`, as changing it to `media_v1` broke the frontend.
+- Fix a notification profile test running duplicate asserts against one filter instead of actually testing the other defined filters.
+
+### Changed
+- Use more factories for notificationprofile tests.
+
+## [1.5.1] - 2022-05-03
+
+### Fixed
+- Acknowledging incidents works again, thanks to a workaround.
+
+## [1.5.0] - 2022-05-03
 
 ### Added
 - Github actions: Add support for SonarQube (for Géant) and prevent CodeCov on
