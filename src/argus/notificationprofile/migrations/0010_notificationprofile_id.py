@@ -44,8 +44,15 @@ def copy_timeslot_to_id(apps, schema_editor):
 
     for profile in profiles:
         old_id = profile.id
+        filters = profile.filters.all()
+        destinations = profile.destinations.all()
         profile.id = profile.timeslot_id
         profile.save()
+
+        # Django creates new object when changing pk
+        # Add filters and destinations to new object
+        profile.filters.set(filters)
+        profile.destinations.set(destinations)
 
         # Delete old object
         NotificationProfile.objects.filter(id=old_id).exclude(id=models.F("timeslot_id")).delete()
