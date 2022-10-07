@@ -14,6 +14,7 @@ from drf_rw_serializers import viewsets as rw_viewsets
 from argus.drf.permissions import IsOwner
 from argus.incident.serializers import IncidentSerializer
 from argus.notificationprofile.media import MEDIA_CLASSES_DICT
+from argus.notificationprofile.media.base import NotificationMedium
 from .models import DestinationConfig, Filter, Media, NotificationProfile, Timeslot
 from .serializers import (
     FilterSerializer,
@@ -170,11 +171,12 @@ class DestinationConfigViewSet(rw_viewsets.ModelViewSet):
         except DestinationConfig.DoesNotExist:
             raise ValidationError(f"Destination with pk={pk} does not exist.")
 
-        error_message = MEDIA_CLASSES_DICT[destination.media.slug].is_deletable(destination)
-        if not error_message:
-            return super().destroy(destination)
+        try:
+            MEDIA_CLASSES_DICT[destination.media.slug].raise_if_not_deletable(destination)
+        except NotificationMedium.NotDeletableError as e:
+            raise ValidationError(str(e))
         else:
-            raise ValidationError(error_message)
+            return super().destroy(destination)
 
 
 class TimeslotViewSet(viewsets.ModelViewSet):

@@ -32,7 +32,7 @@ def create_fake_incident(tags=None, description=None, stateful=True, level=None)
     argus_user, _, source_system = get_or_create_default_instances()
     end_time = INFINITY_REPR if stateful else None
 
-    MAX_ID = 2 ** 32 - 1
+    MAX_ID = 2**32 - 1
     MIN_ID = 1
     source_incident_id = randint(MIN_ID, MAX_ID)
 

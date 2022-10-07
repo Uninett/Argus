@@ -8,7 +8,9 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("source", type=str, help="Create a source with name <source>, default type: argus")
-        parser.add_argument("-t", "--source-type", type=str, help="Create/use the source type <source-type> instead of argus")
+        parser.add_argument(
+            "-t", "--source-type", type=str, help="Create/use the source type <source-type> instead of argus"
+        )
 
     def handle(self, *args, **options):
         source = options["source"]
