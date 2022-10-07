@@ -41,15 +41,14 @@ def copy_timeslot_to_id(apps, schema_editor):
     NotificationProfile = apps.get_model("argus_notificationprofile", "NotificationProfile")
 
     profiles = NotificationProfile.objects.exclude(id=models.F("timeslot_id"))
-    old_ids = []
 
     for profile in profiles:
-        old_ids.append(profile.id)
+        old_id = profile.id
         profile.id = profile.timeslot_id
         profile.save()
 
-    # Django creates new object when changing pk
-    NotificationProfile.objects.filter(id__in=old_ids).delete()
+        # Delete old object
+        NotificationProfile.objects.filter(id=old_id).exclude(id=models.F("timeslot_id")).delete()
 
 
 class Migration(migrations.Migration):
