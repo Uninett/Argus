@@ -52,7 +52,10 @@ def create_fake_incident(tags=None, description=None, stateful=True, level=None)
 
     taglist = [("location", "argus"), ("object", f"{incident.id}"), ("problem_type", "test")]
     if tags:
-        tags = [Tag.split(tag) for tag in tags]
+        try:
+            tags = [Tag.split(tag) for tag in tags]
+        except ValueError as e:
+            raise ValidationError(e)
         taglist.extend(tags)
     for k, v in taglist:
         tag, _ = Tag.objects.get_or_create(key=k, value=v)
@@ -136,9 +139,13 @@ class Tag(models.Model):
         if cls.TAG_DELIMITER not in tag:
             raise ValueError(f"The tag must contain an equality sign ({cls.TAG_DELIMITER}) delimiter.")
         key, value = tag.split(cls.TAG_DELIMITER, maxsplit=1)
+        key = key.strip()
+        value = value.strip()
+
         if not key:
             raise ValueError("The key of the tag cannot be empty.")
-        value = value.strip()
+
+        Tag._meta.get_field("key").run_validators(key)
         return key, value
 
 

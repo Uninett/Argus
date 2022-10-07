@@ -40,30 +40,23 @@ class TagSerializer(serializers.Serializer):
     tag = serializers.CharField()
 
     def validate_tag(self, value: str):
-        if not Tag.TAG_DELIMITER in value:
-            raise serializers.ValidationError(f"The tag must contain an equality sign ({Tag.TAG_DELIMITER}) delimiter.")
+        try:
+            key, value = Tag.split(value)
+        except ValueError as e:
+            raise serializers.ValidationError(e)
 
-        key, value = Tag.split(value)
-        key = key.strip()
-        if not key:  # Django doesn't attempt validating empty values
-            raise serializers.ValidationError("The tag's key must not be empty")
-        Tag._meta.get_field("key").run_validators(key)
-        # Reassemble tag, to enforce key without leading or trailing whitespace (by calling `strip()` above)
         return Tag.join(key, value)
 
     def to_internal_value(self, data: dict):
-        if "tag" in data:
-            if not Tag.TAG_DELIMITER in data["tag"]:
-                raise serializers.ValidationError(
-                    {"tag": f"The tag must contain an equality sign ({Tag.TAG_DELIMITER}) delimiter."}
-                )
+        if not "tag" in data:
+            return data
+
+        try:
             key, value = Tag.split(data.pop("tag"))
-            key = key.strip()
-            if not key:  # Django doesn't attempt validating empty values
-                raise serializers.ValidationError({"tag": "The tag's key must not be empty"})
-            Tag._meta.get_field("key").run_validators(key)
-            return {"key": key, "value": value}
-        return data
+        except ValueError as e:
+            raise serializers.ValidationError(e)
+
+        return {"key": key, "value": value}
 
     def to_representation(self, instance):
         if isinstance(instance, Tag):
@@ -83,35 +76,32 @@ class IncidentTagRelationSerializer(serializers.ModelSerializer):
         read_only_fields = ["added_by", "added_time"]
 
     def validate_tag(self, value: str):
-        if not Tag.TAG_DELIMITER in value:
-            raise serializers.ValidationError(f"The tag must contain an equality sign ({Tag.TAG_DELIMITER}) delimiter.")
+        try:
+            key, value = Tag.split(value)
+        except ValueError as e:
+            raise serializers.ValidationError(e)
 
-        key, value = Tag.split(value)
-        key = key.strip()
-        if not key:  # Django doesn't attempt validating empty values
-            raise serializers.ValidationError("The tag's key must not be empty")
-        Tag._meta.get_field("key").run_validators(key)
-        # Reassemble tag, to enforce key without leading or trailing whitespace (by calling `strip()` above)
         return Tag.join(key, value)
 
     def create(self, validated_data: dict):
         tag = validated_data.pop("tag")
-        key, value = Tag.split(tag)
+        try:
+            key, value = Tag.split(tag)
+        except ValueError as e:
+            raise serializers.ValidationError(e)
+
         return Tag.objects.create(key=key, value=value, **validated_data)
 
     def to_internal_value(self, data: dict):
-        if "tag" in data:
-            if not Tag.TAG_DELIMITER in data["tag"]:
-                raise serializers.ValidationError(
-                    {"tag": f"The tag must contain an equality sign ({Tag.TAG_DELIMITER}) delimiter."}
-                )
+        if not "tag" in data:
+            return data
+
+        try:
             key, value = Tag.split(data.pop("tag"))
-            key = key.strip()
-            if not key:  # Django doesn't attempt validating empty values
-                raise serializers.ValidationError({"tag": "The tag's key must not be empty"})
-            Tag._meta.get_field("key").run_validators(key)
-            return {"key": key, "value": value}
-        return data
+        except ValueError as e:
+            raise serializers.ValidationError(e)
+
+        return {"key": key, "value": value}
 
     def to_representation(self, instance: IncidentTagRelation):
         tag_repr = super().to_representation(instance)
