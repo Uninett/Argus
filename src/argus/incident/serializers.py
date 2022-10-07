@@ -41,9 +41,9 @@ class TagSerializer(serializers.Serializer):
 
     def validate_tag(self, value: str):
         try:
-            key, value = Tag.split(value)
+            [key, value] = Tag.split(value)
         except ValueError as e:
-            raise serializers.ValidationError(e)
+            raise serializers.ValidationError(str(e))
 
         return Tag.join(key, value)
 
@@ -52,9 +52,9 @@ class TagSerializer(serializers.Serializer):
             return data
 
         try:
-            key, value = Tag.split(data.pop("tag"))
+            [key, value] = Tag.split(data.pop("tag"))
         except ValueError as e:
-            raise serializers.ValidationError(e)
+            raise serializers.ValidationError({"tag": str(e)})
 
         return {"key": key, "value": value}
 
@@ -77,18 +77,18 @@ class IncidentTagRelationSerializer(serializers.ModelSerializer):
 
     def validate_tag(self, value: str):
         try:
-            key, value = Tag.split(value)
+            [key, value] = Tag.split(value)
         except ValueError as e:
-            raise serializers.ValidationError(e)
+            raise serializers.ValidationError(str(e))
 
         return Tag.join(key, value)
 
     def create(self, validated_data: dict):
         tag = validated_data.pop("tag")
         try:
-            key, value = Tag.split(tag)
+            [key, value] = Tag.split(tag)
         except ValueError as e:
-            raise serializers.ValidationError(e)
+            raise serializers.ValidationError(str(e))
 
         return Tag.objects.create(key=key, value=value, **validated_data)
 
@@ -97,9 +97,9 @@ class IncidentTagRelationSerializer(serializers.ModelSerializer):
             return data
 
         try:
-            key, value = Tag.split(data.pop("tag"))
+            [key, value] = Tag.split(data.pop("tag"))
         except ValueError as e:
-            raise serializers.ValidationError(e)
+            raise serializers.ValidationError({"tag": str(e)})
 
         return {"key": key, "value": value}
 

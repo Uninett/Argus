@@ -273,7 +273,7 @@ class IncidentTagViewSet(
             key, value = Tag.split(self.kwargs[lookup_url_kwarg])
         except ValueError as e:
             # Not a valid tag. Misses the delimiter, or multiple delimiters
-            raise NotFound(e)
+            raise NotFound(str(e))
         filter_kwargs = {"key": key, "value": value}
         obj = get_object_or_404(queryset, **filter_kwargs)
 

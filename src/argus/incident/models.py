@@ -55,7 +55,7 @@ def create_fake_incident(tags=None, description=None, stateful=True, level=None)
         try:
             tags = [Tag.split(tag) for tag in tags]
         except ValueError as e:
-            raise ValidationError(e)
+            raise ValidationError(str(e))
         taglist.extend(tags)
     for k, v in taglist:
         tag, _ = Tag.objects.get_or_create(key=k, value=v)
