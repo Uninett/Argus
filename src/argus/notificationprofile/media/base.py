@@ -16,6 +16,12 @@ __all__ = ["NotificationMedium"]
 
 
 class NotificationMedium(ABC):
+    class NotDeletableError(Exception):
+        """
+        Custom exception class that is raised when a destination cannot be
+        deleted
+        """
+
     @classmethod
     @abstractmethod
     def validate(cls, instance: RequestDestinationConfigSerializer, dict: dict) -> dict:
@@ -39,11 +45,11 @@ class NotificationMedium(ABC):
         """Sends message about a given event to the given destinations"""
         pass
 
-    @staticmethod
-    def is_deletable(destination: DestinationConfig) -> Union[str, NoneType]:
+    @classmethod
+    def raise_if_not_deletable(cls, destination: DestinationConfig):
         """
-        Returns None if the given destination is able to be deleted and
-        returns an error message if not
+        Returns None if the given destination is deletable and raises an
+        NotDeletableError if not
         """
         return None
 
