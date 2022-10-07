@@ -135,7 +135,11 @@ class Tag(models.Model):
     def split(cls, tag: str):
         if cls.TAG_DELIMITER not in tag:
             raise ValueError(f"The tag must contain an equality sign ({cls.TAG_DELIMITER}) delimiter.")
-        return tag.split(cls.TAG_DELIMITER, maxsplit=1)
+        key, value = tag.split(cls.TAG_DELIMITER, maxsplit=1)
+        if not key:
+            raise ValueError("The key of the tag cannot be empty.")
+        value = value.strip()
+        return key, value
 
 
 class IncidentTagRelation(models.Model):
