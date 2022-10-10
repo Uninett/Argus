@@ -241,7 +241,7 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
             {"sourceSystemIds": [self.source1.pk], "tags": [str(self.tag1)]},
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertTrue(len(response.data), 1)
+        self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data[0]["pk"], self.incident1.pk)
 
     def test_filter_returns_only_incidents_matching_specified_filter(self):
@@ -250,5 +250,5 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
             {"sourceSystemIds": [self.source1.pk], "tags": [str(self.tag1)]},
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertTrue(len(response.data), 1)
+        self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data[0]["pk"], self.incident1.pk)
