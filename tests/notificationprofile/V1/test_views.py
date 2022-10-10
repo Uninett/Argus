@@ -15,6 +15,7 @@ from argus.notificationprofile.models import (
     Filter,
     Timeslot,
 )
+from argus.incident.factories import StatelessIncidentFactory
 from argus.util.testing import disconnect_signals, connect_signals
 
 from .. import IncidentAPITestCaseHelper
@@ -50,16 +51,18 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
         connect_signals()
 
     def test_can_get_all_incidents_of_notification_profile(self):
+        new_incident1_pk = StatelessIncidentFactory(source=self.source1).pk
+        new_incident2_pk = StatelessIncidentFactory(source=self.source1).pk
         response = self.user1_rest_client.get(
             f"/api/v1/notificationprofiles/{self.notification_profile1.pk}/incidents/"
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data[0]["pk"], self.incident1.pk)
+        incident_pks = [data["pk"] for data in response.data]
+        self.assertEqual(set(incident_pks), set([self.incident1.pk, new_incident1_pk, new_incident2_pk]))
 
     def test_can_update_timeslot_for_notification_profile_with_valid_values(self):
         profile1_pk = self.notification_profile1.pk
         profile1_path = f"/api/v1/notificationprofiles/{profile1_pk}/"
-
         response = self.user1_rest_client.put(
             profile1_path,
             {
