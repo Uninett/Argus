@@ -40,22 +40,23 @@ class TagSerializer(serializers.Serializer):
     tag = serializers.CharField()
 
     def validate_tag(self, value: str):
-        if not "=" in value:
-            raise serializers.ValidationError(f"The tag must contain an equality sign ({Tag.TAG_DELIMITER}) delimiter.")
+        try:
+            [key, value] = Tag.split(value)
+        except ValueError as e:
+            raise serializers.ValidationError(str(e))
 
-        key, value = Tag.split(value, 1)
-        key = key.strip()
-        if not key:  # Django doesn't attempt validating empty values
-            raise serializers.ValidationError("The tag's key must not be empty")
-        Tag._meta.get_field("key").run_validators(key)
-        # Reassemble tag, to enforce key without leading or trailing whitespace (by calling `strip()` above)
         return Tag.join(key, value)
 
     def to_internal_value(self, data: dict):
-        if "tag" in data:
-            key, value = Tag.split(data.pop("tag"))
-            return {"key": key, "value": value}
-        return data
+        if not "tag" in data:
+            return data
+
+        try:
+            [key, value] = Tag.split(data.pop("tag"))
+        except ValueError as e:
+            raise serializers.ValidationError({"tag": str(e)})
+
+        return {"key": key, "value": value}
 
     def to_representation(self, instance):
         if isinstance(instance, Tag):
@@ -75,30 +76,32 @@ class IncidentTagRelationSerializer(serializers.ModelSerializer):
         read_only_fields = ["added_by", "added_time"]
 
     def validate_tag(self, value: str):
-        split_tag = Tag.split(value)
-        if len(split_tag) < 2:
-            raise serializers.ValidationError(f"The tag must contain an equality sign ({Tag.TAG_DELIMITER}) delimiter.")
+        try:
+            [key, value] = Tag.split(value)
+        except ValueError as e:
+            raise serializers.ValidationError(str(e))
 
-        key, value_ = split_tag
-        key = key.strip()
-        if not key:  # Django doesn't attempt validating empty values
-            raise serializers.ValidationError("The tag's key must not be empty")
-        Tag._meta.get_field("key").run_validators(key)
-        # Reassemble tag, to enforce key without leading or trailing whitespace (by calling `strip()` above)
-        return Tag.join(key, value_)
+        return Tag.join(key, value)
 
     def create(self, validated_data: dict):
         tag = validated_data.pop("tag")
-        key, value = Tag.split(tag)
+        try:
+            [key, value] = Tag.split(tag)
+        except ValueError as e:
+            raise serializers.ValidationError(str(e))
+
         return Tag.objects.create(key=key, value=value, **validated_data)
 
     def to_internal_value(self, data: dict):
-        tag_dict = super().to_internal_value(data)
-        if "tag" in tag_dict:
-            key, value = Tag.split(tag_dict.pop("tag"))
-            tag_dict["key"] = key
-            tag_dict["value"] = value
-        return tag_dict
+        if not "tag" in data:
+            return data
+
+        try:
+            [key, value] = Tag.split(data.pop("tag"))
+        except ValueError as e:
+            raise serializers.ValidationError({"tag": str(e)})
+
+        return {"key": key, "value": value}
 
     def to_representation(self, instance: IncidentTagRelation):
         tag_repr = super().to_representation(instance)
