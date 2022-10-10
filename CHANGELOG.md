@@ -4,6 +4,47 @@ read by developers.
 
 ## [Unreleased]
 
+## [1.8.0] - 2022-10-06
+
+### Added
+- A notification profile can now have a name.
+- Docstrings and type hints to functions of media plugins.
+- Added tests for the email and sms destination serializer in case of invalid
+  input for updating.
+- Added tests for the incident, event and tag serializer
+- Added endpoint that returns True if another user has a destination with the
+  same medium and settings as the destination with the given primary key
+- Add tests for filtering on stateful/statelss and open/closed incients.
+- Add SMSNotification plugin to MEDIA_PLUGINS in development settings.
+
+### Fixed
+- Fix a notification profile test to include the phone number changes.
+- Broken links and formatting in documentation.
+- Fix notification profile serializer test to actually change phone number when
+  updating.
+- Make code snippets visible in release checklist in documentation.
+- Validate tags before adding them to an incident
+- Disallow the use of `argus` as username when creating admin user via the `initial_setup` script.
+
+### Changed
+- One timeslot can now be used by multiple notification profiles.
+- Replaced wildcard imports with specific imports.
+- Moved the notification profile Github test to parent folder and added
+  regression tag.
+- Renamed notification profile serializer tests to be more descriptive and
+  added integration test tags.
+- Improve query in notification profile signal test and add clarifying comment.
+- Ran black again on whole code base.
+- In media plugins rename the function `is_deletable` to
+  `raise_if_not_deletable` and make it raise an error if a destination is not
+  deletable.
+- Split up and rename notification profile model tests
+
+### Dependencies
+- Upgrade from pyjwt 2.0.1 to 2.4.0
+- Upgrade from django 3.2.13 to 3.2.15
+- Upgrade from black 20.8b1 to 22.3.0 in pre-commit
+
 ## [1.7.0]
 
 ### Changed

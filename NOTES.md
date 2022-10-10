@@ -3,6 +3,22 @@ This file documents changes to Argus that are relevant for the users to know.
 
 ## [Unreleased]
 
+## [1.8.0] - 2022-10-06
+
+### Added
+- A notification profile can now have a name.
+- Added endpoint that returns True if another user has a destination with the
+  same medium and settings as the destination with the given primary key
+
+### Changed
+
+- One timeslot can now be used by multiple notification profiles.
+
+### Steps for upgrading
+
+This update includes changes to the database model, requiring a migration of
+the database.
+
 ## [1.7.0] - 2022-10-04
 
 ### Added
