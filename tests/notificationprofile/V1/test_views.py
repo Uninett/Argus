@@ -57,6 +57,7 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
             f"/api/v1/notificationprofiles/{self.notification_profile1.pk}/incidents/"
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 3)
         incident_pks = [data["pk"] for data in response.data]
         self.assertEqual(set(incident_pks), set([self.incident1.pk, new_incident1_pk, new_incident2_pk]))
 
