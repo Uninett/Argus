@@ -76,7 +76,7 @@ class IncidentViewSetV1TestCase(IncidentAPITestCase):
         IncidentTagRelationFactory(incident=incident, tag=tag)
         return incident
 
-    def add_acknowledgement(self):
+    def add_acknowledgement_with_incident_and_event(self):
         return AcknowledgementFactory()
 
     def test_no_incidents_returns_empty_list(self):
@@ -142,7 +142,7 @@ class IncidentViewSetV1TestCase(IncidentAPITestCase):
         self.assertEqual(Incident.objects.get(pk=incident_pk).level, 2)
 
     def test_can_get_all_acknowledgements_of_incident(self):
-        ack = self.add_acknowledgement()
+        ack = self.add_acknowledgement_with_incident_and_event()
         incident_pk = ack.event.incident.pk
         response = self.client.get(path=f"/api/v1/incidents/{incident_pk}/acks/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -151,7 +151,7 @@ class IncidentViewSetV1TestCase(IncidentAPITestCase):
         self.assertEqual(response.data[0]["event"]["type"]["value"], "ACK")
 
     def test_can_get_specific_acknowledgement_of_incident(self):
-        ack = self.add_acknowledgement()
+        ack = self.add_acknowledgement_with_incident_and_event()
         incident_pk = ack.event.incident.pk
         response = self.client.get(path=f"/api/v1/incidents/{incident_pk}/acks/{ack.pk}/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -176,7 +176,7 @@ class IncidentViewSetV1TestCase(IncidentAPITestCase):
         self.assertTrue(Acknowledgement.objects.exists())
 
     def test_can_update_acknowledgement_of_incident(self):
-        ack = self.add_acknowledgement()
+        ack = self.add_acknowledgement_with_incident_and_event()
         incident_pk = ack.event.incident.pk
         data = {
             "expiration": (datetime.datetime.now(tz=pytz.timezone(TIME_ZONE)) + datetime.timedelta(days=3)).isoformat(),
@@ -429,7 +429,7 @@ class IncidentViewSetTestCase(APITestCase):
     def add_event(self, incident_pk, description="event", type=Event.Type.OTHER):
         return EventFactory(incident_id=incident_pk, description=description, type=type)
 
-    def add_acknowledgement(self):
+    def add_acknowledgement_with_incident_and_event(self):
         return AcknowledgementFactory()
 
     def test_can_get_all_incidents(self):
@@ -543,7 +543,7 @@ class IncidentViewSetTestCase(APITestCase):
         self.assertEqual(Incident.objects.get(pk=incident_pk).level, 2)
 
     def test_can_get_all_acknowledgements_of_incident(self):
-        ack = self.add_acknowledgement()
+        ack = self.add_acknowledgement_with_incident_and_event()
         incident_pk = ack.event.incident.pk
         response = self.client.get(path=f"/api/v1/incidents/{incident_pk}/acks/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -552,7 +552,7 @@ class IncidentViewSetTestCase(APITestCase):
         self.assertEqual(response.data[0]["event"]["type"]["value"], "ACK")
 
     def test_can_get_specific_acknowledgement_of_incident(self):
-        ack = self.add_acknowledgement()
+        ack = self.add_acknowledgement_with_incident_and_event()
         incident_pk = ack.event.incident.pk
         response = self.client.get(path=f"/api/v2/incidents/{incident_pk}/acks/{ack.pk}/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -577,7 +577,7 @@ class IncidentViewSetTestCase(APITestCase):
         self.assertTrue(Acknowledgement.objects.exists())
 
     def test_can_update_acknowledgement_of_incident(self):
-        ack = self.add_acknowledgement()
+        ack = self.add_acknowledgement_with_incident_and_event()
         incident_pk = ack.event.incident.pk
         data = {
             "expiration": (datetime.datetime.now(tz=pytz.timezone(TIME_ZONE)) + datetime.timedelta(days=3)).isoformat(),
