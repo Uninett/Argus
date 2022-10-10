@@ -51,15 +51,17 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
         connect_signals()
 
     def test_can_get_all_incidents_of_notification_profile(self):
-        new_incident1_pk = StatelessIncidentFactory(source=self.source1).pk
-        new_incident2_pk = StatelessIncidentFactory(source=self.source1).pk
+        StatelessIncidentFactory(source=self.source1)
+        StatelessIncidentFactory(source=self.source1)
         response = self.user1_rest_client.get(
             f"/api/v1/notificationprofiles/{self.notification_profile1.pk}/incidents/"
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 3)
-        incident_pks = [data["pk"] for data in response.data]
-        self.assertEqual(set(incident_pks), set([self.incident1.pk, new_incident1_pk, new_incident2_pk]))
+        all_incidents = self.notification_profile1.filtered_incidents
+        self.assertEqual(len(response.data), len(all_incidents))
+        all_incident_pks = set([incident.pk for incident in all_incidents])
+        all_response_pks = set([incident["pk"] for incident in response.data])
+        self.assertEqual(all_response_pks, all_incident_pks)
 
     def test_can_update_timeslot_for_notification_profile_with_valid_values(self):
         profile1_pk = self.notification_profile1.pk
