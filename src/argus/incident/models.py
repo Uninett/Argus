@@ -137,7 +137,7 @@ class Tag(models.Model):
     @classmethod
     def split(cls, tag: str):
         if cls.TAG_DELIMITER not in tag:
-            raise ValueError(f"The tag must contain an equality sign ({cls.TAG_DELIMITER}) delimiter.")
+            raise ValueError(f"The tag does not have its delimiter: {cls.TAG_DELIMITER}.")
         key, value = tag.split(cls.TAG_DELIMITER, maxsplit=1)
         key = key.strip()
         value = value.strip()
