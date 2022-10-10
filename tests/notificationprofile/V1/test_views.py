@@ -193,15 +193,16 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
         self.assertEqual(response.data[0]["pk"], self.filter1.pk)
 
     def test_can_create_filter_with_valid_values(self):
+        filter_name = "test-filter"
         response = self.user1_rest_client.post(
             "/api/v1/notificationprofiles/filters/",
             {
-                "name": "test-filter",
+                "name": filter_name,
                 "filter_string": f'{{"sourceSystemIds": [{self.source1.pk}], "tags": ["key1=value"]}}',
             },
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertTrue(Filter.objects.filter(user=self.user1, name="test-filter").exists())
+        self.assertTrue(Filter.objects.filter(user=self.user1, name=filter_name).exists())
 
     def test_can_get_filter(self):
         filter_pk = self.filter1.pk
