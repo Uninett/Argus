@@ -404,8 +404,6 @@ Incident endpoints
       system), the ``timestamp`` field is optional. It will default to
       the time the server received the event.
 
-.. _api-incident-event-types:
-
       The valid ``type``\ s are:
 
       -  ``STA`` - Incident start
@@ -590,10 +588,6 @@ Notification profile endpoints
    -  ``PUT``: updates and returns one of the logged in user’s
       notification profiles by primary key
 
-      -  Note that if ``timeslot`` is changed, the notification
-         profile’s primary key will also change. This consequently means that the
-         URL containing the previous primary key will return a ``404 Not Found``
-         status code.
       -  Example request body: same as ``POST`` to
          ``/api/v1/notificationprofiles/``
 
@@ -1050,8 +1044,6 @@ Incident endpoints
       system), the ``timestamp`` field is optional. It will default to
       the time the server received the event.
 
-.. _api-incident-event-types-v2:
-
       The valid ``type``\ s are:
 
       -  ``STA`` - Incident start
@@ -1225,10 +1217,6 @@ Notification profile endpoints
    -  ``PUT``: updates and returns one of the logged in user’s
       notification profiles by primary key
 
-      -  Note that if ``timeslot`` is changed, the notification
-         profile’s primary key will also change. This consequently means that the
-         URL containing the previous primary key will return a ``404 Not Found``
-         status code.
       -  Example request body: same as ``POST`` to
          ``/api/v2/notificationprofiles/``
 
@@ -1279,6 +1267,12 @@ Notification profile endpoints
          ``/api/v2/notificationprofiles/destinations/``
 
    -  ``DELETE``: deletes one of the logged in user’s destination-configs by primary key
+
+-  ``/api/v2/notificationprofiles/destinations/<int:pk>/duplicate/``:
+
+   -  ``GET``: returns True if another user has a destination with the same
+      medium and settings as the destination with the given primary key
+
 
 -  ``/api/v2/notificationprofiles/media/``:
 

@@ -4,6 +4,13 @@ read by developers.
 
 ## [Unreleased]
 
+### Added
+- (stveit:test-filtering-stateless-incidents, PR #432) Add tests for filtering on stateful/statelss and open/closed incients.
+- (stveit:smsnotification-settings, PR #493) Add SMSNotification plugin to MEDIA_PLUGINS in development settings.
+
+### Fixed
+- (stveit:fix.disallow-argus-username, PR #492) Disallow the use of `argus` as username when creating admin user via the `initial_setup` script.
+
 ## [1.8.0] - 2022-10-06
 
 ### Added

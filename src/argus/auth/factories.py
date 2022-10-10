@@ -1,6 +1,6 @@
 import factory
 
-from .models import *
+from .models import User
 
 __all__ = [
     "PersonUserFactory",

@@ -21,6 +21,7 @@ from .email import send_email_safely
 if TYPE_CHECKING:
     from django.db.models.query import QuerySet
     from ..models import DestinationConfig
+    from ..serializers import RequestDestinationConfigSerializer
 
 LOG = logging.getLogger(__name__)
 
@@ -46,7 +47,11 @@ class SMSNotification(NotificationMedium):
         phone_number = PhoneNumberField()
 
     @classmethod
-    def validate(cls, instance, sms_dict):
+    def validate(cls, instance: RequestDestinationConfigSerializer, sms_dict: dict) -> dict:
+        """
+        Validates the settings of an SMS destination and returns a dict
+        with validated and cleaned data
+        """
         form = cls.PhoneNumberForm(sms_dict["settings"])
         if not form.is_valid():
             raise ValidationError(form.errors)
@@ -56,11 +61,27 @@ class SMSNotification(NotificationMedium):
         return form.cleaned_data
 
     @staticmethod
-    def get_label(destination):
+    def get_label(destination: DestinationConfig) -> str:
+        """
+        Returns the phone number represented by this SMS destination
+        """
         return destination.settings.get("phone_number")
 
+    @classmethod
+    def has_duplicate(self, queryset: QuerySet, settings: dict) -> bool:
+        """
+        Returns True if a sms destination with the same phone number
+        already exists in the given queryset
+        """
+        return queryset.filter(settings__phone_number=settings["phone_number"]).exists()
+
     @staticmethod
-    def send(event: Event, destinations: QuerySet[DestinationConfig], **kwargs):
+    def send(event: Event, destinations: QuerySet[DestinationConfig], **_) -> bool:
+        """
+        Sends an SMS about a given event to the given sms destinations
+
+        Returns False if no SMS destinations were given and True if SMS were sent
+        """
         recipient = getattr(settings, "SMS_GATEWAY_ADDRESS", None)
         if not recipient:
             LOG.error("SMS_GATEWAY_ADDRESS is not set, cannot dispatch SMS notifications using this plugin")

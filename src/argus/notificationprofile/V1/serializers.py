@@ -2,8 +2,6 @@ from typing import List
 
 from rest_framework import fields, serializers
 
-from django.db import IntegrityError
-
 from ..models import DestinationConfig, NotificationProfile
 from ..serializers import FilterSerializer, TimeslotSerializer
 
@@ -24,8 +22,6 @@ class ResponseNotificationProfileSerializerV1(serializers.ModelSerializer):
             "active",
             "phone_number",
         ]
-        # "pk" needs to be listed, as "timeslot" is the actual primary key
-        read_only_fields = ["pk"]
 
     def get_media(self, profile: NotificationProfile) -> List[str]:
         media = []
@@ -53,15 +49,12 @@ class RequestNotificationProfileSerializerV1(serializers.ModelSerializer):
     class Meta:
         model = NotificationProfile
         fields = [
-            "pk",
             "timeslot",
             "filters",
             "media",
             "active",
             "phone_number",
         ]
-        # "pk" needs to be listed, as "timeslot" is the actual primary key
-        read_only_fields = ["pk"]
 
     def create(self, validated_data: dict):
         phone_number = validated_data.pop("phone_number", None)
@@ -84,30 +77,11 @@ class RequestNotificationProfileSerializerV1(serializers.ModelSerializer):
                 )
             destinations.append(user.destinations.filter(media_id="email").get(settings__email_address=user.email))
 
-        try:
-            profile = super().create(validated_data)
-            profile.destinations.set(destinations)
-            return profile
-
-        except IntegrityError as e:
-            timeslot_pk = validated_data["timeslot"].pk
-            if NotificationProfile.objects.filter(pk=timeslot_pk).exists():
-                raise serializers.ValidationError(
-                    f"NotificationProfile with Timeslot with pk={timeslot_pk} already exists."
-                )
-            else:
-                raise e
+        profile = super().create(validated_data)
+        profile.destinations.set(destinations)
+        return profile
 
     def update(self, instance: NotificationProfile, validated_data: dict):
-        new_timeslot = validated_data.pop("timeslot")
-        old_timeslot = instance.timeslot
-        if new_timeslot != old_timeslot:
-            # Save the notification profile with the new timeslot (will duplicate the object with a different PK)
-            instance.timeslot = new_timeslot
-            instance.save()
-            # Delete the duplicate (old) object
-            NotificationProfile.objects.get(timeslot=old_timeslot).delete()
-
         phone_number = validated_data.pop("phone_number", None)
         media = validated_data.pop("media", None)
 

@@ -5,7 +5,12 @@ from rest_framework import serializers, status, versioning
 from rest_framework.test import APITestCase
 
 from argus.auth.factories import SourceUserFactory
-from argus.incident.factories import SourceSystemTypeFactory, SourceSystemFactory, StatefulIncidentFactory
+from argus.incident.factories import (
+    SourceSystemTypeFactory,
+    SourceSystemFactory,
+    StatefulIncidentFactory,
+    StatelessIncidentFactory,
+)
 from argus.incident.models import Event, Incident, Tag
 from argus.incident.views import EventViewSet
 from argus.util.testing import disconnect_signals, connect_signals
@@ -33,7 +38,7 @@ class EventViewSetTestCase(TestCase):
             view.validate_event_type_for_incident(Event.Type.ACKNOWLEDGE, incident)
 
 
-class IncidentViewSetV1TestCase(APITestCase):
+class IncidentAPITestCase(APITestCase):
     @classmethod
     def setUpClass(cls):
         disconnect_signals()
@@ -48,22 +53,17 @@ class IncidentViewSetV1TestCase(APITestCase):
     def tearDownClass(cls):
         connect_signals()
 
-    def add_incident(self, description="incident"):
-        data = {
-            "start_time": "2022-05-24T13:07:29.254Z",
-            "end_time": "2022-05-24T13:07:29.254Z",
-            "description": description,
-            "level": 1,
-            "tags": [{"tag": "a=b"}],
-        }
-        response = self.client.post("/api/v1/incidents/", data, format="json")
-        self.assertEqual(response.status_code, 201)  # Created
-        return response.data["pk"]
+
+class IncidentViewSetV1TestCase(IncidentAPITestCase):
+    def add_closed_incident(self, description="closed_incident"):
+        return StatefulIncidentFactory(
+            description=description, start_time="2022-05-23T13:07:29.254Z", end_time="2022-05-24T13:07:29.254Z"
+        ).pk
 
     def test_no_incidents_returns_empty_list(self):
         response = self.client.get("/api/v1/incidents/")
         self.assertFalse(Incident.objects.exists())
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         # Paging, so check "results"
         self.assertEqual(response.data["results"], [])
 
@@ -80,7 +80,7 @@ class IncidentViewSetV1TestCase(APITestCase):
             "tags": [{"tag": "a=b"}],
         }
         response = self.client.post("/api/v1/incidents/", data, format="json")
-        self.assertEqual(response.status_code, 201)  # Created
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         # Check that we have made the correct Incident
         self.assertEqual(response.data["description"], data["description"])
         self.assertTrue(Incident.objects.exists())
@@ -93,7 +93,7 @@ class IncidentViewSetV1TestCase(APITestCase):
         self.assertEqual(str(tag), data["tags"][0]["tag"])
 
     def test_incident_can_properly_change_level(self):
-        incident_pk = self.add_incident("incident1")
+        incident_pk = self.add_closed_incident("incident1")
         incident_path = reverse("v1:incident:incident-detail", args=[incident_pk])
         response = self.client.put(
             incident_path,
@@ -106,21 +106,56 @@ class IncidentViewSetV1TestCase(APITestCase):
         self.assertEqual(Incident.objects.get(pk=incident_pk).level, 2)
 
 
-class IncidentViewSetTestCase(APITestCase):
-    @classmethod
-    def setUpClass(cls):
-        disconnect_signals()
-        source_type = SourceSystemTypeFactory()
-        cls.user = SourceUserFactory()
-        cls.source = SourceSystemFactory(type=source_type, user=cls.user)
-
+class IncidentFilterByOpenAndStatefulV1TestCase(IncidentAPITestCase):
     def setUp(self):
-        self.client.force_authenticate(user=self.user)
+        super().setUp()
+        self.open_pk = StatefulIncidentFactory().pk
+        self.closed_pk = StatefulIncidentFactory(
+            start_time="2022-05-23T13:07:29.254Z", end_time="2022-05-24T13:07:29.254Z"
+        ).pk
+        self.stateless_pk = StatelessIncidentFactory().pk
 
-    @classmethod
-    def tearDownClass(cls):
-        connect_signals()
+    def test_open_true_returns_only_open_incidents(self):
+        response = self.client.get("/api/v1/incidents/?open=true")
+        self.assertEqual(len(response.data["results"]), 1)
+        self.assertEqual(response.data["results"][0]["pk"], self.open_pk)
 
+    def test_open_false_returns_only_closed_incidents(self):
+        response = self.client.get("/api/v1/incidents/?open=false")
+        self.assertEqual(len(response.data["results"]), 1)
+        self.assertEqual(response.data["results"][0]["pk"], self.closed_pk)
+
+    def test_stateful_false_returns_only_stateless_incidents(self):
+        response = self.client.get("/api/v1/incidents/?stateful=false")
+        self.assertEqual(len(response.data["results"]), 1)
+        self.assertEqual(response.data["results"][0]["pk"], self.stateless_pk)
+
+    def test_stateful_true_returns_only_stateful_incidents(self):
+        response = self.client.get("/api/v1/incidents/?stateful=true")
+        self.assertEqual(len(response.data["results"]), 2)
+        response_pks = set([result["pk"] for result in response.data["results"]])
+        self.assertEqual(response_pks, set([self.open_pk, self.closed_pk]))
+
+    def test_open_true_and_stateful_true_returns_only_open_incidents(self):
+        response = self.client.get("/api/v1/incidents/?open=true&stateful=true")
+        self.assertEqual(len(response.data["results"]), 1)
+        self.assertEqual(response.data["results"][0]["pk"], self.open_pk)
+
+    def test_open_true_and_stateful_false_returns_no_incidents(self):
+        response = self.client.get("/api/v1/incidents/?stateful=false&open=true")
+        self.assertEqual(len(response.data["results"]), 0, msg=response.data)
+
+    def test_open_false_and_stateful_true_returns_only_closed_incidents(self):
+        response = self.client.get("/api/v1/incidents/?open=false&stateful=true")
+        self.assertEqual(len(response.data["results"]), 1)
+        self.assertEqual(response.data["results"][0]["pk"], self.closed_pk)
+
+    def test_open_false_and_stateful_false_returns_no_incidents(self):
+        response = self.client.get("/api/v1/incidents/?stateful=false&open=false")
+        self.assertEqual(len(response.data["results"]), 0, msg=response.data)
+
+
+class IncidentViewSetTestCase(IncidentAPITestCase):
     def add_incident(self, description="incident"):
         data = {
             "start_time": "2021-08-04T09:13:55.908Z",
@@ -130,13 +165,13 @@ class IncidentViewSetTestCase(APITestCase):
             "tags": [{"tag": "a=b"}],
         }
         response = self.client.post("/api/v2/incidents/", data, format="json")
-        self.assertEqual(response.status_code, 201)  # Created
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         return response.data["pk"]
 
     def add_event(self, incident_pk, description="event"):
         event_data = {"timestamp": "2021-08-04T09:14:55.908Z", "type": "OTH", "description": description}
         response = self.client.post(f"/api/v2/incidents/{incident_pk}/events/", event_data, format="json")
-        self.assertEqual(response.status_code, 201)  # Created
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_incident_search_existing_incident_description(self):
         pk = self.add_incident("incident1")

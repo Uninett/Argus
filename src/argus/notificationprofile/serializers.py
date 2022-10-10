@@ -1,7 +1,4 @@
-from django.db import IntegrityError
 from rest_framework import fields, serializers
-
-from argus.incident.models import SourceSystem, Tag, Incident
 
 from .primitive_serializers import FilterBlobSerializer, FilterPreviewSerializer
 from .media import MEDIA_CLASSES_DICT
@@ -82,15 +79,17 @@ class TimeslotSerializer(serializers.ModelSerializer):
         return timeslot
 
     def update(self, timeslot: Timeslot, validated_data: dict):
-        time_recurrences_data = validated_data.pop("time_recurrences")
-        name = validated_data["name"]
-        timeslot.name = name
-        timeslot.save()
+        time_recurrences_data = validated_data.pop("time_recurrences", None)
+        name = validated_data.pop("name", None)
+        if name:
+            timeslot.name = name
+            timeslot.save()
 
         # Replace existing time recurrences with posted time recurrences
-        timeslot.time_recurrences.all().delete()
-        for time_recurrence_data in time_recurrences_data:
-            TimeRecurrence.objects.create(timeslot=timeslot, **time_recurrence_data)
+        if time_recurrences_data:
+            timeslot.time_recurrences.all().delete()
+            for time_recurrence_data in time_recurrences_data:
+                TimeRecurrence.objects.create(timeslot=timeslot, **time_recurrence_data)
 
         return timeslot
 
@@ -132,6 +131,7 @@ class ResponseDestinationConfigSerializer(serializers.ModelSerializer):
     class Meta:
         model = DestinationConfig
         fields = [
+            "pk",
             "media",
             "label",
             "suggested_label",
@@ -171,6 +171,10 @@ class RequestDestinationConfigSerializer(serializers.ModelSerializer):
         return super().update(destination, validated_data)
 
 
+class DuplicateDestinationSerializer(serializers.Serializer):
+    is_duplicate = serializers.BooleanField(read_only=True)
+
+
 class ResponseNotificationProfileSerializer(serializers.ModelSerializer):
     timeslot = TimeslotSerializer()
     filters = FilterSerializer(many=True)
@@ -180,51 +184,24 @@ class ResponseNotificationProfileSerializer(serializers.ModelSerializer):
         model = NotificationProfile
         fields = [
             "pk",
+            "name",
             "timeslot",
             "filters",
             "destinations",
             "active",
         ]
-        # "pk" needs to be listed, as "timeslot" is the actual primary key
-        read_only_fields = ["pk"]
 
 
 class RequestNotificationProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = NotificationProfile
         fields = [
-            "pk",
+            "name",
             "timeslot",
             "filters",
             "destinations",
             "active",
         ]
-        # "pk" needs to be listed, as "timeslot" is the actual primary key
-        read_only_fields = ["pk"]
-
-    def create(self, validated_data: dict):
-        try:
-            return super().create(validated_data)
-        except IntegrityError as e:
-            timeslot_pk = validated_data["timeslot"].pk
-            if NotificationProfile.objects.filter(pk=timeslot_pk).exists():
-                raise serializers.ValidationError(
-                    f"NotificationProfile with Timeslot with pk={timeslot_pk} already exists."
-                )
-            else:
-                raise e
-
-    def update(self, instance: NotificationProfile, validated_data: dict):
-        new_timeslot = validated_data.pop("timeslot")
-        old_timeslot = instance.timeslot
-        if new_timeslot != old_timeslot:
-            # Save the notification profile with the new timeslot (will duplicate the object with a different PK)
-            instance.timeslot = new_timeslot
-            instance.save()
-            # Delete the duplicate (old) object
-            NotificationProfile.objects.get(timeslot=old_timeslot).delete()
-
-        return super().update(instance, validated_data)
 
     def validate(self, attrs: dict):
         if attrs["timeslot"].user != self.context["request"].user:
