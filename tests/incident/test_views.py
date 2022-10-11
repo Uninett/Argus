@@ -86,11 +86,15 @@ class IncidentViewSetV1TestCase(IncidentAPITestCase):
         self.assertEqual(response.data["results"], [])
 
     def test_can_get_all_incidents(self):
-        incident_pk = self.add_open_incident_with_start_event_and_tag().pk
+        self.add_open_incident_with_start_event_and_tag()
+        incident_pks = list(Incident.objects.all().values_list("pk", flat=True))
+
         response = self.client.get(path="/api/v1/incidents/")
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         # Paging, so check "results"
-        self.assertEqual(response.data["results"][0]["pk"], incident_pk)
+        response_pks = [incident["pk"] for incident in response.data["results"]]
+        self.assertEqual(response_pks, incident_pks)
 
     def test_can_get_specific_incident(self):
         incident_pk = self.add_open_incident_with_start_event_and_tag().pk
@@ -134,11 +138,16 @@ class IncidentViewSetV1TestCase(IncidentAPITestCase):
 
     def test_can_get_all_acknowledgements_of_incident(self):
         ack = self.add_acknowledgement_with_incident_and_event()
-        incident_pk = ack.event.incident.pk
-        response = self.client.get(path=f"/api/v1/incidents/{incident_pk}/acks/")
+        incident = ack.event.incident
+        ack_pks = list(incident.acks.all().values_list("pk", flat=True))
+
+        response = self.client.get(path=f"/api/v1/incidents/{incident.pk}/acks/")
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data[0]["pk"], ack.pk)
-        self.assertEqual(response.data[0]["event"]["type"]["value"], "ACK")
+        response_pks = [ack["pk"] for ack in response.data]
+        self.assertEqual(response_pks, ack_pks)
+        event_types = [ack["event"]["type"]["value"] for ack in response.data]
+        self.assertEqual(set(event_types), {"ACK"})
 
     def test_can_get_specific_acknowledgement_of_incident(self):
         ack = self.add_acknowledgement_with_incident_and_event()
@@ -174,11 +183,14 @@ class IncidentViewSetV1TestCase(IncidentAPITestCase):
         self.assertEqual(response.data["expiration"], data["expiration"])
 
     def test_can_get_all_events_of_incident(self):
-        incident_pk = self.add_open_incident_with_start_event_and_tag().pk
-        event_pk = Event.objects.get(incident_id=incident_pk).pk
-        response = self.client.get(path=f"/api/v1/incidents/{incident_pk}/events/")
+        incident = self.add_open_incident_with_start_event_and_tag()
+        event_pks = list(incident.events.all().values_list("pk", flat=True))
+
+        response = self.client.get(path=f"/api/v1/incidents/{incident.pk}/events/")
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data[0]["pk"], event_pk)
+        response_pks = [ack["pk"] for ack in response.data]
+        self.assertEqual(response_pks, event_pks)
 
     def test_can_get_specific_event_of_incident(self):
         incident_pk = self.add_open_incident_with_start_event_and_tag().pk
@@ -200,11 +212,14 @@ class IncidentViewSetV1TestCase(IncidentAPITestCase):
         self.assertEqual(response.data["description"], data["description"])
 
     def test_can_get_all_tags_of_incident(self):
-        incident_pk = self.add_open_incident_with_start_event_and_tag().pk
-        response = self.client.get(path=f"/api/v1/incidents/{incident_pk}/tags/")
-        tag = str(Tag.objects.get())
+        incident = self.add_open_incident_with_start_event_and_tag()
+        tags = [str(relation.tag) for relation in incident.incident_tag_relations.all()]
+
+        response = self.client.get(path=f"/api/v1/incidents/{incident.pk}/tags/")
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data[0]["tag"], tag)
+        response_tags = [tag["tag"] for tag in response.data]
+        self.assertEqual(response_tags, tags)
 
     def test_can_get_specific_tag_of_incident(self):
         incident_pk = self.add_open_incident_with_start_event_and_tag().pk
@@ -267,12 +282,13 @@ class IncidentViewSetV1TestCase(IncidentAPITestCase):
         self.assertEqual(str(tag), data["tags"][0]["tag"])
 
     def test_can_get_all_source_types(self):
-        response = self.client.get(path=f"/api/v1/incidents/source-types/")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        source_type_names = set([type.name for type in SourceSystemType.objects.all()])
 
-        source_types = set([type.name for type in SourceSystemType.objects.all()])
+        response = self.client.get(path=f"/api/v1/incidents/source-types/")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         response_types = set([type["name"] for type in response.data])
-        self.assertEqual(response_types, source_types)
+        self.assertEqual(response_types, source_type_names)
 
     def test_can_get_specific_source_type(self):
         response = self.client.get(path=f"/api/v1/incidents/source-types/{self.source.type.name}/")
@@ -289,10 +305,11 @@ class IncidentViewSetV1TestCase(IncidentAPITestCase):
         self.assertTrue(SourceSystemType.objects.filter(name=data["name"]).exists())
 
     def test_can_get_all_source_systems(self):
-        response = self.client.get(path=f"/api/v1/incidents/sources/")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
         source_pks = set([source.pk for source in SourceSystem.objects.all()])
+
+        response = self.client.get(path=f"/api/v1/incidents/sources/")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         response_source_pks = set([source["pk"] for source in response.data])
         self.assertEqual(response_source_pks, source_pks)
 
@@ -392,11 +409,15 @@ class IncidentViewSetTestCase(APITestCase):
         return AcknowledgementFactory()
 
     def test_can_get_all_incidents(self):
-        incident_pk = self.add_open_incident_with_start_event_and_tag().pk
+        self.add_open_incident_with_start_event_and_tag()
+        incident_pks = list(Incident.objects.all().values_list("pk", flat=True))
+
         response = self.client.get(path="/api/v2/incidents/")
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         # Paging, so check "results"
-        self.assertEqual(response.data["results"][0]["pk"], incident_pk)
+        response_pks = [incident["pk"] for incident in response.data["results"]]
+        self.assertEqual(response_pks, incident_pks)
 
     def test_can_get_incident_by_incident_description(self):
         pk = self.add_open_incident_with_start_event_and_tag(description="incident1").pk
@@ -490,11 +511,16 @@ class IncidentViewSetTestCase(APITestCase):
 
     def test_can_get_all_acknowledgements_of_incident(self):
         ack = self.add_acknowledgement_with_incident_and_event()
-        incident_pk = ack.event.incident.pk
-        response = self.client.get(path=f"/api/v1/incidents/{incident_pk}/acks/")
+        incident = ack.event.incident
+        ack_pks = list(incident.acks.all().values_list("pk", flat=True))
+
+        response = self.client.get(path=f"/api/v2/incidents/{incident.pk}/acks/")
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data[0]["pk"], ack.pk)
-        self.assertEqual(response.data[0]["event"]["type"]["value"], "ACK")
+        response_pks = [ack["pk"] for ack in response.data]
+        self.assertEqual(response_pks, ack_pks)
+        event_types = [ack["event"]["type"]["value"] for ack in response.data]
+        self.assertEqual(set(event_types), {"ACK"})
 
     def test_can_get_specific_acknowledgement_of_incident(self):
         ack = self.add_acknowledgement_with_incident_and_event()
@@ -530,11 +556,14 @@ class IncidentViewSetTestCase(APITestCase):
         self.assertEqual(response.data["expiration"], data["expiration"])
 
     def test_can_get_all_events_of_incident(self):
-        incident_pk = self.add_open_incident_with_start_event_and_tag().pk
-        event_pk = Event.objects.get(incident_id=incident_pk).pk
-        response = self.client.get(path=f"/api/v2/incidents/{incident_pk}/events/")
+        incident = self.add_open_incident_with_start_event_and_tag()
+        event_pks = list(incident.events.all().values_list("pk", flat=True))
+
+        response = self.client.get(path=f"/api/v2/incidents/{incident.pk}/events/")
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data[0]["pk"], event_pk)
+        response_pks = [ack["pk"] for ack in response.data]
+        self.assertEqual(response_pks, event_pks)
 
     def test_can_get_specific_event_of_incident(self):
         incident = self.add_open_incident_with_start_event_and_tag()
@@ -556,11 +585,14 @@ class IncidentViewSetTestCase(APITestCase):
         self.assertEqual(response.data["description"], data["description"])
 
     def test_can_get_all_tags_of_incident(self):
-        incident_pk = self.add_open_incident_with_start_event_and_tag().pk
-        response = self.client.get(path=f"/api/v2/incidents/{incident_pk}/tags/")
-        tag = str(Tag.objects.get())
+        incident = self.add_open_incident_with_start_event_and_tag()
+        tags = [str(relation.tag) for relation in incident.incident_tag_relations.all()]
+
+        response = self.client.get(path=f"/api/v2/incidents/{incident.pk}/tags/")
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data[0]["tag"], tag)
+        response_tags = [tag["tag"] for tag in response.data]
+        self.assertEqual(response_tags, tags)
 
     def test_can_get_specific_tag_of_incident(self):
         incident_pk = self.add_open_incident_with_start_event_and_tag().pk
@@ -623,20 +655,24 @@ class IncidentViewSetTestCase(APITestCase):
         self.assertEqual(str(tag), data["tags"][0]["tag"])
 
     def test_can_get_all_events(self):
-        incident = self.add_open_incident_with_start_event_and_tag()
-        event_pk = incident.events.get().pk
+        self.add_open_incident_with_start_event_and_tag()
+        event_pks = list(Event.objects.all().values_list("pk", flat=True))
+
         response = self.client.get(path=f"/api/v2/incidents/events/")
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         # Paging, so check "results"
-        self.assertEqual(response.data["results"][0]["pk"], event_pk)
+        response_pks = [ack["pk"] for ack in response.data["results"]]
+        self.assertEqual(response_pks, event_pks)
 
     def test_can_get_all_source_types(self):
-        response = self.client.get(path=f"/api/v2/incidents/source-types/")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        source_type_names = set([type.name for type in SourceSystemType.objects.all()])
 
-        source_types = set([type.name for type in SourceSystemType.objects.all()])
+        response = self.client.get(path=f"/api/v2/incidents/source-types/")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         response_types = set([type["name"] for type in response.data])
-        self.assertEqual(response_types, source_types)
+        self.assertEqual(response_types, source_type_names)
 
     def test_can_get_specific_source_type(self):
         response = self.client.get(path=f"/api/v2/incidents/source-types/{self.source.type.name}/")
@@ -653,10 +689,11 @@ class IncidentViewSetTestCase(APITestCase):
         self.assertTrue(SourceSystemType.objects.filter(name=data["name"]).exists())
 
     def test_can_get_all_source_systems(self):
-        response = self.client.get(path=f"/api/v2/incidents/sources/")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
         source_pks = set([source.pk for source in SourceSystem.objects.all()])
+
+        response = self.client.get(path=f"/api/v2/incidents/sources/")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         response_source_pks = set([source["pk"] for source in response.data])
         self.assertEqual(response_source_pks, source_pks)
 
