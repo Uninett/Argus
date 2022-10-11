@@ -79,6 +79,7 @@ class RequestNotificationProfileSerializerV1(serializers.ModelSerializer):
 
         profile = super().create(validated_data)
         profile.destinations.set(destinations)
+        profile.save()
         return profile
 
     def update(self, instance: NotificationProfile, validated_data: dict):
