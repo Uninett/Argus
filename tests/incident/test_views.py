@@ -81,7 +81,6 @@ class IncidentViewSetV1TestCase(IncidentAPITestCase):
 
     def test_no_incidents_returns_empty_list(self):
         response = self.client.get("/api/v1/incidents/")
-        self.assertFalse(Incident.objects.exists())
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         # Paging, so check "results"
         self.assertEqual(response.data["results"], [])
@@ -101,10 +100,6 @@ class IncidentViewSetV1TestCase(IncidentAPITestCase):
         self.assertEqual(response.data["pk"], incident_pk)
 
     def test_can_create_incident_with_tag(self):
-        # Start with no incidents or tags
-        self.assertFalse(Incident.objects.exists())
-        self.assertFalse(Tag.objects.exists())
-        self.assertFalse(IncidentTagRelation.objects.exists())
         # Minimal data to post that has tags
         data = {
             "start_time": "2021-08-04T09:13:55.908Z",
@@ -117,13 +112,10 @@ class IncidentViewSetV1TestCase(IncidentAPITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         # Check that we have made the correct Incident
         self.assertEqual(response.data["description"], data["description"])
-        self.assertTrue(Incident.objects.exists())
         incident = Incident.objects.get()
         incident_tags = [relation.tag for relation in IncidentTagRelation.objects.filter(incident=incident)]
         self.assertEqual(incident.description, data["description"])
         # Check that we have made the correct Tag
-        self.assertTrue(IncidentTagRelation.objects.exists())
-        self.assertTrue(Tag.objects.exists())
         tag = Tag.objects.get()
         self.assertEqual(incident_tags, [tag])
         self.assertEqual(str(tag), data["tags"][0]["tag"])
@@ -160,7 +152,6 @@ class IncidentViewSetV1TestCase(IncidentAPITestCase):
 
     def test_can_create_acknowledgement_of_incident(self):
         incident_pk = self.add_open_incident_with_start_event_and_tag().pk
-        self.assertFalse(Acknowledgement.objects.exists())
         data = {
             "event": {
                 "timestamp": "2022-08-02T13:04:03.529Z",
@@ -173,7 +164,6 @@ class IncidentViewSetV1TestCase(IncidentAPITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data["event"]["type"]["value"], "ACK")
         self.assertEqual(response.data["event"]["description"], data["event"]["description"])
-        self.assertTrue(Acknowledgement.objects.exists())
 
     def test_can_update_acknowledgement_of_incident(self):
         ack = self.add_acknowledgement_with_incident_and_event()
@@ -266,10 +256,6 @@ class IncidentViewSetV1TestCase(IncidentAPITestCase):
         self.assertEqual(response.data["results"][0]["pk"], incident_pk)
 
     def test_can_create_my_incident_with_tag(self):
-        # Start with no incidents or tags
-        self.assertFalse(Incident.objects.exists())
-        self.assertFalse(Tag.objects.exists())
-        self.assertFalse(IncidentTagRelation.objects.exists())
         # Minimal data to post that has tags
         data = {
             "start_time": "2021-08-04T09:13:55.908Z",
@@ -282,13 +268,10 @@ class IncidentViewSetV1TestCase(IncidentAPITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         # Check that we have made the correct Incident
         self.assertEqual(response.data["description"], data["description"])
-        self.assertTrue(Incident.objects.exists())
         incident = Incident.objects.get()
         incident_tags = [relation.tag for relation in IncidentTagRelation.objects.filter(incident=incident)]
         self.assertEqual(incident.description, data["description"])
         # Check that we have made the correct Tag
-        self.assertTrue(IncidentTagRelation.objects.exists())
-        self.assertTrue(Tag.objects.exists())
         tag = Tag.objects.get()
         self.assertEqual(incident_tags, [tag])
         self.assertEqual(str(tag), data["tags"][0]["tag"])
@@ -502,10 +485,6 @@ class IncidentViewSetTestCase(APITestCase):
         self.assertEqual(response.data["pk"], incident_pk)
 
     def test_can_create_incident_with_tag(self):
-        # Start with no incidents or tags
-        self.assertFalse(Incident.objects.exists())
-        self.assertFalse(Tag.objects.exists())
-        self.assertFalse(IncidentTagRelation.objects.exists())
         # Minimal data to post that has tags
         data = {
             "start_time": "2021-08-04T09:13:55.908Z",
@@ -518,13 +497,10 @@ class IncidentViewSetTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         # Check that we have made the correct Incident
         self.assertEqual(response.data["description"], data["description"])
-        self.assertTrue(Incident.objects.exists())
         incident = Incident.objects.get()
         incident_tags = [relation.tag for relation in IncidentTagRelation.objects.filter(incident=incident)]
         self.assertEqual(incident.description, data["description"])
         # Check that we have made the correct Tag
-        self.assertTrue(IncidentTagRelation.objects.exists())
-        self.assertTrue(Tag.objects.exists())
         tag = Tag.objects.get()
         self.assertEqual(incident_tags, [tag])
         self.assertEqual(str(tag), data["tags"][0]["tag"])
@@ -561,7 +537,6 @@ class IncidentViewSetTestCase(APITestCase):
 
     def test_can_create_acknowledgement_of_incident(self):
         incident_pk = self.add_open_incident_with_start_event_and_tag().pk
-        self.assertFalse(Acknowledgement.objects.exists())
         data = {
             "event": {
                 "timestamp": "2022-08-02T13:04:03.529Z",
@@ -574,7 +549,6 @@ class IncidentViewSetTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data["event"]["type"]["value"], "ACK")
         self.assertEqual(response.data["event"]["description"], data["event"]["description"])
-        self.assertTrue(Acknowledgement.objects.exists())
 
     def test_can_update_acknowledgement_of_incident(self):
         ack = self.add_acknowledgement_with_incident_and_event()
@@ -646,7 +620,6 @@ class IncidentViewSetTestCase(APITestCase):
         tag = str(Tag.objects.get())
         response = self.client.delete(path=f"/api/v2/incidents/{incident_pk}/tags/{tag}/")
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-        self.assertFalse(Tag.objects.exists())
 
     def test_can_create_ticket_url_of_incident(self):
         incident_pk = self.add_open_incident_with_start_event_and_tag().pk
@@ -667,10 +640,6 @@ class IncidentViewSetTestCase(APITestCase):
         self.assertEqual(response.data["results"][0]["pk"], incident_pk)
 
     def test_can_create_my_incident_with_tag(self):
-        # Start with no incidents or tags
-        self.assertFalse(Incident.objects.exists())
-        self.assertFalse(Tag.objects.exists())
-        self.assertFalse(IncidentTagRelation.objects.exists())
         # Minimal data to post that has tags
         data = {
             "start_time": "2021-08-04T09:13:55.908Z",
@@ -683,13 +652,10 @@ class IncidentViewSetTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         # Check that we have made the correct Incident
         self.assertEqual(response.data["description"], data["description"])
-        self.assertTrue(Incident.objects.exists())
         incident = Incident.objects.get()
         incident_tags = [relation.tag for relation in IncidentTagRelation.objects.filter(incident=incident)]
         self.assertEqual(incident.description, data["description"])
         # Check that we have made the correct Tag
-        self.assertTrue(IncidentTagRelation.objects.exists())
-        self.assertTrue(Tag.objects.exists())
         tag = Tag.objects.get()
         self.assertEqual(incident_tags, [tag])
         self.assertEqual(str(tag), data["tags"][0]["tag"])
