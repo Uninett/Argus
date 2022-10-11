@@ -2,6 +2,7 @@ import datetime
 import pytz
 
 from django.conf import settings
+from django.db.models import Q
 from django.urls import reverse
 from django.test import TestCase, RequestFactory
 
@@ -111,17 +112,20 @@ class IncidentViewSetV1TestCase(IncidentAPITestCase):
             "level": 1,
             "tags": [{"tag": "a=b"}],
         }
+
         response = self.client.post(path="/api/v1/incidents/", data=data, format="json")
+
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         # Check that we have made the correct Incident
-        self.assertEqual(response.data["description"], data["description"])
-        incident = Incident.objects.get()
-        incident_tags = [relation.tag for relation in IncidentTagRelation.objects.filter(incident=incident)]
-        self.assertEqual(incident.description, data["description"])
+        self.assertTrue(Incident.objects.filter(id=response.data["pk"]).exists())
+        incident = Incident.objects.get(id=response.data["pk"])
         # Check that we have made the correct Tag
-        tag = Tag.objects.get()
-        self.assertEqual(incident_tags, [tag])
-        self.assertEqual(str(tag), data["tags"][0]["tag"])
+        tag = data["tags"][0]["tag"]
+        key, value = Tag.split(tag)
+        self.assertTrue(Tag.objects.filter(Q(key=key) & Q(value=value)).exists())
+        tag = Tag.objects.get(Q(key=key) & Q(value=value))
+        # Check that incident and tag are linked
+        self.assertTrue(IncidentTagRelation.objects.filter(incident=incident).filter(tag=tag).exists())
 
     def test_can_update_incident_level(self):
         incident_pk = self.add_open_incident_with_start_event_and_tag().pk
@@ -158,7 +162,7 @@ class IncidentViewSetV1TestCase(IncidentAPITestCase):
         self.assertEqual(response.data["event"]["type"]["value"], "ACK")
 
     def test_can_create_acknowledgement_of_incident(self):
-        incident_pk = self.add_open_incident_with_start_event_and_tag().pk
+        incident = self.add_open_incident_with_start_event_and_tag()
         data = {
             "event": {
                 "timestamp": "2022-08-02T13:04:03.529Z",
@@ -167,10 +171,10 @@ class IncidentViewSetV1TestCase(IncidentAPITestCase):
             },
             "expiration": "2022-08-03T13:04:03.529Z",
         }
-        response = self.client.post(path=f"/api/v1/incidents/{incident_pk}/acks/", data=data, format="json")
+        response = self.client.post(path=f"/api/v1/incidents/{incident.pk}/acks/", data=data, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data["event"]["type"]["value"], "ACK")
-        self.assertEqual(response.data["event"]["description"], data["event"]["description"])
+        self.assertTrue(incident.events.filter(id=response.data["pk"]).exists())
+        self.assertTrue(Acknowledgement.objects.filter(event_id=response.data["pk"]).exists())
 
     def test_can_update_acknowledgement_of_incident(self):
         ack = self.add_acknowledgement_with_incident_and_event()
@@ -200,16 +204,15 @@ class IncidentViewSetV1TestCase(IncidentAPITestCase):
         self.assertEqual(response.data["pk"], event_pk)
 
     def test_can_create_event_of_incident(self):
-        incident_pk = self.add_open_incident_with_start_event_and_tag().pk
+        incident = self.add_open_incident_with_start_event_and_tag()
         data = {
             "timestamp": "2022-08-02T13:45:44.056Z",
             "type": "OTH",
             "description": "event",
         }
-        response = self.client.post(path=f"/api/v1/incidents/{incident_pk}/events/", data=data, format="json")
+        response = self.client.post(path=f"/api/v1/incidents/{incident.pk}/events/", data=data, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data["type"]["value"], "OTH")
-        self.assertEqual(response.data["description"], data["description"])
+        self.assertTrue(incident.events.filter(id=response.data["pk"]).exists())
 
     def test_can_get_all_tags_of_incident(self):
         incident = self.add_open_incident_with_start_event_and_tag()
@@ -229,13 +232,16 @@ class IncidentViewSetV1TestCase(IncidentAPITestCase):
         self.assertEqual(response.data["tag"], tag)
 
     def test_can_create_tag_of_incident(self):
-        incident_pk = self.add_open_incident_with_start_event_and_tag().pk
+        incident = self.add_open_incident_with_start_event_and_tag()
         data = {
             "tag": "c=d",
         }
-        response = self.client.post(path=f"/api/v1/incidents/{incident_pk}/tags/", data=data, format="json")
+
+        response = self.client.post(path=f"/api/v1/incidents/{incident.pk}/tags/", data=data, format="json")
+
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data["tag"], data["tag"])
+        incident_tags = [str(relation.tag) for relation in IncidentTagRelation.objects.filter(incident=incident)]
+        self.assertIn(data["tag"], incident_tags)
 
     def test_can_delete_tag_of_incident(self):
         incident_pk = self.add_open_incident_with_start_event_and_tag().pk
@@ -250,7 +256,6 @@ class IncidentViewSetV1TestCase(IncidentAPITestCase):
         }
         response = self.client.put(path=f"/api/v1/incidents/{incident_pk}/ticket_url/", data=data, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["ticket_url"], data["ticket_url"])
         self.assertEqual(Incident.objects.get(id=incident_pk).ticket_url, data["ticket_url"])
 
     def test_can_get_my_incidents(self):
@@ -269,17 +274,20 @@ class IncidentViewSetV1TestCase(IncidentAPITestCase):
             "level": 1,
             "tags": [{"tag": "a=b"}],
         }
+
         response = self.client.post(path="/api/v1/incidents/mine/", data=data, format="json")
+
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         # Check that we have made the correct Incident
-        self.assertEqual(response.data["description"], data["description"])
-        incident = Incident.objects.get()
-        incident_tags = [relation.tag for relation in IncidentTagRelation.objects.filter(incident=incident)]
-        self.assertEqual(incident.description, data["description"])
+        self.assertTrue(Incident.objects.filter(id=response.data["pk"]).exists())
+        incident = Incident.objects.get(id=response.data["pk"])
         # Check that we have made the correct Tag
-        tag = Tag.objects.get()
-        self.assertEqual(incident_tags, [tag])
-        self.assertEqual(str(tag), data["tags"][0]["tag"])
+        tag = data["tags"][0]["tag"]
+        key, value = Tag.split(tag)
+        self.assertTrue(Tag.objects.filter(Q(key=key) & Q(value=value)).exists())
+        tag = Tag.objects.get(Q(key=key) & Q(value=value))
+        # Check that incident and tag are linked
+        self.assertTrue(IncidentTagRelation.objects.filter(incident=incident).filter(tag=tag).exists())
 
     def test_can_get_all_source_types(self):
         source_type_names = set([type.name for type in SourceSystemType.objects.all()])
@@ -301,7 +309,6 @@ class IncidentViewSetV1TestCase(IncidentAPITestCase):
         }
         response = self.client.post(path=f"/api/v1/incidents/source-types/", data=data, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data["name"], data["name"])
         self.assertTrue(SourceSystemType.objects.filter(name=data["name"]).exists())
 
     def test_can_get_all_source_systems(self):
@@ -327,7 +334,6 @@ class IncidentViewSetV1TestCase(IncidentAPITestCase):
         }
         response = self.client.post(path=f"/api/v1/incidents/sources/", data=data, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data["name"], data["name"])
         self.assertTrue(SourceSystem.objects.filter(name=data["name"]).exists())
 
     def test_can_update_source_system(self):
@@ -484,17 +490,20 @@ class IncidentViewSetTestCase(APITestCase):
             "level": 1,
             "tags": [{"tag": "a=b"}],
         }
+
         response = self.client.post(path="/api/v2/incidents/", data=data, format="json")
+
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         # Check that we have made the correct Incident
-        self.assertEqual(response.data["description"], data["description"])
-        incident = Incident.objects.get()
-        incident_tags = [relation.tag for relation in IncidentTagRelation.objects.filter(incident=incident)]
-        self.assertEqual(incident.description, data["description"])
+        self.assertTrue(Incident.objects.filter(id=response.data["pk"]).exists())
+        incident = Incident.objects.get(id=response.data["pk"])
         # Check that we have made the correct Tag
-        tag = Tag.objects.get()
-        self.assertEqual(incident_tags, [tag])
-        self.assertEqual(str(tag), data["tags"][0]["tag"])
+        tag = data["tags"][0]["tag"]
+        key, value = Tag.split(tag)
+        self.assertTrue(Tag.objects.filter(Q(key=key) & Q(value=value)).exists())
+        tag = Tag.objects.get(Q(key=key) & Q(value=value))
+        # Check that incident and tag are linked
+        self.assertTrue(IncidentTagRelation.objects.filter(incident=incident).filter(tag=tag).exists())
 
     def test_can_update_incident_level(self):
         incident_pk = self.add_open_incident_with_start_event_and_tag().pk
@@ -531,7 +540,7 @@ class IncidentViewSetTestCase(APITestCase):
         self.assertEqual(response.data["event"]["type"]["value"], "ACK")
 
     def test_can_create_acknowledgement_of_incident(self):
-        incident_pk = self.add_open_incident_with_start_event_and_tag().pk
+        incident = self.add_open_incident_with_start_event_and_tag()
         data = {
             "event": {
                 "timestamp": "2022-08-02T13:04:03.529Z",
@@ -540,10 +549,10 @@ class IncidentViewSetTestCase(APITestCase):
             },
             "expiration": "2022-08-03T13:04:03.529Z",
         }
-        response = self.client.post(path=f"/api/v2/incidents/{incident_pk}/acks/", data=data, format="json")
+        response = self.client.post(path=f"/api/v2/incidents/{incident.pk}/acks/", data=data, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data["event"]["type"]["value"], "ACK")
-        self.assertEqual(response.data["event"]["description"], data["event"]["description"])
+        self.assertTrue(incident.events.filter(id=response.data["pk"]).exists())
+        self.assertTrue(Acknowledgement.objects.filter(event_id=response.data["pk"]).exists())
 
     def test_can_update_acknowledgement_of_incident(self):
         ack = self.add_acknowledgement_with_incident_and_event()
@@ -573,16 +582,15 @@ class IncidentViewSetTestCase(APITestCase):
         self.assertEqual(response.data["pk"], event_pk)
 
     def test_can_create_event_of_incident(self):
-        incident_pk = self.add_open_incident_with_start_event_and_tag().pk
+        incident = self.add_open_incident_with_start_event_and_tag()
         data = {
             "timestamp": "2022-08-02T13:45:44.056Z",
             "type": "OTH",
             "description": "event",
         }
-        response = self.client.post(path=f"/api/v2/incidents/{incident_pk}/events/", data=data, format="json")
+        response = self.client.post(path=f"/api/v2/incidents/{incident.pk}/events/", data=data, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data["type"]["value"], "OTH")
-        self.assertEqual(response.data["description"], data["description"])
+        self.assertTrue(incident.events.filter(id=response.data["pk"]).exists())
 
     def test_can_get_all_tags_of_incident(self):
         incident = self.add_open_incident_with_start_event_and_tag()
@@ -602,13 +610,16 @@ class IncidentViewSetTestCase(APITestCase):
         self.assertEqual(response.data["tag"], tag)
 
     def test_can_create_tag_of_incident(self):
-        incident_pk = self.add_open_incident_with_start_event_and_tag().pk
+        incident = self.add_open_incident_with_start_event_and_tag()
         data = {
             "tag": "c=d",
         }
-        response = self.client.post(path=f"/api/v2/incidents/{incident_pk}/tags/", data=data, format="json")
+
+        response = self.client.post(path=f"/api/v2/incidents/{incident.pk}/tags/", data=data, format="json")
+
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data["tag"], data["tag"])
+        incident_tags = [str(relation.tag) for relation in IncidentTagRelation.objects.filter(incident=incident)]
+        self.assertIn(data["tag"], incident_tags)
 
     def test_can_delete_tag_of_incident(self):
         incident_pk = self.add_open_incident_with_start_event_and_tag().pk
@@ -623,7 +634,6 @@ class IncidentViewSetTestCase(APITestCase):
         }
         response = self.client.put(path=f"/api/v2/incidents/{incident_pk}/ticket_url/", data=data, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["ticket_url"], data["ticket_url"])
         self.assertEqual(Incident.objects.get(id=incident_pk).ticket_url, data["ticket_url"])
 
     def test_can_get_my_incidents(self):
@@ -642,17 +652,20 @@ class IncidentViewSetTestCase(APITestCase):
             "level": 1,
             "tags": [{"tag": "a=b"}],
         }
+
         response = self.client.post(path="/api/v2/incidents/mine/", data=data, format="json")
+
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         # Check that we have made the correct Incident
-        self.assertEqual(response.data["description"], data["description"])
-        incident = Incident.objects.get()
-        incident_tags = [relation.tag for relation in IncidentTagRelation.objects.filter(incident=incident)]
-        self.assertEqual(incident.description, data["description"])
+        self.assertTrue(Incident.objects.filter(id=response.data["pk"]).exists())
+        incident = Incident.objects.get(id=response.data["pk"])
         # Check that we have made the correct Tag
-        tag = Tag.objects.get()
-        self.assertEqual(incident_tags, [tag])
-        self.assertEqual(str(tag), data["tags"][0]["tag"])
+        tag = data["tags"][0]["tag"]
+        key, value = Tag.split(tag)
+        self.assertTrue(Tag.objects.filter(Q(key=key) & Q(value=value)).exists())
+        tag = Tag.objects.get(Q(key=key) & Q(value=value))
+        # Check that incident and tag are linked
+        self.assertTrue(IncidentTagRelation.objects.filter(incident=incident).filter(tag=tag).exists())
 
     def test_can_get_all_events(self):
         self.add_open_incident_with_start_event_and_tag()
@@ -685,7 +698,6 @@ class IncidentViewSetTestCase(APITestCase):
         }
         response = self.client.post(path=f"/api/v2/incidents/source-types/", data=data, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data["name"], data["name"])
         self.assertTrue(SourceSystemType.objects.filter(name=data["name"]).exists())
 
     def test_can_get_all_source_systems(self):
@@ -711,7 +723,6 @@ class IncidentViewSetTestCase(APITestCase):
         }
         response = self.client.post(path=f"/api/v2/incidents/sources/", data=data, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data["name"], data["name"])
         self.assertTrue(SourceSystem.objects.filter(name=data["name"]).exists())
 
     def test_can_update_source_system(self):
