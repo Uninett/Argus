@@ -196,9 +196,9 @@ class IncidentViewSetV1TestCase(IncidentAPITestCase):
         self.assertEqual(response_pks, event_pks)
 
     def test_can_get_specific_event_of_incident(self):
-        incident_pk = self.add_open_incident_with_start_event_and_tag().pk
-        event_pk = Event.objects.get(incident_id=incident_pk).pk
-        response = self.client.get(path=f"/api/v1/incidents/{incident_pk}/events/{event_pk}/")
+        incident = self.add_open_incident_with_start_event_and_tag()
+        event_pk = incident.events.first().pk
+        response = self.client.get(path=f"/api/v1/incidents/{incident.pk}/events/{event_pk}/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["pk"], event_pk)
 
@@ -224,11 +224,11 @@ class IncidentViewSetV1TestCase(IncidentAPITestCase):
         self.assertEqual(response_tags, tags)
 
     def test_can_get_specific_tag_of_incident(self):
-        incident_pk = self.add_open_incident_with_start_event_and_tag().pk
-        tag = str(Tag.objects.get())
-        response = self.client.get(path=f"/api/v1/incidents/{incident_pk}/tags/{tag}/")
+        incident = self.add_open_incident_with_start_event_and_tag()
+        tag = incident.incident_tag_relations.first().tag
+        response = self.client.get(path=f"/api/v1/incidents/{incident.pk}/tags/{tag}/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["tag"], tag)
+        self.assertEqual(response.data["tag"], str(tag))
 
     def test_can_create_tag_of_incident(self):
         incident = self.add_open_incident_with_start_event_and_tag()
@@ -580,7 +580,7 @@ class IncidentViewSetTestCase(APITestCase):
 
     def test_can_get_specific_event_of_incident(self):
         incident = self.add_open_incident_with_start_event_and_tag()
-        event_pk = incident.events.get().pk
+        event_pk = incident.events.first().pk
         response = self.client.get(path=f"/api/v2/incidents/{incident.pk}/events/{event_pk}/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["pk"], event_pk)
@@ -607,11 +607,11 @@ class IncidentViewSetTestCase(APITestCase):
         self.assertEqual(response_tags, tags)
 
     def test_can_get_specific_tag_of_incident(self):
-        incident_pk = self.add_open_incident_with_start_event_and_tag().pk
-        tag = str(Tag.objects.get())
-        response = self.client.get(path=f"/api/v2/incidents/{incident_pk}/tags/{tag}/")
+        incident = self.add_open_incident_with_start_event_and_tag()
+        tag = incident.incident_tag_relations.first().tag
+        response = self.client.get(path=f"/api/v2/incidents/{incident.pk}/tags/{tag}/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["tag"], tag)
+        self.assertEqual(response.data["tag"], str(tag))
 
     def test_can_create_tag_of_incident(self):
         incident = self.add_open_incident_with_start_event_and_tag()
