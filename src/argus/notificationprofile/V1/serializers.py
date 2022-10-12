@@ -61,6 +61,9 @@ class RequestNotificationProfileSerializerV1(serializers.ModelSerializer):
         media = validated_data.pop("media")
         user = validated_data["user"]
         destinations = []
+        if not media:
+            raise serializers.ValidationError({"media": ["This field may not be null."]})
+
         if "SM" in media:
             if not phone_number:
                 raise serializers.ValidationError({"phone_number": ["This field may not be null."]})
@@ -84,6 +87,9 @@ class RequestNotificationProfileSerializerV1(serializers.ModelSerializer):
     def update(self, instance: NotificationProfile, validated_data: dict):
         phone_number = validated_data.pop("phone_number", None)
         media = validated_data.pop("media", None)
+
+        if media == set():
+            raise serializers.ValidationError({"media": ["This field may not be null."]})
 
         # Update media
         if media:
