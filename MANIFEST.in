@@ -1,0 +1,4 @@
+graft src
+
+prune .github
+global-exclude *.py[cod]

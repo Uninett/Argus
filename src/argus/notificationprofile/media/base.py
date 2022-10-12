@@ -3,6 +3,8 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
+from django.db.models.query import QuerySet
+
 if TYPE_CHECKING:
     from types import NoneType
     from typing import Union
@@ -28,6 +30,15 @@ class NotificationMedium(ABC):
         """
         Validates the settings of destination and returns a dict with
         validated and cleaned data
+        """
+        pass
+
+    @classmethod
+    @abstractmethod
+    def has_duplicate(self, queryset: QuerySet, settings: dict) -> bool:
+        """
+        Returns True if a destination with the given settings already exists
+        in the given queryset
         """
         pass
 

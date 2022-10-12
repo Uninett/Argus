@@ -10,9 +10,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(
-            model_name="notificationprofile", name="timeslot_copy", field=models.IntegerField(null=True)
-        ),
         migrations.AlterField(
             model_name="notificationprofile",
             name="timeslot",
@@ -34,18 +31,5 @@ class Migration(migrations.Migration):
                 related_name="notification_profiles",
                 to="argus_notificationprofile.timeslot",
             ),
-        ),
-        migrations.AddField(
-            model_name="notificationprofile",
-            name="name",
-            field=models.CharField(
-                blank=True,
-                max_length=40,
-                null=True,
-            ),
-        ),
-        migrations.AddConstraint(
-            model_name="notificationprofile",
-            constraint=models.UniqueConstraint(fields=("user", "name"), name="unique_name_per_user"),
         ),
     ]

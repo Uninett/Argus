@@ -52,7 +52,10 @@ def create_fake_incident(tags=None, description=None, stateful=True, level=None)
 
     taglist = [("location", "argus"), ("object", f"{incident.id}"), ("problem_type", "test")]
     if tags:
-        tags = [tag.split("=", 1) for tag in tags]
+        try:
+            tags = [Tag.split(tag) for tag in tags]
+        except ValueError as e:
+            raise ValidationError(str(e))
         taglist.extend(tags)
     for k, v in taglist:
         tag, _ = Tag.objects.get_or_create(key=k, value=v)
@@ -133,7 +136,17 @@ class Tag(models.Model):
 
     @classmethod
     def split(cls, tag: str):
-        return tag.split(cls.TAG_DELIMITER, maxsplit=1)
+        if cls.TAG_DELIMITER not in tag:
+            raise ValueError(f"The tag does not have its delimiter: {cls.TAG_DELIMITER}.")
+        key, value = tag.split(cls.TAG_DELIMITER, maxsplit=1)
+        key = key.strip()
+        value = value.strip()
+
+        if not key:
+            raise ValueError("The key of the tag cannot be empty.")
+
+        Tag._meta.get_field("key").run_validators(key)
+        return key, value
 
 
 class IncidentTagRelation(models.Model):

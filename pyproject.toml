@@ -1,5 +1,87 @@
 [build-system]
-requires = ["setuptools>=44", "wheel", "setuptools_scm[toml]>=3.4"]
+requires = ["setuptools>=61.0", "wheel", "setuptools_scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "argus-server"
+description = "Argus is an alert aggregator for monitoring systems"
+authors = [{name="Uninett Opensource", email="opensource@uninett.no"}]
+readme = "README.md"
+requires-python = ">=3.7"
+license = {text = "GPL-3.0-or-later"}
+classifiers = [
+    "Framework :: Django",
+    "Framework :: Django :: 3.2",
+    "Intended Audience :: Information Technology",
+    "Intended Audience :: System Administrators",
+    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Topic :: System :: Monitoring",
+]
+dependencies = [
+    'importlib-metadata; python_version<"3.8"',
+    "Django>=3.2.15,<3.3",
+    "dj-database-url>=0.5.0",
+    "django-cors-headers>=3.2",
+    "django-filter",
+    "django-multiselectfield",
+    "django-phonenumber-field[phonenumberslite]",
+    "djangorestframework<3.13",
+    "drf-rw-serializers",
+    "drf-spectacular>=0.11",
+    "factory_boy",
+    "psycopg2",
+    "python-dataporten-auth",
+    "social-auth-core>=4.1",
+    "pytz>=2022.4",
+    "social-auth-app-django>=5.0",
+    "whitenoise",
+    "channels>=3,<4",
+    "channels-redis>=3.2.0",
+    "aioredis",
+]
+dynamic = ["version"]
+
+[project.urls]
+"Homepage" = "https://github.com/Uninett/Argus"
+
+[project.optional-dependencies]
+docs = ["sphinx>=2.2.0"]
+dev = [
+    "black",
+    "coverage",
+    "django-extensions",
+    "flake8",
+    "ipython",
+    "pre-commit",
+    "python-dotenv",
+    "werkzeug",
+]
+
+[tool.setuptools]
+include-package-data = true
+zip-safe = false
+platforms = ["any"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+exclude = ["tests*"]
+
+[tool.setuptools.package-data]
+"*" = [
+    "templates/",
+    "*.rst",
+]
+
+[tool.setuptools.exclude-package-data]
+"*" = ["tests/"]
+
+[tool.setuptools_scm]
+write_to = "src/argus/version.py"
 
 [tool.black]
 line-length = 120
@@ -21,6 +103,3 @@ exclude = '''
   | src/.*/migrations
 )
 '''
-
-[tool.setuptools_scm]
-write_to = "src/argus/version.py"
