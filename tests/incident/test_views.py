@@ -243,10 +243,13 @@ class IncidentViewSetV1TestCase(IncidentAPITestCase):
         self.assertIn(data["tag"], incident_tags)
 
     def test_can_delete_tag_of_incident(self):
-        incident_pk = self.add_open_incident_with_start_event_and_tag().pk
-        tag = str(Tag.objects.get())
-        response = self.client.delete(path=f"/api/v1/incidents/{incident_pk}/tags/{tag}/")
+        incident = self.add_open_incident_with_start_event_and_tag()
+        tag = incident.incident_tag_relations.first().tag
+
+        response = self.client.delete(path=f"/api/v1/incidents/{incident.pk}/tags/{tag}/")
+
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(Tag.objects.filter(pk=tag.pk).exists())
 
     def test_can_create_ticket_url_of_incident(self):
         incident_pk = self.add_open_incident_with_start_event_and_tag().pk
@@ -623,10 +626,13 @@ class IncidentViewSetTestCase(APITestCase):
         self.assertIn(data["tag"], incident_tags)
 
     def test_can_delete_tag_of_incident(self):
-        incident_pk = self.add_open_incident_with_start_event_and_tag().pk
-        tag = str(Tag.objects.get())
-        response = self.client.delete(path=f"/api/v2/incidents/{incident_pk}/tags/{tag}/")
+        incident = self.add_open_incident_with_start_event_and_tag()
+        tag = incident.incident_tag_relations.first().tag
+
+        response = self.client.delete(path=f"/api/v2/incidents/{incident.pk}/tags/{tag}/")
+
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(Tag.objects.filter(pk=tag.pk).exists())
 
     def test_can_create_ticket_url_of_incident(self):
         incident_pk = self.add_open_incident_with_start_event_and_tag().pk
