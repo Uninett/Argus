@@ -37,7 +37,6 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
         self.notification_profile1 = NotificationProfileFactory(user=self.user1, timeslot=self.timeslot1)
         self.notification_profile1.filters.add(self.filter1)
         self.notification_profile1.destinations.set(self.user1.destinations.all())
-        self.media = ["EM", "SM"]
         self.sms_destination = DestinationConfigFactory(
             user=self.user1,
             media=Media.objects.get(slug="sms"),
