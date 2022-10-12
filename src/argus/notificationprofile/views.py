@@ -1,5 +1,6 @@
 import json
 
+from django.db.models import Q
 from django.views.generic import DetailView
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import status, viewsets
@@ -14,8 +15,10 @@ from drf_rw_serializers import viewsets as rw_viewsets
 from argus.drf.permissions import IsOwner
 from argus.incident.serializers import IncidentSerializer
 from argus.notificationprofile.media import MEDIA_CLASSES_DICT
+from argus.notificationprofile.media.base import NotificationMedium
 from .models import DestinationConfig, Filter, Media, NotificationProfile, Timeslot
 from .serializers import (
+    DuplicateDestinationSerializer,
     FilterSerializer,
     FilterPreviewSerializer,
     JSONSchemaSerializer,
@@ -170,11 +173,34 @@ class DestinationConfigViewSet(rw_viewsets.ModelViewSet):
         except DestinationConfig.DoesNotExist:
             raise ValidationError(f"Destination with pk={pk} does not exist.")
 
-        error_message = MEDIA_CLASSES_DICT[destination.media.slug].is_deletable(destination)
-        if not error_message:
-            return super().destroy(destination)
+        try:
+            MEDIA_CLASSES_DICT[destination.media.slug].raise_if_not_deletable(destination)
+        except NotificationMedium.NotDeletableError as e:
+            raise ValidationError(str(e))
         else:
-            raise ValidationError(error_message)
+            return super().destroy(destination)
+
+    def _is_destination_duplicate(self, destination):
+        other_destinations = DestinationConfig.objects.filter(media=destination.media).filter(
+            ~Q(user_id=destination.user.id)
+        )
+        destination_in_use = MEDIA_CLASSES_DICT[destination.media_id].has_duplicate(
+            other_destinations, destination.settings
+        )
+        return destination_in_use
+
+    @extend_schema(
+        responses={200: DuplicateDestinationSerializer()},
+    )
+    @action(methods=["get"], detail=True)
+    def duplicate(self, request, pk, *args, **kwargs):
+        try:
+            destination = request.user.destinations.get(pk=pk)
+        except DestinationConfig.DoesNotExist:
+            raise ValidationError(f"Destination with pk={pk} does not exist.")
+        is_duplicate = self._is_destination_duplicate(destination=destination)
+        serializer = DuplicateDestinationSerializer({"is_duplicate": is_duplicate})
+        return Response(serializer.data)
 
 
 class TimeslotViewSet(viewsets.ModelViewSet):

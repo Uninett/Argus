@@ -171,6 +171,10 @@ class RequestDestinationConfigSerializer(serializers.ModelSerializer):
         return super().update(destination, validated_data)
 
 
+class DuplicateDestinationSerializer(serializers.Serializer):
+    is_duplicate = serializers.BooleanField(read_only=True)
+
+
 class ResponseNotificationProfileSerializer(serializers.ModelSerializer):
     timeslot = TimeslotSerializer()
     filters = FilterSerializer(many=True)

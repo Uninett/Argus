@@ -4,11 +4,84 @@ read by developers.
 
 ## [Unreleased]
 
+## filter-duration
+
+### Added
+
+- Add a filter to find incidents with a duration longer than a given amount of
+ minutes.
+
+
+## [1.8.0] - 2022-10-06
+
+### Added
+- A notification profile can now have a name.
+- Docstrings and type hints to functions of media plugins.
+- Added tests for the email and sms destination serializer in case of invalid
+  input for updating.
+- Added tests for the incident, event and tag serializer
+- Added endpoint that returns True if another user has a destination with the
+  same medium and settings as the destination with the given primary key
+- Add tests for filtering on stateful/statelss and open/closed incients.
+- Add SMSNotification plugin to MEDIA_PLUGINS in development settings.
+
+### Fixed
+- Fix a notification profile test to include the phone number changes.
+- Broken links and formatting in documentation.
+- Fix notification profile serializer test to actually change phone number when
+  updating.
+- Make code snippets visible in release checklist in documentation.
+- Validate tags before adding them to an incident
+- Disallow the use of `argus` as username when creating admin user via the `initial_setup` script.
+
+### Changed
+- One timeslot can now be used by multiple notification profiles.
+- Replaced wildcard imports with specific imports.
+- Moved the notification profile Github test to parent folder and added
+  regression tag.
+- Renamed notification profile serializer tests to be more descriptive and
+  added integration test tags.
+- Improve query in notification profile signal test and add clarifying comment.
+- Ran black again on whole code base.
+- In media plugins rename the function `is_deletable` to
+  `raise_if_not_deletable` and make it raise an error if a destination is not
+  deletable.
+- Split up and rename notification profile model tests
+
+### Dependencies
+- Upgrade from pyjwt 2.0.1 to 2.4.0
+- Upgrade from django 3.2.13 to 3.2.15
+- Upgrade from black 20.8b1 to 22.3.0 in pre-commit
+
+## [1.7.0]
+
+### Changed
+
+- Clean away database tables rendered unnecessary due to changes in 1.6.0
+- Modernize packaging. Package-building is all in pyproject.toml, tools are
+  configured either there or in tox.ini.
+
+## [1.6.0] - 2022-10-04
+
 ### Added
 - Add endpoint for getting all events.
 - Add support for multiple emails and phone numbers per user.
+- Allow source systems to post acknowledgements.
+- Added clearer directions to the Argus documentation in the README.
 
-## [1.5.0] - unreleased
+### Fixed
+- Rename the `media_v1` key in the notificationprofile endpoint back to `media`, as changing it to `media_v1` broke the frontend.
+- Fix a notification profile test running duplicate asserts against one filter instead of actually testing the other defined filters.
+
+### Changed
+- Use more factories for notificationprofile tests.
+
+## [1.5.1] - 2022-05-03
+
+### Fixed
+- Acknowledging incidents works again, thanks to a workaround.
+
+## [1.5.0] - 2022-05-03
 
 ### Added
 - Github actions: Add support for SonarQube (for Géant) and prevent CodeCov on

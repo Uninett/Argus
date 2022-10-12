@@ -3,6 +3,42 @@ This file documents changes to Argus that are relevant for the users to know.
 
 ## [Unreleased]
 
+## filter-duration
+
+## Added
+
+- Add a filter to find incidents with a duration longer than a given amount of
+ minutes.
+
+
+## [1.8.0] - 2022-10-06
+
+### Added
+- A notification profile can now have a name.
+- Added endpoint that returns True if another user has a destination with the
+  same medium and settings as the destination with the given primary key
+
+### Changed
+
+- One timeslot can now be used by multiple notification profiles.
+
+### Steps for upgrading
+
+This update includes changes to the database model, requiring a migration of
+the database.
+
+## [1.7.0] - 2022-10-04
+
+### Added
+
+- Documentation for our own management commands (CLI-scripts)
+
+### Steps for upgrading
+
+Running migrate will complete the changes that started with 1.6.0.
+
+## [1.6.0] - 2022-10-04
+
 ### Added
 - New API endpoint `/incidents/all-events/` for listing all events.
 - Users can now have multiple emails and phone numbers
@@ -27,7 +63,13 @@ MEDIA_PLUGINS = [
 ]
 ```
 
-## [1.5.0] - Unreleased
+## [1.5.1] - 2022-05-03
+
+### Fixed
+- Acking an incident when notifications were turned on was broken, this is
+  a workaround.
+
+## [1.5.0] - 2022-05-03
 
 ### Added
 - New query parameter `search` for the incident endpoint. This allows searching

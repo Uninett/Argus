@@ -1,4 +1,5 @@
 from collections import defaultdict
+from datetime import timedelta
 from functools import reduce
 import logging
 from operator import and_
@@ -7,8 +8,8 @@ from urllib.parse import urljoin
 
 from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
-from django.db import models, transaction
-from django.db.models import Q
+from django.db import models
+from django.db.models import F, Q
 from django.utils import timezone
 
 from argus.auth.models import User
@@ -52,7 +53,10 @@ def create_fake_incident(tags=None, description=None, stateful=True, level=None)
 
     taglist = [("location", "argus"), ("object", f"{incident.id}"), ("problem_type", "test")]
     if tags:
-        tags = [tag.split("=", 1) for tag in tags]
+        try:
+            tags = [Tag.split(tag) for tag in tags]
+        except ValueError as e:
+            raise ValidationError(str(e))
         taglist.extend(tags)
     for k, v in taglist:
         tag, _ = Tag.objects.get_or_create(key=k, value=v)
@@ -133,7 +137,17 @@ class Tag(models.Model):
 
     @classmethod
     def split(cls, tag: str):
-        return tag.split(cls.TAG_DELIMITER, maxsplit=1)
+        if cls.TAG_DELIMITER not in tag:
+            raise ValueError(f"The tag does not have its delimiter: {cls.TAG_DELIMITER}.")
+        key, value = tag.split(cls.TAG_DELIMITER, maxsplit=1)
+        key = key.strip()
+        value = value.strip()
+
+        if not key:
+            raise ValueError("The key of the tag cannot be empty.")
+
+        Tag._meta.get_field("key").run_validators(key)
+        return key, value
 
 
 class IncidentTagRelation(models.Model):
@@ -192,6 +206,12 @@ class IncidentQuerySet(models.QuerySet):
             qs.append(self.filter(incident_tag_relations__tag__in=tag_qs))
         qs = reduce(and_, qs)
         return qs.distinct()
+
+    def is_longer_than_minutes(self, minutes):
+        min_duration = timedelta(minutes=minutes)
+        open = self.open().annotate(duration=timezone.now() - F("start_time"))
+        closed = self.closed().annotate(duration=F("end_time") - F("start_time"))
+        return open.filter(duration__gte=min_duration) | closed.filter(duration__gte=min_duration)
 
     # Cannot be a constant, because `timezone.now()` would have been evaluated at compile time
     @staticmethod

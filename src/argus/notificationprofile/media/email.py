@@ -80,27 +80,24 @@ class EmailNotification(NotificationMedium):
 
         return form.cleaned_data
 
-    @staticmethod
-    def is_deletable(destination: DestinationConfig) -> Union[str, NoneType]:
+    @classmethod
+    def raise_if_not_deletable(cls, destination: DestinationConfig) -> Union[str, NoneType]:
         """
-        Returns None if the given email destination is able to be deleted
-        and an error message if it was defined by an outside source or
-        is in use by any notification profiles
+        Raises a NotDeletableError if the given email destination is not able
+        to be deleted (if it was defined by an outside source or is in use by
+        any notification profiles)
         """
         if destination.settings["synced"]:
-            return "Cannot delete this email destination since it was defined by an outside source."
+            raise cls.NotDeletableError(
+                "Cannot delete this email destination since it was defined by an outside source."
+            )
 
         connected_profiles = destination.notification_profiles.all()
         if connected_profiles:
             profiles = ", ".join([str(profile) for profile in connected_profiles])
-            return "".join(
-                [
-                    "Cannot delete this destination since it is in use in the notification profile(s): ",
-                    profiles,
-                    ".",
-                ]
+            raise cls.NotDeletableError(
+                f"Cannot delete this destination since it is in use in the notification profile(s): {profiles}."
             )
-        return None
 
     @staticmethod
     def update(destination: DestinationConfig, validated_data: dict) -> Union[DestinationConfig, NoneType]:
@@ -129,6 +126,14 @@ class EmailNotification(NotificationMedium):
         Returns the e-mail address represented by this destination
         """
         return destination.settings.get("email_address")
+
+    @classmethod
+    def has_duplicate(self, queryset: QuerySet, settings: dict) -> bool:
+        """
+        Returns True if an email destination with the same email address
+        already exists in the given queryset
+        """
+        return queryset.filter(settings__email_address=settings["email_address"]).exists()
 
     @staticmethod
     def send(event: Event, destinations: QuerySet[DestinationConfig], **_) -> bool:

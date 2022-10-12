@@ -21,8 +21,11 @@ class Command(BaseCommand):
         parser.add_argument("-u", "--username", type=str, help="Set admin username. Default: admin")
 
     def handle(self, *args, **options):
-        # Create default superuser first
+        # Create source for argus, also creates a user
+        get_or_create_default_instances()
+        self.stdout.write('Ensured the existence of the source, source type and user "argus"')
 
+        # Create default superuser
         email = options.get("email") or ""
         options_password = options.get("password", None)
         password = options_password or generate_password_string()
@@ -49,8 +52,3 @@ class Command(BaseCommand):
         else:
             msg = f"Argus superuser {username} already exists!"
             self.stderr.write(self.style.WARNING(msg))
-
-        # Create source for argus, also creates a user
-        get_or_create_default_instances()
-
-        self.stdout.write('Ensured the existence of the source, source type and user "argus"')

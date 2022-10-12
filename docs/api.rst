@@ -126,6 +126,10 @@ Incident endpoints
       ``acked=true|false``
         Fetch only acked (``true``) or unacked (``false``) incidents.
 
+      ``duration__gte=number``
+        Fetch only incidents that are or have been open for equal to or
+        more than (``number``) minutes.
+
       ``end_time__gte=end-time``
         Fetch only incidents that ended on or later than (``end-time``).
 
@@ -766,6 +770,10 @@ Incident endpoints
       ``acked=true|false``
         Fetch only acked (``true``) or unacked (``false``) incidents.
 
+      ``duration__gte=number``
+        Fetch only incidents that are or have been open for equal to or
+        more than (``number``) minutes.
+
       ``end_time__gte=end-time``
         Fetch only incidents that ended on or later than (``end-time``).
 
@@ -1267,6 +1275,12 @@ Notification profile endpoints
          ``/api/v2/notificationprofiles/destinations/``
 
    -  ``DELETE``: deletes one of the logged in user’s destination-configs by primary key
+
+-  ``/api/v2/notificationprofiles/destinations/<int:pk>/duplicate/``:
+
+   -  ``GET``: returns True if another user has a destination with the same
+      medium and settings as the destination with the given primary key
+
 
 -  ``/api/v2/notificationprofiles/media/``:
 

@@ -3,6 +3,8 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
+from django.db.models.query import QuerySet
+
 if TYPE_CHECKING:
     from types import NoneType
     from typing import Union
@@ -16,12 +18,27 @@ __all__ = ["NotificationMedium"]
 
 
 class NotificationMedium(ABC):
+    class NotDeletableError(Exception):
+        """
+        Custom exception class that is raised when a destination cannot be
+        deleted
+        """
+
     @classmethod
     @abstractmethod
     def validate(cls, instance: RequestDestinationConfigSerializer, dict: dict) -> dict:
         """
         Validates the settings of destination and returns a dict with
         validated and cleaned data
+        """
+        pass
+
+    @classmethod
+    @abstractmethod
+    def has_duplicate(self, queryset: QuerySet, settings: dict) -> bool:
+        """
+        Returns True if a destination with the given settings already exists
+        in the given queryset
         """
         pass
 
@@ -39,11 +56,11 @@ class NotificationMedium(ABC):
         """Sends message about a given event to the given destinations"""
         pass
 
-    @staticmethod
-    def is_deletable(destination: DestinationConfig) -> Union[str, NoneType]:
+    @classmethod
+    def raise_if_not_deletable(cls, destination: DestinationConfig):
         """
-        Returns None if the given destination is able to be deleted and
-        returns an error message if not
+        Returns None if the given destination is deletable and raises an
+        NotDeletableError if not
         """
         return None
 

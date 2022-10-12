@@ -108,6 +108,11 @@ class SourceSystemViewSet(
                 description="Fetch acked (`true`) or unacked (`false`) incidents.",
                 enum=BooleanStringOAEnum,
             ),
+            OpenApiParameter(
+                name="duration__gte",
+                description="Fetch incidents with a duration longer of equal to `DURATION` minutes",
+                type=int,
+            ),
             OpenApiParameter(name="cursor", description="The pagination cursor value.", type=str),
             OpenApiParameter(
                 name="end_time__gte",
@@ -271,9 +276,9 @@ class IncidentTagViewSet(
         )
         try:
             key, value = Tag.split(self.kwargs[lookup_url_kwarg])
-        except ValueError:
+        except ValueError as e:
             # Not a valid tag. Misses the delimiter, or multiple delimiters
-            raise NotFound("A tag like this does not exist for this incident")
+            raise NotFound(str(e))
         filter_kwargs = {"key": key, "value": value}
         obj = get_object_or_404(queryset, **filter_kwargs)
 
