@@ -89,8 +89,11 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
     def test_can_get_all_notification_profiles(self):
         response = self.user1_rest_client.get("/api/v1/notificationprofiles/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 1)
-        self.assertEqual(response.data[0]["pk"], self.notification_profile1.pk)
+        all_notifprofiles = self.user1.notification_profiles.all()
+        self.assertEqual(len(response.data), len(all_notifprofiles))
+        notifprofile_pks = set([notifprofile.pk for notifprofile in all_notifprofiles])
+        response_pks = set([notifprofile["pk"] for notifprofile in response.data])
+        self.assertEqual(response_pks, notifprofile_pks)
 
     def test_can_create_notification_profile_with_valid_values(self):
         response = self.user1_rest_client.post(
@@ -129,8 +132,9 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
     def test_can_get_all_timeslots(self):
         response = self.user1_rest_client.get("/api/v1/notificationprofiles/timeslots/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 3)
-        timeslot_pks = set([timeslot.pk for timeslot in self.user1.timeslots.all()])
+        all_timeslots = self.user1.timeslots.all()
+        self.assertEqual(len(response.data), len(all_timeslots))
+        timeslot_pks = set([timeslot.pk for timeslot in all_timeslots])
         response_pks = set([timeslot["pk"] for timeslot in response.data])
         self.assertEqual(response_pks, timeslot_pks)
 
