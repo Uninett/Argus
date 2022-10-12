@@ -86,6 +86,8 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
         self.assertEqual(response.data["pk"], profile_pk)
 
     def test_can_get_all_notification_profiles(self):
+        NotificationProfileFactory(user=self.user1)
+        NotificationProfileFactory(user=self.user1)
         response = self.user1_rest_client.get("/api/v1/notificationprofiles/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         all_notifprofiles = self.user1.notification_profiles.all()
@@ -129,6 +131,8 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
         self.assertFalse(NotificationProfile.objects.filter(pk=profile_pk).exists())
 
     def test_can_get_all_timeslots(self):
+        TimeslotFactory(user=self.user1)
+        TimeslotFactory(user=self.user1)
         response = self.user1_rest_client.get("/api/v1/notificationprofiles/timeslots/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         all_timeslots = self.user1.timeslots.all()
@@ -193,6 +197,8 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
         self.assertFalse(Timeslot.objects.filter(pk=timeslot_pk).exists())
 
     def test_can_get_all_filters(self):
+        FilterFactory(user=self.user1)
+        FilterFactory(user=self.user1)
         response = self.user1_rest_client.get("/api/v1/notificationprofiles/filters/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         all_filters = self.user1.filters.all()
