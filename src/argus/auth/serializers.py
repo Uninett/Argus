@@ -38,3 +38,7 @@ class UsernameSerializer(serializers.ModelSerializer):
 
 class RefreshTokenSerializer(serializers.Serializer):
     token = serializers.CharField(label=("Token"), read_only=True)
+
+
+class EmptySerializer(serializers.Serializer):
+    pass
