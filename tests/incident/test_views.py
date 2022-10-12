@@ -1,6 +1,5 @@
 import datetime
 
-from django.db.models import Q
 from django.urls import reverse
 from django.utils.timezone import now
 from django.test import TestCase, RequestFactory
@@ -119,8 +118,8 @@ class IncidentViewSetV1TestCase(IncidentAPITestCase):
         # Check that we have made the correct Tag
         tag = data["tags"][0]["tag"]
         key, value = Tag.split(tag)
-        self.assertTrue(Tag.objects.filter(Q(key=key) & Q(value=value)).exists())
-        tag = Tag.objects.get(Q(key=key) & Q(value=value))
+        self.assertTrue(Tag.objects.filter(key=key, value=value).exists())
+        tag = Tag.objects.get(key=key, value=value)
         # Check that incident and tag are linked
         self.assertTrue(IncidentTagRelation.objects.filter(incident=incident).filter(tag=tag).exists())
 
@@ -291,8 +290,8 @@ class IncidentViewSetV1TestCase(IncidentAPITestCase):
         # Check that we have made the correct Tag
         tag = data["tags"][0]["tag"]
         key, value = Tag.split(tag)
-        self.assertTrue(Tag.objects.filter(Q(key=key) & Q(value=value)).exists())
-        tag = Tag.objects.get(Q(key=key) & Q(value=value))
+        self.assertTrue(Tag.objects.filter(key=key, value=value).exists())
+        tag = Tag.objects.get(key=key, value=value)
         # Check that incident and tag are linked
         self.assertTrue(IncidentTagRelation.objects.filter(incident=incident).filter(tag=tag).exists())
 
@@ -507,8 +506,8 @@ class IncidentViewSetTestCase(APITestCase):
         # Check that we have made the correct Tag
         tag = data["tags"][0]["tag"]
         key, value = Tag.split(tag)
-        self.assertTrue(Tag.objects.filter(Q(key=key) & Q(value=value)).exists())
-        tag = Tag.objects.get(Q(key=key) & Q(value=value))
+        self.assertTrue(Tag.objects.filter(key=key, value=value).exists())
+        tag = Tag.objects.get(key=key, value=value)
         # Check that incident and tag are linked
         self.assertTrue(IncidentTagRelation.objects.filter(incident=incident).filter(tag=tag).exists())
 
@@ -679,8 +678,8 @@ class IncidentViewSetTestCase(APITestCase):
         # Check that we have made the correct Tag
         tag = data["tags"][0]["tag"]
         key, value = Tag.split(tag)
-        self.assertTrue(Tag.objects.filter(Q(key=key) & Q(value=value)).exists())
-        tag = Tag.objects.get(Q(key=key) & Q(value=value))
+        self.assertTrue(Tag.objects.filter(key=key, value=value))
+        tag = Tag.objects.get(key=key, value=value)
         # Check that incident and tag are linked
         self.assertTrue(IncidentTagRelation.objects.filter(incident=incident).filter(tag=tag).exists())
 
