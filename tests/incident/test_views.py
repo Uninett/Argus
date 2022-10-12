@@ -1,9 +1,8 @@
 import datetime
-import pytz
 
-from django.conf import settings
 from django.db.models import Q
 from django.urls import reverse
+from django.utils.timezone import now
 from django.test import TestCase, RequestFactory
 
 from rest_framework import serializers, status, versioning
@@ -31,8 +30,6 @@ from argus.incident.models import (
 )
 from argus.incident.views import EventViewSet
 from argus.util.testing import disconnect_signals, connect_signals
-
-TIME_ZONE = getattr(settings, "TIME_ZONE")
 
 
 class EventViewSetTestCase(TestCase):
@@ -178,13 +175,15 @@ class IncidentViewSetV1TestCase(IncidentAPITestCase):
 
     def test_can_update_acknowledgement_of_incident(self):
         ack = self.add_acknowledgement_with_incident_and_event()
-        incident_pk = ack.event.incident.pk
+        incident = ack.event.incident
         data = {
-            "expiration": (datetime.datetime.now(tz=pytz.timezone(TIME_ZONE)) + datetime.timedelta(days=3)).isoformat(),
+            "expiration": (now() + datetime.timedelta(days=3)).isoformat(),
         }
-        response = self.client.put(path=f"/api/v1/incidents/{incident_pk}/acks/{ack.pk}/", data=data)
+        response = self.client.put(path=f"/api/v1/incidents/{incident.pk}/acks/{ack.pk}/", data=data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["expiration"], data["expiration"])
+        self.assertEqual(
+            incident.events.get(pk=ack.pk).ack.expiration, datetime.datetime.fromisoformat(data["expiration"])
+        )
 
     def test_can_get_all_events_of_incident(self):
         incident = self.add_open_incident_with_start_event_and_tag()
@@ -344,7 +343,7 @@ class IncidentViewSetV1TestCase(IncidentAPITestCase):
         }
         response = self.client.put(path=f"/api/v1/incidents/sources/{self.source.pk}/", data=data, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["name"], data["name"])
+        self.assertEqual(SourceSystem.objects.get(id=self.source.pk).name, data["name"])
 
 
 class IncidentFilterByOpenAndStatefulV1TestCase(IncidentAPITestCase):
@@ -556,13 +555,15 @@ class IncidentViewSetTestCase(APITestCase):
 
     def test_can_update_acknowledgement_of_incident(self):
         ack = self.add_acknowledgement_with_incident_and_event()
-        incident_pk = ack.event.incident.pk
+        incident = ack.event.incident
         data = {
-            "expiration": (datetime.datetime.now(tz=pytz.timezone(TIME_ZONE)) + datetime.timedelta(days=3)).isoformat(),
+            "expiration": (now() + datetime.timedelta(days=3)).isoformat(),
         }
-        response = self.client.put(path=f"/api/v2/incidents/{incident_pk}/acks/{ack.pk}/", data=data)
+        response = self.client.put(path=f"/api/v2/incidents/{incident.pk}/acks/{ack.pk}/", data=data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["expiration"], data["expiration"])
+        self.assertEqual(
+            incident.events.get(pk=ack.pk).ack.expiration, datetime.datetime.fromisoformat(data["expiration"])
+        )
 
     def test_can_get_all_events_of_incident(self):
         incident = self.add_open_incident_with_start_event_and_tag()
@@ -733,4 +734,4 @@ class IncidentViewSetTestCase(APITestCase):
         }
         response = self.client.put(path=f"/api/v2/incidents/sources/{self.source.pk}/", data=data, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["name"], data["name"])
+        self.assertEqual(SourceSystem.objects.get(id=self.source.pk).name, data["name"])
