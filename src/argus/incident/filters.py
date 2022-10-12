@@ -24,6 +24,7 @@ class IncidentFilter(filters.FilterSet):
     stateful = filters.BooleanFilter(label="Stateful", method="incident_filter")
     ticket = filters.BooleanFilter(label="Ticket", method="incident_filter")
     tags = TagInFilter(label="Tags", method="incident_filter")
+    duration__gte = filters.NumberFilter(label="Duration", method="incident_filter")
 
     @classmethod
     def incident_filter(cls, queryset, name, value):
@@ -52,6 +53,9 @@ class IncidentFilter(filters.FilterSet):
                 return queryset.has_ticket()
             else:
                 return queryset.lacks_ticket()
+        elif name == "duration__gte":
+            if value:
+                return queryset.is_longer_than_minutes(int(value))
         return queryset
 
     class Meta:

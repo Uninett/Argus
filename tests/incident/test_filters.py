@@ -93,6 +93,34 @@ class IncidentFilterTestCase(IncidentBasedAPITestCaseHelper, TestCase):
         result = IncidentFilter.incident_filter(qs, "tags", str(tag1))
         self.assertEqual(list(expected), list(result.order_by("pk")))
 
+    def test_duration_gte_filter_should_not_match_open_short_incident(self):
+        open_short_incident = StatefulIncidentFactory(start_time=timezone.now())
+        qs = Incident.objects.filter(pk=open_short_incident.id)
+        result = IncidentFilter.incident_filter(qs, "duration__gte", 10)
+        self.assertFalse(result)
+
+    def test_duration_gte_filter_should_match_open_long_incident(self):
+        open_long_incident = StatefulIncidentFactory(start_time=timezone.now() - timedelta(minutes=50))
+        qs = Incident.objects.filter(pk=open_long_incident.id)
+        result = IncidentFilter.incident_filter(qs, "duration__gte", 10)
+        self.assertTrue(result)
+
+    def test_duration_gte_filter_should_not_match_closed_short_incident(self):
+        closed_short_incident = StatefulIncidentFactory(
+            start_time=timezone.now() - timedelta(minutes=1), end_time=timezone.now()
+        )
+        qs = Incident.objects.filter(pk=closed_short_incident.id)
+        result = IncidentFilter.incident_filter(qs, "duration__gte", 10)
+        self.assertFalse(result)
+
+    def test_duration_gte_filter_should_match_closed_long_incident(self):
+        closed_long_incident = StatefulIncidentFactory(
+            start_time=timezone.now() - timedelta(minutes=50), end_time=timezone.now()
+        )
+        qs = Incident.objects.filter(pk=closed_long_incident.id)
+        result = IncidentFilter.incident_filter(qs, "duration__gte", 10)
+        self.assertTrue(result)
+
     def test_tags_multiple_same_key(self):
         user = SourceUserFactory()
         tag1 = TagFactory(key="testkey", value="testvalue1")
