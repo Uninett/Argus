@@ -262,10 +262,15 @@ class IncidentViewSetV1TestCase(IncidentAPITestCase):
 
     def test_can_get_my_incidents(self):
         incident_pk = self.add_open_incident_with_start_event_and_tag().pk
+        other_incident_pk = StatefulIncidentFactory().pk
+
         response = self.client.get(path="/api/v1/incidents/mine/")
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         # Paging, so check "results"
-        self.assertEqual(response.data["results"][0]["pk"], incident_pk)
+        response_pks = [incident["pk"] for incident in response.data["results"]]
+        self.assertIn(incident_pk, response_pks)
+        self.assertNotIn(other_incident_pk, response_pks)
 
     def test_can_create_my_incident_with_tag(self):
         # Minimal data to post that has tags
@@ -645,10 +650,15 @@ class IncidentViewSetTestCase(APITestCase):
 
     def test_can_get_my_incidents(self):
         incident_pk = self.add_open_incident_with_start_event_and_tag().pk
+        other_incident_pk = StatefulIncidentFactory().pk
+
         response = self.client.get(path="/api/v2/incidents/mine/")
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         # Paging, so check "results"
-        self.assertEqual(response.data["results"][0]["pk"], incident_pk)
+        response_pks = [incident["pk"] for incident in response.data["results"]]
+        self.assertIn(incident_pk, response_pks)
+        self.assertNotIn(other_incident_pk, response_pks)
 
     def test_can_create_my_incident_with_tag(self):
         # Minimal data to post that has tags
