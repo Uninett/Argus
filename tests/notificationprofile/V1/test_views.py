@@ -196,8 +196,11 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
     def test_can_get_all_filters(self):
         response = self.user1_rest_client.get("/api/v1/notificationprofiles/filters/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertTrue(len(response.data), 1)
-        self.assertEqual(response.data[0]["pk"], self.filter1.pk)
+        all_filters = self.user1.filters.all()
+        self.assertEqual(len(response.data), len(all_filters))
+        filter_pks = set([filter.pk for filter in all_filters])
+        response_pks = set([filter["pk"] for filter in response.data])
+        self.assertEqual(response_pks, filter_pks)
 
     def test_can_create_filter_with_valid_values(self):
         filter_name = "test-filter"
