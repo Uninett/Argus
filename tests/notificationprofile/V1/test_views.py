@@ -180,14 +180,16 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
 
     def test_cannot_update_timeslot_end_time_to_before_start_time(self):
         timeslot_pk = self.timeslot1.pk
+        new_recurrences = [{"days": [1, 2, 3], "start": "20:00:00", "end": "10:00:00"}]
         response = self.user1_rest_client.put(
             f"/api/v1/notificationprofiles/timeslots/{timeslot_pk}/",
             {
                 "name": self.timeslot1.name,
-                "time_recurrences": [{"days": [1, 2, 3], "start": "20:00:00", "end": "10:00:00"}],
+                "time_recurrences": new_recurrences,
             },
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertNotEqual(Timeslot.objects.get(id=timeslot_pk).time_recurrences, new_recurrences)
 
     def test_can_delete_timeslot(self):
         timeslot_pk = self.timeslot1.pk
