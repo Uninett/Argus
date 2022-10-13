@@ -10,7 +10,7 @@ For version 1, we reset all the migrations for Argus's own apps:
 
 Please drop the database. This is the only time we're doing this.
 
-If you do not access to drop and recreate the database, you can start the
+If you do not have access to drop and recreate the database, you can start the
 (postgres) database shell like so: `$ python manage.py dbshell` and delete all
 tables like so:
 
