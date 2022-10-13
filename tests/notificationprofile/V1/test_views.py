@@ -149,7 +149,7 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
             },
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertTrue(Timeslot.objects.filter(user=self.user1, name="test-timeslot").exists())
+        self.assertTrue(Timeslot.objects.filter(pk=response.data["pk"]).exists())
 
     def test_cannot_create_timeslot_with_end_time_before_start_time(self):
         response = self.user1_rest_client.post(
@@ -216,7 +216,7 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
             },
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertTrue(Filter.objects.filter(user=self.user1, name=filter_name).exists())
+        self.assertTrue(Filter.objects.filter(pk=response.data["pk"]).exists())
 
     def test_can_get_specific_filter(self):
         filter_pk = self.filter1.pk
