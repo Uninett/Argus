@@ -22,7 +22,7 @@ class SourceSystemTypeFactory(factory.django.DjangoModelFactory):
         model = models.SourceSystemType
         django_get_or_create = ("name",)
 
-    name = factory.Faker("word")
+    name = factory.Sequence(lambda s: "SourceSystemType %s" % s)
 
 
 class SourceSystemFactory(factory.django.DjangoModelFactory):
