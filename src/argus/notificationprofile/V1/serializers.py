@@ -85,8 +85,12 @@ class RequestNotificationProfileSerializerV1(serializers.ModelSerializer):
         phone_number = validated_data.pop("phone_number", None)
         media = validated_data.pop("media", None)
 
-        # Update media
-        if media:
+        # Update media to be empty
+        if media == set():
+            instance.destinations.set([])
+
+        # Update media to not be empty
+        if "SM" in media or "EM" in media:
             if "SM" in media and "EM" not in media:
                 email_destinations = instance.destinations.filter(media_id="email")
                 instance.destinations.remove(*email_destinations)
