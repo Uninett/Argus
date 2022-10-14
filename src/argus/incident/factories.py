@@ -30,7 +30,7 @@ class SourceSystemFactory(factory.django.DjangoModelFactory):
         model = models.SourceSystem
         django_get_or_create = ("name", "user")
 
-    name = factory.Faker("word")
+    name = factory.Sequence(lambda s: "SourceSystem %s" % s)
     type = factory.SubFactory(SourceSystemTypeFactory)
     user = factory.SubFactory(SourceUserFactory)
     base_url = factory.Faker("url")
