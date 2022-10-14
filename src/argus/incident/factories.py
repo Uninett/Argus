@@ -52,7 +52,7 @@ class IncidentFactory(factory.django.DjangoModelFactory):
     start_time = factory.Faker("date_time_between", start_date="-1d", end_date="+1d", tzinfo=pytz.UTC)
     end_time = INFINITY_REPR
     source = factory.SubFactory(SourceSystemFactory)
-    source_incident_id = factory.Faker("md5")
+    source_incident_id = factory.Sequence(lambda s: s)
     details_url = factory.Faker("uri")
     description = factory.Faker("sentence")
     level = factory.fuzzy.FuzzyChoice(models.Incident.LEVELS)  # Random valid level
