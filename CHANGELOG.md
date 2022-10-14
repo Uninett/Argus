@@ -2,12 +2,6 @@
 This file documents all changes to Argus. This file is primarily meant to be
 read by developers.
 
-## fix-randomly-failing-tests
-
-## Fixed
-
-- The FilterFactory no longer leads to random UniqueViolations on testing
-
 ## [Unreleased]
 
 ### Added
@@ -15,6 +9,10 @@ read by developers.
 - Added an endpoint to get a refreshed auth token.
 - Add a filter to find incidents with a duration longer than a given amount of
  minutes.
+
+## Fixed
+
+- The FilterFactory no longer leads to random UniqueViolations on testing
 
 ## [1.8.0] - 2022-10-06
 
