@@ -12,6 +12,7 @@ from argus.util.datetime_utils import INFINITY_REPR
 from . import fields
 from .models import (
     Acknowledgement,
+    ChangeEvent,
     Event,
     Incident,
     IncidentTagRelation,
@@ -224,6 +225,11 @@ class IncidentPureDeserializer(serializers.ModelSerializer):
                     errors[str(tag_relation.tag)] = "Cannot remove this tag when you're not the one who added it."
             if errors:
                 raise serializers.ValidationError(errors)
+
+        # Post change events
+        if remove_tag_relations or add_tags:
+            description = f"Change: tags {[str(tag) for tag in existing_tags]} → {[str(tag) for tag in posted_tags]}"
+            ChangeEvent.objects.create(incident=instance, actor=user, timestamp=timezone.now(), description=description)
 
         for tag_relation in remove_tag_relations:
             tag_relation.delete()
