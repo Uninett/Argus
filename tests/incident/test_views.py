@@ -126,10 +126,9 @@ class IncidentViewSetV1TestCase(IncidentAPITestCase):
     def test_can_update_incident_level(self):
         incident_pk = self.add_open_incident_with_start_event_and_tag().pk
         incident_path = reverse("v1:incident:incident-detail", args=[incident_pk])
-        response = self.client.put(
+        response = self.client.patch(
             path=incident_path,
             data={
-                "tags": [{"tag": "a=b"}],
                 "level": 2,
             },
         )
@@ -514,10 +513,9 @@ class IncidentViewSetTestCase(APITestCase):
     def test_can_update_incident_level(self):
         incident_pk = self.add_open_incident_with_start_event_and_tag().pk
         incident_path = reverse("v2:incident:incident-detail", args=[incident_pk])
-        response = self.client.put(
+        response = self.client.patch(
             path=incident_path,
             data={
-                "tags": [{"tag": "a=b"}],
                 "level": 2,
             },
         )
