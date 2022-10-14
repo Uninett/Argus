@@ -1,4 +1,5 @@
-from rest_framework import serializers
+from rest_framework import exceptions, serializers
+from rest_framework.authtoken.models import Token
 
 from .models import User
 
@@ -33,3 +34,11 @@ class UsernameSerializer(serializers.ModelSerializer):
             "username",
         ]
         read_only_fields = ["pk", "username"]
+
+
+class RefreshTokenSerializer(serializers.Serializer):
+    token = serializers.CharField(label=("Token"), read_only=True)
+
+
+class EmptySerializer(serializers.Serializer):
+    pass

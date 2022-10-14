@@ -23,7 +23,7 @@ class SignalTests(APITestCase):
         self.assertTrue(default_destination.settings["synced"])
 
     def test_default_email_destination_should_not_be_created_if_user_has_no_email(self):
-        self.assertFalse(self.user2.destinations.exists())
+        self.assertFalse(self.user2.destinations.filter(media_id="email", settings__synced=True).exists())
 
     def test_default_email_destination_should_be_added_if_email_is_added_to_user(self):
         self.user2.email = self.user2.username
