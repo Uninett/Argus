@@ -746,6 +746,14 @@ Auth endpoints
         "password": "secret"
       }
 
+-  ``POST`` to ``/api/v2/refresh-token/``: returns an auth token for the
+   currently logged in user
+
+   -  Note that this token will expire after a certain amout of days that is
+      set in the variable ``AUTH_TOKEN_EXPIRES_AFTER_DAYS`` in
+      :ref:`site-specific-settings` (by default 14 days), and can be replaced
+      by posting to the same endpoint.
+
 -  ``/oidc/login/dataporten_feide/``: redirects to Feide login
 
 

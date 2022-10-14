@@ -11,6 +11,13 @@ This file documents changes to Argus that are relevant for the users to know.
  minutes.
 
 
+## token-endpoint
+
+### Added
+
+- Added an endpoint to get a refreshed auth token.
+
+
 ## [1.8.0] - 2022-10-06
 
 ### Added
