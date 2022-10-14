@@ -22,7 +22,7 @@ class TimeslotFactory(factory.django.DjangoModelFactory):
         model = models.Timeslot
 
     user = factory.SubFactory(PersonUserFactory)
-    name = factory.Faker("word")
+    name = factory.Sequence(lambda s: "Timeslot %s" % s)
 
 
 class TimeRecurrenceFactory(factory.django.DjangoModelFactory):
