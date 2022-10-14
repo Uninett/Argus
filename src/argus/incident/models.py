@@ -1,4 +1,5 @@
 from collections import defaultdict
+from datetime import timedelta
 from functools import reduce
 import logging
 from operator import and_
@@ -7,8 +8,8 @@ from urllib.parse import urljoin
 
 from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
-from django.db import models, transaction
-from django.db.models import Q
+from django.db import models
+from django.db.models import F, Q
 from django.utils import timezone
 
 from argus.auth.models import User
@@ -205,6 +206,12 @@ class IncidentQuerySet(models.QuerySet):
             qs.append(self.filter(incident_tag_relations__tag__in=tag_qs))
         qs = reduce(and_, qs)
         return qs.distinct()
+
+    def is_longer_than_minutes(self, minutes):
+        min_duration = timedelta(minutes=minutes)
+        open = self.open().annotate(duration=timezone.now() - F("start_time"))
+        closed = self.closed().annotate(duration=F("end_time") - F("start_time"))
+        return open.filter(duration__gte=min_duration) | closed.filter(duration__gte=min_duration)
 
     # Cannot be a constant, because `timezone.now()` would have been evaluated at compile time
     @staticmethod

@@ -147,3 +147,10 @@ class APITests(APITestCase):
 
         assert_correct_fields_for_user(self.normal_user1)
         assert_correct_fields_for_user(self.superuser1)
+
+    def test_refresh_token_returns_correct_new_token(self):
+        auth_token_path = reverse("v2:auth:refresh-token")
+        response = self.normal_user1_client.post(auth_token_path)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertNotEqual(response.data["token"], self.normal_user1_token.key)
+        self.assertEqual(response.data["token"], Token.objects.get(user=self.normal_user1).key)

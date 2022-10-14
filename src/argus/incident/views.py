@@ -108,6 +108,11 @@ class SourceSystemViewSet(
                 description="Fetch acked (`true`) or unacked (`false`) incidents.",
                 enum=BooleanStringOAEnum,
             ),
+            OpenApiParameter(
+                name="duration__gte",
+                description="Fetch incidents with a duration longer of equal to `DURATION` minutes",
+                type=int,
+            ),
             OpenApiParameter(name="cursor", description="The pagination cursor value.", type=str),
             OpenApiParameter(
                 name="end_time__gte",
@@ -235,7 +240,6 @@ class IncidentViewSet(
         if serializer.is_valid():
             incident.ticket_url = serializer.data["ticket_url"]
             incident.save()
-            # TODO: make argus stateless incident about the url being saved? event?
             return Response(serializer.data)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
