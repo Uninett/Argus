@@ -2,6 +2,12 @@
 This file documents all changes to Argus. This file is primarily meant to be
 read by developers.
 
+## fix-randomly-failing-tests
+
+## Fixed
+
+- The FilterFactory no longer leads to random UniqueViolations on testing
+
 ## [Unreleased]
 
 ### Added
