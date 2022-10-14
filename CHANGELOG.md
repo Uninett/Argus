@@ -4,20 +4,11 @@ read by developers.
 
 ## [Unreleased]
 
-## filter-duration
-
-### Added
-
-- Add a filter to find incidents with a duration longer than a given amount of
- minutes.
-
-
-## token-endpoint
-
 ### Added
 
 - Added an endpoint to get a refreshed auth token.
-
+- Add a filter to find incidents with a duration longer than a given amount of
+ minutes.
 
 ## [1.8.0] - 2022-10-06
 
