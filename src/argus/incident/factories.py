@@ -41,8 +41,8 @@ class TagFactory(factory.django.DjangoModelFactory):
         model = models.Tag
         django_get_or_create = ("key", "value")
 
-    key = factory.Faker("word")
-    value = factory.Faker("word")
+    key = factory.Sequence(lambda s: "key_%s" % s)
+    value = factory.Sequence(lambda s: "value_%s" % s)
 
 
 class IncidentFactory(factory.django.DjangoModelFactory):
