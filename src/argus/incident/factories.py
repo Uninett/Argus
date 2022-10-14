@@ -75,3 +75,23 @@ class IncidentTagRelationFactory(factory.django.DjangoModelFactory):
     incident = factory.SubFactory(IncidentFactory)
     added_by = factory.SubFactory(SourceUserFactory)
     added_time = factory.Faker("date_time_between", start_date="-1d", end_date="+1d", tzinfo=pytz.UTC)
+
+
+class EventFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = models.Event
+
+    incident = factory.SubFactory(IncidentFactory)
+    actor = factory.SubFactory(SourceUserFactory)
+    timestamp = factory.Faker("date_time_between", start_date="-1d", end_date="+1d", tzinfo=pytz.UTC)
+    received = timestamp
+    type = models.Event.Type.OTHER
+    description = factory.Faker("sentence")
+
+
+class AcknowledgementFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = models.Acknowledgement
+
+    event = factory.SubFactory(EventFactory, type=models.Event.Type.ACKNOWLEDGE)
+    expiration = factory.Faker("date_time_between", start_date="+1d", end_date="+2d", tzinfo=pytz.UTC)
