@@ -24,6 +24,12 @@ read by developers.
 - Added an endpoint to set ticket_url of incidents in bulk
 
 
+## event-type-filter
+
+### Added
+- Added the possibility to filter notifications by event-type
+
+
 ## [1.9.0] - 2022-11-08
 
 ### Added
