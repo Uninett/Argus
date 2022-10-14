@@ -60,7 +60,7 @@ class MediaFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Media
 
-    slug = factory.Faker("word")
+    slug = factory.Sequence(lambda s: "Media %s" % s)
     name = factory.LazyAttribute(lambda obj: obj.slug.capitalize())
 
 
