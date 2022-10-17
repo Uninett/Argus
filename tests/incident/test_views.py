@@ -627,6 +627,18 @@ class IncidentViewSetTestCase(APITestCase):
         incident_tags = [str(relation.tag) for relation in IncidentTagRelation.objects.filter(incident=incident)]
         self.assertIn(data["tag"], incident_tags)
 
+    def test_cannot_create_tag_of_incident_with_invalid_key(self):
+        incident = self.add_open_incident_with_start_event_and_tag()
+        data = {
+            "tag": "???=d",
+        }
+
+        response = self.client.post(path=f"/api/v2/incidents/{incident.pk}/tags/", data=data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        incident_tags = [str(relation.tag) for relation in IncidentTagRelation.objects.filter(incident=incident)]
+        self.assertNotIn(data["tag"], incident_tags)
+
     def test_can_delete_tag_of_incident(self):
         incident = self.add_open_incident_with_start_event_and_tag()
         tag = incident.incident_tag_relations.first().tag
