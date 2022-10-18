@@ -1021,6 +1021,11 @@ Incident endpoints
 
       Only ``ticket_url`` may be modified.
 
+-  ``/api/v2/incidents/<int:pk>/ticket/``:
+
+   -  ``PUT``: creates a new ticket in a :ref:`ticket system<ticket-systems>`
+      and returns its url or returns an already set ticket url
+
 
 -  ``/api/v2/incidents/<int:pk>/events/``:
 
