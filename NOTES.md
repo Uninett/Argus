@@ -3,6 +3,14 @@ This file documents changes to Argus that are relevant for the users to know.
 
 ## [Unreleased]
 
+## ticket-plugin-base
+
+### Added
+- Plugin system for ticket system integrations, documented in the new "Ticket
+  system settings" sections.
+- New API endpoint to create a new ticket in an external ticket system
+
+
 ### Added
 - Add docs about notification plugins
 - Added a management command that will create incidents if a source token is
