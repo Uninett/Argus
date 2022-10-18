@@ -418,3 +418,7 @@ class RequestBulkTicketUrlSerializer(serializers.ModelSerializer):
 
 class ResponseBulkSerializer(serializers.Serializer):
     changes = serializers.JSONField()
+
+
+class EmptySerializer(serializers.Serializer):
+    pass
