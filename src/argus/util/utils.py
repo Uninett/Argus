@@ -1,3 +1,5 @@
+import importlib
+
 from django.db.models import Model
 
 
@@ -37,3 +39,10 @@ class NestedAttrGetter(AttrGetter):
     @property
     def query(self):
         return self._attr_query
+
+
+def import_class_from_dotted_path(dotted_path: str):
+    module_name, class_name = dotted_path.rsplit(".", 1)
+    module = importlib.import_module(module_name)
+    class_ = getattr(module, class_name)
+    return class_

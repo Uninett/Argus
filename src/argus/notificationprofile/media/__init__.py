@@ -9,6 +9,7 @@ from django.conf import settings
 from django.db import connections
 
 from ..models import NotificationProfile
+from argus.util.utils import import_class_from_dotted_path
 
 if TYPE_CHECKING:
     from typing import List
@@ -27,17 +28,10 @@ __all__ = [
     "get_notification_media",
 ]
 
-# Import media classes
-def _import_class_from_dotted_path(dotted_path: str):
-    module_name, class_name = dotted_path.rsplit(".", 1)
-    module = importlib.import_module(module_name)
-    class_ = getattr(module, class_name)
-    return class_
-
 
 # TODO: Raise Incident if media_class not importable?
 MEDIA_PLUGINS = getattr(settings, "MEDIA_PLUGINS")
-MEDIA_CLASSES = [_import_class_from_dotted_path(media_plugin) for media_plugin in MEDIA_PLUGINS]
+MEDIA_CLASSES = [import_class_from_dotted_path(media_plugin) for media_plugin in MEDIA_PLUGINS]
 MEDIA_CLASSES_DICT = {media_class.MEDIA_SLUG: media_class for media_class in MEDIA_CLASSES}
 
 
