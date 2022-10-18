@@ -107,7 +107,7 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
             },
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertTrue(NotificationProfile.objects.filter(pk=response.data.get("pk")).exists())
+        self.assertTrue(NotificationProfile.objects.filter(pk=response.data["pk"]).exists())
 
     def test_new_notificaton_profiles_have_correct_media(self):
         response = self.user1_rest_client.post(
