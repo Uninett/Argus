@@ -90,7 +90,7 @@ class SMSNotification(NotificationMedium):
         sms_destinations = destinations.filter(media_id=SMSNotification.MEDIA_SLUG)
         if not sms_destinations:
             return False
-        phone_numbers = [destination.settings["phone_numbers"] for destination in sms_destinations]
+        phone_numbers = [destination.settings["phone_number"] for destination in sms_destinations]
         title = f"{event.description}"
         for phone_number in phone_numbers:
             send_email_safely(
