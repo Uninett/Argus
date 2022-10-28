@@ -4,6 +4,11 @@ read by developers.
 
 ## [Unreleased]
 
+## [1.8.1] - 2022-10-28
+
+### Fixed
+- Fix typo that prevented SMS messages from being sent.
+
 ## [1.8.0] - 2022-10-06
 
 ### Added
