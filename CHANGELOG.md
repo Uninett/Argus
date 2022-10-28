@@ -4,6 +4,11 @@ read by developers.
 
 ## [Unreleased]
 
+## bugfix/sms-sending
+
+### Fixed
+- Fix typo that prevented SMS messages from being sent.
+
 ### Added
 
 - Added an endpoint to get a refreshed auth token.
