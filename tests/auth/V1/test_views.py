@@ -69,6 +69,40 @@ class ViewTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertFalse(DestinationConfig.objects.filter(media_id="sms", settings=settings).exists())
 
+    def test_cannot_create_duplicate_phone_number(self):
+        settings = {"phone_number": "+4747474701"}
+        DestinationConfigFactory(
+            user=self.user1,
+            media=Media.objects.get(slug="sms"),
+            settings=settings,
+        )
+        response = self.user1_rest_client.post(
+            path="/api/v1/auth/phone-number/",
+            data=settings,
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(DestinationConfig.objects.filter(media_id="sms", settings=settings).count(), 1)
+
+    def test_cannot_update_phone_number_with_duplicate_phone_number(self):
+        settings1 = {"phone_number": "+4747474701"}
+        settings2 = {"phone_number": "+4747474702"}
+        DestinationConfigFactory(
+            user=self.user1,
+            media=Media.objects.get(slug="sms"),
+            settings=settings1,
+        )
+        destination_pk = DestinationConfigFactory(
+            user=self.user1,
+            media=Media.objects.get(slug="sms"),
+            settings=settings2,
+        ).pk
+        response = self.user1_rest_client.patch(
+            path=f"/api/v1/auth/phone-number/{destination_pk}/",
+            data=settings1,
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(DestinationConfig.objects.get(pk=destination_pk).settings, settings2)
+
     def test_can_delete_phone_number(self):
         phone_number_pk = DestinationConfigFactory(
             user=self.user1,
