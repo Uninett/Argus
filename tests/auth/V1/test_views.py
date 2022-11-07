@@ -69,6 +69,18 @@ class ViewTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertFalse(DestinationConfig.objects.filter(media_id="sms", settings=settings).exists())
 
+    def test_can_update_phone_number_with_valid_values(self):
+        new_settings = {"phone_number": "+4747474702"}
+        destination_pk = DestinationConfigFactory(
+            user=self.user1, media=Media.objects.get(slug="sms"), settings={"phone_number": "+4747474701"}
+        ).pk
+        response = self.user1_rest_client.patch(
+            path=f"/api/v1/auth/phone-number/{destination_pk}/",
+            data=new_settings,
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(DestinationConfig.objects.get(pk=destination_pk).settings, new_settings)
+
     def test_can_delete_phone_number(self):
         phone_number_pk = DestinationConfigFactory(
             user=self.user1,
