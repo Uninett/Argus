@@ -9,6 +9,7 @@ if TYPE_CHECKING:
     from types import NoneType
     from typing import Union
     from django.db.models.query import QuerySet
+    from argus.auth.models import User
     from argus.incident.models import Event
     from ..models import DestinationConfig
     from ..serializers import RequestDestinationConfigSerializer
@@ -26,7 +27,7 @@ class NotificationMedium(ABC):
 
     @classmethod
     @abstractmethod
-    def validate(cls, instance: RequestDestinationConfigSerializer, dict: dict) -> dict:
+    def validate(cls, instance: RequestDestinationConfigSerializer, dict: dict, user: User) -> dict:
         """
         Validates the settings of destination and returns a dict with
         validated and cleaned data

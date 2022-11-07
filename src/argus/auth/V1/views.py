@@ -44,9 +44,13 @@ class PhoneNumberViewV1(viewsets.ViewSet):
     def create(self, request, pk=None):
         if pk:
             destination = get_object_or_404(self.queryset.filter(user=request.user), pk=pk)
-            serializer = self.write_serializer_class(destination, data={"media": "sms", "settings": request.data})
+            serializer = self.write_serializer_class(
+                destination, data={"media": "sms", "settings": request.data}, context={"request": request}
+            )
         else:
-            serializer = self.write_serializer_class(data={"media": "sms", "settings": request.data})
+            serializer = self.write_serializer_class(
+                data={"media": "sms", "settings": request.data}, context={"request": request}
+            )
         if serializer.is_valid():
             serializer.save(user=request.user)
             response_serializer = self.serializer_class(serializer.instance)
@@ -66,7 +70,9 @@ class PhoneNumberViewV1(viewsets.ViewSet):
             destination = self.queryset.filter(user=request.user).filter(pk=pk).first()
         elif request.stream.method == "PATCH":
             destination = get_object_or_404(self.queryset.filter(user=request.user), pk=pk)
-        serializer = self.write_serializer_class(destination, data={"media": "sms", "settings": request.data})
+        serializer = self.write_serializer_class(
+            destination, data={"media": "sms", "settings": request.data}, context={"request": request}
+        )
         if serializer.is_valid():
             serializer.save(user=request.user)
             response_serializer = self.serializer_class(serializer.instance)
@@ -79,7 +85,7 @@ class PhoneNumberViewV1(viewsets.ViewSet):
     def partial_update(self, request, pk=None):
         destination = get_object_or_404(self.queryset.filter(user=request.user), pk=pk)
         serializer = self.write_serializer_class(
-            destination, data={"media": "sms", "settings": request.data}, partial=True
+            destination, data={"media": "sms", "settings": request.data}, partial=True, context={"request": request}
         )
         if serializer.is_valid():
             serializer.save()
