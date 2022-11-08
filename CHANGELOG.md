@@ -4,6 +4,12 @@ read by developers.
 
 ## [Unreleased]
 
+## bugfix/duplicate-phone-number
+
+### Fixed
+- Validate that user doesn't have destination with same settings before
+  creating/updating destination
+
 ## bugfix/sms-sending
 
 ### Fixed

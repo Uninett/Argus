@@ -20,6 +20,7 @@ from .email import send_email_safely
 
 if TYPE_CHECKING:
     from django.db.models.query import QuerySet
+    from argus.auth.models import User
     from ..models import DestinationConfig
     from ..serializers import RequestDestinationConfigSerializer
 
@@ -47,7 +48,7 @@ class SMSNotification(NotificationMedium):
         phone_number = PhoneNumberField()
 
     @classmethod
-    def validate(cls, instance: RequestDestinationConfigSerializer, sms_dict: dict) -> dict:
+    def validate(cls, instance: RequestDestinationConfigSerializer, sms_dict: dict, user: User) -> dict:
         """
         Validates the settings of an SMS destination and returns a dict
         with validated and cleaned data
@@ -57,6 +58,9 @@ class SMSNotification(NotificationMedium):
             raise ValidationError(form.errors)
 
         form.cleaned_data["phone_number"] = form.cleaned_data["phone_number"].as_e164
+
+        if user.destinations.filter(media_id="sms", settings__phone_number=form.cleaned_data["phone_number"]).exists():
+            raise ValidationError({"phone_number": "Phone number already exists"})
 
         return form.cleaned_data
 

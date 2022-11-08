@@ -17,6 +17,7 @@ if TYPE_CHECKING:
     from types import NoneType
     from typing import Union
     from django.db.models.query import QuerySet
+    from argus.auth.models import User
     from ..serializers import RequestDestinationConfigSerializer
 
 LOG = logging.getLogger(__name__)
@@ -67,7 +68,7 @@ class EmailNotification(NotificationMedium):
         email_address = forms.EmailField()
 
     @classmethod
-    def validate(cls, instance: RequestDestinationConfigSerializer, email_dict: dict) -> dict:
+    def validate(cls, instance: RequestDestinationConfigSerializer, email_dict: dict, user: User) -> dict:
         """
         Validates the settings of an email destination and returns a dict
         with validated and cleaned data
@@ -77,6 +78,10 @@ class EmailNotification(NotificationMedium):
             raise ValidationError(form.errors)
         if form.cleaned_data["email_address"] == instance.context["request"].user.email:
             raise ValidationError("This email address is already registered in another destination.")
+        if user.destinations.filter(
+            media_id="email", settings__email_address=form.cleaned_data["email_address"]
+        ).exists():
+            raise ValidationError({"email_address": "Email address already exists"})
 
         return form.cleaned_data
 

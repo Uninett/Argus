@@ -114,6 +114,28 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
             ).exists()
         )
 
+    def test_cannot_create_email_destination_with_duplicate_email_address(self):
+        settings = {"email_address": "test2@example.com"}
+        DestinationConfigFactory(
+            user=self.user1,
+            media=Media.objects.get(slug="email"),
+            settings=settings,
+        )
+        response = self.user1_rest_client.post(
+            path="/api/v2/notificationprofiles/destinations/",
+            data={
+                "media": "email",
+                "settings": settings,
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(
+            DestinationConfig.objects.filter(
+                media_id="email", settings__email_address=settings["email_address"]
+            ).count(),
+            1,
+        )
+
     def test_can_create_sms_destination_with_valid_values(self):
         response = self.user1_rest_client.post(
             path="/api/v2/notificationprofiles/destinations/",
@@ -132,6 +154,23 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
                 },
             ).exists()
         )
+
+    def test_cannot_create_sms_destination_with_duplicate_phone_number(self):
+        settings = {"phone_number": "+4747474701"}
+        DestinationConfigFactory(
+            user=self.user1,
+            media=Media.objects.get(slug="sms"),
+            settings=settings,
+        )
+        response = self.user1_rest_client.post(
+            path="/api/v2/notificationprofiles/destinations/",
+            data={
+                "media": "sms",
+                "settings": settings,
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(DestinationConfig.objects.filter(media_id="sms", settings=settings).count(), 1)
 
     def test_can_update_email_destination_with_same_medium(self):
         email_destination = self.non_synced_email_destination
@@ -152,6 +191,22 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
             new_settings["email_address"],
         )
 
+    def test_cannot_update_email_destination_with_duplicate_email_address(self):
+        settings = {"email_address": "test2@example.com"}
+        email_destination_pk = DestinationConfigFactory(
+            user=self.user1,
+            media=Media.objects.get(slug="email"),
+            settings=settings,
+        ).pk
+        response = self.user1_rest_client.patch(
+            path=f"/api/v2/notificationprofiles/destinations/{email_destination_pk}/",
+            data={"settings": {"email_address": self.non_synced_email_destination.settings["email_address"]}},
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(
+            DestinationConfig.objects.get(pk=email_destination_pk).settings["email_address"], settings["email_address"]
+        )
+
     def test_can_update_sms_destination_with_same_medium(self):
         sms_destination = self.sms_destination
         new_settings = {
@@ -170,6 +225,25 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
             sms_destination.settings,
             new_settings,
         )
+
+    def test_cannot_update_sms_destination_with_duplicate_phone_number(self):
+        settings1 = {"phone_number": "+4747474701"}
+        settings2 = {"phone_number": "+4747474702"}
+        DestinationConfigFactory(
+            user=self.user1,
+            media=Media.objects.get(slug="sms"),
+            settings=settings1,
+        )
+        sms_destination_pk = DestinationConfigFactory(
+            user=self.user1,
+            media=Media.objects.get(slug="sms"),
+            settings=settings2,
+        ).pk
+        response = self.user1_rest_client.patch(
+            path=f"/api/v2/notificationprofiles/destinations/{sms_destination_pk}/", data={"settings": settings1}
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(DestinationConfig.objects.get(pk=sms_destination_pk).settings, settings2)
 
     def test_can_delete_sms_destination(self):
         response = self.user1_rest_client.delete(
