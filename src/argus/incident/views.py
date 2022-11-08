@@ -8,7 +8,7 @@ from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter
 from rest_framework import generics, mixins, serializers, status, viewsets
 from rest_framework.decorators import action
-from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.generics import get_object_or_404
 from rest_framework.pagination import CursorPagination
 from rest_framework.permissions import IsAuthenticated
@@ -22,6 +22,7 @@ from argus.util.datetime_utils import INFINITY_REPR
 from .forms import AddSourceSystemForm
 from .filters import IncidentFilter, SourceLockedIncidentFilter
 from .models import (
+    Acknowledgement,
     Event,
     Incident,
     SourceSystem,
@@ -35,6 +36,8 @@ from .serializers import (
     IncidentPureDeserializer,
     IncidentSerializer,
     IncidentTicketUrlSerializer,
+    RequestBulkAcknowledgementSerializer,
+    ResponseBulkSerializer,
     SourceSystemSerializer,
     SourceSystemTypeSerializer,
     TagSerializer,
@@ -275,7 +278,7 @@ class IncidentTagViewSet(
         )
         try:
             key, value = Tag.split(self.kwargs[lookup_url_kwarg])
-        except ValueError as e:
+        except (ValueError, ValidationError) as e:
             # Not a valid tag. Misses the delimiter, or multiple delimiters
             raise NotFound(str(e))
         filter_kwargs = {"key": key, "value": value}
@@ -450,3 +453,63 @@ class AcknowledgementViewSet(
         user = self.request.user
         incident = self.get_incident()
         serializer.save(incident=incident, actor=user)
+
+
+@extend_schema_view(
+    create=extend_schema(
+        request=RequestBulkAcknowledgementSerializer,
+        responses=ResponseBulkSerializer,
+    )
+)
+class BulkAcknowledgementViewSet(viewsets.ViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ResponseBulkSerializer
+    write_serializer_class = RequestBulkAcknowledgementSerializer
+    queryset = Incident.objects.all()
+
+    def create(self, request):
+        serializer = self.write_serializer_class(data=request.data, context={"request": request})
+
+        if not serializer.is_valid():
+            return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        incident_ids = serializer.data["ids"]
+        ack_data = serializer.data["ack"]
+        actor = request.user
+
+        incidents = {i.id: i for i in self.queryset.filter(pk__in=incident_ids)}
+        changes = {}
+        status_codes_seen = set()
+
+        for incident_id in incident_ids:
+            incident = incidents.get(incident_id)
+
+            if not incident:
+                changes[str(incident_id)] = {
+                    "ack": None,
+                    "status": status.HTTP_400_BAD_REQUEST,
+                    "errors": {"ids": f"Incident with id {incident_id} could not be found."},
+                }
+                status_codes_seen.add(status.HTTP_400_BAD_REQUEST)
+                continue
+
+            event = Event.objects.create(
+                incident=incident,
+                actor=actor,
+                timestamp=ack_data["event"]["timestamp"],
+                type=Event.Type.ACKNOWLEDGE,
+                description=ack_data["event"]["description"],
+            )
+            ack = Acknowledgement.objects.create(event=event, expiration=ack_data["expiration"])
+            changes[str(incident_id)] = {
+                "ack": AcknowledgementSerializer(instance=ack).to_representation(instance=ack),
+                "status": status.HTTP_201_CREATED,
+                "errors": None,
+            }
+            status_codes_seen.add(status.HTTP_201_CREATED)
+
+        all_bad = status_codes_seen == set((status.HTTP_400_BAD_REQUEST,))
+
+        return Response(
+            data={"changes": changes}, status=status.HTTP_400_BAD_REQUEST if all_bad else status.HTTP_201_CREATED
+        )

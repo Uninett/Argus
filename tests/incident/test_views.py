@@ -7,7 +7,7 @@ from django.test import TestCase, RequestFactory
 from rest_framework import serializers, status, versioning
 from rest_framework.test import APITestCase
 
-from argus.auth.factories import AdminUserFactory, SourceUserFactory
+from argus.auth.factories import AdminUserFactory, BaseUserFactory, SourceUserFactory
 from argus.incident.factories import (
     AcknowledgementFactory,
     EventFactory,
@@ -627,6 +627,18 @@ class IncidentViewSetTestCase(APITestCase):
         incident_tags = [str(relation.tag) for relation in IncidentTagRelation.objects.filter(incident=incident)]
         self.assertIn(data["tag"], incident_tags)
 
+    def test_cannot_create_tag_of_incident_with_invalid_key(self):
+        incident = self.add_open_incident_with_start_event_and_tag()
+        data = {
+            "tag": "???=d",
+        }
+
+        response = self.client.post(path=f"/api/v2/incidents/{incident.pk}/tags/", data=data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        incident_tags = [str(relation.tag) for relation in IncidentTagRelation.objects.filter(incident=incident)]
+        self.assertNotIn(data["tag"], incident_tags)
+
     def test_can_delete_tag_of_incident(self):
         incident = self.add_open_incident_with_start_event_and_tag()
         tag = incident.incident_tag_relations.first().tag
@@ -748,3 +760,97 @@ class IncidentViewSetTestCase(APITestCase):
         response = self.client.put(path=f"/api/v2/incidents/sources/{self.source.pk}/", data=data, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(SourceSystem.objects.get(id=self.source.pk).name, data["name"])
+
+
+class BulkAcknowledgementViewSetTestCase(APITestCase):
+    def setUp(self):
+        disconnect_signals()
+        self.user = BaseUserFactory(username="user1")
+        self.client.force_authenticate(user=self.user)
+        self.ack_data = {
+            "event": {
+                "timestamp": "2022-08-02T13:04:03.529Z",
+                "description": "acknowledgement",
+            },
+            "expiration": "2022-08-03T13:04:03.529Z",
+        }
+
+    def tearDown(self):
+        connect_signals()
+
+    def test_can_bulk_create_acknowledgements_for_incidents_with_valid_ids(self):
+        incident_1 = StatefulIncidentFactory()
+        incident_2 = StatefulIncidentFactory()
+        data = {
+            "ids": [incident_1.pk, incident_2.pk],
+            "ack": self.ack_data,
+        }
+
+        response = self.client.post(path=f"/api/v2/incidents/acks/bulk/", data=data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        incident_1_changes = response.data["changes"][str(incident_1.pk)]
+        self.assertEqual(incident_1_changes["status"], status.HTTP_201_CREATED)
+        self.assertEqual(incident_1_changes["ack"]["event"]["type"]["value"], "ACK")
+        self.assertEqual(incident_1_changes["errors"], None)
+
+        incident_2_changes = response.data["changes"][str(incident_2.pk)]
+        self.assertEqual(incident_2_changes["status"], status.HTTP_201_CREATED)
+        self.assertEqual(incident_2_changes["ack"]["event"]["type"]["value"], "ACK")
+        self.assertEqual(incident_2_changes["errors"], None)
+
+        self.assertTrue(incident_1.events.filter(type="ACK").exists())
+        self.assertTrue(incident_2.events.filter(type="ACK").exists())
+
+    def test_cannot_bulk_create_acknowledgements_for_incidents_with_all_invalid_ids(self):
+        highest_incident_pk = Incident.objects.last().id if Incident.objects.exists() else 0
+        invalid_incident_1_pk = highest_incident_pk + 1
+        invalid_incident_2_pk = highest_incident_pk + 2
+        data = {
+            "ids": [invalid_incident_1_pk, invalid_incident_2_pk],
+            "ack": self.ack_data,
+        }
+
+        response = self.client.post(path=f"/api/v2/incidents/acks/bulk/", data=data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        invalid_incident_1_changes = response.data["changes"][str(invalid_incident_1_pk)]
+        self.assertEqual(invalid_incident_1_changes["status"], status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(invalid_incident_1_changes["ack"], None)
+        self.assertTrue(invalid_incident_1_changes["errors"])
+
+        invalid_incident_2_changes = response.data["changes"][str(invalid_incident_2_pk)]
+        self.assertEqual(invalid_incident_2_changes["status"], status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(invalid_incident_2_changes["ack"], None)
+        self.assertTrue(invalid_incident_2_changes["errors"])
+
+        self.assertFalse(Acknowledgement.objects.filter(event__incident_id=invalid_incident_1_pk).exists())
+        self.assertFalse(Acknowledgement.objects.filter(event__incident_id=invalid_incident_2_pk).exists())
+
+    def test_can_partially_bulk_create_acknowledgements_for_incidents_with_some_valid_ids(self):
+        incident_1 = StatefulIncidentFactory()
+        highest_incident_pk = Incident.objects.last().id
+        invalid_incident_2_pk = highest_incident_pk + 1
+        data = {
+            "ids": [incident_1.pk, invalid_incident_2_pk],
+            "ack": self.ack_data,
+        }
+
+        response = self.client.post(path=f"/api/v2/incidents/acks/bulk/", data=data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        incident_1_changes = response.data["changes"][str(incident_1.pk)]
+        self.assertEqual(incident_1_changes["status"], status.HTTP_201_CREATED)
+        self.assertEqual(incident_1_changes["ack"]["event"]["type"]["value"], "ACK")
+        self.assertEqual(incident_1_changes["errors"], None)
+
+        invalid_incident_2_changes = response.data["changes"][str(invalid_incident_2_pk)]
+        self.assertEqual(invalid_incident_2_changes["status"], status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(invalid_incident_2_changes["ack"], None)
+        self.assertTrue(invalid_incident_2_changes["errors"])
+
+        self.assertTrue(incident_1.events.filter(type="ACK").exists())
+        self.assertFalse(Acknowledgement.objects.filter(event__incident_id=invalid_incident_2_pk).exists())

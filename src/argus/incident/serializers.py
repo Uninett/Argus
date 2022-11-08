@@ -1,6 +1,7 @@
 from collections import OrderedDict
 from typing import List
 
+from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
 from django.utils import timezone
 
@@ -43,7 +44,7 @@ class TagSerializer(serializers.Serializer):
     def validate_tag(self, value: str):
         try:
             [key, value] = Tag.split(value)
-        except ValueError as e:
+        except (ValueError, ValidationError) as e:
             raise serializers.ValidationError(str(e))
 
         return Tag.join(key, value)
@@ -54,7 +55,7 @@ class TagSerializer(serializers.Serializer):
 
         try:
             [key, value] = Tag.split(data.pop("tag"))
-        except ValueError as e:
+        except (ValueError, ValidationError) as e:
             raise serializers.ValidationError({"tag": str(e)})
 
         return {"key": key, "value": value}
@@ -79,7 +80,7 @@ class IncidentTagRelationSerializer(serializers.ModelSerializer):
     def validate_tag(self, value: str):
         try:
             [key, value] = Tag.split(value)
-        except ValueError as e:
+        except (ValueError, ValidationError) as e:
             raise serializers.ValidationError(str(e))
 
         return Tag.join(key, value)
@@ -88,7 +89,7 @@ class IncidentTagRelationSerializer(serializers.ModelSerializer):
         tag = validated_data.pop("tag")
         try:
             [key, value] = Tag.split(tag)
-        except ValueError as e:
+        except (ValueError, ValidationError) as e:
             raise serializers.ValidationError(str(e))
 
         return Tag.objects.create(key=key, value=value, **validated_data)
@@ -99,7 +100,7 @@ class IncidentTagRelationSerializer(serializers.ModelSerializer):
 
         try:
             [key, value] = Tag.split(data.pop("tag"))
-        except ValueError as e:
+        except (ValueError, ValidationError) as e:
             raise serializers.ValidationError({"tag": str(e)})
 
         return {"key": key, "value": value}
@@ -293,11 +294,20 @@ class EventSerializer(serializers.ModelSerializer):
     def to_representation(self, instance: Event):
         event_repr = super().to_representation(instance)
 
-        type_tuples = [
-            ("value", instance.type),
-            ("display", instance.get_type_display()),
-        ]
+        if isinstance(instance, Event):
+            type_tuples = [
+                ("value", instance.type),
+                ("display", instance.get_type_display()),
+            ]
+        else:
+            # Specific case for bulk operations
+            type_tuples = [
+                ("value", instance["type"]),
+                ("display", dict(Event.type.field.choices)[instance["type"]]),
+            ]
+
         event_repr["type"] = OrderedDict(type_tuples)
+
         return event_repr
 
 
@@ -373,3 +383,12 @@ class AcknowledgementSerializer(serializers.ModelSerializer):
         if expiration and expiration <= attrs["event"]["timestamp"]:
             raise serializers.ValidationError("'expiration' is earlier than creation timestamp.")
         return attrs
+
+
+class RequestBulkAcknowledgementSerializer(serializers.Serializer):
+    ids = serializers.ListField(child=serializers.IntegerField(), allow_empty=False)
+    ack = AcknowledgementSerializer()
+
+
+class ResponseBulkSerializer(serializers.Serializer):
+    changes = serializers.JSONField()
