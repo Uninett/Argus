@@ -4,26 +4,28 @@ read by developers.
 
 ## [Unreleased]
 
-## bugfix/duplicate-phone-number
+## [1.9.0] - 2022-11-08
+
+### Added
+- Add test for updating phone number in V1
+- Add test for posting tag with invalid key
+- Added an endpoint to acknowledge incidents in bulk
+- Added an endpoint to get a refreshed auth token.
+- Add a filter to find incidents with a duration longer than a given amount of
+ minutes.
+- Added tests for previously untested incident endpoints
+- A Makefile that cleans away generated files
 
 ### Fixed
 - Validate that user doesn't have destination with same settings before
   creating/updating destination
+- Properly catch tag validtion errors
+- The FilterFactory no longer leads to random UniqueViolations on testing
 
-## bugfix/sms-sending
+## [1.8.1] - 2022-10-28
 
 ### Fixed
 - Fix typo that prevented SMS messages from being sent.
-
-### Added
-
-- Added an endpoint to get a refreshed auth token.
-- Add a filter to find incidents with a duration longer than a given amount of
- minutes.
-
-## Fixed
-
-- The FilterFactory no longer leads to random UniqueViolations on testing
 
 ## [1.8.0] - 2022-10-06
 

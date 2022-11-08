@@ -3,11 +3,20 @@ This file documents changes to Argus that are relevant for the users to know.
 
 ## [Unreleased]
 
-## Added
+## [1.9.0] - 2022-11-08
 
+### Added
+
+- Added an endpoint to acknowledge incidents in bulk
 - Added an endpoint to get a refreshed auth token.
 - Add a filter to find incidents with a duration longer than a given amount of
- minutes.
+  minutes.
+- Added tests for previously untested incident endpoints
+
+## [1.8.1] - 2022-10-28
+
+### Fixed
+- Fix typo that prevented SMS messages from being sent.
 
 ## [1.8.0] - 2022-10-06
 
