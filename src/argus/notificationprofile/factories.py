@@ -22,7 +22,7 @@ class TimeslotFactory(factory.django.DjangoModelFactory):
         model = models.Timeslot
 
     user = factory.SubFactory(PersonUserFactory)
-    name = factory.Faker("word")
+    name = factory.Sequence(lambda s: "Timeslot %s" % s)
 
 
 class TimeRecurrenceFactory(factory.django.DjangoModelFactory):
@@ -60,7 +60,7 @@ class MediaFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Media
 
-    slug = factory.Faker("word")
+    slug = factory.Sequence(lambda s: "Media %s" % s)
     name = factory.LazyAttribute(lambda obj: obj.slug.capitalize())
 
 

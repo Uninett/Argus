@@ -22,7 +22,7 @@ class SourceSystemTypeFactory(factory.django.DjangoModelFactory):
         model = models.SourceSystemType
         django_get_or_create = ("name",)
 
-    name = factory.Faker("word")
+    name = factory.Sequence(lambda s: "SourceSystemType %s" % s)
 
 
 class SourceSystemFactory(factory.django.DjangoModelFactory):
@@ -30,7 +30,7 @@ class SourceSystemFactory(factory.django.DjangoModelFactory):
         model = models.SourceSystem
         django_get_or_create = ("name", "user")
 
-    name = factory.Faker("word")
+    name = factory.Sequence(lambda s: "SourceSystem %s" % s)
     type = factory.SubFactory(SourceSystemTypeFactory)
     user = factory.SubFactory(SourceUserFactory)
     base_url = factory.Faker("url")
@@ -41,8 +41,8 @@ class TagFactory(factory.django.DjangoModelFactory):
         model = models.Tag
         django_get_or_create = ("key", "value")
 
-    key = factory.Faker("word")
-    value = factory.Faker("word")
+    key = factory.Sequence(lambda s: "key_%s" % s)
+    value = factory.Sequence(lambda s: "value_%s" % s)
 
 
 class IncidentFactory(factory.django.DjangoModelFactory):
@@ -52,7 +52,7 @@ class IncidentFactory(factory.django.DjangoModelFactory):
     start_time = factory.Faker("date_time_between", start_date="-1d", end_date="+1d", tzinfo=pytz.UTC)
     end_time = INFINITY_REPR
     source = factory.SubFactory(SourceSystemFactory)
-    source_incident_id = factory.Faker("md5")
+    source_incident_id = factory.Sequence(lambda s: s)
     details_url = factory.Faker("uri")
     description = factory.Faker("sentence")
     level = factory.fuzzy.FuzzyChoice(models.Incident.LEVELS)  # Random valid level
