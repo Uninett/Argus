@@ -1,6 +1,7 @@
 from collections import OrderedDict
 from typing import List
 
+from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
 from django.utils import timezone
 
@@ -43,7 +44,7 @@ class TagSerializer(serializers.Serializer):
     def validate_tag(self, value: str):
         try:
             [key, value] = Tag.split(value)
-        except ValueError as e:
+        except (ValueError, ValidationError) as e:
             raise serializers.ValidationError(str(e))
 
         return Tag.join(key, value)
@@ -54,7 +55,7 @@ class TagSerializer(serializers.Serializer):
 
         try:
             [key, value] = Tag.split(data.pop("tag"))
-        except ValueError as e:
+        except (ValueError, ValidationError) as e:
             raise serializers.ValidationError({"tag": str(e)})
 
         return {"key": key, "value": value}
@@ -79,7 +80,7 @@ class IncidentTagRelationSerializer(serializers.ModelSerializer):
     def validate_tag(self, value: str):
         try:
             [key, value] = Tag.split(value)
-        except ValueError as e:
+        except (ValueError, ValidationError) as e:
             raise serializers.ValidationError(str(e))
 
         return Tag.join(key, value)
@@ -88,7 +89,7 @@ class IncidentTagRelationSerializer(serializers.ModelSerializer):
         tag = validated_data.pop("tag")
         try:
             [key, value] = Tag.split(tag)
-        except ValueError as e:
+        except (ValueError, ValidationError) as e:
             raise serializers.ValidationError(str(e))
 
         return Tag.objects.create(key=key, value=value, **validated_data)
@@ -99,7 +100,7 @@ class IncidentTagRelationSerializer(serializers.ModelSerializer):
 
         try:
             [key, value] = Tag.split(data.pop("tag"))
-        except ValueError as e:
+        except (ValueError, ValidationError) as e:
             raise serializers.ValidationError({"tag": str(e)})
 
         return {"key": key, "value": value}
