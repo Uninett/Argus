@@ -293,11 +293,20 @@ class EventSerializer(serializers.ModelSerializer):
     def to_representation(self, instance: Event):
         event_repr = super().to_representation(instance)
 
-        type_tuples = [
-            ("value", instance.type),
-            ("display", instance.get_type_display()),
-        ]
+        if isinstance(instance, Event):
+            type_tuples = [
+                ("value", instance.type),
+                ("display", instance.get_type_display()),
+            ]
+        else:
+            # Specific case for bulk operations
+            type_tuples = [
+                ("value", instance["type"]),
+                ("display", dict(Event.type.field.choices)[instance["type"]]),
+            ]
+
         event_repr["type"] = OrderedDict(type_tuples)
+
         return event_repr
 
 
@@ -373,3 +382,12 @@ class AcknowledgementSerializer(serializers.ModelSerializer):
         if expiration and expiration <= attrs["event"]["timestamp"]:
             raise serializers.ValidationError("'expiration' is earlier than creation timestamp.")
         return attrs
+
+
+class RequestBulkAcknowledgementSerializer(serializers.Serializer):
+    ids = serializers.ListField(child=serializers.IntegerField(), allow_empty=False)
+    ack = AcknowledgementSerializer()
+
+
+class ResponseBulkSerializer(serializers.Serializer):
+    changes = serializers.JSONField()
