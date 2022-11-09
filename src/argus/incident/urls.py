@@ -24,12 +24,15 @@ acks_bulk_list = views.BulkAcknowledgementViewSet.as_view({"post": "create"})
 tag_list = views.IncidentTagViewSet.as_view({"get": "list", "post": "create"})
 tag_detail = views.IncidentTagViewSet.as_view({"get": "retrieve", "delete": "destroy"})
 
+ticket_url_bulk_list = views.BulkTicketUrlViewSet.as_view({"post": "create"})
+
 app_name = "incident"
 urlpatterns = [
     path("acks/bulk/", acks_bulk_list, name="incident-acks-bulk"),
     path("events/", all_events_list, name="events"),
     path("events/bulk/", events_bulk_list, name="incident-events-bulk"),
     path("mine/", sourced_incident_list, name="source_locked_incidents"),
+    path("ticket_url/bulk/", ticket_url_bulk_list, name="incident-ticket-url-bulk"),
     path("<int:incident_pk>/events/", event_list, name="incident-events"),
     path("<int:incident_pk>/events/<int:pk>/", event_detail, name="incident-event"),
     path("<int:incident_pk>/acks/", ack_list, name="incident-acks"),

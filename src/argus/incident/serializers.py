@@ -398,5 +398,16 @@ class RequestBulkEventSerializer(serializers.Serializer):
     event = EventSerializer()
 
 
+class RequestBulkTicketUrlSerializer(serializers.ModelSerializer):
+    ids = serializers.ListField(child=serializers.IntegerField(), allow_empty=False)
+
+    class Meta:
+        model = Incident
+        fields = [
+            "ids",
+            "ticket_url",
+        ]
+
+
 class ResponseBulkSerializer(serializers.Serializer):
     changes = serializers.JSONField()

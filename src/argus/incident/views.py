@@ -38,6 +38,7 @@ from .serializers import (
     IncidentTicketUrlSerializer,
     RequestBulkAcknowledgementSerializer,
     RequestBulkEventSerializer,
+    RequestBulkTicketUrlSerializer,
     ResponseBulkSerializer,
     SourceSystemSerializer,
     SourceSystemTypeSerializer,
@@ -563,6 +564,59 @@ class BulkEventViewSet(viewsets.ViewSet):
             )
             changes[str(incident_id)] = {
                 "event": EventSerializer(instance=event).to_representation(instance=event),
+                "status": status.HTTP_201_CREATED,
+                "errors": None,
+            }
+            status_codes_seen.add(status.HTTP_201_CREATED)
+
+        all_bad = status_codes_seen == set((status.HTTP_400_BAD_REQUEST,))
+
+        return Response(
+            data={"changes": changes}, status=status.HTTP_400_BAD_REQUEST if all_bad else status.HTTP_201_CREATED
+        )
+
+
+@extend_schema_view(
+    create=extend_schema(
+        request=RequestBulkTicketUrlSerializer,
+        responses=ResponseBulkSerializer,
+    )
+)
+class BulkTicketUrlViewSet(viewsets.ViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ResponseBulkSerializer
+    write_serializer_class = RequestBulkTicketUrlSerializer
+    queryset = Incident.objects.all()
+
+    def create(self, request):
+        serializer = self.write_serializer_class(data=request.data, context={"request": request})
+
+        if not serializer.is_valid():
+            return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        incident_ids = serializer.data["ids"]
+        ticket_url = serializer.data["ticket_url"]
+
+        incidents = {i.id: i for i in self.queryset.filter(pk__in=incident_ids)}
+        changes = {}
+        status_codes_seen = set()
+
+        for incident_id in incident_ids:
+            incident = incidents.get(incident_id)
+
+            if not incident:
+                changes[str(incident_id)] = {
+                    "ticket_url": None,
+                    "status": status.HTTP_400_BAD_REQUEST,
+                    "errors": {"ids": f"Incident with id {incident_id} could not be found."},
+                }
+                status_codes_seen.add(status.HTTP_400_BAD_REQUEST)
+                continue
+
+            incident.ticket_url = ticket_url
+            incident.save()
+            changes[str(incident_id)] = {
+                "ticket_url": ticket_url,
                 "status": status.HTTP_201_CREATED,
                 "errors": None,
             }
