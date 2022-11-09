@@ -16,7 +16,6 @@ Welcome to Argus' documentation!
    authentication
    notifications
    development
-   writing-plugins
    integrating-monitoring-systems
    writing-glueservices
    :maxdepth: 2
