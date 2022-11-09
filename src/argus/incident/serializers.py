@@ -301,6 +301,9 @@ class EventSerializer(serializers.ModelSerializer):
             ]
         else:
             # Specific case for bulk operations
+            if instance["type"] in dict(Event.type.field.choices).keys():
+                return event_repr
+
             type_tuples = [
                 ("value", instance["type"]),
                 ("display", dict(Event.type.field.choices)[instance["type"]]),
