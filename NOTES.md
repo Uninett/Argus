@@ -10,6 +10,12 @@ This file documents changes to Argus that are relevant for the users to know.
 - Added an endpoint to create events for incidents in bulk
 
 
+## bulk/ticket-url
+
+### Added
+- Added an endpoint to set ticket_url of incidents in bulk
+
+
 ## [1.9.0] - 2022-11-08
 
 ### Added
