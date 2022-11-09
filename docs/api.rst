@@ -1197,6 +1197,20 @@ Incident endpoints
    logged in user, and no filtering on source or source type is
    possible.
 
+-  ``/api/v2/incidents/ticket_url/bulk/``:
+
+   -  ``POST``: bulk sets the ticket url of multiple incidents and returns
+      a dictionary indicating if the action was successful for each incident,
+      the ticket url and potential errors
+
+      .. code-block:: json
+        :caption: Example request body
+
+          {
+              "ids": [1, 2],
+              "ticket_url": "https://tickettracker.com/tickets/987654/",
+          }
+
 
 -  ``/api/v2/incidents/events/bulk/``:
 
