@@ -3,6 +3,13 @@ This file documents changes to Argus that are relevant for the users to know.
 
 ## [Unreleased]
 
+## bulk/events
+
+### Added
+
+- Added an endpoint to create events for incidents in bulk
+
+
 ## [1.9.0] - 2022-11-08
 
 ### Added

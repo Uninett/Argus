@@ -37,6 +37,7 @@ from .serializers import (
     IncidentSerializer,
     IncidentTicketUrlSerializer,
     RequestBulkAcknowledgementSerializer,
+    RequestBulkEventSerializer,
     ResponseBulkSerializer,
     SourceSystemSerializer,
     SourceSystemTypeSerializer,
@@ -503,6 +504,65 @@ class BulkAcknowledgementViewSet(viewsets.ViewSet):
             ack = Acknowledgement.objects.create(event=event, expiration=ack_data["expiration"])
             changes[str(incident_id)] = {
                 "ack": AcknowledgementSerializer(instance=ack).to_representation(instance=ack),
+                "status": status.HTTP_201_CREATED,
+                "errors": None,
+            }
+            status_codes_seen.add(status.HTTP_201_CREATED)
+
+        all_bad = status_codes_seen == set((status.HTTP_400_BAD_REQUEST,))
+
+        return Response(
+            data={"changes": changes}, status=status.HTTP_400_BAD_REQUEST if all_bad else status.HTTP_201_CREATED
+        )
+
+
+@extend_schema_view(
+    create=extend_schema(
+        request=RequestBulkEventSerializer,
+        responses=ResponseBulkSerializer,
+    )
+)
+class BulkEventViewSet(viewsets.ViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ResponseBulkSerializer
+    write_serializer_class = RequestBulkEventSerializer
+    queryset = Incident.objects.all()
+
+    def create(self, request):
+        serializer = self.write_serializer_class(data=request.data, context={"request": request})
+
+        if not serializer.is_valid():
+            return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        incident_ids = serializer.data["ids"]
+        event_data = serializer.data["event"]
+        actor = request.user
+
+        incidents = {i.id: i for i in self.queryset.filter(pk__in=incident_ids)}
+        changes = {}
+        status_codes_seen = set()
+
+        for incident_id in incident_ids:
+            incident = incidents.get(incident_id)
+
+            if not incident:
+                changes[str(incident_id)] = {
+                    "event": None,
+                    "status": status.HTTP_400_BAD_REQUEST,
+                    "errors": {"ids": f"Incident with id {incident_id} could not be found."},
+                }
+                status_codes_seen.add(status.HTTP_400_BAD_REQUEST)
+                continue
+
+            event = Event.objects.create(
+                incident=incident,
+                actor=actor,
+                timestamp=event_data["timestamp"],
+                type=event_data["type"],
+                description=event_data["description"],
+            )
+            changes[str(incident_id)] = {
+                "event": EventSerializer(instance=event).to_representation(instance=event),
                 "status": status.HTTP_201_CREATED,
                 "errors": None,
             }
