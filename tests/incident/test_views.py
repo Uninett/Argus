@@ -946,3 +946,90 @@ class BulkEventViewSetTestCase(APITestCase):
 
         self.assertTrue(incident_1.events.filter(type="OTH").exists())
         self.assertFalse(Event.objects.filter(incident_id=invalid_incident_2_pk).exists())
+
+
+class BulkTicketUrlViewSetTestCase(APITestCase):
+    def setUp(self):
+        disconnect_signals()
+        self.user = BaseUserFactory(username="user1")
+        self.client.force_authenticate(user=self.user)
+        self.ticket_url = "www.example.com"
+
+    def tearDown(self):
+        connect_signals()
+
+    def test_can_bulk_set_ticket_url_for_incidents_with_valid_ids(self):
+        incident_1 = StatefulIncidentFactory()
+        incident_2 = StatefulIncidentFactory()
+        data = {
+            "ids": [incident_1.pk, incident_2.pk],
+            "ticket_url": self.ticket_url,
+        }
+
+        response = self.client.post(path=f"/api/v2/incidents/ticket_url/bulk/", data=data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        incident_1_changes = response.data["changes"][str(incident_1.pk)]
+        self.assertEqual(incident_1_changes["status"], status.HTTP_201_CREATED)
+        self.assertEqual(incident_1_changes["ticket_url"], data["ticket_url"])
+        self.assertEqual(incident_1_changes["errors"], None)
+
+        incident_2_changes = response.data["changes"][str(incident_2.pk)]
+        self.assertEqual(incident_2_changes["status"], status.HTTP_201_CREATED)
+        self.assertEqual(incident_2_changes["ticket_url"], data["ticket_url"])
+        self.assertEqual(incident_2_changes["errors"], None)
+
+        incident_1.refresh_from_db()
+        incident_2.refresh_from_db()
+        self.assertEqual(incident_1.ticket_url, data["ticket_url"])
+        self.assertEqual(incident_2.ticket_url, data["ticket_url"])
+
+    def test_cannot_bulk_set_ticket_url_for_incidents_with_all_invalid_ids(self):
+        highest_incident_pk = Incident.objects.last().id if Incident.objects.exists() else 0
+        invalid_incident_1_pk = highest_incident_pk + 1
+        invalid_incident_2_pk = highest_incident_pk + 2
+        data = {
+            "ids": [invalid_incident_1_pk, invalid_incident_2_pk],
+            "ticket_url": self.ticket_url,
+        }
+
+        response = self.client.post(path=f"/api/v2/incidents/ticket_url/bulk/", data=data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        invalid_incident_1_changes = response.data["changes"][str(invalid_incident_1_pk)]
+        self.assertEqual(invalid_incident_1_changes["status"], status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(invalid_incident_1_changes["ticket_url"], None)
+        self.assertTrue(invalid_incident_1_changes["errors"])
+
+        invalid_incident_2_changes = response.data["changes"][str(invalid_incident_2_pk)]
+        self.assertEqual(invalid_incident_2_changes["status"], status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(invalid_incident_2_changes["ticket_url"], None)
+        self.assertTrue(invalid_incident_2_changes["errors"])
+
+    def test_can_partially_bulk_set_ticket_url_for_incidents_with_some_valid_ids(self):
+        incident_1 = StatefulIncidentFactory()
+        highest_incident_pk = Incident.objects.last().id
+        invalid_incident_2_pk = highest_incident_pk + 1
+        data = {
+            "ids": [incident_1.pk, invalid_incident_2_pk],
+            "ticket_url": self.ticket_url,
+        }
+
+        response = self.client.post(path=f"/api/v2/incidents/ticket_url/bulk/", data=data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        incident_1_changes = response.data["changes"][str(incident_1.pk)]
+        self.assertEqual(incident_1_changes["status"], status.HTTP_201_CREATED)
+        self.assertEqual(incident_1_changes["ticket_url"], data["ticket_url"])
+        self.assertEqual(incident_1_changes["errors"], None)
+
+        invalid_incident_2_changes = response.data["changes"][str(invalid_incident_2_pk)]
+        self.assertEqual(invalid_incident_2_changes["status"], status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(invalid_incident_2_changes["ticket_url"], None)
+        self.assertTrue(invalid_incident_2_changes["errors"])
+
+        incident_1.refresh_from_db()
+        self.assertEqual(incident_1.ticket_url, data["ticket_url"])
