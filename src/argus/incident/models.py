@@ -307,7 +307,8 @@ class Incident(models.Model):
     def save(self, *args, **kwargs):
         # Parse and replace `end_time`, to avoid having to call `refresh_from_db()`
         self.end_time = self._meta.get_field("end_time").to_python(self.end_time)
-        self.search_text = self.generate_search_text()
+        if self.id:
+            self.search_text = self.generate_search_text()
         super().save(*args, **kwargs)
 
     @property
