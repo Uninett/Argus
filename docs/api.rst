@@ -1198,6 +1198,23 @@ Incident endpoints
    possible.
 
 
+-  ``/api/v2/incidents/events/bulk/``:
+
+   -  ``POST``: bulk creates events for multiple incidents and returns
+      a dictionary indicating if the action was successful for each incident,
+      the created event and potential errors
+
+      .. code-block:: json
+        :caption: Example request body
+          {
+              "ids": [1, 2],
+              "event": {
+                  "timestamp": "2020-02-20 20:02:20.202021",
+                  "type": "OTH",
+                  "description": "The investigation is still ongoing."
+              }
+          }
+
 Notification profile endpoints
 ==============================
 
