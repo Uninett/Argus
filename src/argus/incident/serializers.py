@@ -390,5 +390,10 @@ class RequestBulkAcknowledgementSerializer(serializers.Serializer):
     ack = AcknowledgementSerializer()
 
 
+class RequestBulkEventSerializer(serializers.Serializer):
+    ids = serializers.ListField(child=serializers.IntegerField(), allow_empty=False)
+    event = EventSerializer()
+
+
 class ResponseBulkSerializer(serializers.Serializer):
     changes = serializers.JSONField()

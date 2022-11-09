@@ -15,6 +15,7 @@ sourced_incident_list = views.SourceLockedIncidentViewSet.as_view({"get": "list"
 all_events_list = views.AllEventsViewSet.as_view({"get": "list"})
 event_list = views.EventViewSet.as_view({"get": "list", "post": "create"})
 event_detail = views.EventViewSet.as_view({"get": "retrieve"})
+events_bulk_list = views.BulkEventViewSet.as_view({"post": "create"})
 
 ack_list = views.AcknowledgementViewSet.as_view({"get": "list", "post": "create"})
 ack_detail = views.AcknowledgementViewSet.as_view({"get": "retrieve", "put": "update", "patch": "partial_update"})
@@ -27,6 +28,7 @@ app_name = "incident"
 urlpatterns = [
     path("acks/bulk/", acks_bulk_list, name="incident-acks-bulk"),
     path("events/", all_events_list, name="events"),
+    path("events/bulk/", events_bulk_list, name="incident-events-bulk"),
     path("mine/", sourced_incident_list, name="source_locked_incidents"),
     path("<int:incident_pk>/events/", event_list, name="incident-events"),
     path("<int:incident_pk>/events/<int:pk>/", event_detail, name="incident-event"),
