@@ -40,7 +40,7 @@ server settings as the included EmailNotification-plugin, and in addition the
 Argus-specific ``SMS_GATEWAY_ADDRESS``-setting, which is the magical
 email-address to send the SMS to.
 
-The settings-field for an SMS-destination contain only a ``phone_number``,
+The settings-field for an SMS-destination contains only a ``phone_number``,
 which is a string that includes the international calling code, see for
 instance `Wikipedia: List of mobile telephone prefixes by country
 <https://en.wikipedia.org/wiki/List_of_mobile_telephone_prefixes_by_country>`__.
