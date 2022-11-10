@@ -3,6 +3,13 @@ This file documents changes to Argus that are relevant for the users to know.
 
 ## [Unreleased]
 
+## incident-token-expiry
+
+### Added
+- Added a management command that will create incidents if a source token is
+  close to expiring
+
+
 ## bulk/events
 
 ### Added
