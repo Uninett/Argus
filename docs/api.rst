@@ -1212,6 +1212,26 @@ Incident endpoints
           }
 
 
+-  ``/api/v2/incidents/acks/bulk/``:
+
+   -  ``POST``: bulk creates acknowledgements for multiple incidents and
+      returns a dictionary indicating if the action was successful for each
+      incident, the created acknowledgement and potential errors
+
+      .. code-block:: json
+        :caption: Example request body
+          {
+              "ids": [1, 2],
+              "ack": {
+                  "event": {
+                      "timestamp": "2011-11-11 11:11:11.235877",
+                      "description": "The incident is being investigated."
+                  },
+                  "expiration": "2011-11-13 12:00:00"
+              }
+          }
+
+
 -  ``/api/v2/incidents/events/bulk/``:
 
    -  ``POST``: bulk creates events for multiple incidents and returns
