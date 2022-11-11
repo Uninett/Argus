@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from argus.incident.constants import INCIDENT_LEVELS
+from argus.incident.models import Event
 
 
 class FilterBlobSerializer(serializers.Serializer):
@@ -20,6 +21,7 @@ class FilterBlobSerializer(serializers.Serializer):
     maxlevel = serializers.IntegerField(
         required=False, allow_null=True, max_value=max(INCIDENT_LEVELS), min_value=min(INCIDENT_LEVELS)
     )
+    event_type = serializers.ChoiceField(choices=Event.Type.choices, required=False, allow_null=True)
 
 
 class FilterPreviewSerializer(serializers.Serializer):

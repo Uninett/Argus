@@ -18,7 +18,7 @@ from argus.auth.models import User
 from .constants import DEPRECATED_FILTER_NAMES
 
 if TYPE_CHECKING:
-    from argus.incident.models import Incident
+    from argus.incident.models import Event, Incident
 
 
 class Timeslot(models.Model):
@@ -114,9 +114,13 @@ class FilterWrapper:
         fallback_filter = self.fallback_filter.get("maxlevel", None)
         return not self.filter.get("maxlevel", fallback_filter)
 
+    def is_event_type_empty(self):
+        fallback_filter = self.fallback_filter.get("event_type", None)
+        return not self.filter.get("event_type", fallback_filter)
+
     @property
     def is_empty(self):
-        return self.are_tristates_empty() and self.is_maxlevel_empty()
+        return self.are_tristates_empty() and self.is_maxlevel_empty() and self.is_event_type_empty()
 
     def _incident_is_tristate(self, tristate, incident):
         return getattr(incident, tristate, None)
@@ -141,6 +145,15 @@ class FilterWrapper:
 
     def incident_fits(self, incident):
         return self.incident_fits_tristates(incident) and self.incident_fits_maxlevel(incident)
+
+    def event_fits_event_type(self, event):
+        if self.is_event_type_empty():
+            return True
+        fallback_filter = self.fallback_filter.get("event_type", None)
+        return event.type == self.filter.get("event_type", fallback_filter)
+
+    def event_fits(self, event):
+        return self.event_fits_event_type(event)
 
 
 class Filter(models.Model):
@@ -239,6 +252,11 @@ class Filter(models.Model):
         checks = set((source_fits, tags_fit, new_filters_fit))
         return not (False in checks)  # At least one filter failed
 
+    def event_fits(self, event: Event):
+        if self.is_empty:
+            return False  # Filter is empty!
+        return self.filter_wrapper.event_fits(event)
+
 
 class Media(models.Model):
     class Meta:
@@ -323,3 +341,8 @@ class NotificationProfile(models.Model):
         is_selected_by_time = self.timeslot.timestamp_is_within_time_recurrences(incident.start_time)
         is_selected_by_filters = any(f.incident_fits(incident) for f in self.filters.all())
         return is_selected_by_time and is_selected_by_filters
+
+    def event_fits(self, event: Event):
+        if not self.active:
+            return False
+        return any(f.event_fits(event) for f in self.filters.all())

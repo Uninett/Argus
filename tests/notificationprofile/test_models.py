@@ -7,7 +7,7 @@ from django.test import TestCase, tag, override_settings
 from django.utils.dateparse import parse_datetime, parse_time
 from django.utils.timezone import make_aware
 
-from argus.incident.models import Incident
+from argus.incident.models import Event, Incident
 from argus.notificationprofile.models import (
     FilterWrapper,
     TimeRecurrence,
@@ -161,6 +161,44 @@ class FilterWrapperIncidentFitsMaxlevelTests(unittest.TestCase):
         filter = FilterWrapper({"maxlevel": maxlevel})
         result = filter.incident_fits_maxlevel(incident)
         self.assertEqual(result, level <= maxlevel)
+
+
+@tag("unittest")
+class FilterWrapperEventTypeEmptyTests(unittest.TestCase):
+    # Validation is handled before the data gets to FilterWrapper
+    # An event type must be one of the types in Event.Type if it is set at all.
+
+    def test_when_filter_is_empty_is_event_type_empty_should_return_true(self):
+        empty_filter = FilterWrapper({})
+        self.assertTrue(empty_filter.is_event_type_empty())
+
+    def test_when_event_filter_exists_is_event_type_empty_should_return_false(self):
+        empty_filter = FilterWrapper({"event_type": "whatever"})
+        self.assertFalse(empty_filter.is_event_type_empty())
+
+
+@tag("unittest")
+class FilterWrapperIncidentFitsEventTypeTests(unittest.TestCase):
+    # Validation is handled before the data gets to FilterWrapper
+    # An event type must be one of the types in Event.Type if it is set at all.
+
+    def test_when_event_filter_is_empty_any_event_should_fit(self):
+        event = Mock()
+        empty_filter = FilterWrapper({})
+        self.assertEqual(empty_filter.event_fits_event_type(event), True)
+
+    def test_when_event_filter_is_set_event_with_matching_type_should_fit(self):
+        event = Mock()
+        event_type = ("CHI", "Incident change")
+        event.type = event_type
+        filter = FilterWrapper({"event_type": event_type})
+        self.assertTrue(filter.event_fits_event_type(event))
+
+    def test_when_event_filter_is_set_event_with_not_matching_type_should_not_fit(self):
+        event = Mock()
+        event.type = ("CHI", "Incident change")
+        filter = FilterWrapper({"event_type": ("ACK", "Acknowledge")})
+        self.assertFalse(filter.event_fits_event_type(event))
 
 
 @tag("unittest")
