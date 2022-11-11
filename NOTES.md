@@ -3,7 +3,19 @@ This file documents changes to Argus that are relevant for the users to know.
 
 ## [Unreleased]
 
+## github-two-way
+
+### Added
+- Added Github support
+
+
 ## [1.10.0] - 2022-11-17
+
+
+## ticket-plugin-base
+
+**_NOTE:_**  To use the new ticket plugins new settings need to be added.
+This is documented in the docs under "Ticket system settings".
 
 ### Added
 - Added support for testing on Python 3.11 and Django 4.0, 4.1

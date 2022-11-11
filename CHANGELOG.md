@@ -4,6 +4,12 @@ read by developers.
 
 ## [Unreleased]
 
+## github-two-way
+
+### Added
+- Added Github to ticket system plugins
+
+
 ## [1.10.0] - 2022-11-17
 
 ### Added
