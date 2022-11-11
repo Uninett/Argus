@@ -8,6 +8,7 @@ drf-spectacular>=0.17
 drf-rw-serializers
 factory_boy
 psycopg2-binary
+PyGithub
 python-dataporten-auth
 social-auth-core>=4.1
 pytz>=2021.1
