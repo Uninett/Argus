@@ -8,6 +8,7 @@ from rest_framework.authtoken.models import Token
 
 from argus.incident.models import (
     create_token_expiry_incident,
+    get_or_create_default_instances,
     Incident,
     Tag,
 )
@@ -65,6 +66,25 @@ def get_tokens_without_expiry_incident(tokens):
     return tokens_without_expiry_incident
 
 
+def close_expiry_incidents_without_expiring_tokens(tokens):
+    argus_user, _, _ = get_or_create_default_instances()
+    open_expiry_incidents = Incident.objects.open().token_expiry()
+
+    if not open_expiry_incidents:
+        return
+
+    source_system_tags = []
+    for token, expiry_date in tokens:
+        source_system_tags.append(
+            Tag.objects.filter((Q(key="source_system_id") & Q(value=token.user.source_system.id))).first()
+        )
+
+    open_expiry_incidents = open_expiry_incidents.exclude(incident_tag_relations__tag__in=source_system_tags)
+
+    for incident in open_expiry_incidents:
+        incident.set_end(actor=argus_user)
+
+
 class Command(BaseCommand):
     help = "Post incident if token is close to expiring"
 
@@ -79,3 +99,5 @@ class Command(BaseCommand):
 
         for token, expiry_date in tokens_without_expiry_incident:
             create_token_expiry_incident(token, expiry_date)
+
+        close_expiry_incidents_without_expiring_tokens(expiring_tokens)
