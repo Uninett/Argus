@@ -64,6 +64,34 @@ def create_fake_incident(tags=None, description=None, stateful=True, level=None)
     return incident
 
 
+def create_token_expiry_incident(token, expiry_date, level=2):
+    if not token:
+        raise ValueError("Token must be not None")
+
+    argus_user, _, source_system = get_or_create_default_instances()
+    end_time = INFINITY_REPR
+    description = f"Token for source system {str(token.user.source_system)} will expire on {expiry_date.date()}"
+
+    incident = Incident.objects.create(
+        start_time=timezone.now(),
+        end_time=end_time,
+        source=source_system,
+        description=description,
+        level=level,
+    )
+
+    taglist = [
+        ("location", "argus"),
+        ("object", f"{incident.id}"),
+        ("problem_type", "token_expiry"),
+        ("source_system_id", f"{token.user.source_system.id}"),
+    ]
+    for k, v in taglist:
+        tag, _ = Tag.objects.get_or_create(key=k, value=v)
+        IncidentTagRelation.objects.create(tag=tag, incident=incident, added_by=argus_user)
+    return incident
+
+
 class SourceSystemType(models.Model):
     name = models.TextField(primary_key=True, validators=[validate_lowercase])
 
@@ -213,6 +241,15 @@ class IncidentQuerySet(models.QuerySet):
         closed = self.closed().annotate(duration=F("end_time") - F("start_time"))
         return open.filter(duration__gte=min_duration) | closed.filter(duration__gte=min_duration)
 
+    def token_expiry(self):
+        """
+        Returns all incidents that concern expiration of authentication tokens
+        """
+        _, _, argus_source_system = get_or_create_default_instances()
+        token_expiry_tag = Tag.objects.filter((Q(key="problem_type") & Q(value="token_expiry"))).first()
+
+        return self.filter(source_id=argus_source_system.id).filter(incident_tag_relations__tag=token_expiry_tag)
+
     # Cannot be a constant, because `timezone.now()` would have been evaluated at compile time
     @staticmethod
     def _get_acked_incident_ids():
@@ -354,6 +391,17 @@ class Incident(models.Model):
         self.end_time = timezone.now()
         self.save(update_fields=["end_time"])
         Event.objects.create(incident=self, actor=actor, timestamp=self.end_time, type=Event.Type.CLOSE)
+
+    # @transaction.atomic
+    def set_end(self, actor: User):
+        if not self.stateful:
+            raise ValidationError("Cannot set a stateless incident as ended")
+        if not self.open:
+            return
+
+        self.end_time = timezone.now()
+        self.save(update_fields=["end_time"])
+        Event.objects.create(incident=self, actor=actor, timestamp=self.end_time, type=Event.Type.INCIDENT_END)
 
     # @transaction.atomic
     def create_ack(self, actor: User, timestamp=None, description="", expiration=None):
