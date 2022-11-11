@@ -393,6 +393,17 @@ class Incident(models.Model):
         Event.objects.create(incident=self, actor=actor, timestamp=self.end_time, type=Event.Type.CLOSE)
 
     # @transaction.atomic
+    def set_end(self, actor: User):
+        if not self.stateful:
+            raise ValidationError("Cannot set a stateless incident as ended")
+        if not self.open:
+            return
+
+        self.end_time = timezone.now()
+        self.save(update_fields=["end_time"])
+        Event.objects.create(incident=self, actor=actor, timestamp=self.end_time, type=Event.Type.INCIDENT_END)
+
+    # @transaction.atomic
     def create_ack(self, actor: User, timestamp=None, description="", expiration=None):
         timestamp = timestamp if timestamp else timezone.now()
         event = Event.objects.create(
