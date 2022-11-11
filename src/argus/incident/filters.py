@@ -25,6 +25,7 @@ class IncidentFilter(filters.FilterSet):
     ticket = filters.BooleanFilter(label="Ticket", method="incident_filter")
     tags = TagInFilter(label="Tags", method="incident_filter")
     duration__gte = filters.NumberFilter(label="Duration", method="incident_filter")
+    token_expiry = filters.BooleanFilter(label="Token expiry", method="incident_filter")
 
     @classmethod
     def incident_filter(cls, queryset, name, value):
@@ -56,6 +57,8 @@ class IncidentFilter(filters.FilterSet):
         elif name == "duration__gte":
             if value:
                 return queryset.is_longer_than_minutes(int(value))
+        elif name == "token_expiry":
+            return queryset.token_expiry()
         return queryset
 
     class Meta:

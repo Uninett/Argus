@@ -241,6 +241,15 @@ class IncidentQuerySet(models.QuerySet):
         closed = self.closed().annotate(duration=F("end_time") - F("start_time"))
         return open.filter(duration__gte=min_duration) | closed.filter(duration__gte=min_duration)
 
+    def token_expiry(self):
+        """
+        Returns all incidents that concern expiration of authentication tokens
+        """
+        _, _, argus_source_system = get_or_create_default_instances()
+        token_expiry_tag = Tag.objects.filter((Q(key="problem_type") & Q(value="token_expiry"))).first()
+
+        return self.filter(source_id=argus_source_system.id).filter(incident_tag_relations__tag=token_expiry_tag)
+
     # Cannot be a constant, because `timezone.now()` would have been evaluated at compile time
     @staticmethod
     def _get_acked_incident_ids():
