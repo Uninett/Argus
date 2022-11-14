@@ -10,8 +10,12 @@ A notification plugin is a class that inherits from
 sending.
 
 A destination is a user-specific and plugin-specific instance of the model
-Destination. In the Destination there's a field ``settings`` that has the
-necessary configuration for the plugin.
+DestinationConfig. In the DestinationConfig there's a field ``settings`` that
+has the necessary configuration for where to send the notification for that
+type of plugin, like an email address, a phone number or a webhook.
+
+A specific type of destination might also need extra settings in the Django
+settings file, this is documented for each plugin.
 
 Notification plugins included on install
 ----------------------------------------
@@ -26,11 +30,13 @@ configure the server.
 
 The settings-field for an email-destination contains an
 ``email_address``-field. Hidden from the API, it also contains
-a ``synced``-field. which is used for some magic if the User model-instance has
+a ``synced``-field, which is used for some magic if the User model-instance has
 its ``email_address``-field set.
 
+To validate the email address we use Django's own email validator.
+
 argus.notificationprofile.media.sms_as_email.SMSNotification
-..............................................................
+............................................................
 
 This plugin is **not** enabled by default.
 
@@ -38,14 +44,29 @@ This plugin is for systems where SMSes are sent via a magical email-address
 (legacy-system support). For that reason it depends on the same Django email
 server settings as the included EmailNotification-plugin, and in addition the
 Argus-specific ``SMS_GATEWAY_ADDRESS``-setting, which is the magical
-email-address to send the SMS to.
+email-address to send the SMSes to.
+
+The phone number is suffixed to the localpart of the email-address.
+
+Given an ``SMS_GATEWAY_ADDRESS`` of the following form::
+
+    SMS_GATEWAY_ADDRESS = "sms@example.com"
+
+and a phone number of the following form::
+
+    +345656787643
+
+then the resulting address is::
+
+    sms+345656787643@example.com
 
 The settings-field for an SMS-destination contains only a ``phone_number``,
 which is a string that includes the international calling code, see for
 instance `Wikipedia: List of mobile telephone prefixes by country
 <https://en.wikipedia.org/wiki/List_of_mobile_telephone_prefixes_by_country>`__.
 
-We use a library to validate that the number is a real phone number, so you
+The library used to validate that the number is a real phone number is based on
+`Google's libphonenumber <https://github.com/google/libphonenumber>`_, so you
 cannot test with an arbitrary string of numbers.
 
 This plugin is a better example to copy for your own plugins than the included
