@@ -4,6 +4,13 @@ read by developers.
 
 ## [Unreleased]
 
+## acks
+
+### Changed
+
+- Flatten the json structure for posting acknowledgements.
+
+
 ## incident-token-expiry
 
 ### Added
