@@ -1,8 +1,10 @@
 from django_filters import rest_framework as filters
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter
-from rest_framework import generics
+from rest_framework import generics, mixins, viewsets
 from rest_framework.decorators import action
+from rest_framework.generics import get_object_or_404
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from ..filters import SourceLockedIncidentFilter
@@ -10,7 +12,12 @@ from ..models import Incident, SourceSystem
 from ..serializers import IncidentPureDeserializer, SourceSystemSerializer
 
 from ..views import IncidentViewSet, BooleanStringOAEnum
-from .serializers import IncidentSerializerV1, MetadataSerializer
+from .serializers import (
+    AcknowledgementSerializerV1,
+    IncidentSerializerV1,
+    MetadataSerializer,
+    UpdateAcknowledgementSerializerV1,
+)
 
 
 @extend_schema_view(
@@ -117,6 +124,49 @@ class SourceLockedIncidentViewSetV1(IncidentViewSetV1):
 
     def get_queryset(self):
         return Incident.objects.filter(source__user=self.request.user).prefetch_default_related()
+
+
+@extend_schema_view(
+    create=extend_schema(
+        request=AcknowledgementSerializerV1,
+        responses={"201": AcknowledgementSerializerV1},
+    ),
+    update=extend_schema(
+        request=UpdateAcknowledgementSerializerV1,
+        responses={"200": AcknowledgementSerializerV1},
+    ),
+    partial_update=extend_schema(
+        request=UpdateAcknowledgementSerializerV1,
+        responses={"200": AcknowledgementSerializerV1},
+    ),
+)
+class AcknowledgementViewSetV1(
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
+    viewsets.GenericViewSet,
+):
+    queryset = Incident.objects.none()  # For OpenAPI
+    permission_classes = [IsAuthenticated]
+    serializer_class = AcknowledgementSerializerV1
+
+    def get_serializer_class(self):
+        if self.action in ("partial_update", "update"):
+            return UpdateAcknowledgementSerializerV1
+        return self.serializer_class
+
+    def get_incident(self):
+        incident_pk = self.kwargs["incident_pk"]
+        return get_object_or_404(Incident.objects.all(), pk=incident_pk)
+
+    def get_queryset(self):
+        return self.get_incident().acks
+
+    def perform_create(self, serializer: AcknowledgementSerializerV1):
+        user = self.request.user
+        incident = self.get_incident()
+        serializer.save(incident=incident, actor=user)
 
 
 # DEPRECATED: The following views will be removed in V2
