@@ -517,8 +517,19 @@ Incident endpoints
       the time the server received the event if omitted.
 
 
--  ``GET`` to ``/api/v1/incidents/<int:pk>/acks/<int:pk>/``: returns a
-   specific acknowledgement of the specified incident
+-  ``/api/v1/incidents/<int:pk>/acks/<int:pk>/``:
+
+   -  ``GET``: returns a specific acknowledgement of the specified incident
+
+   -  ``PUT``: updates the expiration of and returns a specific acknowledgement
+      of the specific incident
+
+      .. code-block:: json
+        :caption: Example request body
+
+          {
+              "expiration": "2011-11-13 12:00:00"
+          }
 
 -  ``/api/v1/incidents/sources/``:
 
@@ -1169,10 +1180,8 @@ Incident endpoints
         :caption: Example request body
 
           {
-              "event": {
-                  "timestamp": "2011-11-11 11:11:11.235877",
-                  "description": "The incident is being investigated."
-              },
+              "timestamp": "2011-11-11 11:11:11.235877",
+              "description": "The incident is being investigated."
               "expiration": "2011-11-13 12:00:00"
           }
 
@@ -1182,8 +1191,19 @@ Incident endpoints
       the time the server received the event if omitted.
 
 
--  ``GET`` to ``/api/v2/incidents/<int:pk>/acks/<int:pk>/``: returns a
-   specific acknowledgement of the specified incident
+-  ``/api/v2/incidents/<int:pk>/acks/<int:pk>/``:
+
+   -  ``GET``: returns a specific acknowledgement of the specified incident
+
+   -  ``PUT``: updates the expiration of and returns a specific acknowledgement
+      of the specific incident
+
+      .. code-block:: json
+        :caption: Example request body
+
+          {
+              "expiration": "2011-11-13 12:00:00"
+          }
 
 -  ``/api/v2/incidents/sources/``:
 
