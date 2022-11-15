@@ -1,10 +1,45 @@
+from django.db.utils import ProgrammingError
+
+from rest_framework.exceptions import APIException
+
 from argus.auth.models import User
 from .models import DestinationConfig, TimeRecurrence, Timeslot
 
 __all__ = [
+    "sync_media",
     "create_default_timeslot",
     "sync_email_destination",
 ]
+
+
+def sync_media(sender, **kwargs):
+    """Sync MEDIA_PLUGINS with the Media table
+
+    Check if all media in Media has a respective class"""
+
+    from .media import MEDIA_CLASSES, MEDIA_CLASSES_DICT
+
+    apps = kwargs['apps']
+    try:
+        Media = apps.get_model('argus_notificationprofile', 'Media')
+    except ImportError:
+        return
+
+    try:
+        for medium in Media.objects.all():
+            if medium.slug not in MEDIA_CLASSES_DICT.keys():
+                raise APIException(f"{medium.name} plugin is not registered in MEDIA_PLUGINS")
+    except ProgrammingError:
+        return
+
+    # Check if all media plugins are also saved in Media
+    new_media = [
+        Media(slug=media_class.MEDIA_SLUG, name=media_class.MEDIA_NAME)
+        for media_class in MEDIA_CLASSES
+        if not Media.objects.filter(slug=media_class.MEDIA_SLUG)
+    ]
+    if new_media:
+        Media.objects.bulk_create(new_media)
 
 
 # Create default immediate Timeslot when a user is created
