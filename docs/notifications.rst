@@ -46,7 +46,7 @@ server settings as the included EmailNotification-plugin, and in addition the
 Argus-specific ``SMS_GATEWAY_ADDRESS``-setting, which is the magical
 email-address to send the SMSes to.
 
-The phone number is suffixed to the localpart of the email-address.
+The phone number is suffixed to the local-part of the email-address.
 
 Given an ``SMS_GATEWAY_ADDRESS`` of the following form::
 
