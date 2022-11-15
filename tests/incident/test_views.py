@@ -546,11 +546,8 @@ class IncidentViewSetTestCase(APITestCase):
     def test_can_create_acknowledgement_of_incident(self):
         incident = self.add_open_incident_with_start_event_and_tag()
         data = {
-            "event": {
-                "timestamp": "2022-08-02T13:04:03.529Z",
-                "type": "STA",
-                "description": "acknowledgement",
-            },
+            "timestamp": "2022-08-02T13:04:03.529Z",
+            "description": "acknowledgement",
             "expiration": "2022-08-03T13:04:03.529Z",
         }
         response = self.client.post(path=f"/api/v2/incidents/{incident.pk}/acks/", data=data, format="json")
@@ -768,10 +765,8 @@ class BulkAcknowledgementViewSetTestCase(APITestCase):
         self.user = BaseUserFactory(username="user1")
         self.client.force_authenticate(user=self.user)
         self.ack_data = {
-            "event": {
-                "timestamp": "2022-08-02T13:04:03.529Z",
-                "description": "acknowledgement",
-            },
+            "timestamp": "2022-08-02T13:04:03.529Z",
+            "description": "acknowledgement",
             "expiration": "2022-08-03T13:04:03.529Z",
         }
 

@@ -4,9 +4,10 @@ from django.db import IntegrityError
 
 from django_filters import rest_framework as filters
 from rest_framework.filters import SearchFilter
+from drf_rw_serializers import viewsets as rw_viewsets
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter
-from rest_framework import generics, mixins, serializers, status, viewsets
+from rest_framework import mixins, serializers, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.generics import get_object_or_404
@@ -31,14 +32,15 @@ from .models import (
 )
 from .serializers import (
     UpdateAcknowledgementSerializer,
-    AcknowledgementSerializer,
     EventSerializer,
     IncidentPureDeserializer,
     IncidentSerializer,
     IncidentTicketUrlSerializer,
+    RequestAcknowledgementSerializer,
     RequestBulkAcknowledgementSerializer,
     RequestBulkEventSerializer,
     RequestBulkTicketUrlSerializer,
+    ResponseAcknowledgementSerializer,
     ResponseBulkSerializer,
     SourceSystemSerializer,
     SourceSystemTypeSerializer,
@@ -419,30 +421,29 @@ class EventViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, mixins.Retrie
 
 
 @extend_schema_view(
+    create=extend_schema(
+        request=RequestAcknowledgementSerializer,
+        responses={"201": ResponseAcknowledgementSerializer},
+    ),
     update=extend_schema(
         request=UpdateAcknowledgementSerializer,
-        responses={"200": AcknowledgementSerializer},
+        responses={"200": ResponseAcknowledgementSerializer},
     ),
     partial_update=extend_schema(
         request=UpdateAcknowledgementSerializer,
-        responses={"200": AcknowledgementSerializer},
+        responses={"200": ResponseAcknowledgementSerializer},
     ),
 )
-class AcknowledgementViewSet(
-    mixins.ListModelMixin,
-    mixins.CreateModelMixin,
-    mixins.RetrieveModelMixin,
-    mixins.UpdateModelMixin,
-    viewsets.GenericViewSet,
-):
+class AcknowledgementViewSet(rw_viewsets.ModelViewSet):
     queryset = Incident.objects.none()  # For OpenAPI
     permission_classes = [IsAuthenticated]
-    serializer_class = AcknowledgementSerializer
+    serializer_class = ResponseAcknowledgementSerializer
+    read_serializer_class = ResponseAcknowledgementSerializer
 
-    def get_serializer_class(self):
+    def get_write_serializer_class(self):
         if self.action in ("partial_update", "update"):
             return UpdateAcknowledgementSerializer
-        return self.serializer_class
+        return RequestAcknowledgementSerializer
 
     def get_incident(self):
         incident_pk = self.kwargs["incident_pk"]
@@ -451,7 +452,7 @@ class AcknowledgementViewSet(
     def get_queryset(self):
         return self.get_incident().acks
 
-    def perform_create(self, serializer: AcknowledgementSerializer):
+    def perform_create(self, serializer: RequestAcknowledgementSerializer):
         user = self.request.user
         incident = self.get_incident()
         serializer.save(incident=incident, actor=user)
@@ -498,13 +499,13 @@ class BulkAcknowledgementViewSet(viewsets.ViewSet):
             event = Event.objects.create(
                 incident=incident,
                 actor=actor,
-                timestamp=ack_data["event"]["timestamp"],
+                timestamp=ack_data["timestamp"],
                 type=Event.Type.ACKNOWLEDGE,
-                description=ack_data["event"]["description"],
+                description=ack_data["description"],
             )
             ack = Acknowledgement.objects.create(event=event, expiration=ack_data["expiration"])
             changes[str(incident_id)] = {
-                "ack": AcknowledgementSerializer(instance=ack).to_representation(instance=ack),
+                "ack": ResponseAcknowledgementSerializer(instance=ack).to_representation(instance=ack),
                 "status": status.HTTP_201_CREATED,
                 "errors": None,
             }

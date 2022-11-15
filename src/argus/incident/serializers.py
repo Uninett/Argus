@@ -339,11 +339,49 @@ class UpdateAcknowledgementSerializer(serializers.ModelSerializer):
         return expiration
 
     def to_representation(self, instance):
-        serializer = AcknowledgementSerializer(instance=instance)
+        serializer = RequestAcknowledgementSerializer(instance=instance)
         return serializer.data
 
 
-class AcknowledgementSerializer(serializers.ModelSerializer):
+class RequestAcknowledgementSerializer(serializers.ModelSerializer):
+    timestamp = serializers.DateTimeField()
+    description = serializers.CharField(allow_blank=True)
+
+    class Meta:
+        model = Acknowledgement
+        fields = [
+            "pk",
+            "timestamp",
+            "description",
+            "expiration",
+        ]
+        # "pk" needs to be listed, as "event" is the actual primary key
+        read_only_fields = ["pk"]
+
+    def create(self, validated_data: dict):
+        assert "incident" in validated_data, '"incident" not in input'
+        assert "actor" in validated_data, '"actor" not in input'
+        incident = validated_data.pop("incident")
+        actor = validated_data.pop("actor")
+        expiration = validated_data.get("expiration", None)
+        timestamp = validated_data.pop("timestamp")
+        description = validated_data.get("description", "")
+        ack = incident.create_ack(
+            actor,
+            timestamp=timestamp,
+            description=description,
+            expiration=expiration,
+        )
+        return ack
+
+    def validate(self, attrs: dict):
+        expiration = attrs.get("expiration")
+        if expiration and expiration <= attrs["timestamp"]:
+            raise serializers.ValidationError("'expiration' is earlier than creation timestamp.")
+        return attrs
+
+
+class ResponseAcknowledgementSerializer(serializers.ModelSerializer):
     event = EventSerializer()
 
     class Meta:
@@ -356,41 +394,10 @@ class AcknowledgementSerializer(serializers.ModelSerializer):
         # "pk" needs to be listed, as "event" is the actual primary key
         read_only_fields = ["pk"]
 
-    def create(self, validated_data: dict):
-        assert "incident" in validated_data, '"incident" not in input'
-        assert "actor" in validated_data, '"actor" not in input'
-        incident = validated_data.pop("incident")
-        actor = validated_data.pop("actor")
-        expiration = validated_data.get("expiration", None)
-        event_data = validated_data.pop("event")
-        timestamp = event_data.pop("timestamp")
-        description = event_data.get("description", "")
-        ack = incident.create_ack(actor, timestamp=timestamp, description=description, expiration=expiration)
-        return ack
-
-    def to_internal_value(self, data: dict):
-        data["event"]["type"] = Event.Type.ACKNOWLEDGE
-        return super().to_internal_value(data)
-
-    def validate_event(self, value: dict):
-        event_type = value["type"]
-        if event_type != Event.Type.ACKNOWLEDGE:
-            raise serializers.ValidationError(
-                f"'{event_type}' is not a valid event type for acknowledgements."
-                f" Use '{Event.Type.ACKNOWLEDGE}' or omit 'type' completely."
-            )
-        return value
-
-    def validate(self, attrs: dict):
-        expiration = attrs.get("expiration")
-        if expiration and expiration <= attrs["event"]["timestamp"]:
-            raise serializers.ValidationError("'expiration' is earlier than creation timestamp.")
-        return attrs
-
 
 class RequestBulkAcknowledgementSerializer(serializers.Serializer):
     ids = serializers.ListField(child=serializers.IntegerField(), allow_empty=False)
-    ack = AcknowledgementSerializer()
+    ack = RequestAcknowledgementSerializer()
 
 
 class RequestBulkEventSerializer(serializers.Serializer):

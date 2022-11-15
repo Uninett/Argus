@@ -3,6 +3,13 @@ This file documents changes to Argus that are relevant for the users to know.
 
 ## [Unreleased]
 
+## acks
+
+### Changed
+
+- Flatten the json structure for posting acknowledgements.
+
+
 ## incident-token-expiry
 
 ### Added

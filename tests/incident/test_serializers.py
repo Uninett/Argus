@@ -1,32 +1,28 @@
-from collections import OrderedDict
 import datetime
 
-from django.db import IntegrityError
 from django.test import TestCase
 from django.utils import timezone
 
 from rest_framework.test import APIRequestFactory
 from rest_framework import serializers
-from rest_framework.exceptions import ValidationError
-from argus import incident
 
 from argus.auth.factories import PersonUserFactory
 from argus.incident.factories import IncidentTagRelationFactory, StatefulIncidentFactory
-from argus.incident.models import IncidentTagRelation
 from argus.incident.serializers import (
-    AcknowledgementSerializer,
     EventSerializer,
     IncidentPureDeserializer,
     IncidentSerializer,
     IncidentTagRelationSerializer,
+    RequestAcknowledgementSerializer,
     TagSerializer,
     UpdateAcknowledgementSerializer,
 )
+from argus.incident.V1.serializers import AcknowledgementSerializerV1, UpdateAcknowledgementSerializerV1
 from argus.util.datetime_utils import INFINITY_REPR
 from argus.util.testing import disconnect_signals, connect_signals
 
 
-class AcknowledgementSerializerTests(TestCase):
+class AcknowledgementSerializerV1Tests(TestCase):
     def setUp(self):
         disconnect_signals()
         self.user = PersonUserFactory()
@@ -49,7 +45,65 @@ class AcknowledgementSerializerTests(TestCase):
             },
             "expiration": None,
         }
-        serializer = AcknowledgementSerializer(data=data, context={"request": request})
+        serializer = AcknowledgementSerializerV1(data=data, context={"request": request})
+        serializer.is_valid()
+        validated_data = serializer.validated_data
+        validated_data["actor"] = self.user
+        validated_data["incident"] = incident
+        ack = serializer.create(validated_data)
+        self.assertEqual(ack.event.incident, incident)
+        self.assertEqual(ack.event.type, "ACK")
+
+
+class UpdateAcknowledgementSerializerV1Tests(TestCase):
+    def setUp(self):
+        disconnect_signals()
+        self.user = PersonUserFactory()
+
+    def tearDown(self):
+        connect_signals()
+
+    def test_update_golden_path(self):
+        incident = StatefulIncidentFactory()
+        ack = incident.create_ack(self.user, expiration=None)
+        self.assertFalse(ack.expiration)
+        validated_data = {"expiration": timezone.now()}
+        serializer = UpdateAcknowledgementSerializerV1()
+        updated_ack = serializer.update(ack, validated_data)
+        self.assertEqual(ack, updated_ack)
+        self.assertTrue(updated_ack.expiration)
+
+    def test_update_expired_ack_should_fail(self):
+        incident = StatefulIncidentFactory()
+        timestamp_in_the_past = timezone.now() - datetime.timedelta(days=30)
+        ack = incident.create_ack(self.user, expiration=timestamp_in_the_past)
+        validated_data = {"expiration": None}
+        serializer = UpdateAcknowledgementSerializerV1()
+        with self.assertRaises(serializers.ValidationError):
+            serializer.update(ack, validated_data)
+
+
+class AcknowledgementSerializerTests(TestCase):
+    def setUp(self):
+        disconnect_signals()
+        self.user = PersonUserFactory()
+        self.request_factory = APIRequestFactory()
+
+    def tearDown(self):
+        connect_signals()
+
+    def test_create_golden_path(self):
+        request = self.request_factory.post("/")
+        request.user = self.user
+        incident = StatefulIncidentFactory()
+        timestamp = timezone.now()
+        data = {
+            "actor": {},  # Forced to request.user
+            "timestamp": timestamp.isoformat(),
+            "description": "string",
+            "expiration": None,
+        }
+        serializer = RequestAcknowledgementSerializer(data=data, context={"request": request})
         serializer.is_valid()
         validated_data = serializer.validated_data
         validated_data["actor"] = self.user
@@ -83,8 +137,8 @@ class UpdateAcknowledgementSerializerTests(TestCase):
         ack = incident.create_ack(self.user, expiration=timestamp_in_the_past)
         validated_data = {"expiration": None}
         serializer = UpdateAcknowledgementSerializer()
-        with self.assertRaises(serializers.ValidationError) as e:
-            updated_ack = serializer.update(ack, validated_data)
+        with self.assertRaises(serializers.ValidationError):
+            serializer.update(ack, validated_data)
 
 
 class IncidentSerializerTests(TestCase):
