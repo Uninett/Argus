@@ -29,9 +29,11 @@ This plugin uses the email server settings provided by Django itself to
 configure the server.
 
 The settings-field for an email-destination contains an
-``email_address``-field. Hidden from the API, it also contains
-a ``synced``-field, which is used for some magic if the User model-instance has
-its ``email_address``-field set.
+``email_address``-field. It also contains a read-only ``synced``-field, which
+is used for some magic if the User model-instance has its
+``email_address``-field set. If the email-address has ``synced`` set to True, that
+email-address is read-only as far as the API is concerned, because the address
+on the User is synced to that specific destination.
 
 To validate the email address we use Django's own email validator.
 
