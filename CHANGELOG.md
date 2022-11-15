@@ -4,38 +4,23 @@ read by developers.
 
 ## [Unreleased]
 
-## acks
+### Added
+
+- Add docs about notification plugins
+- Added the possibility to filter notifications by event-type
+- Added a management command that will create incidents if a source token is
+  close to expiring
+- Added an endpoint to set `ticket_url` of incidents in bulk
+- Added an endpoint to create events for incidents in bulk
+
+### Fixed
+- Changed when the Media-table is synced with settings `MEDIA_PLUGINS` to avoid
+  dev/prod-settings leaking into the tests
 
 ### Changed
 
 - Flatten the json structure for posting acknowledgements.
-
-
-## incident-token-expiry
-
-### Added
-- Added a management command that will create incidents if a source token is
-  close to expiring
-
-
-## bulk/events
-
-### Added
-
-- Added an endpoint to create events for incidents in bulk
-
-
-## bulk/ticket-url
-
-### Added
-- Added an endpoint to set ticket_url of incidents in bulk
-
-
-## event-type-filter
-
-### Added
-- Added the possibility to filter notifications by event-type
-
+- Improve Sonar Cloud settings, like just testing for Python 3
 
 ## [1.9.0] - 2022-11-08
 

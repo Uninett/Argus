@@ -3,39 +3,17 @@ This file documents changes to Argus that are relevant for the users to know.
 
 ## [Unreleased]
 
-## acks
+### Added
+- Add docs about notification plugins
+- Added a management command that will create incidents if a source token is
+  close to expiring
+- Added an endpoint to create events for incidents in bulk
+- Added an endpoint to set ticket_url of incidents in bulk
+- Added the possibility to filter notifications by event-type
 
 ### Changed
 
 - Flatten the json structure for posting acknowledgements.
-
-
-## incident-token-expiry
-
-### Added
-- Added a management command that will create incidents if a source token is
-  close to expiring
-
-
-## bulk/events
-
-### Added
-
-- Added an endpoint to create events for incidents in bulk
-
-
-## bulk/ticket-url
-
-### Added
-- Added an endpoint to set ticket_url of incidents in bulk
-
-
-## event-type-filter
-
-### Added
-
-- Added the possibility to filter notifications by event-type
-
 
 ## [1.9.0] - 2022-11-08
 
