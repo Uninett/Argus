@@ -28,7 +28,7 @@ def sync_media(sender, **kwargs):
     try:
         for medium in Media.objects.all():
             if medium.slug not in MEDIA_CLASSES_DICT.keys():
-                raise APIException("".join([medium.name, " plugin is not registered in MEDIA_PLUGINS"]))
+                raise APIException(f"{medium.name} plugin is not registered in MEDIA_PLUGINS")
     except ProgrammingError:
         return
 
