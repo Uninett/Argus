@@ -79,8 +79,8 @@ class UpdateAcknowledgementSerializerV1Tests(TestCase):
         ack = incident.create_ack(self.user, expiration=timestamp_in_the_past)
         validated_data = {"expiration": None}
         serializer = UpdateAcknowledgementSerializerV1()
-        with self.assertRaises(serializers.ValidationError) as e:
-            updated_ack = serializer.update(ack, validated_data)
+        with self.assertRaises(serializers.ValidationError):
+            serializer.update(ack, validated_data)
 
 
 class AcknowledgementSerializerTests(TestCase):
@@ -137,8 +137,8 @@ class UpdateAcknowledgementSerializerTests(TestCase):
         ack = incident.create_ack(self.user, expiration=timestamp_in_the_past)
         validated_data = {"expiration": None}
         serializer = UpdateAcknowledgementSerializer()
-        with self.assertRaises(serializers.ValidationError) as e:
-            updated_ack = serializer.update(ack, validated_data)
+        with self.assertRaises(serializers.ValidationError):
+            serializer.update(ack, validated_data)
 
 
 class IncidentSerializerTests(TestCase):
