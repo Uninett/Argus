@@ -5,8 +5,9 @@ from argus.site.settings.prod import *
 # outside the container:
 ALLOWED_HOSTS = ["*"]
 
-# Enable both Email and SMS notification backends
-MEDIA_PLUGINS = [
-    "argus.notificationprofile.media.email.EmailNotification",
-    "argus.notificationprofile.media.sms_as_email.SMSNotification",
-]
+# Uncomment to enable both Email and SMS-as-email notification backends,
+# leave commented out to keep just the default email backend:
+# MEDIA_PLUGINS = [
+#    "argus.notificationprofile.media.email.EmailNotificationo",
+#    "argus.notificationprofile.media.sms_as_email.SMSNotification",
+# ]
