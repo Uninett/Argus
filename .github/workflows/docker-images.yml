@@ -4,7 +4,6 @@ name: Create and publish Argus API Docker image
 on:
   release:
     types:
-      - released
       - published
       - edited
 
