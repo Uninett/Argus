@@ -3,7 +3,9 @@ name: Create and publish Argus API Docker image
 
 on:
   release:
-    types: [published, edited]
+    types:
+      - published
+      - edited
 
 env:
   REGISTRY: ghcr.io
