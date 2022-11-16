@@ -561,14 +561,12 @@ class BulkAcknowledgementViewSet(viewsets.ViewSet):
                 status_codes_seen.add(status.HTTP_400_BAD_REQUEST)
                 continue
 
-            event = Event.objects.create(
-                incident=incident,
+            ack = incident.create_ack(
                 actor=actor,
                 timestamp=ack_data["timestamp"],
-                type=Event.Type.ACKNOWLEDGE,
                 description=ack_data["description"],
+                expiration=ack_data["expiration"],
             )
-            ack = Acknowledgement.objects.create(event=event, expiration=ack_data["expiration"])
             changes[str(incident_id)] = {
                 "ack": ResponseAcknowledgementSerializer(instance=ack).to_representation(instance=ack),
                 "status": status.HTTP_201_CREATED,
