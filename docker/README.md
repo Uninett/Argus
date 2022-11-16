@@ -25,3 +25,13 @@ This image runs with default production settings, with a few tweaks from
 settings can be overriden through the use of environment variables exported to
 the container.  Consult the documentation section on [site-specific
 settings](http://argus-server.rtfd.io/en/latest/site-specific-settings.html).
+
+## Limitations
+
+This is not a complete Argus environment.  This image only defines the backend
+API server component. It still depends on a PostgreSQL and a Redis server to be
+functional. Also, the Argus front-end component is needed to have a functional
+user interface against the API server.
+
+For a full production environment example, take a look at
+https://github.com/Uninett/argus-docker
