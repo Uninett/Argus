@@ -10,16 +10,20 @@ license.
 class PytestTestRunner:
     """Runs pytest to discover and run tests."""
 
-    def __init__(self, verbosity=1, failfast=False, keepdb=False, junitxml=None, **kwargs):
+    def __init__(self, verbosity=1, failfast=False, keepdb=False, junitxml=None, junit_suite_name=None, **kwargs):
         self.verbosity = verbosity
         self.failfast = failfast
         self.keepdb = keepdb
         self.junitxml = junitxml
+        self.junit_suite_name = junit_suite_name
 
     @classmethod
     def add_arguments(cls, parser):
         parser.add_argument("--keepdb", action="store_true", help="Preserves the test DB between runs.")
         parser.add_argument("--junitxml", metavar="PATH", help="Produce a JUnit XML test report.")
+        parser.add_argument(
+            "--junit_suite_name", metavar="NAME", help="Set the test suite name in the JUnit XML report."
+        )
 
     def run_tests(self, test_labels):
         """Run pytest and return the exitcode.
@@ -41,6 +45,8 @@ class PytestTestRunner:
             argv.append("--reuse-db")
         if self.junitxml:
             argv.append("--junitxml={}".format(self.junitxml))
+        if self.junit_suite_name:
+            argv.extend(["-o", "junit_suite_name={}".format(self.junit_suite_name)])
 
         argv.extend(test_labels)
         return pytest.main(argv)
