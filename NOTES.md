@@ -3,6 +3,12 @@ This file documents changes to Argus that are relevant for the users to know.
 
 ## [Unreleased]
 
+## gitlab-two-way
+
+### Added
+- Added Gitlab to ticket system plugins
+
+
 ## ticket-plugin-base
 
 ### Added

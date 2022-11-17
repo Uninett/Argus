@@ -4,6 +4,12 @@ read by developers.
 
 ## [Unreleased]
 
+## gitlab-two-way
+
+### Added
+- Added Gitlab to ticket system plugins
+
+
 ## ticket-plugin-base
 
 ### Added
