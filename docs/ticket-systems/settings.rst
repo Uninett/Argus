@@ -26,3 +26,18 @@ be created in.
 
 To enable an integration with a ticket plugin these settings MUST be added
 to Argus.
+
+Gitlab
+------
+
+* ``TICKET_PLUGIN``: ``"argus.incident.ticket.gitlab.GitlabPlugin"``
+* ``TICKET_ENDPOINT``: ``"https://gitlab.com/"`` or link to self-hosted instance
+* ``TICKET_AUTHENTICATION_SECRET``:
+    - create a `project access token <https://docs.gitlab.com/ee/user/project/settings/project_access_tokens.html>`_ or a `personal access token <https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html>`_ with the scope "``api``"
+    - add it like this: ``{"token": project/personal access token}``
+* ``TICKET_INFORMATION``:
+    - to know which project to create the ticket in the Gitlab API needs to know the namespace and name of it
+    - to figure out the namespace visit the `namespace page <https://docs.gitlab.com/ee/user/namespace/>`_ of the Gitlab documentation
+    - the name is the name of the Gitlab project
+    - fill the dictionary like this: ``{"project_namespace_and_name": "namespace/name"}``
+    - for the Gitlab project `Simple Maven Example <https://gitlab.com/gitlab-examples/maven/simple-maven-example>`_ the dictionary would look like this: ``{"project_namespace_and_name": "gitlab-examples/maven/simple-maven-example"}``
