@@ -3,6 +3,12 @@ This file documents changes to Argus that are relevant for the users to know.
 
 ## [Unreleased]
 
+## rt-two-way
+
+### Added
+- Added Request Tracker to ticket system plugins
+
+
 ## ticket-plugin-base
 
 ### Added

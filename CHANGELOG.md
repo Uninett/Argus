@@ -4,6 +4,12 @@ read by developers.
 
 ## [Unreleased]
 
+## rt-two-way
+
+### Added
+- Added Request Tracker to ticket system plugins
+
+
 ## ticket-plugin-base
 
 ### Added
