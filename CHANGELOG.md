@@ -4,6 +4,14 @@ read by developers.
 
 ## [Unreleased]
 
+## ticket-plugin-base
+
+### Added
+- Plugin system for ticket system integrations, documented in the new "Ticket
+  system settings" sections.
+- New API endpoint to create a new ticket in an external ticket system
+
+
 ### Added
 
 - Add docs about notification plugins

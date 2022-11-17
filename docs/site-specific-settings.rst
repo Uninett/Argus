@@ -226,6 +226,12 @@ Token settings
 * :setting:`AUTH_TOKEN_EXPIRES_AFTER_DAYS`  determines how long an authentication token is valid.
     If undefined it will default to the value of 14 days.
 
+Ticket system settings
+----------------------
+
+``TICKET_PLUGIN``, ``TICKET_ENDPOINT``, ``TICKET_AUTHENTICATION_SECRET``,
+``TICKET_INFORMATION`` are all described in :ref:`ticket-systems-settings`.
+
 Debugging settings
 ------------------
 

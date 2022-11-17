@@ -24,6 +24,7 @@ acks_bulk_list = views.BulkAcknowledgementViewSet.as_view({"post": "create"})
 tag_list = views.IncidentTagViewSet.as_view({"get": "list", "post": "create"})
 tag_detail = views.IncidentTagViewSet.as_view({"get": "retrieve", "delete": "destroy"})
 
+ticket_plugin_detail = views.TicketPluginViewSet.as_view({"put": "update"})
 ticket_url_bulk_list = views.BulkTicketUrlViewSet.as_view({"post": "create"})
 
 app_name = "incident"
@@ -39,4 +40,5 @@ urlpatterns = [
     path("<int:incident_pk>/acks/<int:pk>/", ack_detail, name="incident-ack"),
     path("<int:incident_pk>/tags/", tag_list, name="incident-tags"),
     path("<int:incident_pk>/tags/<str:tag>/", tag_detail, name="incident-tag"),
+    path("<int:incident_pk>/ticket/", ticket_plugin_detail, name="incident-ticket-plugin"),
 ] + router.urls
