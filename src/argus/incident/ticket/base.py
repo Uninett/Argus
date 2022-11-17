@@ -21,17 +21,17 @@ class TicketPlugin(ABC):
         Imports, validates and returns settings needed for ticket creation.
         Raises a ValueError if settings are not set properly
         """
-        endpoint = getattr(settings, "TICKET_ENDPOINT")
+        endpoint = getattr(settings, "TICKET_ENDPOINT", None)
         if not endpoint:
             raise ValueError("No endpoint can be found in the settings. Please update the setting 'TICKET_ENDPOINT'.")
 
-        authentication = getattr(settings, "TICKET_AUTHENTICATION_SECRET")
+        authentication = getattr(settings, "TICKET_AUTHENTICATION_SECRET", None)
         if not authentication:
             raise ValueError(
                 "No authentication information can be found in the settings. Please update the setting 'TICKET_AUTHENTICATION_SECRET'."
             )
 
-        ticket_information = getattr(settings, "TICKET_INFORMATION")
+        ticket_information = getattr(settings, "TICKET_INFORMATION", None)
         if not ticket_information:
             raise ValueError(
                 "No extra information for ticket creation can be found in the settings. Please update the setting 'TICKET_INFORMATION'."
