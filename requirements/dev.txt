@@ -5,3 +5,5 @@ pre-commit
 ipython
 django-extensions
 Werkzeug  # for django-extensions:runserver_plus
+pytest
+pytest-django
