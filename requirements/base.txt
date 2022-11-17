@@ -9,6 +9,7 @@ drf-rw-serializers
 factory_boy
 psycopg2-binary
 python-dataporten-auth
+python-gitlab
 social-auth-core>=4.1
 pytz>=2021.1
 social-auth-app-django

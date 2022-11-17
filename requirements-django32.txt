@@ -132,6 +132,8 @@ python-dataporten-auth==2.0.0
     # via -r requirements/base.txt
 python-dateutil==2.8.1
     # via faker
+python-gitlab==3.11.0
+    # via -r requirements/base.txt
 python3-openid==3.2.0
     # via social-auth-core
 pytz==2021.1
@@ -144,10 +146,14 @@ pyyaml==5.4.1
     #   drf-spectacular
 requests==2.25.1
     # via
+    #   python-gitlab
     #   requests-oauthlib
+    #   requests-toolbelt
     #   social-auth-core
 requests-oauthlib==1.3.0
     # via social-auth-core
+requests-toolbelt==0.10.1
+    # via python-gitlab
 service-identity==18.1.0
     # via twisted
 six==1.15.0
