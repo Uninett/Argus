@@ -26,3 +26,15 @@ be created in.
 
 To enable an integration with a ticket plugin these settings MUST be added
 to Argus.
+
+Request Tracker
+---------------
+
+* ``TICKET_PLUGIN``: ``"argus.incident.issue.request_tracker.RequestTrackerPlugin"``
+* ``TICKET_ENDPOINT``: Link to self-hosted instance
+* ``TICKET_AUTHENTICATION_SECRET``:
+    - token-based authentication does not work with the library used, therefore username- and password-based authentication is necessary
+    - ``{"username": username, "password": password}``
+* ``TICKET_INFORMATION``:
+    - the only additional information needed is the queue the ticket should be added to
+    - ``{"queue": queue_name}``
