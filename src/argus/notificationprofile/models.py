@@ -54,7 +54,8 @@ class TimeRecurrence(models.Model):
 
     timeslot = models.ForeignKey(to=Timeslot, on_delete=models.CASCADE, related_name="time_recurrences")
 
-    days = MultiSelectField(choices=Day.choices, min_choices=1)
+    # Set max_length to avoid bug on Django 4.x
+    days = MultiSelectField(choices=Day.choices, min_choices=1, max_length=13)
     start = models.TimeField(help_text="Local time.")
     end = models.TimeField(help_text="Local time.")
 
