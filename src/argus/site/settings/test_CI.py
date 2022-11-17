@@ -39,6 +39,11 @@ MEDIA_PLUGINS = [
     "argus.notificationprofile.media.sms_as_email.SMSNotification",
 ]
 
+# Tests
+
+TEST_RUNNER = 'xmlrunner.extra.djangotestrunner.XMLTestRunner'
+
+
 # PSA for login
 
 SOCIAL_AUTH_DATAPORTEN_KEY = get_str_env("ARGUS_DATAPORTEN_KEY")
