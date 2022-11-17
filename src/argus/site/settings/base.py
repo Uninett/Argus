@@ -22,6 +22,9 @@ from . import *
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = get_bool_env("DEBUG", False)
 
+# Use pytest as our Django test suite runner
+TEST_RUNNER = "argus.testrunner.PytestTestRunner"
+
 ALLOWED_HOSTS = []
 
 # Application definition
