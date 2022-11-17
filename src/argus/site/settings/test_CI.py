@@ -41,7 +41,8 @@ MEDIA_PLUGINS = [
 
 # Tests
 
-TEST_RUNNER = 'xmlrunner.extra.djangotestrunner.XMLTestRunner'
+TEST_RUNNER = "xmlrunner.extra.djangotestrunner.XMLTestRunner"
+TEST_OUTPUT_VERBOSE = 2
 
 
 # PSA for login
