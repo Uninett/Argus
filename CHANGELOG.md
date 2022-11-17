@@ -4,16 +4,14 @@ read by developers.
 
 ## [Unreleased]
 
-## ticket-plugin-base
+## [1.10.0] - 2022-11-17
 
 ### Added
+- Added support for testing on Python 3.11 and Django 4.0, 4.1
 - Plugin system for ticket system integrations, documented in the new "Ticket
   system settings" sections.
+- Add a production-oriented Dockerfile and use Github to build and store images
 - New API endpoint to create a new ticket in an external ticket system
-
-
-### Added
-
 - Add docs about notification plugins
 - Added the possibility to filter notifications by event-type
 - Added a management command that will create incidents if a source token is
@@ -26,7 +24,6 @@ read by developers.
   dev/prod-settings leaking into the tests
 
 ### Changed
-
 - Flatten the json structure for posting acknowledgements.
 - Improve Sonar Cloud settings, like just testing for Python 3
 

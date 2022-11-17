@@ -3,16 +3,16 @@ This file documents changes to Argus that are relevant for the users to know.
 
 ## [Unreleased]
 
-## ticket-plugin-base
+## [1.10.0] - 2022-11-17
 
 ### Added
+- Added support for testing on Python 3.11 and Django 4.0, 4.1
 - Plugin system for ticket system integrations, documented in the new "Ticket
   system settings" sections.
+- Add a production-oriented Dockerfile and use Github to build and store images
 - New API endpoint to create a new ticket in an external ticket system
-
-
-### Added
 - Add docs about notification plugins
+- Added the possibility to filter notifications by event-type
 - Added a management command that will create incidents if a source token is
   close to expiring
 - Added an endpoint to create events for incidents in bulk
