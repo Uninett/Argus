@@ -25,46 +25,26 @@ class ExpiringTokenAuthentication(TokenAuthentication):
 
 
 class JWTAuthentication(BaseAuthentication):
+    REQUIRED_CLAIMS = ["exp", "nbf", "aud", "iss", "sub"]
+    SUPPORTED_ALGORITHMS = ["RS256", "RS384", "RS512"]
+
     def authenticate(self, request):
         try:
-            raw_token = self.get_raw_jwt_token(request)
+            raw_token = self.get_raw_token(request)
         except ValueError:
             return None
-        try:
-            validated_token = jwt.decode(
-                jwt=raw_token,
-                algorithms=["RS256", "RS384", "RS512"],
-                key=self.get_public_key(),
-                options={
-                    "require": [
-                        "exp",
-                        "nbf",
-                        "aud",
-                        "iss",
-                        "sub",
-                    ]
-                },
-                audience=settings.JWT_AUDIENCE,
-                issuer=settings.JWT_ISSUER,
-            )
-        except jwt.exceptions.PyJWTError as e:
-            raise AuthenticationFailed(f"Error validating JWT token: {e}")
-        username = validated_token["sub"]
-        try:
-            user = User.objects.get(username=username)
-        except User.DoesNotExist:
-            raise AuthenticationFailed(f"No user found for username {username}")
+        validated_token = self.decode_token(raw_token)
+        return self.get_user(validated_token), validated_token
 
-        return user, validated_token
-
-    def get_public_key(self):
+    def get_public_key(self, kid):
         response = urlopen(settings.JWK_ENDPOINT)
         jwks = json.loads(response.read())
-        jwk = jwks["keys"][0]
-        public_key = jwt.algorithms.RSAAlgorithm.from_jwk(json.dumps(jwk))
-        return public_key
+        for jwk in jwks.get("keys"):
+            if jwk["kid"] == kid:
+                return jwt.algorithms.RSAAlgorithm.from_jwk(json.dumps(jwk))
+        raise AuthenticationFailed(f"Invalid kid '{kid}'")
 
-    def get_raw_jwt_token(self, request):
+    def get_raw_token(self, request):
         """Raises ValueError if a jwt token could not be found"""
         auth_header = request.META.get("HTTP_AUTHORIZATION")
         if not auth_header:
@@ -74,5 +54,31 @@ class JWTAuthentication(BaseAuthentication):
         except ValueError as e:
             raise ValueError(f"Failed to parse Authorization header: {e}")
         if scheme != settings.JWT_AUTH_SCHEME:
-            raise ValueError(f"Invalid Authorization scheme: {scheme}")
+            raise ValueError(f"Invalid Authorization scheme '{scheme}'")
         return token
+
+    def decode_token(self, raw_token):
+        header = jwt.get_unverified_header(raw_token)
+        kid = header.get("kid")
+        if not kid:
+            raise AuthenticationFailed("Token must include the 'kid' header")
+        public_key = self.get_public_key(kid)
+        try:
+            validated_token = jwt.decode(
+                jwt=raw_token,
+                algorithms=self.SUPPORTED_ALGORITHMS,
+                key=public_key,
+                options={"require": self.REQUIRED_CLAIMS},
+                audience=settings.JWT_AUDIENCE,
+                issuer=settings.JWT_ISSUER,
+            )
+            return validated_token
+        except jwt.exceptions.PyJWTError as e:
+            raise AuthenticationFailed(f"Error validating token: {e}")
+
+    def get_user(self, token):
+        username = token["sub"]
+        try:
+            return User.objects.get(username=username)
+        except User.DoesNotExist:
+            raise AuthenticationFailed(f"No user found for username '{username}'")
