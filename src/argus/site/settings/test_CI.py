@@ -1,3 +1,4 @@
+import os
 import subprocess
 import logging.config
 
@@ -43,8 +44,7 @@ MEDIA_PLUGINS = [
 
 TEST_RUNNER = "xmlrunner.extra.djangotestrunner.XMLTestRunner"
 TEST_OUTPUT_VERBOSE = 2
-TEST_OUTPUT_DIR = "junit"
-
+TEST_OUTPUT_DIR = os.path.join("test-reports", os.getenv("TOX_ENV_NAME", ""))
 TEST_OUTPUT_FILE_NAME = "test-results.xml"
 
 # PSA for login
