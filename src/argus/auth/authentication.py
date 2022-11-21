@@ -1,5 +1,6 @@
 from datetime import timedelta
 from urllib.request import urlopen
+from urllib.parse import urljoin
 import json
 import jwt
 
@@ -27,6 +28,7 @@ class ExpiringTokenAuthentication(TokenAuthentication):
 class JWTAuthentication(BaseAuthentication):
     REQUIRED_CLAIMS = ["exp", "nbf", "aud", "iss", "sub"]
     SUPPORTED_ALGORITHMS = ["RS256", "RS384", "RS512"]
+    AUTH_SCHEME = "Bearer"
 
     def authenticate(self, request):
         try:
@@ -37,8 +39,8 @@ class JWTAuthentication(BaseAuthentication):
         return self.get_user(validated_token), validated_token
 
     def get_public_key(self, kid):
-        response = urlopen(settings.JWK_ENDPOINT)
-        jwks = json.loads(response.read())
+        r = urlopen(self.get_jwk_endpoint())
+        jwks = json.loads(r.read())
         for jwk in jwks.get("keys"):
             if jwk["kid"] == kid:
                 return jwt.algorithms.RSAAlgorithm.from_jwk(json.dumps(jwk))
@@ -53,24 +55,20 @@ class JWTAuthentication(BaseAuthentication):
             scheme, token = auth_header.split()
         except ValueError as e:
             raise ValueError(f"Failed to parse Authorization header: {e}")
-        if scheme != settings.JWT_AUTH_SCHEME:
+        if scheme != self.AUTH_SCHEME:
             raise ValueError(f"Invalid Authorization scheme '{scheme}'")
         return token
 
     def decode_token(self, raw_token):
-        header = jwt.get_unverified_header(raw_token)
-        kid = header.get("kid")
-        if not kid:
-            raise AuthenticationFailed("Token must include the 'kid' header")
-        public_key = self.get_public_key(kid)
+        kid = self.get_kid(raw_token)
         try:
             validated_token = jwt.decode(
                 jwt=raw_token,
                 algorithms=self.SUPPORTED_ALGORITHMS,
-                key=public_key,
+                key=self.get_public_key(kid),
                 options={"require": self.REQUIRED_CLAIMS},
                 audience=settings.JWT_AUDIENCE,
-                issuer=settings.JWT_ISSUER,
+                issuer=self.get_openid_issuer(),
             )
             return validated_token
         except jwt.exceptions.PyJWTError as e:
@@ -82,3 +80,23 @@ class JWTAuthentication(BaseAuthentication):
             return User.objects.get(username=username)
         except User.DoesNotExist:
             raise AuthenticationFailed(f"No user found for username '{username}'")
+
+    def get_openid_config(self):
+        url = urljoin(settings.OIDC_ENDPOINT, ".well-known/openid-configuration")
+        r = urlopen(url)
+        return json.loads(r.read())
+
+    def get_jwk_endpoint(self):
+        openid_config = self.get_openid_config()
+        return openid_config["jwks_uri"]
+
+    def get_openid_issuer(self):
+        openid_config = self.get_openid_config()
+        return openid_config["issuer"]
+
+    def get_kid(self, token):
+        header = jwt.get_unverified_header(token)
+        kid = header.get("kid")
+        if not kid:
+            raise AuthenticationFailed("Token must include the 'kid' header")
+        return kid
