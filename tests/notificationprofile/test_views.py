@@ -26,31 +26,31 @@ from argus.util.testing import disconnect_signals, connect_signals
 
 
 @tag("API", "integration")
-class NotificationViewTests(APITestCase):
+class NotificationProfileViewTests(APITestCase):
     ENDPOINT = "/api/v2/notificationprofiles/"
     def setUp(self):
         disconnect_signals()
-        user1 = PersonUserFactory()
+        self.user1 = PersonUserFactory()
 
         self.user1_rest_client = APIClient()
-        self.user1_rest_client.force_authenticate(user=user1)
+        self.user1_rest_client.force_authenticate(user=self.user1)
 
         source_type = SourceSystemTypeFactory(name="nav")
         source1_user = SourceUserFactory(username="nav1")
         self.source1 = SourceSystemFactory(name="NAV 1", type=source_type, user=source1_user)
 
-        timeslot1 = TimeslotFactory(user=user1, name="Never")
-        self.timeslot2 = TimeslotFactory(user=user1, name="Never 2: Ever-expanding Void")
+        timeslot1 = TimeslotFactory(user=self.user1, name="Never")
+        self.timeslot2 = TimeslotFactory(user=self.user1, name="Never 2: Ever-expanding Void")
         filter1 = FilterFactory(
-            user=user1,
+            user=self.user1,
             name="Critical incidents",
             filter_string=f'{{"sourceSystemIds": [{self.source1.pk}]}}',
         )
-        self.notification_profile1 = NotificationProfileFactory(user=user1, timeslot=timeslot1)
+        self.notification_profile1 = NotificationProfileFactory(user=self.user1, timeslot=timeslot1)
         self.notification_profile1.filters.add(filter1)
 
         # Default email destination is automatically created with user
-        self.synced_email_destination = user1.destinations.get()
+        self.synced_email_destination = self.user1.destinations.get()
         self.notification_profile1.destinations.set([self.synced_email_destination])
 
     def teardown(self):
@@ -59,13 +59,23 @@ class NotificationViewTests(APITestCase):
     def test_notification_profile_list_is_reachable(self):
         response = self.user1_rest_client.get(path=self.ENDPOINT)
         self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
-        self.assertTrue(response.data, 'No notification profiles found')
+
+    def test_notification_profile_list_has_all_user_profiles(self):
+        response = self.user1_rest_client.get(path=self.ENDPOINT)
+        all_profile_pks = set(profile.pk for profile in self.user1.notification_profiles.all())
+        all_response_pks = set(profile["pk"] for profile in response.data)
+        self.assertEqual(all_response_pks, all_profile_pks)
 
     def test_specific_notification_profile_is_reachable(self):
         profile1_pk = self.notification_profile1.pk
         profile1_path = f"{self.ENDPOINT}{profile1_pk}/"
         response = self.user1_rest_client.get(path=profile1_path)
         self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
+
+    def test_specific_notification_profile_is_what_we_think_it_is(self):
+        profile1_pk = self.notification_profile1.pk
+        profile1_path = f"{self.ENDPOINT}{profile1_pk}/"
+        response = self.user1_rest_client.get(path=profile1_path)
         self.assertEqual(response.data["pk"], profile1_pk)
 
     def test_notification_profile_can_update_timeslot_without_changing_pk(self):
@@ -105,7 +115,7 @@ class NotificationIncidentViewTests(APITestCase):
         self.source2 = SourceSystemFactory(name="System 2", type=source_type2, user=source2_user)
 
         self.incident1 = StatelessIncidentFactory(source=self.source1)
-        self.incident2 = StatelessIncidentFactory(source=self.source2)
+        incident2 = StatelessIncidentFactory(source=self.source2)
 
         timeslot1 = TimeslotFactory(user=user1, name="Never")
         filter1 = FilterFactory(
@@ -116,10 +126,6 @@ class NotificationIncidentViewTests(APITestCase):
         self.notification_profile1 = NotificationProfileFactory(user=user1, timeslot=timeslot1)
         self.notification_profile1.filters.add(filter1)
 
-        # Default email destination is automatically created with user
-        self.synced_email_destination = user1.destinations.get()
-        self.notification_profile1.destinations.set([self.synced_email_destination])
-
     def teardown(self):
         connect_signals()
 
@@ -127,8 +133,9 @@ class NotificationIncidentViewTests(APITestCase):
         response = self.user1_rest_client.get(
             path=f"/api/v2/notificationprofiles/{self.notification_profile1.pk}/incidents/"
         )
+
         self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
-        self.assertEqual(len(response.data), 1)
+        self.assertEqual(len(response.data), 1)  # 1, not 2
         self.assertEqual(response.data[0]["pk"], self.incident1.pk)
 
 
@@ -221,14 +228,6 @@ class DestinationViewTests(APITestCase):
             settings={"phone_number": "+4747474747"},
         )
 
-        # Hook up destinations to user
-        timeslot1 = TimeslotFactory(user=user1, name="Never")
-        self.notification_profile1 = NotificationProfileFactory(user=user1, timeslot=timeslot1)
-
-        self.notification_profile1.destinations.set([self.synced_email_destination])
-        self.notification_profile1.destinations.set([self.non_synced_email_destination])
-        self.notification_profile1.destinations.set([self.sms_destination])
-
     def teardown(self):
         connect_signals()
 
@@ -251,6 +250,7 @@ class DestinationViewTests(APITestCase):
 
 @tag("API", "integration")
 class EmailDestinationViewTests(APITestCase):
+    ENDPOINT = "/api/v2/notificationprofiles/destinations/"
 
     def setUp(self):
         disconnect_signals()
@@ -276,14 +276,14 @@ class EmailDestinationViewTests(APITestCase):
 
     def test_can_delete_unsynced_unconnected_email_destination(self):
         response = self.user1_rest_client.delete(
-            path=f"/api/v2/notificationprofiles/destinations/{self.non_synced_email_destination.pk}/"
+            path=f"{self.ENDPOINT}{self.non_synced_email_destination.pk}/"
         )
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT, response.data)
         self.assertFalse(DestinationConfig.objects.filter(id=self.non_synced_email_destination.pk).exists())
 
     def test_cannot_delete_synced_email_destination(self):
         response = self.user1_rest_client.delete(
-            path=f"/api/v2/notificationprofiles/destinations/{self.synced_email_destination.pk}/"
+            path=f"{self.ENDPOINT}{self.synced_email_destination.pk}/"
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST, response.data)
         self.assertTrue(DestinationConfig.objects.filter(id=self.synced_email_destination.pk).exists())
@@ -291,14 +291,14 @@ class EmailDestinationViewTests(APITestCase):
     def test_cannot_delete_connected_email_destination(self):
         self.notification_profile1.destinations.add(self.non_synced_email_destination)
         response = self.user1_rest_client.delete(
-            path=f"/api/v2/notificationprofiles/destinations/{self.non_synced_email_destination.pk}/"
+            path=f"{self.ENDPOINT}{self.non_synced_email_destination.pk}/"
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST, response.data)
         self.assertTrue(DestinationConfig.objects.filter(id=self.non_synced_email_destination.pk).exists())
 
     def test_can_create_email_destination_with_valid_values(self):
         response = self.user1_rest_client.post(
-            path="/api/v2/notificationprofiles/destinations/",
+            path=self.ENDPOINT,
             data={
                 "media": "email",
                 "settings": {
@@ -324,7 +324,7 @@ class EmailDestinationViewTests(APITestCase):
             settings=settings,
         )
         response = self.user1_rest_client.post(
-            path="/api/v2/notificationprofiles/destinations/",
+            path=self.ENDPOINT,
             data={
                 "media": "email",
                 "settings": settings,
@@ -344,7 +344,7 @@ class EmailDestinationViewTests(APITestCase):
             "email_address": "test2@example.com",
         }
         response = self.user1_rest_client.patch(
-            path=f"/api/v2/notificationprofiles/destinations/{email_destination.pk}/",
+            path=f"{self.ENDPOINT}{email_destination.pk}/",
             data={
                 "media": "email",
                 "settings": new_settings,
@@ -365,7 +365,7 @@ class EmailDestinationViewTests(APITestCase):
             settings=settings,
         ).pk
         response = self.user1_rest_client.patch(
-            path=f"/api/v2/notificationprofiles/destinations/{email_destination_pk}/",
+            path=f"{self.ENDPOINT}{email_destination_pk}/",
             data={"settings": {"email_address": self.non_synced_email_destination.settings["email_address"]}},
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -385,8 +385,6 @@ class SMSDestinationViewTests(APITestCase):
         self.user1_rest_client = APIClient()
         self.user1_rest_client.force_authenticate(user=self.user1)
 
-        timeslot1 = TimeslotFactory(user=self.user1, name="Never")
-        notification_profile1 = NotificationProfileFactory(user=self.user1, timeslot=timeslot1)
         self.sms_destination = DestinationConfigFactory(
             user=self.user1,
             media=Media.objects.get(slug="sms"),
