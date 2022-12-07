@@ -86,7 +86,7 @@ class DummyPlugin(TicketPlugin):
         return TicketTestClient(endpoint, authentication)
 
     @classmethod
-    def create_ticket(cls, incident: Incident):
+    def create_ticket(cls, serialized_incident: dict):
         """Create a ticket in the ticket system and return the new url
 
         Since this is a dummy, the actual ticket is stored locally so that the
@@ -100,8 +100,8 @@ class DummyPlugin(TicketPlugin):
         client = cls.create_client(endpoint=endpoint, authentication=authentication)
         ticket_url = client.create(
             {
-                "title": str(incident),
-                "description": incident.description,
+                "title": serialized_incident["description"],
+                "description": serialized_incident["description"],
             }
         )
 

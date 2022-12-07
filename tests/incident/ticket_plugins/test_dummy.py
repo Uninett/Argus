@@ -4,6 +4,7 @@ from django.test import TestCase
 
 from argus.incident.factories import StatefulIncidentFactory
 from argus.incident.ticket.dummy import created_tickets
+from argus.incident.V1.serializers import IncidentSerializerV1
 from argus.util.utils import import_class_from_dotted_path
 from argus.util.testing import disconnect_signals, connect_signals
 
@@ -21,11 +22,13 @@ class DummyTicketSystemTests(TestCase):
         incident = StatefulIncidentFactory()
 
         ticket_data = {
-            "title": str(incident),
+            "title": incident.description,
             "description": incident.description,
         }
 
-        url = dummy_class.create_ticket(incident)
+        serialized_incident = IncidentSerializerV1(incident).data
+
+        url = dummy_class.create_ticket(serialized_incident)
 
         url_validator = URLValidator()
 
