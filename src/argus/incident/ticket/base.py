@@ -52,7 +52,7 @@ class TicketPlugin(ABC):
 
     @classmethod
     @abstractmethod
-    def create_ticket(cls, incident):
+    def create_ticket(cls, serialized_incident: dict):
         """
         Creates a ticket with the information of the given incident and returns
         its url

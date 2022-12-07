@@ -296,10 +296,10 @@ class TicketPluginViewSet(viewsets.ViewSet):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        incident_json = IncidentSerializerV1(incident).data
+        serialized_incident = IncidentSerializerV1(incident).data
 
         try:
-            url = ticket_class.create_ticket(incident_json)
+            url = ticket_class.create_ticket(serialized_incident)
         except TicketPluginException as e:
             return Response(
                 data=str(e),
