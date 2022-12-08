@@ -4,6 +4,17 @@ read by developers.
 
 ## [Unreleased]
 
+## [1.10.1] - 2022-12-08
+
+### Fixed
+
+- Run API auth V1 tests
+
+### Changed
+
+- Send serialized incidents to the ticket-plugin, not database objects
+- Improved version-detection in git flow
+
 ## [1.10.0] - 2022-11-17
 
 ### Added

@@ -3,6 +3,13 @@ This file documents changes to Argus that are relevant for the users to know.
 
 ## [Unreleased]
 
+## [1.10.1] - 2022-12-08
+
+### Changed
+
+- Send serialized incidents to the ticket-plugin, not database objects
+  (This makes plugins much easier to test.)
+
 ## [1.10.0] - 2022-11-17
 
 ### Added
