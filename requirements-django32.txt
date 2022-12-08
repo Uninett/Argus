@@ -28,7 +28,7 @@ autobahn==21.3.1
     #   daphne
 automat==20.2.0
     # via twisted
-certifi==2020.12.5
+certifi==2022.12.7
     # via requests
 cffi==1.14.5
     # via cryptography
