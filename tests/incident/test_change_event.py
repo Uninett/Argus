@@ -25,6 +25,7 @@ class ChangeEventTests(APITestCase, IncidentBasedAPITestCaseHelper):
         data = {
             "level": 2,
         }
+        description = "Change: level 1 → 2"
         response = self.user1_rest_client.patch(
             path=f"/api/v2/incidents/{self.incident.pk}/",
             data=data,
@@ -33,10 +34,13 @@ class ChangeEventTests(APITestCase, IncidentBasedAPITestCaseHelper):
         change_events = self.incident.events.filter(type=Event.Type.INCIDENT_CHANGE)
         change_events_descriptions = [event.description for event in change_events]
         self.assertTrue(change_events)
-        self.assertIn("Change: level 1 → 2", change_events_descriptions)
+        self.assertIn(description, change_events_descriptions)
+        self.assertEqual(change_events.get(description=description).actor, self.user1)
 
     def test_change_event_is_created_on_ticket_url_changes(self):
         new_ticket_url = "http://www.example.com/repository/issues/other-issue"
+        description = f"Change: ticket_url {self.url} → {new_ticket_url}"
+
         response = self.user1_rest_client.patch(
             path=f"/api/v2/incidents/{self.incident.pk}/",
             data={
@@ -47,10 +51,13 @@ class ChangeEventTests(APITestCase, IncidentBasedAPITestCaseHelper):
         change_events = self.incident.events.filter(type=Event.Type.INCIDENT_CHANGE)
         change_events_descriptions = [event.description for event in change_events]
         self.assertTrue(change_events)
-        self.assertIn(f"Change: ticket_url {self.url} → {new_ticket_url}", change_events_descriptions)
+        self.assertIn(description, change_events_descriptions)
+        self.assertEqual(change_events.get(description=description).actor, self.user1)
 
     def test_change_event_is_created_on_ticket_url_changes_for_ticket_url_endpoint(self):
         new_ticket_url = "http://www.example.com/repository/issues/other-issue"
+        description = f"Change: ticket_url {self.url} → {new_ticket_url}"
+
         response = self.user1_rest_client.put(
             path=f"/api/v2/incidents/{self.incident.pk}/ticket_url/",
             data={
@@ -61,10 +68,13 @@ class ChangeEventTests(APITestCase, IncidentBasedAPITestCaseHelper):
         change_events = self.incident.events.filter(type=Event.Type.INCIDENT_CHANGE)
         change_events_descriptions = [event.description for event in change_events]
         self.assertTrue(change_events)
-        self.assertIn(f"Change: ticket_url {self.url} → {new_ticket_url}", change_events_descriptions)
+        self.assertIn(description, change_events_descriptions)
+        self.assertEqual(change_events.get(description=description).actor, self.user1)
 
     def test_change_event_is_created_on_details_url_changes(self):
         new_details_url = "http://www.example.com/repository/issues/other-issue"
+        description = f"Change: details_url {self.url} → {new_details_url}"
+
         response = self.user1_rest_client.patch(
             path=f"/api/v2/incidents/{self.incident.pk}/",
             data={
@@ -75,10 +85,13 @@ class ChangeEventTests(APITestCase, IncidentBasedAPITestCaseHelper):
         change_events = self.incident.events.filter(type=Event.Type.INCIDENT_CHANGE)
         change_events_descriptions = [event.description for event in change_events]
         self.assertTrue(change_events)
-        self.assertIn(f"Change: details_url {self.url} → {new_details_url}", change_events_descriptions)
+        self.assertIn(description, change_events_descriptions)
+        self.assertEqual(change_events.get(description=description).actor, self.user1)
 
     def test_change_event_is_created_on_tag_changes(self):
         new_tag = "a=b"
+        description = f"Change: tags [] → ['{new_tag}']"
+
         response = self.user1_rest_client.patch(
             path=f"/api/v2/incidents/{self.incident.pk}/",
             data={
@@ -89,4 +102,5 @@ class ChangeEventTests(APITestCase, IncidentBasedAPITestCaseHelper):
         change_events = self.incident.events.filter(type=Event.Type.INCIDENT_CHANGE)
         change_events_descriptions = [event.description for event in change_events]
         self.assertTrue(change_events)
-        self.assertIn(f"Change: tags [] → ['{new_tag}']", change_events_descriptions)
+        self.assertIn(description, change_events_descriptions)
+        self.assertEqual(change_events.get(description=description).actor, self.user1)
