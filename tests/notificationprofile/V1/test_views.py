@@ -2,6 +2,7 @@ from django.test import tag
 
 from rest_framework import status
 from rest_framework.test import APITestCase
+from rest_framework.test import APIClient
 
 from argus.notificationprofile.factories import (
     DestinationConfigFactory,
@@ -15,17 +16,46 @@ from argus.notificationprofile.models import (
     Filter,
     Timeslot,
 )
-from argus.incident.factories import StatelessIncidentFactory
+from argus.incident.factories import (
+    IncidentTagRelationFactory,
+    SourceSystemFactory,
+    SourceSystemTypeFactory,
+    StatelessIncidentFactory,
+    TagFactory,
+)
+from argus.auth.factories import PersonUserFactory, SourceUserFactory
 from argus.util.testing import disconnect_signals, connect_signals
-
-from .. import IncidentAPITestCaseHelper
 
 
 @tag("API", "integration")
-class ViewTests(APITestCase, IncidentAPITestCaseHelper):
+class ViewTests(APITestCase):
     def setUp(self):
         disconnect_signals()
-        super().init_test_objects()
+
+        self.user1 = PersonUserFactory()
+
+        self.user1_rest_client = APIClient()
+        self.user1_rest_client.force_authenticate(user=self.user1)
+
+        source_type = SourceSystemTypeFactory(name="nav")
+        source1_user = SourceUserFactory(username="nav1")
+        self.source1 = SourceSystemFactory(name="NAV 1", type=source_type, user=source1_user)
+
+        source_type2 = SourceSystemTypeFactory(name="type2")
+        source2_user = SourceUserFactory(username="system_2")
+        self.source2 = SourceSystemFactory(name="System 2", type=source_type2, user=source2_user)
+
+        self.incident1 = StatelessIncidentFactory(source=self.source1)
+        self.incident2 = StatelessIncidentFactory(source=self.source2)
+
+        self.tag1 = TagFactory(key="object", value="1")
+        self.tag2 = TagFactory(key="object", value="2")
+        self.tag3 = TagFactory(key="location", value="Oslo")
+
+        IncidentTagRelationFactory(tag=self.tag1, incident=self.incident1, added_by=self.user1)
+        IncidentTagRelationFactory(tag=self.tag3, incident=self.incident1, added_by=self.user1)
+        IncidentTagRelationFactory(tag=self.tag2, incident=self.incident2, added_by=self.user1)
+        IncidentTagRelationFactory(tag=self.tag3, incident=self.incident2, added_by=self.user1)
 
         self.timeslot1 = TimeslotFactory(user=self.user1, name="Never")
         self.timeslot2 = TimeslotFactory(user=self.user1, name="Never 2: Ever-expanding Void")
