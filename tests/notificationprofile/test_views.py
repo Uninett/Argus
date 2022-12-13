@@ -1,33 +1,23 @@
-from django.urls import reverse
 from django.test import tag
-
 from rest_framework import status
-from rest_framework.test import APITestCase
-from rest_framework.test import APIClient
+from rest_framework.test import APIClient, APITestCase
 
 from argus.auth.factories import PersonUserFactory, SourceUserFactory
+from argus.incident.factories import SourceSystemFactory, SourceSystemTypeFactory, StatelessIncidentFactory
 from argus.notificationprofile.factories import (
-    TimeslotFactory,
+    DestinationConfigFactory,
     FilterFactory,
     NotificationProfileFactory,
-    DestinationConfigFactory,
+    TimeslotFactory,
 )
-from argus.incident.factories import (
-    SourceSystemTypeFactory,
-    SourceSystemFactory,
-    StatelessIncidentFactory,
-)
-from argus.notificationprofile.models import (
-    DestinationConfig,
-    Media,
-    NotificationProfile,
-)
-from argus.util.testing import disconnect_signals, connect_signals
+from argus.notificationprofile.models import Media, NotificationProfile
+from argus.util.testing import connect_signals, disconnect_signals
 
 
 @tag("API", "integration")
 class NotificationProfileViewTests(APITestCase):
     ENDPOINT = "/api/v2/notificationprofiles/"
+
     def setUp(self):
         disconnect_signals()
         self.user1 = PersonUserFactory()
@@ -159,80 +149,6 @@ class MediumViewTests(APITestCase):
 
 
 @tag("API", "integration")
-class EmailMediumViewTests(APITestCase):
-    def setUp(self):
-        disconnect_signals()
-        user1 = PersonUserFactory()
-
-        self.user1_rest_client = APIClient()
-        self.user1_rest_client.force_authenticate(user=user1)
-
-    def teardown(self):
-        connect_signals()
-
-    def test_should_get_json_schema_for_email(self):
-        schema = {
-            "json_schema": {
-                "title": "Email Settings",
-                "description": "Settings for a DestinationConfig using email.",
-                "type": "object",
-                "required": ["email_address"],
-                "properties": {"email_address": {"type": "string", "title": "Email address"}},
-                "$id": "http://testserver/json-schema/email",
-            }
-        }
-
-        response = self.user1_rest_client.get(path=f"/api/v2/notificationprofiles/media/email/json_schema/")
-        self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
-        self.assertEqual(response.data, schema)
-
-    def test_should_get_email_medium(self):
-        response = self.user1_rest_client.get(path=f"/api/v2/notificationprofiles/media/email/")
-        self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
-        self.assertEqual(response.data["name"], "Email")
-
-
-@tag("API", "integration")
-class SMSMediumViewTests(APITestCase):
-    def setUp(self):
-        disconnect_signals()
-        user1 = PersonUserFactory()
-
-        self.user1_rest_client = APIClient()
-        self.user1_rest_client.force_authenticate(user=user1)
-
-    def teardown(self):
-        connect_signals()
-
-    def test_should_get_json_schema_for_sms(self):
-        schema = {
-            "json_schema": {
-                "title": "SMS Settings",
-                "description": "Settings for a DestinationConfig using SMS.",
-                "type": "object",
-                "required": ["phone_number"],
-                "properties": {
-                    "phone_number": {
-                        "type": "string",
-                        "title": "Phone number",
-                        "description": "The phone number is validated and the country code needs to be given.",
-                    }
-                },
-                "$id": "http://testserver/json-schema/sms",
-            }
-        }
-
-        response = self.user1_rest_client.get(path=f"/api/v2/notificationprofiles/media/sms/json_schema/")
-        self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
-        self.assertEqual(response.data, schema)
-
-    def test_should_get_sms_medium(self):
-        response = self.user1_rest_client.get(path=f"/api/v2/notificationprofiles/media/sms/")
-        self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
-        self.assertEqual(response.data["name"], "SMS")
-
-
-@tag("API", "integration")
 class DestinationViewTests(APITestCase):
     ENDPOINT = "/api/v2/notificationprofiles/destinations/"
 
@@ -269,236 +185,6 @@ class DestinationViewTests(APITestCase):
         self.assertTrue(self.sms_destination.settings in response_settings)
 
     def test_should_get_specific_destination(self):
-        response = self.user1_rest_client.get(
-            path=f"{self.ENDPOINT}{self.synced_email_destination.pk}/"
-        )
+        response = self.user1_rest_client.get(path=f"{self.ENDPOINT}{self.synced_email_destination.pk}/")
         self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
         self.assertEqual(response.data["settings"], self.synced_email_destination.settings)
-
-
-@tag("API", "integration")
-class EmailDestinationViewTests(APITestCase):
-    ENDPOINT = "/api/v2/notificationprofiles/destinations/"
-
-    def setUp(self):
-        disconnect_signals()
-        self.user1 = PersonUserFactory()
-
-        self.user1_rest_client = APIClient()
-        self.user1_rest_client.force_authenticate(user=self.user1)
-
-        timeslot1 = TimeslotFactory(user=self.user1, name="Never")
-
-        self.notification_profile1 = NotificationProfileFactory(user=self.user1, timeslot=timeslot1)
-        # Default email destination is automatically created with user
-        self.synced_email_destination = self.user1.destinations.get()
-        self.non_synced_email_destination = DestinationConfigFactory(
-            user=self.user1,
-            media=Media.objects.get(slug="email"),
-            settings={"email_address": "test@example.com", "synced": False},
-        )
-        self.notification_profile1.destinations.set([self.synced_email_destination])
-
-    def teardown(self):
-        connect_signals()
-
-    def test_should_delete_unsynced_unused_email_destination(self):
-        response = self.user1_rest_client.delete(
-            path=f"{self.ENDPOINT}{self.non_synced_email_destination.pk}/"
-        )
-        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT, response.data)
-        self.assertFalse(DestinationConfig.objects.filter(id=self.non_synced_email_destination.pk).exists())
-
-    def test_should_not_allow_deletion_of_synced_email_destination(self):
-        response = self.user1_rest_client.delete(
-            path=f"{self.ENDPOINT}{self.synced_email_destination.pk}/"
-        )
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST, response.data)
-        self.assertTrue(DestinationConfig.objects.filter(id=self.synced_email_destination.pk).exists())
-
-    def test_should_not_allow_deletion_of_email_destination_in_use(self):
-        self.notification_profile1.destinations.add(self.non_synced_email_destination)
-        response = self.user1_rest_client.delete(
-            path=f"{self.ENDPOINT}{self.non_synced_email_destination.pk}/"
-        )
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST, response.data)
-        self.assertTrue(DestinationConfig.objects.filter(id=self.non_synced_email_destination.pk).exists())
-
-    def test_should_create_email_destination_with_valid_values(self):
-        response = self.user1_rest_client.post(
-            path=self.ENDPOINT,
-            data={
-                "media": "email",
-                "settings": {
-                    "email_address": "test2@example.com",
-                },
-            },
-        )
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertTrue(
-            DestinationConfig.objects.filter(
-                settings={
-                    "email_address": "test2@example.com",
-                    "synced": False,
-                },
-            ).exists()
-        )
-
-    def test_should_not_allow_creating_email_destination_with_duplicate_email_address(self):
-        settings = {"email_address": "test2@example.com"}
-        DestinationConfigFactory(
-            user=self.user1,
-            media=Media.objects.get(slug="email"),
-            settings=settings,
-        )
-        response = self.user1_rest_client.post(
-            path=self.ENDPOINT,
-            data={
-                "media": "email",
-                "settings": settings,
-            },
-        )
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(
-            DestinationConfig.objects.filter(
-                media_id="email", settings__email_address=settings["email_address"]
-            ).count(),
-            1,
-        )
-
-    def test_should_update_email_destination_with_same_medium(self):
-        email_destination = self.non_synced_email_destination
-        new_settings = {
-            "email_address": "test2@example.com",
-        }
-        response = self.user1_rest_client.patch(
-            path=f"{self.ENDPOINT}{email_destination.pk}/",
-            data={
-                "media": "email",
-                "settings": new_settings,
-            },
-        )
-        self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
-        email_destination.refresh_from_db()
-        self.assertEqual(
-            email_destination.settings["email_address"],
-            new_settings["email_address"],
-        )
-
-    def test_should_not_allow_updating_email_destination_with_duplicate_email_address(self):
-        settings = {"email_address": "test2@example.com"}
-        email_destination_pk = DestinationConfigFactory(
-            user=self.user1,
-            media=Media.objects.get(slug="email"),
-            settings=settings,
-        ).pk
-        response = self.user1_rest_client.patch(
-            path=f"{self.ENDPOINT}{email_destination_pk}/",
-            data={"settings": {"email_address": self.non_synced_email_destination.settings["email_address"]}},
-        )
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(
-            DestinationConfig.objects.get(pk=email_destination_pk).settings["email_address"], settings["email_address"]
-        )
-
-
-@tag("API", "integration")
-class SMSDestinationViewTests(APITestCase):
-    ENDPOINT = "/api/v2/notificationprofiles/destinations/"
-
-    def setUp(self):
-        disconnect_signals()
-        self.user1 = PersonUserFactory()
-
-        self.user1_rest_client = APIClient()
-        self.user1_rest_client.force_authenticate(user=self.user1)
-
-        self.sms_destination = DestinationConfigFactory(
-            user=self.user1,
-            media=Media.objects.get(slug="sms"),
-            settings={"phone_number": "+4747474747"},
-        )
-
-    def teardown(self):
-        connect_signals()
-
-    def test_should_create_sms_destination_with_valid_values(self):
-        response = self.user1_rest_client.post(
-            path=self.ENDPOINT,
-            data={
-                "media": "sms",
-                "settings": {
-                    "phone_number": "+4747474740",
-                },
-            },
-        )
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertTrue(
-            DestinationConfig.objects.filter(
-                settings={
-                    "phone_number": "+4747474740",
-                },
-            ).exists()
-        )
-
-    def test_should_not_allow_creating_sms_destination_with_duplicate_phone_number(self):
-        settings = {"phone_number": "+4747474701"}
-        DestinationConfigFactory(
-            user=self.user1,
-            media=Media.objects.get(slug="sms"),
-            settings=settings,
-        )
-        response = self.user1_rest_client.post(
-            path="/api/v2/notificationprofiles/destinations/",
-            data={
-                "media": "sms",
-                "settings": settings,
-            },
-        )
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(DestinationConfig.objects.filter(media_id="sms", settings=settings).count(), 1)
-
-    def test_should_update_sms_destination_with_same_medium(self):
-        sms_destination = self.sms_destination
-        new_settings = {
-            "phone_number": "+4747474746",
-        }
-        response = self.user1_rest_client.patch(
-            path=f"{self.ENDPOINT}{sms_destination.pk}/",
-            data={
-                "media": "sms",
-                "settings": new_settings,
-            },
-        )
-        self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
-        sms_destination.refresh_from_db()
-        self.assertEqual(
-            sms_destination.settings,
-            new_settings,
-        )
-
-    def test_should_not_allow_updating_sms_destination_with_duplicate_phone_number(self):
-        settings1 = {"phone_number": "+4747474701"}
-        settings2 = {"phone_number": "+4747474702"}
-        DestinationConfigFactory(
-            user=self.user1,
-            media=Media.objects.get(slug="sms"),
-            settings=settings1,
-        )
-        sms_destination_pk = DestinationConfigFactory(
-            user=self.user1,
-            media=Media.objects.get(slug="sms"),
-            settings=settings2,
-        ).pk
-        response = self.user1_rest_client.patch(
-            path=f"/api/v2/notificationprofiles/destinations/{sms_destination_pk}/", data={"settings": settings1}
-        )
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(DestinationConfig.objects.get(pk=sms_destination_pk).settings, settings2)
-
-    def test_should_delete_sms_destination(self):
-        response = self.user1_rest_client.delete(
-            path=f"{self.ENDPOINT}{self.sms_destination.pk}/",
-        )
-        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT, response.data)
-        self.assertFalse(DestinationConfig.objects.filter(id=self.sms_destination.pk).exists())
