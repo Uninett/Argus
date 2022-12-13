@@ -4,6 +4,13 @@ read by developers.
 
 ## [Unreleased]
 
+## [1.10.2]
+
+### Changed
+- Renamed the ticket creation endpoint via plugin from `/ticket/` to `/automatic-ticket/`
+- Refactored the view tests for NotificationProfile
+- Explicitly set language in sphinx conf, silencing a warning
+
 ## [1.10.1] - 2022-12-08
 
 ### Fixed
