@@ -52,6 +52,7 @@ from .serializers import (
     TagSerializer,
     IncidentTagRelation,
 )
+from .V1.serializers import IncidentSerializerV1
 
 LOG = logging.getLogger(__name__)
 
@@ -295,8 +296,10 @@ class TicketPluginViewSet(viewsets.ViewSet):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
+        serialized_incident = IncidentSerializerV1(incident).data
+
         try:
-            url = ticket_class.create_ticket(incident)
+            url = ticket_class.create_ticket(serialized_incident)
         except TicketPluginException as e:
             return Response(
                 data=str(e),
