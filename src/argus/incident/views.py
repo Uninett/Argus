@@ -3,6 +3,7 @@ import secrets
 
 from django.conf import settings
 from django.db import IntegrityError
+from django.utils import timezone
 
 from django_filters import rest_framework as filters
 from rest_framework.filters import SearchFilter
@@ -27,7 +28,7 @@ from argus.util.utils import import_class_from_dotted_path
 from .forms import AddSourceSystemForm
 from .filters import IncidentFilter, SourceLockedIncidentFilter
 from .models import (
-    Acknowledgement,
+    ChangeEvent,
     Event,
     Incident,
     SourceSystem,
@@ -253,8 +254,15 @@ class IncidentViewSet(
         incident = self.get_object()
         serializer = IncidentTicketUrlSerializer(data=request.data)
         if serializer.is_valid():
-            incident.ticket_url = serializer.data["ticket_url"]
-            incident.save()
+            old_url = incident.ticket_url
+            new_url = serializer.data["ticket_url"]
+            if old_url != new_url:
+                description = f"Change: ticket_url {old_url} → {new_url}"
+                ChangeEvent.objects.create(
+                    incident=incident, actor=request.user, timestamp=timezone.now(), description=description
+                )
+                incident.ticket_url = serializer.data["ticket_url"]
+                incident.save()
             return Response(serializer.data)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

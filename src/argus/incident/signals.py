@@ -64,32 +64,3 @@ def close_token_incident(instance: Token, **kwargs):
         return
 
     token_expiry_incident.set_end(actor=argus_user)
-
-
-def detect_changes(sender, instance: Incident, raw, *args, **kwargs):
-    if raw or not instance.id or not instance.end_time:
-        return
-    instance._changed = {}
-    previous = Incident.objects.get(id=instance.id)
-    if previous.level != instance.level:
-        instance._changed["level"] = previous.level
-    if previous.details_url != instance.details_url:
-        instance._changed["details_url"] = previous.details_url
-    if previous.ticket_url != instance.ticket_url:
-        instance._changed["ticket_url"] = previous.ticket_url
-
-
-def create_change_events(sender, instance: Incident, created, raw, *args, **kwargs):
-    if not instance or not getattr(instance, "_changed", None):
-        return
-
-    for attr in ("level", "details_url", "ticket_url"):
-        if attr not in instance._changed.keys():
-            continue
-
-        old_value = instance._changed[attr]
-        new_value = getattr(instance, attr)
-        description = f"Change: {attr} {old_value} → {new_value}"
-        ChangeEvent.objects.create(
-            incident=instance, actor=instance.source.user, timestamp=timezone.now(), description=description
-        )

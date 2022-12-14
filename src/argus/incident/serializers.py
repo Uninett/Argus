@@ -187,6 +187,8 @@ class IncidentSerializer(serializers.ModelSerializer):
 
 
 class IncidentPureDeserializer(serializers.ModelSerializer):
+    EDITABLE_FIELDS = set(["ticket_url", "details_url", "level"])
+
     tags = IncidentTagRelationSerializer(many=True, write_only=True)
 
     class Meta:
@@ -206,7 +208,20 @@ class IncidentPureDeserializer(serializers.ModelSerializer):
             tags_data = validated_data.pop("tags")
             self.add_and_remove_tags(instance, user, tags_data)
 
+        if self.EDITABLE_FIELDS.intersection(validated_data):
+            self.post_change_events(instance, user, validated_data)
+
         return super().update(instance, validated_data)
+
+    def post_change_events(self, instance: Incident, user: User, validated_data: dict):
+        for attr in self.EDITABLE_FIELDS:
+            if attr in validated_data and validated_data[attr] != getattr(instance, attr):
+                old_value = getattr(instance, attr)
+                new_value = validated_data[attr]
+                description = f"Change: {attr} {old_value} → {new_value}"
+                ChangeEvent.objects.create(
+                    incident=instance, actor=user, timestamp=timezone.now(), description=description
+                )
 
     @staticmethod
     def add_and_remove_tags(instance: Incident, user: User, tags_data: List[dict]):
