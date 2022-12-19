@@ -29,15 +29,15 @@ class NotificationProfileViewTests(APITestCase):
         source1_user = SourceUserFactory(username="nav1")
         self.source1 = SourceSystemFactory(name="NAV 1", type=source_type, user=source1_user)
 
-        timeslot1 = TimeslotFactory(user=self.user1, name="Never")
+        self.timeslot1 = TimeslotFactory(user=self.user1, name="Never")
         self.timeslot2 = TimeslotFactory(user=self.user1, name="Never 2: Ever-expanding Void")
-        filter1 = FilterFactory(
+        self.filter1 = FilterFactory(
             user=self.user1,
             name="Critical incidents",
             filter_string=f'{{"sourceSystemIds": [{self.source1.pk}]}}',
         )
-        self.notification_profile1 = NotificationProfileFactory(user=self.user1, timeslot=timeslot1)
-        self.notification_profile1.filters.add(filter1)
+        self.notification_profile1 = NotificationProfileFactory(user=self.user1, timeslot=self.timeslot1)
+        self.notification_profile1.filters.add(self.filter1)
 
         # Default email destination is automatically created with user
         self.synced_email_destination = self.user1.destinations.get()
@@ -68,6 +68,20 @@ class NotificationProfileViewTests(APITestCase):
         response = self.user1_rest_client.get(path=profile1_path)
         self.assertEqual(response.data["pk"], profile1_pk)
 
+    def test_should_create_profile_with_valid_values(self):
+        response = self.user1_rest_client.post(
+            path=self.ENDPOINT,
+            data={
+                "name": "New notification profile",
+                "timeslot": self.timeslot1.pk,
+                "filters": [self.filter1.pk],
+                "destinations": [],
+                "active": self.notification_profile1.active,
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertTrue(NotificationProfile.objects.filter(pk=response.data["pk"]).exists())
+
     def test_updating_timeslot_should_not_change_pk(self):
         # Originally timeslot was the pk of notification profile
         profile1_pk = self.notification_profile1.pk
@@ -85,6 +99,13 @@ class NotificationProfileViewTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
         self.assertEqual(response.data["pk"], profile1_pk)
         self.assertEqual(NotificationProfile.objects.get(pk=profile1_pk).timeslot.pk, self.timeslot2.pk)
+
+    def test_should_delete_profile(self):
+        profile1_pk = self.notification_profile1.pk
+        profile1_path = f"{self.ENDPOINT}{profile1_pk}/"
+        response = self.user1_rest_client.delete(path=profile1_path)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(NotificationProfile.objects.filter(pk=profile1_pk).exists())
 
 
 @tag("API", "integration")
