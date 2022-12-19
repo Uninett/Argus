@@ -16,7 +16,7 @@ from argus.notificationprofile.factories import (
     NotificationProfileFactory,
     TimeslotFactory,
 )
-from argus.notificationprofile.models import Media, NotificationProfile
+from argus.notificationprofile.models import Filter, Media, NotificationProfile
 from argus.util.testing import connect_signals, disconnect_signals
 
 
@@ -211,6 +211,104 @@ class NotificationFilterIncidentViewTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data[0]["pk"], self.incident1.pk)
+
+
+@tag("API", "integration")
+class FilterViewTests(APITestCase):
+    ENDPOINT = "/api/v2/notificationprofiles/filters/"
+
+    def setUp(self):
+        disconnect_signals()
+        self.user1 = PersonUserFactory()
+
+        self.user1_rest_client = APIClient()
+        self.user1_rest_client.force_authenticate(user=self.user1)
+
+        source_type = SourceSystemTypeFactory(name="nav")
+        source1_user = SourceUserFactory(username="nav1")
+        self.source1 = SourceSystemFactory(name="NAV 1", type=source_type, user=source1_user)
+
+        timeslot1 = TimeslotFactory(user=self.user1, name="Never")
+        self.filter1 = FilterFactory(
+            user=self.user1,
+            name="Critical incidents",
+            filter_string=f'{{"sourceSystemIds": [{self.source1.pk}]}}',
+        )
+        self.filter2 = FilterFactory(
+            user=self.user1,
+            name="Unused filter",
+            filter_string=f'{{"sourceSystemIds": [{self.source1.pk}]}}',
+        )
+        notification_profile1 = NotificationProfileFactory(user=self.user1, timeslot=timeslot1)
+        notification_profile1.filters.add(self.filter1)
+
+    def teardown(self):
+        connect_signals()
+
+    def test_list_is_reachable(self):
+        response = self.user1_rest_client.get(path=self.ENDPOINT)
+        self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
+
+    def test_list_has_all_filters(self):
+        response = self.user1_rest_client.get(path=self.ENDPOINT)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        all_filters = self.user1.filters.all()
+        self.assertEqual(len(response.data), len(all_filters))
+        filter_pks = set([filter.pk for filter in all_filters])
+        response_pks = set([filter["pk"] for filter in response.data])
+        self.assertEqual(response_pks, filter_pks)
+
+    def test_specific_filter_is_reachable(self):
+        filter1_pk = self.filter1.pk
+        filter1_path = f"{self.ENDPOINT}{filter1_pk}/"
+        response = self.user1_rest_client.get(path=filter1_path)
+        self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
+
+    def test_get_specific_filter_should_return_the_filter_we_asked_for(self):
+        filter1_pk = self.filter1.pk
+        filter1_path = f"{self.ENDPOINT}{filter1_pk}/"
+        response = self.user1_rest_client.get(path=filter1_path)
+        self.assertEqual(response.data["pk"], filter1_pk)
+
+    def test_should_create_filter_with_valid_values(self):
+        filter_name = "test-filter"
+        response = self.user1_rest_client.post(
+            path=self.ENDPOINT,
+            data={
+                "name": filter_name,
+                "filter_string": f'{{"sourceSystemIds": [{self.source1.pk}], "tags": ["key1=value"]}}',
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertTrue(Filter.objects.filter(pk=response.data["pk"]).exists())
+
+    def test_should_update_filter_name_with_valid_values(self):
+        filter1_pk = self.filter1.pk
+        filter1_path = f"{self.ENDPOINT}{filter1_pk}/"
+        new_name = "new-test-name"
+        response = self.user1_rest_client.put(
+            path=filter1_path,
+            data={
+                "name": new_name,
+                "filter_string": f'{{"sourceSystemIds": [{self.source1.pk}], "tags": ["key1=value"]}}',
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(Filter.objects.get(pk=filter1_pk).name, new_name)
+
+    def test_should_delete_unused_filter(self):
+        unused_filter_pk = self.filter2.pk
+        unused_filter_path = f"{self.ENDPOINT}{unused_filter_pk}/"
+        response = self.user1_rest_client.delete(path=unused_filter_path)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(Filter.objects.filter(pk=unused_filter_pk).exists())
+
+    def test_should_not_delete_used_filter(self):
+        filter1_pk = self.filter1.pk
+        filter1_path = f"{self.ENDPOINT}{filter1_pk}/"
+        response = self.user1_rest_client.delete(path=filter1_path)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertTrue(Filter.objects.filter(pk=filter1_pk).exists())
 
 
 @tag("API", "integration")
