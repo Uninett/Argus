@@ -16,7 +16,7 @@ from argus.notificationprofile.factories import (
     NotificationProfileFactory,
     TimeslotFactory,
 )
-from argus.notificationprofile.models import Filter, Media, NotificationProfile
+from argus.notificationprofile.models import Filter, Media, NotificationProfile, Timeslot
 from argus.util.testing import connect_signals, disconnect_signals
 
 
@@ -381,3 +381,88 @@ class DestinationViewTests(APITestCase):
         response = self.user1_rest_client.get(path=f"{self.ENDPOINT}{self.sms_destination.pk}/duplicate/")
         self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
         self.assertFalse(response.data["is_duplicate"])
+
+
+@tag("API", "integration")
+class TimeslotViewTests(APITestCase):
+    ENDPOINT = "/api/v2/notificationprofiles/timeslots/"
+
+    def setUp(self):
+        disconnect_signals()
+        self.user1 = PersonUserFactory()
+
+        self.user1_rest_client = APIClient()
+        self.user1_rest_client.force_authenticate(user=self.user1)
+
+        source_type = SourceSystemTypeFactory(name="nav")
+        source1_user = SourceUserFactory(username="nav1")
+        self.source1 = SourceSystemFactory(name="NAV 1", type=source_type, user=source1_user)
+
+        self.timeslot1 = TimeslotFactory(user=self.user1, name="Never")
+        filter1 = FilterFactory(
+            user=self.user1,
+            name="Critical incidents",
+            filter_string=f'{{"sourceSystemIds": [{self.source1.pk}]}}',
+        )
+        notification_profile1 = NotificationProfileFactory(user=self.user1, timeslot=self.timeslot1)
+        notification_profile1.filters.add(filter1)
+
+    def teardown(self):
+        connect_signals()
+
+    def test_list_is_reachable(self):
+        response = self.user1_rest_client.get(path=self.ENDPOINT)
+        self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
+
+    def test_list_has_all_timeslots(self):
+        response = self.user1_rest_client.get(path=self.ENDPOINT)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        all_timeslots = self.user1.timeslots.all()
+        self.assertEqual(len(response.data), len(all_timeslots))
+        timeslot_pks = set([filter.pk for filter in all_timeslots])
+        response_pks = set([filter["pk"] for filter in response.data])
+        self.assertEqual(response_pks, timeslot_pks)
+
+    def test_specific_timeslot_is_reachable(self):
+        timeslot1_pk = self.timeslot1.pk
+        timeslot1_path = f"{self.ENDPOINT}{timeslot1_pk}/"
+        response = self.user1_rest_client.get(path=timeslot1_path)
+        self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
+
+    def test_get_specific_timeslot_should_return_the_timeslot_we_asked_for(self):
+        timeslot1_pk = self.timeslot1.pk
+        timeslot1_path = f"{self.ENDPOINT}{timeslot1_pk}/"
+        response = self.user1_rest_client.get(path=timeslot1_path)
+        self.assertEqual(response.data["pk"], timeslot1_pk)
+
+    def test_should_create_timeslot_with_valid_values(self):
+        response = self.user1_rest_client.post(
+            path=self.ENDPOINT,
+            data={
+                "name": "test-timeslot",
+                "time_recurrences": [{"days": [1, 2, 3], "start": "10:00:00", "end": "20:00:00"}],
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertTrue(Timeslot.objects.filter(pk=response.data["pk"]).exists())
+
+    def test_should_update_timeslot_name_with_valid_values(self):
+        timeslot1_pk = self.timeslot1.pk
+        timeslot1_path = f"{self.ENDPOINT}{timeslot1_pk}/"
+        new_name = "new-test-name"
+        response = self.user1_rest_client.put(
+            path=timeslot1_path,
+            data={
+                "name": new_name,
+                "time_recurrences": [{"days": [1, 2, 3], "start": "10:00:00", "end": "20:00:00"}],
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(Timeslot.objects.get(pk=timeslot1_pk).name, new_name)
+
+    def test_should_delete_unused_timeslot(self):
+        timeslot1_pk = self.timeslot1.pk
+        timeslot1_path = f"{self.ENDPOINT}{timeslot1_pk}/"
+        response = self.user1_rest_client.delete(path=timeslot1_path)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(Timeslot.objects.filter(pk=timeslot1_pk).exists())
