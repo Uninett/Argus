@@ -11,10 +11,11 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from rest_framework.views import APIView
+from social_core.backends.oauth import BaseOAuth2
 
 from .models import User
 from .serializers import BasicUserSerializer, EmptySerializer, RefreshTokenSerializer, UserSerializer
-from .utils import get_psa_authentication_names
+from .utils import get_psa_authentication_classes
 
 
 class ObtainNewAuthToken(ObtainAuthToken):
@@ -68,8 +69,26 @@ class AuthMethodListView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request, *args, **kwargs):
-        names = get_psa_authentication_names()
-        data = {name: reverse("social:begin", kwargs={"backend": name}, request=request) for name in names}
+        backends = get_psa_authentication_classes()
+        data = [
+            {
+                "type": "username_password",
+                "url": reverse("v1:api-token-auth", request=request),
+                "name": "user_pw",
+            }
+        ]
+        for backend in backends:
+            backend_type = ""
+            if issubclass(backend, BaseOAuth2):
+                backend_type = "OAuth2"
+            data.extend(
+                {
+                    "type": backend_type,
+                    "url": reverse("social:begin", kwargs={"backend": backend.name}, request=request),
+                    "name": backend.name,
+                }
+                for backend in backends
+            )
         return Response(data)
 
 

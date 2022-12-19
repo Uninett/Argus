@@ -10,10 +10,10 @@ def get_authentication_backend_classes():
     return backends
 
 
-def get_psa_authentication_names(backends=None):
+def get_psa_authentication_classes(backends=None):
     backends = backends if backends else get_authentication_backend_classes()
     psa_backends = set()
     for backend in backends:
         if issubclass(backend, BaseAuth):
-            psa_backends.add(backend.name)
+            psa_backends.add(backend)
     return sorted(psa_backends)
