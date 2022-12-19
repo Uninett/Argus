@@ -3,7 +3,13 @@ from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
 from argus.auth.factories import PersonUserFactory, SourceUserFactory
-from argus.incident.factories import SourceSystemFactory, SourceSystemTypeFactory, StatelessIncidentFactory
+from argus.incident.factories import (
+    IncidentTagRelationFactory,
+    SourceSystemFactory,
+    SourceSystemTypeFactory,
+    StatelessIncidentFactory,
+    TagFactory,
+)
 from argus.notificationprofile.factories import (
     DestinationConfigFactory,
     FilterFactory,
@@ -147,6 +153,63 @@ class NotificationIncidentViewTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
         self.assertEqual(len(response.data), 1)  # 1, not 2
+        self.assertEqual(response.data[0]["pk"], self.incident1.pk)
+
+
+@tag("API", "integration")
+class NotificationFilterIncidentViewTests(APITestCase):
+    def setUp(self):
+        disconnect_signals()
+        user1 = PersonUserFactory()
+
+        self.user1_rest_client = APIClient()
+        self.user1_rest_client.force_authenticate(user=user1)
+
+        source_type = SourceSystemTypeFactory(name="nav")
+        source1_user = SourceUserFactory(username="nav1")
+        self.source1 = SourceSystemFactory(name="NAV 1", type=source_type, user=source1_user)
+
+        source_type2 = SourceSystemTypeFactory(name="type2")
+        source2_user = SourceUserFactory(username="system_2")
+        self.source2 = SourceSystemFactory(name="System 2", type=source_type2, user=source2_user)
+
+        self.incident1 = StatelessIncidentFactory(source=self.source1)
+        incident2 = StatelessIncidentFactory(source=self.source2)
+
+        self.tag1 = TagFactory(key="object", value="1")
+        self.tag2 = TagFactory(key="object", value="2")
+
+        IncidentTagRelationFactory(tag=self.tag1, incident=self.incident1, added_by=user1)
+        IncidentTagRelationFactory(tag=self.tag2, incident=incident2, added_by=user1)
+
+        timeslot1 = TimeslotFactory(user=user1, name="Never")
+        filter1 = FilterFactory(
+            user=user1,
+            name="Critical incidents",
+            filter_string=f'{{"sourceSystemIds": [{self.source1.pk}]}}',
+        )
+        self.notification_profile1 = NotificationProfileFactory(user=user1, timeslot=timeslot1)
+        self.notification_profile1.filters.add(filter1)
+
+    def teardown(self):
+        connect_signals()
+
+    def test_filterpreview_returns_only_incidents_matching_specified_filter(self):
+        response = self.user1_rest_client.post(
+            "/api/v2/notificationprofiles/filterpreview/",
+            {"sourceSystemIds": [self.source1.pk], "tags": [str(self.tag1)]},
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]["pk"], self.incident1.pk)
+
+    def test_preview_returns_only_incidents_matching_specified_filter(self):
+        response = self.user1_rest_client.post(
+            "/api/v2/notificationprofiles/preview/",
+            {"sourceSystemIds": [self.source1.pk], "tags": [str(self.tag1)]},
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data[0]["pk"], self.incident1.pk)
 
 
