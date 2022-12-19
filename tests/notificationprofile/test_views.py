@@ -370,3 +370,14 @@ class DestinationViewTests(APITestCase):
         response = self.user1_rest_client.get(path=f"{self.ENDPOINT}{self.synced_email_destination.pk}/")
         self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
         self.assertEqual(response.data["settings"], self.synced_email_destination.settings)
+
+    def test_should_indicate_duplicate_destination_when_it_exists(self):
+        DestinationConfigFactory(media_id="sms", settings=self.sms_destination.settings)
+        response = self.user1_rest_client.get(path=f"{self.ENDPOINT}{self.sms_destination.pk}/duplicate/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
+        self.assertTrue(response.data["is_duplicate"])
+
+    def test_should_not_indicate_duplicate_destination_when_it_doesnt_exist(self):
+        response = self.user1_rest_client.get(path=f"{self.ENDPOINT}{self.sms_destination.pk}/duplicate/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
+        self.assertFalse(response.data["is_duplicate"])
