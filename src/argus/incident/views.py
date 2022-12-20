@@ -22,7 +22,12 @@ from rest_framework.reverse import reverse
 
 from argus.auth.models import User
 from argus.drf.permissions import IsSuperuserOrReadOnly
-from argus.incident.ticket.base import TicketPluginException
+from argus.incident.ticket.base import (
+    TicketClientException,
+    TicketCreationException,
+    TicketPluginException,
+    TicketSettingsException,
+)
 from argus.util.datetime_utils import INFINITY_REPR
 from argus.util.utils import import_class_from_dotted_path
 
@@ -313,10 +318,25 @@ class TicketPluginViewSet(viewsets.ViewSet):
 
         try:
             url = ticket_class.create_ticket(serialized_incident)
-        except TicketPluginException as e:
+        except TicketSettingsException as e:
             return Response(
                 data=str(e),
                 status=status.HTTP_400_BAD_REQUEST,
+            )
+        except TicketClientException as e:
+            return Response(
+                data=str(e),
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+            )
+        except TicketCreationException as e:
+            return Response(
+                data=str(e),
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        except TicketPluginException as e:
+            return Response(
+                data=str(e),
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
         if url:
