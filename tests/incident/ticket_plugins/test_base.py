@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.test import TestCase, override_settings
 
+from argus.incident.ticket.base import TicketSettingsException
 from argus.util.utils import import_class_from_dotted_path
 
 
@@ -41,7 +42,7 @@ class ImportSettingsTests(TestCase):
     def test_import_settings_raises_error_when_ticket_endpoint_is_missing(self):
         ticket_class = import_class_from_dotted_path("argus.incident.ticket.base.TicketPlugin")
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TicketSettingsException):
             ticket_class.import_settings()
 
     @override_settings(
@@ -52,7 +53,7 @@ class ImportSettingsTests(TestCase):
     def test_import_settings_raises_error_when_ticket_authentication_secret_is_missing(self):
         ticket_class = import_class_from_dotted_path("argus.incident.ticket.base.TicketPlugin")
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TicketSettingsException):
             ticket_class.import_settings()
 
     @override_settings(
@@ -63,5 +64,5 @@ class ImportSettingsTests(TestCase):
     def test_import_settings_raises_error_when_ticket_information_is_missing(self):
         ticket_class = import_class_from_dotted_path("argus.incident.ticket.base.TicketPlugin")
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TicketSettingsException):
             ticket_class.import_settings()
