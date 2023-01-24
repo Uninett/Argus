@@ -1,5 +1,6 @@
 import logging
 import secrets
+from urllib.parse import urljoin
 
 from django.conf import settings
 from django.db import IntegrityError
@@ -305,6 +306,10 @@ class TicketPluginViewSet(viewsets.ViewSet):
             )
 
         serialized_incident = IncidentSerializerV1(incident).data
+        serialized_incident["argus_url"] = urljoin(
+            getattr(settings, "FRONTEND_URL", ""),
+            f"incidents/{incident_pk}",
+        )
 
         try:
             url = ticket_class.create_ticket(serialized_incident)
