@@ -1,8 +1,10 @@
 import logging
 import secrets
+from urllib.parse import urljoin
 
 from django.conf import settings
 from django.db import IntegrityError
+from django.utils import timezone
 
 from django_filters import rest_framework as filters
 from rest_framework.filters import SearchFilter
@@ -20,14 +22,19 @@ from rest_framework.reverse import reverse
 
 from argus.auth.models import User
 from argus.drf.permissions import IsSuperuserOrReadOnly
-from argus.incident.ticket.base import TicketPluginException
+from argus.incident.ticket.base import (
+    TicketClientException,
+    TicketCreationException,
+    TicketPluginException,
+    TicketSettingsException,
+)
 from argus.util.datetime_utils import INFINITY_REPR
 from argus.util.utils import import_class_from_dotted_path
 
 from .forms import AddSourceSystemForm
 from .filters import IncidentFilter, SourceLockedIncidentFilter
 from .models import (
-    Acknowledgement,
+    ChangeEvent,
     Event,
     Incident,
     SourceSystem,
@@ -52,6 +59,7 @@ from .serializers import (
     TagSerializer,
     IncidentTagRelation,
 )
+from .V1.serializers import IncidentSerializerV1
 
 LOG = logging.getLogger(__name__)
 
@@ -252,8 +260,15 @@ class IncidentViewSet(
         incident = self.get_object()
         serializer = IncidentTicketUrlSerializer(data=request.data)
         if serializer.is_valid():
-            incident.ticket_url = serializer.data["ticket_url"]
-            incident.save()
+            old_url = incident.ticket_url
+            new_url = serializer.data["ticket_url"]
+            if old_url != new_url:
+                description = f"Change: ticket_url {old_url} → {new_url}"
+                ChangeEvent.objects.create(
+                    incident=incident, actor=request.user, timestamp=timezone.now(), description=description
+                )
+                incident.ticket_url = serializer.data["ticket_url"]
+                incident.save()
             return Response(serializer.data)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -295,12 +310,33 @@ class TicketPluginViewSet(viewsets.ViewSet):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
+        serialized_incident = IncidentSerializerV1(incident).data
+        serialized_incident["argus_url"] = urljoin(
+            getattr(settings, "FRONTEND_URL", ""),
+            f"incidents/{incident_pk}",
+        )
+
         try:
-            url = ticket_class.create_ticket(incident)
-        except TicketPluginException as e:
+            url = ticket_class.create_ticket(serialized_incident)
+        except TicketSettingsException as e:
             return Response(
                 data=str(e),
                 status=status.HTTP_400_BAD_REQUEST,
+            )
+        except TicketClientException as e:
+            return Response(
+                data=str(e),
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+            )
+        except TicketCreationException as e:
+            return Response(
+                data=str(e),
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        except TicketPluginException as e:
+            return Response(
+                data=str(e),
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
         if url:

@@ -1,5 +1,6 @@
 import logging
 
+from django.conf import settings
 from django.http import (
     HttpResponseBadRequest,
     HttpResponseForbidden,
@@ -94,5 +95,7 @@ class MetadataView(APIView):
                 "v1": "/api/v1/schema/",
                 "v2": "/api/v2/schema/",
             },
+            "ticket_plugin": getattr(settings, "TICKET_PLUGIN", None),
+            "destination_plugins": getattr(settings, "MEDIA_PLUGINS", None),
         }
         return Response(metadata)
