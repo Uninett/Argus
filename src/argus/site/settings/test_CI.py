@@ -44,6 +44,8 @@ MEDIA_PLUGINS = [
 
 TEST_RUNNER = "xmlrunner.extra.djangotestrunner.XMLTestRunner"
 TEST_OUTPUT_VERBOSE = 2
+# This ensures that each tox environment receives test reports in separate directories. If not running tests under tox,
+# reports land directly in test-reports/
 TEST_OUTPUT_DIR = os.path.join("test-reports", os.getenv("TOX_ENV_NAME", ""))
 TEST_OUTPUT_FILE_NAME = "test-results.xml"
 
