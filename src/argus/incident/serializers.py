@@ -359,6 +359,7 @@ class UpdateAcknowledgementSerializer(serializers.ModelSerializer):
 
 
 class RequestAcknowledgementSerializer(serializers.ModelSerializer):
+    timestamp = serializers.DateTimeField()
     description = serializers.CharField(required=False, allow_blank=True)
     expiration = serializers.DateTimeField(required=False, allow_null=True)
 
@@ -366,6 +367,7 @@ class RequestAcknowledgementSerializer(serializers.ModelSerializer):
         model = Acknowledgement
         fields = [
             "pk",
+            "timestamp",
             "description",
             "expiration",
         ]
@@ -378,10 +380,11 @@ class RequestAcknowledgementSerializer(serializers.ModelSerializer):
         incident = validated_data.pop("incident")
         actor = validated_data.pop("actor")
         expiration = validated_data.get("expiration", None)
+        timestamp = validated_data.pop("timestamp")
         description = validated_data.get("description", "")
         ack = incident.create_ack(
             actor,
-            timestamp=timezone.now(),
+            timestamp=timestamp,
             description=description,
             expiration=expiration,
         )

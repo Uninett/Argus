@@ -585,7 +585,6 @@ class BulkAcknowledgementViewSet(viewsets.ViewSet):
         changes = {}
         status_codes_seen = set()
 
-        timestamp = timezone.now()
         for incident_id in incident_ids:
             incident = incidents.get(incident_id)
 
@@ -600,7 +599,7 @@ class BulkAcknowledgementViewSet(viewsets.ViewSet):
 
             ack = incident.create_ack(
                 actor=actor,
-                timestamp=timestamp,
+                timestamp=ack_data["timestamp"],
                 description=ack_data.get("description", ""),
                 expiration=ack_data.get("expiration", None),
             )
