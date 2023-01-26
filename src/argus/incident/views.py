@@ -660,7 +660,7 @@ class BulkEventViewSet(viewsets.ViewSet):
                 actor=actor,
                 timestamp=event_data["timestamp"],
                 type=event_data["type"],
-                description=event_data["description"],
+                description=event_data.get("description", ""),
             )
             changes[str(incident_id)] = {
                 "event": EventSerializer(instance=event).to_representation(instance=event),
