@@ -600,8 +600,8 @@ class BulkAcknowledgementViewSet(viewsets.ViewSet):
             ack = incident.create_ack(
                 actor=actor,
                 timestamp=ack_data["timestamp"],
-                description=ack_data["description"],
-                expiration=ack_data["expiration"],
+                description=ack_data.get("description", ""),
+                expiration=ack_data.get("expiration", None),
             )
             changes[str(incident_id)] = {
                 "ack": ResponseAcknowledgementSerializer(instance=ack).to_representation(instance=ack),

@@ -360,7 +360,8 @@ class UpdateAcknowledgementSerializer(serializers.ModelSerializer):
 
 class RequestAcknowledgementSerializer(serializers.ModelSerializer):
     timestamp = serializers.DateTimeField()
-    description = serializers.CharField(allow_blank=True)
+    description = serializers.CharField(required=False, allow_blank=True)
+    expiration = serializers.DateTimeField(required=False, allow_null=True)
 
     class Meta:
         model = Acknowledgement
@@ -390,7 +391,7 @@ class RequestAcknowledgementSerializer(serializers.ModelSerializer):
         return ack
 
     def validate(self, attrs: dict):
-        expiration = attrs.get("expiration")
+        expiration = attrs.get("expiration", None)
         if expiration and expiration <= attrs["timestamp"]:
             raise serializers.ValidationError("'expiration' is earlier than creation timestamp.")
         return attrs
