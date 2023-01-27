@@ -915,11 +915,13 @@ class BulkEventViewSetTestCase(APITestCase):
         incident_1_changes = response.data["changes"][str(incident_1.pk)]
         self.assertEqual(incident_1_changes["status"], status.HTTP_201_CREATED)
         self.assertEqual(incident_1_changes["event"]["type"]["value"], "OTH")
+        self.assertEqual(incident_1_changes["event"]["description"], "")
         self.assertEqual(incident_1_changes["errors"], None)
 
         incident_2_changes = response.data["changes"][str(incident_2.pk)]
         self.assertEqual(incident_2_changes["status"], status.HTTP_201_CREATED)
         self.assertEqual(incident_2_changes["event"]["type"]["value"], "OTH")
+        self.assertEqual(incident_2_changes["event"]["description"], "")
         self.assertEqual(incident_2_changes["errors"], None)
 
         self.assertTrue(incident_1.events.filter(type="OTH").exists())
