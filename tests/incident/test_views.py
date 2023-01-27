@@ -555,6 +555,31 @@ class IncidentViewSetTestCase(APITestCase):
         self.assertTrue(incident.events.filter(id=response.data["pk"]).exists())
         self.assertTrue(Acknowledgement.objects.filter(event_id=response.data["pk"]).exists())
 
+    def test_can_create_acknowledgement_of_incident_with_empty_description(self):
+        incident = self.add_open_incident_with_start_event_and_tag()
+        data = {
+            "timestamp": "2022-08-02T13:04:03.529Z",
+            "description": "",
+            "expiration": "2022-08-03T13:04:03.529Z",
+        }
+        response = self.client.post(path=f"/api/v2/incidents/{incident.pk}/acks/", data=data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertTrue(incident.events.filter(id=response.data["pk"]).exists())
+        self.assertTrue(Acknowledgement.objects.filter(event_id=response.data["pk"]).exists())
+        self.assertEqual(Acknowledgement.objects.get(event_id=response.data["pk"]).event.description, "")
+
+    def test_can_create_acknowledgement_of_incident_without_description_and_expiration(self):
+        incident = self.add_open_incident_with_start_event_and_tag()
+        data = {
+            "timestamp": "2022-08-02T13:04:03.529Z",
+        }
+        response = self.client.post(path=f"/api/v2/incidents/{incident.pk}/acks/", data=data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertTrue(incident.events.filter(id=response.data["pk"]).exists())
+        self.assertTrue(Acknowledgement.objects.filter(event_id=response.data["pk"]).exists())
+        self.assertEqual(Acknowledgement.objects.get(event_id=response.data["pk"]).event.description, "")
+        self.assertEqual(Acknowledgement.objects.get(event_id=response.data["pk"]).expiration, None)
+
     def test_can_update_acknowledgement_of_incident(self):
         ack = self.add_acknowledgement_with_incident_and_event()
         incident = ack.event.incident
