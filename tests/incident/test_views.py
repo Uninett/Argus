@@ -830,6 +830,67 @@ class BulkAcknowledgementViewSetTestCase(APITestCase):
         self.assertTrue(incident_1.events.filter(type="ACK").exists())
         self.assertTrue(incident_2.events.filter(type="ACK").exists())
 
+    def test_can_bulk_create_acknowledgements_without_description_and_expiration_for_incidents_with_valid_ids(self):
+        incident_1 = StatefulIncidentFactory()
+        incident_2 = StatefulIncidentFactory()
+        data = {
+            "ids": [incident_1.pk, incident_2.pk],
+            "ack": {
+                "timestamp": "2022-08-02T13:04:03.529Z",
+            },
+        }
+
+        response = self.client.post(path=f"/api/v2/incidents/acks/bulk/", data=data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        incident_1_changes = response.data["changes"][str(incident_1.pk)]
+        self.assertEqual(incident_1_changes["status"], status.HTTP_201_CREATED)
+        self.assertEqual(incident_1_changes["ack"]["event"]["type"]["value"], "ACK")
+        self.assertEqual(incident_1_changes["ack"]["event"]["description"], "")
+        self.assertEqual(incident_1_changes["ack"]["expiration"], None)
+        self.assertEqual(incident_1_changes["errors"], None)
+
+        incident_2_changes = response.data["changes"][str(incident_2.pk)]
+        self.assertEqual(incident_2_changes["status"], status.HTTP_201_CREATED)
+        self.assertEqual(incident_2_changes["ack"]["event"]["type"]["value"], "ACK")
+        self.assertEqual(incident_2_changes["ack"]["event"]["description"], "")
+        self.assertEqual(incident_2_changes["ack"]["expiration"], None)
+        self.assertEqual(incident_2_changes["errors"], None)
+
+        self.assertTrue(incident_1.events.filter(type="ACK").exists())
+        self.assertTrue(incident_2.events.filter(type="ACK").exists())
+
+    def test_can_bulk_create_acknowledgements_with_empty_description_for_incidents_with_valid_ids(self):
+        incident_1 = StatefulIncidentFactory()
+        incident_2 = StatefulIncidentFactory()
+        data = {
+            "ids": [incident_1.pk, incident_2.pk],
+            "ack": {
+                "timestamp": "2022-08-02T13:04:03.529Z",
+                "description": "",
+            },
+        }
+
+        response = self.client.post(path=f"/api/v2/incidents/acks/bulk/", data=data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        incident_1_changes = response.data["changes"][str(incident_1.pk)]
+        self.assertEqual(incident_1_changes["status"], status.HTTP_201_CREATED)
+        self.assertEqual(incident_1_changes["ack"]["event"]["type"]["value"], "ACK")
+        self.assertEqual(incident_1_changes["ack"]["event"]["description"], "")
+        self.assertEqual(incident_1_changes["errors"], None)
+
+        incident_2_changes = response.data["changes"][str(incident_2.pk)]
+        self.assertEqual(incident_2_changes["status"], status.HTTP_201_CREATED)
+        self.assertEqual(incident_2_changes["ack"]["event"]["type"]["value"], "ACK")
+        self.assertEqual(incident_2_changes["ack"]["event"]["description"], "")
+        self.assertEqual(incident_2_changes["errors"], None)
+
+        self.assertTrue(incident_1.events.filter(type="ACK").exists())
+        self.assertTrue(incident_2.events.filter(type="ACK").exists())
+
     def test_cannot_bulk_create_acknowledgements_for_incidents_with_all_invalid_ids(self):
         highest_incident_pk = Incident.objects.last().id if Incident.objects.exists() else 0
         invalid_incident_1_pk = highest_incident_pk + 1
