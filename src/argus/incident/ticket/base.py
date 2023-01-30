@@ -3,6 +3,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 
 from django.conf import settings
+from django.template.loader import render_to_string
 
 __all__ = [
     "TicketClientException",
@@ -72,6 +73,10 @@ class TicketPlugin(ABC):
         Raises a TicketClientException in case of any errors
         """
         return None
+
+    @staticmethod
+    def create_html_body(serialized_incident: dict) -> str:
+        return render_to_string("incident/ticket/default_ticket_body.html", serialized_incident)
 
     @classmethod
     @abstractmethod
