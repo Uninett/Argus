@@ -257,6 +257,7 @@ class IncidentViewSet(
     @extend_schema(request=IncidentTicketUrlSerializer, responses=IncidentTicketUrlSerializer)
     @action(detail=True, methods=["put"])
     def ticket_url(self, request, pk=None):
+        """This endpoint manually sets the ticket URL of an incident."""
         incident = self.get_object()
         serializer = IncidentTicketUrlSerializer(data=request.data)
         if serializer.is_valid():
@@ -280,6 +281,13 @@ class IncidentViewSet(
     ),
 )
 class TicketPluginViewSet(viewsets.ViewSet):
+    """This endpoint will automatically create a pre-filled ticket in a ticket
+    system that is configured in the settings and return its URL or return the
+    URL of an existing linked ticket.
+    To change the URL the endpoint /api/v1/incidents/<int:pk>/ticket_url/
+    should be used.
+    """
+
     permission_classes = [IsAuthenticated]
     serializer_class = IncidentTicketUrlSerializer
     queryset = Incident.objects.all()
