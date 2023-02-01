@@ -323,6 +323,7 @@ class TicketPluginViewSet(viewsets.ViewSet):
             getattr(settings, "FRONTEND_URL", ""),
             f"incidents/{incident_pk}",
         )
+        serialized_incident["user"] = request.user.get_full_name()
 
         try:
             url = ticket_class.create_ticket(serialized_incident)
