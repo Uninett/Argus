@@ -79,7 +79,13 @@ Other notification plugins
 
 Open an issue to have a plugin added to this list. It needs to be publicly
 accessible so we can check the code, and be on PyPI. We will link up both the
-source code repo and the PyPI-entry.
+source code repo (or homepage otherwise) and the PyPI-entry.
+
+argus_notification_msteams.MSTeamsNotification
+..............................................
+
+Source: `https://github.com/Uninett/argus_notification_msteams`_
+PyPI: `https://pypi.org/project/argus-notification-msteams/`_
 
 Writing your own notification plugins
 -------------------------------------
