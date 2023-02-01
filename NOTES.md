@@ -3,7 +3,21 @@ This file documents changes to Argus that are relevant for the users to know.
 
 ## [Unreleased]
 
-## [1.10.2]
+## [1.11.0]
+
+With this version, the API for bulk changes of incidents and sending of
+notifications to new and interesting destinations via destination plugins has
+been frozen, and should be ready for use, completing what was started in 1.10.
+
+## Added
+- Also include frontend-url to incident in incident-serializer
+- Show installed plugins in the metadata view
+
+### Fixed
+- Fix API for adding events in bulk, with tests
+- Fix API for bulk acking, with tests
+
+## [1.10.2] - 2022-12-13
 
 ### Changed
 - Renamed the ticket creation endpoint via plugin from `/ticket/` to `/automatic-ticket/`

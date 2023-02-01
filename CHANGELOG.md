@@ -4,6 +4,29 @@ read by developers.
 
 ## [Unreleased]
 
+## [1.11.0]
+
+With this version, the API for bulk changes of incidents and sending of
+notifications to new and interesting destinations via destination plugins has
+been frozen, and should be ready for use, completing what was started in 1.10.
+
+## Added
+- Add default HTML template for autocreated tickets
+- Also include frontend-url to incident in incident-serializer
+- Output XML test-reports and set up github actions for it
+- Show installed plugins in the metadata view
+
+### Fixed
+- Fix API for addking events in bulk, with tests
+- Fix API for bulk acking, with tests
+
+### Changed
+- Improved OpenAPI by adding some more docstrings
+- Updated version of github-actions actions
+- Use better exceptions for ticket plugins
+- Change how/where change-events are created
+- Move tests for included destinations to individual files
+
 ## [1.10.2]
 
 ### Changed
