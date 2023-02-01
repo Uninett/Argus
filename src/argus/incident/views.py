@@ -349,6 +349,10 @@ class TicketPluginViewSet(viewsets.ViewSet):
             )
 
         if url:
+            description = f"Change: ticket_url → {url}"
+            ChangeEvent.objects.create(
+                incident=incident, actor=request.user, timestamp=timezone.now(), description=description
+            )
             incident.ticket_url = url
             incident.save(update_fields=["ticket_url"])
             serializer = self.serializer_class(data={"ticket_url": incident.ticket_url})
