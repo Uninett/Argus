@@ -1044,6 +1044,76 @@ class BulkEventViewSetTestCase(APITestCase):
         self.assertTrue(incident_1.events.filter(type="OTH").exists())
         self.assertTrue(incident_2.events.filter(type="OTH").exists())
 
+    def test_bulk_close_sets_incident_end_time(self):
+        incident_1 = StatefulIncidentFactory()
+        incident_2 = StatefulIncidentFactory()
+        data = {
+            "ids": [incident_1.pk, incident_2.pk],
+            "event": {
+                "timestamp": "2022-08-02T13:04:03.529Z",
+                "description": "event",
+                "type": "CLO",
+            },
+        }
+
+        response = self.client.post(path=f"/api/v2/incidents/events/bulk/", data=data, format="json")
+
+        incident_1.refresh_from_db()
+        incident_2.refresh_from_db()
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        incident_1_changes = response.data["changes"][str(incident_1.pk)]
+        self.assertEqual(incident_1_changes["status"], status.HTTP_201_CREATED)
+        self.assertEqual(incident_1_changes["event"]["type"]["value"], "CLO")
+        self.assertEqual(incident_1_changes["errors"], None)
+
+        incident_2_changes = response.data["changes"][str(incident_2.pk)]
+        self.assertEqual(incident_2_changes["status"], status.HTTP_201_CREATED)
+        self.assertEqual(incident_2_changes["event"]["type"]["value"], "CLO")
+        self.assertEqual(incident_2_changes["errors"], None)
+
+        self.assertTrue(incident_1.events.filter(type="CLO").exists())
+        self.assertTrue(incident_2.events.filter(type="CLO").exists())
+
+        self.assertFalse(incident_1.open)
+        self.assertFalse(incident_2.open)
+
+    def test_bulk_reopen_removes_incident_end_time(self):
+        incident_1 = StatefulIncidentFactory(end_time=now())
+        incident_2 = StatefulIncidentFactory(end_time=now())
+        data = {
+            "ids": [incident_1.pk, incident_2.pk],
+            "event": {
+                "timestamp": "2022-08-02T13:04:03.529Z",
+                "description": "event",
+                "type": "REO",
+            },
+        }
+
+        response = self.client.post(path=f"/api/v2/incidents/events/bulk/", data=data, format="json")
+
+        incident_1.refresh_from_db()
+        incident_2.refresh_from_db()
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        incident_1_changes = response.data["changes"][str(incident_1.pk)]
+        self.assertEqual(incident_1_changes["status"], status.HTTP_201_CREATED)
+        self.assertEqual(incident_1_changes["event"]["type"]["value"], "REO")
+        self.assertEqual(incident_1_changes["errors"], None)
+
+        incident_2_changes = response.data["changes"][str(incident_2.pk)]
+        self.assertEqual(incident_2_changes["status"], status.HTTP_201_CREATED)
+        self.assertEqual(incident_2_changes["event"]["type"]["value"], "REO")
+        self.assertEqual(incident_2_changes["errors"], None)
+
+        self.assertTrue(incident_1.events.filter(type="REO").exists())
+        self.assertTrue(incident_2.events.filter(type="REO").exists())
+
+        self.assertTrue(incident_1.open)
+        self.assertTrue(incident_2.open)
+
     def test_cannot_bulk_create_events_for_incidents_with_all_invalid_ids(self):
         highest_incident_pk = Incident.objects.last().id if Incident.objects.exists() else 0
         invalid_incident_1_pk = highest_incident_pk + 1
