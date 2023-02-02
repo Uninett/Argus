@@ -1,4 +1,4 @@
-from django.test import tag
+from django.test import override_settings, tag
 
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -68,6 +68,27 @@ class ChangeEventTests(APITestCase, IncidentBasedAPITestCaseHelper):
         change_events = self.incident.events.filter(type=Event.Type.INCIDENT_CHANGE)
         change_events_descriptions = [event.description for event in change_events]
         self.assertTrue(change_events)
+        self.assertIn(description, change_events_descriptions)
+        self.assertEqual(change_events.get(description=description).actor, self.user1)
+
+    @override_settings(
+        TICKET_PLUGIN="argus.incident.ticket.dummy.DummyPlugin",
+    )
+    def test_change_event_is_created_on_ticket_url_changes_for_automatic_ticket_url_endpoint(self):
+        incident = StatefulIncidentFactory(ticket_url="")
+        response = self.user1_rest_client.put(
+            path=f"/api/v2/incidents/{incident.pk}/automatic-ticket/",
+            data={},
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        change_events = incident.events.filter(type=Event.Type.INCIDENT_CHANGE)
+        change_events_descriptions = [event.description for event in change_events]
+        self.assertTrue(change_events)
+
+        new_ticket_url = response.data["ticket_url"]
+        description = f"Change: ticket_url → {new_ticket_url}"
         self.assertIn(description, change_events_descriptions)
         self.assertEqual(change_events.get(description=description).actor, self.user1)
 
