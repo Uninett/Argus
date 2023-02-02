@@ -669,19 +669,17 @@ class BulkEventViewSet(viewsets.ViewSet):
                 continue
 
             if event_data["type"] == "CLO":
-                incident.end_time = event_data["timestamp"]
-                incident.save(update_fields=["end_time"])
-            if event_data["type"] == "REO":
-                incident.end_time = INFINITY_REPR
-                incident.save(update_fields=["end_time"])
-
-            event = Event.objects.create(
-                incident=incident,
-                actor=actor,
-                timestamp=event_data["timestamp"],
-                type=event_data["type"],
-                description=event_data.get("description", ""),
-            )
+                event = incident.set_closed(actor=actor, timestamp=event_data["timestamp"])
+            elif event_data["type"] == "REO":
+                event = incident.set_open(actor=actor, timestamp=event_data["timestamp"])
+            else:
+                event = Event.objects.create(
+                    incident=incident,
+                    actor=actor,
+                    timestamp=event_data["timestamp"],
+                    type=event_data["type"],
+                    description=event_data.get("description", ""),
+                )
             changes[str(incident_id)] = {
                 "event": EventSerializer(instance=event).to_representation(instance=event),
                 "status": status.HTTP_201_CREATED,
