@@ -3,7 +3,7 @@ This file documents changes to Argus that are relevant for the users to know.
 
 ## [Unreleased]
 
-## [1.11.0]
+## [1.11.0] - 2023-02-02
 
 With this version, the API for bulk changes of incidents and sending of
 notifications to new and interesting destinations via destination plugins has
