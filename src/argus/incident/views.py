@@ -668,6 +668,13 @@ class BulkEventViewSet(viewsets.ViewSet):
                 status_codes_seen.add(status.HTTP_400_BAD_REQUEST)
                 continue
 
+            if event_data["type"] == "CLO":
+                incident.end_time = event_data["timestamp"]
+                incident.save(update_fields=["end_time"])
+            if event_data["type"] == "REO":
+                incident.end_time = INFINITY_REPR
+                incident.save(update_fields=["end_time"])
+
             event = Event.objects.create(
                 incident=incident,
                 actor=actor,
