@@ -2,6 +2,7 @@ from django.conf import settings
 from django.utils.module_loading import import_string
 
 from social_core.backends.base import BaseAuth
+from social_core.backends.oauth import BaseOAuth2
 
 
 def get_authentication_backend_classes():
@@ -17,3 +18,18 @@ def get_psa_authentication_names(backends=None):
         if issubclass(backend, BaseAuth):
             psa_backends.add(backend.name)
     return sorted(psa_backends)
+
+
+def get_authentication_backend_name_and_type():
+    backends = get_authentication_backend_classes()
+    data = []
+    data.extend(
+        {
+            "type": "OAuth2",
+            "name": backend.name,
+        }
+        for backend in backends
+        if issubclass(backend, BaseOAuth2)
+    )
+
+    return data

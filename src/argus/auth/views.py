@@ -15,7 +15,7 @@ from social_core.backends.oauth import BaseOAuth2
 
 from .models import User
 from .serializers import BasicUserSerializer, EmptySerializer, RefreshTokenSerializer, UserSerializer
-from .utils import get_psa_authentication_classes
+from .utils import get_authentication_backend_name_and_type
 
 
 class ObtainNewAuthToken(ObtainAuthToken):
@@ -69,26 +69,18 @@ class AuthMethodListView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request, *args, **kwargs):
-        backends = get_psa_authentication_classes()
-        data = [
+        data = get_authentication_backend_name_and_type()
+        for backend in data:
+            backend["url"] = reverse("social:begin", kwargs={"backend": backend["name"]}, request=request)
+
+        data.append(
             {
                 "type": "username_password",
                 "url": reverse("v1:api-token-auth", request=request),
                 "name": "user_pw",
             }
-        ]
-        for backend in backends:
-            backend_type = ""
-            if issubclass(backend, BaseOAuth2):
-                backend_type = "OAuth2"
-            data.extend(
-                {
-                    "type": backend_type,
-                    "url": reverse("social:begin", kwargs={"backend": backend.name}, request=request),
-                    "name": backend.name,
-                }
-                for backend in backends
-            )
+        )
+
         return Response(data)
 
 
