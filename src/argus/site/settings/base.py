@@ -177,7 +177,7 @@ FRONTEND_URL = get_str_env("ARGUS_FRONTEND_URL")
 
 CORS_ALLOWED_ORIGINS = []
 if FRONTEND_URL:
-    CORS_ALLOWED_ORIGINS.append(FRONTEND_URL)
+    CORS_ALLOWED_ORIGINS.append(normalize_url(FRONTEND_URL))
 
 # django-rest-framework
 
