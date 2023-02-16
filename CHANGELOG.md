@@ -4,6 +4,18 @@ read by developers.
 
 ## [Unreleased]
 
+## [1.11.1] - 2023-02-16
+
+### Added
+- Coverage of the notificationprofile app was improved with several new tests
+
+### Fixed
+- CORS-headers do not want explicit port numbers if the ports are the default
+  for their type, that is: 80 for http or 443 for https. This lead to CORS not
+  working if there was an explicit port in the `ARGUS_FRONTEND_URL` setting,
+  which used to generate a CORS entry for the frontend. Such port numbers are
+  now stripped when generating the CORS header.
+
 ## [1.11.0] - 2023-02-02
 
 With this version, the API for bulk changes of incidents and sending of
