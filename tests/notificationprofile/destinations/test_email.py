@@ -4,6 +4,7 @@ from rest_framework.test import APIClient, APIRequestFactory, APITestCase
 
 from argus.auth.factories import PersonUserFactory
 from argus.notificationprofile.factories import DestinationConfigFactory, NotificationProfileFactory, TimeslotFactory
+from argus.notificationprofile.media.email import EmailNotification
 from argus.notificationprofile.models import DestinationConfig, Media
 from argus.notificationprofile.serializers import RequestDestinationConfigSerializer
 from argus.util.testing import connect_signals, disconnect_signals
@@ -365,3 +366,42 @@ class EmailDestinationViewTests(APITestCase):
         self.assertEqual(
             DestinationConfig.objects.get(pk=email_destination_pk).settings["email_address"], settings["email_address"]
         )
+
+
+@tag("integration")
+class EmailDestinationSendTests(TestCase):
+    def setUp(self):
+        disconnect_signals()
+        self.user1 = PersonUserFactory()
+
+    def teardown(self):
+        connect_signals()
+
+    def test_get_relevant_addresses_returns_only_email_addresses(self):
+        email_address = "test2@example.com"
+        email_destination = DestinationConfigFactory(
+            user=self.user1,
+            media=Media.objects.get(slug="email"),
+            settings={
+                "email_address": email_address,
+                "synced": False,
+            },
+        )
+        phone_number = "+4747474747"
+        sms_destination = DestinationConfigFactory(
+            user=self.user1,
+            media=Media.objects.get_or_create(slug="sms")[0],
+            settings={
+                "phone_number": phone_number,
+            },
+        )
+
+        email_addresses = EmailNotification.get_relevant_addresses(
+            [
+                email_destination,
+                sms_destination,
+            ]
+        )
+
+        self.assertIn(email_address, email_addresses)
+        self.assertNotIn(phone_number, email_addresses)
