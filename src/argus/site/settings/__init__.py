@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging.config
 from os import getenv
 from pathlib import Path
+from urllib.parse import urlsplit, urlunsplit
 
 from django.utils.module_loading import import_string
 
@@ -16,6 +17,7 @@ __all__ = [
     "get_int_env",
     "setup_logging",
     "update_loglevels",
+    "normalize_url",
 ]
 
 
@@ -24,6 +26,9 @@ SETTINGS_DIR = Path(__file__).resolve().parent
 SITE_DIR = SETTINGS_DIR.parent
 BASE_DIR = SITE_DIR.parent
 
+
+# deserialize environment variables. There are libraries to do this,
+# but we haven't settled on one (they tend to be bloated)
 
 def get_any_env(envname, required=False):
     env = getenv(envname)
@@ -60,6 +65,44 @@ def get_int_env(envname, default=0, required=False):
     env = str(env).strip()
     return int(env)
 
+
+# fixes
+
+def _add_missing_scheme_to_url(url):
+    parsed_url = urlsplit(url)
+    scheme, netloc, *_ = parsed_url
+    if scheme:  # nothing to fix
+        return url
+    if not netloc:  # relative url
+        return url
+    port = parsed_url.port
+    if port == 80:
+        scheme = 'http'
+    elif port == 443:
+        scheme = 'https'
+    else:
+        return url  # nothing to guess
+    fixed_url = parsed_url._replace(scheme=scheme)
+    return urlunsplit(fixed_url)
+
+
+def normalize_url(url):
+    scheme_url = _add_missing_scheme_to_url(url)
+    parsed_url = urlsplit(scheme_url)
+    scheme, netloc, *_ = parsed_url
+    port = parsed_url.port
+    if scheme not in ("http", "https"):
+        # nothing to normalize
+        return url
+    if port == None or port not in (80, 443):
+        # nothing to normalize
+        return url
+    netloc = ''.join(netloc.rsplit(':', 1)[0])
+    fixed_url = parsed_url._replace(netloc=netloc)
+    return urlunsplit(fixed_url)
+
+
+# logging-helpers, we want the logging-setup separate from the rest
 
 def setup_logging(dotted_path=None):
     """Use the dictionary on the dotted path to set up logging
