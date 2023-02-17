@@ -79,7 +79,7 @@ django-multiselectfield==0.1.12
     # via argus-server (pyproject.toml)
 django-phonenumber-field[phonenumberslite]==7.0.0
     # via argus-server (pyproject.toml)
-djangorestframework==3.12.4
+djangorestframework==3.14.0
     # via
     #   argus-server (pyproject.toml)
     #   drf-spectacular
@@ -141,7 +141,9 @@ python-dateutil==2.8.2
 python3-openid==3.2.0
     # via social-auth-core
 pytz==2022.6
-    # via argus-server (pyproject.toml)
+    # via
+    #   argus-server (pyproject.toml)
+    #   djangorestframework
 pyyaml==6.0
     # via
     #   -r requirements/forced-upgrade.txt
