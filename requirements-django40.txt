@@ -4,8 +4,6 @@
 #
 #    pip-compile --output-file=requirements-django40.txt pyproject.toml requirements/django40.txt requirements/forced-upgrade.txt
 #
-aioredis==2.0.1
-    # via argus-server (pyproject.toml)
 asgiref==3.5.2
     # via
     #   channels
@@ -13,9 +11,7 @@ asgiref==3.5.2
     #   daphne
     #   django
 async-timeout==4.0.2
-    # via
-    #   aioredis
-    #   redis
+    # via redis
 attrs==22.1.0
     # via
     #   automat
@@ -32,7 +28,7 @@ certifi==2022.12.7
     # via requests
 cffi==1.15.1
     # via cryptography
-channels==3.0.5
+channels[daphne]==4.0.0
     # via
     #   argus-server (pyproject.toml)
     #   channels-redis
@@ -48,7 +44,7 @@ cryptography==38.0.3
     #   pyopenssl
     #   service-identity
     #   social-auth-core
-daphne==3.0.2
+daphne==4.0.0
     # via channels
 defusedxml==0.7.1
     # via
@@ -177,9 +173,7 @@ twisted[tls]==22.10.0
 txaio==22.2.1
     # via autobahn
 typing-extensions==4.4.0
-    # via
-    #   aioredis
-    #   twisted
+    # via twisted
 uritemplate==4.1.1
     # via drf-spectacular
 urllib3==1.26.12

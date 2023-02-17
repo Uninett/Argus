@@ -4,25 +4,21 @@
 #
 #    pip-compile --output-file=requirements-django32.txt pyproject.toml requirements/django32.txt requirements/forced-upgrade.txt
 #
-aioredis==1.3.1
-    # via
-    #   argus-server (pyproject.toml)
-    #   channels-redis
-asgiref==3.3.4
+asgiref==3.6.0
     # via
     #   channels
     #   channels-redis
     #   daphne
     #   django
-async-timeout==3.0.1
-    # via aioredis
+async-timeout==4.0.2
+    # via redis
 attrs==20.3.0
     # via
     #   automat
     #   jsonschema
     #   service-identity
     #   twisted
-autobahn==21.3.1
+autobahn==23.1.2
     # via
     #   -r requirements/forced-upgrade.txt
     #   daphne
@@ -32,23 +28,23 @@ certifi==2022.12.7
     # via requests
 cffi==1.14.5
     # via cryptography
-channels==3.0.3
+channels[daphne]==4.0.0
     # via
     #   argus-server (pyproject.toml)
     #   channels-redis
-channels-redis==3.2.0
+channels-redis==4.0.0
     # via argus-server (pyproject.toml)
 chardet==4.0.0
     # via requests
 constantly==15.1.0
     # via twisted
-cryptography==3.4.7
+cryptography==39.0.1
     # via
     #   autobahn
     #   pyopenssl
     #   service-identity
     #   social-auth-core
-daphne==3.0.2
+daphne==4.0.0
     # via channels
 defusedxml==0.7.1
     # via
@@ -88,8 +84,6 @@ factory-boy==3.2.1
     # via argus-server (pyproject.toml)
 faker==8.0.0
     # via factory-boy
-hiredis==2.0.0
-    # via aioredis
 hyperlink==21.0.0
     # via
     #   autobahn
@@ -125,7 +119,7 @@ pycparser==2.20
     # via cffi
 pyjwt==2.4.0
     # via social-auth-core
-pyopenssl==20.0.1
+pyopenssl==23.0.0
     # via twisted
 pyrsistent==0.17.3
     # via jsonschema
@@ -144,6 +138,8 @@ pyyaml==5.4.1
     # via
     #   -r requirements/forced-upgrade.txt
     #   drf-spectacular
+redis==4.5.1
+    # via channels-redis
 requests==2.25.1
     # via
     #   requests-oauthlib
@@ -156,7 +152,6 @@ six==1.15.0
     # via
     #   automat
     #   jsonschema
-    #   pyopenssl
     #   python-dateutil
 social-auth-app-django==5.0.0
     # via argus-server (pyproject.toml)
@@ -169,10 +164,12 @@ sqlparse==0.4.2
     # via django
 text-unidecode==1.3
     # via faker
-twisted[tls]==21.2.0
+twisted[tls]==22.10.0
     # via daphne
 txaio==21.2.1
     # via autobahn
+typing-extensions==4.5.0
+    # via twisted
 uritemplate==3.0.1
     # via drf-spectacular
 urllib3==1.26.5
