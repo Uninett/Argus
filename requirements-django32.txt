@@ -12,8 +12,9 @@ asgiref==3.6.0
     #   django
 async-timeout==4.0.2
     # via redis
-attrs==20.3.0
+attrs==22.2.0
     # via
+    #   -r requirements/forced-upgrade.txt
     #   automat
     #   jsonschema
     #   service-identity
