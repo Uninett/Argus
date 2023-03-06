@@ -9,8 +9,8 @@ from ..serializers import FilterSerializer, TimeslotSerializer
 class ResponseNotificationProfileSerializerV1(serializers.ModelSerializer):
     timeslot = TimeslotSerializer()
     filters = FilterSerializer(many=True)
-    media = serializers.SerializerMethodField("get_media")
-    phone_number = serializers.SerializerMethodField("get_phone_number")
+    media = serializers.SerializerMethodField(method_name="get_media")
+    phone_number = serializers.SerializerMethodField(method_name="get_phone_number")
 
     class Meta:
         model = NotificationProfile

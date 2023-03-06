@@ -10,9 +10,9 @@ class RequestPhoneNumberSerializerV1(serializers.Serializer):
 
 
 class ResponsePhoneNumberSerializerV1(serializers.Serializer):
-    pk = serializers.SerializerMethodField("get_pk")
-    user = serializers.SerializerMethodField("get_user")
-    phone_number = serializers.SerializerMethodField("get_phone_number")
+    pk = serializers.SerializerMethodField(method_name="get_pk")
+    user = serializers.SerializerMethodField(method_name="get_user")
+    phone_number = serializers.SerializerMethodField(method_name="get_phone_number")
 
     def get_pk(self, destination: DestinationConfig) -> int:
         return destination.pk
@@ -25,7 +25,7 @@ class ResponsePhoneNumberSerializerV1(serializers.Serializer):
 
 
 class UserSerializerV1(serializers.ModelSerializer):
-    phone_numbers = serializers.SerializerMethodField("get_phone_numbers")
+    phone_numbers = serializers.SerializerMethodField(method_name="get_phone_numbers")
 
     class Meta:
         model = User

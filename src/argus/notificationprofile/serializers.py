@@ -126,7 +126,7 @@ class JSONSchemaSerializer(serializers.Serializer):
 
 class ResponseDestinationConfigSerializer(serializers.ModelSerializer):
     media = MediaSerializer()
-    suggested_label = serializers.SerializerMethodField("get_suggested_label")
+    suggested_label = serializers.SerializerMethodField(method_name="get_suggested_label")
 
     class Meta:
         model = DestinationConfig
