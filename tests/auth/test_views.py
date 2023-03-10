@@ -1,4 +1,4 @@
-from django.test import tag
+from django.test import override_settings, tag
 
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
@@ -29,3 +29,21 @@ class ViewTests(APITestCase):
         response = self.user1_rest_client.get(path="/api/v2/auth/user/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["username"], self.user1.username)
+
+    @override_settings(
+        AUTHENTICATION_BACKENDS=[
+            "argus.dataporten.social.DataportenFeideOAuth2",
+            "django.contrib.auth.backends.RemoteUserBackend",
+            "django.contrib.auth.backends.ModelBackend",
+        ]
+    )
+    def test_can_get_login_methods(self):
+        response = self.user1_rest_client.get(path="/login-methods/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            response.data,
+            [
+                {"type": "username_password", "url": "http://testserver/api/v1/token-auth/", "name": "user_pw"},
+                {"type": "OAuth2", "url": "http://testserver/oidc/login/dataporten_feide/", "name": "dataporten_feide"},
+            ],
+        )

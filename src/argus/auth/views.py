@@ -9,12 +9,11 @@ from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
-from rest_framework.reverse import reverse
 from rest_framework.views import APIView
 
 from .models import User
 from .serializers import BasicUserSerializer, EmptySerializer, RefreshTokenSerializer, UserSerializer
-from .utils import get_psa_authentication_names
+from .utils import get_authentication_backend_name_and_type
 
 
 class ObtainNewAuthToken(ObtainAuthToken):
@@ -68,8 +67,8 @@ class AuthMethodListView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request, *args, **kwargs):
-        names = get_psa_authentication_names()
-        data = {name: reverse("social:begin", kwargs={"backend": name}, request=request) for name in names}
+        data = get_authentication_backend_name_and_type(request=request)
+
         return Response(data)
 
 

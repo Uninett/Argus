@@ -36,6 +36,13 @@
     <h2>Argus User</h2>
     {{ user }}
 
+    {% if __missing_fields__ %}
+    <h2>Missing fields/tags</h2>
+    {% for field in __missing_fields__ %}
+    <p>{{ field }}</p>
+    {% endfor %}
+    {% endif %}
+
 </body>
 
 </html>
