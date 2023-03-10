@@ -30,7 +30,7 @@ dependencies = [
     "django-filter",
     "django-multiselectfield",
     "django-phonenumber-field[phonenumberslite]",
-    "djangorestframework<3.13",
+    "djangorestframework>=3.14",
     "drf-rw-serializers",
     "drf-spectacular>=0.17",
     "factory_boy",
@@ -41,9 +41,8 @@ dependencies = [
     "social-auth-app-django>=5.0",
     "whitenoise",
     "wheel",
-    "channels>=3,<4",
-    "channels-redis>=3.2.0",
-    "aioredis",
+    "channels[daphne]>=4.0.0,<5",
+    "channels-redis>=4",
 ]
 dynamic = ["version"]
 
