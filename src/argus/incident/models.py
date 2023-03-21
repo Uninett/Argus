@@ -1,5 +1,5 @@
 from collections import defaultdict
-from datetime import timedelta
+from datetime import datetime, timedelta
 from functools import reduce
 import logging
 from operator import and_
@@ -372,7 +372,7 @@ class Incident(models.Model):
         return self.events.filter(acks_query & acks_not_expired_query).exists()
 
     # @transaction.atomic
-    def set_open(self, actor: User):
+    def set_open(self, actor: User, timestamp: datetime = None):
         if not self.stateful:
             raise ValidationError("Cannot set a stateless incident as open")
         if self.open:
@@ -380,18 +380,20 @@ class Incident(models.Model):
 
         self.end_time = INFINITY_REPR
         self.save(update_fields=["end_time"])
-        Event.objects.create(incident=self, actor=actor, timestamp=timezone.now(), type=Event.Type.REOPEN)
+        return Event.objects.create(
+            incident=self, actor=actor, timestamp=timestamp or timezone.now(), type=Event.Type.REOPEN
+        )
 
     # @transaction.atomic
-    def set_closed(self, actor: User):
+    def set_closed(self, actor: User, timestamp: datetime = None):
         if not self.stateful:
             raise ValidationError("Cannot set a stateless incident as closed")
         if not self.open:
             return
 
-        self.end_time = timezone.now()
+        self.end_time = timestamp or timezone.now()
         self.save(update_fields=["end_time"])
-        Event.objects.create(incident=self, actor=actor, timestamp=self.end_time, type=Event.Type.CLOSE)
+        return Event.objects.create(incident=self, actor=actor, timestamp=self.end_time, type=Event.Type.CLOSE)
 
     # @transaction.atomic
     def set_end(self, actor: User):
