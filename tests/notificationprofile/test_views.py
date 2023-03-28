@@ -14,6 +14,7 @@ from argus.notificationprofile.factories import (
     DestinationConfigFactory,
     FilterFactory,
     NotificationProfileFactory,
+    TimeRecurrenceFactory,
     TimeslotFactory,
 )
 from argus.notificationprofile.models import Filter, Media, NotificationProfile, Timeslot
@@ -459,6 +460,38 @@ class TimeslotViewTests(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(Timeslot.objects.get(pk=timeslot1_pk).name, new_name)
+
+    def test_should_update_timeslot_with_empty_time_recurrence(self):
+        timeslot = TimeslotFactory(user=self.user1, name="Whatever")
+        TimeRecurrenceFactory(timeslot=timeslot)
+        timeslot_path = f"{self.ENDPOINT}{timeslot.pk}/"
+        new_name = "new-test-name"
+        response = self.user1_rest_client.put(
+            path=timeslot_path,
+            data={
+                "name": new_name,
+                "time_recurrences": [],
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        timeslot.refresh_from_db()
+        self.assertFalse(timeslot.time_recurrences.all())
+
+    def test_should_update_timeslot_with_no_time_recurrence(self):
+        timeslot = self.timeslot1
+        TimeRecurrenceFactory(timeslot=timeslot)
+        timeslot_path = f"{self.ENDPOINT}{timeslot.pk}/"
+        time_recurrences = list(self.timeslot1.time_recurrences.all())
+        new_name = "new-test-name"
+        response = self.user1_rest_client.patch(
+            path=timeslot_path,
+            data={
+                "name": new_name,
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(Timeslot.objects.get(pk=timeslot.pk).name, new_name)
+        self.assertEqual(list(Timeslot.objects.get(pk=timeslot.pk).time_recurrences.all()), time_recurrences)
 
     def test_should_delete_unused_timeslot(self):
         timeslot1_pk = self.timeslot1.pk
