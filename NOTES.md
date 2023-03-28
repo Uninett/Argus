@@ -3,6 +3,15 @@ This file documents changes to Argus that are relevant for the users to know.
 
 ## [Unreleased]
 
+
+
+## bugfix/updating-timeslot-empty-time-recurrence
+
+### Fixed
+- Allow updating of a timeslot with an empty time recurrence list, which
+  results in all time recurrences to be removed from the timeslot
+
+
 ## [1.11.1] - 2023-02-16
 
 ### Fixed
