@@ -86,7 +86,7 @@ class TimeslotSerializer(serializers.ModelSerializer):
             timeslot.save()
 
         # Replace existing time recurrences with posted time recurrences
-        if time_recurrences_data:
+        if time_recurrences_data is not None:
             timeslot.time_recurrences.all().delete()
             for time_recurrence_data in time_recurrences_data:
                 TimeRecurrence.objects.create(timeslot=timeslot, **time_recurrence_data)
