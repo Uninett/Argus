@@ -139,7 +139,7 @@ pyyaml==5.4.1
     # via
     #   -r requirements/forced-upgrade.txt
     #   drf-spectacular
-redis==4.5.1
+redis==4.4.4
     # via channels-redis
 requests==2.25.1
     # via
