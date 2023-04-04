@@ -84,8 +84,8 @@ source code repo (or homepage otherwise) and the PyPI-entry.
 argus_notification_msteams.MSTeamsNotification
 ..............................................
 
-Source: `https://github.com/Uninett/argus_notification_msteams`_
-PyPI: `https://pypi.org/project/argus-notification-msteams/`_
+Source: `<https://github.com/Uninett/argus_notification_msteams>`_
+PyPI: `<https://pypi.org/project/argus-notification-msteams/>`_
 
 Writing your own notification plugins
 -------------------------------------
