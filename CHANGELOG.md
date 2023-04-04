@@ -4,6 +4,9 @@ read by developers.
 
 ## [Unreleased]
 
+### Added
+- Add inline destinations to user edit page in admin
+
 ## [1.12.1] - 2023-05-04
 
 ### Fixed
