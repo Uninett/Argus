@@ -15,8 +15,14 @@
 import os
 import sys
 
+import django
+
 sys.path.insert(0, os.path.abspath("../src"))
 sys.path.insert(0, os.path.abspath("_exts"))
+sys.path.insert(0, os.path.abspath("."))  # For finding the django_settings.py file
+
+os.environ["DJANGO_SETTINGS_MODULE"] = "django_settings"
+django.setup()
 
 
 # -- Project information -----------------------------------------------------
