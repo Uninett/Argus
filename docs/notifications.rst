@@ -20,80 +20,9 @@ settings file, this is documented for each plugin.
 Notification plugins included on install
 ----------------------------------------
 
-argus.notificationprofile.media.email.EmailNotification
-.......................................................
-
-This plugin is enabled by default.
-
-This plugin uses the email server settings provided by Django itself to
-configure the server.
-
-The settings-field for an email-destination contains an
-``email_address``-field. It also contains a read-only ``synced``-field, which
-is used for some magic if the User model-instance has its
-``email_address``-field set. If the email-address has ``synced`` set to True, that
-email-address is read-only as far as the API is concerned, because the address
-on the User is synced to that specific destination.
-
-To validate the email address we use Django's own email validator.
-
-Using the email plugin to send notifications to Slack
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Slack has the option to send an email to a certain email address, which will
-then be sent as a Slack message to a channel or conversation.
-
-To use that feature one needs to get the email address for the relevant channel
-or conversation by opening the channel/conversation, clicking the channel or
-member name(s) in the conversation header and selecting the tab
-``Integrations``. Then select ``Send emails to this channel/conversation.``
-and ``Get Email Address.``
-
-If the ability of creating this email address is disabled, please contact an
-owner or admin of the Slack workspace.
-
-This email can be copied and a destination with that email address can be
-created in Argus and added to notification profiles.
-
-More information about this can be found on the
-`Slack help website <https://slack.com/help/articles/206819278-Send-emails-to-Slack#h_01F4WDZG8RTCTNAMR4KJ7D419V>`_.
-
-argus.notificationprofile.media.sms_as_email.SMSNotification
-............................................................
-
-This plugin is **not** enabled by default.
-
-This plugin is for systems where SMSes are sent via a magical email-address
-(legacy-system support). For that reason it depends on the same Django email
-server settings as the included EmailNotification-plugin, and in addition the
-Argus-specific ``SMS_GATEWAY_ADDRESS``-setting, which is the magical
-email-address to send the SMSes to.
-
-The phone number is suffixed to the local-part of the email-address.
-
-Given an ``SMS_GATEWAY_ADDRESS`` of the following form::
-
-    SMS_GATEWAY_ADDRESS = "sms@example.com"
-
-and a phone number of the following form::
-
-    +345656787643
-
-then the resulting address is::
-
-    sms+345656787643@example.com
-
-The settings-field for an SMS-destination contains only a ``phone_number``,
-which is a string that includes the international calling code, see for
-instance `Wikipedia: List of mobile telephone prefixes by country
-<https://en.wikipedia.org/wiki/List_of_mobile_telephone_prefixes_by_country>`__.
-
-The library used to validate that the number is a real phone number is based on
-`Google's libphonenumber <https://github.com/google/libphonenumber>`_, so you
-cannot test with an arbitrary string of numbers.
-
-This plugin is a better example to copy for your own plugins than the included
-email-plugin since it doesn't have the Django-specific User-magic.
+.. toctree::
+   notifications/email-plugin
+   notifications/sms-plugin
 
 Other notification plugins
 --------------------------
@@ -111,4 +40,5 @@ argus_notification_msteams.MSTeamsNotification
 Writing your own notification plugins
 -------------------------------------
 
-TBD
+.. toctree::
+   notifications/writing-notification-plugins
