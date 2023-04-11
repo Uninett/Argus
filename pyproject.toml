@@ -37,7 +37,6 @@ dependencies = [
     "psycopg2",
     "python-dataporten-auth",
     "social-auth-core>=4.1",
-    "pytz>=2022.4",
     "social-auth-app-django>=5.0",
     "whitenoise",
     "wheel",
