@@ -24,6 +24,7 @@ LOG = logging.getLogger(__name__)
 __all__ = [
     "send_notification",
     "background_send_notification",
+    "find_destinations_for_event",
     "send_notifications_to_users",
     "get_notification_media",
 ]
@@ -55,14 +56,8 @@ def background_send_notification(destinations: List[DestinationConfig], event: E
     p.start()
     return p
 
-def send_notifications_to_users(event: Event, send=send_notification):
-    if not getattr(settings, "SEND_NOTIFICATIONS", False):
-        LOG.info('Notification: turned off sitewide, not sending for "%s"', event)
-        return
-    # TODO: only send one notification per medium per user
-    LOG.info('Notification: sending event "%s"', event)
-    LOG.debug('Fallback filter set to "%s"', getattr(settings, "ARGUS_FALLBACK_FILTER", {}))
-    sent = False
+
+def find_destinations_for_event(event: Event):
     destinations = []
     incident = event.incident
     for profile in NotificationProfile.objects.prefetch_related("destinations").select_related("user"):
@@ -71,7 +66,17 @@ def send_notifications_to_users(event: Event, send=send_notification):
             destinations.extend(profile.destinations.all())
     if not destinations:
         LOG.info('Notification: no listeners for "%s"', event)
+    return destinations
+
+
+def send_notifications_to_users(event: Event, send=send_notification):
+    if not getattr(settings, "SEND_NOTIFICATIONS", False):
+        LOG.info('Notification: turned off sitewide, not sending for "%s"', event)
         return
+    # TODO: only send one notification per medium per user
+    LOG.info('Notification: sending event "%s"', event)
+    LOG.debug('Fallback filter set to "%s"', getattr(settings, "ARGUS_FALLBACK_FILTER", {}))
+    destinations = find_destinations_for_event(event)
     send(destinations, event)
     LOG.info('Notification: event "%s" sent! %i copies', event, len(destinations))
 
