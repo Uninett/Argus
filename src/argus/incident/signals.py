@@ -37,11 +37,11 @@ def create_first_event(sender, instance: Incident, created, raw, *args, **kwargs
         )
 
 
-def send_notification(sender, instance: Event, *args, **kwargs):
+def task_send_notification(sender, instance: Event, *args, **kwargs):
     send_notifications_to_users(instance)
 
 
-def background_send_notification(sender, instance: Event, *args, **kwargs):
+def task_background_send_notification(sender, instance: Event, *args, **kwargs):
     send_notifications_to_users(instance, background_send_notification)
 
 
