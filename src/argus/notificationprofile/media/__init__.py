@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING
 from django.conf import settings
 from django.db import connections
 
-from ..models import NotificationProfile
+from ..models import NotificationProfile, DestinationConfig
 from argus.util.utils import import_class_from_dotted_path
 
 if TYPE_CHECKING:
@@ -22,9 +22,9 @@ LOG = logging.getLogger(__name__)
 
 
 __all__ = [
-    "send_notifications_to_users",
-    "background_send_notifications_to_users",
     "send_notification",
+    "background_send_notification",
+    "send_notifications_to_users",
     "get_notification_media",
 ]
 
@@ -35,7 +35,27 @@ MEDIA_CLASSES = [import_class_from_dotted_path(media_plugin) for media_plugin in
 MEDIA_CLASSES_DICT = {media_class.MEDIA_SLUG: media_class for media_class in MEDIA_CLASSES}
 
 
-def send_notifications_to_users(event: Event):
+def send_notification(destinations: List[DestinationConfig], event: Event):
+    sent = False
+    media = get_notification_media(destinations)
+    # Plugin expects queryset...
+    ids = (dest.id for dest in destinations)
+    qs = DestinationConfig.objects.filter(id__in=ids)
+    for medium in media:
+        sent = medium.send(event, qs) or sent
+    if not sent:
+        LOG.warn("Notification: Could not send notification, nowhere to send it to")
+        # TODO Store error as incident
+
+
+def background_send_notification(destinations: List[DestinationConfig], event: Event):
+    connections.close_all()
+    LOG.info('Notification: backgrounded: about to send event "%s"', event)
+    p = Process(target=send_notification, args=(destinations, event))
+    p.start()
+    return p
+
+def send_notifications_to_users(event: Event, send=send_notification):
     if not getattr(settings, "SEND_NOTIFICATIONS", False):
         LOG.info('Notification: turned off sitewide, not sending for "%s"', event)
         return
@@ -43,34 +63,17 @@ def send_notifications_to_users(event: Event):
     LOG.info('Notification: sending event "%s"', event)
     LOG.debug('Fallback filter set to "%s"', getattr(settings, "ARGUS_FALLBACK_FILTER", {}))
     sent = False
-    for profile in NotificationProfile.objects.select_related("user"):
+    destinations = []
+    incident = event.incident
+    for profile in NotificationProfile.objects.prefetch_related("destinations").select_related("user"):
         LOG.debug('Notification: checking profile "%s"', profile)
-        if profile.incident_fits(event.incident) and profile.event_fits(event):
-            send_notification(profile.destinations.all(), event)
-            sent = True
-        LOG.debug('Notification: sent? %s: profile "%s", event "%s"', sent, profile, event)
-    if not sent:
+        if profile.incident_fits(incident) and profile.event_fits(event):
+            destinations.extend(profile.destinations.all())
+    if not destinations:
         LOG.info('Notification: no listeners for "%s"', event)
         return
-    LOG.info('Notification: event "%s" sent!', event)
-
-
-def background_send_notifications_to_users(event: Event):
-    connections.close_all()
-    LOG.info('Notification: backgrounded: about to send event "%s"', event)
-    p = Process(target=send_notifications_to_users, args=(event,))
-    p.start()
-    return p
-
-
-def send_notification(destinations: List[DestinationConfig], event: Event):
-    sent = False
-    media = get_notification_media(destinations)
-    for medium in media:
-        sent = medium.send(event, destinations) or sent
-    if not sent:
-        LOG.warn("Notification: Could not send notification, nowhere to send it to")
-        # TODO Store error as incident
+    send(destinations, event)
+    LOG.info('Notification: event "%s" sent! %i copies', event, len(destinations))
 
 
 def get_notification_media(destinations: List[DestinationConfig]):
