@@ -572,6 +572,26 @@ class AcknowledgementViewSet(rw_viewsets.ModelViewSet):
         serializer.save(incident=incident, actor=user)
 
 
+def bulk_setup(incident_ids, qs, change_key):
+    # setup
+    changes = {}
+    status_codes_seen = set()
+    incidents = {i.id: i for i in qs.filter(pk__in=incident_ids)}
+    incident_ids = set(incident_ids)
+
+    # wash ids
+    missing_ids = incident_ids - set(incidents.keys())
+    for missing_id in missing_ids:
+        changes[str(missing_id)] = {
+            change_key: None,
+            "status": status.HTTP_400_BAD_REQUEST,
+            "errors": {"ids": f"Incident with id {missing_id} could not be found."},
+        }
+        status_codes_seen.add(status.HTTP_400_BAD_REQUEST)
+    incident_ids = incident_ids - missing_ids
+    return incident_ids, incidents, changes, status_codes_seen
+
+
 @extend_schema_view(
     create=extend_schema(
         request=RequestBulkAcknowledgementSerializer,
@@ -590,25 +610,14 @@ class BulkAcknowledgementViewSet(viewsets.ViewSet):
         if not serializer.is_valid():
             return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        incident_ids = serializer.data["ids"]
+        incident_ids = set(serializer.data["ids"])
         ack_data = serializer.data["ack"]
         actor = request.user
 
-        incidents = {i.id: i for i in self.queryset.filter(pk__in=incident_ids)}
-        changes = {}
-        status_codes_seen = set()
+        incident_ids, incidents, changes, status_codes_seen = bulk_setup(incident_ids, self.queryset, "ack")
 
         for incident_id in incident_ids:
             incident = incidents.get(incident_id)
-
-            if not incident:
-                changes[str(incident_id)] = {
-                    "ack": None,
-                    "status": status.HTTP_400_BAD_REQUEST,
-                    "errors": {"ids": f"Incident with id {incident_id} could not be found."},
-                }
-                status_codes_seen.add(status.HTTP_400_BAD_REQUEST)
-                continue
 
             ack = incident.create_ack(
                 actor=actor,
@@ -652,21 +661,10 @@ class BulkEventViewSet(viewsets.ViewSet):
         event_data = serializer.data["event"]
         actor = request.user
 
-        incidents = {i.id: i for i in self.queryset.filter(pk__in=incident_ids)}
-        changes = {}
-        status_codes_seen = set()
+        incident_ids, incidents, changes, status_codes_seen = bulk_setup(incident_ids, self.queryset, "event")
 
         for incident_id in incident_ids:
             incident = incidents.get(incident_id)
-
-            if not incident:
-                changes[str(incident_id)] = {
-                    "event": None,
-                    "status": status.HTTP_400_BAD_REQUEST,
-                    "errors": {"ids": f"Incident with id {incident_id} could not be found."},
-                }
-                status_codes_seen.add(status.HTTP_400_BAD_REQUEST)
-                continue
 
             if event_data["type"] == "CLO":
                 event = incident.set_closed(actor=actor, timestamp=event_data["timestamp"])
@@ -715,21 +713,10 @@ class BulkTicketUrlViewSet(viewsets.ViewSet):
         incident_ids = serializer.data["ids"]
         ticket_url = serializer.data["ticket_url"]
 
-        incidents = {i.id: i for i in self.queryset.filter(pk__in=incident_ids)}
-        changes = {}
-        status_codes_seen = set()
+        incident_ids, incidents, changes, status_codes_seen = bulk_setup(incident_ids, self.queryset, "ticket_url")
 
         for incident_id in incident_ids:
             incident = incidents.get(incident_id)
-
-            if not incident:
-                changes[str(incident_id)] = {
-                    "ticket_url": None,
-                    "status": status.HTTP_400_BAD_REQUEST,
-                    "errors": {"ids": f"Incident with id {incident_id} could not be found."},
-                }
-                status_codes_seen.add(status.HTTP_400_BAD_REQUEST)
-                continue
 
             incident.ticket_url = ticket_url
             incident.save()
