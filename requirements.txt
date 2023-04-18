@@ -33,7 +33,7 @@ channels[daphne]==4.0.0
     # via
     #   argus-server (pyproject.toml)
     #   channels-redis
-channels-redis==4.0.0
+channels-redis==4.1.0
     # via argus-server (pyproject.toml)
 chardet==4.0.0
     # via requests
@@ -139,7 +139,7 @@ pyyaml==5.4.1
     # via
     #   -r requirements/forced-upgrade.txt
     #   drf-spectacular
-redis==4.5.1
+redis==4.5.4
     # via channels-redis
 requests==2.25.1
     # via

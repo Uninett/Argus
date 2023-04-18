@@ -33,7 +33,7 @@ channels[daphne]==4.0.0
     # via
     #   argus-server (pyproject.toml)
     #   channels-redis
-channels-redis==4.0.0
+channels-redis==4.1.0
     # via argus-server (pyproject.toml)
 charset-normalizer==2.1.1
     # via requests
@@ -51,8 +51,6 @@ defusedxml==0.7.1
     # via
     #   python3-openid
     #   social-auth-core
-deprecated==1.2.13
-    # via redis
 dj-database-url==1.0.0
     # via argus-server (pyproject.toml)
 django==4.1.7
@@ -109,8 +107,6 @@ oauthlib==3.2.2
     # via
     #   requests-oauthlib
     #   social-auth-core
-packaging==21.3
-    # via redis
 phonenumberslite==8.13.0
     # via django-phonenumber-field
 psycopg2==2.9.5
@@ -127,8 +123,6 @@ pyjwt==2.6.0
     # via social-auth-core
 pyopenssl==22.1.0
     # via twisted
-pyparsing==3.0.9
-    # via packaging
 pyrsistent==0.19.2
     # via jsonschema
 python-dataporten-auth==2.0.0
@@ -145,7 +139,7 @@ pyyaml==6.0
     # via
     #   -r requirements/forced-upgrade.txt
     #   drf-spectacular
-redis==4.3.4
+redis==4.5.4
     # via channels-redis
 requests==2.28.1
     # via
@@ -185,8 +179,6 @@ wheel==0.38.4
     # via argus-server (pyproject.toml)
 whitenoise==6.2.0
     # via argus-server (pyproject.toml)
-wrapt==1.14.1
-    # via deprecated
 zope-interface==5.5.1
     # via twisted
 
