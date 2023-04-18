@@ -1261,10 +1261,8 @@ Incident endpoints
           {
               "ids": [1, 2],
               "ack": {
-                  "event": {
-                      "timestamp": "2011-11-11 11:11:11.235877",
-                      "description": "The incident is being investigated."
-                  },
+                  "timestamp": "2011-11-11 11:11:11.235877",
+                  "description": "The incident is being investigated.",
                   "expiration": "2011-11-13 12:00:00"
               }
           }
