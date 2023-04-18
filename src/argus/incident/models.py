@@ -193,13 +193,46 @@ class IncidentTagRelation(models.Model):
         return f"Tag <{self.tag}> on incident #{self.incident.pk} added by {self.added_by}"
 
 
-class IncidentQuerySet(models.QuerySet):
-    def update(self, **kwargs):
-        """
-        This should not be used, as it doesn't call `save()`, which breaks things like the ws (WebSocket) app.
-        """
-        raise NotImplementedError()
+class Event(models.Model):
+    class Type(models.TextChoices):
+        INCIDENT_START = "STA", "Incident start"
+        INCIDENT_END = "END", "Incident end"
+        INCIDENT_CHANGE = "CHI", "Incident change"
+        CLOSE = "CLO", "Close"
+        REOPEN = "REO", "Reopen"
+        ACKNOWLEDGE = "ACK", "Acknowledge"
+        OTHER = "OTH", "Other"
+        STATELESS = "LES", "Stateless"
 
+    ALLOWED_TYPES_FOR_SOURCE_SYSTEMS = {
+        Type.INCIDENT_START,
+        Type.INCIDENT_END,
+        Type.OTHER,
+        Type.INCIDENT_CHANGE,
+        Type.STATELESS,
+    }
+    ALLOWED_TYPES_FOR_END_USERS = {Type.CLOSE, Type.REOPEN, Type.ACKNOWLEDGE, Type.OTHER}
+
+    incident = models.ForeignKey(to='Incident', on_delete=models.PROTECT, related_name="events")
+    actor = models.ForeignKey(to=User, on_delete=models.PROTECT, related_name="caused_events")
+    timestamp = models.DateTimeField()
+    received = models.DateTimeField(default=timezone.now)
+    type = models.TextField(choices=Type.choices)
+    description = models.TextField(blank=True)
+
+    class Meta:
+        ordering = ["-timestamp"]
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        # update incident.search_text
+        self.incident.save()
+
+    def __str__(self):
+        return f"'{self.get_type_display()}': {self.incident.description}, {self.actor} @ {self.timestamp}"
+
+
+class IncidentQuerySet(models.QuerySet):
     def stateful(self):
         return self.filter(end_time__isnull=False)
 
@@ -255,6 +288,67 @@ class IncidentQuerySet(models.QuerySet):
     def _get_acked_incident_ids():
         current_acks = Acknowledgement.objects.active().prefetch_related("event__incident")
         return current_acks.values_list("event__incident", flat=True).distinct()
+
+    def create_acks(self, actor: User, timestamp=None, description="", expiration=None):
+        events = self.create_events(actor, Event.Type.ACKNOWLEDGE, timestamp, description)
+        ack_objs = [
+            Acknowledgement(event=event, expiration=expiration)
+            for event in events
+        ]
+        Acknowledgement.objects.bulk_create(ack_objs)
+        qs = Acknowledgement.objects.filter(event__in=events)
+        return qs
+
+    def create_events(self, actor: User, event_type: Event.Type, timestamp=None, description=""):
+        """
+        Create events of type ``event_type``, does not change dependent objects
+
+        This means that no signals are sent. On CLOSE, INCIDENT_END or REOPEN,
+        the incident for the event keeps its original end_time. Also, it is not
+        possible to set an expiration time for an ack.
+        """
+        timestamp = timestamp if timestamp else timezone.now()
+        event_objs = [
+            Event(
+                incident=i,
+                actor=actor,
+                timestamp=timestamp,
+                type=event_type,
+                description=description,
+            )
+            for i in self
+        ]
+        Event.objects.bulk_create(event_objs)
+        qs = Event.objects.filter(
+            incident__in=self,
+            actor=actor,
+            timestamp=timestamp,
+            type=event_type,
+            description=description,
+        )
+        return qs
+
+    def close(self, actor: User, timestamp=None, description=""):
+        "Close incidents correctly and create the needed events"
+        qs = self.open()
+        qs.update(end_time=timestamp or timezone.now())
+        qs = self.all()  # Reload changes from database
+        event_type = Event.Type.CLOSE
+        events = qs.create_events(actor, event_type, timestamp, description)
+        return events
+
+    def reopen(self, actor: User, timestamp=None, description=""):
+        "Reopen incidents correctly and create the needed events"
+        qs = self.closed()
+        qs.update(end_time=INFINITY_REPR)
+        qs = self.all()  # Reload changes from database
+        event_type = Event.Type.REOPEN
+        events = qs.create_events(actor, event_type, timestamp, description)
+        return events
+
+    def update_ticket_url(self, url: str):
+        self.update(ticket_url=url)
+        return self.all()  # Return updated qs
 
 
 # TODO: review whether fields should be nullable, and on_delete modes
@@ -458,45 +552,6 @@ class IncidentRelation(models.Model):
 
     def __str__(self):
         return f"Incident #{self.incident1.pk} {self.type} #{self.incident2.pk}"
-
-
-class Event(models.Model):
-    class Type(models.TextChoices):
-        INCIDENT_START = "STA", "Incident start"
-        INCIDENT_END = "END", "Incident end"
-        INCIDENT_CHANGE = "CHI", "Incident change"
-        CLOSE = "CLO", "Close"
-        REOPEN = "REO", "Reopen"
-        ACKNOWLEDGE = "ACK", "Acknowledge"
-        OTHER = "OTH", "Other"
-        STATELESS = "LES", "Stateless"
-
-    ALLOWED_TYPES_FOR_SOURCE_SYSTEMS = {
-        Type.INCIDENT_START,
-        Type.INCIDENT_END,
-        Type.OTHER,
-        Type.INCIDENT_CHANGE,
-        Type.STATELESS,
-    }
-    ALLOWED_TYPES_FOR_END_USERS = {Type.CLOSE, Type.REOPEN, Type.ACKNOWLEDGE, Type.OTHER}
-
-    incident = models.ForeignKey(to=Incident, on_delete=models.PROTECT, related_name="events")
-    actor = models.ForeignKey(to=User, on_delete=models.PROTECT, related_name="caused_events")
-    timestamp = models.DateTimeField()
-    received = models.DateTimeField(default=timezone.now)
-    type = models.TextField(choices=Type.choices)
-    description = models.TextField(blank=True)
-
-    class Meta:
-        ordering = ["-timestamp"]
-
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-        # update incident.search_text
-        self.incident.save()
-
-    def __str__(self):
-        return f"'{self.get_type_display()}': {self.incident.description}, {self.actor} @ {self.timestamp}"
 
 
 class ChangeEvent(Event):
