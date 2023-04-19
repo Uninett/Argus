@@ -466,7 +466,7 @@ class Incident(models.Model):
         return self.events.filter(acks_query & acks_not_expired_query).exists()
 
     # @transaction.atomic
-    def set_open(self, actor: User, timestamp: datetime = None):
+    def set_open(self, actor: User, timestamp: datetime = None, description=""):
         if not self.stateful:
             raise ValidationError("Cannot set a stateless incident as open")
         if self.open:
@@ -475,11 +475,15 @@ class Incident(models.Model):
         self.end_time = INFINITY_REPR
         self.save(update_fields=["end_time"])
         return Event.objects.create(
-            incident=self, actor=actor, timestamp=timestamp or timezone.now(), type=Event.Type.REOPEN
+            incident=self,
+            actor=actor,
+            timestamp=timestamp or timezone.now(),
+            type=Event.Type.REOPEN,
+            description=description,
         )
 
     # @transaction.atomic
-    def set_closed(self, actor: User, timestamp: datetime = None):
+    def set_closed(self, actor: User, timestamp: datetime = None, description=""):
         if not self.stateful:
             raise ValidationError("Cannot set a stateless incident as closed")
         if not self.open:
@@ -487,7 +491,13 @@ class Incident(models.Model):
 
         self.end_time = timestamp or timezone.now()
         self.save(update_fields=["end_time"])
-        return Event.objects.create(incident=self, actor=actor, timestamp=self.end_time, type=Event.Type.CLOSE)
+        return Event.objects.create(
+            incident=self,
+            actor=actor,
+            timestamp=self.end_time,
+            type=Event.Type.CLOSE,
+            description=description,
+        )
 
     # @transaction.atomic
     def set_end(self, actor: User):
