@@ -572,24 +572,32 @@ class AcknowledgementViewSet(rw_viewsets.ModelViewSet):
         serializer.save(incident=incident, actor=user)
 
 
-def bulk_setup(incident_ids, qs, change_key):
-    # setup
-    changes = {}
-    status_codes_seen = set()
-    incidents = {i.id: i for i in qs.filter(pk__in=incident_ids)}
-    incident_ids = set(incident_ids)
+class BulkHelper:
+    """Methods and attributes that views changing incidents in bulk need"""
 
-    # wash ids
-    missing_ids = incident_ids - set(incidents.keys())
-    for missing_id in missing_ids:
-        changes[str(missing_id)] = {
-            change_key: None,
-            "status": status.HTTP_400_BAD_REQUEST,
-            "errors": {"ids": f"Incident with id {missing_id} could not be found."},
-        }
-        status_codes_seen.add(status.HTTP_400_BAD_REQUEST)
-    incident_ids = incident_ids - missing_ids
-    return incident_ids, incidents, changes, status_codes_seen
+    change_key: str
+
+    def bulk_setup(self, incident_ids):
+        """Setup needed variables and handle ids not existing in the database
+
+        The setup-part is here because overriding __init__ is error-prone.
+        """
+        # setup
+        changes = {}
+        status_codes_seen = set()
+        qs = self.queryset.filter(pk__in=incident_ids)
+        found_ids = set(qs.values_list('id', flat=True))
+
+        # wash ids
+        missing_ids = set(incident_ids) - found_ids
+        for missing_id in missing_ids:
+            changes[str(missing_id)] = {
+                self.change_key: None,
+                "status": status.HTTP_400_BAD_REQUEST,
+                "errors": {"ids": f"Incident with id {missing_id} could not be found."},
+            }
+            status_codes_seen.add(status.HTTP_400_BAD_REQUEST)
+        return qs, changes, status_codes_seen
 
 
 @extend_schema_view(
@@ -598,11 +606,12 @@ def bulk_setup(incident_ids, qs, change_key):
         responses=ResponseBulkSerializer,
     )
 )
-class BulkAcknowledgementViewSet(viewsets.ViewSet):
+class BulkAcknowledgementViewSet(BulkHelper, viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = ResponseBulkSerializer
     write_serializer_class = RequestBulkAcknowledgementSerializer
     queryset = Incident.objects.all()
+    change_key = "ack"
 
     def create(self, request):
         serializer = self.write_serializer_class(data=request.data, context={"request": request})
@@ -611,20 +620,22 @@ class BulkAcknowledgementViewSet(viewsets.ViewSet):
             return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         incident_ids = set(serializer.data["ids"])
-        ack_data = serializer.data["ack"]
         actor = request.user
+        ack_data = serializer.data["ack"]
+        timestamp = ack_data["timestamp"]
+        description = ack_data.get("description", "")
+        expiration = ack_data.get("expiration", None)
 
-        incident_ids, incidents, changes, status_codes_seen = bulk_setup(incident_ids, self.queryset, "ack")
+        qs, changes, status_codes_seen = self.bulk_setup(incident_ids)
 
-        for incident_id in incident_ids:
-            incident = incidents.get(incident_id)
+        acks = qs.create_acks(actor, timestamp, description, expiration)
+        # send notifications manually
 
-            ack = incident.create_ack(
-                actor=actor,
-                timestamp=ack_data["timestamp"],
-                description=ack_data.get("description", ""),
-                expiration=ack_data.get("expiration", None),
-            )
+        event_ids = []
+        for ack in acks:
+            event = ack.event
+            event_ids.append(event.id)
+            incident_id = event.incident_id
             changes[str(incident_id)] = {
                 "ack": ResponseAcknowledgementSerializer(instance=ack).to_representation(instance=ack),
                 "status": status.HTTP_201_CREATED,
@@ -645,11 +656,12 @@ class BulkAcknowledgementViewSet(viewsets.ViewSet):
         responses=ResponseBulkSerializer,
     )
 )
-class BulkEventViewSet(viewsets.ViewSet):
+class BulkEventViewSet(BulkHelper, viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = ResponseBulkSerializer
     write_serializer_class = RequestBulkEventSerializer
     queryset = Incident.objects.all()
+    change_key = "event"
 
     def create(self, request):
         serializer = self.write_serializer_class(data=request.data, context={"request": request})
@@ -658,27 +670,25 @@ class BulkEventViewSet(viewsets.ViewSet):
             return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         incident_ids = serializer.data["ids"]
-        event_data = serializer.data["event"]
         actor = request.user
+        event_data = serializer.data["event"]
+        timestamp = event_data["timestamp"]
+        description = event_data.get("description", "")
+        event_type = Event.Type(event_data["type"])
 
-        incident_ids, incidents, changes, status_codes_seen = bulk_setup(incident_ids, self.queryset, "event")
+        qs, changes, status_codes_seen = self.bulk_setup(incident_ids)
 
-        for incident_id in incident_ids:
-            incident = incidents.get(incident_id)
+        if event_type is Event.Type.CLOSE:
+            events = qs.close(actor, timestamp, description)
+        elif event_type is Event.Type.REOPEN:
+            events = qs.reopen(actor, timestamp, description)
+        else:
+            events = qs.create_events(actor, event_type, timestamp, description)
+        # send notifications manually
 
-            if event_data["type"] == "CLO":
-                event = incident.set_closed(actor=actor, timestamp=event_data["timestamp"])
-            elif event_data["type"] == "REO":
-                event = incident.set_open(actor=actor, timestamp=event_data["timestamp"])
-            else:
-                event = Event.objects.create(
-                    incident=incident,
-                    actor=actor,
-                    timestamp=event_data["timestamp"],
-                    type=event_data["type"],
-                    description=event_data.get("description", ""),
-                )
-            changes[str(incident_id)] = {
+        for event in events:
+            incident = event.incident
+            changes[str(incident.id)] = {
                 "event": EventSerializer(instance=event).to_representation(instance=event),
                 "status": status.HTTP_201_CREATED,
                 "errors": None,
@@ -698,11 +708,12 @@ class BulkEventViewSet(viewsets.ViewSet):
         responses=ResponseBulkSerializer,
     )
 )
-class BulkTicketUrlViewSet(viewsets.ViewSet):
+class BulkTicketUrlViewSet(BulkHelper, viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = ResponseBulkSerializer
     write_serializer_class = RequestBulkTicketUrlSerializer
     queryset = Incident.objects.all()
+    change_key = "ticket_url"
 
     def create(self, request):
         serializer = self.write_serializer_class(data=request.data, context={"request": request})
@@ -713,14 +724,12 @@ class BulkTicketUrlViewSet(viewsets.ViewSet):
         incident_ids = serializer.data["ids"]
         ticket_url = serializer.data["ticket_url"]
 
-        incident_ids, incidents, changes, status_codes_seen = bulk_setup(incident_ids, self.queryset, "ticket_url")
+        qs, changes, status_codes_seen = self.bulk_setup(incident_ids)
 
-        for incident_id in incident_ids:
-            incident = incidents.get(incident_id)
+        incidents = qs.update_ticket_url(ticket_url)
 
-            incident.ticket_url = ticket_url
-            incident.save()
-            changes[str(incident_id)] = {
+        for incident in incidents:
+            changes[str(incident.id)] = {
                 "ticket_url": ticket_url,
                 "status": status.HTTP_201_CREATED,
                 "errors": None,
