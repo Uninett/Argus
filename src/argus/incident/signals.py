@@ -3,7 +3,9 @@ from django.utils import timezone
 from rest_framework.authtoken.models import Token
 
 from argus.incident.models import get_or_create_default_instances, Incident
-from argus.notificationprofile.media import background_send_notifications_to_users
+from argus.notificationprofile.media import send_notifications_to_users
+from argus.notificationprofile.media import background_send_notification
+from argus.notificationprofile.media import send_notification
 from .models import Acknowledgement, ChangeEvent, Event, Incident, SourceSystem, Tag
 
 
@@ -35,8 +37,12 @@ def create_first_event(sender, instance: Incident, created, raw, *args, **kwargs
         )
 
 
-def send_notification(sender, instance: Event, *args, **kwargs):
-    background_send_notifications_to_users(instance)
+def task_send_notification(sender, instance: Event, *args, **kwargs):
+    send_notifications_to_users(instance)
+
+
+def task_background_send_notification(sender, instance: Event, *args, **kwargs):
+    send_notifications_to_users(instance, background_send_notification)
 
 
 def delete_associated_event(sender, instance: Acknowledgement, *args, **kwargs):
