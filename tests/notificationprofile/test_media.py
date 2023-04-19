@@ -24,6 +24,7 @@ class FindDestinationsTest(TestCase):
 
         # Create two separate timeslots
         user = PersonUserFactory()
+        self.user = user
         timeslot1 = factories.TimeslotFactory(user=user)
         factories.MaximalTimeRecurrenceFactory(timeslot=timeslot1)
         timeslot2 = factories.TimeslotFactory(user=user)
@@ -54,5 +55,6 @@ class FindDestinationsTest(TestCase):
         incident = create_fake_incident()
         event = incident.events.get(type="STA")
         destinations = find_destinations_for_event(event)
-        self.assertTrue(len(destinations), 1)
+        for destination in self.user.destinations.all():
+            self.assertIn(destination, destinations)
 
