@@ -4,7 +4,7 @@
 #
 #    pip-compile --output-file=requirements-django41.txt pyproject.toml requirements/django41.txt requirements/forced-upgrade.txt
 #
-asgiref==3.5.2
+asgiref==3.6.0
     # via
     #   channels
     #   channels-redis
@@ -53,7 +53,7 @@ defusedxml==0.7.1
     #   social-auth-core
 dj-database-url==1.0.0
     # via argus-server (pyproject.toml)
-django==4.1.7
+django==4.1.8
     # via
     #   -r requirements/django41.txt
     #   argus-server (pyproject.toml)
@@ -131,10 +131,8 @@ python-dateutil==2.8.2
     # via faker
 python3-openid==3.2.0
     # via social-auth-core
-pytz==2022.6
-    # via
-    #   argus-server (pyproject.toml)
-    #   djangorestframework
+pytz==2023.3
+    # via djangorestframework
 pyyaml==6.0
     # via
     #   -r requirements/forced-upgrade.txt
