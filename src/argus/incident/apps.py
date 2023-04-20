@@ -12,7 +12,8 @@ class IncidentConfig(AppConfig):
             create_first_event,
             delete_associated_user,
             delete_associated_event,
-            send_notification,
+            task_send_notification,  # noqa
+            task_background_send_notification,
         )
 
         post_delete.connect(delete_associated_user, "argus_incident.SourceSystem")
@@ -20,4 +21,4 @@ class IncidentConfig(AppConfig):
         post_delete.connect(close_token_incident, "authtoken.Token")
         post_save.connect(close_token_incident, "authtoken.Token")
         post_save.connect(create_first_event, "argus_incident.Incident")
-        post_save.connect(send_notification, "argus_incident.Event", dispatch_uid="send_notification")
+        post_save.connect(task_background_send_notification, "argus_incident.Event", dispatch_uid="send_notification")
