@@ -3,7 +3,7 @@
 Writing your own ticket system plugin
 =====================================
 
-To create a project for a new plugin easily it is reccommended to use the
+To create a project for a new plugin easily it is recommended to use the
 `Argus Ticket Cookiecutter Template <https://github.com/Uninett/argus_ticket_cookiecutter>_`.
 
 To write your own ticket system plugin it is easiest to use a Python library
