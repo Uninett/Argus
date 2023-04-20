@@ -1258,6 +1258,7 @@ Incident endpoints
 
       .. code-block:: json
         :caption: Example request body
+
           {
               "ids": [1, 2],
               "ack": {
@@ -1276,6 +1277,7 @@ Incident endpoints
 
       .. code-block:: json
         :caption: Example request body
+
           {
               "ids": [1, 2],
               "event": {
