@@ -12,7 +12,10 @@ from ..models import DestinationConfig, Media, NotificationProfile
 from argus.util.utils import import_class_from_dotted_path
 
 if TYPE_CHECKING:
-    from typing import List
+    if sys.version_info[:2] < (3, 9):
+        from typing import Iterable
+    else:
+        from collections.abc import Iterable
 
     from argus.incident.models import Event  # noqa: Break circular import
 
@@ -24,6 +27,7 @@ __all__ = [
     "send_notification",
     "background_send_notification",
     "find_destinations_for_event",
+    "find_destinations_for_many_events",
     "send_notifications_to_users",
     "get_notification_media",
 ]
@@ -43,52 +47,65 @@ def api_safely_get_medium_object(media_slug):
     return obj
 
 
-def send_notification(destinations: List[DestinationConfig], event: Event):
+def send_notification(destinations: Iterable[DestinationConfig], *events: Iterable[Event]):
+    if not events:
+        return
     sent = False
     media = get_notification_media(destinations)
     # Plugin expects queryset...
     ids = (dest.id for dest in destinations)
     qs = DestinationConfig.objects.filter(id__in=ids)
-    for medium in media:
-        sent = medium.send(event, qs) or sent
+    for event in events:
+        LOG.info('Notification: sending event "%s"', event)
+        for medium in media:
+            sent = medium.send(event, qs) or sent
     if not sent:
-        LOG.warn("Notification: Could not send notification, nowhere to send it to")
+        LOG.info("Notification: Could not send notification, nowhere to send it to")
         # TODO Store error as incident
 
 
-def background_send_notification(destinations: List[DestinationConfig], event: Event):
+def background_send_notification(destinations: Iterable[DestinationConfig], *events: Event):
     connections.close_all()
-    LOG.info('Notification: backgrounded: about to send event "%s"', event)
-    p = Process(target=send_notification, args=(destinations, event))
+    LOG.info('Notification: backgrounded: about to send %i events', len(event))
+    p = Process(target=send_notification, args=(destinations, events))
     p.start()
     return p
 
 
 def find_destinations_for_event(event: Event):
-    destinations = []
+    destinations = set()
     incident = event.incident
     for profile in NotificationProfile.objects.prefetch_related("destinations").select_related("user"):
-        LOG.debug('Notification: checking profile "%s"', profile)
+        LOG.debug('Notification: checking profile "%s" for event "%s"', profile, event)
         if profile.incident_fits(incident) and profile.event_fits(event):
-            destinations.extend(profile.destinations.all())
+            destinations.update(profile.destinations.all())
+    return destinations
+
+
+def find_destinations_for_many_events(events: Iterable[Event]):
+    destinations = set()
+    for event in events:
+        destinations.update(find_destinations_for_event(event))
     if not destinations:
         LOG.info('Notification: no listeners for "%s"', event)
     return destinations
 
 
-def send_notifications_to_users(event: Event, send=send_notification):
+def send_notifications_to_users(*events: Iterable[Event], send=send_notification):
+    if not events:
+        LOG.warn('Notification: no events to send, programming error?')
+        return
     if not getattr(settings, "SEND_NOTIFICATIONS", False):
-        LOG.info('Notification: turned off sitewide, not sending for "%s"', event)
+        LOG.info('Notification: turned off sitewide, not sending any')
         return
     # TODO: only send one notification per medium per user
-    LOG.info('Notification: sending event "%s"', event)
     LOG.debug('Fallback filter set to "%s"', getattr(settings, "ARGUS_FALLBACK_FILTER", {}))
-    destinations = find_destinations_for_event(event)
-    send(destinations, event)
-    LOG.info('Notification: event "%s" sent! %i copies', event, len(destinations))
+    destinations = find_destinations_for_many_events(events)
+    send(destinations, *events)
+    LOG.info('Notification: %i events sent! %i copies', len(events), len(destinations))
 
 
-def get_notification_media(destinations: List[DestinationConfig]):
+def get_notification_media(destinations: Iterable[DestinationConfig]):
     destination_slugs = set([destination.media.slug for destination in destinations])
     media = []
     for slug in destination_slugs:
