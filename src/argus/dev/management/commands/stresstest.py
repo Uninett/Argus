@@ -40,6 +40,9 @@ class Command(BaseCommand):
     async def spam_post_incident(self, url, duration, token, client, start_time):
         request_counter = 0
         while True:
+            current_duration = (datetime.now() - start_time).seconds
+            if current_duration >= duration:
+                break
             # Can raise HTTPError but does not need to be handled here
             response = await client.post(url, json=self.INCIDENT_DATA, headers={"Authorization": f"Token {token}"})
             try:
@@ -48,9 +51,6 @@ class Command(BaseCommand):
                 msg = f"HTTP error {response.status_code}: {response.content.decode('utf-8')}"
                 raise HTTPError(msg)
             request_counter += 1
-            current_duration = (datetime.now() - start_time).seconds
-            if current_duration >= duration:
-                break
         return request_counter
 
     async def run_spam_workers(self, url, duration, token, worker_count, start_time):
