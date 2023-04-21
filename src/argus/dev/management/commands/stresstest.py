@@ -19,7 +19,11 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            "-s", "--seconds", type=int, help="Number of seconds the stresstest should last", default=100
+            "-s",
+            "--seconds",
+            type=int,
+            help="Number of seconds to run. The total runtime might be longer if workers are waiting for a response for a long time",
+            default=100,
         )
         parser.add_argument(
             "-u",
@@ -31,7 +35,7 @@ class Command(BaseCommand):
         parser.add_argument(
             "-t", "--token", type=str, help="Token for authenticating against target API", required=True
         )
-        parser.add_argument("-n", type=int, help="Number of parallel connections", default=1)
+        parser.add_argument("-n", type=int, help="Number of workers", default=1)
 
     async def spam_post_incident(self, url, duration, token, client):
         request_counter = 0
