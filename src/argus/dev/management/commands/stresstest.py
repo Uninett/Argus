@@ -2,8 +2,7 @@ from datetime import datetime
 from urllib.parse import urljoin
 import asyncio
 
-import httpx
-from httpx import HTTPError
+from httpx import HTTPError, AsyncClient
 
 from django.core.management.base import BaseCommand
 
@@ -52,7 +51,7 @@ class Command(BaseCommand):
         return request_counter
 
     async def run_spam_workers(self, url, duration, token, worker_count):
-        async with httpx.AsyncClient() as client:
+        async with AsyncClient() as client:
             return await asyncio.gather(
                 *(self.spam_post_incident(url, duration, token, client) for _ in range(worker_count))
             )
