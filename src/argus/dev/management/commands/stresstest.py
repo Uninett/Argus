@@ -37,9 +37,8 @@ class Command(BaseCommand):
         )
         parser.add_argument("-n", type=int, help="Number of workers", default=1)
 
-    async def spam_post_incident(self, url, duration, token, client):
+    async def spam_post_incident(self, url, duration, token, client, start_time):
         request_counter = 0
-        stresstest_start = datetime.now()
         while True:
             # Can raise HTTPError but does not need to be handled here
             response = await client.post(url, json=self.INCIDENT_DATA, headers={"Authorization": f"Token {token}"})
@@ -49,15 +48,15 @@ class Command(BaseCommand):
                 msg = f"HTTP error {response.status_code}: {response.content.decode('utf-8')}"
                 raise HTTPError(msg)
             request_counter += 1
-            current_duration = (datetime.now() - stresstest_start).seconds
+            current_duration = (datetime.now() - start_time).seconds
             if current_duration >= duration:
                 break
         return request_counter
 
-    async def run_spam_workers(self, url, duration, token, worker_count):
+    async def run_spam_workers(self, url, duration, token, worker_count, start_time):
         async with AsyncClient() as client:
             return await asyncio.gather(
-                *(self.spam_post_incident(url, duration, token, client) for _ in range(worker_count))
+                *(self.spam_post_incident(url, duration, token, client, start_time) for _ in range(worker_count))
             )
 
     def handle(self, *args, **options):
@@ -66,14 +65,16 @@ class Command(BaseCommand):
         token = options.get("token")
         worker_count = options.get("n")
         loop = asyncio.get_event_loop()
+        start_time = datetime.now()
         try:
-            result = loop.run_until_complete(self.run_spam_workers(url, test_duration, token, worker_count))
+            result = loop.run_until_complete(self.run_spam_workers(url, test_duration, token, worker_count, start_time))
         except HTTPError as e:
             self.stderr.write(self.style.ERROR(e))
         else:
             total_requests = sum(result)
+            seconds_run = (datetime.now() - start_time).seconds
             self.stdout.write(
                 self.style.SUCCESS(
-                    f"Stresstest complete with no errors. {total_requests} requests were sent in {test_duration} seconds."
+                    f"Stresstest complete with no errors. {total_requests} requests were sent in {seconds_run} seconds."
                 )
             )
