@@ -11,7 +11,6 @@ class Command(BaseCommand):
     help = "Stresstests incident creation API"
 
     INCIDENT_DATA = {
-        "source": "1",
         "start_time": "2023-04-18T15:44:00+02:00",
         "description": "Stresstest",
         "tags": [],
@@ -33,7 +32,11 @@ class Command(BaseCommand):
             required=True,
         )
         parser.add_argument(
-            "-t", "--token", type=str, help="Token for authenticating against target API", required=True
+            "-t",
+            "--token",
+            type=str,
+            help="Token for authenticating against target API. The token must belong to a user that is associated with a source system",
+            required=True,
         )
         parser.add_argument("-n", type=int, help="Number of workers", default=1)
 
