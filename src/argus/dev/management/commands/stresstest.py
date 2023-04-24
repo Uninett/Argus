@@ -10,12 +10,6 @@ from django.core.management.base import BaseCommand
 class Command(BaseCommand):
     help = "Stresstests incident creation API"
 
-    INCIDENT_DATA = {
-        "start_time": datetime.now().isoformat(),
-        "description": "Stresstest",
-        "tags": [],
-    }
-
     def add_arguments(self, parser):
         parser.add_argument(
             "-s",
