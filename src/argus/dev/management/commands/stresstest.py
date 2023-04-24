@@ -11,7 +11,7 @@ class Command(BaseCommand):
     help = "Stresstests incident creation API"
 
     INCIDENT_DATA = {
-        "start_time": "2023-04-18T15:44:00+02:00",
+        "start_time": datetime.now().isoformat(),
         "description": "Stresstest",
         "tags": [],
     }
@@ -40,13 +40,21 @@ class Command(BaseCommand):
         )
         parser.add_argument("-n", type=int, help="Number of workers", default=1)
 
+    def get_incident_data(self):
+        return {
+            "start_time": datetime.now().isoformat(),
+            "description": "Stresstest",
+            "tags": [],
+        }
+
     async def post_incidents_until_end_time(self, url, end_time, token, client):
         request_counter = 0
+        incident_data = self.get_incident_data()
         while True:
             if datetime.now() >= end_time:
                 break
             # Can raise HTTPError but does not need to be handled here
-            response = await client.post(url, json=self.INCIDENT_DATA, headers={"Authorization": f"Token {token}"})
+            response = await client.post(url, json=incident_data, headers={"Authorization": f"Token {token}"})
             try:
                 response.raise_for_status()
             except HTTPError:
