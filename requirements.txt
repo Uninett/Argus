@@ -70,6 +70,8 @@ django==4.2.11
     #   django-cors-headers
     #   django-filter
     #   django-phonenumber-field
+    #   django-picklefield
+    #   django-q2
     #   djangorestframework
     #   drf-rw-serializers
     #   drf-spectacular
@@ -79,6 +81,10 @@ django-cors-headers==4.2.0
 django-filter==23.2
     # via argus-server (pyproject.toml)
 django-phonenumber-field[phonenumberslite]==7.1.0
+    # via argus-server (pyproject.toml)
+django-picklefield==3.1
+    # via django-q2
+django-q2==1.5.2
     # via argus-server (pyproject.toml)
 djangorestframework==3.14.0
     # via
