@@ -22,7 +22,7 @@ class Command(BaseCommand):
             "-s",
             "--seconds",
             type=int,
-            help="Number of seconds to run. The total runtime might be longer if workers are waiting for a response for a long time",
+            help="Number of seconds to send http requests. After this no more requests will be sent but responses will be waited for",
             default=100,
         )
         parser.add_argument(
