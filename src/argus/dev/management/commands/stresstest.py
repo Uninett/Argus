@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from urllib.parse import urljoin
 import asyncio
 
@@ -37,11 +37,10 @@ class Command(BaseCommand):
         )
         parser.add_argument("-n", type=int, help="Number of workers", default=1)
 
-    async def spam_post_incident(self, url, duration, token, client, start_time):
+    async def spam_post_incident(self, url, end_time, token, client):
         request_counter = 0
         while True:
-            current_duration = (datetime.now() - start_time).seconds
-            if current_duration >= duration:
+            if datetime.now() >= end_time:
                 break
             # Can raise HTTPError but does not need to be handled here
             response = await client.post(url, json=self.INCIDENT_DATA, headers={"Authorization": f"Token {token}"})
@@ -53,10 +52,10 @@ class Command(BaseCommand):
             request_counter += 1
         return request_counter
 
-    async def run_spam_workers(self, url, duration, token, worker_count, start_time):
+    async def run_spam_workers(self, url, end_time, token, worker_count):
         async with AsyncClient() as client:
             return await asyncio.gather(
-                *(self.spam_post_incident(url, duration, token, client, start_time) for _ in range(worker_count))
+                *(self.spam_post_incident(url, end_time, token, client) for _ in range(worker_count))
             )
 
     def handle(self, *args, **options):
@@ -66,8 +65,9 @@ class Command(BaseCommand):
         worker_count = options.get("n")
         loop = asyncio.get_event_loop()
         start_time = datetime.now()
+        end_time = start_time + timedelta(seconds=test_duration)
         try:
-            result = loop.run_until_complete(self.run_spam_workers(url, test_duration, token, worker_count, start_time))
+            result = loop.run_until_complete(self.run_spam_workers(url, end_time, token, worker_count))
         except HTTPError as e:
             self.stderr.write(self.style.ERROR(e))
         else:
