@@ -37,7 +37,7 @@ class Command(BaseCommand):
         )
         parser.add_argument("-n", type=int, help="Number of workers", default=1)
 
-    async def spam_post_incident(self, url, end_time, token, client):
+    async def post_incidents_until_end_time(self, url, end_time, token, client):
         request_counter = 0
         while True:
             if datetime.now() >= end_time:
@@ -52,10 +52,10 @@ class Command(BaseCommand):
             request_counter += 1
         return request_counter
 
-    async def run_spam_workers(self, url, end_time, token, worker_count):
+    async def run_workers(self, url, end_time, token, worker_count):
         async with AsyncClient() as client:
             return await asyncio.gather(
-                *(self.spam_post_incident(url, end_time, token, client) for _ in range(worker_count))
+                *(self.post_incidents_until_end_time(url, end_time, token, client) for _ in range(worker_count))
             )
 
     def handle(self, *args, **options):
@@ -67,7 +67,7 @@ class Command(BaseCommand):
         start_time = datetime.now()
         end_time = start_time + timedelta(seconds=test_duration)
         try:
-            result = loop.run_until_complete(self.run_spam_workers(url, end_time, token, worker_count))
+            result = loop.run_until_complete(self.run_workers(url, end_time, token, worker_count))
         except HTTPError as e:
             self.stderr.write(self.style.ERROR(e))
         else:
