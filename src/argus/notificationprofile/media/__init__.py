@@ -1,11 +1,9 @@
 from __future__ import annotations
 
 import logging
-from multiprocessing import Process
 from typing import TYPE_CHECKING
 
 from django.conf import settings
-from django.db import connections
 from rest_framework.exceptions import ValidationError
 
 from ..models import DestinationConfig, Media, NotificationProfile
@@ -25,9 +23,9 @@ LOG = logging.getLogger(__name__)
 
 
 __all__ = [
+    "are_notifications_turned_on",
     "api_safely_get_medium_object",
     "send_notification",
-    "background_send_notification",
     "find_destinations_for_event",
     "find_destinations_for_many_events",
     "send_notifications_to_users",
@@ -39,6 +37,13 @@ __all__ = [
 MEDIA_PLUGINS = getattr(settings, "MEDIA_PLUGINS")
 MEDIA_CLASSES = [import_class_from_dotted_path(media_plugin) for media_plugin in MEDIA_PLUGINS]
 MEDIA_CLASSES_DICT = {media_class.MEDIA_SLUG: media_class for media_class in MEDIA_CLASSES}
+
+
+def are_notifications_turned_on():
+    if not getattr(settings, "SEND_NOTIFICATIONS", False):
+        LOG.info("Notification: turned off sitewide, not sending any")
+        return False
+    return True
 
 
 def api_safely_get_medium_object(media_slug):
@@ -62,14 +67,6 @@ def send_notification(destinations: Iterable[DestinationConfig], *events: Iterab
                 LOG.info('Notification: sent event "%s" to "%s"', event, medium.MEDIA_SLUG)
             else:
                 LOG.warn('Notification: could not send event "%s" to "%s"', event, medium.MEDIA_SLUG)
-
-
-def background_send_notification(destinations: Iterable[DestinationConfig], *events: Event):
-    connections.close_all()
-    LOG.info("Notification: backgrounded: about to send %i events", len(events))
-    p = Process(target=send_notification, args=(destinations, *events))
-    p.start()
-    return p
 
 
 def find_destinations_for_event(event: Event):
@@ -97,8 +94,7 @@ def send_notifications_to_users(*events: Iterable[Event], send=send_notification
     if not events:
         LOG.warn("Notification: no events to send, programming error?")
         return
-    if not getattr(settings, "SEND_NOTIFICATIONS", False):
-        LOG.info("Notification: turned off sitewide, not sending any")
+    if not are_notifications_turned_on():
         return
     # TODO: only send one notification per medium per user
     LOG.debug('Fallback filter set to "%s"', getattr(settings, "ARGUS_FALLBACK_FILTER", {}))

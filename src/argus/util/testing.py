@@ -1,9 +1,6 @@
-from django.db.models.signals import post_save
+# import the signal sender (aka. post_save)
 
-from argus.incident.signals import send_notification
-from argus.incident.signals import background_send_notification
-from argus.incident.models import Event
-
+# import the signal receivers
 
 __all__ = [
     "disconnect_signals",
@@ -15,10 +12,10 @@ __all__ = [
 
 
 def disconnect_signals():
-    post_save.disconnect(send_notification, Event, dispatch_uid="send_notification")
-    post_save.disconnect(background_send_notification, Event, dispatch_uid="send_notification")
+    # signal.disconnect(receiver)
+    pass
 
 
 def connect_signals():
-    post_save.connect(send_notification, Event, dispatch_uid="send_notification")
-    post_save.connect(background_send_notification, Event, dispatch_uid="send_notification")
+    # signal.connect(receiver)
+    pass

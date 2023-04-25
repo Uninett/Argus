@@ -28,10 +28,6 @@ from argus.incident.ticket.base import (
     TicketPluginException,
     TicketSettingsException,
 )
-from argus.notificationprofile.media import (
-    send_notifications_to_users,
-    background_send_notification,
-)
 from argus.util.datetime_utils import INFINITY_REPR
 from argus.util.signals import bulk_changed
 from argus.util.utils import import_class_from_dotted_path

@@ -100,9 +100,10 @@ class TimeRecurrence(models.Model):
 class FilterWrapper:
     TRINARY_FILTERS = ("open", "acked", "stateful")
 
-    def __init__(self, filterblob):
+    def __init__(self, filterblob, user=None):
         self.fallback_filter = getattr(settings, "ARGUS_FALLBACK_FILTER", {})
         self.filter = filterblob.copy()
+        self.user = user  # simplifies debugging, set breakpoint for specific user
 
     def _get_tristate(self, tristate):
         fallback_filter = self.fallback_filter.get(tristate, None)
@@ -179,7 +180,8 @@ class Filter(models.Model):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.filter_wrapper = FilterWrapper(self.filter)
+        user = getattr(self, "user", None)
+        self.filter_wrapper = FilterWrapper(self.filter, user)
 
     def __str__(self):
         return f"{self.name} [{self.filter}]"
