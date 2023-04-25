@@ -88,5 +88,5 @@ def get_notification_media(destinations: List[DestinationConfig]):
         if slug in MEDIA_CLASSES_DICT.keys():
             media.append(MEDIA_CLASSES_DICT[slug])
         else:
-            raise ValueError("Medium %s was not found in imported media.", slug)
+            LOG.warning("Medium %s was not found in imported media.", slug)
     return media

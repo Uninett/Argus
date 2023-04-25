@@ -1,9 +1,13 @@
+import logging
+
 from django.db.utils import ProgrammingError
 
 from rest_framework.exceptions import APIException
 
 from argus.auth.models import User
 from .models import DestinationConfig, TimeRecurrence, Timeslot
+
+LOG = logging.getLogger(__name__)
 
 __all__ = [
     "sync_media",
@@ -19,16 +23,16 @@ def sync_media(sender, **kwargs):
 
     from .media import MEDIA_CLASSES, MEDIA_CLASSES_DICT
 
-    apps = kwargs['apps']
+    apps = kwargs["apps"]
     try:
-        Media = apps.get_model('argus_notificationprofile', 'Media')
+        Media = apps.get_model("argus_notificationprofile", "Media")
     except ImportError:
         return
 
     try:
         for medium in Media.objects.all():
             if medium.slug not in MEDIA_CLASSES_DICT.keys():
-                raise APIException(f"{medium.name} plugin is not registered in MEDIA_PLUGINS")
+                LOG.warning("%s plugin is not registered in MEDIA_PLUGINS", medium.name)
     except ProgrammingError:
         return
 
