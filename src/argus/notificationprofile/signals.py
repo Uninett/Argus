@@ -33,6 +33,10 @@ def sync_media(sender, **kwargs):
         for medium in Media.objects.all():
             if medium.slug not in MEDIA_CLASSES_DICT.keys():
                 LOG.warning("%s plugin is not registered in MEDIA_PLUGINS", medium.name)
+                # Need to check in case of backwards migrations
+                if getattr(medium, "installed", None):
+                    medium.installed = False
+                    medium.save(update_fields=["installed"])
     except ProgrammingError:
         return
 
