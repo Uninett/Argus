@@ -267,6 +267,7 @@ class Media(models.Model):
     MEDIA_NAME_LENGTH = 20
     slug = models.SlugField(max_length=MEDIA_NAME_LENGTH, blank=True, primary_key=True)
     name = models.CharField(max_length=MEDIA_NAME_LENGTH)
+    installed = models.BooleanField(default=True)
 
     def __str__(self) -> str:
         return f"{self.slug}"
