@@ -111,6 +111,7 @@ class MediaSerializer(serializers.ModelSerializer):
         fields = [
             "slug",
             "name",
+            "installed",
         ]
 
 
