@@ -33,6 +33,7 @@ from argus.notificationprofile.media import (
     background_send_notification,
 )
 from argus.util.datetime_utils import INFINITY_REPR
+from argus.util.signals import bulk_changed
 from argus.util.utils import import_class_from_dotted_path
 
 from .forms import AddSourceSystemForm
@@ -70,6 +71,10 @@ LOG = logging.getLogger(__name__)
 
 # Used in OpenApiParameter
 BooleanStringOAEnum = ("true", "false")
+
+
+def send_changed_incidents(incidents):
+    bulk_changed.send(sender=Incident, instances=incidents)
 
 
 class IncidentPagination(CursorPagination):
@@ -636,10 +641,12 @@ class BulkAcknowledgementViewSet(BulkHelper, viewsets.ViewSet):
         # send notifications manually
 
         event_ids = []
+        incidents = []
         for ack in acks:
             event = ack.event
             event_ids.append(event.id)
             incident_id = event.incident_id
+            incidents.append(event.incident)
             changes[str(incident_id)] = {
                 "ack": ResponseAcknowledgementSerializer(instance=ack).to_representation(instance=ack),
                 "status": status.HTTP_201_CREATED,
@@ -647,8 +654,9 @@ class BulkAcknowledgementViewSet(BulkHelper, viewsets.ViewSet):
             }
             status_codes_seen.add(status.HTTP_201_CREATED)
 
-        all_bad = status_codes_seen == set((status.HTTP_400_BAD_REQUEST,))
+        send_changed_incidents(incidents)
 
+        all_bad = status_codes_seen == set((status.HTTP_400_BAD_REQUEST,))
         return Response(
             data={"changes": changes}, status=status.HTTP_400_BAD_REQUEST if all_bad else status.HTTP_201_CREATED
         )
@@ -690,8 +698,10 @@ class BulkEventViewSet(BulkHelper, viewsets.ViewSet):
             events = qs.create_events(actor, event_type, timestamp, description)
         # send notifications manually
 
+        incidents = []
         for event in events:
             incident = event.incident
+            incidents.append(incident)
             changes[str(incident.id)] = {
                 "event": EventSerializer(instance=event).to_representation(instance=event),
                 "status": status.HTTP_201_CREATED,
@@ -699,8 +709,9 @@ class BulkEventViewSet(BulkHelper, viewsets.ViewSet):
             }
             status_codes_seen.add(status.HTTP_201_CREATED)
 
-        all_bad = status_codes_seen == set((status.HTTP_400_BAD_REQUEST,))
+        send_changed_incidents(incidents)
 
+        all_bad = status_codes_seen == set((status.HTTP_400_BAD_REQUEST,))
         return Response(
             data={"changes": changes}, status=status.HTTP_400_BAD_REQUEST if all_bad else status.HTTP_201_CREATED
         )
@@ -731,7 +742,6 @@ class BulkTicketUrlViewSet(BulkHelper, viewsets.ViewSet):
         qs, changes, status_codes_seen = self.bulk_setup(incident_ids)
 
         incidents = qs.update_ticket_url(ticket_url)
-
         for incident in incidents:
             changes[str(incident.id)] = {
                 "ticket_url": ticket_url,
@@ -740,8 +750,9 @@ class BulkTicketUrlViewSet(BulkHelper, viewsets.ViewSet):
             }
             status_codes_seen.add(status.HTTP_201_CREATED)
 
-        all_bad = status_codes_seen == set((status.HTTP_400_BAD_REQUEST,))
+        send_changed_incidents(incidents)
 
+        all_bad = status_codes_seen == set((status.HTTP_400_BAD_REQUEST,))
         return Response(
             data={"changes": changes}, status=status.HTTP_400_BAD_REQUEST if all_bad else status.HTTP_201_CREATED
         )
