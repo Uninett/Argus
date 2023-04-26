@@ -88,8 +88,8 @@ class Command(BaseCommand):
 
     def verify_tags(self, response_data, expected_data):
         expected_tags = set([tag["tag"] for tag in expected_data["tags"]])
-        response_data = set([tag["tag"] for tag in response_data["tags"]])
-        if expected_tags != response_data:
+        response_tags = set([tag["tag"] for tag in response_data["tags"]])
+        if expected_tags != response_tags:
             raise DatabaseMismatchError("Expected tags are different from actual tags")
 
     def verify_description(self, response_data, expected_data):
