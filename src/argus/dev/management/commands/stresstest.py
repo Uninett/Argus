@@ -15,6 +15,7 @@ class DatabaseMismatchError(Exception):
 
 class Command(BaseCommand):
     help = "Stresstests incident creation API"
+    DEFAULT_TIMEOUT = 5
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -47,7 +48,7 @@ class Command(BaseCommand):
             "tags": [{"tag": "problem_type=stresstest"}],
         }
 
-    async def post_incidents_until_end_time(self, url, end_time, token, client):
+    async def post_incidents_until_end_time(self, url, end_time, token, client, timeout=DEFAULT_TIMEOUT):
         request_counter = 0
         incident_data = self.get_incident_data()
         created_ids = []
@@ -55,12 +56,15 @@ class Command(BaseCommand):
             if datetime.now() >= end_time:
                 break
             try:
-                response = await client.post(url, json=incident_data, headers={"Authorization": f"Token {token}"})
+                response = await client.post(
+                    url, json=incident_data, headers={"Authorization": f"Token {token}"}, timeout=timeout
+                )
+            except ReadTimeout:
+                raise HTTPError(f"Timeout ({timeout}s) waiting for POST response to {url}")
+            try:
                 response.raise_for_status()
                 incident = response.json()
                 created_ids.append(incident["pk"])
-            except ReadTimeout:
-                raise HTTPError(f"Timeout waiting for POST response to {url}")
             except HTTPError as e:
                 msg = f"HTTP error {response.status_code}: {response.content.decode('utf-8')}"
                 raise HTTPError(msg)
@@ -79,16 +83,17 @@ class Command(BaseCommand):
                 *(self.verify_created_incidents(url, token, incident_ids, client) for _ in range(worker_count))
             )
 
-    async def verify_created_incidents(self, url, token, incident_ids, client):
+    async def verify_created_incidents(self, url, token, incident_ids, client, timeout=DEFAULT_TIMEOUT):
         expected_data = self.get_incident_data()
         while incident_ids:
             id = incident_ids.pop()
             id_url = urljoin(url, str(id) + "/")
             try:
-                response = await client.get(id_url, headers={"Authorization": f"Token {token}"})
-                response.raise_for_status()
+                response = await client.get(id_url, headers={"Authorization": f"Token {token}"}, timeout=timeout)
             except ReadTimeout:
-                raise HTTPError(f"Timeout waiting for GET response to {id_url}")
+                raise HTTPError(f"Timeout ({timeout}s) waiting for GET response to {id_url}")
+            try:
+                response.raise_for_status()
             except HTTPError:
                 msg = f"HTTP error {response.status_code}: {response.content.decode('utf-8')}"
                 raise HTTPError(msg)
