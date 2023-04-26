@@ -65,7 +65,7 @@ class Command(BaseCommand):
                 response.raise_for_status()
                 incident = response.json()
                 created_ids.append(incident["pk"])
-            except HTTPError as e:
+            except HTTPError:
                 msg = f"HTTP error {response.status_code}: {response.content.decode('utf-8')}"
                 raise HTTPError(msg)
             request_counter += 1
