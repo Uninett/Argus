@@ -118,7 +118,7 @@ class Command(BaseCommand):
         loop = asyncio.get_event_loop()
         start_time = datetime.now()
         end_time = start_time + timedelta(seconds=test_duration)
-        self.stdout.write("Starting stresstest ...")
+        self.stdout.write("Running stresstest ...")
         try:
             result = loop.run_until_complete(self.run_stresstest_workers(url, end_time, token, worker_count))
         except HTTPError as e:
