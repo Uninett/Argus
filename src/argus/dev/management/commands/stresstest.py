@@ -66,18 +66,25 @@ class Command(BaseCommand):
             request_counter += 1
         return created_ids
 
-    async def run_workers(self, url, end_time, token, worker_count):
+    async def run_stresstest_workers(self, url, end_time, token, worker_count):
         async with AsyncClient() as client:
             return await asyncio.gather(
                 *(self.post_incidents_until_end_time(url, end_time, token, client) for _ in range(worker_count))
             )
 
-    def verify_created_incidents(self, incident_ids, url, token):
+    async def run_verification_workers(self, url, token, incident_ids, worker_count):
+        async with AsyncClient() as client:
+            return await asyncio.gather(
+                *(self.verify_created_incidents(url, token, incident_ids, client) for _ in range(worker_count))
+            )
+
+    async def verify_created_incidents(self, url, token, incident_ids, client):
         expected_data = self.get_incident_data()
-        for id in incident_ids:
-            id_url = urljoin(url, str(id))
+        while incident_ids:
+            id = incident_ids.pop()
+            id_url = urljoin(url, str(id) + "/")
             try:
-                response = requests.get(id_url, headers={"Authorization": f"Token {token}"})
+                response = await client.get(id_url, headers={"Authorization": f"Token {token}"})
                 response.raise_for_status()
             except HTTPError:
                 msg = f"HTTP error {response.status_code}: {response.content.decode('utf-8')}"
@@ -110,19 +117,19 @@ class Command(BaseCommand):
         end_time = start_time + timedelta(seconds=test_duration)
         self.stdout.write("Starting stresstest ...")
         try:
-            result = loop.run_until_complete(self.run_workers(url, end_time, token, worker_count))
+            result = loop.run_until_complete(self.run_stresstest_workers(url, end_time, token, worker_count))
         except HTTPError as e:
             self.stderr.write(self.style.ERROR(e))
             return
-        all_created_ids = list(itertools.chain.from_iterable(result))
+        incident_ids = list(itertools.chain.from_iterable(result))
         self.stdout.write(
             self.style.SUCCESS(
-                f"Completed in {datetime.now() - start_time} after sending {len(all_created_ids)} requests."
+                f"Completed in {datetime.now() - start_time} after sending {len(incident_ids)} requests."
             )
         )
         self.stdout.write("Verifying incidents were created correctly ...")
         try:
-            self.verify_created_incidents(all_created_ids, url, token)
+            loop.run_until_complete(self.run_verification_workers(url, token, incident_ids, worker_count))
         except (DatabaseMismatchError, HTTPError) as e:
             self.stderr.write(self.style.ERROR(e))
             return
