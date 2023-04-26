@@ -9,6 +9,10 @@ from httpx import HTTPError, AsyncClient
 from django.core.management.base import BaseCommand
 
 
+class DatabaseMismatchError(Exception):
+    pass
+
+
 class Command(BaseCommand):
     help = "Stresstests incident creation API"
 
@@ -81,11 +85,11 @@ class Command(BaseCommand):
         expected_tags = set([tag["tag"] for tag in expected_data["tags"]])
         response_data = set([tag["tag"] for tag in response_data["tags"]])
         if expected_tags != response_data:
-            raise ValueError("Expected tags are different from actual tags")
+            raise DatabaseMismatchError("Expected tags are different from actual tags")
 
     def verify_description(self, response_data, expected_data):
         if response_data["description"] != expected_data["description"]:
-            raise ValueError("Expected description is different from actual description")
+            raise DatabaseMismatchError("Expected description is different from actual description")
 
     def handle(self, *args, **options):
         test_duration = options.get("seconds")
@@ -110,7 +114,7 @@ class Command(BaseCommand):
         self.stdout.write("Verifying incidents were created correctly ...")
         try:
             self.verify_created_incidents(all_created_ids, url, token)
-        except ValueError as e:
+        except DatabaseMismatchError as e:
             self.stderr.write(self.style.ERROR(e))
             return
         self.stdout.write(self.style.SUCCESS("Verification complete with no errors."))
