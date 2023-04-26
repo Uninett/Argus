@@ -51,9 +51,7 @@ class Command(BaseCommand):
         request_counter = 0
         incident_data = self.get_incident_data()
         created_ids = []
-        while True:
-            if datetime.now() >= end_time:
-                break
+        while datetime.now() < end_time:
             try:
                 response = await client.post(
                     url, json=incident_data, headers={"Authorization": f"Token {token}"}, timeout=timeout
