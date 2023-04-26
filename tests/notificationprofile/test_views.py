@@ -329,6 +329,11 @@ class MediumViewTests(APITestCase):
         self.assertEqual(len(response.data), 2)
         self.assertEqual(set([medium["slug"] for medium in response.data]), set(["sms", "email"]))
 
+    def test_should_get_specific_medium(self):
+        response = self.user1_rest_client.get(path=f"/api/v2/notificationprofiles/media/email/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
+        self.assertEqual(response.data["slug"], "email")
+
 
 @tag("API", "integration")
 class DestinationViewTests(APITestCase):
