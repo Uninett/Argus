@@ -90,11 +90,15 @@ class Command(BaseCommand):
         expected_tags = set([tag["tag"] for tag in expected_data["tags"]])
         response_tags = set([tag["tag"] for tag in response_data["tags"]])
         if expected_tags != response_tags:
-            raise DatabaseMismatchError("Expected tags are different from actual tags")
+            msg = f'Actual tags "{response_tags}" differ from expected tags "{expected_tags}"'
+            raise DatabaseMismatchError(msg)
 
     def verify_description(self, response_data, expected_data):
-        if response_data["description"] != expected_data["description"]:
-            raise DatabaseMismatchError("Expected description is different from actual description")
+        expected_descr = expected_data["description"]
+        response_descr = response_data["description"]
+        if response_descr != expected_descr:
+            msg = f'Actual description "{response_descr}" differ from expected description "{expected_descr}"'
+            raise DatabaseMismatchError(msg)
 
     def handle(self, *args, **options):
         test_duration = options.get("seconds")
