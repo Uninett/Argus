@@ -102,10 +102,9 @@ class Command(BaseCommand):
             self.stderr.write(self.style.ERROR(e))
             return
         all_created_ids = list(itertools.chain.from_iterable(result))
-        seconds_run = (datetime.now() - start_time).seconds
         self.stdout.write(
             self.style.SUCCESS(
-                f"Stresstest complete with no errors. {len(all_created_ids)} requests were sent in {seconds_run} seconds."
+                f"Completed in {datetime.now() - start_time} after sending {len(all_created_ids)} requests."
             )
         )
         self.stdout.write("Verifying incidents were created correctly ...")
