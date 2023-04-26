@@ -33,8 +33,8 @@ class Command(BaseCommand):
             help="Number of seconds to send http requests. After this no more requests will be sent but responses will be waited for",
             default=100,
         )
-        parser.add_argument("-n", type=int, help="Number of workers", default=1)
         parser.add_argument("-t", "--timeout", type=int, help="Timeout for requests", default=5)
+        parser.add_argument("-n", type=int, help="Number of workers", default=1)
 
     def get_incident_data(self):
         return {
