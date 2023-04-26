@@ -14,7 +14,6 @@ class DatabaseMismatchError(Exception):
 
 class Command(BaseCommand):
     help = "Stresstests incident creation API"
-    DEFAULT_TIMEOUT = 5
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -35,6 +34,7 @@ class Command(BaseCommand):
             help="Token for authenticating against target API. The token must belong to a user that is associated with a source system",
         )
         parser.add_argument("-n", type=int, help="Number of workers", default=1)
+        parser.add_argument("-t", "--timeout", type=int, help="Timeout for requests", default=5)
 
     def get_incident_data(self):
         return {
@@ -43,48 +43,46 @@ class Command(BaseCommand):
             "tags": [{"tag": "problem_type=stresstest"}],
         }
 
-    async def post_incidents_until_end_time(self, url, end_time, token, client, timeout=DEFAULT_TIMEOUT):
+    async def post_incidents_until_end_time(self, url, end_time, token, client):
         request_counter = 0
         incident_data = self.get_incident_data()
         created_ids = []
         while datetime.now() < end_time:
             try:
-                response = await client.post(
-                    url, json=incident_data, headers={"Authorization": f"Token {token}"}, timeout=timeout
-                )
+                response = await client.post(url, json=incident_data, headers={"Authorization": f"Token {token}"})
                 response.raise_for_status()
                 incident = response.json()
                 created_ids.append(incident["pk"])
             except ReadTimeout:
-                raise ReadTimeout(f"Timeout ({timeout}s) waiting for POST response to {url}")
+                raise ReadTimeout(f"Timeout waiting for POST response to {url}")
             except HTTPStatusError:
                 msg = f"HTTP error {response.status_code}: {response.content.decode('utf-8')}"
                 raise HTTPStatusError(msg)
             request_counter += 1
         return created_ids
 
-    async def run_stresstest_workers(self, url, end_time, token, worker_count):
-        async with AsyncClient() as client:
+    async def run_stresstest_workers(self, url, end_time, token, timeout, worker_count):
+        async with AsyncClient(timeout=timeout) as client:
             return await asyncio.gather(
                 *(self.post_incidents_until_end_time(url, end_time, token, client) for _ in range(worker_count))
             )
 
-    async def run_verification_workers(self, url, token, incident_ids, worker_count):
-        async with AsyncClient() as client:
+    async def run_verification_workers(self, url, token, incident_ids, timeout, worker_count):
+        async with AsyncClient(timeout=timeout) as client:
             return await asyncio.gather(
                 *(self.verify_created_incidents(url, token, incident_ids, client) for _ in range(worker_count))
             )
 
-    async def verify_created_incidents(self, url, token, incident_ids, client, timeout=DEFAULT_TIMEOUT):
+    async def verify_created_incidents(self, url, token, incident_ids, client):
         expected_data = self.get_incident_data()
         while incident_ids:
             id = incident_ids.pop()
             id_url = urljoin(url, str(id) + "/")
             try:
-                response = await client.get(id_url, headers={"Authorization": f"Token {token}"}, timeout=timeout)
+                response = await client.get(id_url, headers={"Authorization": f"Token {token}"})
                 response.raise_for_status()
             except ReadTimeout:
-                raise ReadTimeout(f"Timeout ({timeout}s) waiting for GET response to {id_url}")
+                raise ReadTimeout(f"Timeout waiting for GET response to {id_url}")
             except HTTPStatusError:
                 msg = f"HTTP error {response.status_code}: {response.content.decode('utf-8')}"
                 raise HTTPStatusError(msg)
