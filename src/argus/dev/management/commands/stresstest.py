@@ -3,7 +3,7 @@ from urllib.parse import urljoin
 import asyncio
 import itertools
 
-from httpx import AsyncClient, ReadTimeout, HTTPStatusError
+from httpx import AsyncClient, HTTPStatusError, TimeoutException
 
 from django.core.management.base import BaseCommand
 
@@ -53,8 +53,8 @@ class Command(BaseCommand):
                 response.raise_for_status()
                 incident = response.json()
                 created_ids.append(incident["pk"])
-            except ReadTimeout:
-                raise ReadTimeout(f"Timeout waiting for POST response to {url}")
+            except TimeoutException:
+                raise TimeoutException(f"Timeout waiting for POST response to {url}")
             except HTTPStatusError:
                 msg = f"HTTP error {response.status_code}: {response.content.decode('utf-8')}"
                 raise HTTPStatusError(msg)
@@ -81,8 +81,8 @@ class Command(BaseCommand):
             try:
                 response = await client.get(id_url, headers={"Authorization": f"Token {token}"})
                 response.raise_for_status()
-            except ReadTimeout:
-                raise ReadTimeout(f"Timeout waiting for GET response to {id_url}")
+            except TimeoutException:
+                raise TimeoutException(f"Timeout waiting for GET response to {id_url}")
             except HTTPStatusError:
                 msg = f"HTTP error {response.status_code}: {response.content.decode('utf-8')}"
                 raise HTTPStatusError(msg)
@@ -109,13 +109,14 @@ class Command(BaseCommand):
         url = urljoin(options.get("url"), "/api/v1/incidents/")
         token = options.get("token")
         worker_count = options.get("n")
+        timeout = options.get("timeout")
         loop = asyncio.get_event_loop()
         start_time = datetime.now()
         end_time = start_time + timedelta(seconds=test_duration)
         self.stdout.write("Running stresstest ...")
         try:
-            result = loop.run_until_complete(self.run_stresstest_workers(url, end_time, token, worker_count))
-        except (HTTPStatusError, ReadTimeout) as e:
+            result = loop.run_until_complete(self.run_stresstest_workers(url, end_time, token, timeout, worker_count))
+        except (HTTPStatusError, TimeoutException) as e:
             self.stderr.write(self.style.ERROR(e))
             return
         incident_ids = list(itertools.chain.from_iterable(result))
@@ -126,8 +127,8 @@ class Command(BaseCommand):
         )
         self.stdout.write("Verifying incidents were created correctly ...")
         try:
-            loop.run_until_complete(self.run_verification_workers(url, token, incident_ids, worker_count))
-        except (DatabaseMismatchError, HTTPStatusError, ReadTimeout) as e:
+            loop.run_until_complete(self.run_verification_workers(url, token, incident_ids, timeout, worker_count))
+        except (DatabaseMismatchError, HTTPStatusError, TimeoutException) as e:
             self.stderr.write(self.style.ERROR(e))
             return
         self.stdout.write(self.style.SUCCESS("Verification complete with no errors."))
