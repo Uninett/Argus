@@ -3,7 +3,7 @@ from urllib.parse import urljoin
 import asyncio
 import itertools
 
-from httpx import HTTPError, AsyncClient, ReadTimeout
+from httpx import HTTPError, AsyncClient, ReadTimeout, HTTPStatusError
 
 from django.core.management.base import BaseCommand
 
@@ -58,15 +58,14 @@ class Command(BaseCommand):
                 response = await client.post(
                     url, json=incident_data, headers={"Authorization": f"Token {token}"}, timeout=timeout
                 )
-            except ReadTimeout:
-                raise HTTPError(f"Timeout ({timeout}s) waiting for POST response to {url}")
-            try:
                 response.raise_for_status()
                 incident = response.json()
                 created_ids.append(incident["pk"])
-            except HTTPError:
+            except ReadTimeout:
+                raise ReadTimeout(f"Timeout ({timeout}s) waiting for POST response to {url}")
+            except HTTPStatusError:
                 msg = f"HTTP error {response.status_code}: {response.content.decode('utf-8')}"
-                raise HTTPError(msg)
+                raise HTTPStatusError(msg)
             request_counter += 1
         return created_ids
 
@@ -89,13 +88,12 @@ class Command(BaseCommand):
             id_url = urljoin(url, str(id) + "/")
             try:
                 response = await client.get(id_url, headers={"Authorization": f"Token {token}"}, timeout=timeout)
-            except ReadTimeout:
-                raise HTTPError(f"Timeout ({timeout}s) waiting for GET response to {id_url}")
-            try:
                 response.raise_for_status()
-            except HTTPError:
+            except ReadTimeout:
+                raise ReadTimeout(f"Timeout ({timeout}s) waiting for GET response to {id_url}")
+            except HTTPStatusError:
                 msg = f"HTTP error {response.status_code}: {response.content.decode('utf-8')}"
-                raise HTTPError(msg)
+                raise HTTPStatusError(msg)
             response_data = response.json()
             self.verify_tags(response_data, expected_data)
             self.verify_description(response_data, expected_data)
