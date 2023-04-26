@@ -17,13 +17,6 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            "-s",
-            "--seconds",
-            type=int,
-            help="Number of seconds to send http requests. After this no more requests will be sent but responses will be waited for",
-            default=100,
-        )
-        parser.add_argument(
             "url",
             type=str,
             help="URL for target argus host including port, ex https://argushost.no:443",
@@ -32,6 +25,13 @@ class Command(BaseCommand):
             "token",
             type=str,
             help="Token for authenticating against target API. The token must belong to a user that is associated with a source system",
+        )
+        parser.add_argument(
+            "-s",
+            "--seconds",
+            type=int,
+            help="Number of seconds to send http requests. After this no more requests will be sent but responses will be waited for",
+            default=100,
         )
         parser.add_argument("-n", type=int, help="Number of workers", default=1)
         parser.add_argument("-t", "--timeout", type=int, help="Timeout for requests", default=5)
