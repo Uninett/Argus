@@ -25,18 +25,14 @@ class Command(BaseCommand):
             default=100,
         )
         parser.add_argument(
-            "-u",
-            "--url",
+            "url",
             type=str,
             help="URL for target argus host including port, ex https://argushost.no:443",
-            required=True,
         )
         parser.add_argument(
-            "-t",
-            "--token",
+            "token",
             type=str,
             help="Token for authenticating against target API. The token must belong to a user that is associated with a source system",
-            required=True,
         )
         parser.add_argument("-n", type=int, help="Number of workers", default=1)
 
