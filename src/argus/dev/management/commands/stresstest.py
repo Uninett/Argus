@@ -3,7 +3,7 @@ from urllib.parse import urljoin
 import asyncio
 import itertools
 
-from httpx import HTTPError, AsyncClient, ReadTimeout, HTTPStatusError
+from httpx import AsyncClient, ReadTimeout, HTTPStatusError
 
 from django.core.management.base import BaseCommand
 
@@ -121,7 +121,7 @@ class Command(BaseCommand):
         self.stdout.write("Running stresstest ...")
         try:
             result = loop.run_until_complete(self.run_stresstest_workers(url, end_time, token, worker_count))
-        except HTTPError as e:
+        except (HTTPStatusError, ReadTimeout) as e:
             self.stderr.write(self.style.ERROR(e))
             return
         incident_ids = list(itertools.chain.from_iterable(result))
@@ -133,7 +133,7 @@ class Command(BaseCommand):
         self.stdout.write("Verifying incidents were created correctly ...")
         try:
             loop.run_until_complete(self.run_verification_workers(url, token, incident_ids, worker_count))
-        except (DatabaseMismatchError, HTTPError) as e:
+        except (DatabaseMismatchError, HTTPStatusError, ReadTimeout) as e:
             self.stderr.write(self.style.ERROR(e))
             return
         self.stdout.write(self.style.SUCCESS("Verification complete with no errors."))
