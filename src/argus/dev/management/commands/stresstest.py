@@ -123,7 +123,7 @@ class Command(BaseCommand):
         self.stdout.write("Verifying incidents were created correctly ...")
         try:
             self.verify_created_incidents(all_created_ids, url, token)
-        except DatabaseMismatchError as e:
+        except (DatabaseMismatchError, HTTPError) as e:
             self.stderr.write(self.style.ERROR(e))
             return
         self.stdout.write(self.style.SUCCESS("Verification complete with no errors."))
