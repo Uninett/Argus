@@ -76,7 +76,12 @@ class Command(BaseCommand):
         expected_data = self.get_incident_data()
         for id in incident_ids:
             id_url = urljoin(url, str(id))
-            response = requests.get(id_url, headers={"Authorization": f"Token {token}"})
+            try:
+                response = requests.get(id_url, headers={"Authorization": f"Token {token}"})
+                response.raise_for_status()
+            except HTTPError:
+                msg = f"HTTP error {response.status_code}: {response.content.decode('utf-8')}"
+                raise HTTPError(msg)
             response_data = response.json()
             self.verify_tags(response_data, expected_data)
             self.verify_description(response_data, expected_data)
