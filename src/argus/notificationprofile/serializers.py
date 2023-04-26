@@ -113,6 +113,7 @@ class MediaSerializer(serializers.ModelSerializer):
             "name",
             "installed",
         ]
+        read_only_fields = fields
 
 
 class JSONSchemaSerializer(serializers.Serializer):
