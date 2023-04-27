@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from urllib.parse import urljoin
 import asyncio
 
-from httpx import HTTPError, AsyncClient, TimeoutException
+from httpx import AsyncClient, TimeoutException, HTTPStatusError
 
 from django.core.management.base import BaseCommand
 
@@ -48,9 +48,9 @@ class Command(BaseCommand):
                 response.raise_for_status()
             except TimeoutException:
                 raise TimeoutException(f"Timeout waiting for POST response to {url}")
-            except HTTPError:
+            except HTTPStatusError:
                 msg = f"HTTP error {response.status_code}: {response.content.decode('utf-8')}"
-                raise HTTPError(msg)
+                raise HTTPStatusError(msg)
             request_counter += 1
         return request_counter
 
@@ -70,7 +70,7 @@ class Command(BaseCommand):
         end_time = start_time + timedelta(seconds=test_duration)
         try:
             result = loop.run_until_complete(self.run_workers(url, end_time, token, worker_count))
-        except HTTPError as e:
+        except (TimeoutException, HTTPStatusError) as e:
             self.stderr.write(self.style.ERROR(e))
         else:
             total_requests = sum(result)
