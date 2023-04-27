@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from urllib.parse import urljoin
 import asyncio
 
-from httpx import HTTPError, AsyncClient
+from httpx import HTTPError, AsyncClient, TimeoutException
 
 from django.core.management.base import BaseCommand
 
@@ -43,10 +43,11 @@ class Command(BaseCommand):
         while True:
             if datetime.now() >= end_time:
                 break
-            # Can raise HTTPError but does not need to be handled here
-            response = await client.post(url, json=incident_data, headers={"Authorization": f"Token {token}"})
             try:
+                response = await client.post(url, json=incident_data, headers={"Authorization": f"Token {token}"})
                 response.raise_for_status()
+            except TimeoutException:
+                raise TimeoutException(f"Timeout waiting for POST response to {url}")
             except HTTPError:
                 msg = f"HTTP error {response.status_code}: {response.content.decode('utf-8')}"
                 raise HTTPError(msg)
