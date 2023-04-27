@@ -36,14 +36,12 @@ class Command(BaseCommand):
         parser.add_argument("-w", "--workers", type=int, help="Number of workers", default=1)
 
     def handle(self, *args, **options):
-        test_duration = options.get("seconds")
-        url = urljoin(options.get("url"), "/api/v1/incidents/")
-        token = options.get("token")
-        worker_count = options.get("workers")
-        tester = StressTester(url, token, worker_count)
+        tester = StressTester(
+            urljoin(options.get("url"), "/api/v1/incidents/"), options.get("token"), options.get("workers")
+        )
         loop = asyncio.get_event_loop()
         start_time = datetime.now()
-        end_time = start_time + timedelta(seconds=test_duration)
+        end_time = start_time + timedelta(seconds=options.get("seconds"))
         self.stdout.write("Running stresstest ...")
         try:
             incident_ids = loop.run_until_complete(tester.run_stresstest_workers(end_time))
