@@ -351,6 +351,17 @@ class IncidentViewSetV1TestCase(IncidentAPITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(SourceSystem.objects.get(id=self.source.pk).name, data["name"])
 
+    def test_cannot_create_incident_with_invalid_tags(self):
+        data = {
+            "start_time": "2021-08-04T09:13:55.908Z",
+            "end_time": "2021-08-04T09:13:55.908Z",
+            "description": "incident",
+            "level": 1,
+            "tags": ["a=b"],
+        }
+        response = self.client.post(path="/api/v1/incidents/", data=data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
 
 class IncidentFilterByOpenAndStatefulV1TestCase(IncidentAPITestCase):
     def setUp(self):
