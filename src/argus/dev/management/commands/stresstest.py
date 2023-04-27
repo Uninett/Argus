@@ -33,12 +33,12 @@ class Command(BaseCommand):
             help="Number of seconds to send http requests. After this no more requests will be sent but responses will be waited for",
             default=100,
         )
+        parser.add_argument("-t", "--timeout", type=int, help="Timeout for requests", default=5)
         parser.add_argument("-w", "--workers", type=int, help="Number of workers", default=1)
 
     def handle(self, *args, **options):
-        tester = StressTester(
-            urljoin(options.get("url"), "/api/v1/incidents/"), options.get("token"), options.get("workers")
-        )
+        url = urljoin(options.get("url"), "/api/v1/incidents/")
+        tester = StressTester(url, options.get("token"), options.get("timeout"), options.get("workers"))
         loop = asyncio.get_event_loop()
         start_time = datetime.now()
         end_time = start_time + timedelta(seconds=options.get("seconds"))
@@ -63,9 +63,10 @@ class Command(BaseCommand):
 
 
 class StressTester:
-    def __init__(self, url, token, worker_count):
+    def __init__(self, url, token, timeout, worker_count):
         self.url = url
         self.token = token
+        self.timeout = timeout
         self.worker_count = worker_count
 
     def _get_incident_data(self):
@@ -94,14 +95,14 @@ class StressTester:
         return created_ids
 
     async def run_stresstest_workers(self, end_time):
-        async with AsyncClient() as client:
+        async with AsyncClient(timeout=self.timeout) as client:
             results = await asyncio.gather(
                 *(self._post_incidents_until_end_time(end_time, client) for _ in range(self.worker_count))
             )
             return list(itertools.chain.from_iterable(results))
 
     async def run_verification_workers(self, incident_ids):
-        async with AsyncClient() as client:
+        async with AsyncClient(timeout=self.timeout) as client:
             await asyncio.gather(
                 *(self._verify_created_incidents(incident_ids, client) for _ in range(self.worker_count))
             )
