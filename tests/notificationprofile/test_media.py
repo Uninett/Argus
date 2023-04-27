@@ -4,8 +4,9 @@ import json
 from argus.auth.factories import PersonUserFactory
 from argus.incident.models import create_fake_incident, get_or_create_default_instances
 from argus.notificationprofile import factories
-from argus.notificationprofile.media import find_destinations_for_event
+from argus.notificationprofile.media import find_destinations_for_event, get_notification_media
 from argus.notificationprofile.media.email import modelinstance_to_dict
+from argus.notificationprofile.models import Media
 from argus.util.testing import disconnect_signals, connect_signals
 
 
@@ -58,3 +59,28 @@ class FindDestinationsTest(TestCase):
         for destination in self.user.destinations.all():
             self.assertIn(destination, destinations)
 
+
+class GetNotificationMediaTests(TestCase):
+    def setUp(self):
+        disconnect_signals()
+
+        self.installed_media = Media.objects.all()
+        self.not_installed_medium = Media.objects.create(slug="missing", name="Missing medium", installed=True)
+
+        self.user = PersonUserFactory()
+
+    def tearDown(self):
+        connect_signals()
+
+    def test_get_notification_media_will_set_installed_to_false_for_medium_of_destination(self):
+        destination = factories.DestinationConfigFactory(user=self.user, media=self.not_installed_medium, settings={})
+        get_notification_media(destinations=[destination])
+
+        self.not_installed_medium.refresh_from_db()
+        self.assertFalse(self.not_installed_medium.installed)
+
+    def test_get_notification_media_will_not_set_installed_to_false_for_destinations_with_other_media(self):
+        get_notification_media(destinations=list(self.user.destinations.all()))
+
+        self.not_installed_medium.refresh_from_db()
+        self.assertTrue(self.not_installed_medium.installed)

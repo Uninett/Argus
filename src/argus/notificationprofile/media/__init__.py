@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING
 from django.conf import settings
 from django.db import connections
 
-from ..models import NotificationProfile, DestinationConfig
+from ..models import DestinationConfig, Media, NotificationProfile
 from argus.util.utils import import_class_from_dotted_path
 
 if TYPE_CHECKING:
@@ -89,4 +89,7 @@ def get_notification_media(destinations: List[DestinationConfig]):
             media.append(MEDIA_CLASSES_DICT[slug])
         else:
             LOG.warning("Medium %s was not found in imported media.", slug)
+            not_installed_medium = Media.objects.get(slug=slug)
+            not_installed_medium.installed = False
+            not_installed_medium.save(update_fields=["installed"])
     return media
