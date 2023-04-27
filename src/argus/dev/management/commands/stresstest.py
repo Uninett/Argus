@@ -28,7 +28,7 @@ class Command(BaseCommand):
             help="Number of seconds to send http requests. After this no more requests will be sent but responses will be waited for",
             default=100,
         )
-        parser.add_argument("-n", type=int, help="Number of workers", default=1)
+        parser.add_argument("-w", "--workers", type=int, help="Number of workers", default=1)
 
     def get_incident_data(self):
         return {
@@ -63,7 +63,7 @@ class Command(BaseCommand):
         test_duration = options.get("seconds")
         url = urljoin(options.get("url"), "/api/v1/incidents/")
         token = options.get("token")
-        worker_count = options.get("n")
+        worker_count = options.get("workers")
         loop = asyncio.get_event_loop()
         start_time = datetime.now()
         end_time = start_time + timedelta(seconds=test_duration)
