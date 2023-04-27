@@ -39,7 +39,7 @@ class Command(BaseCommand):
         return {
             "start_time": datetime.now().isoformat(),
             "description": "Stresstest",
-            "tags": [],
+            "tags": [{"tag": "problem_type=stresstest"}],
         }
 
     async def post_incidents_until_end_time(self, url, end_time, token, client):
