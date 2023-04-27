@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 from urllib.parse import urljoin
 import asyncio
+import itertools
 
 from httpx import AsyncClient, TimeoutException, HTTPStatusError
 
@@ -38,7 +39,7 @@ class Command(BaseCommand):
         }
 
     async def post_incidents_until_end_time(self, url, end_time, token, client):
-        request_counter = 0
+        created_ids = []
         incident_data = self.get_incident_data()
         while True:
             if datetime.now() >= end_time:
@@ -46,13 +47,14 @@ class Command(BaseCommand):
             try:
                 response = await client.post(url, json=incident_data, headers={"Authorization": f"Token {token}"})
                 response.raise_for_status()
+                incident = response.json()
+                created_ids.append(incident["pk"])
             except TimeoutException:
                 raise TimeoutException(f"Timeout waiting for POST response to {url}")
             except HTTPStatusError as e:
                 msg = f"HTTP error {e.response.status_code}: {e.response.content.decode('utf-8')}"
                 raise HTTPStatusError(msg, request=e.request, response=e.response)
-            request_counter += 1
-        return request_counter
+        return created_ids
 
     async def run_workers(self, url, end_time, token, worker_count):
         async with AsyncClient() as client:
@@ -74,10 +76,10 @@ class Command(BaseCommand):
         except (TimeoutException, HTTPStatusError) as e:
             self.stderr.write(self.style.ERROR(e))
         else:
-            total_requests = sum(result)
+            incident_ids = list(itertools.chain.from_iterable(result))
             seconds_run = (datetime.now() - start_time).seconds
             self.stdout.write(
                 self.style.SUCCESS(
-                    f"Stresstest complete with no errors. {total_requests} requests were sent in {seconds_run} seconds."
+                    f"Stresstest complete with no errors. {len(incident_ids)} requests were sent in {seconds_run} seconds."
                 )
             )
