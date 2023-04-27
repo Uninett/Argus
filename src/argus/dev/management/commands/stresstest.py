@@ -49,7 +49,7 @@ class Command(BaseCommand):
             except TimeoutException:
                 raise TimeoutException(f"Timeout waiting for POST response to {url}")
             except HTTPStatusError as e:
-                msg = f"HTTP error {response.status_code}: {response.content.decode('utf-8')}"
+                msg = f"HTTP error {e.response.status_code}: {e.response.content.decode('utf-8')}"
                 raise HTTPStatusError(msg, request=e.request, response=e.response)
             request_counter += 1
         return request_counter
