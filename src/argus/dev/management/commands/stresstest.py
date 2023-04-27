@@ -49,12 +49,19 @@ class Command(BaseCommand):
             incident_ids = loop.run_until_complete(tester.run_stresstest_workers(end_time))
         except (TimeoutException, HTTPStatusError) as e:
             self.stderr.write(self.style.ERROR(e))
-        else:
-            self.stdout.write(
-                self.style.SUCCESS(
-                    f"Completed in {datetime.now() - start_time} after sending {len(incident_ids)} requests."
-                )
+            return
+        self.stdout.write(
+            self.style.SUCCESS(
+                f"Completed in {datetime.now() - start_time} after sending {len(incident_ids)} requests."
             )
+        )
+        self.stdout.write("Verifying incidents were created correctly ...")
+        try:
+            loop.run_until_complete(tester.run_verification_workers(incident_ids))
+        except (DatabaseMismatchError, HTTPStatusError, TimeoutException) as e:
+            self.stderr.write(self.style.ERROR(e))
+            return
+        self.stdout.write(self.style.SUCCESS("Verification complete with no errors."))
 
 
 class StressTester:
