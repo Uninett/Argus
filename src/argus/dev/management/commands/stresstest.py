@@ -48,9 +48,9 @@ class Command(BaseCommand):
                 response.raise_for_status()
             except TimeoutException:
                 raise TimeoutException(f"Timeout waiting for POST response to {url}")
-            except HTTPStatusError:
+            except HTTPStatusError as e:
                 msg = f"HTTP error {response.status_code}: {response.content.decode('utf-8')}"
-                raise HTTPStatusError(msg)
+                raise HTTPStatusError(msg, request=e.request, response=e.response)
             request_counter += 1
         return request_counter
 
