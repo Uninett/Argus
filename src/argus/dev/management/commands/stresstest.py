@@ -45,9 +45,7 @@ class Command(BaseCommand):
     async def post_incidents_until_end_time(self, url, end_time, token, client):
         created_ids = []
         incident_data = self.get_incident_data()
-        while True:
-            if datetime.now() >= end_time:
-                break
+        while datetime.now() < end_time:
             try:
                 response = await client.post(url, json=incident_data, headers={"Authorization": f"Token {token}"})
                 response.raise_for_status()
