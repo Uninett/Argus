@@ -46,11 +46,10 @@ class Command(BaseCommand):
         end_time = start_time + timedelta(seconds=test_duration)
         self.stdout.write("Running stresstest ...")
         try:
-            result = loop.run_until_complete(tester.run_workers(end_time))
+            incident_ids = loop.run_until_complete(tester.run_workers(end_time))
         except (TimeoutException, HTTPStatusError) as e:
             self.stderr.write(self.style.ERROR(e))
         else:
-            incident_ids = list(itertools.chain.from_iterable(result))
             self.stdout.write(
                 self.style.SUCCESS(
                     f"Completed in {datetime.now() - start_time} after sending {len(incident_ids)} requests."
@@ -91,9 +90,10 @@ class StressTester:
 
     async def run_workers(self, end_time):
         async with AsyncClient() as client:
-            return await asyncio.gather(
+            results = await asyncio.gather(
                 *(self._post_incidents_until_end_time(end_time, client) for _ in range(self.worker_count))
             )
+            return list(itertools.chain.from_iterable(results))
 
     async def _verify_created_incidents(self, incident_ids, client):
         expected_data = self._get_incident_data()
