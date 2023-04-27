@@ -8,6 +8,10 @@ from httpx import AsyncClient, TimeoutException, HTTPStatusError
 from django.core.management.base import BaseCommand
 
 
+class DatabaseMismatchError(Exception):
+    pass
+
+
 class Command(BaseCommand):
     help = "Stresstests incident creation API"
 
@@ -61,6 +65,37 @@ class Command(BaseCommand):
             return await asyncio.gather(
                 *(self.post_incidents_until_end_time(url, end_time, token, client) for _ in range(worker_count))
             )
+
+    async def verify_created_incidents(self, url, token, incident_ids, client):
+        expected_data = self.get_incident_data()
+        while incident_ids:
+            id = incident_ids.pop()
+            id_url = urljoin(url, str(id) + "/")
+            try:
+                response = await client.get(id_url, headers={"Authorization": f"Token {token}"})
+                response.raise_for_status()
+            except TimeoutException:
+                raise TimeoutException(f"Timeout waiting for GET response to {id_url}")
+            except HTTPStatusError as e:
+                msg = f"HTTP error {e.response.status_code}: {e.response.content.decode('utf-8')}"
+                raise HTTPStatusError(msg, request=e.request, response=e.response)
+            response_data = response.json()
+            self.verify_tags(response_data, expected_data)
+            self.verify_description(response_data, expected_data)
+
+    def verify_tags(self, response_data, expected_data):
+        expected_tags = set([tag["tag"] for tag in expected_data["tags"]])
+        response_tags = set([tag["tag"] for tag in response_data["tags"]])
+        if expected_tags != response_tags:
+            msg = f'Actual tag(s) "{response_tags}" differ from expected tag(s) "{expected_tags}"'
+            raise DatabaseMismatchError(msg)
+
+    def verify_description(self, response_data, expected_data):
+        expected_descr = expected_data["description"]
+        response_descr = response_data["description"]
+        if response_descr != expected_descr:
+            msg = f'Actual description "{response_descr}" differ from expected description "{expected_descr}"'
+            raise DatabaseMismatchError(msg)
 
     def handle(self, *args, **options):
         test_duration = options.get("seconds")
