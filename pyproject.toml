@@ -49,7 +49,10 @@ dynamic = ["version"]
 "Homepage" = "https://github.com/Uninett/Argus"
 
 [project.optional-dependencies]
-docs = ["sphinx>=2.2.0"]
+docs = [
+    "sphinx>=2.2.0",
+    "sphinxcontrib-openapi",
+]
 dev = [
     "django-debug-toolbar",
     "black",
