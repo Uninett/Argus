@@ -7,6 +7,9 @@ read by developers.
 ### Added
 - Add inline destinations to user edit page in admin
 
+### Fixed
+- Raise validation error on posting incident with tags without tag key
+
 ## [1.12.1] - 2023-05-04
 
 ### Fixed

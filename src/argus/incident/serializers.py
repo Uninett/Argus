@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from typing import List
+from typing import List, Tuple
 
 from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
@@ -23,6 +23,15 @@ from .models import (
 )
 
 
+def clean_tag(value: str) -> Tuple[str, str]:
+    try:
+        [key, value] = Tag.split(value)
+    except (ValueError, ValidationError) as e:
+        raise serializers.ValidationError({"tag": str(e)})
+
+    return key, value
+
+
 class SourceSystemTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = SourceSystemType
@@ -41,23 +50,11 @@ class SourceSystemSerializer(serializers.ModelSerializer):
 class TagSerializer(serializers.Serializer):
     tag = serializers.CharField()
 
-    def validate_tag(self, value: str):
-        try:
-            [key, value] = Tag.split(value)
-        except (ValueError, ValidationError) as e:
-            raise serializers.ValidationError(str(e))
-
-        return Tag.join(key, value)
-
     def to_internal_value(self, data: dict):
         if not "tag" in data:
-            return data
+            raise serializers.ValidationError('Tags need to follow the format {"tag": key=value}')
 
-        try:
-            [key, value] = Tag.split(data.pop("tag"))
-        except (ValueError, ValidationError) as e:
-            raise serializers.ValidationError({"tag": str(e)})
-
+        key, value = clean_tag(data.pop("tag"))
         return {"key": key, "value": value}
 
     def to_representation(self, instance):
@@ -77,32 +74,16 @@ class IncidentTagRelationSerializer(serializers.ModelSerializer):
         fields = ["tag", "added_by", "added_time"]
         read_only_fields = ["added_by", "added_time"]
 
-    def validate_tag(self, value: str):
-        try:
-            [key, value] = Tag.split(value)
-        except (ValueError, ValidationError) as e:
-            raise serializers.ValidationError(str(e))
-
-        return Tag.join(key, value)
-
     def create(self, validated_data: dict):
-        tag = validated_data.pop("tag")
-        try:
-            [key, value] = Tag.split(tag)
-        except (ValueError, ValidationError) as e:
-            raise serializers.ValidationError(str(e))
+        key, value = clean_tag(validated_data.pop("tag"))
 
         return Tag.objects.create(key=key, value=value, **validated_data)
 
     def to_internal_value(self, data: dict):
         if not "tag" in data:
-            return data
+            raise serializers.ValidationError('Tags need to follow the format {"tag": key=value}')
 
-        try:
-            [key, value] = Tag.split(data.pop("tag"))
-        except (ValueError, ValidationError) as e:
-            raise serializers.ValidationError({"tag": str(e)})
-
+        key, value = clean_tag(data.pop("tag"))
         return {"key": key, "value": value}
 
     def to_representation(self, instance: IncidentTagRelation):
