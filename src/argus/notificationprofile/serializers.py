@@ -1,3 +1,5 @@
+import json
+
 from rest_framework import fields, serializers
 
 from .primitive_serializers import FilterBlobSerializer, FilterPreviewSerializer
@@ -98,6 +100,7 @@ class FilterSerializer(serializers.ModelSerializer):
     filter_string = serializers.CharField(
         validators=[validate_filter_string],
         help_text='Deprecated: Use "filter" instead',
+        required=False,
     )
     filter = FilterBlobSerializer(required=False)
 
@@ -109,6 +112,37 @@ class FilterSerializer(serializers.ModelSerializer):
             "filter_string",
             "filter",
         ]
+
+    # Only temporary until we remove filter_string
+    def create(self, validated_data):
+        if "filter_string" not in validated_data.keys():
+            filter_string_dict = dict()
+            filter_string_dict["sourceSystemIds"] = (
+                validated_data["filter"]["sourceSystemIds"]
+                if "filter" in validated_data.keys() and "sourceSystemIds" in validated_data["filter"].keys()
+                else []
+            )
+            filter_string_dict["tags"] = (
+                validated_data["filter"]["tags"]
+                if "filter" in validated_data.keys() and "tags" in validated_data["filter"].keys()
+                else []
+            )
+            validated_data["filter_string"] = json.dumps(filter_string_dict)
+        return Filter.objects.create(**validated_data)
+
+    def update(self, instance, validated_data):
+        if "filter" in validated_data.keys() and "filter_string" not in validated_data.keys():
+            filter_string_dict = dict()
+            filter_string_dict["sourceSystemIds"] = (
+                validated_data["filter"]["sourceSystemIds"]
+                if "sourceSystemIds" in validated_data["filter"].keys()
+                else []
+            )
+            filter_string_dict["tags"] = (
+                validated_data["filter"]["tags"] if "tags" in validated_data["filter"].keys() else []
+            )
+            validated_data["filter_string"] = json.dumps(filter_string_dict)
+        return super().update(instance=instance, validated_data=validated_data)
 
 
 class MediaSerializer(serializers.ModelSerializer):
