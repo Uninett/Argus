@@ -14,7 +14,7 @@ from drf_rw_serializers import viewsets as rw_viewsets
 
 from argus.drf.permissions import IsOwner
 from argus.incident.serializers import IncidentSerializer
-from argus.notificationprofile.media import MEDIA_CLASSES_DICT
+from argus.notificationprofile.media import api_safely_get_medium_object
 from argus.notificationprofile.media.base import NotificationMedium
 from .models import DestinationConfig, Filter, Media, NotificationProfile, Timeslot
 from .serializers import (
@@ -110,8 +110,8 @@ class SchemaView(DetailView):
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
-        media_slug = self.object.slug
-        kwargs["schema_info"] = MEDIA_CLASSES_DICT[media_slug].MEDIA_JSON_SCHEMA
+        medium = api_safely_get_medium_object(self.object.slug)
+        kwargs["schema_info"] = medium.MEDIA_JSON_SCHEMA
         return kwargs
 
 
@@ -128,7 +128,8 @@ class MediaViewSet(viewsets.ModelViewSet):
     @action(methods=["get"], detail=True)
     def json_schema(self, request, pk, *args, **kwargs):
         try:
-            schema = MEDIA_CLASSES_DICT[pk].MEDIA_JSON_SCHEMA
+            medium = api_safely_get_medium_object(pk)
+            schema = medium.MEDIA_JSON_SCHEMA
             schema["$id"] = reverse(
                 "json-schema",
                 kwargs={"slug": pk},
@@ -174,7 +175,8 @@ class DestinationConfigViewSet(rw_viewsets.ModelViewSet):
             raise ValidationError(f"Destination with pk={pk} does not exist.")
 
         try:
-            MEDIA_CLASSES_DICT[destination.media.slug].raise_if_not_deletable(destination)
+            medium = api_safely_get_medium_object(destination.media.slug)
+            medium.raise_if_not_deletable(destination)
         except NotificationMedium.NotDeletableError as e:
             raise ValidationError(str(e))
         else:
@@ -184,7 +186,8 @@ class DestinationConfigViewSet(rw_viewsets.ModelViewSet):
         other_destinations = DestinationConfig.objects.filter(media=destination.media).filter(
             ~Q(user_id=destination.user.id)
         )
-        destination_in_use = MEDIA_CLASSES_DICT[destination.media_id].has_duplicate(
+        medium = api_safely_get_medium_object(destination.media_id)
+        destination_in_use = medium.has_duplicate(
             other_destinations, destination.settings
         )
         return destination_in_use
