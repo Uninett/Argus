@@ -31,11 +31,11 @@ class Command(BaseCommand):
             "-s",
             "--seconds",
             type=int,
-            help="Number of seconds to send http requests. After this no more requests will be sent but responses will be waited for",
+            help="Number of seconds to send http requests. After this no more requests will be sent but responses will be waited for. Default 10s",
             default=10,
         )
-        parser.add_argument("-t", "--timeout", type=int, help="Timeout for requests", default=5)
-        parser.add_argument("-w", "--workers", type=int, help="Number of workers", default=1)
+        parser.add_argument("-t", "--timeout", type=int, help="Timeout for requests. Default 5s", default=5)
+        parser.add_argument("-w", "--workers", type=int, help="Number of workers. Default 1s", default=1)
         parser.add_argument("-b", "--bulk", action="store_true", help="Bulk ACK created incidents")
 
     def handle(self, *args, **options):
