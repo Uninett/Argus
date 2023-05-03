@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import importlib
 import logging
 from multiprocessing import Process
 from typing import TYPE_CHECKING
@@ -16,8 +15,6 @@ if TYPE_CHECKING:
     from typing import List
 
     from argus.incident.models import Event  # noqa: Break circular import
-
-    from ..models import DestinationConfig
 
 LOG = logging.getLogger(__name__)
 
