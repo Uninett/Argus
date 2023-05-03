@@ -22,6 +22,7 @@ LOG = logging.getLogger(__name__)
 
 
 __all__ = [
+    "api_safely_get_medium_object",
     "send_notification",
     "background_send_notification",
     "find_destinations_for_event",
@@ -34,6 +35,14 @@ __all__ = [
 MEDIA_PLUGINS = getattr(settings, "MEDIA_PLUGINS")
 MEDIA_CLASSES = [import_class_from_dotted_path(media_plugin) for media_plugin in MEDIA_PLUGINS]
 MEDIA_CLASSES_DICT = {media_class.MEDIA_SLUG: media_class for media_class in MEDIA_CLASSES}
+
+
+def api_safely_get_medium_object(media_slug):
+    try:
+        obj = MEDIA_CLASSES_DICT[media_slug]
+    except KeyError:
+        raise ValidationError(f'Medium "{pk}" is not installed.')
+    return obj
 
 
 def send_notification(destinations: List[DestinationConfig], event: Event):

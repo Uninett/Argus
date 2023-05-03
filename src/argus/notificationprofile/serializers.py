@@ -3,7 +3,7 @@ import json
 from rest_framework import fields, serializers
 
 from .primitive_serializers import FilterBlobSerializer, FilterPreviewSerializer
-from .media import MEDIA_CLASSES_DICT
+from .media import api_safely_get_medium_object
 from .models import DestinationConfig, Filter, Media, NotificationProfile, TimeRecurrence, Timeslot
 from .validators import validate_filter_string
 
@@ -173,7 +173,8 @@ class ResponseDestinationConfigSerializer(serializers.ModelSerializer):
         ]
 
     def get_suggested_label(self, destination: DestinationConfig) -> str:
-        return f"{destination.media.name}: {MEDIA_CLASSES_DICT[destination.media.slug].get_label(destination)}"
+        medium = api_safely_get_medium_object(destination.media.slug)
+        return f"{destination.media.name}: {medium.get_label(destination)}"
 
 
 class RequestDestinationConfigSerializer(serializers.ModelSerializer):
@@ -192,18 +193,18 @@ class RequestDestinationConfigSerializer(serializers.ModelSerializer):
             if type(attrs["settings"]) != dict:
                 raise serializers.ValidationError("Settings has to be a dictionary.")
             if self.instance:
-                attrs["settings"] = MEDIA_CLASSES_DICT[self.instance.media.slug].validate(
-                    self, attrs, self.context["request"].user
-                )
+                medium = api_safely_get_medium_object(self.instance.media.slug)
             else:
-                attrs["settings"] = MEDIA_CLASSES_DICT[attrs["media"].slug].validate(
+                medium = api_safely_get_medium_object(attrs["media"].slug)
+            attrs["settings"] = medium.validate(
                     self, attrs, self.context["request"].user
-                )
+            )
 
         return attrs
 
     def update(self, destination: DestinationConfig, validated_data: dict):
-        updated_destination = MEDIA_CLASSES_DICT[destination.media.slug].update(destination, validated_data)
+        medium = api_safely_get_medium_object(destination.media.slug)
+        updated_destination = medium.update(destination, validated_data)
 
         if updated_destination:
             return updated_destination
