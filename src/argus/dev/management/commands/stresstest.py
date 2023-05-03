@@ -76,14 +76,15 @@ class StressTester:
             "tags": [{"tag": "problem_type=stresstest"}],
         }
 
+    def _get_auth_header(self):
+        return {"Authorization": f"Token {self.token}"}
+
     async def _post_incidents_until_end_time(self, end_time, client):
         created_ids = []
         incident_data = self._get_incident_data()
         while datetime.now() < end_time:
             try:
-                response = await client.post(
-                    self.url, json=incident_data, headers={"Authorization": f"Token {self.token}"}
-                )
+                response = await client.post(self.url, json=incident_data, headers=self._get_auth_header())
                 response.raise_for_status()
                 incident = response.json()
                 created_ids.append(incident["pk"])
@@ -113,7 +114,7 @@ class StressTester:
             id = incident_ids.pop()
             id_url = urljoin(self.url, str(id) + "/")
             try:
-                response = await client.get(id_url, headers={"Authorization": f"Token {self.token}"})
+                response = await client.get(id_url, headers=self._get_auth_header())
                 response.raise_for_status()
             except TimeoutException:
                 raise TimeoutException(f"Timeout waiting for GET response to {id_url}")
