@@ -4,13 +4,24 @@ This file documents changes to Argus that are relevant for the users to know.
 ## [Unreleased]
 
 
+## [1.12.0] - 2023-05-03
 
-## bugfix/updating-timeslot-empty-time-recurrence
+### Added
+- Add docs for how to write a notification plugin
+- Add a new command "stresstest", for stress-testing the API
+- Migration! Add a field "installed" to the Media-model
+- Support running on Django 4.2
+- Documented how to use email to send notifications to Slack
+- Make the auth-method endpoint also show username/password
 
 ### Fixed
 - Allow updating of a timeslot with an empty time recurrence list, which
   results in all time recurrences to be removed from the timeslot
 
+### Changed
+- Optimize and refactor bulk api operations
+- Start the process of getting rid of `Filter.filter_string` by ensuring the
+  info in `filter_string` is also in `Filter.filter`
 
 ## [1.11.1] - 2023-02-16
 

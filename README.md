@@ -23,6 +23,7 @@ There are several ways to install Argus.
 #### Requirements
 
 * Python 3.7+
+* Django 3.2 or 4.2
 * pip
 
 #### Optional requirements
