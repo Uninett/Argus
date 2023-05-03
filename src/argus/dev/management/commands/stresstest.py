@@ -39,8 +39,7 @@ class Command(BaseCommand):
         parser.add_argument("-b", "--bulk", action="store_true", help="Bulk ACK created incidents")
 
     def handle(self, *args, **options):
-        url = urljoin(options.get("url"), "/api/v1/incidents/")
-        tester = StressTester(url, options.get("token"), options.get("timeout"), options.get("workers"))
+        tester = StressTester(options.get("url"), options.get("token"), options.get("timeout"), options.get("workers"))
         loop = asyncio.get_event_loop()
         start_time = datetime.now()
         end_time = start_time + timedelta(seconds=options.get("seconds"))
@@ -81,12 +80,20 @@ class StressTester:
     def _get_auth_header(self):
         return {"Authorization": f"Token {self.token}"}
 
+    def _get_incidents_v1_url(self):
+        return urljoin(self.url, "/api/v1/incidents/")
+
+    def _get_incidents_v2_url(self):
+        return urljoin(self.url, "/api/v2/incidents/")
+
     async def _post_incidents_until_end_time(self, end_time, client):
         created_ids = []
         incident_data = self._get_incident_data()
         while datetime.now() < end_time:
             try:
-                response = await client.post(self.url, json=incident_data, headers=self._get_auth_header())
+                response = await client.post(
+                    self._get_incidents_v1_url(), json=incident_data, headers=self._get_auth_header()
+                )
                 response.raise_for_status()
                 incident = response.json()
                 created_ids.append(incident["pk"])
@@ -113,7 +120,7 @@ class StressTester:
         expected_data = self._get_incident_data()
         while incident_ids:
             id = incident_ids.pop()
-            id_url = urljoin(self.url, str(id) + "/")
+            id_url = urljoin(self._get_incidents_v1_url(), str(id) + "/")
             try:
                 response = await client.get(id_url, headers=self._get_auth_header())
                 response.raise_for_status()
@@ -148,7 +155,7 @@ class StressTester:
                 "description": "Stresstest",
             },
         }
-        url = urljoin(self.url, "acks", "bulk" + "/")
+        url = urljoin(self._get_incidents_v2_url(), "acks/bulk/")
         try:
             response = httpx.post(url, json=request_data, headers=self._get_auth_header())
             response.raise_for_status()
