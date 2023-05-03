@@ -105,10 +105,9 @@ class StressTester:
             return list(itertools.chain.from_iterable(results))
 
     async def run_verification_workers(self, incident_ids):
+        ids = incident_ids.copy()
         async with AsyncClient(timeout=self.timeout) as client:
-            await asyncio.gather(
-                *(self._verify_created_incidents(incident_ids, client) for _ in range(self.worker_count))
-            )
+            await asyncio.gather(*(self._verify_created_incidents(ids, client) for _ in range(self.worker_count)))
 
     async def _verify_created_incidents(self, incident_ids, client):
         expected_data = self._get_incident_data()
