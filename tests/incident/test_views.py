@@ -1052,7 +1052,7 @@ class BulkEventViewSetTestCase(APITestCase):
             "event": {
                 "timestamp": "2022-08-02T13:04:03.529Z",
                 "description": "event",
-                "type": "CLO",
+                "type": Event.Type.CLOSE,
             },
         }
 
@@ -1065,16 +1065,16 @@ class BulkEventViewSetTestCase(APITestCase):
 
         incident_1_changes = response.data["changes"][str(incident_1.pk)]
         self.assertEqual(incident_1_changes["status"], status.HTTP_201_CREATED)
-        self.assertEqual(incident_1_changes["event"]["type"]["value"], "CLO")
+        self.assertEqual(incident_1_changes["event"]["type"]["value"], Event.Type.CLOSE)
         self.assertEqual(incident_1_changes["errors"], None)
 
         incident_2_changes = response.data["changes"][str(incident_2.pk)]
         self.assertEqual(incident_2_changes["status"], status.HTTP_201_CREATED)
-        self.assertEqual(incident_2_changes["event"]["type"]["value"], "CLO")
+        self.assertEqual(incident_2_changes["event"]["type"]["value"], Event.Type.CLOSE)
         self.assertEqual(incident_2_changes["errors"], None)
 
-        self.assertTrue(incident_1.events.filter(type="CLO").exists())
-        self.assertTrue(incident_2.events.filter(type="CLO").exists())
+        self.assertTrue(incident_1.events.filter(type=Event.Type.CLOSE).exists())
+        self.assertTrue(incident_2.events.filter(type=Event.Type.CLOSE).exists())
 
         self.assertFalse(incident_1.open)
         self.assertFalse(incident_2.open)
@@ -1087,7 +1087,7 @@ class BulkEventViewSetTestCase(APITestCase):
             "event": {
                 "timestamp": "2022-08-02T13:04:03.529Z",
                 "description": "event",
-                "type": "REO",
+                "type": Event.Type.REOPEN,
             },
         }
 
@@ -1098,18 +1098,20 @@ class BulkEventViewSetTestCase(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
+        self.assertTrue(response.data["changes"])
+
         incident_1_changes = response.data["changes"][str(incident_1.pk)]
         self.assertEqual(incident_1_changes["status"], status.HTTP_201_CREATED)
-        self.assertEqual(incident_1_changes["event"]["type"]["value"], "REO")
+        self.assertEqual(incident_1_changes["event"]["type"]["value"], Event.Type.REOPEN)
         self.assertEqual(incident_1_changes["errors"], None)
 
         incident_2_changes = response.data["changes"][str(incident_2.pk)]
         self.assertEqual(incident_2_changes["status"], status.HTTP_201_CREATED)
-        self.assertEqual(incident_2_changes["event"]["type"]["value"], "REO")
+        self.assertEqual(incident_2_changes["event"]["type"]["value"], Event.Type.REOPEN)
         self.assertEqual(incident_2_changes["errors"], None)
 
-        self.assertTrue(incident_1.events.filter(type="REO").exists())
-        self.assertTrue(incident_2.events.filter(type="REO").exists())
+        self.assertTrue(incident_1.events.filter(type=Event.Type.REOPEN).exists())
+        self.assertTrue(incident_2.events.filter(type=Event.Type.REOPEN).exists())
 
         self.assertTrue(incident_1.open)
         self.assertTrue(incident_2.open)

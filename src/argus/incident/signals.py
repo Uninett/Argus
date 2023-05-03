@@ -2,11 +2,13 @@ from django.db.models import Q
 from django.utils import timezone
 from rest_framework.authtoken.models import Token
 
-from argus.incident.models import get_or_create_default_instances, Incident
 from argus.notificationprofile.media import send_notifications_to_users
 from argus.notificationprofile.media import background_send_notification
 from argus.notificationprofile.media import send_notification
-from .models import Acknowledgement, ChangeEvent, Event, Incident, SourceSystem, Tag
+from .models import (
+    Acknowledgement, ChangeEvent, Event, Incident, SourceSystem, Tag,
+    get_or_create_default_instances,
+)
 
 
 __all__ = [
@@ -42,7 +44,7 @@ def task_send_notification(sender, instance: Event, *args, **kwargs):
 
 
 def task_background_send_notification(sender, instance: Event, *args, **kwargs):
-    send_notifications_to_users(instance, background_send_notification)
+    send_notifications_to_users(instance, send=background_send_notification)
 
 
 def delete_associated_event(sender, instance: Acknowledgement, *args, **kwargs):

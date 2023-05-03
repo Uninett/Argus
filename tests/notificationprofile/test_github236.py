@@ -3,7 +3,7 @@ from django.test import TestCase, tag
 import json
 
 from argus.auth.factories import PersonUserFactory
-from argus.incident.models import create_fake_incident, get_or_create_default_instances
+from argus.incident.models import create_fake_incident, get_or_create_default_instances, Event
 from argus.notificationprofile import factories
 from argus.notificationprofile.media import send_notifications_to_users
 from argus.util.testing import disconnect_signals, connect_signals
@@ -52,7 +52,7 @@ class SendingNotificationTest(TestCase):
         LOG_PREFIX = "INFO:argus.notificationprofile.media:"
         # Send a test event
         self.incident = create_fake_incident()
-        event = self.incident.events.get(type="STA")
+        event = self.incident.events.get(type=Event.Type.INCIDENT_START)
         with self.settings(SEND_NOTIFICATIONS=True):
             try:
                 send_notifications_to_users(event)
