@@ -32,7 +32,7 @@ class Command(BaseCommand):
             "--seconds",
             type=int,
             help="Number of seconds to send http requests. After this no more requests will be sent but responses will be waited for",
-            default=100,
+            default=10,
         )
         parser.add_argument("-t", "--timeout", type=int, help="Timeout for requests", default=5)
         parser.add_argument("-w", "--workers", type=int, help="Number of workers", default=1)
