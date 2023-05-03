@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 
 from django.conf import settings
 from django.db import connections
+from rest_framework.exceptions import ValidationError
 
 from ..models import DestinationConfig, Media, NotificationProfile
 from argus.util.utils import import_class_from_dotted_path
@@ -41,7 +42,7 @@ def api_safely_get_medium_object(media_slug):
     try:
         obj = MEDIA_CLASSES_DICT[media_slug]
     except KeyError:
-        raise ValidationError(f'Medium "{pk}" is not installed.')
+        raise ValidationError(f'Medium "{media_slug}" is not installed.')
     return obj
 
 
