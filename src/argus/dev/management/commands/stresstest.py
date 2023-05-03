@@ -47,29 +47,21 @@ class Command(BaseCommand):
         self.stdout.write("Running stresstest ...")
         try:
             incident_ids = loop.run_until_complete(tester.run_stresstest_workers(end_time))
-        except (TimeoutException, HTTPStatusError) as e:
-            self.stderr.write(self.style.ERROR(e))
-            return
-        self.stdout.write(
-            self.style.SUCCESS(
-                f"Completed in {datetime.now() - start_time} after sending {len(incident_ids)} requests."
+            self.stdout.write(
+                self.style.SUCCESS(
+                    f"Completed in {datetime.now() - start_time} after sending {len(incident_ids)} requests."
+                )
             )
-        )
-        self.stdout.write("Verifying incidents were created correctly ...")
-        try:
+            self.stdout.write("Verifying incidents were created correctly ...")
             loop.run_until_complete(tester.run_verification_workers(incident_ids))
+            self.stdout.write(self.style.SUCCESS("Verification complete with no errors."))
+            if options.get("bulk"):
+                self.stdout.write("Bulk ACKing incidents ...")
+                tester.bulk_ack(incident_ids)
+                self.stdout.write(self.style.SUCCESS("Succesfully bulk ACK'd"))
         except (DatabaseMismatchError, HTTPStatusError, TimeoutException) as e:
             self.stderr.write(self.style.ERROR(e))
             return
-        self.stdout.write(self.style.SUCCESS("Verification complete with no errors."))
-        if options.get("bulk"):
-            self.stdout.write("Bulk ACKing incidents ...")
-            try:
-                tester.bulk_ack(incident_ids)
-            except (TimeoutException, HTTPStatusError) as e:
-                self.stderr.write(self.style.ERROR(e))
-                return
-            self.stdout.write(self.style.SUCCESS("Succesfully bulk ACK'd"))
 
 
 class StressTester:
