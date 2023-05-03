@@ -13,13 +13,13 @@ read by developers.
 - Add a new command "stresstest", for stress-testing the API
 - Start a process for revealing to the frontend which media plugins are
   actually installed
-- Log a warning if a medium in the Media-table does not have a pligin installed
+- Log a warning if a medium in the Media-table does not have a plugin installed
 - Mention cookiecutter-template for tickets in the ticket docs
 - Support running on Django 4.2
 - Documented how to use email to send notifications to Slack
 - Make the auth-method endpoint also show that username/password is supported
-- In ticket-automation, show which fields that were configured but not found in
-  the generated ticket
+- In ticket-automation, show which fields were configured but not found in the
+  generated ticket
 
 ### Fixed
 - Lots of formatting-bugaboos in the docs
@@ -28,7 +28,7 @@ read by developers.
 
 ### Changed
 - Optimize and refactor bulk api operations
-- Change how media plugins are looked up in order to avoid/control some exceptions
+- Change how media plugins are accessed in order to avoid/control some exceptions
 - Start the process of getting rid of `Filter.filter_string` by ensuring the
   info in `filter_string` is also in `Filter.filter`
 - Correct some api examples in docs
