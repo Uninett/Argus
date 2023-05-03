@@ -3,6 +3,7 @@ from urllib.parse import urljoin
 import asyncio
 import itertools
 
+import httpx
 from httpx import AsyncClient, TimeoutException, HTTPStatusError
 
 from django.core.management.base import BaseCommand
@@ -35,6 +36,7 @@ class Command(BaseCommand):
         )
         parser.add_argument("-t", "--timeout", type=int, help="Timeout for requests", default=5)
         parser.add_argument("-w", "--workers", type=int, help="Number of workers", default=1)
+        parser.add_argument("-b", "--bulk", action="store_true", help="Bulk ACK created incidents")
 
     def handle(self, *args, **options):
         url = urljoin(options.get("url"), "/api/v1/incidents/")
@@ -60,6 +62,14 @@ class Command(BaseCommand):
             self.stderr.write(self.style.ERROR(e))
             return
         self.stdout.write(self.style.SUCCESS("Verification complete with no errors."))
+        if options.get("bulk"):
+            self.stdout.write("Bulk ACKing incidents ...")
+            try:
+                tester.bulk_ack(incident_ids)
+            except (TimeoutException, HTTPStatusError) as e:
+                self.stderr.write(self.style.ERROR(e))
+                return
+            self.stdout.write(self.style.SUCCESS("Succesfully bulk ACK'd"))
 
 
 class StressTester:
@@ -138,3 +148,21 @@ class StressTester:
         if response_descr != expected_descr:
             msg = f'Actual description "{response_descr}" differ from expected description "{expected_descr}"'
             raise DatabaseMismatchError(msg)
+
+    def bulk_ack(self, incident_ids):
+        request_data = {
+            "ids": incident_ids,
+            "ack": {
+                "timestamp": datetime.now().isoformat(),
+                "description": "Stresstest",
+            },
+        }
+        url = urljoin(self.url, "acks", "bulk" + "/")
+        try:
+            response = httpx.post(url, json=request_data, headers=self._get_auth_header())
+            response.raise_for_status()
+        except TimeoutException:
+            raise TimeoutException(f"Timeout waiting for POST response to {url}")
+        except HTTPStatusError as e:
+            msg = f"HTTP error {e.response.status_code}: {e.response.content.decode('utf-8')}"
+            raise HTTPStatusError(msg, request=e.request, response=e.response)
