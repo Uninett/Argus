@@ -31,6 +31,8 @@ jobs:
       run: tox -e flake8-critical
 
   test:
+    needs: lint
+
     name: "Python ${{ matrix.python-version }}"
     runs-on: ubuntu-latest
     env:
