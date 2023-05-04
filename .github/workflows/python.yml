@@ -3,6 +3,33 @@ name: Test django site
 on: [push, pull_request]
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    name: Lint
+    steps:
+    - uses: actions/checkout@v3
+
+    - uses: actions/cache@v3
+      id: cache
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.11
+
+    - name: Install dependencies
+      run: |
+        pip install -U pip
+        pip install tox flake8
+
+    - name: flake8 critical lint
+      run: tox -e flake8-critical
+
   test:
     name: "Python ${{ matrix.python-version }}"
     runs-on: ubuntu-latest
