@@ -4,6 +4,11 @@ read by developers.
 
 ## [Unreleased]
 
+## [1.12.1] - 2023-05-04
+
+### Fixed
+- Typo in code (that could have been found by flake8) lead to acks not working
+  when notifications are turned on
 
 ## [1.12.0] - 2023-05-03
 

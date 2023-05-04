@@ -3,6 +3,10 @@ This file documents changes to Argus that are relevant for the users to know.
 
 ## [Unreleased]
 
+## [1.12.1] - 2023-05-05
+
+### Fixed
+- Fixed acking-bug that only occured if notifications were turned on
 
 ## [1.12.0] - 2023-05-03
 
