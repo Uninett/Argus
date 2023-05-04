@@ -12,6 +12,7 @@ from ..models import DestinationConfig, Media, NotificationProfile
 from argus.util.utils import import_class_from_dotted_path
 
 if TYPE_CHECKING:
+    import sys
     if sys.version_info[:2] < (3, 9):
         from typing import Iterable
     else:
