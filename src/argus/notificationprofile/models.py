@@ -172,7 +172,7 @@ class Filter(models.Model):
         self.filter_wrapper = FilterWrapper(self.filter)
 
     def __str__(self):
-        return f"{self.name} [{self.filter_string}]"
+        return f"{self.name} [{self.filter}]"
 
     @property
     def filter_json(self):
