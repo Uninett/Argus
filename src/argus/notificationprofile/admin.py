@@ -32,10 +32,10 @@ class TimeslotAdmin(admin.ModelAdmin):
 
 
 class FilterAdmin(admin.ModelAdmin):
-    list_display = ("name", "user", "filter_string")
+    list_display = ("name", "user", "filter")
     search_fields = (
         "name",
-        "filter_string",
+        "filter",
         "user__first_name",
         "user__last_name",
         "user__username",
@@ -82,7 +82,7 @@ class NotificationProfileAdmin(admin.ModelAdmin):
         "name",
         "timeslot__name",
         "filters__name",
-        "filters__filter_string",
+        "filters__filter",
         "user__first_name",
         "user__last_name",
         "user__username",
