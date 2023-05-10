@@ -63,6 +63,7 @@ class ViewTests(APITestCase):
             user=self.user1,
             name="Critical incidents",
             filter_string=f'{{"sourceSystemIds": [{self.source1.pk}]}}',
+            filter={"sourceSystemIds": [self.source1.pk]},
         )
         self.notification_profile1 = NotificationProfileFactory(user=self.user1, timeslot=self.timeslot1)
         self.notification_profile1.filters.add(self.filter1)
@@ -274,6 +275,7 @@ class ViewTests(APITestCase):
             user=self.user1,
             name="Unused filter",
             filter_string=f'{{"sourceSystemIds": [{self.source1.pk}]}}',
+            filter={"sourceSystemIds": [self.source1.pk]},
         )
         response = self.user1_rest_client.delete(f"/api/v1/notificationprofiles/filters/{filter.pk}/")
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)

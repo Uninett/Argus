@@ -36,7 +36,11 @@ class FindDestinationsTest(TestCase):
         (_, _, argus_source) = get_or_create_default_instances()
         filter_dict = {"sourceSystemIds": [argus_source.id], "tags": []}
         filter_string = json.dumps(filter_dict)
-        filter = factories.FilterFactory(user=self.user, filter_string=filter_string)
+        filter = factories.FilterFactory(
+            user=self.user,
+            filter_string=filter_string,
+            filter=filter_dict,
+        )
 
         # Get user related destinations
         # if user.email_address is set then at least one
@@ -58,7 +62,7 @@ class FindDestinationsTest(TestCase):
         incident = create_fake_incident()
         event = incident.events.get(type=Event.Type.INCIDENT_START)
         destinations = find_destinations_for_event(event)
-        self.assertEqual(len(destinations), 1, 'No destinations found')
+        self.assertEqual(len(destinations), 1, "No destinations found")
         for destination in self.destinations:
             self.assertIn(destination, destinations)
 
@@ -68,9 +72,10 @@ class FindDestinationsTest(TestCase):
         incident.set_closed(self.user)
         event2 = incident.events.get(type=Event.Type.CLOSE)
         destinations = find_destinations_for_many_events((event1, event2))
-        self.assertEqual(len(destinations), 1, 'No destinations found')
+        self.assertEqual(len(destinations), 1, "No destinations found")
         for destination in self.destinations:
             self.assertIn(destination, destinations)
+
 
 class GetNotificationMediaTests(TestCase):
     def setUp(self):

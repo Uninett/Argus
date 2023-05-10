@@ -42,6 +42,7 @@ class NotificationProfileViewTests(APITestCase):
             user=self.user1,
             name="Critical incidents",
             filter_string=f'{{"sourceSystemIds": [{self.source1.pk}]}}',
+            filter={"sourceSystemIds": [self.source1.pk]},
         )
         self.notification_profile1 = NotificationProfileFactory(user=self.user1, timeslot=self.timeslot1)
         self.notification_profile1.filters.add(self.filter1)
@@ -140,6 +141,7 @@ class NotificationIncidentViewTests(APITestCase):
             user=user1,
             name="Critical incidents",
             filter_string=f'{{"sourceSystemIds": [{self.source1.pk}]}}',
+            filter={"sourceSystemIds": [self.source1.pk]},
         )
         self.notification_profile1 = NotificationProfileFactory(user=user1, timeslot=timeslot1)
         self.notification_profile1.filters.add(filter1)
@@ -188,6 +190,7 @@ class NotificationFilterIncidentViewTests(APITestCase):
             user=user1,
             name="Critical incidents",
             filter_string=f'{{"sourceSystemIds": [{self.source1.pk}]}}',
+            filter={"sourceSystemIds": [self.source1.pk]},
         )
         self.notification_profile1 = NotificationProfileFactory(user=user1, timeslot=timeslot1)
         self.notification_profile1.filters.add(filter1)
@@ -234,11 +237,13 @@ class FilterViewTests(APITestCase):
             user=self.user1,
             name="Critical incidents",
             filter_string=f'{{"sourceSystemIds": [{self.source1.pk}]}}',
+            filter={"sourceSystemIds": [self.source1.pk]},
         )
         self.filter2 = FilterFactory(
             user=self.user1,
             name="Unused filter",
             filter_string=f'{{"sourceSystemIds": [{self.source1.pk}]}}',
+            filter={"sourceSystemIds": [self.source1.pk]},
         )
         notification_profile1 = NotificationProfileFactory(user=self.user1, timeslot=timeslot1)
         notification_profile1.filters.add(self.filter1)
@@ -404,6 +409,7 @@ class TimeslotViewTests(APITestCase):
             user=self.user1,
             name="Critical incidents",
             filter_string=f'{{"sourceSystemIds": [{self.source1.pk}]}}',
+            filter={"sourceSystemIds": [self.source1.pk]},
         )
         notification_profile1 = NotificationProfileFactory(user=self.user1, timeslot=self.timeslot1)
         notification_profile1.filters.add(filter1)
