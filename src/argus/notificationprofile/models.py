@@ -119,9 +119,23 @@ class FilterWrapper:
         fallback_filter = self.fallback_filter.get("event_type", None)
         return not self.filter.get("event_type", fallback_filter)
 
+    def are_source_system_ids_empty(self):
+        fallback_filter = self.fallback_filter.get("sourceSystemIds", None)
+        return not self.filter.get("sourceSystemIds", fallback_filter)
+
+    def are_tags_empty(self):
+        fallback_filter = self.fallback_filter.get("tags", None)
+        return not self.filter.get("tags", fallback_filter)
+
     @property
     def is_empty(self):
-        return self.are_tristates_empty() and self.is_maxlevel_empty() and self.is_event_type_empty()
+        return (
+            self.are_source_system_ids_empty()
+            and self.are_tags_empty()
+            and self.are_tristates_empty()
+            and self.is_maxlevel_empty()
+            and self.is_event_type_empty()
+        )
 
     def _incident_is_tristate(self, tristate, incident):
         return getattr(incident, tristate, None)
@@ -178,18 +192,9 @@ class Filter(models.Model):
     def filter_json(self):
         return json.loads(self.filter_string)
 
-    def _old_is_empty(self):
-        data = self.filter_json
-        for value in data.values():
-            if value:
-                return False
-        return True
-
     @property
     def is_empty(self):
-        old = self._old_is_empty()
-        new = self.filter_wrapper.is_empty
-        return all((old, new))
+        return self.filter_wrapper.is_empty
 
     @property
     def all_incidents(self):

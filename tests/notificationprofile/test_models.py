@@ -202,6 +202,42 @@ class FilterWrapperIncidentFitsEventTypeTests(unittest.TestCase):
 
 
 @tag("unittest")
+class FilterWrapperSourceSystemIdsEmptyTests(unittest.TestCase):
+    # Validation is handled before the data gets to FilterWrapper
+    # A sourceSystemId must be an integer if it is set at all.
+
+    def test_when_filter_is_empty_are_source_system_ids_empty_should_return_true(self):
+        empty_filter = FilterWrapper({})
+        self.assertTrue(empty_filter.are_source_system_ids_empty())
+
+    def test_when_source_system_ids_is_an_empty_list_are_source_system_ids_empty_should_return_true(self):
+        empty_filter = FilterWrapper({"sourceSystemIds": []})
+        self.assertTrue(empty_filter.are_source_system_ids_empty())
+
+    def test_when_source_system_ids_filter_exists_are_source_system_ids_empty_should_return_false(self):
+        empty_filter = FilterWrapper({"sourceSystemIds": [1]})
+        self.assertFalse(empty_filter.are_source_system_ids_empty())
+
+
+@tag("unittest")
+class FilterWrapperTagsEmptyTests(unittest.TestCase):
+    # Validation is handled before the data gets to FilterWrapper
+    # A tag must be a string of the format key=value if it is set at all.
+
+    def test_when_filter_is_empty_are_tags_empty_should_return_true(self):
+        empty_filter = FilterWrapper({})
+        self.assertTrue(empty_filter.are_tags_empty())
+
+    def test_when_tags_is_an_empty_list_are_tags_empty_should_return_true(self):
+        empty_filter = FilterWrapper({"tags": []})
+        self.assertTrue(empty_filter.are_tags_empty())
+
+    def test_when_tags_filter_exists_are_tags_empty_should_return_false(self):
+        empty_filter = FilterWrapper({"tags": ["a=b"]})
+        self.assertFalse(empty_filter.are_tags_empty())
+
+
+@tag("unittest")
 class HelperTimeFunctionsTests(TestCase):
     def test_set_time_works(self):
         self.assertEqual(parse_datetime("2000-01-01 10:00"), set_time(parse_datetime("2000-01-01 00:00"), "10:00"))
