@@ -31,7 +31,11 @@ class SendingNotificationTest(TestCase):
         (_, _, argus_source) = get_or_create_default_instances()
         filter_dict = {"sourceSystemIds": [argus_source.id], "tags": []}
         filter_string = json.dumps(filter_dict)
-        filter = factories.FilterFactory(user=user, filter_string=filter_string)
+        filter = factories.FilterFactory(
+            user=user,
+            filter_string=filter_string,
+            filter=filter_dict,
+        )
 
         # Get user related destinations
         destinations = user.destinations.all()
