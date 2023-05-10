@@ -7,6 +7,7 @@ from django.test import TestCase, tag, override_settings
 from django.utils.dateparse import parse_datetime, parse_time
 from django.utils.timezone import make_aware
 
+from argus.incident.factories import SourceSystemFactory, TagFactory
 from argus.incident.models import Event, Incident
 from argus.notificationprofile.models import (
     FilterWrapper,
@@ -394,6 +395,70 @@ class FilterTests(TestCase, IncidentAPITestCaseHelper):
 
     def teardown(self):
         connect_signals()
+
+    def test_incidents_with_source_systems_empty_if_no_incidents_with_these_source_systems(self):
+        source3 = SourceSystemFactory()
+        filter_source3 = FilterFactory(
+            user=self.user1,
+            filter={"sourceSystemIds": [source3.pk]},
+        )
+        self.assertFalse(filter_source3.incidents_with_source_systems())
+
+    def test_incidents_with_source_systems_finds_incidents_with_these_source_systems(self):
+        source1_filtered_incidents = list(self.filter_source1.incidents_with_source_systems())
+        self.assertIn(self.incident1, source1_filtered_incidents)
+        self.assertNotIn(self.incident2, source1_filtered_incidents)
+
+    def test_incidents_with_tags_empty_if_no_incidents_with_these_tags(self):
+        tag4 = TagFactory()
+        filter_tag4 = FilterFactory(
+            user=self.user1,
+            filter={"tags": [str(tag4)]},
+        )
+        self.assertFalse(filter_tag4.incidents_with_tags())
+
+    def test_incidents_with_tags_finds_incidents_with_these_tags(self):
+        tags1_filtered_incidents = list(self.filter_tags1.incidents_with_tags())
+        self.assertIn(self.incident1, tags1_filtered_incidents)
+        self.assertNotIn(self.incident2, tags1_filtered_incidents)
+
+    def test_incidents_fitting_tristates_empty_if_no_incidents_with_these_tristates(self):
+        filter_stateful = FilterFactory(
+            user=self.user1,
+            filter={"stateful": True},
+        )
+
+        self.assertFalse(filter_stateful.incidents_fitting_tristates())
+
+    def test_incidents_fitting_tristates_finds_incidents_with_these_tristates(self):
+        filter_stateless = FilterFactory(
+            user=self.user1,
+            filter={"stateful": False},
+        )
+        stateless_filtered_incidents = list(filter_stateless.incidents_fitting_tristates())
+        self.assertIn(self.incident1, stateless_filtered_incidents)
+        self.assertIn(self.incident2, stateless_filtered_incidents)
+
+    def test_incidents_fitting_maxlevel_empty_if_no_incidents_with_this_maxlevel(self):
+        self.incident1.level = 5
+        self.incident1.save(update_fields=["level"])
+        self.incident2.level = 5
+        self.incident2.save(update_fields=["level"])
+        filter_maxlevel1 = FilterFactory(
+            user=self.user1,
+            filter={"maxlevel": 1},
+        )
+
+        self.assertFalse(filter_maxlevel1.incidents_fitting_maxlevel())
+
+    def test_incidents_fitting_maxlevel_finds_incidents_with_this_maxlevel(self):
+        filter_maxlevel5 = FilterFactory(
+            user=self.user1,
+            filter={"maxlevel": 5},
+        )
+        maxlevel_filtered_incidents = list(filter_maxlevel5.incidents_fitting_maxlevel())
+        self.assertIn(self.incident1, maxlevel_filtered_incidents)
+        self.assertIn(self.incident2, maxlevel_filtered_incidents)
 
     def test_source_fits_true_if_incident_fits_source(self):
         self.assertTrue(self.filter_source1.source_system_fits(self.incident1))
