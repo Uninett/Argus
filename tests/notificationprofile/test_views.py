@@ -282,7 +282,7 @@ class FilterViewTests(APITestCase):
             path=self.ENDPOINT,
             data={
                 "name": filter_name,
-                "filter_string": f'{{"sourceSystemIds": [{self.source1.pk}], "tags": ["key1=value"]}}',
+                "filter": {"sourceSystemIds": [self.source1.pk], "tags": ["key1=value"]},
             },
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -296,7 +296,6 @@ class FilterViewTests(APITestCase):
             path=filter1_path,
             data={
                 "name": new_name,
-                "filter_string": f'{{"sourceSystemIds": [{self.source1.pk}], "tags": ["key1=value"]}}',
             },
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
