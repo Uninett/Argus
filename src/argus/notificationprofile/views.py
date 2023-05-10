@@ -17,6 +17,7 @@ from argus.incident.serializers import IncidentSerializer
 from argus.notificationprofile.media import api_safely_get_medium_object
 from argus.notificationprofile.media.base import NotificationMedium
 from .models import DestinationConfig, Filter, Media, NotificationProfile, Timeslot
+from .primitive_serializers import FilterBlobSerializer
 from .serializers import (
     DuplicateDestinationSerializer,
     FilterSerializer,
@@ -29,7 +30,6 @@ from .serializers import (
     RequestNotificationProfileSerializer,
     TimeslotSerializer,
 )
-from .validators import validate_filter_string
 
 
 @extend_schema_view(
@@ -70,36 +70,35 @@ class NotificationProfileViewSet(rw_viewsets.ModelViewSet):
         return Response(serializer.data)
 
     @extend_schema(
-        request=FilterPreviewSerializer,
+        request=FilterBlobSerializer,
         responses=IncidentSerializer(many=True),
     )
     @action(methods=["post"], detail=False)
     def preview(self, request, **_):
         """
-        POST a filterstring, get a list of filtered incidents back
+        POST a filter, get a list of filtered incidents back
 
         Format:
         {
             "sourceSystemIds": [1, ..],
             "tags": ["some=tag", ..],
+            "open": true,
+            "acked": false,
+            "stateful": true,
+            "maxlevel": 3
         }
 
         Minimal format:
-        {
-            "sourceSystemIds": [],
-            "tags": [],
-        }
+        {}
 
         Will eventually take over for the filterpreview endpoint
         """
-        filter_string_dict = request.data
-        try:
-            validate_filter_string(filter_string_dict)
-        except Exception as e:
-            assert False, e
+        filter_dict = request.data
+        serializer = FilterBlobSerializer(data=filter_dict)
+        if not serializer.is_valid():
+            raise ValidationError(serializer.errors)
 
-        filter_string_json = json.dumps(filter_string_dict)
-        mock_filter = Filter(filter_string=filter_string_json)
+        mock_filter = Filter(filter=serializer.data)
         serializer = IncidentSerializer(mock_filter.filtered_incidents, many=True)
         return Response(serializer.data)
 
@@ -187,9 +186,7 @@ class DestinationConfigViewSet(rw_viewsets.ModelViewSet):
             ~Q(user_id=destination.user.id)
         )
         medium = api_safely_get_medium_object(destination.media_id)
-        destination_in_use = medium.has_duplicate(
-            other_destinations, destination.settings
-        )
+        destination_in_use = medium.has_duplicate(other_destinations, destination.settings)
         return destination_in_use
 
     @extend_schema(
@@ -253,17 +250,27 @@ class FilterPreviewView(APIView):
     @extend_schema(request=FilterPreviewSerializer, responses={"200": IncidentSerializer})
     def post(self, request, format=None):
         """
-        POST a filterstring, get a list of filtered incidents back
+        POST a filter, get a list of filtered incidents back
 
-        Format: { "sourceSystemIds": [1, ..], "tags": ["some=tag", ..], }
+        Format:
+        {
+            "sourceSystemIds": [1, ..],
+            "tags": ["some=tag", ..],
+            "open": true,
+            "acked": false,
+            "stateful": true,
+            "maxlevel": 3
+        }
 
-        Minimal format: { "sourceSystemIds": [], "tags": [], }
+        Minimal format:
+        {}
         """
-        filter_string_dict = request.data
-        validate_filter_string(filter_string_dict)
+        filter_dict = request.data
+        serializer = FilterBlobSerializer(data=filter_dict)
+        if not serializer.is_valid():
+            raise ValidationError(serializer.errors)
 
-        filter_string_json = json.dumps(filter_string_dict)
-        mock_filter = Filter(filter_string=filter_string_json)
+        mock_filter = Filter(filter=serializer.data)
         serializer = IncidentSerializer(mock_filter.filtered_incidents, many=True)
         return Response(serializer.data)
 
