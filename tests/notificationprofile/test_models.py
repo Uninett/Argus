@@ -354,42 +354,34 @@ class FilterTests(TestCase, IncidentAPITestCaseHelper):
 
         self.filter_no_source = FilterFactory(
             user=self.user1,
-            filter_string='{"sourceSystemIds": []}',
             filter=dict(),
         )
         self.filter_source1 = FilterFactory(
             user=self.user1,
-            filter_string=f'{{"sourceSystemIds": [{self.source1.pk}]}}',
             filter={"sourceSystemIds": [self.source1.pk]},
         )
         self.filter_source2 = FilterFactory(
             user=self.user1,
-            filter_string=f'{{"sourceSystemIds": [{self.source2.pk}]}}',
             filter={"sourceSystemIds": [self.source2.pk]},
         )
         self.filter_no_tags = FilterFactory(
             user=self.user1,
-            filter_string='{"tags": []}',
             filter=dict(),
         )
         self.filter_tags1 = FilterFactory(
             user=self.user1,
-            filter_string=f'{{"tags": ["{self.tag1}"]}}',
             filter={"tags": [str(self.tag1)]},
         )
         self.filter_tags2 = FilterFactory(
             user=self.user1,
-            filter_string=f'{{"tags": ["{self.tag2}"]}}',
             filter={"tags": [str(self.tag2)]},
         )
         self.filter_no_source_no_tags = FilterFactory(
             user=self.user1,
-            filter_string='{"sourceSystemIds": [], "tags": []}',
             filter=dict(),
         )
         self.filter_source1_tags1 = FilterFactory(
             user=self.user1,
-            filter_string=f'{{"sourceSystemIds": [{self.source1.pk}], "tags": ["{self.tag1}"]}}',
             filter={"sourceSystemIds": [self.source1.pk], "tags": [str(self.tag1)]},
         )
 

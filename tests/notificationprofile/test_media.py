@@ -35,10 +35,8 @@ class FindDestinationsTest(TestCase):
         # Create a filter that matches your test incident
         (_, _, argus_source) = get_or_create_default_instances()
         filter_dict = {"sourceSystemIds": [argus_source.id], "tags": []}
-        filter_string = json.dumps(filter_dict)
         filter = factories.FilterFactory(
             user=self.user,
-            filter_string=filter_string,
             filter=filter_dict,
         )
 

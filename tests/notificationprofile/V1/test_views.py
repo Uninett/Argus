@@ -62,7 +62,6 @@ class ViewTests(APITestCase):
         self.filter1 = FilterFactory(
             user=self.user1,
             name="Critical incidents",
-            filter_string=f'{{"sourceSystemIds": [{self.source1.pk}]}}',
             filter={"sourceSystemIds": [self.source1.pk]},
         )
         self.notification_profile1 = NotificationProfileFactory(user=self.user1, timeslot=self.timeslot1)
@@ -273,7 +272,6 @@ class ViewTests(APITestCase):
         filter = FilterFactory(
             user=self.user1,
             name="Unused filter",
-            filter_string=f'{{"sourceSystemIds": [{self.source1.pk}]}}',
             filter={"sourceSystemIds": [self.source1.pk]},
         )
         response = self.user1_rest_client.delete(f"/api/v1/notificationprofiles/filters/{filter.pk}/")
