@@ -158,14 +158,11 @@ class FilterWrapper:
         fallback_filter = self.fallback_filter.get("maxlevel", None)
         return incident.level <= min(filter(None, (self.filter["maxlevel"], fallback_filter)))
 
-    def event_fits_event_type(self, event):
+    def event_fits(self, event):
         if self.is_event_type_empty():
             return True
         fallback_filter = self.fallback_filter.get("event_type", None)
         return event.type == self.filter.get("event_type", fallback_filter)
-
-    def event_fits(self, event):
-        return self.event_fits_event_type(event)
 
 
 class Filter(models.Model):
