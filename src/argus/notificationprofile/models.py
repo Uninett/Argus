@@ -158,9 +158,6 @@ class FilterWrapper:
         fallback_filter = self.fallback_filter.get("maxlevel", None)
         return incident.level <= min(filter(None, (self.filter["maxlevel"], fallback_filter)))
 
-    def incident_fits(self, incident):
-        return self.incident_fits_tristates(incident) and self.incident_fits_maxlevel(incident)
-
     def event_fits_event_type(self, event):
         if self.is_event_type_empty():
             return True
@@ -289,7 +286,9 @@ class Filter(models.Model):
         data = self.filter_json
         source_fits = self.source_system_fits(incident, data)
         tags_fit = self.tags_fit(incident, data)
-        new_filters_fit = self.filter_wrapper.incident_fits(incident)
+        new_filters_fit = self.filter_wrapper.incident_fits_tristates(
+            incident
+        ) and self.filter_wrapper.incident_fits_maxlevel(incident)
         # If False then one filter failed
         checks = set((source_fits, tags_fit, new_filters_fit))
         return not (False in checks)  # At least one filter failed
