@@ -1,6 +1,5 @@
-import json
-
 from drf_spectacular.utils import extend_schema, extend_schema_view
+from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
@@ -12,10 +11,41 @@ from argus.incident.serializers import IncidentSerializer
 from ..models import Filter, NotificationProfile
 from ..primitive_serializers import FilterBlobSerializer
 from .serializers import (
+    FilterSerializerV1,
     ResponseNotificationProfileSerializerV1,
     RequestNotificationProfileSerializerV1,
 )
 from ..serializers import FilterPreviewSerializer
+
+
+class FilterViewSetV1(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated, IsOwner]
+    serializer_class = FilterSerializerV1
+    queryset = Filter.objects.none()
+
+    def get_queryset(self):
+        return self.request.user.filters.all()
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+    def destroy(self, request, *args, **kwargs):
+        filter = self.get_queryset().get(pk=self.kwargs["pk"])
+        connected_profiles = filter.notification_profiles.all()
+        if connected_profiles:
+            profiles = ", ".join([str(profile) for profile in connected_profiles])
+            return Response(
+                data="".join(
+                    [
+                        "Cannot delete this filter since it is in use in the notification profile(s): ",
+                        profiles,
+                        ".",
+                    ]
+                ),
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        self.perform_destroy(filter)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 @extend_schema_view(

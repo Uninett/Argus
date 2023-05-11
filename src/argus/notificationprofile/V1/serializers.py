@@ -1,14 +1,61 @@
+import json
 from typing import List
 
 from rest_framework import fields, serializers
 
-from ..models import DestinationConfig, NotificationProfile
-from ..serializers import FilterSerializer, TimeslotSerializer
+from ..models import DestinationConfig, Filter, NotificationProfile
+from ..primitive_serializers import FilterBlobSerializer
+from ..serializers import TimeslotSerializer
+from ..validators import validate_filter_string
+
+
+class FilterSerializerV1(serializers.ModelSerializer):
+    filter_string = serializers.CharField(
+        validators=[validate_filter_string],
+        help_text='Deprecated: Use "filter" instead',
+        required=False,
+    )
+    filter = FilterBlobSerializer(required=False)
+
+    class Meta:
+        model = Filter
+        fields = [
+            "pk",
+            "name",
+            "filter_string",
+            "filter",
+        ]
+
+    def _copy_content_from_filter_string_to_filter(self, validated_data):
+        if "filter_string" in validated_data.keys():
+            filter_string_dict = json.loads(validated_data.pop("filter_string"))
+            if "filter" not in validated_data.keys():
+                validated_data["filter"] = filter_string_dict
+            else:
+                filter_dict = validated_data["filter"]
+                source_system_ids = filter_string_dict["sourceSystemIds"]
+                if source_system_ids and (
+                    "sourceSystemIds" not in filter_dict.keys() or filter_dict["sourceSystemIds"] != source_system_ids
+                ):
+                    validated_data["filter"]["sourceSystemIds"] = source_system_ids
+
+                tags = filter_string_dict["tags"]
+                if tags and ("tags" not in filter_dict.keys() or filter_dict["tags"] != tags):
+                    validated_data["filter"]["tags"] = tags
+        return validated_data
+
+    def create(self, validated_data):
+        validated_data = self._copy_content_from_filter_string_to_filter(validated_data=validated_data)
+        return Filter.objects.create(**validated_data)
+
+    def update(self, instance, validated_data):
+        validated_data = self._copy_content_from_filter_string_to_filter(validated_data=validated_data)
+        return super().update(instance=instance, validated_data=validated_data)
 
 
 class ResponseNotificationProfileSerializerV1(serializers.ModelSerializer):
     timeslot = TimeslotSerializer()
-    filters = FilterSerializer(many=True)
+    filters = FilterSerializerV1(many=True)
     media = serializers.SerializerMethodField(method_name="get_media")
     phone_number = serializers.SerializerMethodField(method_name="get_phone_number")
 

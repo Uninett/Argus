@@ -1,11 +1,8 @@
-import json
-
 from rest_framework import fields, serializers
 
 from .primitive_serializers import FilterBlobSerializer, FilterPreviewSerializer
 from .media import api_safely_get_medium_object
 from .models import DestinationConfig, Filter, Media, NotificationProfile, TimeRecurrence, Timeslot
-from .validators import validate_filter_string
 
 
 class TimeRecurrenceSerializer(serializers.ModelSerializer):
@@ -97,11 +94,6 @@ class TimeslotSerializer(serializers.ModelSerializer):
 
 
 class FilterSerializer(serializers.ModelSerializer):
-    filter_string = serializers.CharField(
-        validators=[validate_filter_string],
-        help_text='Deprecated: Use "filter" instead',
-        required=False,
-    )
     filter = FilterBlobSerializer(required=False)
 
     class Meta:
@@ -109,7 +101,6 @@ class FilterSerializer(serializers.ModelSerializer):
         fields = [
             "pk",
             "name",
-            "filter_string",
             "filter",
         ]
 
