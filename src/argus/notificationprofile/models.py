@@ -137,9 +137,6 @@ class FilterWrapper:
             and self.is_event_type_empty()
         )
 
-    def _incident_is_tristate(self, tristate, incident):
-        return getattr(incident, tristate, None)
-
     def incident_fits_tristates(self, incident):
         if self.are_tristates_empty():
             return None
@@ -148,7 +145,7 @@ class FilterWrapper:
             filter_tristate = self._get_tristate(tristate)
             if filter_tristate is None:
                 continue
-            incident_tristate = self._incident_is_tristate(tristate, incident)
+            incident_tristate = getattr(incident, tristate, None)
             fits_tristates.append(filter_tristate == incident_tristate)
         return all(fits_tristates)
 
