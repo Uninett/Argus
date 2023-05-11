@@ -216,7 +216,7 @@ class Filter(models.Model):
 
     def source_system_fits(self, incident: Incident, data=None):
         if not data:
-            data = self.filter_json
+            data = self.filter
         source_list = data.pop("sourceSystemIds", [])
         if not source_list:
             # We're not limiting on sources!
@@ -233,7 +233,7 @@ class Filter(models.Model):
 
     def tags_fit(self, incident: Incident, data=None):
         if not data:
-            data = self.filter_json
+            data = self.filter
         tags_list = data.pop("tags", [])
         if not tags_list:
             # We're not limiting on tags!
@@ -277,7 +277,7 @@ class Filter(models.Model):
     def incident_fits(self, incident: Incident):
         if self.is_empty:
             return False  # Filter is empty!
-        data = self.filter_json
+        data = self.filter
         source_fits = self.source_system_fits(incident, data)
         tags_fit = self.tags_fit(incident, data)
         new_filters_fit = self.filter_wrapper.incident_fits_tristates(
