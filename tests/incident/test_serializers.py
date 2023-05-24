@@ -202,6 +202,18 @@ class IncidentSerializerTests(TestCase):
         self.assertFalse(serializer.is_valid())
         self.assertIn("ticket_url", serializer.errors)
 
+    def test_incident_serializer_is_invalid_with_incorrect_tags(self):
+        data = {
+            "start_time": "2021-08-04T09:13:55.908Z",
+            "end_time": "2021-08-04T09:13:55.908Z",
+            "description": "incident",
+            "level": 1,
+            "tags": ["a=b"],
+        }
+        serializer = IncidentSerializer(data=data)
+        self.assertFalse(serializer.is_valid())
+        self.assertIn("tags", serializer.errors)
+
 
 class IncidentPureDeserializerTests(TestCase):
     def setUp(self):
