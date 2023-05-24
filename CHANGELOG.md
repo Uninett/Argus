@@ -6,6 +6,7 @@ read by developers.
 
 ### Added
 - Add inline destinations to user edit page in admin
+- Add management command for listing filters
 
 ### Fixed
 - Raise validation error on posting incident with tags without tag key
