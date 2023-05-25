@@ -62,7 +62,6 @@ class ViewTests(APITestCase):
         self.filter1 = FilterFactory(
             user=self.user1,
             name="Critical incidents",
-            filter_string=f'{{"sourceSystemIds": [{self.source1.pk}]}}',
             filter={"sourceSystemIds": [self.source1.pk]},
         )
         self.notification_profile1 = NotificationProfileFactory(user=self.user1, timeslot=self.timeslot1)
@@ -251,6 +250,35 @@ class ViewTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertTrue(Filter.objects.filter(pk=response.data["pk"]).exists())
 
+    def test_create_filter_with_filter_string_copies_to_filter(self):
+        response = self.user1_rest_client.post(
+            "/api/v1/notificationprofiles/filters/",
+            {
+                "name": "test-filter",
+                "filter_string": f'{{"sourceSystemIds": [{self.source1.pk}], "tags": ["key1=value"]}}',
+                "filter": {"open": True},
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        created_filter = Filter.objects.filter(pk=response.data["pk"]).first()
+        self.assertTrue(created_filter)
+        self.assertIn("sourceSystemIds", created_filter.filter.keys())
+
+    def test_create_filter_with_filter_string_copies_to_filter_with_conflicting_source_system_ids(self):
+        response = self.user1_rest_client.post(
+            "/api/v1/notificationprofiles/filters/",
+            {
+                "name": "test-filter",
+                "filter_string": f'{{"sourceSystemIds": [{self.source1.pk}], "tags": ["key1=value"]}}',
+                "filter": {"sourceSystemIds": [self.source2.pk], "open": True},
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        created_filter = Filter.objects.filter(pk=response.data["pk"]).first()
+        self.assertTrue(created_filter)
+        self.assertIn("sourceSystemIds", created_filter.filter.keys())
+        self.assertEqual(created_filter.filter["sourceSystemIds"], [self.source1.pk])
+
     def test_can_get_specific_filter(self):
         filter_pk = self.filter1.pk
         response = self.user1_rest_client.get(f"/api/v1/notificationprofiles/filters/{filter_pk}/")
@@ -269,11 +297,39 @@ class ViewTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(Filter.objects.get(pk=filter_pk).name, new_name)
 
+    def test_update_filter_with_filter_string_copies_to_filter(self):
+        filter_pk = self.filter1.pk
+        response = self.user1_rest_client.patch(
+            f"/api/v1/notificationprofiles/filters/{filter_pk}/",
+            {
+                "filter_string": f'{{"sourceSystemIds": [{self.source1.pk}], "tags": ["key1=value"]}}',
+                "filter": {"open": True},
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        created_filter = Filter.objects.filter(pk=response.data["pk"]).first()
+        self.assertTrue(created_filter)
+        self.assertIn("sourceSystemIds", created_filter.filter.keys())
+
+    def test_update_filter_with_filter_string_copies_to_filter_with_conflicting_source_system_ids(self):
+        filter_pk = self.filter1.pk
+        response = self.user1_rest_client.patch(
+            f"/api/v1/notificationprofiles/filters/{filter_pk}/",
+            {
+                "filter_string": f'{{"sourceSystemIds": [{self.source1.pk}], "tags": ["key1=value"]}}',
+                "filter": {"sourceSystemIds": [self.source2.pk], "open": True},
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        created_filter = Filter.objects.filter(pk=response.data["pk"]).first()
+        self.assertTrue(created_filter)
+        self.assertIn("sourceSystemIds", created_filter.filter.keys())
+        self.assertEqual(created_filter.filter["sourceSystemIds"], [self.source1.pk])
+
     def test_can_delete_unused_filter(self):
         filter = FilterFactory(
             user=self.user1,
             name="Unused filter",
-            filter_string=f'{{"sourceSystemIds": [{self.source1.pk}]}}',
             filter={"sourceSystemIds": [self.source1.pk]},
         )
         response = self.user1_rest_client.delete(f"/api/v1/notificationprofiles/filters/{filter.pk}/")

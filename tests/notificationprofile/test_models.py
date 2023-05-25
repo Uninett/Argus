@@ -186,20 +186,20 @@ class FilterWrapperIncidentFitsEventTypeTests(unittest.TestCase):
     def test_when_event_filter_is_empty_any_event_should_fit(self):
         event = Mock()
         empty_filter = FilterWrapper({})
-        self.assertEqual(empty_filter.event_fits_event_type(event), True)
+        self.assertEqual(empty_filter.event_fits(event), True)
 
     def test_when_event_filter_is_set_event_with_matching_type_should_fit(self):
         event = Mock()
         event_type = ("CHI", "Incident change")
         event.type = event_type
         filter = FilterWrapper({"event_type": event_type})
-        self.assertTrue(filter.event_fits_event_type(event))
+        self.assertTrue(filter.event_fits(event))
 
     def test_when_event_filter_is_set_event_with_not_matching_type_should_not_fit(self):
         event = Mock()
         event.type = ("CHI", "Incident change")
         filter = FilterWrapper({"event_type": ("ACK", "Acknowledge")})
-        self.assertFalse(filter.event_fits_event_type(event))
+        self.assertFalse(filter.event_fits(event))
 
 
 @tag("unittest")
@@ -354,42 +354,34 @@ class FilterTests(TestCase, IncidentAPITestCaseHelper):
 
         self.filter_no_source = FilterFactory(
             user=self.user1,
-            filter_string='{"sourceSystemIds": []}',
             filter=dict(),
         )
         self.filter_source1 = FilterFactory(
             user=self.user1,
-            filter_string=f'{{"sourceSystemIds": [{self.source1.pk}]}}',
             filter={"sourceSystemIds": [self.source1.pk]},
         )
         self.filter_source2 = FilterFactory(
             user=self.user1,
-            filter_string=f'{{"sourceSystemIds": [{self.source2.pk}]}}',
             filter={"sourceSystemIds": [self.source2.pk]},
         )
         self.filter_no_tags = FilterFactory(
             user=self.user1,
-            filter_string='{"tags": []}',
             filter=dict(),
         )
         self.filter_tags1 = FilterFactory(
             user=self.user1,
-            filter_string=f'{{"tags": ["{self.tag1}"]}}',
             filter={"tags": [str(self.tag1)]},
         )
         self.filter_tags2 = FilterFactory(
             user=self.user1,
-            filter_string=f'{{"tags": ["{self.tag2}"]}}',
             filter={"tags": [str(self.tag2)]},
         )
         self.filter_no_source_no_tags = FilterFactory(
             user=self.user1,
-            filter_string='{"sourceSystemIds": [], "tags": []}',
             filter=dict(),
         )
         self.filter_source1_tags1 = FilterFactory(
             user=self.user1,
-            filter_string=f'{{"sourceSystemIds": [{self.source1.pk}], "tags": ["{self.tag1}"]}}',
             filter={"sourceSystemIds": [self.source1.pk], "tags": [str(self.tag1)]},
         )
 

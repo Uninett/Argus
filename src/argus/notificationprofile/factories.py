@@ -87,5 +87,4 @@ class FilterFactory(factory.django.DjangoModelFactory):
 
     user = factory.SubFactory(PersonUserFactory)
     name = factory.Sequence(lambda s: "Filter %s" % s)
-    filter_string = '{"sourceSystemIds": [], "tags": []}'
     filter = dict()

@@ -1475,7 +1475,19 @@ Notification profile endpoints
 
           {
               "name": "Critical incidents",
-              "filter_string": "{\"sourceSystemIds\": [<SourceSystem.pk>, ...], \"tags\": [\"key1=value1\", ...]}"
+              "filter": {
+                  "sourceSystemIds": [
+                      1
+                  ],
+                  "tags": [
+                      "key1=value1"
+                  ],
+                  "open": true,
+                  "acked": false,
+                  "stateful": true,
+                  "maxlevel": 1,
+                  "event_type": "STA"
+              }
           }
 
 

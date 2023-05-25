@@ -7,7 +7,7 @@ from .. import views
 
 router = routers.SimpleRouter()
 router.register(r"timeslots", views.TimeslotViewSet)
-router.register(r"filters", views.FilterViewSet)
+router.register(r"filters", views_V1.FilterViewSetV1)
 router.register(r"", views_V1.NotificationProfileViewSetV1)
 
 app_name = "notification-profile"

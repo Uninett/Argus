@@ -137,9 +137,6 @@ class FilterWrapper:
             and self.is_event_type_empty()
         )
 
-    def _incident_is_tristate(self, tristate, incident):
-        return getattr(incident, tristate, None)
-
     def incident_fits_tristates(self, incident):
         if self.are_tristates_empty():
             return None
@@ -148,7 +145,7 @@ class FilterWrapper:
             filter_tristate = self._get_tristate(tristate)
             if filter_tristate is None:
                 continue
-            incident_tristate = self._incident_is_tristate(tristate, incident)
+            incident_tristate = getattr(incident, tristate, None)
             fits_tristates.append(filter_tristate == incident_tristate)
         return all(fits_tristates)
 
@@ -158,17 +155,11 @@ class FilterWrapper:
         fallback_filter = self.fallback_filter.get("maxlevel", None)
         return incident.level <= min(filter(None, (self.filter["maxlevel"], fallback_filter)))
 
-    def incident_fits(self, incident):
-        return self.incident_fits_tristates(incident) and self.incident_fits_maxlevel(incident)
-
-    def event_fits_event_type(self, event):
+    def event_fits(self, event):
         if self.is_event_type_empty():
             return True
         fallback_filter = self.fallback_filter.get("event_type", None)
         return event.type == self.filter.get("event_type", fallback_filter)
-
-    def event_fits(self, event):
-        return self.event_fits_event_type(event)
 
 
 class Filter(models.Model):
@@ -225,7 +216,7 @@ class Filter(models.Model):
 
     def source_system_fits(self, incident: Incident, data=None):
         if not data:
-            data = self.filter_json
+            data = self.filter
         source_list = data.pop("sourceSystemIds", [])
         if not source_list:
             # We're not limiting on sources!
@@ -242,7 +233,7 @@ class Filter(models.Model):
 
     def tags_fit(self, incident: Incident, data=None):
         if not data:
-            data = self.filter_json
+            data = self.filter
         tags_list = data.pop("tags", [])
         if not tags_list:
             # We're not limiting on tags!
@@ -286,10 +277,12 @@ class Filter(models.Model):
     def incident_fits(self, incident: Incident):
         if self.is_empty:
             return False  # Filter is empty!
-        data = self.filter_json
+        data = self.filter
         source_fits = self.source_system_fits(incident, data)
         tags_fit = self.tags_fit(incident, data)
-        new_filters_fit = self.filter_wrapper.incident_fits(incident)
+        new_filters_fit = self.filter_wrapper.incident_fits_tristates(
+            incident
+        ) and self.filter_wrapper.incident_fits_maxlevel(incident)
         # If False then one filter failed
         checks = set((source_fits, tags_fit, new_filters_fit))
         return not (False in checks)  # At least one filter failed
