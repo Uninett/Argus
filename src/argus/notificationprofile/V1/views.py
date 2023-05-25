@@ -10,12 +10,12 @@ from drf_rw_serializers import viewsets as rw_viewsets
 from argus.drf.permissions import IsOwner
 from argus.incident.serializers import IncidentSerializer
 from ..models import Filter, NotificationProfile
+from ..primitive_serializers import FilterBlobSerializer
 from .serializers import (
     ResponseNotificationProfileSerializerV1,
     RequestNotificationProfileSerializerV1,
 )
 from ..serializers import FilterPreviewSerializer
-from ..validators import validate_filter_string
 
 
 @extend_schema_view(
@@ -62,29 +62,28 @@ class NotificationProfileViewSetV1(rw_viewsets.ModelViewSet):
     @action(methods=["post"], detail=False)
     def preview(self, request, **_):
         """
-        POST a filterstring, get a list of filtered incidents back
+        POST a filter, get a list of filtered incidents back
 
         Format:
         {
             "sourceSystemIds": [1, ..],
             "tags": ["some=tag", ..],
+            "open": true,
+            "acked": false,
+            "stateful": true,
+            "maxlevel": 3
         }
 
         Minimal format:
-        {
-            "sourceSystemIds": [],
-            "tags": [],
-        }
+        {}
 
         Will eventually take over for the filterpreview endpoint
         """
-        filter_string_dict = request.data
-        try:
-            validate_filter_string(filter_string_dict)
-        except Exception as e:
-            assert False, e
+        filter_dict = request.data
+        serializer = FilterBlobSerializer(data=filter_dict)
+        if not serializer.is_valid():
+            raise ValidationError(serializer.errors)
 
-        filter_string_json = json.dumps(filter_string_dict)
-        mock_filter = Filter(filter_string=filter_string_json)
+        mock_filter = Filter(filter=serializer.data)
         serializer = IncidentSerializer(mock_filter.filtered_incidents, many=True)
         return Response(serializer.data)

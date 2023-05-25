@@ -119,9 +119,23 @@ class FilterWrapper:
         fallback_filter = self.fallback_filter.get("event_type", None)
         return not self.filter.get("event_type", fallback_filter)
 
+    def are_source_system_ids_empty(self):
+        fallback_filter = self.fallback_filter.get("sourceSystemIds", None)
+        return not self.filter.get("sourceSystemIds", fallback_filter)
+
+    def are_tags_empty(self):
+        fallback_filter = self.fallback_filter.get("tags", None)
+        return not self.filter.get("tags", fallback_filter)
+
     @property
     def is_empty(self):
-        return self.are_tristates_empty() and self.is_maxlevel_empty() and self.is_event_type_empty()
+        return (
+            self.are_source_system_ids_empty()
+            and self.are_tags_empty()
+            and self.are_tristates_empty()
+            and self.is_maxlevel_empty()
+            and self.is_event_type_empty()
+        )
 
     def _incident_is_tristate(self, tristate, incident):
         return getattr(incident, tristate, None)
@@ -178,18 +192,9 @@ class Filter(models.Model):
     def filter_json(self):
         return json.loads(self.filter_string)
 
-    def _old_is_empty(self):
-        data = self.filter_json
-        for value in data.values():
-            if value:
-                return False
-        return True
-
     @property
     def is_empty(self):
-        old = self._old_is_empty()
-        new = self.filter_wrapper.is_empty
-        return all((old, new))
+        return self.filter_wrapper.is_empty
 
     @property
     def all_incidents(self):
@@ -202,14 +207,17 @@ class Filter(models.Model):
     def filtered_incidents(self):
         if self.is_empty:
             return self.all_incidents.none().distinct()
-        data = self.filter_json
-        filtered_by_source = self.incidents_with_source_systems(data)
-        filtered_by_tags = self.incidents_with_tags(data)
-        return filtered_by_source & filtered_by_tags
+        data = self.filter
+        filtered_by_source = self.incidents_with_source_systems(data=data)
+        filtered_by_tags = self.incidents_with_tags(data=data)
+        filtered_by_tristates = self.incidents_fitting_tristates(data=data)
+        filtered_by_maxlevel = self.incidents_fitting_maxlevel(data=data)
+
+        return filtered_by_source & filtered_by_tags & filtered_by_tristates & filtered_by_maxlevel
 
     def incidents_with_source_systems(self, data=None):
         if not data:
-            data = self.filter_json
+            data = self.filter
         source_list = data.pop("sourceSystemIds", [])
         if source_list:
             return self.all_incidents.filter(source__in=source_list).distinct()
@@ -226,7 +234,7 @@ class Filter(models.Model):
 
     def incidents_with_tags(self, data=None):
         if not data:
-            data = self.filter_json
+            data = self.filter
         tags_list = data.pop("tags", [])
         if tags_list:
             return self.all_incidents.from_tags(*tags_list)
@@ -241,6 +249,39 @@ class Filter(models.Model):
             return None
         tags = set(tag.representation for tag in incident.deprecated_tags)
         return tags.issuperset(tags_list)
+
+    def incidents_fitting_tristates(
+        self,
+        data=None,
+    ):
+        if not data:
+            data = self.filter
+        fitting_incidents = self.all_incidents
+        filter_open = data.pop("open", None)
+        filter_acked = data.pop("acked", None)
+        filter_stateful = data.pop("stateful", None)
+
+        if filter_open is True:
+            fitting_incidents = fitting_incidents.open()
+        if filter_open is False:
+            fitting_incidents = fitting_incidents.closed()
+        if filter_acked is True:
+            fitting_incidents = fitting_incidents.acked()
+        if filter_acked is False:
+            fitting_incidents = fitting_incidents.not_acked()
+        if filter_stateful is True:
+            fitting_incidents = fitting_incidents.stateful()
+        if filter_stateful is False:
+            fitting_incidents = fitting_incidents.stateless()
+        return fitting_incidents.distinct()
+
+    def incidents_fitting_maxlevel(self, data=None):
+        if not data:
+            data = self.filter
+        maxlevel = data.pop("maxlevel", None)
+        if not maxlevel:
+            return self.all_incidents.distinct()
+        return self.all_incidents.filter(level__lte=maxlevel)
 
     def incident_fits(self, incident: Incident):
         if self.is_empty:
