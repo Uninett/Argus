@@ -1,3 +1,5 @@
+import json
+
 from django.test import tag
 
 from rest_framework import status
@@ -284,6 +286,20 @@ class ViewTests(APITestCase):
         response = self.user1_rest_client.get(f"/api/v1/notificationprofiles/filters/{filter_pk}/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["pk"], filter_pk)
+
+    def test_specific_filter_has_filter_string_copied_from_filter(self):
+        filter_pk = self.filter1.pk
+        response = self.user1_rest_client.get(f"/api/v1/notificationprofiles/filters/{filter_pk}/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["pk"], filter_pk)
+        expected_filter_string_dict = dict()
+        expected_filter_string_dict["sourceSystemIds"] = (
+            self.filter1.filter["sourceSystemIds"] if "sourceSystemIds" in self.filter1.filter.keys() else []
+        )
+        expected_filter_string_dict["tags"] = (
+            self.filter1.filter["tags"] if "tags" in self.filter1.filter.keys() else []
+        )
+        self.assertEqual(response.data["filter_string"], json.dumps(expected_filter_string_dict))
 
     def test_can_update_filter_name_with_valid_values(self):
         filter_pk = self.filter1.pk
