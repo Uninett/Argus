@@ -34,13 +34,11 @@ class FilterSerializerV1(serializers.ModelSerializer):
             else:
                 filter_dict = validated_data["filter"]
                 source_system_ids = filter_string_dict["sourceSystemIds"]
-                if source_system_ids and (
-                    "sourceSystemIds" not in filter_dict.keys() or filter_dict["sourceSystemIds"] != source_system_ids
-                ):
+                if source_system_ids and ("sourceSystemIds" not in filter_dict.keys()):
                     validated_data["filter"]["sourceSystemIds"] = source_system_ids
 
                 tags = filter_string_dict["tags"]
-                if tags and ("tags" not in filter_dict.keys() or filter_dict["tags"] != tags):
+                if tags and "tags" not in filter_dict.keys():
                     validated_data["filter"]["tags"] = tags
         return validated_data
 

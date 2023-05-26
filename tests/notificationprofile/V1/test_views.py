@@ -266,7 +266,7 @@ class ViewTests(APITestCase):
         self.assertTrue(created_filter)
         self.assertIn("sourceSystemIds", created_filter.filter.keys())
 
-    def test_create_filter_with_filter_string_copies_to_filter_with_conflicting_source_system_ids(self):
+    def test_create_filter_with_filter_string_with_conflicting_source_system_ids_prefers_filter_content(self):
         response = self.user1_rest_client.post(
             "/api/v1/notificationprofiles/filters/",
             {
@@ -279,7 +279,7 @@ class ViewTests(APITestCase):
         created_filter = Filter.objects.filter(pk=response.data["pk"]).first()
         self.assertTrue(created_filter)
         self.assertIn("sourceSystemIds", created_filter.filter.keys())
-        self.assertEqual(created_filter.filter["sourceSystemIds"], [self.source1.pk])
+        self.assertEqual(created_filter.filter["sourceSystemIds"], [self.source2.pk])
 
     def test_can_get_specific_filter(self):
         filter_pk = self.filter1.pk
@@ -327,7 +327,7 @@ class ViewTests(APITestCase):
         self.assertTrue(created_filter)
         self.assertIn("sourceSystemIds", created_filter.filter.keys())
 
-    def test_update_filter_with_filter_string_copies_to_filter_with_conflicting_source_system_ids(self):
+    def test_update_filter_with_filter_string_with_conflicting_source_system_ids_prefers_filter_content(self):
         filter_pk = self.filter1.pk
         response = self.user1_rest_client.patch(
             f"/api/v1/notificationprofiles/filters/{filter_pk}/",
@@ -340,7 +340,7 @@ class ViewTests(APITestCase):
         created_filter = Filter.objects.filter(pk=response.data["pk"]).first()
         self.assertTrue(created_filter)
         self.assertIn("sourceSystemIds", created_filter.filter.keys())
-        self.assertEqual(created_filter.filter["sourceSystemIds"], [self.source1.pk])
+        self.assertEqual(created_filter.filter["sourceSystemIds"], [self.source2.pk])
 
     def test_can_delete_unused_filter(self):
         filter = FilterFactory(
