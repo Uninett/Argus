@@ -52,6 +52,17 @@ class FilterSerializerV1(serializers.ModelSerializer):
         validated_data = self._copy_content_from_filter_string_to_filter(validated_data=validated_data)
         return super().update(instance=instance, validated_data=validated_data)
 
+    def to_representation(self, obj):
+        filter_string_dict = {"sourceSystemIds": [], "tags": []}
+        filter_keys = obj.filter.keys()
+        if "sourceSystemIds" in filter_keys:
+            filter_string_dict["sourceSystemIds"] = obj.filter["sourceSystemIds"]
+        if "tags" in filter_keys:
+            filter_string_dict["tags"] = obj.filter["tags"]
+        obj.filter_string = json.dumps(filter_string_dict)
+
+        return super().to_representation(obj)
+
 
 class ResponseNotificationProfileSerializerV1(serializers.ModelSerializer):
     timeslot = TimeslotSerializer()
