@@ -4,7 +4,13 @@ read by developers.
 
 ## [Unreleased]
 
+## Next up: [1.13.0]
+
+Works with argus-frontend 1.11 and newer.
+
 ### Added
+- Lint for critical problems before testing in Github CI, to speed things up
+- Added config-file for building docs at readthedocs
 - Add inline destinations to user edit page in admin
 - Add management command for listing filters
 - Add management command for bulk acting on incidents matching a given filter
@@ -14,9 +20,16 @@ read by developers.
 
 ### Changed
 - Drop support for Python 3.7. Github's CI/CD was sufficiently different from
-  testing on local (different seuptools-version used maybe?) that we had
+  testing on local (different setuptools-version used maybe?) that we had
   a "fun" goose chase finding and upgrading the sub-dependency that broke the
   build.
+- Remove all remaining uses of `Filter.filter_string`, replace with
+  Filter.filter, in preparation of removing the actual `filter_string` field
+  from the database.
+
+  The API v1 still accepts `filter_string` but it is optional. It will prefer
+  the data in `filter`. v2 ignores the presence or absence of `filter_string`
+  entirely.
 
 ## [1.12.4] - 2023-09-04
 

@@ -3,8 +3,27 @@ This file documents changes to Argus that are relevant for the users to know.
 
 ## [Unreleased]
 
+## Next up: [1.13.0]
+
+Works with argus-frontend 1.11 and newer.
+
+### Added
+- Add inline destinations to user edit page in admin
+- Add management command for listing filters
+- Add management command for bulk acting on incidents matching a given filter
+
+### Fixed
+- Raise validation error on posting incident with tags without tag key
+
 ### Changed
 - Drop support for Python 3.7
+- Remove all remaining uses of `Filter.filter_string`, replace with
+  Filter.filter, in preparation of removing the actual `filter_string` field
+  from the database.
+
+  The API v1 still accepts `filter_string` but it is optional. It will prefer
+  the data in `filter`. v2 ignores the presence or absence of `filter_string`
+  entirely.
 
 ## [1.12.4] - 2023-09-04
 
