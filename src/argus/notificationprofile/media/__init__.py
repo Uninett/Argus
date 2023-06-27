@@ -67,7 +67,7 @@ def send_notification(destinations: Iterable[DestinationConfig], *events: Iterab
 def background_send_notification(destinations: Iterable[DestinationConfig], *events: Event):
     connections.close_all()
     LOG.info('Notification: backgrounded: about to send %i events', len(events))
-    p = Process(target=send_notification, args=(destinations, events))
+    p = Process(target=send_notification, args=(destinations, *events))
     p.start()
     return p
 
