@@ -131,6 +131,7 @@ class IncidentSerializer(serializers.ModelSerializer):
         incident = Incident.objects.create(**validated_data)
         for tag in tags:
             IncidentTagRelation.objects.create(tag=tag, incident=incident, added_by=user)
+        incident.create_first_event()
 
         return incident
 

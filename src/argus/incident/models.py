@@ -61,6 +61,7 @@ def create_fake_incident(tags=None, description=None, stateful=True, level=None)
     for k, v in taglist:
         tag, _ = Tag.objects.get_or_create(key=k, value=v)
         IncidentTagRelation.objects.create(tag=tag, incident=incident, added_by=argus_user)
+    incident.create_first_event()
     return incident
 
 
@@ -464,6 +465,20 @@ class Incident(models.Model):
         acks_query = Q(ack__isnull=False)
         acks_not_expired_query = Q(ack__expiration__isnull=True) | Q(ack__expiration__gt=timezone.now())
         return self.events.filter(acks_query & acks_not_expired_query).exists()
+
+    def create_first_event(self):
+        if self.start_event or self.stateless_event:
+            return
+        event_type = Event.Type.INCIDENT_START
+        if not self.stateful:
+            event_type = Event.Type.STATELESS
+        Event.objects.create(
+            incident=self,
+            actor=self.source.user,
+            timestamp=self.start_time,
+            type=event_type,
+            description=self.description,
+        )
 
     # @transaction.atomic
     def set_open(self, actor: User, timestamp: datetime = None, description=""):

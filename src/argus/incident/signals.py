@@ -13,7 +13,6 @@ from .models import (
 
 __all__ = [
     "delete_associated_user",
-    "create_first_event",
     "send_notification",
     "delete_associated_event",
     "close_token_incident",
@@ -23,20 +22,6 @@ __all__ = [
 def delete_associated_user(sender, instance: SourceSystem, *args, **kwargs):
     if hasattr(instance, "user") and instance.user:
         instance.user.delete()
-
-
-def create_first_event(sender, instance: Incident, created, raw, *args, **kwargs):
-    if raw or not created:
-        return
-    if not instance.start_event and not instance.stateless_event:
-        event_type = Event.Type.INCIDENT_START if instance.stateful else Event.Type.STATELESS
-        Event.objects.create(
-            incident=instance,
-            actor=instance.source.user,
-            timestamp=instance.start_time,
-            type=event_type,
-            description=instance.description,
-        )
 
 
 def task_send_notification(sender, instance: Event, *args, **kwargs):
