@@ -102,6 +102,8 @@ def send_notifications_to_users(*events: Iterable[Event], send=send_notification
     # TODO: only send one notification per medium per user
     LOG.debug('Fallback filter set to "%s"', getattr(settings, "ARGUS_FALLBACK_FILTER", {}))
     destinations = find_destinations_for_many_events(events)
+    if not destinations:
+        return
     send(destinations, *events)
     LOG.info("Notification: %i events sent! %i copies", len(events), len(destinations))
 
