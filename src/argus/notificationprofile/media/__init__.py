@@ -76,7 +76,8 @@ def background_send_notification(destinations: Iterable[DestinationConfig], *eve
 def find_destinations_for_event(event: Event):
     destinations = set()
     incident = event.incident
-    for profile in NotificationProfile.objects.prefetch_related("destinations").select_related("user"):
+    qs = NotificationProfile.objects.filter(active=True)
+    for profile in qs.prefetch_related("destinations").select_related("user"):
         LOG.debug('Notification: checking profile "%s" for event "%s"', profile, event)
         if profile.incident_fits(incident) and profile.event_fits(event):
             destinations.update(profile.destinations.all())
