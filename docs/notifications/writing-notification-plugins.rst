@@ -10,7 +10,7 @@ and
 can be used as guides.
 
 To create a project for a new plugin easily it is recommended to use the
-`Argus Notification Cookiecutter Template <https://github.com/Uninett/argus-notification-cookiecutter>_`.
+`Argus Notification Cookiecutter Template <https://github.com/Uninett/argus-notification-cookiecutter>`_.
 
 If a Python library that speaks the protocol of the medium already exists, we
 recommend that you use it. This helps keep the plugin itself short and simple.
