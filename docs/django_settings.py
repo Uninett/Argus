@@ -23,3 +23,5 @@ INSTALLED_APPS = [
 ]
 
 MEDIA_PLUGINS = []
+# This is just to get the documentation to work
+SECRET_KEY = "secret-secret!"
