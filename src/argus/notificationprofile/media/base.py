@@ -51,9 +51,14 @@ class NotificationMedium(ABC):
         """
         pass
 
-    @staticmethod
+    @classmethod
+    def get_relevant_addresses(cls, destinations: QuerySet[DestinationConfig]) -> QuerySet[DestinationConfig]:
+        """Returns a list of addresses the message should be sent to"""
+        pass
+
+    @classmethod
     @abstractmethod
-    def send(event: Event, destinations: QuerySet[DestinationConfig], **kwargs) -> bool:
+    def send(cls, event: Event, destinations: QuerySet[DestinationConfig], **kwargs) -> bool:
         """Sends message about a given event to the given destinations"""
         pass
 
