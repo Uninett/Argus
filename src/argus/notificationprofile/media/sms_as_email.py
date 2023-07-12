@@ -79,8 +79,14 @@ class SMSNotification(NotificationMedium):
         """
         return queryset.filter(settings__phone_number=settings["phone_number"]).exists()
 
-    @staticmethod
-    def send(event: Event, destinations: QuerySet[DestinationConfig], **_) -> bool:
+    @classmethod
+    def get_relevant_addresses(cls, destinations: QuerySet[DestinationConfig]) -> QuerySet[DestinationConfig]:
+        """Returns a list of phone numbers the message should be sent to"""
+        sms_destinations = destinations.filter(media_id=cls.MEDIA_SLUG)
+        return [destination.settings["phone_number"] for destination in sms_destinations]
+
+    @classmethod
+    def send(cls, event: Event, destinations: QuerySet[DestinationConfig], **_) -> bool:
         """
         Sends an SMS about a given event to the given sms destinations
 
@@ -91,14 +97,18 @@ class SMSNotification(NotificationMedium):
             LOG.error("SMS_GATEWAY_ADDRESS is not set, cannot dispatch SMS notifications using this plugin")
             return
 
-        sms_destinations = destinations.filter(media_id=SMSNotification.MEDIA_SLUG)
-        if not sms_destinations:
+        phone_numbers = cls.get_relevant_addresses(destinations=destinations)
+
+        if not phone_numbers:
             return False
-        phone_numbers = [destination.settings["phone_number"] for destination in sms_destinations]
-        title = f"{event.description}"
+
         for phone_number in phone_numbers:
             send_email_safely(
-                send_mail, subject=f"sms {phone_number}", message=title, from_email=None, recipient_list=[recipient]
+                send_mail,
+                subject=f"sms {phone_number}",
+                message=f"{event.description}",
+                from_email=None,
+                recipient_list=[recipient],
             )
 
         return True
