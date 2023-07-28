@@ -12,6 +12,12 @@ read by developers.
 ### Fixed
 - Raise validation error on posting incident with tags without tag key
 
+### Changed
+- Drop support for Python 3.7. Github's CI/CD was sufficiently different from
+  testing on local (different seuptools-version used maybe?) that we had
+  a "fun" goose chase finding and upgrading the sub-dependency that broke the
+  build.
+
 ## [1.12.1] - 2023-05-04
 
 ### Fixed

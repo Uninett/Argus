@@ -3,6 +3,9 @@ This file documents changes to Argus that are relevant for the users to know.
 
 ## [Unreleased]
 
+### Changed
+- Drop support for Python 3.7
+
 ## [1.12.1] - 2023-05-05
 
 ### Fixed
