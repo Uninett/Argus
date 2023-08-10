@@ -50,6 +50,8 @@ cryptography==38.0.3
     #   pyopenssl
     #   service-identity
     #   social-auth-core
+cython==0.29.36
+    # via -r requirements/forced-upgrade.txt
 daphne==4.0.0
     # via channels
 defusedxml==0.7.1
@@ -58,7 +60,7 @@ defusedxml==0.7.1
     #   social-auth-core
 dj-database-url==1.0.0
     # via argus-server (pyproject.toml)
-django==4.1.8
+django==4.1.10
     # via
     #   -r requirements/django41.txt
     #   argus-server (pyproject.toml)
@@ -146,7 +148,7 @@ python3-openid==3.2.0
     # via social-auth-core
 pytz==2023.3
     # via djangorestframework
-pyyaml==6.0
+pyyaml==6.0.1
     # via
     #   -r requirements/forced-upgrade.txt
     #   drf-spectacular

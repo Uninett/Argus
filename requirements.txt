@@ -50,6 +50,8 @@ cryptography==39.0.1
     #   pyopenssl
     #   service-identity
     #   social-auth-core
+cython==0.29.36
+    # via -r requirements/forced-upgrade.txt
 daphne==4.0.0
     # via channels
 defusedxml==0.7.1
@@ -147,7 +149,7 @@ pytz==2023.3
     # via
     #   django
     #   djangorestframework
-pyyaml==5.4.1
+pyyaml==6.0.1
     # via
     #   -r requirements/forced-upgrade.txt
     #   drf-spectacular
