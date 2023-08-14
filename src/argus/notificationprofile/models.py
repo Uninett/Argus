@@ -256,14 +256,10 @@ class Filter(models.Model):
         checks["tags"] = self.tags_fit(incident, data)
         checks["tristates"] = self.filter_wrapper.incident_fits_tristates(incident)
         checks["max_level"] = self.filter_wrapper.incident_fits_maxlevel(incident)
-        # If False then at least one filter failed
-        final_result = True
-        for check, result in checks.items():
-            if result is False:
-                final_result = False
-                # Do not bail out early in order to log all failing checks
-                LOG.debug("Filter: incident failed %s check", check)
-        return final_result
+        any_failed = False in checks.values()
+        if any_failed:
+            LOG.debug("Filter: at least one incident check failed: %r", checks)
+        return not any_failed
 
     def event_fits(self, event: Event):
         if self.is_empty:
