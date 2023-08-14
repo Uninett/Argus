@@ -235,3 +235,4 @@ cloc.xml
 pylint.txt
 *~
 src/argus/version.py
+!.readthedocs.yaml
