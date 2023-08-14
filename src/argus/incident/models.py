@@ -60,7 +60,7 @@ def create_fake_incident(tags=None, description=None, stateful=True, level=None)
         taglist.extend(tags)
     for k, v in taglist:
         tag, _ = Tag.objects.get_or_create(key=k, value=v)
-        itr = IncidentTagRelation.objects.create(tag=tag, incident=incident, added_by=argus_user)
+        IncidentTagRelation.objects.create(tag=tag, incident=incident, added_by=argus_user)
         LOG.debug('Incident: Added tag "%s" on incident %i', str(tag), incident.id)
     return incident
 
