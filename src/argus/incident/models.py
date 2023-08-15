@@ -467,6 +467,10 @@ class Incident(models.Model):
         return self.events.filter(acks_query & acks_not_expired_query).exists()
 
     def create_first_event(self):
+        """Create the correct type of first event for an incident
+
+        To be used on creation of an incident
+        """
         if self.start_event or self.stateless_event:
             return
         event_type = Event.Type.INCIDENT_START
