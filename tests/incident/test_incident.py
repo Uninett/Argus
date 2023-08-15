@@ -14,7 +14,7 @@ class CreateIncidentTests(TestCase):
     def tearDown(self):
         connect_signals()
 
-    def test_event_has_description(self):
+    def test_new_stateful_incident_has_single_start_event(self):
         source_incident_id = "abcknekkebrod"
         incident = Incident.objects.create(
             start_time=timezone.now(),
@@ -24,12 +24,12 @@ class CreateIncidentTests(TestCase):
             description=f"Incident #{source_incident_id} created for testing",
         )
         incident.create_first_event()
-        event_start = incident.events.filter(type=Event.Type.INCIDENT_START)
+        event = incident.events.filter(type=Event.Type.INCIDENT_START)
 
-        self.assertTrue(event_start)
-        self.assertEqual(incident.description, incident.events.get(type="STA").description)
+        self.assertEqual(1, event.count())
+        self.assertEqual(incident.description, event.description)
 
-    def test_new_stateless_incident_has_stateless_event(self):
+    def test_new_stateless_incident_has_single_stateless_event(self):
         source_incident_id = "abcknekkebrod"
         incident = Incident.objects.create(
             start_time=timezone.now(),
@@ -39,6 +39,7 @@ class CreateIncidentTests(TestCase):
             description=f"Incident #{source_incident_id} created for testing",
         )
         incident.create_first_event()
-        event_stateless = incident.events.filter(type=Event.Type.STATELESS)
+        event = incident.events.filter(type=Event.Type.STATELESS)
 
-        self.assertEqual(1, event_stateless.count())
+        self.assertEqual(1, event.count())
+        self.assertEqual(incident.description, event.description)
