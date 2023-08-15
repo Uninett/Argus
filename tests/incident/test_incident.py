@@ -39,7 +39,7 @@ class CreateIncidentTests(TestCase):
             description=f"Incident #{source_incident_id} created for testing",
         )
         incident.create_first_event()
-        event = incident.events.filter(type=Event.Type.STATELESS)
+        events = incident.events.filter(type=Event.Type.STATELESS)
 
-        self.assertEqual(1, event.count())
-        self.assertEqual(incident.description, event.description)
+        self.assertEqual(events.count(), 1)
+        self.assertEqual(events.get().description, incident.description)
