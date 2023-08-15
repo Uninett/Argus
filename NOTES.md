@@ -6,6 +6,13 @@ This file documents changes to Argus that are relevant for the users to know.
 ### Changed
 - Drop support for Python 3.7
 
+## [1.12.2] - 2023-06-27
+
+### Fixed
+- When sending a notification in production a typo lead to an exception that
+  prevented sending the notification but was otherwise hidden from the end
+  user.
+
 ## [1.12.1] - 2023-05-05
 
 ### Fixed

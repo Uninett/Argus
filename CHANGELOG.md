@@ -18,6 +18,13 @@ read by developers.
   a "fun" goose chase finding and upgrading the sub-dependency that broke the
   build.
 
+## [1.12.2] - 2023-06-27
+
+### Fixed
+- When sending a notification in production a typo lead to an exception that
+  prevented sending the notification but was otherwise hidden from the end
+  user.
+
 ## [1.12.1] - 2023-05-04
 
 ### Fixed
@@ -104,14 +111,9 @@ been frozen, and should be ready for use, completing what was started in 1.10.
 
 ## [1.10.1] - 2022-12-08
 
-### Fixed
 
-- Run API auth V1 tests
+## [1.10.1] - 2022-12-08
 
-### Changed
-
-- Send serialized incidents to the ticket-plugin, not database objects
-- Improved version-detection in git flow
 
 ## [1.10.0] - 2022-11-17
 
@@ -201,6 +203,11 @@ been frozen, and should be ready for use, completing what was started in 1.10.
 - Upgrade from black 20.8b1 to 22.3.0 in pre-commit
 
 ## [1.7.0]
+
+### Changed
+
+- Clean away database tables rendered unnecessary due to changes in 1.6.0
+- Modernize packaging. Package-building is all in pyproject.toml, tools are
 
 ### Changed
 

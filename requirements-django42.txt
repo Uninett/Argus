@@ -51,6 +51,8 @@ cryptography==41.0.2
     #   pyopenssl
     #   service-identity
     #   social-auth-core
+cython==0.29.36
+    # via -r requirements/forced-upgrade.txt
 daphne==4.0.0
     # via channels
 defusedxml==0.7.1
