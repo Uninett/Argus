@@ -24,10 +24,10 @@ class CreateIncidentTests(TestCase):
             description=f"Incident #{source_incident_id} created for testing",
         )
         incident.create_first_event()
-        event = incident.events.filter(type=Event.Type.INCIDENT_START)
+        events = incident.events.filter(type=Event.Type.INCIDENT_START)
 
-        self.assertEqual(1, event.count())
-        self.assertEqual(incident.description, event.description)
+        self.assertEqual(events.count(), 1)
+        self.assertEqual(events.get().description, incident.description)
 
     def test_new_stateless_incident_has_single_stateless_event(self):
         source_incident_id = "abcknekkebrod"
