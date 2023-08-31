@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from datetime import datetime, time
 from functools import reduce
+import logging
 from operator import or_
 from typing import TYPE_CHECKING
 
@@ -19,6 +20,9 @@ from .constants import DEPRECATED_FILTER_NAMES
 
 if TYPE_CHECKING:
     from argus.incident.models import Event, Incident
+
+
+LOG = logging.getLogger(__name__)
 
 
 class Timeslot(models.Model):
@@ -278,14 +282,15 @@ class Filter(models.Model):
         if self.is_empty:
             return False  # Filter is empty!
         data = self.filter
-        source_fits = self.source_system_fits(incident, data)
-        tags_fit = self.tags_fit(incident, data)
-        new_filters_fit = self.filter_wrapper.incident_fits_tristates(
-            incident
-        ) and self.filter_wrapper.incident_fits_maxlevel(incident)
-        # If False then one filter failed
-        checks = set((source_fits, tags_fit, new_filters_fit))
-        return not (False in checks)  # At least one filter failed
+        checks = {}
+        checks["source"] = self.source_system_fits(incident, data)
+        checks["tags"] = self.tags_fit(incident, data)
+        checks["tristates"] = self.filter_wrapper.incident_fits_tristates(incident)
+        checks["max_level"] = self.filter_wrapper.incident_fits_maxlevel(incident)
+        any_failed = False in checks.values()
+        if any_failed:
+            LOG.debug("Filter: at least one incident check failed: %r", checks)
+        return not any_failed
 
     def event_fits(self, event: Event):
         if self.is_empty:

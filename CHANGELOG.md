@@ -18,6 +18,12 @@ read by developers.
   a "fun" goose chase finding and upgrading the sub-dependency that broke the
   build.
 
+## [1.12.3] - 2023-08-31
+
+### Changed
+- Change what is logged on notification sending in order to ease solving
+  problems in production
+
 ## [1.12.2] - 2023-06-27
 
 ### Fixed
