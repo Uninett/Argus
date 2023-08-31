@@ -61,6 +61,7 @@ def create_fake_incident(tags=None, description=None, stateful=True, level=None)
     for k, v in taglist:
         tag, _ = Tag.objects.get_or_create(key=k, value=v)
         IncidentTagRelation.objects.create(tag=tag, incident=incident, added_by=argus_user)
+        LOG.debug('Incident: Added tag "%s" on incident %i', str(tag), incident.id)
     return incident
 
 
@@ -213,7 +214,7 @@ class Event(models.Model):
     }
     ALLOWED_TYPES_FOR_END_USERS = {Type.CLOSE, Type.REOPEN, Type.ACKNOWLEDGE, Type.OTHER}
 
-    incident = models.ForeignKey(to='Incident', on_delete=models.PROTECT, related_name="events")
+    incident = models.ForeignKey(to="Incident", on_delete=models.PROTECT, related_name="events")
     actor = models.ForeignKey(to=User, on_delete=models.PROTECT, related_name="caused_events")
     timestamp = models.DateTimeField()
     received = models.DateTimeField(default=timezone.now)
@@ -291,10 +292,7 @@ class IncidentQuerySet(models.QuerySet):
 
     def create_acks(self, actor: User, timestamp=None, description="", expiration=None):
         events = self.create_events(actor, Event.Type.ACKNOWLEDGE, timestamp, description)
-        ack_objs = [
-            Acknowledgement(event=event, expiration=expiration)
-            for event in events
-        ]
+        ack_objs = [Acknowledgement(event=event, expiration=expiration) for event in events]
         Acknowledgement.objects.bulk_create(ack_objs)
         qs = Acknowledgement.objects.filter(event__in=events)
         return qs
