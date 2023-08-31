@@ -3,6 +3,14 @@ This file documents changes to Argus that are relevant for the users to know.
 
 ## [Unreleased]
 
+## [1.12.3] - 2023-08-31
+
+### Changed
+- Change what is logged on notification sending in order to ease solving
+  problems in production. Prior to this, we couldn't know whether there is
+  a problem with matching an event to filters, or whether the problem is
+  actually storing all incoming events. Turn on debug-logging to get it all.
+
 ## [1.12.2] - 2023-06-27
 
 ### Fixed
