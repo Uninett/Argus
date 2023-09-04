@@ -1,19 +1,17 @@
 from datetime import datetime, timedelta
 
-from django.db.models import signals
 from django.test import Client
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 from django.utils.timezone import make_aware
-from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APITestCase
 
 from argus.util import datetime_utils
 from argus.util.utils import duplicate
 from argus.util.testing import disconnect_signals, connect_signals
-from argus.incident.factories import StatefulIncidentFactory, SourceSystemFactory
+from argus.incident.factories import StatefulIncidentFactory
 from argus.incident.models import Event, Incident
 from . import IncidentBasedAPITestCaseHelper
 
@@ -30,7 +28,9 @@ class EventAPITests(APITestCase, IncidentBasedAPITestCaseHelper):
             source=self.source1,
             source_incident_id="1",
         )
+        self.stateful_incident1.create_first_event()
         self.stateless_incident1 = duplicate(self.stateful_incident1, end_time=None, source_incident_id="2")
+        self.stateless_incident1.create_first_event()
 
         self.events_url = lambda incident: reverse("v1:incident:incident-events", args=[incident.pk])
 
@@ -174,45 +174,3 @@ class EventAPITests(APITestCase, IncidentBasedAPITestCaseHelper):
                 self._assert_posting_event_is_rejected_and_does_not_change_end_time(
                     self._create_event_dict(event_type), original_end_time, self.user1_rest_client
                 )
-
-
-class EventSignalTests(APITestCase):
-    def setUp(self):
-        disconnect_signals()
-
-    def tearDown(self):
-        connect_signals()
-
-    def test_event_has_description(self):
-        source_incident_id = "abcknekkebrod"
-        incident = Incident.objects.create(
-            start_time=timezone.now(),
-            end_time=datetime_utils.INFINITY_REPR,
-            source_incident_id=source_incident_id,
-            source=SourceSystemFactory(),
-            description=f"Incident #{source_incident_id} created for testing",
-        )
-        event_start = incident.events.filter(type=Event.Type.INCIDENT_START)
-
-        self.assertTrue(event_start)
-        self.assertEqual(incident.description, incident.events.get(type="STA").description)
-
-
-class StatelessEventTests(TestCase):
-    def setUp(self):
-        disconnect_signals()
-
-    def tearDown(self):
-        connect_signals()
-
-    def test_new_stateless_incident_has_stateless_event(self):
-        source_incident_id = "abcknekkebrod"
-        incident = Incident.objects.create(
-            start_time=timezone.now(),
-            end_time=None,
-            source_incident_id=source_incident_id,
-            source=SourceSystemFactory(),
-            description=f"Incident #{source_incident_id} created for testing",
-        )
-        event_stateless = incident.events.filter(type=Event.Type.STATELESS)
-        self.assertEqual(1, event_stateless.count())
