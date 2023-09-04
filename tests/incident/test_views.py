@@ -71,6 +71,7 @@ class IncidentViewSetV1TestCase(IncidentAPITestCase):
         incident = StatefulIncidentFactory(source=self.source, description=description)
         tag = TagFactory(key="a", value="b")
         IncidentTagRelationFactory(incident=incident, tag=tag)
+        incident.create_first_event()
         return incident
 
     def add_acknowledgement_with_incident_and_event(self):
@@ -411,6 +412,7 @@ class IncidentViewSetTestCase(APITestCase):
         incident = StatefulIncidentFactory(source=self.source, description=description)
         tag = TagFactory(key="a", value="b")
         IncidentTagRelationFactory(incident=incident, tag=tag)
+        incident.create_first_event()
         return incident
 
     def add_event(self, incident_pk, description="event", type=Event.Type.OTHER):

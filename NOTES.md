@@ -6,6 +6,12 @@ This file documents changes to Argus that are relevant for the users to know.
 ### Changed
 - Drop support for Python 3.7
 
+## [1.12.4] - 2023-09-04
+
+### Changed
+- Ensure that the start event is created *after* the incident has its tags so
+  that notification filters with tags trigger correctly.
+
 ## [1.12.3] - 2023-08-31
 
 ### Changed

@@ -18,6 +18,14 @@ read by developers.
   a "fun" goose chase finding and upgrading the sub-dependency that broke the
   build.
 
+## [1.12.4] - 2023-09-04
+
+### Changed
+- Ensure that the start event is created *after* the incident has its tags so
+  that notification filters with tags trigger correctly. The signal that
+  creates the first event is gone, but the signal that triggers on creation of
+  the first event is not, that will have to wait until we utilize a queue.
+
 ## [1.12.3] - 2023-08-31
 
 ### Changed
