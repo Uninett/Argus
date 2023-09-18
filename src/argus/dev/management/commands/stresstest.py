@@ -51,7 +51,7 @@ class Command(BaseCommand):
 
     def _run_stresstest(self, tester: "StressTester", seconds: int) -> List[int]:
         self.stdout.write("Running stresstest ...")
-        incident_ids, runtime = tester.run_stresstest(seconds)
+        incident_ids, runtime = tester.run(seconds)
         requests_per_second = len(incident_ids) / runtime.seconds
         self.stdout.write(
             self.style.SUCCESS(f"Completed in {runtime} with an average of {requests_per_second} requests per second")
@@ -60,7 +60,7 @@ class Command(BaseCommand):
 
     def _verify_incidents(self, tester: "StressTester", incident_ids: List[int]):
         self.stdout.write("Verifying incidents were created correctly ...")
-        tester.run_verification(incident_ids)
+        tester.verify(incident_ids)
         self.stdout.write(self.style.SUCCESS("Verification complete with no errors."))
 
     def _bulk_ack_incidents(self, tester: "StressTester", incident_ids: List[int]):
@@ -93,7 +93,7 @@ class StressTester:
     def _get_incidents_v2_url(self) -> AnyStr:
         return urljoin(self.url, "/api/v2/incidents/")
 
-    async def _post_incidents_until_end_time(self, end_time: datetime, client: AsyncClient) -> List[int]:
+    async def _post_incidents(self, end_time: datetime, client: AsyncClient) -> List[int]:
         created_ids = []
         incident_data = self._get_incident_data()
         while datetime.now() < end_time:
@@ -111,7 +111,7 @@ class StressTester:
                 raise HTTPStatusError(msg, request=e.request, response=e.response)
         return created_ids
 
-    def run_stresstest(self, seconds: int) -> tuple(List[int], timedelta):
+    def run(self, seconds: int) -> tuple(List[int], timedelta):
         start_time = datetime.now()
         end_time = start_time + timedelta(seconds=seconds)
         incident_ids = self._loop.run_until_complete(self._run_stresstest_workers(end_time))
@@ -120,12 +120,10 @@ class StressTester:
 
     async def _run_stresstest_workers(self, end_time: datetime) -> List[int]:
         async with AsyncClient(timeout=self.timeout) as client:
-            results = await asyncio.gather(
-                *(self._post_incidents_until_end_time(end_time, client) for _ in range(self.worker_count))
-            )
+            results = await asyncio.gather(*(self._post_incidents(end_time, client) for _ in range(self.worker_count)))
             return list(itertools.chain.from_iterable(results))
 
-    def run_verification(self, incident_ids: List[int]):
+    def verify(self, incident_ids: List[int]):
         self._loop.run_until_complete(self._run_verification_workers(incident_ids))
 
     async def _run_verification_workers(self, incident_ids: List[int]):
