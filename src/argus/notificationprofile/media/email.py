@@ -166,13 +166,14 @@ class EmailNotification(NotificationMedium):
         subject = f"{settings.NOTIFICATION_SUBJECT_PREFIX}{title}"
         message = render_to_string("notificationprofile/email.txt", template_context)
         html_message = render_to_string("notificationprofile/email.html", template_context)
-        send_email_safely(
-            send_mail,
-            subject=subject,
-            message=message,
-            from_email=None,
-            recipient_list=recipient_list,
-            html_message=html_message,
-        )
+        for receipient in recipient_list:
+            send_email_safely(
+                send_mail,
+                subject=subject,
+                message=message,
+                from_email=None,
+                recipient_list=[receipient],
+                html_message=html_message,
+            )
 
         return True
