@@ -35,7 +35,7 @@ class Command(BaseCommand):
             default=10,
         )
         parser.add_argument("-t", "--timeout", type=int, help="Timeout for requests. Default 5s", default=5)
-        parser.add_argument("-w", "--workers", type=int, help="Number of workers. Default 1s", default=1)
+        parser.add_argument("-w", "--workers", type=int, help="Number of workers. Default 1", default=1)
         parser.add_argument("-b", "--bulk", action="store_true", help="Bulk ACK created incidents")
 
     def handle(self, *args, **options):
