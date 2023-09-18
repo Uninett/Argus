@@ -63,7 +63,6 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.SUCCESS("Succesfully bulk ACK'd"))
         except (DatabaseMismatchError, HTTPStatusError, TimeoutException) as e:
             self.stderr.write(self.style.ERROR(e))
-            return
 
 
 class StressTester:
