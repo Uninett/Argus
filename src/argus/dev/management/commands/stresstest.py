@@ -119,21 +119,24 @@ class StressTester:
             await asyncio.gather(*(self._verify_created_incidents(ids, client) for _ in range(self.worker_count)))
 
     async def _verify_created_incidents(self, incident_ids, client):
-        expected_data = self._get_incident_data()
         while incident_ids:
             incident_id = incident_ids.pop()
-            id_url = urljoin(self._get_incidents_v1_url(), str(incident_id) + "/")
-            try:
-                response = await client.get(id_url, headers=self._get_auth_header())
-                response.raise_for_status()
-            except TimeoutException:
-                raise TimeoutException(f"Timeout waiting for GET response to {id_url}")
-            except HTTPStatusError as e:
-                msg = f"HTTP error {e.response.status_code}: {e.response.content.decode('utf-8')}"
-                raise HTTPStatusError(msg, request=e.request, response=e.response)
-            response_data = response.json()
-            self._verify_tags(response_data, expected_data)
-            self._verify_description(response_data, expected_data)
+            self._verify_incident(incident_id, client)
+
+    async def _verify_incident(self, incident_id, client):
+        expected_data = self._get_incident_data()
+        id_url = urljoin(self._get_incidents_v1_url(), str(incident_id) + "/")
+        try:
+            response = await client.get(id_url, headers=self._get_auth_header())
+            response.raise_for_status()
+        except TimeoutException:
+            raise TimeoutException(f"Timeout waiting for GET response to {id_url}")
+        except HTTPStatusError as e:
+            msg = f"HTTP error {e.response.status_code}: {e.response.content.decode('utf-8')}"
+            raise HTTPStatusError(msg, request=e.request, response=e.response)
+        response_data = response.json()
+        self._verify_tags(response_data, expected_data)
+        self._verify_description(response_data, expected_data)
 
     def _verify_tags(self, response_data, expected_data):
         expected_tags = set([tag["tag"] for tag in expected_data["tags"]])
