@@ -41,28 +41,37 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         tester = StressTester(options.get("url"), options.get("token"), options.get("timeout"), options.get("workers"))
-        loop = asyncio.get_event_loop()
-        start_time = datetime.now()
-        end_time = start_time + timedelta(seconds=options.get("seconds"))
-        self.stdout.write("Running stresstest ...")
         try:
-            incident_ids = loop.run_until_complete(tester.run_stresstest_workers(end_time))
-            runtime = datetime.now() - start_time
-            requests_per_second = len(incident_ids) / runtime.seconds
-            self.stdout.write(
-                self.style.SUCCESS(
-                    f"Completed in {runtime} with an average of {requests_per_second} requests per second"
-                )
-            )
-            self.stdout.write("Verifying incidents were created correctly ...")
-            loop.run_until_complete(tester.run_verification_workers(incident_ids))
-            self.stdout.write(self.style.SUCCESS("Verification complete with no errors."))
+            incident_ids = self._run_stresstest(tester, options.get("seconds"))
+            self._verify_incidents(tester, incident_ids)
             if options.get("bulk"):
-                self.stdout.write("Bulk ACKing incidents ...")
-                tester.bulk_ack(incident_ids)
-                self.stdout.write(self.style.SUCCESS("Succesfully bulk ACK'd"))
+                self._bulk_ack_incidents(tester, incident_ids)
         except (DatabaseMismatchError, HTTPStatusError, TimeoutException) as e:
             self.stderr.write(self.style.ERROR(e))
+
+    def _run_stresstest(self, tester: "StressTester", seconds: int) -> List[int]:
+        self.stdout.write("Running stresstest ...")
+        loop = asyncio.get_event_loop()
+        start_time = datetime.now()
+        end_time = start_time + timedelta(seconds=seconds)
+        incident_ids = loop.run_until_complete(tester.run_stresstest_workers(end_time))
+        runtime = datetime.now() - start_time
+        requests_per_second = len(incident_ids) / runtime.seconds
+        self.stdout.write(
+            self.style.SUCCESS(f"Completed in {runtime} with an average of {requests_per_second} requests per second")
+        )
+        return incident_ids
+
+    def _verify_incidents(self, tester: "StressTester", incident_ids: List[int]):
+        self.stdout.write("Verifying incidents were created correctly ...")
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(tester.run_verification_workers(incident_ids))
+        self.stdout.write(self.style.SUCCESS("Verification complete with no errors."))
+
+    def _bulk_ack_incidents(self, tester: "StressTester", incident_ids: List[int]):
+        self.stdout.write("Bulk ACKing incidents ...")
+        tester.bulk_ack(incident_ids)
+        self.stdout.write(self.style.SUCCESS("Succesfully bulk ACK'd"))
 
 
 class StressTester:
