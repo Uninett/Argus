@@ -19,6 +19,7 @@ Works with argus-frontend 1.11 and newer.
 - Raise validation error on posting incident with tags without tag key
 
 ### Changed
+- Update Django patch versions and various dependencies
 - Drop support for Python 3.7. Github's CI/CD was sufficiently different from
   testing on local (different setuptools-version used maybe?) that we had
   a "fun" goose chase finding and upgrading the sub-dependency that broke the

@@ -45,7 +45,7 @@ charset-normalizer==3.2.0
     # via requests
 constantly==15.1.0
     # via twisted
-cryptography==41.0.2
+cryptography==41.0.3
     # via
     #   autobahn
     #   pyopenssl
@@ -61,7 +61,7 @@ defusedxml==0.7.1
     #   social-auth-core
 dj-database-url==2.0.0
     # via argus-server (pyproject.toml)
-django==3.2.20
+django==3.2.21
     # via
     #   -r requirements/django32.txt
     #   argus-server (pyproject.toml)
