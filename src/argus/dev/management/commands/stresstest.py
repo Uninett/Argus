@@ -119,8 +119,8 @@ class StressTester:
     async def _verify_created_incidents(self, incident_ids, client):
         expected_data = self._get_incident_data()
         while incident_ids:
-            id = incident_ids.pop()
-            id_url = urljoin(self._get_incidents_v1_url(), str(id) + "/")
+            incident_id = incident_ids.pop()
+            id_url = urljoin(self._get_incidents_v1_url(), str(incident_id) + "/")
             try:
                 response = await client.get(id_url, headers=self._get_auth_header())
                 response.raise_for_status()
