@@ -46,9 +46,11 @@ class Command(BaseCommand):
         self.stdout.write("Running stresstest ...")
         try:
             incident_ids = loop.run_until_complete(tester.run_stresstest_workers(end_time))
+            runtime = datetime.now() - start_time
+            requests_per_second = len(incident_ids) / runtime.seconds
             self.stdout.write(
                 self.style.SUCCESS(
-                    f"Completed in {datetime.now() - start_time} after sending {len(incident_ids)} requests."
+                    f"Completed in {runtime} with an average of {requests_per_second} requests per second"
                 )
             )
             self.stdout.write("Verifying incidents were created correctly ...")
