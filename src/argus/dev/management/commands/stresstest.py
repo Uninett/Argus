@@ -112,6 +112,11 @@ class StressTester:
         return created_ids
 
     def run(self, seconds: int) -> tuple(List[int], timedelta):
+        """Runs a stresstest against the configured URL.
+        The test will continually send requests for `seconds` seconds and stop when all requests have gotten a response.
+        Returns a list containing the IDs of all created incidents and a timedelta detailing how long the test ran for.
+        Since the stresstest waits for responses to all requests, the total runtime should exceed `seconds` to varying degrees.
+        """
         start_time = datetime.now()
         end_time = start_time + timedelta(seconds=seconds)
         incident_ids = self._loop.run_until_complete(self._run_stresstest_workers(end_time))
@@ -124,6 +129,7 @@ class StressTester:
             return list(itertools.chain.from_iterable(results))
 
     def verify(self, incident_ids: List[int]):
+        """Verifies that the incidents included in `incident_ids` exist and contain the expected values"""
         self._loop.run_until_complete(self._run_verification_workers(incident_ids))
 
     async def _run_verification_workers(self, incident_ids: List[int]):
@@ -166,6 +172,7 @@ class StressTester:
             raise DatabaseMismatchError(msg)
 
     def bulk_ack(self, incident_ids: List[int]):
+        """Sends a request to ACK all incidents included in `incident_ids`"""
         request_data = {
             "ids": incident_ids,
             "ack": {
