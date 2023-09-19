@@ -109,7 +109,7 @@ class StressTester:
             except TimeoutException:
                 raise TimeoutException(f"Timeout waiting for POST response to {self.url}")
             except HTTPStatusError as e:
-                msg = f"HTTP error {e.response.status_code}: {e.response.content.decode('utf-8')}"
+                msg = f"HTTP Error {e.response.status_code}: {e.response.content.decode('utf-8')}"
                 raise HTTPStatusError(msg, request=e.request, response=e.response)
         return created_ids
 
@@ -153,7 +153,7 @@ class StressTester:
         except TimeoutException:
             raise TimeoutException(f"Timeout waiting for GET response to {id_url}")
         except HTTPStatusError as e:
-            msg = f"HTTP error {e.response.status_code}: {e.response.content.decode('utf-8')}"
+            msg = f"HTTP Error {e.response.status_code}: {e.response.content.decode('utf-8')}"
             raise HTTPStatusError(msg, request=e.request, response=e.response)
         response_data = response.json()
         self._verify_tags(response_data, expected_data)
@@ -189,5 +189,5 @@ class StressTester:
         except TimeoutException:
             raise TimeoutException(f"Timeout waiting for POST response to {url}")
         except HTTPStatusError as e:
-            msg = f"HTTP error {e.response.status_code}: {e.response.content.decode('utf-8')}"
+            msg = f"HTTP Error {e.response.status_code}: {e.response.content.decode('utf-8')}"
             raise HTTPStatusError(msg, request=e.request, response=e.response)
