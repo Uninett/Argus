@@ -270,7 +270,7 @@ class Filter(models.Model):
         maxlevel = data.pop("maxlevel", None)
         if not maxlevel:
             return self.all_incidents.distinct()
-        return self.all_incidents.filter(level__lte=maxlevel)
+        return self.all_incidents.filter(level__lte=maxlevel).distinct()
 
     def incident_fits(self, incident: Incident):
         if self.is_empty:
