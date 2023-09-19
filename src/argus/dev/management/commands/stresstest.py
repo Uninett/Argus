@@ -111,7 +111,7 @@ class StressTester:
                 raise HTTPStatusError(msg, request=e.request, response=e.response)
         return created_ids
 
-    def run(self, seconds: int) -> tuple(List[int], timedelta):
+    def run(self, seconds: int) -> tuple[List[int], timedelta]:
         """Runs a stresstest against the configured URL.
         The test will continually send requests for `seconds` seconds and stop when all requests have gotten a response.
         Returns a list containing the IDs of all created incidents and a timedelta detailing how long the test ran for.
