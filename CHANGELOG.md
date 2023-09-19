@@ -4,7 +4,7 @@ read by developers.
 
 ## [Unreleased]
 
-## Next up: [1.13.0]
+## [1.13.0] - 2023-09-19
 
 Works with argus-frontend 1.11 and newer.
 
