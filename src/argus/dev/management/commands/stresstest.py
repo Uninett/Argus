@@ -5,7 +5,7 @@ import itertools
 from typing import Any, Dict, AnyStr, List
 
 import httpx
-from httpx import AsyncClient, TimeoutException, HTTPStatusError
+from httpx import AsyncClient, TimeoutException, HTTPStatusError, HTTPError
 
 from django.core.management.base import BaseCommand
 
@@ -48,6 +48,8 @@ class Command(BaseCommand):
                 self._bulk_ack_incidents(tester, incident_ids)
         except (DatabaseMismatchError, HTTPStatusError, TimeoutException) as e:
             self.stderr.write(self.style.ERROR(e))
+        except HTTPError as e:
+            self.stderr.write(self.style.ERROR(f"HTTP Error: {e}"))
 
     def _run_stresstest(self, tester: "StressTester", seconds: int) -> List[int]:
         self.stdout.write("Running stresstest ...")
