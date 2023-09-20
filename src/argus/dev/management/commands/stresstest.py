@@ -142,7 +142,7 @@ class StressTester:
     async def _verify_created_incidents(self, incident_ids: List[int], client: AsyncClient):
         while incident_ids:
             incident_id = incident_ids.pop()
-            self._verify_incident(incident_id, client)
+            await self._verify_incident(incident_id, client)
 
     async def _verify_incident(self, incident_id: int, client: AsyncClient):
         expected_data = self._get_incident_data()
