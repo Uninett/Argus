@@ -16,8 +16,8 @@ from argus.incident.factories import (
 )
 from argus.incident.models import Incident, IncidentTagRelation, SourceSystem, get_or_create_default_instances
 from argus.incident.views import IncidentFilter
-from argus.notificationprofile.factories import FilterFactory
-from argus.notificationprofile.models import Filter
+from argus.notificationprofile.factories import FilterFactory, NotificationProfileFactory
+from argus.notificationprofile.models import Filter, NotificationProfile
 from argus.util.testing import disconnect_signals, connect_signals
 
 
@@ -244,3 +244,73 @@ class IncidentFilterTestCase(IncidentBasedAPITestCaseHelper, TestCase):
             value=filtr.pk,
         )
         self.assertFalse(result)
+
+    def test_notificationprofile_pk_returns_empty_queryset_if_profile_does_not_exist(self):
+        qs = Incident.objects.order_by("pk")
+        last_profile_pk = NotificationProfile.objects.last().id if NotificationProfile.objects.exists() else 0
+
+        result = IncidentFilter.incident_filter(
+            queryset=qs,
+            name="notificationprofile_pk",
+            value=last_profile_pk + 1,
+        )
+        self.assertFalse(result)
+
+    def test_notificationprofile_pk_returns_empty_queryset_if_profile_belongs_to_other_user(self):
+        other_users_profile = NotificationProfileFactory()
+        request = Mock()
+        request.user = self.source1_user
+        incident_filter = IncidentFilter(
+            data={"notificationprofile_pk": other_users_profile.pk},
+            request=request,
+        )
+
+        self.assertFalse(incident_filter.qs)
+
+    def test_notificationprofile_pk_returns_filtered_incidents(self):
+        qs = Incident.objects.order_by("pk")
+        filtr = FilterFactory(filter={"sourceSystemIds": [self.source1.pk]})
+        profile = NotificationProfileFactory()
+        profile.filters.add(filtr)
+
+        result = IncidentFilter.incident_filter(
+            queryset=qs,
+            name="notificationprofile_pk",
+            value=profile.pk,
+        )
+        self.assertIn(self.incident1, result)
+        self.assertIn(self.incident2, result)
+        self.assertNotIn(self.incident3, result)
+        self.assertNotIn(self.incident4, result)
+
+    def test_notificationprofile_pk_returns_no_filtered_incidents_if_none_match(self):
+        last_source_pk = SourceSystem.objects.last().id
+        qs = Incident.objects.order_by("pk")
+        filtr = FilterFactory(filter={"sourceSystemIds": [last_source_pk + 1]})
+        profile = NotificationProfileFactory()
+        profile.filters.add(filtr)
+
+        result = IncidentFilter.incident_filter(
+            queryset=qs,
+            name="notificationprofile_pk",
+            value=profile.pk,
+        )
+        self.assertFalse(result)
+
+    def test_notificationprofile_pk_returns_filtered_incidents_for_multiple_connected_filters(self):
+        qs = Incident.objects.order_by("pk")
+        filter_source1 = FilterFactory(filter={"sourceSystemIds": [self.source1.pk]})
+        filter_source2 = FilterFactory(filter={"sourceSystemIds": [self.source2.pk]})
+        profile = NotificationProfileFactory()
+        profile.filters.add(filter_source1)
+        profile.filters.add(filter_source2)
+
+        result = IncidentFilter.incident_filter(
+            queryset=qs,
+            name="notificationprofile_pk",
+            value=profile.pk,
+        )
+        self.assertIn(self.incident1, result)
+        self.assertIn(self.incident2, result)
+        self.assertIn(self.incident3, result)
+        self.assertIn(self.incident4, result)
