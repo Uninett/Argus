@@ -78,7 +78,7 @@ def find_destinations_for_event(event: Event):
     incident = event.incident
     qs = NotificationProfile.objects.filter(active=True)
     for profile in qs.prefetch_related("destinations").select_related("user"):
-        LOG.debug('Notification: checking profile "%s" for event "%s"', profile, event)
+        LOG.debug('Notification: checking profile "%s" (%s) for event "%s"', profile, profile.user.username, event)
         if profile.incident_fits(incident) and profile.event_fits(event):
             destinations.update(profile.destinations.all())
     return destinations
