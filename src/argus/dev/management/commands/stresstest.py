@@ -54,7 +54,7 @@ class Command(BaseCommand):
     def _run_stresstest(self, tester: "StressTester", seconds: int) -> List[int]:
         self.stdout.write("Running stresstest ...")
         incident_ids, runtime = tester.run(seconds)
-        requests_per_second = len(incident_ids) / runtime.seconds
+        requests_per_second = round(len(incident_ids) / runtime.total_seconds(), 2)
         self.stdout.write(
             self.style.SUCCESS(f"Completed in {runtime} with an average of {requests_per_second} requests per second")
         )
