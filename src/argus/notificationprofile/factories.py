@@ -76,7 +76,7 @@ class NotificationProfileFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.NotificationProfile
 
-    user = factory.SubFactory(PersonUserFactory, user=factory.SelfAttribute("..timeslot"))
+    user = factory.LazyAttribute(lambda profile: profile.timeslot.user)
     timeslot = factory.SubFactory(TimeslotFactory)
     active = factory.Faker("boolean")
 
