@@ -173,6 +173,11 @@ class SourceSystemViewSet(
                 name="level__lte", description="Fetch incidents with levels in `LEVEL`", enum=Incident.LEVELS
             ),
             OpenApiParameter(
+                name="notificationprofile_pk",
+                description="Fetch incidents that are included in the filters connected to the notificationprofile with the given primary key.",
+                type=int,
+            ),
+            OpenApiParameter(
                 name="open",
                 description="Fetch open (`true`) or closed (`false`) incidents.",
                 enum=BooleanStringOAEnum,

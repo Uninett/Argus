@@ -3,7 +3,7 @@ from django_filters import rest_framework as filters
 
 from .fields import KeyValueField
 from .models import Incident
-from argus.notificationprofile.models import Filter
+from argus.notificationprofile.models import Filter, NotificationProfile
 
 
 __all__ = [
@@ -33,12 +33,14 @@ class IncidentFilter(filters.FilterSet):
     duration__gte = filters.NumberFilter(label="Duration", method="incident_filter")
     token_expiry = filters.BooleanFilter(label="Token expiry", method="incident_filter")
     filter_pk = IntegerFilter(label="Filter pk", method="incident_filter")
+    notificationprofile_pk = IntegerFilter(label="Notificationprofile pk", method="incident_filter")
 
     @property
     def qs(self):
         """
-        In case of filtering by filter pk returns an empty queryset if the filter
-        belongs to a different user than the requesting user
+        In case of filtering by filter pk or notificationprofile pk returns an empty
+        queryset if the filter/profile belongs to a different user than the requesting
+        user
 
         Otherwise returns the default queryset
         """
@@ -50,6 +52,14 @@ class IncidentFilter(filters.FilterSet):
             filtr = Filter.objects.filter(pk=filter_pk).first()
 
             if filtr and filtr.user != self.request.user:
+                return queryset.none()
+
+        notificationprofile_pk = self.data.get("notificationprofile_pk", None)
+
+        if notificationprofile_pk:
+            profile = NotificationProfile.objects.filter(pk=notificationprofile_pk).first()
+
+            if profile and profile.user != self.request.user:
                 return queryset.none()
 
         return queryset
@@ -88,6 +98,8 @@ class IncidentFilter(filters.FilterSet):
             return queryset.token_expiry()
         elif name == "filter_pk":
             return queryset.filter_pk(value)
+        elif name == "notificationprofile_pk":
+            return queryset.notificationprofile_pk(value)
         return queryset
 
     class Meta:
