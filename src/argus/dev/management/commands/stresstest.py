@@ -42,33 +42,23 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         tester = StressTester(options.get("url"), options.get("token"), options.get("timeout"), options.get("workers"))
         try:
-            incident_ids = self._run_stresstest(tester, options.get("seconds"))
-            self._verify_incidents(tester, incident_ids)
+            self.stdout.write("Running stresstest ...")
+            incident_ids, runtime = tester.run(options.get("seconds"))
+            requests_per_second = round(len(incident_ids) / runtime.total_seconds(), 2)
+            self.stdout.write("Verifying incidents were created correctly ...")
+            tester.verify(incident_ids)
             if options.get("bulk"):
-                self._bulk_ack_incidents(tester, incident_ids)
+                self.stdout.write("Bulk ACKing incidents ...")
+                tester.bulk_ack(incident_ids)
+            self.stdout.write(
+                self.style.SUCCESS(
+                    f"Stresstest completed. Runtime: {runtime}. Incidents created: {len(incident_ids)}. Average incidents per second: {requests_per_second}."
+                )
+            )
         except (DatabaseMismatchError, HTTPStatusError, TimeoutException) as e:
             self.stderr.write(self.style.ERROR(e))
         except HTTPError as e:
             self.stderr.write(self.style.ERROR(f"HTTP Error: {e}"))
-
-    def _run_stresstest(self, tester: "StressTester", seconds: int) -> List[int]:
-        self.stdout.write("Running stresstest ...")
-        incident_ids, runtime = tester.run(seconds)
-        requests_per_second = round(len(incident_ids) / runtime.total_seconds(), 2)
-        self.stdout.write(
-            self.style.SUCCESS(f"Completed in {runtime} with an average of {requests_per_second} requests per second")
-        )
-        return incident_ids
-
-    def _verify_incidents(self, tester: "StressTester", incident_ids: List[int]):
-        self.stdout.write("Verifying incidents were created correctly ...")
-        tester.verify(incident_ids)
-        self.stdout.write(self.style.SUCCESS("Verification complete with no errors."))
-
-    def _bulk_ack_incidents(self, tester: "StressTester", incident_ids: List[int]):
-        self.stdout.write("Bulk ACKing incidents ...")
-        tester.bulk_ack(incident_ids)
-        self.stdout.write(self.style.SUCCESS("Succesfully bulk ACK'd"))
 
 
 class StressTester:
