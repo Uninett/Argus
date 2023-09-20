@@ -95,6 +95,23 @@ class StressTester:
     def _get_incidents_v2_url(self) -> AnyStr:
         return urljoin(self.url, "/api/v2/incidents/")
 
+    def run(self, seconds: int) -> tuple[List[int], timedelta]:
+        """Runs a stresstest against the configured URL.
+        The test will continually send requests for `seconds` seconds and stop when all requests have gotten a response.
+        Returns a list containing the IDs of all created incidents and a timedelta detailing how long the test ran for.
+        Since the stresstest waits for responses to all requests, the total runtime should exceed `seconds` to varying degrees.
+        """
+        start_time = datetime.now()
+        end_time = start_time + timedelta(seconds=seconds)
+        incident_ids = self._loop.run_until_complete(self._run_stresstest_workers(end_time))
+        runtime = datetime.now() - start_time
+        return incident_ids, runtime
+
+    async def _run_stresstest_workers(self, end_time: datetime) -> List[int]:
+        async with AsyncClient(timeout=self.timeout) as client:
+            results = await asyncio.gather(*(self._post_incidents(end_time, client) for _ in range(self.worker_count)))
+            return list(itertools.chain.from_iterable(results))
+
     async def _post_incidents(self, end_time: datetime, client: AsyncClient) -> List[int]:
         created_ids = []
         incident_data = self._get_incident_data()
@@ -112,23 +129,6 @@ class StressTester:
                 msg = f"HTTP Error {e.response.status_code}: {e.response.content.decode('utf-8')}"
                 raise HTTPStatusError(msg, request=e.request, response=e.response)
         return created_ids
-
-    def run(self, seconds: int) -> tuple[List[int], timedelta]:
-        """Runs a stresstest against the configured URL.
-        The test will continually send requests for `seconds` seconds and stop when all requests have gotten a response.
-        Returns a list containing the IDs of all created incidents and a timedelta detailing how long the test ran for.
-        Since the stresstest waits for responses to all requests, the total runtime should exceed `seconds` to varying degrees.
-        """
-        start_time = datetime.now()
-        end_time = start_time + timedelta(seconds=seconds)
-        incident_ids = self._loop.run_until_complete(self._run_stresstest_workers(end_time))
-        runtime = datetime.now() - start_time
-        return incident_ids, runtime
-
-    async def _run_stresstest_workers(self, end_time: datetime) -> List[int]:
-        async with AsyncClient(timeout=self.timeout) as client:
-            results = await asyncio.gather(*(self._post_incidents(end_time, client) for _ in range(self.worker_count)))
-            return list(itertools.chain.from_iterable(results))
 
     def verify(self, incident_ids: List[int]):
         """Verifies that the incidents included in `incident_ids` exist and contain the expected values"""
