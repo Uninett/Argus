@@ -140,15 +140,19 @@ class FilterWrapper:
 
     def incident_fits_tristates(self, incident):
         if self.are_tristates_empty():
-            return None
-        fits_tristates = []
+            return {}
+        fits_tristates = {}
+        incident.refresh_from_db()
         for tristate in self.TRINARY_FILTERS:
             filter_tristate = self._get_tristate(tristate)
             if filter_tristate is None:
+                LOG.debug('Tristates: "%s" not in filter, ignoring', tristate)
+                fits_tristates[tristate] = None
                 continue
             incident_tristate = getattr(incident, tristate, None)
-            fits_tristates.append(filter_tristate == incident_tristate)
-        return all(fits_tristates)
+            LOG.debug('Tristates: "%s": filter = %s, incident = %s', tristate, filter_tristate, incident_tristate)
+            fits_tristates[tristate] = filter_tristate == incident_tristate
+        return fits_tristates
 
     def incident_fits_maxlevel(self, incident):
         if self.is_maxlevel_empty():
@@ -277,7 +281,9 @@ class Filter(models.Model):
         checks = {}
         checks["source"] = self.source_system_fits(incident, data)
         checks["tags"] = self.tags_fit(incident, data)
-        checks["tristates"] = self.filter_wrapper.incident_fits_tristates(incident)
+        tristate_checks = self.filter_wrapper.incident_fits_tristates(incident)
+        for tristate, result in tristate_checks.items():
+            checks[tristate] = result
         checks["max_level"] = self.filter_wrapper.incident_fits_maxlevel(incident)
         any_failed = False in checks.values()
         if any_failed:
@@ -372,7 +378,8 @@ class NotificationProfile(models.Model):
         if not self.active:
             return False
         is_selected_by_time = self.timeslot.timestamp_is_within_time_recurrences(incident.start_time)
-        is_selected_by_filters = any(f.incident_fits(incident) for f in self.filters.all())
+        checks = {f: f.incident_fits(incident) for f in self.filters.all()}
+        is_selected_by_filters = False not in checks.values()
         return is_selected_by_time and is_selected_by_filters
 
     def event_fits(self, event: Event):
