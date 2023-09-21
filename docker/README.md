@@ -18,7 +18,19 @@ Or, from the top level directory:
 docker build -t argus -f docker/Dockerfile .
 ```
 
-## Configuration of the running container
+## Services
+
+While this image provides the necessary environment for the backend processes,
+it defaults to run only the API server itself.  In addition to an API
+container, a second container is needed to process notifications
+asynchronously.  The second container needs to run from this same image, but
+you should replace the container command with `django-admin qcluster`, to run
+the "qcluster" service.
+
+The "qcluster" command comes from Django Q2, and is used to process a message
+queue of tasks to complete in the background.
+
+## Configuration of the running containers
 
 This image runs with default production settings, with a few tweaks from
 [dockersettings.py](dockersettings.py). This means that the most useful
