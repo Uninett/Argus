@@ -4,6 +4,14 @@ read by developers.
 
 ## [Unreleased]
 
+### Added
+- Add the "installed" field to the media serializer. This is so that the
+  frontend can detect media used that is no longer installed on the backend.
+
+### Changed
+- Remove the `Filter.filter_string`-field from the database. We're not using it
+  anymore and shouldn't ever use it by accident either.
+
 ## [1.13.0] - 2023-09-19
 
 Works with argus-frontend 1.11 and newer.

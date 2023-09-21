@@ -3,6 +3,10 @@ This file documents changes to Argus that are relevant for the users to know.
 
 ## [Unreleased]
 
+### Added
+- Add the "installed" field to the media serializer. This is so that the
+  frontend can detect media used that is no longer installed on the backend.
+
 ## [1.13.0] - 2023-09-19
 
 Works with argus-frontend 1.11 and newer.
