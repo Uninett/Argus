@@ -199,6 +199,16 @@ class SourceSystemViewSet(
                 description="Fetch stateful (`true`) or stateless (`false`) incidents.",
                 enum=BooleanStringOAEnum,
             ),
+            OpenApiParameter(
+                name="ticket",
+                description="Fetch incidents with or without a ticket.",
+                enum=BooleanStringOAEnum,
+            ),
+            OpenApiParameter(
+                name="token_expiry",
+                description="Fetch incidents that concern expiration of authentication tokens.",
+                enum=BooleanStringOAEnum,
+            ),
         ]
     )
 )
@@ -595,7 +605,7 @@ class BulkHelper:
         changes = {}
         status_codes_seen = set()
         qs = self.queryset.filter(pk__in=incident_ids)
-        found_ids = set(qs.values_list('id', flat=True))
+        found_ids = set(qs.values_list("id", flat=True))
 
         # wash ids
         missing_ids = set(incident_ids) - found_ids
