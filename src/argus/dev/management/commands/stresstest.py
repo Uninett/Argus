@@ -4,8 +4,7 @@ import asyncio
 import itertools
 from typing import Any, Dict, AnyStr, List
 
-import httpx
-from httpx import AsyncClient, TimeoutException, HTTPStatusError, HTTPError
+from httpx import AsyncClient, TimeoutException, HTTPStatusError, HTTPError, post
 
 from django.core.management.base import BaseCommand
 
@@ -174,7 +173,7 @@ class StressTester:
         }
         url = urljoin(self._get_incidents_v2_url(), "acks/bulk/")
         try:
-            response = httpx.post(url, json=request_data, headers=self._get_auth_header())
+            response = post(url, json=request_data, headers=self._get_auth_header())
             response.raise_for_status()
         except TimeoutException:
             raise TimeoutException(f"Timeout waiting for POST response to {url}")
