@@ -20,7 +20,7 @@ class Command(BaseCommand):
         parser.add_argument(
             "url",
             type=str,
-            help="URL for target argus host including port, ex https://argushost.no:443",
+            help="URL for target argus host. Port may be specified (defaults to 443 for HTTPS and 80 for HTTP), e.g. https://argushost.no:8080",
         )
         parser.add_argument(
             "token",
