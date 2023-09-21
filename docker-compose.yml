@@ -1,26 +1,33 @@
 version: '3.5'
+
+x-api: &api-service
+  build: .
+  depends_on:
+    - postgres
+    - redis
+  environment:
+    - TIME_ZONE=Europe/Oslo
+    - DJANGO_SETTINGS_MODULE=argus.site.settings.dockerdev
+    - DATABASE_URL=postgresql://argus:HahF9araeKoo@postgres/argus
+    - ARGUS_REDIS_SERVER=redis
+  volumes:
+    - ${PWD}:/argus
+  restart: always
+
 services:
   api:
-    build: .
+    <<: *api-service
     ports:
       - "8000:8000"
-    depends_on:
-      - postgres
-      - redis
-    environment:
-      - TIME_ZONE=Europe/Oslo
-      - DJANGO_SETTINGS_MODULE=argus.site.settings.dockerdev
-      - DATABASE_URL=postgresql://argus:HahF9araeKoo@postgres/argus
-      - ARGUS_REDIS_SERVER=redis
-    volumes:
-      - ${PWD}:/argus
-    restart: always
 
+  qcluster:
+    <<: *api-service
+    command: ./docker-entrypoint-qcluster.sh
 
   postgres:
-    image: "postgres:12"
+    image: "postgres:13"
     volumes:
-      - postgres:/var/lib/postgresql/data:Z
+      - postgres:/var/lib/postgresql/data
     restart: always
     environment:
       - POSTGRES_USER=argus
