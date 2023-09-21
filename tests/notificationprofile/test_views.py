@@ -89,6 +89,30 @@ class NotificationProfileViewTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertTrue(NotificationProfile.objects.filter(pk=response.data["pk"]).exists())
 
+    def test_should_not_create_profile_with_duplicate_name(self):
+        name = "My profile"
+        self.notification_profile1.name = name
+        self.notification_profile1.save()
+
+        response = self.user1_rest_client.post(
+            path=self.ENDPOINT,
+            data={
+                "name": name,
+                "timeslot": self.timeslot1.pk,
+                "filters": [self.filter1.pk],
+                "destinations": [],
+                "active": self.notification_profile1.active,
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(
+            NotificationProfile.objects.filter(
+                user=self.user1,
+                name=name,
+            ).count(),
+            1,
+        )
+
     def test_updating_timeslot_should_not_change_pk(self):
         # Originally timeslot was the pk of notification profile
         profile1_pk = self.notification_profile1.pk
@@ -106,6 +130,31 @@ class NotificationProfileViewTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
         self.assertEqual(response.data["pk"], profile1_pk)
         self.assertEqual(NotificationProfile.objects.get(pk=profile1_pk).timeslot.pk, self.timeslot2.pk)
+
+    def test_updating_profile_with_name_of_other_profile_should_fail(self):
+        name = "My profile"
+        NotificationProfileFactory(user=self.user1, name=name)
+        profile1_pk = self.notification_profile1.pk
+        profile1_path = f"{self.ENDPOINT}{profile1_pk}/"
+
+        response = self.user1_rest_client.put(
+            path=profile1_path,
+            data={
+                "timeslot": self.timeslot1.pk,
+                "filters": [f.pk for f in self.notification_profile1.filters.all()],
+                "destinations": [self.synced_email_destination.pk],
+                "active": self.notification_profile1.active,
+                "name": name,
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(
+            NotificationProfile.objects.filter(
+                user=self.user1,
+                name=name,
+            ).count(),
+            1,
+        )
 
     def test_should_delete_profile(self):
         profile1_pk = self.notification_profile1.pk
