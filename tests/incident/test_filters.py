@@ -5,7 +5,7 @@ from django.test import TestCase
 from django.utils import timezone
 from django.utils.timezone import is_aware, make_aware
 
-from argus.auth.factories import SourceUserFactory
+from argus.auth.factories import PersonUserFactory, SourceUserFactory
 from argus.incident.factories import (
     SourceSystemFactory,
     SourceSystemTypeFactory,
@@ -13,7 +13,7 @@ from argus.incident.factories import (
     StatelessIncidentFactory,
     TagFactory,
 )
-from argus.incident.models import Incident, IncidentTagRelation, get_or_create_default_instances
+from argus.incident.models import Event, Incident, IncidentTagRelation, get_or_create_default_instances
 from argus.incident.views import IncidentFilter
 from argus.util.testing import disconnect_signals, connect_signals
 
@@ -64,6 +64,36 @@ class IncidentFilterTestCase(IncidentBasedAPITestCaseHelper, TestCase):
         expected = qs.closed()
         result = IncidentFilter.incident_filter(qs, "open", False)
         self.assertEqual(list(expected), list(result.order_by("pk")))
+
+    def test_acked_true(self):
+        qs = Incident.objects.order_by("pk")
+        self.incident1.create_ack(actor=PersonUserFactory())
+        result = IncidentFilter.incident_filter(qs, "acked", True)
+        self.assertIn(self.incident1, result)
+        self.assertNotIn(self.incident2, result)
+        self.assertNotIn(self.incident3, result)
+        self.assertNotIn(self.incident4, result)
+
+    def test_acked_false_because_no_ack(self):
+        qs = Incident.objects.order_by("pk")
+        result = IncidentFilter.incident_filter(qs, "acked", True)
+        self.assertNotIn(self.incident1, result)
+        self.assertNotIn(self.incident2, result)
+        self.assertNotIn(self.incident3, result)
+        self.assertNotIn(self.incident4, result)
+
+    def test_acked_false_because_ack_expired(self):
+        qs = Incident.objects.order_by("pk")
+        self.incident1.create_ack(
+            actor=PersonUserFactory(),
+            timestamp=timezone.now(),
+            expiration=timezone.now(),
+        )
+        result = IncidentFilter.incident_filter(qs, "acked", True)
+        self.assertNotIn(self.incident1, result)
+        self.assertNotIn(self.incident2, result)
+        self.assertNotIn(self.incident3, result)
+        self.assertNotIn(self.incident4, result)
 
     def test_ticket_true(self):
         qs = Incident.objects.order_by("pk")
