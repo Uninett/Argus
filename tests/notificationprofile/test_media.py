@@ -64,15 +64,18 @@ class FindDestinationsTest(TestCase):
         for destination in self.destinations:
             self.assertIn(destination, destinations)
 
-    def test_test_find_destinations_for_many_events(self):
+    def test_find_destinations_for_many_events(self):
         incident = create_fake_incident()
         event1 = incident.events.get(type=Event.Type.INCIDENT_START)
         incident.set_closed(self.user)
         event2 = incident.events.get(type=Event.Type.CLOSE)
-        destinations = find_destinations_for_many_events((event1, event2))
-        self.assertEqual(len(destinations), 1, "No destinations found")
+        found_destinations = find_destinations_for_many_events((event1, event2))
+        self.assertEqual(len(found_destinations), 2, "No destinations found")
+        found_destination_set = set()
+        for fd in found_destinations.values():
+            found_destination_set.update(fd)
         for destination in self.destinations:
-            self.assertIn(destination, destinations)
+            self.assertIn(destination, found_destination_set)
 
 
 class GetNotificationMediaTests(TestCase):

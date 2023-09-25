@@ -81,14 +81,16 @@ def find_destinations_for_event(event: Event):
         LOG.debug('Notification: checking profile "%s" for event "%s"', profile, event)
         if profile.incident_fits(incident) and profile.event_fits(event):
             destinations.update(profile.destinations.all())
+    LOG.info('Notification: found %i listeners for "%s"', len(destinations), event)
     return destinations
 
 
 def find_destinations_for_many_events(events: Iterable[Event]):
-    destinations = set()
+    destinations = dict()
     for event in events:
-        destinations.update(find_destinations_for_event(event))
-    LOG.info('Notification: found %i listeners for "%s"', len(destinations), event)
+        found = find_destinations_for_event(event)
+        if found:
+            destinations[event] = found
     return destinations
 
 
@@ -101,10 +103,11 @@ def send_notifications_to_users(*events: Iterable[Event], send=send_notification
         return
     # TODO: only send one notification per medium per user
     LOG.debug('Fallback filter set to "%s"', getattr(settings, "ARGUS_FALLBACK_FILTER", {}))
-    destinations = find_destinations_for_many_events(events)
-    if not destinations:
+    all_destinations = find_destinations_for_many_events(events)
+    if not all_destinations:
         return
-    send(destinations, *events)
+    for event, destinations in all_destinations.items():
+        send(destinations, event)
     LOG.info("Notification: %i events sent! %i copies", len(events), len(destinations))
 
 
