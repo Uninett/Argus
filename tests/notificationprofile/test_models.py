@@ -92,13 +92,17 @@ class FilterWrapperIncidentFitsTristatesTests(unittest.TestCase):
         incident.acked = False
         empty_filter = FilterWrapper({})
         result = empty_filter.incident_fits_tristates(incident)
+        self.assertEqual(result["open"], None)
         self.assertEqual(result["acked"], False)
+        self.assertEqual(result["stateful"], None)
         # Should match
         incident.acked = True
         empty_filter = FilterWrapper({})
         result = empty_filter.incident_fits_tristates(incident)
-        self.assertEqual(result["acked"], True)
         self.assertNotIn(False, result.values())
+        self.assertEqual(result["open"], None)
+        self.assertEqual(result["acked"], True)
+        self.assertEqual(result["stateful"], None)
 
     def test_incident_fits_tristates_is_true(self):
         incident = Mock()
@@ -108,6 +112,9 @@ class FilterWrapperIncidentFitsTristatesTests(unittest.TestCase):
         filter = FilterWrapper({"open": True, "acked": False})
         result = filter.incident_fits_tristates(incident)
         self.assertTrue(set(result.values()))  # all True!
+        self.assertEqual(result["open"], True)
+        self.assertEqual(result["acked"], True)
+        self.assertEqual(result["stateful"], None)
 
     def test_incident_fits_tristates_is_false(self):
         incident = Mock()
@@ -117,6 +124,9 @@ class FilterWrapperIncidentFitsTristatesTests(unittest.TestCase):
         filter = FilterWrapper({"open": False, "acked": False})
         result = filter.incident_fits_tristates(incident)
         self.assertIn(False, result.values())
+        self.assertEqual(result["open"], False)
+        self.assertEqual(result["acked"], True)
+        self.assertEqual(result["stateful"], None)
 
     @override_settings(ARGUS_FALLBACK_FILTER={"acked": True})
     def test_incident_fits_tristates_fallback_should_not_override(self):
@@ -127,6 +137,9 @@ class FilterWrapperIncidentFitsTristatesTests(unittest.TestCase):
         result = filter.incident_fits_tristates(incident)
         self.assertEqual(result["acked"], True)
         self.assertNotIn(False, result.values())
+        self.assertEqual(result["open"], None)
+        self.assertEqual(result["acked"], True)
+        self.assertEqual(result["stateful"], None)
 
 
 @tag("unittest")

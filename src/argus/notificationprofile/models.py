@@ -142,7 +142,6 @@ class FilterWrapper:
         if self.are_tristates_empty():
             return {}
         fits_tristates = {}
-        incident.refresh_from_db()
         for tristate in self.TRINARY_FILTERS:
             filter_tristate = self._get_tristate(tristate)
             if filter_tristate is None:
