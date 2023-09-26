@@ -17,7 +17,13 @@ from argus.notificationprofile.factories import (
     TimeRecurrenceFactory,
     TimeslotFactory,
 )
-from argus.notificationprofile.models import Filter, Media, NotificationProfile, Timeslot
+from argus.notificationprofile.models import (
+    DestinationConfig,
+    Filter,
+    Media,
+    NotificationProfile,
+    Timeslot,
+)
 from argus.util.testing import connect_signals, disconnect_signals
 
 
@@ -113,6 +119,12 @@ class NotificationProfileViewTests(APITestCase):
         response = self.user1_rest_client.delete(path=profile1_path)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(NotificationProfile.objects.filter(pk=profile1_pk).exists())
+
+    def test_should_not_break_on_trying_to_delete_nonexisting_profile(self):
+        non_existent_pk = NotificationProfile.objects.last().id + 1
+        non_existent_profile_path = f"{self.ENDPOINT}{non_existent_pk}/"
+        response = self.user1_rest_client.delete(path=non_existent_profile_path)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 
 @tag("API", "integration")
@@ -311,6 +323,12 @@ class FilterViewTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertTrue(Filter.objects.filter(pk=filter1_pk).exists())
 
+    def test_should_not_break_on_trying_to_delete_non_existent_filter(self):
+        non_existent_pk = Filter.objects.last().id + 1
+        non_existent_filter_path = f"{self.ENDPOINT}{non_existent_pk}/"
+        response = self.user1_rest_client.delete(path=non_existent_filter_path)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
 
 @tag("API", "integration")
 class MediumViewTests(APITestCase):
@@ -382,6 +400,12 @@ class DestinationViewTests(APITestCase):
         response = self.user1_rest_client.get(path=f"{self.ENDPOINT}{self.sms_destination.pk}/duplicate/")
         self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
         self.assertFalse(response.data["is_duplicate"])
+
+    def test_should_not_break_on_trying_to_delete_nonexisting_destination(self):
+        non_existent_pk = DestinationConfig.objects.last().id + 1
+        non_existent_destination_path = f"{self.ENDPOINT}{non_existent_pk}/"
+        response = self.user1_rest_client.delete(path=non_existent_destination_path)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 
 @tag("API", "integration")
@@ -494,8 +518,24 @@ class TimeslotViewTests(APITestCase):
         self.assertEqual(list(Timeslot.objects.get(pk=timeslot.pk).time_recurrences.all()), time_recurrences)
 
     def test_should_delete_unused_timeslot(self):
+        timeslot2_pk = TimeslotFactory(user=self.user1, name="Never say never").pk
+        timeslot2_path = f"{self.ENDPOINT}{timeslot2_pk}/"
+        response = self.user1_rest_client.delete(path=timeslot2_path)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(Timeslot.objects.filter(pk=timeslot2_pk).exists())
+
+    def test_should_delete_used_timeslot_and_connected_profile(self):
         timeslot1_pk = self.timeslot1.pk
+        connected_profiles_pks = [profile.pk for profile in self.timeslot1.notification_profiles.all()]
         timeslot1_path = f"{self.ENDPOINT}{timeslot1_pk}/"
         response = self.user1_rest_client.delete(path=timeslot1_path)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(Timeslot.objects.filter(pk=timeslot1_pk).exists())
+        for profile_pk in connected_profiles_pks:
+            self.assertFalse(NotificationProfile.objects.filter(pk=profile_pk).exists())
+
+    def test_should_not_break_on_trying_to_delete_nonexisting_timeslot(self):
+        non_existent_pk = Timeslot.objects.last().id + 1
+        non_existent_timeslot_path = f"{self.ENDPOINT}{non_existent_pk}/"
+        response = self.user1_rest_client.delete(path=non_existent_timeslot_path)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
