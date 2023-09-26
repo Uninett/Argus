@@ -2,6 +2,7 @@ from django.test import TestCase
 import json
 
 from argus.auth.factories import PersonUserFactory
+from argus.incident.factories import EventFactory
 from argus.incident.models import create_fake_incident, get_or_create_default_instances, Event
 from argus.notificationprofile import factories
 from argus.notificationprofile.media import find_destinations_for_event
@@ -55,16 +56,16 @@ class FindDestinationsTest(TestCase):
         )
 
         # Make a timeslot
-        timeslot = factories.TimeslotFactory(user=self.user1)
-        factories.MaximalTimeRecurrenceFactory(timeslot=timeslot)
+        self.timeslot = factories.TimeslotFactory(user=self.user1)
+        factories.MaximalTimeRecurrenceFactory(timeslot=self.timeslot)
 
         # Create two notification profiles that match this filter,
         # with different destinations
-        self.np1 = factories.NotificationProfileFactory(user=self.user1, timeslot=timeslot, active=True)
+        self.np1 = factories.NotificationProfileFactory(user=self.user1, timeslot=self.timeslot, active=True)
         self.np1.filters.add(filter1)
         self.np1.destinations.add(self.user1_destination)
 
-        self.np2 = factories.NotificationProfileFactory(user=self.user2, timeslot=timeslot, active=True)
+        self.np2 = factories.NotificationProfileFactory(user=self.user2, timeslot=self.timeslot, active=True)
         self.np2.filters.add(filter2)
         self.np2.destinations.add(self.user2_destination)
         self.np2.destinations.add(self.extra_destination2)
@@ -80,6 +81,24 @@ class FindDestinationsTest(TestCase):
         self.assertIn(self.user1_destination, destinations)
         self.assertNotIn(self.extra_destination1, destinations)
         self.assertNotIn(self.extra_destination2, destinations)
+
+    def test_find_destinations_for_ack_event_without_acknowledgement(self):
+        ack_profile = factories.NotificationProfileFactory(
+            user=PersonUserFactory(),
+            timeslot=self.timeslot,
+            active=True,
+        )
+        ack_filter = factories.FilterFactory(
+            user=ack_profile.user,
+            filter={"acked": True},
+        )
+        ack_profile.filters.add(ack_filter)
+        ack_destination = ack_profile.user.destinations.get()  # default email
+        ack_profile.destinations.add(ack_destination)
+
+        event = EventFactory(type=Event.Type.ACKNOWLEDGE)
+        destinations = find_destinations_for_event(event)
+        self.assertIn(ack_destination, destinations)
 
     def test_find_destinations_for_many_events(self):
         incident1 = create_fake_incident()
