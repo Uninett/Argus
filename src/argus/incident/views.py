@@ -13,7 +13,7 @@ from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter
 from rest_framework import mixins, serializers, status, viewsets
 from rest_framework.decorators import action
-from rest_framework.exceptions import NotFound, ValidationError
+from rest_framework.exceptions import ValidationError
 from rest_framework.generics import get_object_or_404
 from rest_framework.pagination import CursorPagination
 from rest_framework.permissions import IsAuthenticated
@@ -256,12 +256,12 @@ class IncidentViewSet(
             try:
                 source = SourceSystem.objects.get(pk=source_pk)
             except SourceSystem.DoesNotExist:
-                raise serializers.ValidationError(f"SourceSystem with pk={source_pk} does not exist.")
+                raise ValidationError(f"SourceSystem with pk={source_pk} does not exist.")
         else:
             try:
                 source = user.source_system
             except SourceSystem.DoesNotExist:
-                raise serializers.ValidationError("The requesting user must have a connected source system.")
+                raise ValidationError("The requesting user must have a connected source system.")
 
         # TODO: send notifications to users
         try:
@@ -402,7 +402,7 @@ class IncidentTagViewSet(
         try:
             incident = Incident.objects.get(pk=incident_pk)
         except Incident.DoesNotExist:
-            raise NotFound("An incident with this id does not exist")
+            raise ValidationError(f"An incident with pk={incident_pk} does not exist")
         return incident
 
     def get_object(self):
@@ -417,7 +417,7 @@ class IncidentTagViewSet(
             key, value = Tag.split(self.kwargs[lookup_url_kwarg])
         except (ValueError, ValidationError) as e:
             # Not a valid tag. Misses the delimiter, or multiple delimiters
-            raise NotFound(str(e))
+            raise ValidationError(str(e))
         filter_kwargs = {"key": key, "value": value}
         obj = get_object_or_404(queryset, **filter_kwargs)
 
