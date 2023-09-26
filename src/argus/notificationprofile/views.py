@@ -1,6 +1,7 @@
 import json
 
 from django.db.models import Q
+from django.shortcuts import get_object_or_404
 from django.views.generic import DetailView
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import status, viewsets
@@ -169,10 +170,7 @@ class DestinationConfigViewSet(rw_viewsets.ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         pk = self.kwargs["pk"]
-        try:
-            destination = self.get_queryset().get(pk=pk)
-        except DestinationConfig.DoesNotExist:
-            raise ValidationError(f"Destination with pk={pk} does not exist.")
+        destination = get_object_or_404(self.get_queryset(), pk=pk)
 
         try:
             medium = api_safely_get_medium_object(destination.media.slug)
@@ -230,7 +228,7 @@ class FilterViewSet(viewsets.ModelViewSet):
         serializer.save(user=self.request.user)
 
     def destroy(self, request, *args, **kwargs):
-        filter = self.get_queryset().get(pk=self.kwargs["pk"])
+        filter = get_object_or_404(self.get_queryset(), pk=self.kwargs["pk"])
         connected_profiles = filter.notification_profiles.all()
         if connected_profiles:
             profiles = ", ".join([str(profile) for profile in connected_profiles])
