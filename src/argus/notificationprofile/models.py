@@ -4,7 +4,7 @@ from datetime import datetime, time
 from functools import reduce
 import logging
 from operator import or_
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Dict, Optional
 
 from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
@@ -18,6 +18,8 @@ from .constants import DEPRECATED_FILTER_NAMES
 
 if TYPE_CHECKING:
     from argus.incident.models import Event, Incident
+
+TriState = Optional[bool]
 
 
 LOG = logging.getLogger(__name__)
@@ -138,7 +140,7 @@ class FilterWrapper:
             and self.is_event_type_empty()
         )
 
-    def incident_fits_tristates(self, incident):
+    def incident_fits_tristates(self, incident) -> Dict[str, TriState]:
         if self.are_tristates_empty():
             return {}
         fits_tristates = {}
