@@ -709,7 +709,7 @@ Notification profile endpoints
                   "acked": false,
                   "stateful": true,
                   "maxlevel": 1,
-                  "event_type": "STA"
+                  "event_types": ["STA"]
               }
           }
 
@@ -1486,7 +1486,7 @@ Notification profile endpoints
                   "acked": false,
                   "stateful": true,
                   "maxlevel": 1,
-                  "event_type": "STA"
+                  "event_types": ["STA"]
               }
           }
 
