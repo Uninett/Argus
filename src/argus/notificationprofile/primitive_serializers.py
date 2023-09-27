@@ -4,6 +4,11 @@ from argus.incident.constants import INCIDENT_LEVELS
 from argus.incident.models import Event
 
 
+class CustomMultipleChoiceField(serializers.MultipleChoiceField):
+    def to_internal_value(self, value):
+        return list(super().to_internal_value(value))
+
+
 class FilterBlobSerializer(serializers.Serializer):
     sourceSystemIds = serializers.ListField(
         child=serializers.IntegerField(min_value=1),
@@ -21,7 +26,10 @@ class FilterBlobSerializer(serializers.Serializer):
     maxlevel = serializers.IntegerField(
         required=False, allow_null=True, max_value=max(INCIDENT_LEVELS), min_value=min(INCIDENT_LEVELS)
     )
-    event_type = serializers.ChoiceField(choices=Event.Type.choices, required=False, allow_null=True)
+    event_types = CustomMultipleChoiceField(
+        choices=Event.Type.choices,
+        required=False,
+    )
 
 
 class FilterPreviewSerializer(serializers.Serializer):
