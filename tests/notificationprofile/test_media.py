@@ -1,5 +1,4 @@
-from django.test import TestCase
-import json
+from django.test import TestCase, override_settings
 
 from argus.auth.factories import PersonUserFactory
 from argus.incident.factories import EventFactory
@@ -95,6 +94,43 @@ class FindDestinationsTest(TestCase):
         ack_profile.filters.add(ack_filter)
         ack_destination = ack_profile.user.destinations.get()  # default email
         ack_profile.destinations.add(ack_destination)
+
+        event = EventFactory(type=Event.Type.ACKNOWLEDGE)
+        destinations = find_destinations_for_event(event)
+        self.assertIn(ack_destination, destinations)
+
+    def test_find_destinations_by_filtering_by_event_types(self):
+        ack_event_type_profile = factories.NotificationProfileFactory(
+            user=PersonUserFactory(),
+            timeslot=self.timeslot,
+            active=True,
+        )
+        ack_event_type_filter = factories.FilterFactory(
+            user=ack_event_type_profile.user,
+            filter={"event_types": [Event.Type.ACKNOWLEDGE]},
+        )
+        ack_event_type_profile.filters.add(ack_event_type_filter)
+        ack_destination = ack_event_type_profile.user.destinations.get()  # default email
+        ack_event_type_profile.destinations.add(ack_destination)
+
+        event = EventFactory(type=Event.Type.ACKNOWLEDGE)
+        destinations = find_destinations_for_event(event)
+        self.assertIn(ack_destination, destinations)
+
+    @override_settings(ARGUS_FALLBACK_FILTER={"event_types": ["ACK"]})
+    def test_find_destinations_by_filtering_by_event_types_using_fallback_filter(self):
+        ack_event_type_profile = factories.NotificationProfileFactory(
+            user=PersonUserFactory(),
+            timeslot=self.timeslot,
+            active=True,
+        )
+        ack_event_type_filter = factories.FilterFactory(
+            user=ack_event_type_profile.user,
+            filter={},
+        )
+        ack_event_type_profile.filters.add(ack_event_type_filter)
+        ack_destination = ack_event_type_profile.user.destinations.get()  # default email
+        ack_event_type_profile.destinations.add(ack_destination)
 
         event = EventFactory(type=Event.Type.ACKNOWLEDGE)
         destinations = find_destinations_for_event(event)
