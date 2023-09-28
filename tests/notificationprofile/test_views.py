@@ -403,6 +403,17 @@ class FilterViewTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertTrue(Filter.objects.filter(pk=response.data["pk"]).exists())
 
+    def test_should_not_create_filter_with_empty_event_types(self):
+        filter_name = "test-filter"
+        response = self.user1_rest_client.post(
+            path=self.ENDPOINT,
+            data={
+                "name": filter_name,
+                "filter": {"event_types": []},
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
     def test_should_update_filter_name_with_valid_values(self):
         filter1_pk = self.filter1.pk
         filter1_path = f"{self.ENDPOINT}{filter1_pk}/"

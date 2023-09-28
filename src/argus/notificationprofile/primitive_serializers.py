@@ -31,6 +31,11 @@ class FilterBlobSerializer(serializers.Serializer):
         required=False,
     )
 
+    def validate_event_types(self, value):
+        if not value:
+            raise serializers.ValidationError("Event types cannot be empty, remove it completely from filter instead.")
+        return value
+
 
 class FilterPreviewSerializer(serializers.Serializer):
     sourceSystemIds = serializers.ListField(child=serializers.IntegerField(min_value=1), allow_empty=True)
