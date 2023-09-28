@@ -713,6 +713,11 @@ Notification profile endpoints
               }
           }
 
+      .. note::
+        ``event_types`` cannot be ``null`` or ``[]``, because all events have an event
+        type set, which would therefore result in no notifications ever being sent.
+        For not filtering by ``event_types`` the key needs to be removed.
+
 
 -  ``/api/v1/notificationprofiles/filters/<int:pk>/``:
 
@@ -1489,6 +1494,11 @@ Notification profile endpoints
                   "event_types": ["STA"]
               }
           }
+
+      .. note::
+        ``event_types`` cannot be ``null`` or ``[]``, because all events have an event
+        type set, which would therefore result in no notifications ever being sent.
+        For not filtering by ``event_types`` the key needs to be removed.
 
 
 -  ``/api/v2/notificationprofiles/filters/<int:pk>/``:
