@@ -3,11 +3,16 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
-from django.db.models.query import QuerySet
-
 if TYPE_CHECKING:
+    import sys
+
+    if sys.version_info[:2] < (3, 9):
+        from typing import Iterable
+    else:
+        from collections.abc import Iterable
+
     from types import NoneType
-    from typing import Union
+    from typing import List, Union
     from django.db.models.query import QuerySet
     from argus.auth.models import User
     from argus.incident.models import Event
@@ -52,13 +57,13 @@ class NotificationMedium(ABC):
         pass
 
     @classmethod
-    def get_relevant_addresses(cls, destinations: QuerySet[DestinationConfig]) -> QuerySet[DestinationConfig]:
+    def get_relevant_addresses(cls, destinations: Iterable[DestinationConfig]) -> List[DestinationConfig]:
         """Returns a list of addresses the message should be sent to"""
         pass
 
     @classmethod
     @abstractmethod
-    def send(cls, event: Event, destinations: QuerySet[DestinationConfig], **kwargs) -> bool:
+    def send(cls, event: Event, destinations: Iterable[DestinationConfig], **kwargs) -> bool:
         """Sends message about a given event to the given destinations"""
         pass
 

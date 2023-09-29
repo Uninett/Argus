@@ -14,8 +14,15 @@ from .base import NotificationMedium
 from ..models import DestinationConfig
 
 if TYPE_CHECKING:
+    import sys
+
+    if sys.version_info[:2] < (3, 9):
+        from typing import Iterable
+    else:
+        from collections.abc import Iterable
+
     from types import NoneType
-    from typing import Union
+    from typing import List, Union
     from django.db.models.query import QuerySet
     from argus.auth.models import User
     from ..serializers import RequestDestinationConfigSerializer
@@ -141,10 +148,15 @@ class EmailNotification(NotificationMedium):
         return queryset.filter(settings__email_address=settings["email_address"]).exists()
 
     @classmethod
-    def get_relevant_addresses(cls, destinations: QuerySet[DestinationConfig]) -> QuerySet[DestinationConfig]:
+    def get_relevant_addresses(cls, destinations: Iterable[DestinationConfig]) -> List[DestinationConfig]:
         """Returns a list of email addresses the message should be sent to"""
-        email_destinations = destinations.filter(media_id=cls.MEDIA_SLUG)
-        return [destination.settings["email_address"] for destination in email_destinations]
+        email_addresses = [
+            destination.settings["email_address"]
+            for destination in destinations
+            if destination.media_id == cls.MEDIA_SLUG
+        ]
+
+        return email_addresses
 
     @staticmethod
     def create_message_context(event: Event):
@@ -166,7 +178,7 @@ class EmailNotification(NotificationMedium):
         return subject, message, html_message
 
     @classmethod
-    def send(cls, event: Event, destinations: QuerySet[DestinationConfig], **_) -> bool:
+    def send(cls, event: Event, destinations: Iterable[DestinationConfig], **_) -> bool:
         """
         Sends email about a given event to the given email destinations
 
