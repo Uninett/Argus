@@ -19,6 +19,14 @@ from .base import NotificationMedium
 from .email import send_email_safely
 
 if TYPE_CHECKING:
+    import sys
+
+    if sys.version_info[:2] < (3, 9):
+        from typing import Iterable
+    else:
+        from collections.abc import Iterable
+
+    from typing import List
     from django.db.models.query import QuerySet
     from argus.auth.models import User
     from ..models import DestinationConfig
@@ -80,13 +88,18 @@ class SMSNotification(NotificationMedium):
         return queryset.filter(settings__phone_number=settings["phone_number"]).exists()
 
     @classmethod
-    def get_relevant_addresses(cls, destinations: QuerySet[DestinationConfig]) -> QuerySet[DestinationConfig]:
+    def get_relevant_addresses(cls, destinations: Iterable[DestinationConfig]) -> List[DestinationConfig]:
         """Returns a list of phone numbers the message should be sent to"""
-        sms_destinations = destinations.filter(media_id=cls.MEDIA_SLUG)
-        return [destination.settings["phone_number"] for destination in sms_destinations]
+        phone_numbers = [
+            destination.settings["phone_number"]
+            for destination in destinations
+            if destination.media_id == cls.MEDIA_SLUG
+        ]
+
+        return phone_numbers
 
     @classmethod
-    def send(cls, event: Event, destinations: QuerySet[DestinationConfig], **_) -> bool:
+    def send(cls, event: Event, destinations: Iterable[DestinationConfig], **_) -> bool:
         """
         Sends an SMS about a given event to the given sms destinations
 

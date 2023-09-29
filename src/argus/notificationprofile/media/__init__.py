@@ -53,14 +53,11 @@ def send_notification(destinations: Iterable[DestinationConfig], *events: Iterab
     if not events:
         return
     media = get_notification_media(destinations)
-    # Plugin expects queryset...
-    ids = (dest.id for dest in destinations)
-    qs = DestinationConfig.objects.filter(id__in=ids)
     media_count = len(media)
     for event in events:
         LOG.info('Notification: sending event "%s" to %i mediums', event, media_count)
         for medium in media:
-            sent = medium.send(event, qs)
+            sent = medium.send(event=event, destinations=destinations)
             if sent:
                 LOG.info('Notification: sent event "%s" to "%s"', event, medium.MEDIA_SLUG)
 
