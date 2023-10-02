@@ -19,6 +19,14 @@ from .base import NotificationMedium
 from .email import send_email_safely
 
 if TYPE_CHECKING:
+    import sys
+
+    if sys.version_info[:2] < (3, 9):
+        from typing import Iterable
+    else:
+        from collections.abc import Iterable
+
+    from typing import List
     from django.db.models.query import QuerySet
     from argus.auth.models import User
     from ..models import DestinationConfig
@@ -79,8 +87,19 @@ class SMSNotification(NotificationMedium):
         """
         return queryset.filter(settings__phone_number=settings["phone_number"]).exists()
 
-    @staticmethod
-    def send(event: Event, destinations: QuerySet[DestinationConfig], **_) -> bool:
+    @classmethod
+    def get_relevant_addresses(cls, destinations: Iterable[DestinationConfig]) -> List[DestinationConfig]:
+        """Returns a list of phone numbers the message should be sent to"""
+        phone_numbers = [
+            destination.settings["phone_number"]
+            for destination in destinations
+            if destination.media_id == cls.MEDIA_SLUG
+        ]
+
+        return phone_numbers
+
+    @classmethod
+    def send(cls, event: Event, destinations: Iterable[DestinationConfig], **_) -> bool:
         """
         Sends an SMS about a given event to the given sms destinations
 
@@ -91,14 +110,18 @@ class SMSNotification(NotificationMedium):
             LOG.error("SMS_GATEWAY_ADDRESS is not set, cannot dispatch SMS notifications using this plugin")
             return
 
-        sms_destinations = destinations.filter(media_id=SMSNotification.MEDIA_SLUG)
-        if not sms_destinations:
+        phone_numbers = cls.get_relevant_addresses(destinations=destinations)
+
+        if not phone_numbers:
             return False
-        phone_numbers = [destination.settings["phone_number"] for destination in sms_destinations]
-        title = f"{event.description}"
+
         for phone_number in phone_numbers:
             send_email_safely(
-                send_mail, subject=f"sms {phone_number}", message=title, from_email=None, recipient_list=[recipient]
+                send_mail,
+                subject=f"sms {phone_number}",
+                message=f"{event.description}",
+                from_email=None,
+                recipient_list=[recipient],
             )
 
         return True

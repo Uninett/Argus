@@ -207,4 +207,13 @@ class RequestNotificationProfileSerializer(serializers.ModelSerializer):
     def validate(self, attrs: dict):
         if attrs["timeslot"].user != self.context["request"].user:
             raise serializers.ValidationError("The user of 'timeslot' must be the same as the requesting user.")
+
+        if (
+            "name" in attrs.keys()
+            and NotificationProfile.objects.exclude(pk=getattr(self.instance, "pk", None))
+            .filter(name=attrs["name"])
+            .exists()
+        ):
+            raise serializers.ValidationError("The requesting user already has a profile with that name.")
+
         return attrs

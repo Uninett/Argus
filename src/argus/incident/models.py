@@ -462,7 +462,13 @@ class Incident(models.Model):
     def acked(self):
         acks_query = Q(ack__isnull=False)
         acks_not_expired_query = Q(ack__expiration__isnull=True) | Q(ack__expiration__gt=timezone.now())
-        return self.events.filter(acks_query & acks_not_expired_query).exists()
+        # This is specifically for when acks are just created
+        # The event (with type ACK) is created before the acknowledgement
+        # which triggers the notification sending which uses this function
+        # which is why we have to have this additional check
+        ack_is_just_being_created = Q(type=Event.Type.ACKNOWLEDGE) & Q(ack__isnull=True)
+
+        return self.events.filter((acks_query & acks_not_expired_query) | ack_is_just_being_created).exists()
 
     def create_first_event(self):
         """Create the correct type of first event for an incident

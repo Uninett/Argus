@@ -4,6 +4,7 @@ from rest_framework.test import APIClient, APIRequestFactory, APITestCase
 
 from argus.auth.factories import PersonUserFactory
 from argus.notificationprofile.factories import DestinationConfigFactory
+from argus.notificationprofile.media.sms_as_email import SMSNotification
 from argus.notificationprofile.models import DestinationConfig, Media
 from argus.notificationprofile.serializers import RequestDestinationConfigSerializer
 from argus.util.testing import connect_signals, disconnect_signals
@@ -116,7 +117,6 @@ class SMSDestinationConfigSerializerTests(TestCase):
         )
 
     def test_can_update_sms_destination(self):
-
         destination = DestinationConfigFactory(
             user=self.user,
             media_id="sms",
@@ -308,3 +308,42 @@ class SMSDestinationViewTests(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT, response.data)
         self.assertFalse(DestinationConfig.objects.filter(id=self.sms_destination.pk).exists())
+
+
+@tag("integration")
+class SMSDestinationSendTests(TestCase):
+    def setUp(self):
+        disconnect_signals()
+        self.user1 = PersonUserFactory()
+
+    def teardown(self):
+        connect_signals()
+
+    def test_get_relevant_addresses_returns_only_phone_numbers(self):
+        phone_number = "+4747474747"
+        sms_destination = DestinationConfigFactory(
+            user=self.user1,
+            media=Media.objects.get_or_create(slug="sms")[0],
+            settings={
+                "phone_number": phone_number,
+            },
+        )
+        email_address = "test2@example.com"
+        email_destination = DestinationConfigFactory(
+            user=self.user1,
+            media=Media.objects.get(slug="email"),
+            settings={
+                "email_address": email_address,
+                "synced": False,
+            },
+        )
+
+        phone_numbers = SMSNotification.get_relevant_addresses(
+            [
+                email_destination,
+                sms_destination,
+            ]
+        )
+
+        self.assertIn(phone_number, phone_numbers)
+        self.assertNotIn(email_address, phone_numbers)
