@@ -50,14 +50,23 @@ $ pip install argus-server
 ```
 
 If you are using the PyPI package in production, please note: The file
-`requirements.txt` contains the versions of dependencies that the release was
-tested on.
-To update all the dependencies to recent versions, use `pip-compile`:
+`requirements.txt` contains the pinned versions of dependencies that the
+release was tested on. The file `constraints.txt` is for controlling versions
+of sub-dependencies so as to not poison the pyproject.toml.
+
+To update the dependency lock-files, use `tox`:
 
 ```console
-$ pip install pip-tools
-$ pip-compile -o your-updated-requirements.txt
-$ pip install --upgrade -r your-updated-requirements.txt
+$ pip install tox
+$ tox -e upgrade-deps -- -U
+```
+
+To upgrade a single dependency, replace the `-U` flag with `-P PACKAGENAME`.
+
+To install from the lock-file use pip:
+
+```console
+$ pip install -c constraints.txt --upgrade -r requirements.txt
 ```
 
 Now change and adapt [Argus' settings](#settings-in-argus) according to your needs.
