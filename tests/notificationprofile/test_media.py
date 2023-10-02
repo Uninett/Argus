@@ -2,6 +2,7 @@ from django.test import TestCase
 import json
 
 from argus.auth.factories import PersonUserFactory
+from argus.incident.factories import EventFactory
 from argus.incident.models import create_fake_incident, get_or_create_default_instances, Event
 from argus.notificationprofile import factories
 from argus.notificationprofile.media import find_destinations_for_event
@@ -25,33 +26,49 @@ class FindDestinationsTest(TestCase):
     def setUp(self):
         disconnect_signals()
 
-        # Create two separate timeslots
-        self.user = PersonUserFactory()
-        timeslot1 = factories.TimeslotFactory(user=self.user)
-        factories.MaximalTimeRecurrenceFactory(timeslot=timeslot1)
-        timeslot2 = factories.TimeslotFactory(user=self.user)
-        factories.MinimalTimeRecurrenceFactory(timeslot=timeslot2)
+        self.user1 = PersonUserFactory()
+        self.user1_destination = self.user1.destinations.get()  # default email
+        self.extra_destination1 = factories.DestinationConfigFactory(
+            user=self.user1,
+            media=Media.objects.get(slug="email"),
+            settings={"email": "a@b.ca", "synced": False},
+        )
+
+        self.user2 = PersonUserFactory()
+        self.user2_destination = self.user2.destinations.get()  # default email
+        self.extra_destination2 = factories.DestinationConfigFactory(
+            user=self.user2,
+            media=Media.objects.get(slug="email"),
+            settings={"email": "b@c.de", "synced": False},
+        )
 
         # Create a filter that matches your test incident
         (_, _, argus_source) = get_or_create_default_instances()
-        filter_dict = {"sourceSystemIds": [argus_source.id], "tags": []}
-        filter = factories.FilterFactory(
-            user=self.user,
-            filter=filter_dict,
+        filter_dict1 = {"sourceSystemIds": [argus_source.id]}
+        filter1 = factories.FilterFactory(
+            user=self.user1,
+            filter=filter_dict1,
+        )
+        filter_dict2 = {"tags": ["foo=bar"]}
+        filter2 = factories.FilterFactory(
+            user=self.user2,
+            filter=filter_dict2,
         )
 
-        # Get user related destinations
-        # if user.email_address is set then at least one
-        self.destinations = self.user.destinations.all()
+        # Make a timeslot
+        self.timeslot = factories.TimeslotFactory(user=self.user1)
+        factories.MaximalTimeRecurrenceFactory(timeslot=self.timeslot)
 
         # Create two notification profiles that match this filter,
-        # but attached to different timeslots
-        self.np1 = factories.NotificationProfileFactory(user=self.user, timeslot=timeslot1, active=True)
-        self.np1.filters.add(filter)
-        self.np1.destinations.set(self.destinations)
-        self.np2 = factories.NotificationProfileFactory(user=self.user, timeslot=timeslot2, active=True)
-        self.np2.filters.add(filter)
-        self.np2.destinations.set(self.destinations)
+        # with different destinations
+        self.np1 = factories.NotificationProfileFactory(user=self.user1, timeslot=self.timeslot, active=True)
+        self.np1.filters.add(filter1)
+        self.np1.destinations.add(self.user1_destination)
+
+        self.np2 = factories.NotificationProfileFactory(user=self.user2, timeslot=self.timeslot, active=True)
+        self.np2.filters.add(filter2)
+        self.np2.destinations.add(self.user2_destination)
+        self.np2.destinations.add(self.extra_destination2)
 
     def tearDown(self):
         connect_signals()
@@ -60,19 +77,57 @@ class FindDestinationsTest(TestCase):
         incident = create_fake_incident()
         event = incident.events.get(type=Event.Type.INCIDENT_START)
         destinations = find_destinations_for_event(event)
-        self.assertEqual(len(destinations), 1, "No destinations found")
-        for destination in self.destinations:
-            self.assertIn(destination, destinations)
+        self.assertEqual(len(destinations), 1)
+        self.assertIn(self.user1_destination, destinations)
+        self.assertNotIn(self.extra_destination1, destinations)
+        self.assertNotIn(self.extra_destination2, destinations)
 
-    def test_test_find_destinations_for_many_events(self):
-        incident = create_fake_incident()
-        event1 = incident.events.get(type=Event.Type.INCIDENT_START)
-        incident.set_closed(self.user)
-        event2 = incident.events.get(type=Event.Type.CLOSE)
-        destinations = find_destinations_for_many_events((event1, event2))
-        self.assertEqual(len(destinations), 1, "No destinations found")
-        for destination in self.destinations:
-            self.assertIn(destination, destinations)
+    def test_find_destinations_for_ack_event_without_acknowledgement(self):
+        ack_profile = factories.NotificationProfileFactory(
+            user=PersonUserFactory(),
+            timeslot=self.timeslot,
+            active=True,
+        )
+        ack_filter = factories.FilterFactory(
+            user=ack_profile.user,
+            filter={"acked": True},
+        )
+        ack_profile.filters.add(ack_filter)
+        ack_destination = ack_profile.user.destinations.get()  # default email
+        ack_profile.destinations.add(ack_destination)
+
+        event = EventFactory(type=Event.Type.ACKNOWLEDGE)
+        destinations = find_destinations_for_event(event)
+        self.assertIn(ack_destination, destinations)
+
+    def test_find_destinations_for_many_events(self):
+        incident1 = create_fake_incident()
+        event1 = incident1.events.get(type=Event.Type.INCIDENT_START)
+        incident1.set_closed(self.user1)
+        event2 = incident1.events.get(type=Event.Type.CLOSE)
+        incident2 = create_fake_incident(tags=["foo=bar"])
+        event3 = incident2.events.get(type=Event.Type.INCIDENT_START)
+
+        destinations = find_destinations_for_many_events((event1, event2, event3))
+        self.assertEqual(len(destinations), 3)
+
+        self.assertIn(event1, destinations)
+        self.assertIn(self.user1_destination, destinations[event1])
+        self.assertNotIn(self.user2_destination, destinations[event1])
+        self.assertNotIn(self.extra_destination1, destinations[event1])
+        self.assertNotIn(self.extra_destination2, destinations[event1])
+
+        self.assertIn(event2, destinations)
+        self.assertIn(self.user1_destination, destinations[event2])
+        self.assertNotIn(self.user2_destination, destinations[event2])
+        self.assertNotIn(self.extra_destination1, destinations[event2])
+        self.assertNotIn(self.extra_destination2, destinations[event2])
+
+        self.assertIn(event3, destinations)
+        self.assertIn(self.user1_destination, destinations[event3])
+        self.assertIn(self.user2_destination, destinations[event3])
+        self.assertNotIn(self.extra_destination1, destinations[event3])
+        self.assertIn(self.extra_destination2, destinations[event3])
 
 
 class GetNotificationMediaTests(TestCase):

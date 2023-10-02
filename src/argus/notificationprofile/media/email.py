@@ -14,8 +14,15 @@ from .base import NotificationMedium
 from ..models import DestinationConfig
 
 if TYPE_CHECKING:
+    import sys
+
+    if sys.version_info[:2] < (3, 9):
+        from typing import Iterable
+    else:
+        from collections.abc import Iterable
+
     from types import NoneType
-    from typing import Union
+    from typing import List, Union
     from django.db.models.query import QuerySet
     from argus.auth.models import User
     from ..serializers import RequestDestinationConfigSerializer
@@ -140,19 +147,20 @@ class EmailNotification(NotificationMedium):
         """
         return queryset.filter(settings__email_address=settings["email_address"]).exists()
 
+    @classmethod
+    def get_relevant_addresses(cls, destinations: Iterable[DestinationConfig]) -> List[DestinationConfig]:
+        """Returns a list of email addresses the message should be sent to"""
+        email_addresses = [
+            destination.settings["email_address"]
+            for destination in destinations
+            if destination.media_id == cls.MEDIA_SLUG
+        ]
+
+        return email_addresses
+
     @staticmethod
-    def send(event: Event, destinations: QuerySet[DestinationConfig], **_) -> bool:
-        """
-        Sends email about a given event to the given email destinations
-
-        Returns False if no email destinations were given and
-        True if emails were sent
-        """
-        email_destinations = destinations.filter(media_id=EmailNotification.MEDIA_SLUG)
-        if not email_destinations:
-            return False
-
-        recipient_list = [destination.settings["email_address"] for destination in email_destinations]
+    def create_message_context(event: Event):
+        """Creates the subject, message and html message for the email"""
         title = f"{event}"
         incident_dict = modelinstance_to_dict(event.incident)
         for field in ("id", "source_id"):
@@ -166,13 +174,31 @@ class EmailNotification(NotificationMedium):
         subject = f"{settings.NOTIFICATION_SUBJECT_PREFIX}{title}"
         message = render_to_string("notificationprofile/email.txt", template_context)
         html_message = render_to_string("notificationprofile/email.html", template_context)
-        send_email_safely(
-            send_mail,
-            subject=subject,
-            message=message,
-            from_email=None,
-            recipient_list=recipient_list,
-            html_message=html_message,
-        )
+
+        return subject, message, html_message
+
+    @classmethod
+    def send(cls, event: Event, destinations: Iterable[DestinationConfig], **_) -> bool:
+        """
+        Sends email about a given event to the given email destinations
+
+        Returns False if no email destinations were given and
+        True if emails were sent
+        """
+        email_addresses = cls.get_relevant_addresses(destinations=destinations)
+        if not email_addresses:
+            return False
+
+        subject, message, html_message = cls.create_message_context(event=event)
+
+        for email_address in email_addresses:
+            send_email_safely(
+                send_mail,
+                subject=subject,
+                message=message,
+                from_email=None,
+                recipient_list=[email_address],
+                html_message=html_message,
+            )
 
         return True

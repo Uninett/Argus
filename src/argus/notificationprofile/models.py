@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import json
 from datetime import datetime, time
 from functools import reduce
 import logging
@@ -170,7 +169,6 @@ class Filter(models.Model):
     FILTER_NAMES = set(DEPRECATED_FILTER_NAMES)
     user = models.ForeignKey(to=User, on_delete=models.CASCADE, related_name="filters")
     name = models.CharField(max_length=40)
-    filter_string = models.TextField()
     filter = models.JSONField(default=dict)
 
     class Meta:
@@ -182,10 +180,6 @@ class Filter(models.Model):
 
     def __str__(self):
         return f"{self.name} [{self.filter}]"
-
-    @property
-    def filter_json(self):
-        return json.loads(self.filter_string)
 
     @property
     def is_empty(self):
