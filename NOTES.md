@@ -3,9 +3,24 @@ This file documents changes to Argus that are relevant for the users to know.
 
 ## [Unreleased]
 
+## [1.14.0] - 2023-01-03
+
+Due to a change in the signature of `NotificationPlugin.send()`, 3rd party
+plugins will need to mark better which versions of argus-server they work with
+in their dependencies-list. The old-style plugins work on 1.9-1.13.
+
 ### Added
 - Add the "installed" field to the media serializer. This is so that the
   frontend can detect media used that is no longer installed on the backend.
+
+### Fixed
+- Ensure the right notifications go to the right destinations when sending many
+  of each.
+
+### Changed
+- Change the signature of the notification-plugin `send`-method to avoid
+  passing in the database
+- Send one email per email-address so as to not leak who else gets that email.
 
 ## [1.13.0] - 2023-09-19
 
