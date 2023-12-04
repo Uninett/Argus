@@ -48,8 +48,10 @@ Known ticket system plugins
 1st party ticket plugins
 ------------------------
 
-* `Request Tracker <https://pypi.org/project/argus-ticket-rt/>`_
-* `Jira <https://pypi.org/project/argus-ticket-jira/>`_
+* Request Tracker: https://pypi.org/project/argus-ticket-rt/, pip install argus-ticket-rt
+* Jira: https://pypi.org/project/argus-ticket-jira/, pip install argus-ticket-jira
+* Github: https://github.com/Uninett/argus_ticket_github, pip install argus-ticket-github
+* Gitlab: https://github.com/Uninett/argus_ticket_gitlab, pip install argus-ticket-gitlab
 
 Other ticket plugins
 --------------------
