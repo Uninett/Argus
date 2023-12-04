@@ -14,11 +14,8 @@ Welcome to Argus' documentation!
    api
    site-specific-settings
    authentication
-   notifications
-   ticket-systems
+   integrations/index
    development
-   integrating-monitoring-systems
-   writing-glueservices
    :maxdepth: 2
    :caption: Contents:
 

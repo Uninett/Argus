@@ -5,8 +5,8 @@ Ticket systems
 ==============
 
 .. toctree::
-   ticket-systems/settings
-   ticket-systems/writing-ticket-system-plugins
+   settings
+   writing-ticket-system-plugins
 
 It is possible to automatically create a ticket from an Argus incident with
 a pre-filled title and body.

@@ -28,14 +28,6 @@ Existing glue services
 * Network Administration Visualized: https://github.com/Uninett/nav-argus-glue
 
 
-Writing your own glue service
------------------------------
-
-If there is no pre-existing glue service software for your particular
-monitoring system, we've provided a :doc:`guide for writing your own
-<writing-glueservices>`.
-
-
 Integrating an existing monitoring system
 =========================================
 
@@ -81,3 +73,13 @@ the Argus API server, reachable at
 
      If a token is not valid it will currently lead to the source system
      not being able to report incidents without any warnings.
+
+Writing your own glue service
+=============================
+
+If there is no pre-existing glue service software for your particular
+monitoring system, we've provided a :doc:`guide for writing your own
+<writing-glueservices>`.
+
+.. toctree::
+   writing-glueservices

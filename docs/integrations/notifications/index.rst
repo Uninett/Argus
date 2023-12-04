@@ -21,8 +21,8 @@ Notification plugins included on install
 ----------------------------------------
 
 .. toctree::
-   notifications/email-plugin
-   notifications/sms-plugin
+   email-plugin
+   sms-plugin
 
 Other notification plugins
 --------------------------
@@ -41,4 +41,4 @@ Writing your own notification plugins
 -------------------------------------
 
 .. toctree::
-   notifications/writing-notification-plugins
+   writing-notification-plugins
