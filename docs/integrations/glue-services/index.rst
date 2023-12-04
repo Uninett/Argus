@@ -36,6 +36,7 @@ Existing glue services
     that is run by NAGIOS. It sends alerts to
     https://github.com/SUNET/nglue-api, designed to run in a container. The
     nglue-api pre-filters what to send to argus.
+* Mist Systems Administration (Juniper): https://gitlab.sikt.no/cnaas/mist-argus
 
 Integrating an existing monitoring system
 =========================================
