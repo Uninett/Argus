@@ -25,8 +25,17 @@ may need to write your own.
 Existing glue services
 ----------------------
 
-* Network Administration Visualized: https://github.com/Uninett/nav-argus-glue
+* Network Administration Visualized: https://github.com/Uninett/nav-argus-glue.
+  This is an extension of nav, runs on the same server, and uses the NAV config
+  files.
+* NAGIOS:
 
+  * There's a python script at https://github.com/SUNET/nagios-argus-glue. It
+    didn't scale to SUNET's needs.
+  * There's the code for a tiny rust binary at https://github.com/SUNET/nglue
+    that is run by NAGIOS. It sends alerts to
+    https://github.com/SUNET/nglue-api, designed to run in a container. The
+    nglue-api pre-filters what to send to argus.
 
 Integrating an existing monitoring system
 =========================================
