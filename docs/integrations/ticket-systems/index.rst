@@ -59,7 +59,7 @@ Other ticket plugins
 * None known to us at this time
 
 Open an issue to have a plugin added to this list. It needs to be publicly
-accessible so we can check the code, and be on PyPI. We will link up both the
+accessible (and preferably available on PyPI) so we can check the code. We will link up both the
 source code repo (or homepage otherwise) and the PyPI-entry.
 
 Writing your own ticket system plugin

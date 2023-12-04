@@ -19,9 +19,9 @@ In short:
   multiple entries from the same type. The source has a token connected with
   it, which the service uses to authenticate.
 * Notification systems are hooked up via plugins. The plugins are installed
-  (via pip) to the same path as argus. Most plugins are configured solely via
+  (via pip) to the same environment as Argus. Most plugins are configured solely via
   the web interface, except for the two included email-based plugins. These
-  piggy back on the email server configuration of argus itself (see
+  piggyback on the email server configuration of Argus itself (see
   :ref:`site-specific-settings`).
 * A single ticket system is hooked up via a plugin. It is installed (via pip)
   to the same path as argus. All ticket system plugins are configured via the
