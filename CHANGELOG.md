@@ -4,6 +4,12 @@ read by developers.
 
 ## [Unreleased]
 
+## [1.14.1 - 2023-12-05]
+
+### Changed
+
+- Restructured documentation about integrations
+
 ## [1.14.0] - 2023-01-03
 
 Incomplete changelog.

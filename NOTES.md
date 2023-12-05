@@ -3,6 +3,12 @@ This file documents changes to Argus that are relevant for the users to know.
 
 ## [Unreleased]
 
+## [1.14.1 - 2023-12-05]
+
+### Changed
+
+- Restructured documentation about integrations
+
 ## [1.14.0] - 2023-01-03
 
 Due to a change in the signature of `NotificationPlugin.send()`, 3rd party
