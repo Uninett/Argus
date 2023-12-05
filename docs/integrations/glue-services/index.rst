@@ -25,16 +25,18 @@ may need to write your own.
 Existing glue services
 ----------------------
 
-* Network Administration Visualized: https://github.com/Uninett/nav-argus-glue
+* Network Administration Visualized: https://github.com/Uninett/nav-argus-glue.
+  This is an extension of nav, runs on the same server, and uses the NAV config
+  files.
+* NAGIOS:
 
-
-Writing your own glue service
------------------------------
-
-If there is no pre-existing glue service software for your particular
-monitoring system, we've provided a :doc:`guide for writing your own
-<writing-glueservices>`.
-
+  * There's a python script at https://github.com/SUNET/nagios-argus-glue. It
+    didn't scale to SUNET's needs.
+  * There's the code for a tiny rust binary at https://github.com/SUNET/nglue
+    that is run by NAGIOS. It sends alerts to
+    https://github.com/SUNET/nglue-api, designed to run in a container. The
+    nglue-api pre-filters what to send to argus.
+* Mist Systems Administration (Juniper): https://gitlab.sikt.no/cnaas/mist-argus
 
 Integrating an existing monitoring system
 =========================================
@@ -81,3 +83,13 @@ the Argus API server, reachable at
 
      If a token is not valid it will currently lead to the source system
      not being able to report incidents without any warnings.
+
+Writing your own glue service
+=============================
+
+If there is no pre-existing glue service software for your particular
+monitoring system, we've provided a :doc:`guide for writing your own
+<writing-glueservices>`.
+
+.. toctree::
+   writing-glueservices
