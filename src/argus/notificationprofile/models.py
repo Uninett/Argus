@@ -7,11 +7,10 @@ from operator import or_
 from typing import TYPE_CHECKING
 
 from django.conf import settings
+from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.utils import timezone
 from django.utils.text import slugify
-
-from multiselectfield import MultiSelectField
 
 from argus.auth.models import User
 
@@ -57,8 +56,7 @@ class TimeRecurrence(models.Model):
 
     timeslot = models.ForeignKey(to=Timeslot, on_delete=models.CASCADE, related_name="time_recurrences")
 
-    # Set max_length to avoid bug on Django 4.x
-    days = MultiSelectField(choices=Day.choices, min_choices=1, max_length=13)
+    days = ArrayField(base_field=models.IntegerField(choices=Day.choices), size=7)
     start = models.TimeField(help_text="Local time.")
     end = models.TimeField(help_text="Local time.")
 
