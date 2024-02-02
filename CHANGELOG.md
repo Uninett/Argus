@@ -4,6 +4,9 @@ read by developers.
 
 ## [Unreleased]
 
+### Added
+- Added the possibility to filter incident by a given list of ids
+
 ## [1.14.1 - 2023-12-05]
 
 ### Changed
