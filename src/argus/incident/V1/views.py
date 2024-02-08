@@ -50,6 +50,10 @@ from .serializers import (
                 type=OpenApiTypes.DATETIME,
             ),
             OpenApiParameter(
+                name="id__in",
+                description="Fetch the incidents with an id in the given id list.",
+            ),
+            OpenApiParameter(
                 name="level__lte",
                 description="Fetch incidents with levels less than or equal to `LEVEL`",
                 enum=Incident.LEVELS,
