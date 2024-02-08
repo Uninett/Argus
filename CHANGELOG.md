@@ -6,6 +6,8 @@ read by developers.
 
 ### Added
 - Added the possibility to filter incident by a given list of ids
+- Add the "admin_url" field to the user serializer. This is so that the
+  frontend can show a link to the Django admin.
 
 ## [1.14.1 - 2023-12-05]
 
