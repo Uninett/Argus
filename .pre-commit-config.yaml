@@ -5,6 +5,7 @@ repos:
     -   id: trailing-whitespace
     -   id: mixed-line-ending
     -   id: end-of-file-fixer
+        exclude: &exclude_pattern '^changelog.d/'
     -   id: debug-statements
 -   repo: https://github.com/pycqa/flake8
     rev: 3.9.2
