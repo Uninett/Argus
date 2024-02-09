@@ -5,6 +5,7 @@ repos:
     -   id: trailing-whitespace
     -   id: mixed-line-ending
     -   id: end-of-file-fixer
+        exclude: &exclude_pattern '^changelog.d/'
     -   id: debug-statements
 -   repo: https://github.com/pycqa/flake8
     rev: 3.9.2
@@ -17,3 +18,9 @@ repos:
     hooks:
     -   id: black
         exclude: migrations/
+-   repo: https://github.com/twisted/towncrier
+    rev: 23.11.0
+    hooks:
+      - id: towncrier-check
+        files: $changelog\.d/
+        args: [--compare-with origin/master]

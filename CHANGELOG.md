@@ -2,7 +2,11 @@
 This file documents all changes to Argus. This file is primarily meant to be
 read by developers.
 
-## [Unreleased]
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+This project uses [*towncrier*](https://towncrier.readthedocs.io/) and the changes for the upcoming release can be found in <https://github.com/Uninett/Argus/tree/master/changelog.d/>.
+
+<!-- towncrier release notes start -->
 
 ### Added
 - Added the possibility to filter incident by a given list of ids
