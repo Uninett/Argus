@@ -64,6 +64,7 @@ class IncidentFilter(filters.FilterSet):
     class Meta:
         model = Incident
         fields = {
+            "id": ["in"],
             "source__id": ["in"],
             "source__name": ["in"],
             "source__type": ["in"],

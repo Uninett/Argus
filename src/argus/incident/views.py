@@ -161,6 +161,10 @@ class SourceSystemViewSet(
                 type=OpenApiTypes.DATETIME,
             ),
             OpenApiParameter(
+                name="id__in",
+                description="Fetch the incidents with an id in the given id list.",
+            ),
+            OpenApiParameter(
                 name="level__lte", description="Fetch incidents with levels in `LEVEL`", enum=Incident.LEVELS
             ),
             OpenApiParameter(

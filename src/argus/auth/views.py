@@ -52,7 +52,7 @@ class CurrentUserView(APIView):
     serializer_class = UserSerializer
 
     def get(self, request, *args, **kwargs):
-        serializer = self.serializer_class(request.user)
+        serializer = self.serializer_class(instance=request.user, context={"request": request})
         return Response(serializer.data)
 
 
