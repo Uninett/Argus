@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from unittest.mock import Mock
 
 from django.core.exceptions import ValidationError
 from django.test import TestCase
@@ -13,8 +14,10 @@ from argus.incident.factories import (
     StatelessIncidentFactory,
     TagFactory,
 )
-from argus.incident.models import Event, Incident, IncidentTagRelation, get_or_create_default_instances
+from argus.incident.models import Incident, IncidentTagRelation, SourceSystem, get_or_create_default_instances
 from argus.incident.views import IncidentFilter
+from argus.notificationprofile.factories import FilterFactory
+from argus.notificationprofile.models import Filter
 from argus.util.testing import disconnect_signals, connect_signals
 
 
@@ -194,3 +197,50 @@ class IncidentFilterTestCase(IncidentBasedAPITestCaseHelper, TestCase):
         expected = qs.token_expiry()
         result = IncidentFilter.incident_filter(queryset=qs, name="token_expiry", value=None)
         self.assertEqual(list(expected), list(result.order_by("pk")))
+
+    def test_filter_pk_returns_empty_queryset_if_filter_does_not_exist(self):
+        qs = Incident.objects.order_by("pk")
+        last_filter_pk = Filter.objects.last().id if Filter.objects.exists() else 0
+
+        result = IncidentFilter.incident_filter(
+            queryset=qs,
+            name="filter_pk",
+            value=last_filter_pk + 1,
+        )
+        self.assertFalse(result)
+
+    def test_filter_pk_returns_empty_queryset_if_filter_belongs_to_other_user(self):
+        other_users_filter = FilterFactory()
+        request = Mock()
+        request.user = self.source1_user
+        incident_filter = IncidentFilter(
+            data={"filter_pk": other_users_filter.pk},
+            request=request,
+        )
+        self.assertFalse(incident_filter.qs)
+
+    def test_filter_pk_returns_filtered_incidents(self):
+        qs = Incident.objects.order_by("pk")
+        filtr = FilterFactory(filter={"sourceSystemIds": [self.source1.pk]})
+
+        result = IncidentFilter.incident_filter(
+            queryset=qs,
+            name="filter_pk",
+            value=filtr.pk,
+        )
+        self.assertIn(self.incident1, result)
+        self.assertIn(self.incident2, result)
+        self.assertNotIn(self.incident3, result)
+        self.assertNotIn(self.incident4, result)
+
+    def test_filter_pk_returns_no_filtered_incidents_if_none_match(self):
+        last_source_pk = SourceSystem.objects.last().id
+        qs = Incident.objects.order_by("pk")
+        filtr = FilterFactory(filter={"sourceSystemIds": [last_source_pk + 1]})
+
+        result = IncidentFilter.incident_filter(
+            queryset=qs,
+            name="filter_pk",
+            value=filtr.pk,
+        )
+        self.assertFalse(result)

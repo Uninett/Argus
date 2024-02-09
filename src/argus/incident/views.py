@@ -161,6 +161,11 @@ class SourceSystemViewSet(
                 type=OpenApiTypes.DATETIME,
             ),
             OpenApiParameter(
+                name="filter_pk",
+                description="Fetch incidents that are included in the filter with the given primary key.",
+                type=int,
+            ),
+            OpenApiParameter(
                 name="id__in",
                 description="Fetch the incidents with an id in the given id list.",
             ),

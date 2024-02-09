@@ -28,6 +28,8 @@ from argus.incident.models import (
     Tag,
 )
 from argus.incident.views import EventViewSet
+from argus.notificationprofile.factories import FilterFactory
+from argus.notificationprofile.models import Filter
 from argus.util.testing import disconnect_signals, connect_signals
 
 
@@ -394,6 +396,32 @@ class IncidentFilterByOpenAndStatefulV1TestCase(IncidentAPITestCase):
     def test_open_false_and_stateful_false_returns_no_incidents(self):
         response = self.client.get("/api/v1/incidents/?stateful=false&open=false")
         self.assertEqual(len(response.data["results"]), 0, msg=response.data)
+
+
+class IncidentFilterByFilterPkTestCase(IncidentAPITestCase):
+    def setUp(self):
+        super().setUp()
+        self.open_pk = StatefulIncidentFactory().pk
+        self.closed_pk = StatefulIncidentFactory(
+            start_time="2022-05-23T13:07:29.254Z", end_time="2022-05-24T13:07:29.254Z"
+        ).pk
+        self.stateless_pk = StatelessIncidentFactory().pk
+
+    def test_filter_by_filter_pk_returns_no_incidents_on_non_existent_filter(self):
+        non_existent_filter_pk = Filter.objects.last().pk + 1 if Filter.objects.exists() else 1
+        response = self.client.get(f"/api/v2/incidents/?filter_pk={non_existent_filter_pk}")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertFalse(response.data["results"])
+
+    def test_filter_by_filter_pk_raises_error_on_invalid_decimal_pk(self):
+        response = self.client.get("/api/v2/incidents/?filter_pk=1.5")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_filter_by_filter_pk_returns_no_incidents_on_someone_elses_filter(self):
+        someone_elses_filter_pk = FilterFactory().pk
+        response = self.client.get(f"/api/v2/incidents/?filter_pk={someone_elses_filter_pk}")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertFalse(response.data["results"])
 
 
 class IncidentViewSetTestCase(APITestCase):
