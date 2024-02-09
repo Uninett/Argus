@@ -61,6 +61,8 @@ dev = [
     "pre-commit",
     "python-dotenv",
     "werkzeug",
+    "tox<4",  # does not work on tox 4 for some reason
+    "build",  # for debugging builds/installs
 ]
 
 [tool.setuptools]
