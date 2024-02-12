@@ -8,24 +8,6 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    replaces = [
-        ("argus_notificationprofile", "0001_initial"),
-        ("argus_notificationprofile", "0002_filter_filter"),
-        ("argus_notificationprofile", "0003_alter_filter_filter"),
-        ("argus_notificationprofile", "0004_copy_notificationprofile_media_to_media_v1"),
-        ("argus_notificationprofile", "0005_destinationconfig_media"),
-        ("argus_notificationprofile", "0006_related_name_destinations"),
-        ("argus_notificationprofile", "0007_copy_phone_number_from_destinations"),
-        ("argus_notificationprofile", "0008_remove_media_phone_number"),
-        ("argus_notificationprofile", "0009_notificationprofile_id"),
-        ("argus_notificationprofile", "0010_notificationprofile_id"),
-        ("argus_notificationprofile", "0011_media_installed_alter_media_slug_and_more"),
-        ("argus_notificationprofile", "0012_copy_filter_string_to_filter"),
-        ("argus_notificationprofile", "0013_remove_filter_filter_string"),
-        ("argus_notificationprofile", "0014_timerecurrence_days_array"),
-        ("argus_notificationprofile", "0015_remove_days_alter_days_array"),
-    ]
-
     initial = True
 
     dependencies = [
