@@ -46,8 +46,9 @@ charset-normalizer==3.2.0
     # via requests
 constantly==15.1.0
     # via twisted
-cryptography==41.0.3
+cryptography==41.0.7
     # via
+    #   -r constraints.txt
     #   autobahn
     #   pyopenssl
     #   service-identity
