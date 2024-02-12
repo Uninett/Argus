@@ -79,62 +79,62 @@ class FilterWrapperIncidentFitsTristatesTests(unittest.TestCase):
     # A tristate must be one of True, False, None
     # "None" is equivalent to the tristate not being mentioned in the filter at all
 
-    def test_incident_fits_tristates_no_tristates_set(self):
+    def test_get_incident_tristate_checks_no_tristates_set(self):
         incident = Mock()
         empty_filter = FilterWrapper({})
-        result = empty_filter.incident_fits_tristates(incident)
+        result = empty_filter.get_incident_tristate_checks(incident)
         self.assertEqual(result, {})
 
     @override_settings(ARGUS_FALLBACK_FILTER={"acked": True})
-    def test_incident_fits_tristates_no_tristates_set_with_fallback(self):
+    def test_get_incident_tristate_checks_no_tristates_set_with_fallback(self):
         incident = Mock()
         # Shouldn't match
         incident.acked = False
         empty_filter = FilterWrapper({})
-        result = empty_filter.incident_fits_tristates(incident)
+        result = empty_filter.get_incident_tristate_checks(incident)
         self.assertEqual(result["open"], None)
         self.assertEqual(result["acked"], False)
         self.assertEqual(result["stateful"], None)
         # Should match
         incident.acked = True
         empty_filter = FilterWrapper({})
-        result = empty_filter.incident_fits_tristates(incident)
+        result = empty_filter.get_incident_tristate_checks(incident)
         self.assertNotIn(False, result.values())
         self.assertEqual(result["open"], None)
         self.assertEqual(result["acked"], True)
         self.assertEqual(result["stateful"], None)
 
-    def test_incident_fits_tristates_is_true(self):
+    def test_get_incident_tristate_checks_is_true(self):
         incident = Mock()
         incident.open = True
         incident.acked = False
         incident.stateful = True
         filter = FilterWrapper({"open": True, "acked": False})
-        result = filter.incident_fits_tristates(incident)
+        result = filter.get_incident_tristate_checks(incident)
         self.assertTrue(set(result.values()))  # all True!
         self.assertEqual(result["open"], True)
         self.assertEqual(result["acked"], True)
         self.assertEqual(result["stateful"], None)
 
-    def test_incident_fits_tristates_is_false(self):
+    def test_get_incident_tristate_checks_is_false(self):
         incident = Mock()
         incident.open = True
         incident.acked = False
         incident.stateful = True
         filter = FilterWrapper({"open": False, "acked": False})
-        result = filter.incident_fits_tristates(incident)
+        result = filter.get_incident_tristate_checks(incident)
         self.assertIn(False, result.values())
         self.assertEqual(result["open"], False)
         self.assertEqual(result["acked"], True)
         self.assertEqual(result["stateful"], None)
 
     @override_settings(ARGUS_FALLBACK_FILTER={"acked": True})
-    def test_incident_fits_tristates_fallback_should_not_override(self):
+    def test_get_incident_tristate_checks_fallback_should_not_override(self):
         incident = Mock()
         # Should match
         incident.acked = False
         filter = FilterWrapper({"acked": False})
-        result = filter.incident_fits_tristates(incident)
+        result = filter.get_incident_tristate_checks(incident)
         self.assertEqual(result["acked"], True)
         self.assertNotIn(False, result.values())
         self.assertEqual(result["open"], None)

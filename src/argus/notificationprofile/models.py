@@ -140,7 +140,7 @@ class FilterWrapper:
             and self.is_event_type_empty()
         )
 
-    def incident_fits_tristates(self, incident) -> Dict[str, TriState]:
+    def get_incident_tristate_checks(self, incident) -> Dict[str, TriState]:
         if self.are_tristates_empty():
             return {}
         fits_tristates = {}
@@ -282,7 +282,7 @@ class Filter(models.Model):
         checks = {}
         checks["source"] = self.source_system_fits(incident, data)
         checks["tags"] = self.tags_fit(incident, data)
-        tristate_checks = self.filter_wrapper.incident_fits_tristates(incident)
+        tristate_checks = self.filter_wrapper.get_incident_tristate_checks(incident)
         for tristate, result in tristate_checks.items():
             checks[tristate] = result
         checks["max_level"] = self.filter_wrapper.incident_fits_maxlevel(incident)
