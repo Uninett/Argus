@@ -38,6 +38,7 @@ cffi==1.15.1
 channels[daphne]==4.0.0
     # via
     #   argus-server (pyproject.toml)
+    #   channels
     #   channels-redis
 channels-redis==4.1.0
     # via argus-server (pyproject.toml)
@@ -59,7 +60,7 @@ defusedxml==0.7.1
     #   social-auth-core
 dj-database-url==2.0.0
     # via argus-server (pyproject.toml)
-django==3.2.21
+django==3.2.24
     # via
     #   -r requirements/django32.txt
     #   argus-server (pyproject.toml)
@@ -193,7 +194,9 @@ social-auth-core==4.4.2
 sqlparse==0.4.4
     # via django
 twisted[tls]==22.10.0
-    # via daphne
+    # via
+    #   daphne
+    #   twisted
 txaio==23.1.1
     # via autobahn
 typing-extensions==4.7.1
