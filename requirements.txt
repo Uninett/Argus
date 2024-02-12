@@ -46,7 +46,7 @@ charset-normalizer==3.2.0
     # via requests
 constantly==15.1.0
     # via twisted
-cryptography==41.0.7
+cryptography==42.0.2
     # via
     #   -r constraints.txt
     #   autobahn
@@ -87,7 +87,7 @@ djangorestframework==3.14.0
     # via
     #   argus-server (pyproject.toml)
     #   drf-spectacular
-drf-rw-serializers==1.0.5
+drf-rw-serializers==1.1.1
     # via argus-server (pyproject.toml)
 drf-spectacular==0.26.4
     # via argus-server (pyproject.toml)
@@ -142,8 +142,10 @@ pycparser==2.21
     # via cffi
 pyjwt==2.8.0
     # via social-auth-core
-pyopenssl==23.2.0
-    # via twisted
+pyopenssl==24.0.0
+    # via
+    #   -r constraints.txt
+    #   twisted
 python-dataporten-auth==2.0.0
     # via argus-server (pyproject.toml)
 python-dateutil==2.8.2
@@ -207,7 +209,7 @@ typing-extensions==4.7.1
     #   twisted
 uritemplate==4.1.1
     # via drf-spectacular
-urllib3==2.0.6
+urllib3==2.2.0
     # via
     #   -r constraints.txt
     #   requests

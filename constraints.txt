@@ -1,6 +1,7 @@
-urllib3>=2.0.6
-cryptography>=41.0.6
-PyYAML>=5.4
-autobahn>=20.12.3
 #cython<3 # sometimes needed by pyyaml
+PyYAML>=5.4
 attrs # needed by twisted
+autobahn>=20.12.3
+cryptography>=42
+pyopenssl>=24
+urllib3>=2.2
