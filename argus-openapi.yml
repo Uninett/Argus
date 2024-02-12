@@ -1,0 +1,2879 @@
+openapi: 3.0.3
+info:
+  title: ''
+  version: 0.0.0
+paths:
+  /api/:
+    get:
+      operationId: api_retrieve
+      tags:
+      - api
+      security:
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/schema/:
+    get:
+      operationId: api_schema_retrieve
+      description: |-
+        OpenApi3 schema for this API. Format can be selected via content negotiation.
+
+        - YAML: application/vnd.oai.openapi
+        - JSON: application/vnd.oai.openapi+json
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - yaml
+      - in: query
+        name: lang
+        schema:
+          type: string
+          enum:
+          - af
+          - ar
+          - ar-dz
+          - ast
+          - az
+          - be
+          - bg
+          - bn
+          - br
+          - bs
+          - ca
+          - ckb
+          - cs
+          - cy
+          - da
+          - de
+          - dsb
+          - el
+          - en
+          - en-au
+          - en-gb
+          - eo
+          - es
+          - es-ar
+          - es-co
+          - es-mx
+          - es-ni
+          - es-ve
+          - et
+          - eu
+          - fa
+          - fi
+          - fr
+          - fy
+          - ga
+          - gd
+          - gl
+          - he
+          - hi
+          - hr
+          - hsb
+          - hu
+          - hy
+          - ia
+          - id
+          - ig
+          - io
+          - is
+          - it
+          - ja
+          - ka
+          - kab
+          - kk
+          - km
+          - kn
+          - ko
+          - ky
+          - lb
+          - lt
+          - lv
+          - mk
+          - ml
+          - mn
+          - mr
+          - ms
+          - my
+          - nb
+          - ne
+          - nl
+          - nn
+          - os
+          - pa
+          - pl
+          - pt
+          - pt-br
+          - ro
+          - ru
+          - sk
+          - sl
+          - sq
+          - sr
+          - sr-latn
+          - sv
+          - sw
+          - ta
+          - te
+          - tg
+          - th
+          - tk
+          - tr
+          - tt
+          - udm
+          - uk
+          - ur
+          - uz
+          - vi
+          - zh-hans
+          - zh-hant
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.oai.openapi:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/yaml:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/vnd.oai.openapi+json:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/auth/logout/:
+    post:
+      operationId: api_v1_auth_logout_create
+      description: Log out the logged in user
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/auth/phone-number/:
+    get:
+      operationId: api_v1_auth_phone_number_list
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ResponsePhoneNumberSerializerV1'
+          description: ''
+    post:
+      operationId: api_v1_auth_phone_number_create
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestPhoneNumberSerializerV1'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RequestPhoneNumberSerializerV1'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RequestPhoneNumberSerializerV1'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponsePhoneNumberSerializerV1'
+          description: ''
+  /api/v1/auth/phone-number/{id}/:
+    get:
+      operationId: api_v1_auth_phone_number_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this destination config.
+        required: true
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponsePhoneNumberSerializerV1'
+          description: ''
+    put:
+      operationId: api_v1_auth_phone_number_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this destination config.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestPhoneNumberSerializerV1'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RequestPhoneNumberSerializerV1'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RequestPhoneNumberSerializerV1'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponsePhoneNumberSerializerV1'
+          description: ''
+    patch:
+      operationId: api_v1_auth_phone_number_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this destination config.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedRequestPhoneNumberSerializerV1'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedRequestPhoneNumberSerializerV1'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedRequestPhoneNumberSerializerV1'
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponsePhoneNumberSerializerV1'
+          description: ''
+    delete:
+      operationId: api_v1_auth_phone_number_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this destination config.
+        required: true
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/auth/user/:
+    get:
+      operationId: api_v1_auth_user_retrieve
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserSerializerV1'
+          description: ''
+  /api/v1/auth/users/{id}/:
+    get:
+      operationId: api_v1_auth_users_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BasicUser'
+          description: ''
+  /api/v1/incidents/:
+    get:
+      operationId: api_v1_incidents_list
+      description: |-
+        All incidents
+
+        Paged using a cursor
+      parameters:
+      - in: query
+        name: acked
+        schema:
+          type: string
+          enum:
+          - 'false'
+          - 'true'
+        description: Fetch acked (`true`) or unacked (`false`) incidents.
+      - in: query
+        name: cursor
+        schema:
+          type: string
+        description: The pagination cursor value.
+      - in: query
+        name: duration__gte
+        schema:
+          type: integer
+        description: Fetch incidents with a duration longer of equal to `DURATION`
+          minutes
+      - in: query
+        name: end_time__gte
+        schema:
+          type: string
+          format: date-time
+        description: Fetch incidents that ended on or after `END_TIME`
+      - in: query
+        name: end_time__isnull
+        schema:
+          type: string
+          enum:
+          - 'false'
+          - 'true'
+        description: Fetch incidents that have `end_time` set to None (`true`), a
+          datetime or "infinity" (`false`).
+      - in: query
+        name: end_time__lte
+        schema:
+          type: string
+          format: date-time
+        description: Fetch incidents that ended on or before `END_TIME`
+      - in: query
+        name: level__lte
+        schema:
+          type: string
+          enum:
+          - 1
+          - 2
+          - 3
+          - 4
+          - 5
+        description: Fetch incidents with levels less than or equal to `LEVEL`
+      - in: query
+        name: open
+        schema:
+          type: string
+          enum:
+          - 'false'
+          - 'true'
+        description: Fetch open (`true`) or closed (`false`) incidents.
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: source__id__in
+        schema:
+          type: string
+        description: Fetch incidents with a source with numeric id `ID1` or `ID2`
+          or..
+      - in: query
+        name: source__name__in
+        schema:
+          type: string
+        description: Fetch incidents with a source with name ``NAME1`` or ``NAME2``
+          or..
+      - in: query
+        name: source__type__in
+        schema:
+          type: string
+        description: Fetch incidents with a source of a type with numeric id `ID1`
+          or `ID2` or..
+      - in: query
+        name: source_incident_id
+        schema:
+          type: string
+        description: Fetch incidents with the specific source incident id.
+      - in: query
+        name: start_time__gte
+        schema:
+          type: string
+          format: date-time
+        description: Fetch incidents that started on or after `START_TIME`
+      - in: query
+        name: start_time__lte
+        schema:
+          type: string
+          format: date-time
+        description: Fetch incidents that started on or before `START_TIME`
+      - in: query
+        name: stateful
+        schema:
+          type: string
+          enum:
+          - 'false'
+          - 'true'
+        description: Fetch stateful (`true`) or stateless (`false`) incidents.
+      - in: query
+        name: tags
+        schema:
+          type: array
+          items:
+            type: string
+        description: Multiple values may be separated by commas.
+        explode: false
+        style: form
+      - in: query
+        name: ticket
+        schema:
+          type: boolean
+        description: Ticket
+      - in: query
+        name: token_expiry
+        schema:
+          type: boolean
+        description: Token expiry
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedIncidentSerializerV1List'
+          description: ''
+    post:
+      operationId: api_v1_incidents_create
+      description: |-
+        All incidents
+
+        Paged using a cursor
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IncidentSerializerV1'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/IncidentSerializerV1'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/IncidentSerializerV1'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IncidentSerializerV1'
+          description: ''
+  /api/v1/incidents/{incident_pk}/acks/:
+    get:
+      operationId: api_v1_incidents_acks_list
+      parameters:
+      - in: path
+        name: incident_pk
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AcknowledgementSerializerV1'
+          description: ''
+    post:
+      operationId: api_v1_incidents_acks_create
+      parameters:
+      - in: path
+        name: incident_pk
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AcknowledgementSerializerV1'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AcknowledgementSerializerV1'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AcknowledgementSerializerV1'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AcknowledgementSerializerV1'
+          description: ''
+  /api/v1/incidents/{incident_pk}/acks/{id}/:
+    get:
+      operationId: api_v1_incidents_acks_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: incident_pk
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AcknowledgementSerializerV1'
+          description: ''
+    put:
+      operationId: api_v1_incidents_acks_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: incident_pk
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAcknowledgementSerializerV1'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UpdateAcknowledgementSerializerV1'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UpdateAcknowledgementSerializerV1'
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AcknowledgementSerializerV1'
+          description: ''
+    patch:
+      operationId: api_v1_incidents_acks_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: incident_pk
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUpdateAcknowledgementSerializerV1'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUpdateAcknowledgementSerializerV1'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUpdateAcknowledgementSerializerV1'
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AcknowledgementSerializerV1'
+          description: ''
+  /api/v1/incidents/{incident_pk}/events/:
+    get:
+      operationId: api_v1_incidents_events_list
+      parameters:
+      - in: path
+        name: incident_pk
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Event'
+          description: ''
+    post:
+      operationId: api_v1_incidents_events_create
+      parameters:
+      - in: path
+        name: incident_pk
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Event'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Event'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Event'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+          description: ''
+  /api/v1/incidents/{incident_pk}/events/{id}/:
+    get:
+      operationId: api_v1_incidents_events_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: incident_pk
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+          description: ''
+  /api/v1/incidents/{incident_pk}/tags/:
+    get:
+      operationId: api_v1_incidents_tags_list
+      parameters:
+      - in: path
+        name: incident_pk
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Tag'
+          description: ''
+    post:
+      operationId: api_v1_incidents_tags_create
+      parameters:
+      - in: path
+        name: incident_pk
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Tag'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Tag'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Tag'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tag'
+          description: ''
+  /api/v1/incidents/{incident_pk}/tags/{tag}/:
+    get:
+      operationId: api_v1_incidents_tags_retrieve
+      parameters:
+      - in: path
+        name: incident_pk
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: tag
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tag'
+          description: ''
+    delete:
+      operationId: api_v1_incidents_tags_destroy
+      parameters:
+      - in: path
+        name: incident_pk
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: tag
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/incidents/{id}/:
+    get:
+      operationId: api_v1_incidents_retrieve
+      description: |-
+        All incidents
+
+        Paged using a cursor
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this incident.
+        required: true
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IncidentSerializerV1'
+          description: ''
+    put:
+      operationId: api_v1_incidents_update
+      description: |-
+        All incidents
+
+        Paged using a cursor
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this incident.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IncidentPureDeserializer'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/IncidentPureDeserializer'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/IncidentPureDeserializer'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IncidentPureDeserializer'
+          description: ''
+    patch:
+      operationId: api_v1_incidents_partial_update
+      description: |-
+        All incidents
+
+        Paged using a cursor
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this incident.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedIncidentPureDeserializer'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedIncidentPureDeserializer'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedIncidentPureDeserializer'
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IncidentPureDeserializer'
+          description: ''
+  /api/v1/incidents/{id}/ticket_url/:
+    put:
+      operationId: api_v1_incidents_ticket_url_update
+      description: This endpoint manually sets the ticket URL of an incident.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this incident.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IncidentTicketUrl'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/IncidentTicketUrl'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/IncidentTicketUrl'
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IncidentTicketUrl'
+          description: ''
+  /api/v1/incidents/metadata/:
+    get:
+      operationId: api_v1_incidents_metadata_retrieve
+      description: |-
+        Metadata used by incidents.
+
+        Deprecated, use the individual endpoints instead
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      deprecated: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Metadata'
+          description: ''
+  /api/v1/incidents/mine/:
+    get:
+      operationId: api_v1_incidents_mine_list
+      description: |-
+        All incidents added by the currently logged in user
+
+        Paged using a cursor
+      parameters:
+      - in: query
+        name: acked
+        schema:
+          type: string
+          enum:
+          - 'false'
+          - 'true'
+        description: Fetch acked (`true`) or unacked (`false`) incidents.
+      - in: query
+        name: cursor
+        schema:
+          type: string
+        description: The pagination cursor value.
+      - in: query
+        name: duration__gte
+        schema:
+          type: integer
+        description: Fetch incidents with a duration longer of equal to `DURATION`
+          minutes
+      - in: query
+        name: end_time__gte
+        schema:
+          type: string
+          format: date-time
+        description: Fetch incidents that ended on or after `END_TIME`
+      - in: query
+        name: end_time__isnull
+        schema:
+          type: string
+          enum:
+          - 'false'
+          - 'true'
+        description: Fetch incidents that have `end_time` set to None (`true`), a
+          datetime or "infinity" (`false`).
+      - in: query
+        name: end_time__lte
+        schema:
+          type: string
+          format: date-time
+        description: Fetch incidents that ended on or before `END_TIME`
+      - in: query
+        name: level__lte
+        schema:
+          type: string
+          enum:
+          - 1
+          - 2
+          - 3
+          - 4
+          - 5
+        description: Fetch incidents with levels less than or equal to `LEVEL`
+      - in: query
+        name: open
+        schema:
+          type: string
+          enum:
+          - 'false'
+          - 'true'
+        description: Fetch open (`true`) or closed (`false`) incidents.
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: query
+        name: source__id__in
+        schema:
+          type: string
+        description: Fetch incidents with a source with numeric id `ID1` or `ID2`
+          or..
+      - in: query
+        name: source__name__in
+        schema:
+          type: string
+        description: Fetch incidents with a source with name ``NAME1`` or ``NAME2``
+          or..
+      - in: query
+        name: source__type__in
+        schema:
+          type: string
+        description: Fetch incidents with a source of a type with numeric id `ID1`
+          or `ID2` or..
+      - in: query
+        name: source_incident_id
+        schema:
+          type: string
+        description: Fetch incidents with the specific source incident id.
+      - in: query
+        name: start_time__gte
+        schema:
+          type: string
+          format: date-time
+        description: Fetch incidents that started on or after `START_TIME`
+      - in: query
+        name: start_time__lte
+        schema:
+          type: string
+          format: date-time
+        description: Fetch incidents that started on or before `START_TIME`
+      - in: query
+        name: stateful
+        schema:
+          type: string
+          enum:
+          - 'false'
+          - 'true'
+        description: Fetch stateful (`true`) or stateless (`false`) incidents.
+      - in: query
+        name: tags
+        schema:
+          type: array
+          items:
+            type: string
+        description: Multiple values may be separated by commas.
+        explode: false
+        style: form
+      - in: query
+        name: ticket
+        schema:
+          type: boolean
+        description: Ticket
+      - in: query
+        name: token_expiry
+        schema:
+          type: boolean
+        description: Token expiry
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedIncidentSerializerV1List'
+          description: ''
+    post:
+      operationId: api_v1_incidents_mine_create
+      description: |-
+        All incidents added by the currently logged in user
+
+        Paged using a cursor
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IncidentSerializerV1'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/IncidentSerializerV1'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/IncidentSerializerV1'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IncidentSerializerV1'
+          description: ''
+  /api/v1/incidents/open/:
+    get:
+      operationId: api_v1_incidents_open_list
+      description: |-
+        All incidents that are open
+
+        open: stateful, end_time is "infinity"
+
+        Deprecated: This endpoint will be removed in API version 2.
+        Use query parameter ``open=true`` with the other Incident list endpoints
+        instead.
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      deprecated: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/IncidentSerializerV1'
+          description: ''
+  /api/v1/incidents/openunacked/:
+    get:
+      operationId: api_v1_incidents_openunacked_list
+      description: |-
+        All incidents that are open and unacked
+
+        open: stateful, end_time is "infinity"
+        unacked: no acknowledgements are currently in play
+
+        Deprecated: This endpoint will be removed in API version 2.
+        Use query parameters ``open=true&acked=false`` with the other Incident list
+        endpoints instead.
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      deprecated: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/IncidentSerializerV1'
+          description: ''
+  /api/v1/incidents/source-types/:
+    get:
+      operationId: api_v1_incidents_source_types_list
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SourceSystemType'
+          description: ''
+    post:
+      operationId: api_v1_incidents_source_types_create
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SourceSystemType'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SourceSystemType'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SourceSystemType'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SourceSystemType'
+          description: ''
+  /api/v1/incidents/source-types/{name}/:
+    get:
+      operationId: api_v1_incidents_source_types_retrieve
+      parameters:
+      - in: path
+        name: name
+        schema:
+          type: string
+        description: A unique value identifying this source system type.
+        required: true
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SourceSystemType'
+          description: ''
+  /api/v1/incidents/sources/:
+    get:
+      operationId: api_v1_incidents_sources_list
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SourceSystem'
+          description: ''
+    post:
+      operationId: api_v1_incidents_sources_create
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SourceSystem'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SourceSystem'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SourceSystem'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SourceSystem'
+          description: ''
+  /api/v1/incidents/sources/{id}/:
+    get:
+      operationId: api_v1_incidents_sources_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this source system.
+        required: true
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SourceSystem'
+          description: ''
+    put:
+      operationId: api_v1_incidents_sources_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this source system.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SourceSystem'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SourceSystem'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SourceSystem'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SourceSystem'
+          description: ''
+    patch:
+      operationId: api_v1_incidents_sources_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this source system.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedSourceSystem'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedSourceSystem'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedSourceSystem'
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SourceSystem'
+          description: ''
+  /api/v1/notificationprofiles/:
+    get:
+      operationId: api_v1_notificationprofiles_list
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ResponseNotificationProfileSerializerV1'
+          description: ''
+    post:
+      operationId: api_v1_notificationprofiles_create
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestNotificationProfileSerializerV1'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RequestNotificationProfileSerializerV1'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RequestNotificationProfileSerializerV1'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseNotificationProfileSerializerV1'
+          description: ''
+  /api/v1/notificationprofiles/{id}/:
+    get:
+      operationId: api_v1_notificationprofiles_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this notification profile.
+        required: true
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseNotificationProfileSerializerV1'
+          description: ''
+    put:
+      operationId: api_v1_notificationprofiles_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this notification profile.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestNotificationProfileSerializerV1'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RequestNotificationProfileSerializerV1'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RequestNotificationProfileSerializerV1'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseNotificationProfileSerializerV1'
+          description: ''
+    patch:
+      operationId: api_v1_notificationprofiles_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this notification profile.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedRequestNotificationProfileSerializerV1'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedRequestNotificationProfileSerializerV1'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedRequestNotificationProfileSerializerV1'
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseNotificationProfileSerializerV1'
+          description: ''
+    delete:
+      operationId: api_v1_notificationprofiles_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this notification profile.
+        required: true
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/notificationprofiles/{id}/incidents/:
+    get:
+      operationId: api_v1_notificationprofiles_incidents_list
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this notification profile.
+        required: true
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Incident'
+          description: ''
+  /api/v1/notificationprofiles/filterpreview/:
+    post:
+      operationId: api_v1_notificationprofiles_filterpreview_create
+      description: |-
+        POST a filterstring, get a list of filtered incidents back
+
+        Format: { "sourceSystemIds": [1, ..], "tags": ["some=tag", ..], }
+
+        Minimal format: { "sourceSystemIds": [], "tags": [], }
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FilterPreview'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FilterPreview'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FilterPreview'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Incident'
+          description: ''
+  /api/v1/notificationprofiles/filters/:
+    get:
+      operationId: api_v1_notificationprofiles_filters_list
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Filter'
+          description: ''
+    post:
+      operationId: api_v1_notificationprofiles_filters_create
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Filter'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Filter'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Filter'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Filter'
+          description: ''
+  /api/v1/notificationprofiles/filters/{id}/:
+    get:
+      operationId: api_v1_notificationprofiles_filters_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this filter.
+        required: true
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Filter'
+          description: ''
+    put:
+      operationId: api_v1_notificationprofiles_filters_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this filter.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Filter'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Filter'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Filter'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Filter'
+          description: ''
+    patch:
+      operationId: api_v1_notificationprofiles_filters_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this filter.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedFilter'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedFilter'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedFilter'
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Filter'
+          description: ''
+    delete:
+      operationId: api_v1_notificationprofiles_filters_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this filter.
+        required: true
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/notificationprofiles/preview/:
+    post:
+      operationId: api_v1_notificationprofiles_preview_create
+      description: |-
+        POST a filterstring, get a list of filtered incidents back
+
+        Format:
+        {
+            "sourceSystemIds": [1, ..],
+            "tags": ["some=tag", ..],
+        }
+
+        Minimal format:
+        {
+            "sourceSystemIds": [],
+            "tags": [],
+        }
+
+        Will eventually take over for the filterpreview endpoint
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FilterPreview'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FilterPreview'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FilterPreview'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Incident'
+          description: ''
+  /api/v1/notificationprofiles/timeslots/:
+    get:
+      operationId: api_v1_notificationprofiles_timeslots_list
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Timeslot'
+          description: ''
+    post:
+      operationId: api_v1_notificationprofiles_timeslots_create
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Timeslot'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Timeslot'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Timeslot'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Timeslot'
+          description: ''
+  /api/v1/notificationprofiles/timeslots/{id}/:
+    get:
+      operationId: api_v1_notificationprofiles_timeslots_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this timeslot.
+        required: true
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Timeslot'
+          description: ''
+    put:
+      operationId: api_v1_notificationprofiles_timeslots_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this timeslot.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Timeslot'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Timeslot'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Timeslot'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Timeslot'
+          description: ''
+    patch:
+      operationId: api_v1_notificationprofiles_timeslots_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this timeslot.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedTimeslot'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedTimeslot'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedTimeslot'
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Timeslot'
+          description: ''
+    delete:
+      operationId: api_v1_notificationprofiles_timeslots_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this timeslot.
+        required: true
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/schema/:
+    get:
+      operationId: api_v1_schema_retrieve
+      description: |-
+        OpenApi3 schema for this API. Format can be selected via content negotiation.
+
+        - YAML: application/vnd.oai.openapi
+        - JSON: application/vnd.oai.openapi+json
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - yaml
+      - in: query
+        name: lang
+        schema:
+          type: string
+          enum:
+          - af
+          - ar
+          - ar-dz
+          - ast
+          - az
+          - be
+          - bg
+          - bn
+          - br
+          - bs
+          - ca
+          - ckb
+          - cs
+          - cy
+          - da
+          - de
+          - dsb
+          - el
+          - en
+          - en-au
+          - en-gb
+          - eo
+          - es
+          - es-ar
+          - es-co
+          - es-mx
+          - es-ni
+          - es-ve
+          - et
+          - eu
+          - fa
+          - fi
+          - fr
+          - fy
+          - ga
+          - gd
+          - gl
+          - he
+          - hi
+          - hr
+          - hsb
+          - hu
+          - hy
+          - ia
+          - id
+          - ig
+          - io
+          - is
+          - it
+          - ja
+          - ka
+          - kab
+          - kk
+          - km
+          - kn
+          - ko
+          - ky
+          - lb
+          - lt
+          - lv
+          - mk
+          - ml
+          - mn
+          - mr
+          - ms
+          - my
+          - nb
+          - ne
+          - nl
+          - nn
+          - os
+          - pa
+          - pl
+          - pt
+          - pt-br
+          - ro
+          - ru
+          - sk
+          - sl
+          - sq
+          - sr
+          - sr-latn
+          - sv
+          - sw
+          - ta
+          - te
+          - tg
+          - th
+          - tk
+          - tr
+          - tt
+          - udm
+          - uk
+          - ur
+          - uz
+          - vi
+          - zh-hans
+          - zh-hant
+      tags:
+      - api
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.oai.openapi:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/yaml:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/vnd.oai.openapi+json:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/token-auth/:
+    post:
+      operationId: api_v1_token_auth_create
+      tags:
+      - api
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AuthToken'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AuthToken'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthToken'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthToken'
+          description: ''
+  /login-methods/:
+    get:
+      operationId: login_methods_retrieve
+      tags:
+      - login-methods
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+components:
+  schemas:
+    AcknowledgementSerializerV1:
+      type: object
+      properties:
+        pk:
+          type: string
+          readOnly: true
+          title: Event
+        event:
+          $ref: '#/components/schemas/Event'
+        expiration:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+      - event
+      - pk
+    AuthToken:
+      type: object
+      properties:
+        username:
+          type: string
+          writeOnly: true
+        password:
+          type: string
+          writeOnly: true
+        token:
+          type: string
+          readOnly: true
+      required:
+      - password
+      - token
+      - username
+    BasicUser:
+      type: object
+      properties:
+        username:
+          type: string
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          title: Email address
+          maxLength: 254
+      required:
+      - username
+    DaysEnum:
+      enum:
+      - 1
+      - 2
+      - 3
+      - 4
+      - 5
+      - 6
+      - 7
+      type: integer
+      description: |-
+        * `1` - Monday
+        * `2` - Tuesday
+        * `3` - Wednesday
+        * `4` - Thursday
+        * `5` - Friday
+        * `6` - Saturday
+        * `7` - Sunday
+    Event:
+      type: object
+      properties:
+        pk:
+          type: integer
+          readOnly: true
+          title: ID
+        incident:
+          type: integer
+          readOnly: true
+        actor:
+          $ref: '#/components/schemas/Username'
+        timestamp:
+          type: string
+          format: date-time
+        received:
+          type: string
+          format: date-time
+          readOnly: true
+        type:
+          $ref: '#/components/schemas/TypeEnum'
+        description:
+          type: string
+      required:
+      - incident
+      - pk
+      - received
+      - timestamp
+      - type
+    EventTypeEnum:
+      enum:
+      - STA
+      - END
+      - CHI
+      - CLO
+      - REO
+      - ACK
+      - OTH
+      - LES
+      type: string
+      description: |-
+        * `STA` - Incident start
+        * `END` - Incident end
+        * `CHI` - Incident change
+        * `CLO` - Close
+        * `REO` - Reopen
+        * `ACK` - Acknowledge
+        * `OTH` - Other
+        * `LES` - Stateless
+    Filter:
+      type: object
+      properties:
+        pk:
+          type: integer
+          readOnly: true
+          title: ID
+        name:
+          type: string
+          maxLength: 40
+        filter_string:
+          type: string
+          description: 'Deprecated: Use "filter" instead'
+        filter:
+          $ref: '#/components/schemas/FilterBlob'
+      required:
+      - filter_string
+      - name
+      - pk
+    FilterBlob:
+      type: object
+      properties:
+        sourceSystemIds:
+          type: array
+          items:
+            type: integer
+            minimum: 1
+        tags:
+          type: array
+          items:
+            type: string
+            minLength: 3
+        open:
+          type: boolean
+          nullable: true
+        acked:
+          type: boolean
+          nullable: true
+        stateful:
+          type: boolean
+          nullable: true
+        maxlevel:
+          type: integer
+          maximum: 5
+          minimum: 1
+          nullable: true
+        event_type:
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/EventTypeEnum'
+          - $ref: '#/components/schemas/NullEnum'
+    FilterPreview:
+      type: object
+      properties:
+        sourceSystemIds:
+          type: array
+          items:
+            type: integer
+            minimum: 1
+        tags:
+          type: array
+          items:
+            type: string
+            minLength: 3
+      required:
+      - sourceSystemIds
+      - tags
+    Incident:
+      type: object
+      properties:
+        pk:
+          type: integer
+          readOnly: true
+          title: ID
+        start_time:
+          type: string
+          format: date-time
+          description: The time the incident was created.
+        end_time:
+          type: string
+          format: date-time
+          nullable: true
+        source:
+          allOf:
+          - $ref: '#/components/schemas/SourceSystem'
+          readOnly: true
+        source_incident_id:
+          type: string
+        details_url:
+          type: string
+        description:
+          type: string
+        level:
+          allOf:
+          - $ref: '#/components/schemas/LevelEnum'
+          minimum: -2147483648
+          maximum: 2147483647
+        ticket_url:
+          type: string
+          description: URL to existing ticket in a ticketing system.
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/IncidentTagRelation'
+          writeOnly: true
+      required:
+      - pk
+      - source
+      - start_time
+      - tags
+    IncidentPureDeserializer:
+      type: object
+      properties:
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/IncidentTagRelation'
+          writeOnly: true
+        details_url:
+          type: string
+        ticket_url:
+          type: string
+          description: URL to existing ticket in a ticketing system.
+        level:
+          allOf:
+          - $ref: '#/components/schemas/LevelEnum'
+          minimum: -2147483648
+          maximum: 2147483647
+      required:
+      - tags
+    IncidentSerializerV1:
+      type: object
+      properties:
+        pk:
+          type: integer
+          readOnly: true
+          title: ID
+        start_time:
+          type: string
+          format: date-time
+          description: The time the incident was created.
+        end_time:
+          type: string
+          format: date-time
+          nullable: true
+        source:
+          allOf:
+          - $ref: '#/components/schemas/SourceSystem'
+          readOnly: true
+        source_incident_id:
+          type: string
+        details_url:
+          type: string
+        description:
+          type: string
+        level:
+          allOf:
+          - $ref: '#/components/schemas/LevelEnum'
+          minimum: -2147483648
+          maximum: 2147483647
+        ticket_url:
+          type: string
+          description: URL to existing ticket in a ticketing system.
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/IncidentTagRelation'
+          writeOnly: true
+      required:
+      - pk
+      - source
+      - start_time
+      - tags
+    IncidentTagRelation:
+      type: object
+      properties:
+        tag:
+          type: string
+          writeOnly: true
+        added_by:
+          type: integer
+          readOnly: true
+        added_time:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - added_by
+      - added_time
+      - tag
+    IncidentTicketUrl:
+      type: object
+      properties:
+        ticket_url:
+          type: string
+          description: URL to existing ticket in a ticketing system.
+    LevelEnum:
+      enum:
+      - 1
+      - 2
+      - 3
+      - 4
+      - 5
+      type: integer
+      description: |-
+        * `1` - 1
+        * `2` - 2
+        * `3` - 3
+        * `4` - 4
+        * `5` - 5
+    MediaEnum:
+      enum:
+      - EM
+      - SM
+      type: string
+      description: |-
+        * `EM` - Email
+        * `SM` - SMS
+    Metadata:
+      type: object
+      properties:
+        sourceSystems:
+          type: array
+          items:
+            $ref: '#/components/schemas/SourceSystem'
+      required:
+      - sourceSystems
+    NullEnum:
+      enum:
+      - null
+    PaginatedIncidentSerializerV1List:
+      type: object
+      properties:
+        next:
+          type: string
+          nullable: true
+        previous:
+          type: string
+          nullable: true
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/IncidentSerializerV1'
+    PatchedFilter:
+      type: object
+      properties:
+        pk:
+          type: integer
+          readOnly: true
+          title: ID
+        name:
+          type: string
+          maxLength: 40
+        filter_string:
+          type: string
+          description: 'Deprecated: Use "filter" instead'
+        filter:
+          $ref: '#/components/schemas/FilterBlob'
+    PatchedIncidentPureDeserializer:
+      type: object
+      properties:
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/IncidentTagRelation'
+          writeOnly: true
+        details_url:
+          type: string
+        ticket_url:
+          type: string
+          description: URL to existing ticket in a ticketing system.
+        level:
+          allOf:
+          - $ref: '#/components/schemas/LevelEnum'
+          minimum: -2147483648
+          maximum: 2147483647
+    PatchedRequestNotificationProfileSerializerV1:
+      type: object
+      properties:
+        timeslot:
+          type: integer
+        filters:
+          type: array
+          items:
+            type: integer
+        media:
+          type: array
+          items:
+            $ref: '#/components/schemas/MediaEnum'
+          default:
+          - EM
+        active:
+          type: boolean
+        phone_number:
+          type: integer
+          nullable: true
+    PatchedRequestPhoneNumberSerializerV1:
+      type: object
+      properties:
+        phone_number:
+          type: string
+    PatchedSourceSystem:
+      type: object
+      properties:
+        pk:
+          type: integer
+          readOnly: true
+          title: ID
+        name:
+          type: string
+        type:
+          allOf:
+          - $ref: '#/components/schemas/SourceSystemType'
+          readOnly: true
+        user:
+          type: integer
+          readOnly: true
+        base_url:
+          type: string
+          readOnly: true
+          description: Base url to combine with an incident's relative url to point
+            to more info in the source system.
+    PatchedTimeslot:
+      type: object
+      properties:
+        pk:
+          type: integer
+          readOnly: true
+          title: ID
+        name:
+          type: string
+          maxLength: 40
+        time_recurrences:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimeRecurrence'
+    PatchedUpdateAcknowledgementSerializerV1:
+      type: object
+      properties:
+        expiration:
+          type: string
+          format: date-time
+          nullable: true
+    RequestNotificationProfileSerializerV1:
+      type: object
+      properties:
+        timeslot:
+          type: integer
+        filters:
+          type: array
+          items:
+            type: integer
+        media:
+          type: array
+          items:
+            $ref: '#/components/schemas/MediaEnum'
+          default:
+          - EM
+        active:
+          type: boolean
+        phone_number:
+          type: integer
+          nullable: true
+      required:
+      - filters
+      - timeslot
+    RequestPhoneNumberSerializerV1:
+      type: object
+      properties:
+        phone_number:
+          type: string
+      required:
+      - phone_number
+    ResponseNotificationProfileSerializerV1:
+      type: object
+      properties:
+        pk:
+          type: integer
+          readOnly: true
+          title: Id
+        timeslot:
+          $ref: '#/components/schemas/Timeslot'
+        filters:
+          type: array
+          items:
+            $ref: '#/components/schemas/Filter'
+        media:
+          type: array
+          items:
+            type: string
+          readOnly: true
+        active:
+          type: boolean
+        phone_number:
+          type: string
+          readOnly: true
+      required:
+      - filters
+      - media
+      - phone_number
+      - pk
+      - timeslot
+    ResponsePhoneNumberSerializerV1:
+      type: object
+      properties:
+        pk:
+          type: integer
+          readOnly: true
+        user:
+          type: integer
+          readOnly: true
+        phone_number:
+          type: string
+          readOnly: true
+      required:
+      - phone_number
+      - pk
+      - user
+    SourceSystem:
+      type: object
+      properties:
+        pk:
+          type: integer
+          readOnly: true
+          title: ID
+        name:
+          type: string
+        type:
+          allOf:
+          - $ref: '#/components/schemas/SourceSystemType'
+          readOnly: true
+        user:
+          type: integer
+          readOnly: true
+        base_url:
+          type: string
+          readOnly: true
+          description: Base url to combine with an incident's relative url to point
+            to more info in the source system.
+      required:
+      - base_url
+      - name
+      - pk
+      - type
+      - user
+    SourceSystemType:
+      type: object
+      properties:
+        name:
+          type: string
+      required:
+      - name
+    Tag:
+      type: object
+      properties:
+        tag:
+          type: string
+      required:
+      - tag
+    TimeRecurrence:
+      type: object
+      properties:
+        days:
+          type: array
+          items:
+            $ref: '#/components/schemas/DaysEnum'
+        start:
+          type: string
+          format: time
+          description: Local time.
+        end:
+          type: string
+          format: time
+          description: Local time.
+      required:
+      - days
+      - end
+      - start
+    Timeslot:
+      type: object
+      properties:
+        pk:
+          type: integer
+          readOnly: true
+          title: ID
+        name:
+          type: string
+          maxLength: 40
+        time_recurrences:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimeRecurrence'
+      required:
+      - name
+      - pk
+      - time_recurrences
+    TypeEnum:
+      enum:
+      - STA
+      - END
+      - CHI
+      - CLO
+      - REO
+      - ACK
+      - OTH
+      - LES
+      type: string
+      description: |-
+        * `STA` - Incident start
+        * `END` - Incident end
+        * `CHI` - Incident change
+        * `CLO` - Close
+        * `REO` - Reopen
+        * `ACK` - Acknowledge
+        * `OTH` - Other
+        * `LES` - Stateless
+    UpdateAcknowledgementSerializerV1:
+      type: object
+      properties:
+        expiration:
+          type: string
+          format: date-time
+          nullable: true
+    UserSerializerV1:
+      type: object
+      properties:
+        username:
+          type: string
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          title: Email address
+          maxLength: 254
+        phone_numbers:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+          readOnly: true
+      required:
+      - phone_numbers
+      - username
+    Username:
+      type: object
+      properties:
+        pk:
+          type: integer
+          readOnly: true
+          title: ID
+        username:
+          type: string
+          readOnly: true
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+      required:
+      - pk
+      - username
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid
+    tokenAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: Token-based authentication with required prefix "Token"
