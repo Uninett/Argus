@@ -34,7 +34,7 @@ class TimeRecurrenceFactory(factory.django.DjangoModelFactory):
     timeslot = factory.SubFactory(TimeslotFactory)
     start = factory.Faker("time_object")
     end = factory.Faker("time_object")
-    days = factory.Faker("random_sample", elements=[models.TimeRecurrence.Day])
+    days = factory.Faker("random_sample", elements=[x for x, _ in models.TimeRecurrence.Day.choices])
 
 
 class MinimalTimeRecurrenceFactory(TimeRecurrenceFactory):
