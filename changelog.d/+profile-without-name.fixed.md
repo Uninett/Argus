@@ -1,1 +1,0 @@
-Fixed posting/updating notification profiles without name
