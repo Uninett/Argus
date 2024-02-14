@@ -13,7 +13,7 @@ from django.db.models import F, Q
 from django.utils import timezone
 
 from argus.auth.models import User
-from argus.notificationprofile.models import Filter
+from argus.notificationprofile.models import Filter, NotificationProfile
 from argus.util.datetime_utils import INFINITY_REPR, get_infinity_repr
 from .constants import INCIDENT_LEVELS, INCIDENT_LEVEL_CHOICES, MIN_INCIDENT_LEVEL, MAX_INCIDENT_LEVEL
 from .fields import DateTimeInfinityField
@@ -299,6 +299,24 @@ class IncidentQuerySet(models.QuerySet):
             return self.none()
 
         return self.filter(pk__in=filtr.filtered_incidents.values_list("pk", flat=True))
+
+    def notificationprofile_pk(self, pk):
+        """
+        Returns all incidents that are included in the filters connected to the profile
+        with the given primary key
+        """
+        notification_profile = NotificationProfile.objects.filter(pk=pk).first()
+
+        if not notification_profile:
+            return self.none()
+
+        filters = notification_profile.filters.all()
+
+        filtered_incidents_pks = set()
+        for filtr in filters:
+            filtered_incidents_pks.update(filtr.filtered_incidents.values_list("pk", flat=True))
+
+        return self.filter(pk__in=filtered_incidents_pks)
 
     # Cannot be a constant, because `timezone.now()` would have been evaluated at compile time
     @staticmethod
