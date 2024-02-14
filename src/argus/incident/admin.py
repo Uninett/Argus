@@ -95,7 +95,7 @@ class IncidentAdmin(TextWidgetsOverrideModelAdmin):
         raw_id_fields = ("tag", "added_by")
         extra = 0
 
-    change_list_template = "incident/incident_change_list.html"
+    change_list_template = "incident/admin/incident_change_list.html"
 
     inlines = [IncidentTagRelationInline]
 
