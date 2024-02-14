@@ -4,6 +4,7 @@ from django.contrib import admin
 from django.contrib.admin import widgets as admin_widgets
 from django.db.models.functions import Concat
 from django.http import HttpResponseRedirect
+from django.template.response import TemplateResponse
 from django.urls import path
 from django.utils.html import format_html_join, format_html
 from django.utils.safestring import mark_safe
@@ -11,7 +12,7 @@ from django.utils.safestring import mark_safe
 from argus.auth.models import User
 from argus.util.admin_utils import add_elements_to_deleted_objects, list_filter_factory
 from . import fields, widgets
-from .forms import AddSourceSystemForm
+from .forms import AddSourceSystemForm, FakeIncidentForm
 from .models import (
     Acknowledgement,
     Event,
@@ -179,16 +180,36 @@ class IncidentAdmin(TextWidgetsOverrideModelAdmin):
     get_shown.short_description = "Shown"
     get_shown.boolean = True
 
-    def send_fake(self, request):
-        create_fake_incident()
-        return HttpResponseRedirect("../")
-
     def get_urls(self):
         orig_urls = super().get_urls()
-        urls = [
-            path("fake/", self.send_fake),
-        ]
+        urls = [path("fake/", self.admin_site.admin_view(self.add_fake_incident), name="add-fake-incident")]
         return urls + orig_urls
+
+    def add_fake_incident(self, request):
+        request.current_app = self.admin_site.name
+        if request.method == "POST":
+            form = FakeIncidentForm(request.POST)
+            if form.is_valid():
+                tags = form.cleaned_data.get("tags", None)
+                description = form.cleaned_data.get("description", None)
+                stateful = form.cleaned_data.get("stateful")
+                level = form.cleaned_data.get("level", None)
+                create_fake_incident(tags=tags, description=description, stateful=stateful, level=level)
+                return HttpResponseRedirect("../")
+        else:
+            form = FakeIncidentForm()
+
+        fieldsets = [(None, {"fields": list(form.base_fields)})]
+        admin_form = admin.helpers.AdminForm(form, fieldsets, {})
+        context = {
+            "title": "Add fake incident",
+            "subtitle": None,
+            "adminform": admin_form,
+            "opts": self.model._meta,
+            "errors": None,
+            **self.admin_site.each_context(request),
+        }
+        return TemplateResponse(request, "incident/admin/fake_incident_add_form.html", context)
 
     def get_form(self, request, obj: Incident = None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
