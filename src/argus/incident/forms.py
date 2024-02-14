@@ -1,8 +1,10 @@
 from django import forms
+from django.core.exceptions import ValidationError
 from django.forms import modelform_factory
 
 from argus.auth.models import User
-from .models import SourceSystem
+from .constants import INCIDENT_LEVELS
+from .models import Incident, SourceSystem, Tag
 
 
 class AddSourceSystemForm(forms.ModelForm):
@@ -49,3 +51,40 @@ class AddSourceSystemForm(forms.ModelForm):
             instance.save()
 
         return instance
+
+
+class FakeIncidentForm(forms.ModelForm):
+    level = forms.TypedChoiceField(
+        choices=[("", "")] + [(str(level), str(level)) for level in INCIDENT_LEVELS],
+        coerce=int,
+    )
+    stateful = forms.BooleanField(
+        initial=True, help_text="Stateful = incident with start and end, not stateful = single point in time incident"
+    )
+    tags = forms.CharField(help_text="Comma separated of form key=value")
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.required = False
+
+    class Meta:
+        model = Incident
+        fields = [
+            "stateful",
+            "description",
+            "level",
+            "tags",
+        ]
+
+    def clean_tags(self):
+        tags = self.cleaned_data["tags"]
+        if tags:
+            tag_list = tags.split(",")
+            for tag in tag_list:
+                try:
+                    Tag.split(tag=tag)
+                except (ValueError, ValidationError) as e:
+                    raise forms.ValidationError(str(e))
+            tags = tag_list
+        return tags
