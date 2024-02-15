@@ -211,6 +211,7 @@ class RequestNotificationProfileSerializer(serializers.ModelSerializer):
         if (
             "name" in attrs.keys()
             and NotificationProfile.objects.exclude(pk=getattr(self.instance, "pk", None))
+            .exclude(name=None)
             .filter(name=attrs["name"])
             .exists()
         ):

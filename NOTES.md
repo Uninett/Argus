@@ -1,7 +1,19 @@
 # Release Notes
-This file documents changes to Argus that are relevant for the users to know.
+This file documents changes to Argus that are relevant for operations and
+end-users.
 
-## [Unreleased]
+## [1.14.2] - 2024-02-15
+
+This version can run on Django 4.2. In production, ensure that the list of
+entries in `CSRF_TRUSTED_ORIGINS` are absolute urls, all starting with
+`https://`.
+
+The CHANGELOG is now maintained by `towncrier`.
+
+The frozen requirements-files have been updated with new versions, please
+upgrade which versions are used in production accordingly with
+`pip install -r requirements-djangoVERSION.txt` where VERSION is either `32`for
+Django 3.2 or `42` for Django 4.2.
 
 ## [1.14.1 - 2023-12-05]
 

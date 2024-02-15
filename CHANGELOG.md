@@ -8,10 +8,48 @@ This project uses [*towncrier*](https://towncrier.readthedocs.io/) and the chang
 
 <!-- towncrier release notes start -->
 
+## [1.14.2] - 2024-02-15
+
+This version can run on Django 4.2. In production, ensure that the list of
+entries in `CSRF_TRUSTED_ORIGINS` are absolute urls, all starting with
+`https://`.
+
 ### Added
-- Added the possibility to filter incident by a given list of ids
+
+- Add filtering of incident list by filter
+
+  This returns all incidents that are included in the filter
+  ([#244](https://github.com/Uninett/Argus/issues/244))
+- Allow running and testing on Python 3.12
+- Added towncrier to automatically produce changelog
+- Add two development dependencies
+
+  While `tox` doesn't need to be in the venv, it DOES currently need to be less
+  than version 4.
+
+  `build` is useful for debugging pip errors and pip-compile trouble.
+  Whenever pip-compile (via `tox -e upgrade-deps` for instance) fails with
+
+  ```
+  Backend subprocess exited when trying to invoke get_requires_for_build_wheel
+  Failed to parse /PATH/pyproject.toml
+  ```
+
+  run `python -m build -w` to see what `build` is actually complaining about.
+
+  See also https://github.com/pypa/build/issues/553
 - Add the "admin_url" field to the user serializer. This is so that the
   frontend can show a link to the Django admin.
+- Added the possibility to filter incident by a given list of ids
+
+### Fixed
+
+- Fixed posting/updating notification profiles without name
+
+### Changed
+
+- Updated a lot of (sub)dependencies to allow running on newer pythons and
+  newer Djangos, and to quiet dependency bots
 
 ## [1.14.1 - 2023-12-05]
 
