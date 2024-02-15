@@ -2,6 +2,14 @@
 This file documents changes to Argus that are relevant for operations and
 end-users.
 
+## [1.14.3] - 2024-02-15
+
+This release changes the database in order to get rid of a dead dependency,
+make sure to run migrations.
+
+This version can run on Django 5.0 if necessary. Install the dependencies in
+`requirements-django50.txt` if so.
+
 ## [1.14.2] - 2024-02-15
 
 This version can run on Django 4.2. In production, ensure that the list of

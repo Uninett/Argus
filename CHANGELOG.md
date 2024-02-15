@@ -8,6 +8,28 @@ This project uses [*towncrier*](https://towncrier.readthedocs.io/) and the chang
 
 <!-- towncrier release notes start -->
 
+## [1.14.3] - 2024-02-15
+
+This release changes the database in order to get rid of a dead dependency,
+make sure to run migrations.
+
+This version can run on Django 5.0 if necessary. Install the dependencies in
+`requirements-django50.txt` if so.
+
+### Added
+
+- Add filtering of incident list by notificationprofile
+
+  This returns all incidents that are included in filters that are connected to
+  that notificationprofile
+- Added support for running and testing on Django 5.0
+
+### Changed
+
+- Change TimeRecurrence.days from MultiSelectField to ArrayField
+  ([#707](https://github.com/Uninett/Argus/issues/707))
+- Updated lots of depenendcies in order to run on Django 5.0
+
 ## [1.14.2] - 2024-02-15
 
 This version can run on Django 4.2. In production, ensure that the list of
