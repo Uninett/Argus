@@ -1,10 +1,16 @@
 from datetime import datetime, timedelta
 from urllib.parse import urljoin
 import asyncio
+import itertools
+from typing import Any, Dict, AnyStr, List
 
-from httpx import AsyncClient, TimeoutException, HTTPStatusError
+from httpx import AsyncClient, TimeoutException, HTTPStatusError, HTTPError, post
 
 from django.core.management.base import BaseCommand
+
+
+class DatabaseMismatchError(Exception):
+    pass
 
 
 class Command(BaseCommand):
@@ -14,7 +20,7 @@ class Command(BaseCommand):
         parser.add_argument(
             "url",
             type=str,
-            help="URL for target argus host including port, ex https://argushost.no:443",
+            help="URL for target argus host. Port may be specified (defaults to 443 for HTTPS and 80 for HTTP), e.g. https://argushost.no:8080",
         )
         parser.add_argument(
             "token",
@@ -25,58 +31,152 @@ class Command(BaseCommand):
             "-s",
             "--seconds",
             type=int,
-            help="Number of seconds to send http requests. After this no more requests will be sent but responses will be waited for",
-            default=100,
+            help="Number of seconds to send http requests. After this no more requests will be sent but responses will be waited for. Default 10s",
+            default=10,
         )
-        parser.add_argument("-w", "--workers", type=int, help="Number of workers", default=1)
+        parser.add_argument("-t", "--timeout", type=int, help="Timeout for requests. Default 5s", default=5)
+        parser.add_argument("-w", "--workers", type=int, help="Number of workers. Default 1", default=1)
+        parser.add_argument("-b", "--bulk", action="store_true", help="Bulk ACK created incidents")
 
-    def get_incident_data(self):
+    def handle(self, *args, **options):
+        tester = StressTester(options.get("url"), options.get("token"), options.get("timeout"), options.get("workers"))
+        try:
+            self.stdout.write("Running stresstest ...")
+            incident_ids, runtime = tester.run(options.get("seconds"))
+            requests_per_second = round(len(incident_ids) / runtime.total_seconds(), 2)
+            self.stdout.write("Verifying incidents were created correctly ...")
+            tester.verify(incident_ids)
+            if options.get("bulk"):
+                self.stdout.write("Bulk ACKing incidents ...")
+                tester.bulk_ack(incident_ids)
+            self.stdout.write(
+                self.style.SUCCESS(
+                    f"Stresstest completed. Runtime: {runtime}. Incidents created: {len(incident_ids)}. Average incidents per second: {requests_per_second}."
+                )
+            )
+        except (DatabaseMismatchError, HTTPStatusError, TimeoutException) as e:
+            self.stderr.write(self.style.ERROR(e))
+        except HTTPError as e:
+            self.stderr.write(self.style.ERROR(f"HTTP Error: {e}"))
+
+
+class StressTester:
+    def __init__(self, url: str, token: str, timeout: int, worker_count: int):
+        self.url = url
+        self.token = token
+        self.timeout = timeout
+        self.worker_count = worker_count
+        self._loop = asyncio.get_event_loop()
+
+    def _get_incident_data(self) -> Dict[str, Any]:
         return {
             "start_time": datetime.now().isoformat(),
             "description": "Stresstest",
-            "tags": [],
+            "tags": [{"tag": "problem_type=stresstest"}],
         }
 
-    async def post_incidents_until_end_time(self, url, end_time, token, client):
-        request_counter = 0
-        incident_data = self.get_incident_data()
-        while True:
-            if datetime.now() >= end_time:
-                break
-            try:
-                response = await client.post(url, json=incident_data, headers={"Authorization": f"Token {token}"})
-                response.raise_for_status()
-            except TimeoutException:
-                raise TimeoutException(f"Timeout waiting for POST response to {url}")
-            except HTTPStatusError as e:
-                msg = f"HTTP error {e.response.status_code}: {e.response.content.decode('utf-8')}"
-                raise HTTPStatusError(msg, request=e.request, response=e.response)
-            request_counter += 1
-        return request_counter
+    def _get_auth_header(self) -> Dict[str, str]:
+        return {"Authorization": f"Token {self.token}"}
 
-    async def run_workers(self, url, end_time, token, worker_count):
-        async with AsyncClient() as client:
-            return await asyncio.gather(
-                *(self.post_incidents_until_end_time(url, end_time, token, client) for _ in range(worker_count))
-            )
+    def _get_incidents_v1_url(self) -> AnyStr:
+        return urljoin(self.url, "/api/v1/incidents/")
 
-    def handle(self, *args, **options):
-        test_duration = options.get("seconds")
-        url = urljoin(options.get("url"), "/api/v1/incidents/")
-        token = options.get("token")
-        worker_count = options.get("workers")
-        loop = asyncio.get_event_loop()
+    def _get_incidents_v2_url(self) -> AnyStr:
+        return urljoin(self.url, "/api/v2/incidents/")
+
+    def run(self, seconds: int) -> tuple[List[int], timedelta]:
+        """Runs a stresstest against the configured URL.
+        The test will continually send requests for `seconds` seconds and stop when all requests have gotten a response.
+        Returns a list containing the IDs of all created incidents and a timedelta detailing how long the test ran for.
+        Since the stresstest waits for responses to all requests, the total runtime should exceed `seconds` to varying degrees.
+        """
         start_time = datetime.now()
-        end_time = start_time + timedelta(seconds=test_duration)
-        try:
-            result = loop.run_until_complete(self.run_workers(url, end_time, token, worker_count))
-        except (TimeoutException, HTTPStatusError) as e:
-            self.stderr.write(self.style.ERROR(e))
-        else:
-            total_requests = sum(result)
-            seconds_run = (datetime.now() - start_time).seconds
-            self.stdout.write(
-                self.style.SUCCESS(
-                    f"Stresstest complete with no errors. {total_requests} requests were sent in {seconds_run} seconds."
+        end_time = start_time + timedelta(seconds=seconds)
+        incident_ids = self._loop.run_until_complete(self._run_stresstest_workers(end_time))
+        runtime = datetime.now() - start_time
+        return incident_ids, runtime
+
+    async def _run_stresstest_workers(self, end_time: datetime) -> List[int]:
+        async with AsyncClient(timeout=self.timeout) as client:
+            results = await asyncio.gather(*(self._post_incidents(end_time, client) for _ in range(self.worker_count)))
+            return list(itertools.chain.from_iterable(results))
+
+    async def _post_incidents(self, end_time: datetime, client: AsyncClient) -> List[int]:
+        created_ids = []
+        incident_data = self._get_incident_data()
+        while datetime.now() < end_time:
+            try:
+                response = await client.post(
+                    self._get_incidents_v1_url(), json=incident_data, headers=self._get_auth_header()
                 )
-            )
+                response.raise_for_status()
+                incident = response.json()
+                created_ids.append(incident["pk"])
+            except TimeoutException:
+                raise TimeoutException(f"Timeout waiting for POST response to {self.url}")
+            except HTTPStatusError as e:
+                msg = f"HTTP Error {e.response.status_code}: {e.response.content.decode('utf-8')}"
+                raise HTTPStatusError(msg, request=e.request, response=e.response)
+        return created_ids
+
+    def verify(self, incident_ids: List[int]):
+        """Verifies that the incidents included in `incident_ids` exist and contain the expected values"""
+        self._loop.run_until_complete(self._run_verification_workers(incident_ids))
+
+    async def _run_verification_workers(self, incident_ids: List[int]):
+        ids = incident_ids.copy()
+        async with AsyncClient(timeout=self.timeout) as client:
+            await asyncio.gather(*(self._verify_created_incidents(ids, client) for _ in range(self.worker_count)))
+
+    async def _verify_created_incidents(self, incident_ids: List[int], client: AsyncClient):
+        while incident_ids:
+            incident_id = incident_ids.pop()
+            await self._verify_incident(incident_id, client)
+
+    async def _verify_incident(self, incident_id: int, client: AsyncClient):
+        expected_data = self._get_incident_data()
+        id_url = urljoin(self._get_incidents_v1_url(), str(incident_id) + "/")
+        try:
+            response = await client.get(id_url, headers=self._get_auth_header())
+            response.raise_for_status()
+        except TimeoutException:
+            raise TimeoutException(f"Timeout waiting for GET response to {id_url}")
+        except HTTPStatusError as e:
+            msg = f"HTTP Error {e.response.status_code}: {e.response.content.decode('utf-8')}"
+            raise HTTPStatusError(msg, request=e.request, response=e.response)
+        response_data = response.json()
+        self._verify_tags(response_data, expected_data)
+        self._verify_description(response_data, expected_data)
+
+    def _verify_tags(self, response_data: Dict[str, Any], expected_data: Dict[str, Any]):
+        expected_tags = set([tag["tag"] for tag in expected_data["tags"]])
+        response_tags = set([tag["tag"] for tag in response_data["tags"]])
+        if expected_tags != response_tags:
+            msg = f'Actual tag(s) "{response_tags}" differ from expected tag(s) "{expected_tags}"'
+            raise DatabaseMismatchError(msg)
+
+    def _verify_description(self, response_data: Dict[str, Any], expected_data: Dict[str, Any]):
+        expected_descr = expected_data["description"]
+        response_descr = response_data["description"]
+        if response_descr != expected_descr:
+            msg = f'Actual description "{response_descr}" differ from expected description "{expected_descr}"'
+            raise DatabaseMismatchError(msg)
+
+    def bulk_ack(self, incident_ids: List[int]):
+        """Sends a request to ACK all incidents included in `incident_ids`"""
+        request_data = {
+            "ids": incident_ids,
+            "ack": {
+                "timestamp": datetime.now().isoformat(),
+                "description": "Stresstest",
+            },
+        }
+        url = urljoin(self._get_incidents_v2_url(), "acks/bulk/")
+        try:
+            response = post(url, json=request_data, headers=self._get_auth_header())
+            response.raise_for_status()
+        except TimeoutException:
+            raise TimeoutException(f"Timeout waiting for POST response to {url}")
+        except HTTPStatusError as e:
+            msg = f"HTTP Error {e.response.status_code}: {e.response.content.decode('utf-8')}"
+            raise HTTPStatusError(msg, request=e.request, response=e.response)
