@@ -113,17 +113,22 @@ class SMSNotification(NotificationMedium):
             return
 
         phone_numbers = cls.get_relevant_addresses(destinations=destinations)
-
         if not phone_numbers:
             return False
 
+        # there is only one recipient, so failing to send a single message
+        # means something is wrong on the email server
+        sent = True
         for phone_number in phone_numbers:
-            send_email_safely(
+            sent = send_email_safely(
                 send_mail,
                 subject=f"sms {phone_number}",
                 message=f"{event.description}",
                 from_email=None,
                 recipient_list=[recipient],
             )
+            if not sent:
+                LOG.error("SMS: Failed to send")
+                break
 
-        return True
+        return sent
