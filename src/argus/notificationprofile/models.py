@@ -102,7 +102,7 @@ class FilterWrapper:
 
     def __init__(self, filterblob):
         self.fallback_filter = getattr(settings, "ARGUS_FALLBACK_FILTER", {})
-        self.filter = filterblob
+        self.filter = filterblob.copy()
 
     def _get_tristate(self, tristate):
         fallback_filter = self.fallback_filter.get(tristate, None)
@@ -209,7 +209,7 @@ class Filter(models.Model):
 
     def incidents_with_source_systems(self, data=None):
         if not data:
-            data = self.filter
+            data = self.filter.copy()
         source_list = data.pop("sourceSystemIds", [])
         if source_list:
             return self.all_incidents.filter(source__in=source_list).distinct()
@@ -217,7 +217,7 @@ class Filter(models.Model):
 
     def source_system_fits(self, incident: Incident, data=None):
         if not data:
-            data = self.filter
+            data = self.filter.copy()
         source_list = data.pop("sourceSystemIds", [])
         if not source_list:
             # We're not limiting on sources!
@@ -226,7 +226,7 @@ class Filter(models.Model):
 
     def incidents_with_tags(self, data=None):
         if not data:
-            data = self.filter
+            data = self.filter.copy()
         tags_list = data.pop("tags", [])
         if tags_list:
             return self.all_incidents.from_tags(*tags_list)
@@ -234,7 +234,7 @@ class Filter(models.Model):
 
     def tags_fit(self, incident: Incident, data=None):
         if not data:
-            data = self.filter
+            data = self.filter.copy()
         tags_list = data.pop("tags", [])
         if not tags_list:
             # We're not limiting on tags!
@@ -247,7 +247,7 @@ class Filter(models.Model):
         data=None,
     ):
         if not data:
-            data = self.filter
+            data = self.filter.copy()
         fitting_incidents = self.all_incidents
         filter_open = data.pop("open", None)
         filter_acked = data.pop("acked", None)
@@ -269,7 +269,7 @@ class Filter(models.Model):
 
     def incidents_fitting_maxlevel(self, data=None):
         if not data:
-            data = self.filter
+            data = self.filter.copy()
         maxlevel = data.pop("maxlevel", None)
         if not maxlevel:
             return self.all_incidents.distinct()
@@ -278,7 +278,7 @@ class Filter(models.Model):
     def incident_fits(self, incident: Incident):
         if self.is_empty:
             return False  # Filter is empty!
-        data = self.filter
+        data = self.filter.copy()
         checks = {}
         checks["source"] = self.source_system_fits(incident, data)
         checks["tags"] = self.tags_fit(incident, data)
