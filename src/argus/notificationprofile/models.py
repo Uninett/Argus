@@ -288,7 +288,9 @@ class Filter(models.Model):
         checks["max_level"] = self.filter_wrapper.incident_fits_maxlevel(incident)
         any_failed = False in checks.values()
         if any_failed:
-            LOG.debug("Filter: at least one incident check failed: %r", checks)
+            LOG.debug("Filter: %s: MISS! checks: %r", self, checks)
+        else:
+            LOG.debug("Filter: %s: HIT!", self)
         return not any_failed
 
     def event_fits(self, event: Event):
