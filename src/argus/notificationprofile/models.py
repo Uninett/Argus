@@ -116,9 +116,9 @@ class FilterWrapper:
         fallback_filter = self.fallback_filter.get("maxlevel", None)
         return not self.filter.get("maxlevel", fallback_filter)
 
-    def is_event_type_empty(self):
-        fallback_filter = self.fallback_filter.get("event_type", None)
-        return not self.filter.get("event_type", fallback_filter)
+    def is_event_types_empty(self):
+        fallback_filter = self.fallback_filter.get("event_types", None)
+        return not self.filter.get("event_types", fallback_filter)
 
     def are_source_system_ids_empty(self):
         fallback_filter = self.fallback_filter.get("sourceSystemIds", None)
@@ -135,7 +135,7 @@ class FilterWrapper:
             and self.are_tags_empty()
             and self.are_tristates_empty()
             and self.is_maxlevel_empty()
-            and self.is_event_type_empty()
+            and self.is_event_types_empty()
         )
 
     def incident_fits_tristates(self, incident):
@@ -157,10 +157,10 @@ class FilterWrapper:
         return incident.level <= min(filter(None, (self.filter["maxlevel"], fallback_filter)))
 
     def event_fits(self, event):
-        if self.is_event_type_empty():
+        if self.is_event_types_empty():
             return True
-        fallback_filter = self.fallback_filter.get("event_type", None)
-        return event.type == self.filter.get("event_type", fallback_filter)
+        fallback_filter = self.fallback_filter.get("event_types", None)
+        return event.type in self.filter.get("event_types", fallback_filter)
 
 
 class Filter(models.Model):
