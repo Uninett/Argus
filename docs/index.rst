@@ -10,6 +10,7 @@ Welcome to Argus' documentation!
 
 .. toctree::
    about-argus
+   philosophy
    models
    api
    site-specific-settings
