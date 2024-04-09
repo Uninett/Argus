@@ -47,7 +47,7 @@ charset-normalizer==3.3.2
     # via requests
 constantly==23.10.4
     # via twisted
-cryptography==42.0.2
+cryptography==42.0.5
     # via
     #   -r constraints.txt
     #   autobahn
