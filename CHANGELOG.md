@@ -8,7 +8,7 @@ This project uses [*towncrier*](https://towncrier.readthedocs.io/) and the chang
 
 <!-- towncrier release notes start -->
 
-## [1.14.3] - 2024-02-15
+## [1.14.3] - 2024-04-09
 
 This release changes the database in order to get rid of a dead dependency,
 make sure to run migrations.
