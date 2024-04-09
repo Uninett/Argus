@@ -118,8 +118,18 @@ issue_format = "[#{issue}](https://github.com/Uninett/Argus/issues/{issue})"
 wrap = true
 
 [[tool.towncrier.type]]
-directory = "critical"
-name = "Critical"
+directory = "security"
+name = "Security"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "removed"
+name = "Removed"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "deprecated"
+name = "Deprecated"
 showcontent = true
 
 [[tool.towncrier.type]]

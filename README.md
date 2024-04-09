@@ -228,18 +228,21 @@ An [HTML coverage report](htmlcov/index.html) will be generated.
 Refer to the [tox.ini](tox.ini) file for further options.
 
 ## Using towncrier to automatically produce the changelog
-### Before opening a PR
-To be able to automatically produce the changelog for a release a file for each
+### Before merging a pull request
+To be able to automatically produce the changelog for a release one file for each
 pull request (also called news fragment) needs to be added to the folder
 `changelog.d/`.
-The name of the file consists of three parts seperated by a period:
-1. The identifier, either the issue number this pull request is refering to or if
-there is no related issue a `+` followed by a unique short description.
-2. The type of the change, we use `critical`, `added`, `changed` and `fixed`.
+
+The name of the file consists of three parts separated by a period:
+1. The identifier: either the issue number (in case the pull request fixes that issue)
+or the pull request number. If we don't want to add a link to the resulting changelog
+entry then a `+` followed by a unique short description.
+2. The type of the change: we use `security`, `removed`, `deprecated`, `added`,
+`changed` and `fixed`.
 3. The file suffix, e.g. `.md`, towncrier does not care which suffix a fragment has.
 
-So an example for a file name linked to an issue would be `214.added.md` or for a file
-without corresponding issue `+fixed-pagination-bug.fixed.md`.
+So an example for a file name related to an issue/pull request would be `214.added.md`
+or for a file without corresponding issue `+fixed-pagination-bug.fixed.md`.
 
 This file can either be created manually with a file name as specified above and the
 changelog text as content or one can use towncrier to create such a file as following:
@@ -248,8 +251,8 @@ changelog text as content or one can use towncrier to create such a file as foll
 $ towncrier create -c "Changelog content" 214.added.md
 ```
 
-When opening a PR there will be a check to make sure that a news fragment is added, it
-will fail if it is missing.
+When opening a pull request there will be a check to make sure that a news fragment is
+added and it will fail if it is missing.
 
 ### Before a release
 To add all content from the `changelog.d/` folder to the changelog file simply run
@@ -258,10 +261,12 @@ $ towncrier build --version {version}
 ```
 This will also delete all files in `changelog.d/`.
 
-To preview what the addition to the changelog file would look like add the flag `--draft`.
+To preview what the addition to the changelog file would look like add the flag
+`--draft`. This will not delete any files or change `CHANGELOG.md`. It will only output
+the preview in the terminal.
 
 A few other helpful flags:
 - `date DATE` - set the date of the release, default is today
-- `keep` - keep all news fragments
+- `keep` - do not delete the files in `changelog.d/`
 
 More information about [towncrier](https://towncrier.readthedocs.io).
