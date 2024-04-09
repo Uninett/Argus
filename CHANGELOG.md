@@ -8,6 +8,29 @@ This project uses [*towncrier*](https://towncrier.readthedocs.io/) and the chang
 
 <!-- towncrier release notes start -->
 
+## [1.15.0] - 2024-04-10
+
+Due to the removal of the django-multiselectfield dependency it is vitally
+important to upgrade to *this* version *after* correctly having upgraded to
+1.14.3 (the previous version).
+
+Be sure to migrate the database:
+
+```console
+$ python manage.py migrate
+```
+
+This version supports Django 4.2 and newer.
+
+### Changed
+
+- Drop all support for Django 3.2. No version-specific requirements for 3.2 are
+  included anymore, and we no longer test on 3.2.
+
+### Removed
+
+- Remove django-multiselectfield dependency ([#707](https://github.com/Uninett/Argus/issues/707))
+
 ## [1.14.3] - 2024-04-09
 
 This release changes the database in order to get rid of a dead dependency,
@@ -15,6 +38,8 @@ make sure to run migrations.
 
 This version can run on Django 5.0 if necessary. Install the dependencies in
 `requirements-django50.txt` if so.
+
+This is the last version that supports Django 3.2.
 
 ### Added
 
