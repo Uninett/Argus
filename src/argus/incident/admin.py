@@ -302,7 +302,7 @@ class AcknowledgementAdmin(admin.ModelAdmin):
         return mark_safe(f"#{ack.event.incident.pk} &emsp; [{source_incident_str}]")
 
     get_id.short_description = "Incident ID"
-    get_id.admin_order_field = "event__indicent__pk"
+    get_id.admin_order_field = "event__incident__pk"
 
     def get_timestamp(self, ack: Acknowledgement):
         return ack.event.timestamp
