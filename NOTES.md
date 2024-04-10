@@ -2,10 +2,21 @@
 This file documents changes to Argus that are relevant for operations and
 end-users.
 
-## [1.14.3] - 2024-02-15
+## [1.15.0] - 2024-04-10
+
+This release finishes the process started in 1.14.3. Make sure to run
+the migrations in 1.14.3 before you run the migrations included here!
+
+Furthermore, Django 3.2 is no longer supported so upgrade, upgrade!
+
+## [1.14.3] - 2024-04-09
 
 This release changes the database in order to get rid of a dead dependency,
-make sure to run migrations.
+make sure to run migrations:
+
+```console
+$ python manage.py migrate
+```
 
 This version can run on Django 5.0 if necessary. Install the dependencies in
 `requirements-django50.txt` if so.
