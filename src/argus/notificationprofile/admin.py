@@ -76,6 +76,10 @@ class DestinationConfigInline(admin.TabularInline):
 
 class NotificationProfileAdmin(admin.ModelAdmin):
     list_display = ("get_str", "user", "get_filters", "get_destination_media", "active")
+    list_filter = (
+        "active",
+        "user",
+    )
     search_fields = (
         "name",
         "timeslot__name",
