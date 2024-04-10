@@ -2,7 +2,6 @@ from django.contrib import admin
 from django.db.models.functions import Concat
 from django.utils.html import format_html_join
 
-from argus.util.admin_utils import list_filter_factory
 from .models import DestinationConfig, Filter, Media, NotificationProfile, TimeRecurrence, Timeslot
 
 
