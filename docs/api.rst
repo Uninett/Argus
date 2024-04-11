@@ -581,6 +581,23 @@ Incident endpoints
 -  ``GET`` to ``/api/v1/incidents/metadata/``: returns metadata
    for all incidents
 
+   .. code-block:: json
+        :caption: Example response body
+
+          {
+            "sourceSystems": [
+              {
+                "pk": 1,
+                "name": "argus",
+                "type": {
+                  "name": "argus"
+                },
+                "user": 1,
+                "base_url": ""
+              }
+            ]
+          }
+
 
 Notification profile endpoints
 ------------------------------
