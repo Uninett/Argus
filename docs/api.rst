@@ -22,6 +22,23 @@ Auth endpoints
 
 -  ``GET`` to ``/api/v1/auth/user/``: returns the logged in user
 
+      .. code-block:: json
+        :caption: Example response body
+
+          {
+            "username": "username",
+            "first_name": "User",
+            "last_name": "Name",
+            "email": "user@example.com",
+            "phone_numbers": [
+              {
+                "pk": 6,
+                "user": 2,
+                "phone_number": "+4747474747"
+              }
+            ]
+          }
+
 -  ``GET`` to ``/api/v1/auth/users/<int:pk>/``: returns a user by primary key
    (``pk``)
 
@@ -750,6 +767,19 @@ Auth endpoints
 ==============================
 
 -  ``GET`` to ``/api/v2/auth/user/``: returns the logged in user
+
+      .. code-block:: json
+        :caption: Example response body
+
+          {
+            "username": "username",
+            "first_name": "User",
+            "last_name": "Name",
+            "email": "user@example.com",
+            "admin_url": "http://localhost:8000/admin/"
+          }
+
+      The ``admin_url`` parameter is the link to the Django admin.
 
 -  ``GET`` to ``/api/v2/auth/users/<int:pk>/``: returns a user by primary key
    (``pk``)
