@@ -93,22 +93,17 @@ class EmailNotification(NotificationMedium):
         return form.cleaned_data
 
     @classmethod
-    def raise_if_not_deletable(cls, destination: DestinationConfig) -> Union[str, NoneType]:
+    def raise_if_not_deletable(cls, destination: DestinationConfig) -> NoneType:
         """
         Raises a NotDeletableError if the given email destination is not able
         to be deleted (if it was defined by an outside source or is in use by
         any notification profiles)
         """
+        super().raise_if_not_deletable(destination=destination)
+
         if destination.settings["synced"]:
             raise cls.NotDeletableError(
                 "Cannot delete this email destination since it was defined by an outside source."
-            )
-
-        connected_profiles = destination.notification_profiles.all()
-        if connected_profiles:
-            profiles = ", ".join([str(profile) for profile in connected_profiles])
-            raise cls.NotDeletableError(
-                f"Cannot delete this destination since it is in use in the notification profile(s): {profiles}."
             )
 
     @staticmethod

@@ -3,6 +3,7 @@
 This SMS gateway has an email specific interface. The email subject must contain the
 recipient's phone number. The email body must contain the message text.
 """
+
 from __future__ import annotations
 
 import logging
@@ -26,7 +27,8 @@ if TYPE_CHECKING:
     else:
         from collections.abc import Iterable
 
-    from typing import List
+    from typing import List, Union
+    from types import NoneType
     from django.db.models.query import QuerySet
     from argus.auth.models import User
     from ..models import DestinationConfig

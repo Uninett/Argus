@@ -68,12 +68,17 @@ class NotificationMedium(ABC):
         pass
 
     @classmethod
-    def raise_if_not_deletable(cls, destination: DestinationConfig):
+    def raise_if_not_deletable(cls, destination: DestinationConfig) -> NoneType:
         """
-        Returns None if the given destination is deletable and raises an
-        NotDeletableError if not
+        Raises a NotDeletableError if the given destination is not able to be deleted
+        (if it is in use by any notification profiles)
         """
-        return None
+        connected_profiles = destination.notification_profiles.all()
+        if connected_profiles:
+            profiles = ", ".join([str(profile) for profile in connected_profiles])
+            raise cls.NotDeletableError(
+                f"Cannot delete this destination since it is in use in the notification profile(s): {profiles}."
+            )
 
     @staticmethod
     def update(destination: DestinationConfig, validated_data: dict) -> Union[DestinationConfig, NoneType]:

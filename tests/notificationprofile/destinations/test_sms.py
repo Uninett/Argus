@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework.test import APIClient, APIRequestFactory, APITestCase
 
 from argus.auth.factories import PersonUserFactory
-from argus.notificationprofile.factories import DestinationConfigFactory
+from argus.notificationprofile.factories import DestinationConfigFactory, NotificationProfileFactory
 from argus.notificationprofile.media.sms_as_email import SMSNotification
 from argus.notificationprofile.models import DestinationConfig, Media
 from argus.notificationprofile.serializers import RequestDestinationConfigSerializer
@@ -302,12 +302,19 @@ class SMSDestinationViewTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(DestinationConfig.objects.get(pk=sms_destination_pk).settings, settings2)
 
-    def test_should_delete_sms_destination(self):
+    def test_should_delete_unused_sms_destination(self):
         response = self.user1_rest_client.delete(
             path=f"{self.ENDPOINT}{self.sms_destination.pk}/",
         )
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT, response.data)
         self.assertFalse(DestinationConfig.objects.filter(id=self.sms_destination.pk).exists())
+
+    def test_should_not_allow_deletion_of_sms_destination_in_use(self):
+        notification_profile = NotificationProfileFactory(user=self.user1)
+        notification_profile.destinations.add(self.sms_destination)
+        response = self.user1_rest_client.delete(path=f"{self.ENDPOINT}{self.sms_destination.pk}/")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST, response.data)
+        self.assertTrue(DestinationConfig.objects.filter(pk=self.sms_destination.pk).exists())
 
 
 @tag("integration")
