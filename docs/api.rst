@@ -606,6 +606,62 @@ Notification profile endpoints
 
    -  ``GET``: returns the logged in user’s notification profiles
 
+      .. code-block:: json
+        :caption: Example response body
+
+          [
+            {
+              "pk": 1,
+              "timeslot": {
+                "pk": 2,
+                "name": "All the time",
+                "time_recurrences": [
+                  {
+                    "days": [
+                      1,
+                      2,
+                      3,
+                      4,
+                      5,
+                      6,
+                      7
+                    ],
+                    "start": "00:00:00",
+                    "end": "23:59:59.999999",
+                    "all_day": true
+                  }
+                ]
+              },
+              "filters": [
+                {
+                  "pk": 7,
+                  "name": "test",
+                  "filter_string": "{\"sourceSystemIds\": [2], \"tags\": []}",
+                  "filter": {
+                    "sourceSystemIds": [
+                      2
+                    ],
+                    "open": null,
+                    "acked": null,
+                    "stateful": null,
+                    "maxlevel": null,
+                    "event_type": null
+                  }
+                }
+              ],
+              "media": [
+                "EM",
+                "SM"
+              ],
+              "active": true,
+              "phone_number": {
+                "pk": 6,
+                "user": 2,
+                "phone_number": "+4747474747"
+              }
+            }
+          ]
+
    -  ``POST``: creates and returns a notification profile, which is then
       connected to the logged in user
 
@@ -650,6 +706,33 @@ Notification profile endpoints
 -  ``/api/v1/notificationprofiles/timeslots/``:
 
    -  ``GET``: returns the logged in user’s time slots
+
+      .. code-block:: json
+        :caption: Example response body
+
+          [
+            {
+              "pk": 2,
+              "name": "All the time",
+              "time_recurrences": [
+                {
+                  "days": [
+                    1,
+                    2,
+                    3,
+                    4,
+                    5,
+                    6,
+                    7
+                  ],
+                  "start": "00:00:00",
+                  "end": "23:59:59.999999",
+                  "all_day": true
+                }
+              ]
+            }
+          ]
+
    -  ``POST``: creates and returns a time slot, which is then connected
       to the logged in user
 
@@ -723,6 +806,31 @@ Notification profile endpoints
 -  ``/api/v1/notificationprofiles/filters/``:
 
    -  ``GET``: returns the logged in user’s filters
+
+      .. code-block:: json
+        :caption: Example response body
+
+          [
+            {
+              "pk": 2,
+              "name": "Critical incidents",
+              "filter_string": "{\"sourceSystemIds\": [1], \"tags\": [\"key1=value1\"]}",
+              "filter": {
+                "sourceSystemIds": [
+                  1
+                ],
+                "tags": [
+                  "key1=value1"
+                ],
+                "open": true,
+                "acked": false,
+                "stateful": true,
+                "maxlevel": 1,
+                "event_type": "STA"
+              }
+            }
+          ]
+
    -  ``POST``: creates and returns a filter, which is then connected to
       the logged in user
 
@@ -1341,6 +1449,83 @@ Notification profile endpoints
 
    -  ``GET``: returns the logged in user’s notification profiles
 
+      .. code-block:: json
+        :caption: Example response body
+
+          [
+            {
+              "pk": 1,
+              "name": null,
+              "timeslot": {
+                "pk": 2,
+                "name": "All the time",
+                "time_recurrences": [
+                  {
+                    "days": [
+                      1,
+                      2,
+                      3,
+                      4,
+                      5,
+                      6,
+                      7
+                    ],
+                    "start": "00:00:00",
+                    "end": "23:59:59.999999",
+                    "all_day": true
+                  }
+                ]
+              },
+              "filters": [
+                {
+                  "pk": 7,
+                  "name": "test",
+                  "filter": {
+                    "sourceSystemIds": [
+                      2
+                    ],
+                    "open": null,
+                    "acked": null,
+                    "stateful": null,
+                    "maxlevel": null,
+                    "event_type": null
+                  }
+                }
+              ],
+              "destinations": [
+                {
+                  "pk": 2,
+                  "media": {
+                    "slug": "email",
+                    "name": "Email",
+                    "installed": true
+                  },
+                  "label": "work",
+                  "suggested_label": "Email: user@example.com",
+                  "settings": {
+                    "synced": true,
+                    "email_address": "user@example.com"
+                  }
+                },
+                {
+                  "pk": 3,
+                  "media": {
+                    "slug": "sms",
+                    "name": "SMS",
+                    "installed": true
+                  },
+                  "label": "work",
+                  "suggested_label": "SMS: +4747474747",
+                  "settings": {
+                    "phone_number": "+4747474747"
+                  }
+                }
+              ],
+              "active": true
+            }
+          ]
+
+
    -  ``POST``: creates and returns a notification profile, which is then
       connected to the logged in user
 
@@ -1382,6 +1567,39 @@ Notification profile endpoints
 -  ``/api/v2/notificationprofiles/destinations/``:
 
    -  ``GET``: returns the logged in user’s destination-configs
+
+      .. code-block:: json
+        :caption: Example response body
+
+          [
+            {
+              "pk": 2,
+              "media": {
+                "slug": "email",
+                "name": "Email",
+                "installed": true
+              },
+              "label": "work",
+              "suggested_label": "Email: work@example.com",
+              "settings": {
+                "synced": false,
+                "email_address": "work@example.com"
+              }
+            },
+            {
+              "pk": 3,
+              "media": {
+                "slug": "sms",
+                "name": "SMS",
+                "installed": true
+              },
+              "label": "work",
+              "suggested_label": "SMS: +4747474747",
+              "settings": {
+                "phone_number": "+4747474747"
+              }
+            }
+          ]
 
    -  ``POST``: creates and returns a destination-config, which is then
       connected to the logged in user
@@ -1430,6 +1648,22 @@ Notification profile endpoints
 
    -  ``GET``: returns media
 
+      .. code-block:: json
+        :caption: Example response body
+
+          [
+            {
+              "slug": "email",
+              "name": "Email",
+              "installed": true
+            },
+            {
+              "slug": "sms",
+              "name": "SMS",
+              "installed": true
+            }
+          ]
+
 -  ``/api/v2/notificationprofiles/media/<slug:slug>/``:
 
    -  ``GET``: returns one of the media by it's slug
@@ -1438,9 +1672,57 @@ Notification profile endpoints
 
    -  ``GET``: returns the json schema of the media by it's slug
 
+      .. code-block:: json
+        :caption: Example response body
+
+          {
+            "json_schema": {
+              "title": "Email Settings",
+              "description": "Settings for a DestinationConfig using email.",
+              "type": "object",
+              "required": [
+                "email_address"
+              ],
+              "properties": {
+                "email_address": {
+                  "type": "string",
+                  "title": "Email address"
+                }
+              },
+              "$id": "http://localhost:8000/json-schema/email"
+            }
+          }
+
 -  ``/api/v2/notificationprofiles/timeslots/``:
 
    -  ``GET``: returns the logged in user’s time slots
+
+      .. code-block:: json
+        :caption: Example response body
+
+          [
+            {
+              "pk": 2,
+              "name": "All the time",
+              "time_recurrences": [
+                {
+                  "days": [
+                    1,
+                    2,
+                    3,
+                    4,
+                    5,
+                    6,
+                    7
+                  ],
+                  "start": "00:00:00",
+                  "end": "23:59:59.999999",
+                  "all_day": true
+                }
+              ]
+            }
+          ]
+
    -  ``POST``: creates and returns a time slot, which is then connected
       to the logged in user
 
@@ -1514,6 +1796,30 @@ Notification profile endpoints
 -  ``/api/v2/notificationprofiles/filters/``:
 
    -  ``GET``: returns the logged in user’s filters
+
+      .. code-block:: json
+        :caption: Example response body
+
+          [
+            {
+              "pk": 2,
+              "name": "Critical incidents",
+              "filter": {
+                "sourceSystemIds": [
+                  1
+                ],
+                "tags": [
+                  "key1=value1"
+                ],
+                "open": true,
+                "acked": false,
+                "stateful": true,
+                "maxlevel": 1,
+                "event_type": "STA"
+              }
+            }
+          ]
+
    -  ``POST``: creates and returns a filter, which is then connected to
       the logged in user
 
