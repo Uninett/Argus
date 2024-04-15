@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Argus Server: {{ page_title }}</title>
+</head>
+<body>
+  <h1>Argus Server: {{ page_title }}</h1>
+  <ul>
+    <li>
+      <a href="{{ frontend }}">Frontend</a>
+    </li>
+    <li>
+      <a href="{% url 'admin:index' %}">Admin</a>
+    </li>
+    <li>OpenAPI
+      <ul>
+        <li>V1
+        <ul>
+          <li>
+            <a href="{% url 'v1:openapi:schema-v1' %}" title="Argus OpenAPI V1 schema file">Download schema</a>
+          </li>
+          <li>
+            <a href="{% url 'v1:openapi:swagger-ui-v1' %}" title="Argus OpenAPI V1 UI">UI</a>
+          </li>
+        </ul>
+        </li>
+        <li>V2
+        <ul>
+          <li>
+            <a href="{% url 'v2:openapi:schema' %}" title="Argus OpenAPI V2 schema file">Download schema</a>
+           </li>
+          <li>
+            <a href="{% url 'v2:openapi:swagger-ui' %}" title="Argus OpenAPI V2 UI">UI</a>
+          </li>
+        </ul>
+        </li>
+      </ul>
+    </li>
+</ul>
+</body>
+</html>

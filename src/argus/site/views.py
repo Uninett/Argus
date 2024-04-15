@@ -25,7 +25,11 @@ LOG = logging.getLogger(__name__)
 
 
 def index(request):
-    return render(request, "base.html")
+    context = {
+        "page_title": "Home",
+        "frontend": settings.FRONTEND_URL,
+    }
+    return render(request, "index.html", context=context)
 
 
 def error(request):
