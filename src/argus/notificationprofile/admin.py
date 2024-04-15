@@ -2,7 +2,6 @@ from django.contrib import admin
 from django.db.models.functions import Concat
 from django.utils.html import format_html_join
 
-from argus.util.admin_utils import list_filter_factory
 from .models import DestinationConfig, Filter, Media, NotificationProfile, TimeRecurrence, Timeslot
 
 
@@ -76,8 +75,11 @@ class DestinationConfigInline(admin.TabularInline):
 
 
 class NotificationProfileAdmin(admin.ModelAdmin):
-    list_display = ("get_str", "get_filters", "get_destination_media", "active")
-    list_filter = ("active",)
+    list_display = ("get_str", "user", "get_filters", "get_destination_media", "active")
+    list_filter = (
+        "active",
+        "user",
+    )
     search_fields = (
         "name",
         "timeslot__name",
