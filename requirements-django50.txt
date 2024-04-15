@@ -192,7 +192,7 @@ social-auth-core==4.5.2
     #   argus-server (pyproject.toml)
     #   python-dataporten-auth
     #   social-auth-app-django
-sqlparse==0.4.4
+sqlparse==0.5.0
     # via django
 twisted[tls]==23.10.0
     # via
