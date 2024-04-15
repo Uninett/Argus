@@ -1,4 +1,4 @@
-{# Code based on https://github.com/django/django/blob/3.0.7/django/contrib/admin/templates/admin/widgets/split_datetime.html #}
+{# Code based on https://github.com/django/django/blob/4.2/django/contrib/admin/templates/admin/widgets/split_datetime.html #}
 <p class="datetime">
     {{ date_label }} {% with widget=widget.subwidgets.0 %}{% include widget.template_name %}{% endwith %}<br />
     {{ time_label }} {% with widget=widget.subwidgets.1 %}{% include widget.template_name %}{% endwith %}<br />
