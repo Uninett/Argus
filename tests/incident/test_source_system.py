@@ -23,7 +23,7 @@ class SourceSystemPostingTests(APITestCase):
         self.django_client = Client()
         self.django_client.login(username=self.user1.username, password=password)
 
-        # URL format: https://docs.djangoproject.com/en/3.0/ref/contrib/admin/#reversing-admin-urls
+        # URL format: https://docs.djangoproject.com/en/4.2/ref/contrib/admin/#reversing-admin-urls
         self.base_admin_url = f"admin:{SourceSystem._meta.app_label}_{SourceSystem._meta.model_name}"
         self.add_url = reverse(f"{self.base_admin_url}_add")
         self.change_url = lambda source_system: reverse(f"{self.base_admin_url}_change", args=[source_system.pk])

@@ -77,7 +77,7 @@ def add_elements_to_deleted_objects(
 
 
 def admin_urlize(obj: Model, admin_site):
-    # Code based on https://github.com/django/django/blob/3.0.7/django/contrib/admin/utils.py#L121-L149
+    # Code based on https://github.com/django/django/blob/4.2/django/contrib/admin/utils.py#L124-L152
     opts = obj._meta
 
     no_edit_link = f"{capfirst(opts.verbose_name)}: {obj}"
