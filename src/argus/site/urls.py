@@ -15,6 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path, re_path
+from django.views.generic.base import RedirectView
 
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from social_django.urls import extra
@@ -32,6 +33,7 @@ psa_urls = [
 ]
 
 urlpatterns = [
+    path("favicon.ico", RedirectView.as_view(url="/static/favicon.ico", permanent=True)),
     # path(".error/", error),  # Only needed when testing error pages and error behavior
     path("admin/", admin.site.urls),
     path("oidc/", include(psa_urls)),
