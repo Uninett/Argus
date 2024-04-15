@@ -156,7 +156,7 @@ $ source venv/bin/activate
 
 Install Argus' requirements into the virtual env.
 ```console
-$ pip install -r requirements-django32.txt
+$ pip install -r requirements-django42.txt
 $ pip install -r requirements/dev.txt
 ```
 
