@@ -151,6 +151,7 @@ TIME_ZONE = "Europe/Oslo"
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = "/static/"
+STATICFILES_DIRS = [SITE_DIR / "static"]
 STATICFILES_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
 
 
