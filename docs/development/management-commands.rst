@@ -190,3 +190,36 @@ is changed.
 
 This incident will automatically be closed if the token related to the incident
 is renewed, deleted or replaced by a new one.
+
+
+.. _toggle-profile-activation:
+
+Toggle profile activation
+-------------------------
+.. warning::
+    You should be careful using the `toggle_profile_activation` command in a
+    production environment, since activating previously inactive notification profiles
+    can lead to notifications, and deactivating a previously active profile might lead to
+    missing notifications.
+
+To quickly make a notification profile (in)active one can use the command
+`toggle_profile_activation`:
+
+    .. code:: console
+
+        $ python manage.py toggle_profile_activation
+
+See the inbuilt help for flags and toggles:
+
+    .. code:: console
+
+        $ python manage.py toggle_profile_activation --help
+
+This command takes a list of notification profile ids (separated by spaces) as
+arguments:
+
+    .. code:: console
+
+        $ python manage.py toggle_profile_activation 1 2 3 4
+
+It will lead to an error if no ids are given.
