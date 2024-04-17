@@ -20,5 +20,4 @@ ENV DJANGO_SETTINGS_MODULE=dockersettings
 ENV PORT=8000
 EXPOSE 8000
 COPY docker/docker-entrypoint.sh /api-entrypoint.sh
-ENTRYPOINT ["/usr/bin/tini", "-v", "--"]
-CMD /api-entrypoint.sh
+ENTRYPOINT ["/usr/bin/tini", "-v", "--", "/api-entrypoint.sh"]
