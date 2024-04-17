@@ -5,8 +5,8 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get install -y --no-install-recommends tini build-essential
 
-# Install some dev requirements that aren't part of the regular setup.cfg:
-RUN pip install psycopg2-binary django-extensions python-dotenv
+# Install some dev requirements that aren't part of the minimal dependencies:
+RUN pip install psycopg2-binary django-extensions python-dotenv gunicorn 'uvicorn[standard]'
 
 COPY . /src
 RUN pip install /src && rm -rf /src
