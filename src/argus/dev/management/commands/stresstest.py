@@ -104,11 +104,11 @@ class StressTester:
     async def _post_incidents(self, end_time: datetime, client: AsyncClient) -> List[int]:
         created_ids = []
         incident_data = self._get_incident_data()
+        url = self._get_incidents_v1_url()
+        headers = self._get_auth_header()
         while datetime.now() < end_time:
             try:
-                response = await client.post(
-                    self._get_incidents_v1_url(), json=incident_data, headers=self._get_auth_header()
-                )
+                response = await client.post(url, json=incident_data, headers=headers)
                 response.raise_for_status()
                 incident = response.json()
                 created_ids.append(incident["pk"])
