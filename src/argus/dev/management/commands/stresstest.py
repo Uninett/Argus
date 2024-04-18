@@ -152,7 +152,7 @@ class StressTester:
         expected_tags = set([tag["tag"] for tag in expected_data["tags"]])
         response_tags = set([tag["tag"] for tag in response_data["tags"]])
         if expected_tags != response_tags:
-            msg = f'Actual tag(s) "{response_tags}" differ from expected tag(s) "{expected_tags}"'
+            msg = f'Actual tag(s) "{response_tags}" differ(s) from expected tag(s) "{expected_tags}"'
             raise DatabaseMismatchError(msg)
 
     def _verify_description(self, response_data: Dict[str, Any], expected_data: Dict[str, Any]):
