@@ -212,6 +212,7 @@ To quickly make a notification profile (in)active one can use the command
 See the inbuilt help for flags and toggles:
 
     .. code:: console
+
         $ python manage.py toggle_profile_activation --help
 
 This command takes a list of notification profile ids (separated by spaces) as
