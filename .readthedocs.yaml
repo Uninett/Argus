@@ -20,5 +20,6 @@ sphinx:
 python:
   install:
   - requirements: requirements-django42.txt
+  - method: pip
     extra_requirements:
       - docs
