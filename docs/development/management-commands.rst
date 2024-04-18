@@ -291,4 +291,4 @@ If you are running Argus inside a Docker container, the stresstest can be run wi
 
     .. code:: console
 
-        $ docker-compose exec api python manage.py stresstest
+        $ docker compose exec api python manage.py stresstest
