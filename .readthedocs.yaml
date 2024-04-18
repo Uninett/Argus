@@ -21,5 +21,6 @@ python:
   install:
   - requirements: requirements-django42.txt
   - method: pip
+    path: .
     extra_requirements:
       - docs
