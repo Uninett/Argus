@@ -27,7 +27,7 @@ if TYPE_CHECKING:
     else:
         from collections.abc import Iterable
 
-    from typing import List, Union
+    from typing import Union, Set
     from types import NoneType
     from django.db.models.query import QuerySet
     from argus.auth.models import User
@@ -90,7 +90,7 @@ class SMSNotification(NotificationMedium):
         return queryset.filter(settings__phone_number=settings["phone_number"]).exists()
 
     @classmethod
-    def get_relevant_addresses(cls, destinations: Iterable[DestinationConfig]) -> List[DestinationConfig]:
+    def get_relevant_addresses(cls, destinations: Iterable[DestinationConfig]) -> Set[DestinationConfig]:
         """Returns a list of phone numbers the message should be sent to"""
         phone_numbers = [
             destination.settings["phone_number"]
@@ -98,7 +98,7 @@ class SMSNotification(NotificationMedium):
             if destination.media_id == cls.MEDIA_SLUG
         ]
 
-        return phone_numbers
+        return set(phone_numbers)
 
     @classmethod
     def send(cls, event: Event, destinations: Iterable[DestinationConfig], **_) -> bool:

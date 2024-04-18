@@ -12,7 +12,7 @@ if TYPE_CHECKING:
         from collections.abc import Iterable
 
     from types import NoneType
-    from typing import List, Union
+    from typing import Union, Set
     from django.db.models.query import QuerySet
     from argus.auth.models import User
     from argus.incident.models import Event
@@ -57,8 +57,8 @@ class NotificationMedium(ABC):
         pass
 
     @classmethod
-    def get_relevant_addresses(cls, destinations: Iterable[DestinationConfig]) -> List[DestinationConfig]:
-        """Returns a list of addresses the message should be sent to"""
+    def get_relevant_addresses(cls, destinations: Iterable[DestinationConfig]) -> Set[DestinationConfig]:
+        """Returns a set of addresses the message should be sent to"""
         pass
 
     @classmethod
