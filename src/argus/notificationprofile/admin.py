@@ -5,6 +5,23 @@ from django.utils.html import format_html_join
 from .models import DestinationConfig, Filter, Media, NotificationProfile, TimeRecurrence, Timeslot
 
 
+@admin.action(description="Toggle activation for selected profiles")
+def toggle_activation(modeladmin, request, queryset):
+    for profile in queryset:
+        profile.active = not profile.active
+        profile.save()
+
+
+@admin.action(description="Activate selected profiles")
+def activate_profiles(modeladmin, request, queryset):
+    queryset.update(active=True)
+
+
+@admin.action(description="Deactivate selected profiles")
+def deactivate_profiles(modeladmin, request, queryset):
+    queryset.update(active=False)
+
+
 class TimeslotAdmin(admin.ModelAdmin):
     class TimeRecurrenceInline(admin.TabularInline):
         model = TimeRecurrence
@@ -90,6 +107,7 @@ class NotificationProfileAdmin(admin.ModelAdmin):
         "user__username",
     )
     ordering = ("user",)
+    actions = [toggle_activation, activate_profiles, deactivate_profiles]
 
     raw_id_fields = ("user", "timeslot")
     filter_horizontal = ("filters",)
