@@ -159,7 +159,7 @@ class StressTester:
         expected_descr = expected_data["description"]
         response_descr = response_data["description"]
         if response_descr != expected_descr:
-            msg = f'Actual description "{response_descr}" differ from expected description "{expected_descr}"'
+            msg = f'Actual description "{response_descr}" differs from expected description "{expected_descr}"'
             raise DatabaseMismatchError(msg)
 
     def bulk_ack(self, incident_ids: List[int]):
