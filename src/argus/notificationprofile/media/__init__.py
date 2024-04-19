@@ -60,6 +60,8 @@ def send_notification(destinations: Iterable[DestinationConfig], *events: Iterab
             sent = medium.send(event=event, destinations=destinations)
             if sent:
                 LOG.info('Notification: sent event "%s" to "%s"', event, medium.MEDIA_SLUG)
+            else:
+                LOG.warn('Notification: could not send event "%s" to "%s"', event, medium.MEDIA_SLUG)
 
 
 def background_send_notification(destinations: Iterable[DestinationConfig], *events: Event):

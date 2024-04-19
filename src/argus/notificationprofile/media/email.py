@@ -22,7 +22,7 @@ if TYPE_CHECKING:
         from collections.abc import Iterable
 
     from types import NoneType
-    from typing import List, Union
+    from typing import Union, Set
     from django.db.models.query import QuerySet
     from argus.auth.models import User
     from ..serializers import RequestDestinationConfigSerializer
@@ -41,7 +41,7 @@ def modelinstance_to_dict(obj):
     return dict_
 
 
-def send_email_safely(function, additional_error=None, *args, **kwargs):
+def send_email_safely(function, additional_error=None, *args, **kwargs) -> int:
     try:
         result = function(*args, **kwargs)
         return result
@@ -143,7 +143,7 @@ class EmailNotification(NotificationMedium):
         return queryset.filter(settings__email_address=settings["email_address"]).exists()
 
     @classmethod
-    def get_relevant_addresses(cls, destinations: Iterable[DestinationConfig]) -> List[DestinationConfig]:
+    def get_relevant_addresses(cls, destinations: Iterable[DestinationConfig]) -> Set[DestinationConfig]:
         """Returns a list of email addresses the message should be sent to"""
         email_addresses = [
             destination.settings["email_address"]
@@ -151,7 +151,7 @@ class EmailNotification(NotificationMedium):
             if destination.media_id == cls.MEDIA_SLUG
         ]
 
-        return email_addresses
+        return set(email_addresses)
 
     @staticmethod
     def create_message_context(event: Event):
@@ -183,11 +183,13 @@ class EmailNotification(NotificationMedium):
         email_addresses = cls.get_relevant_addresses(destinations=destinations)
         if not email_addresses:
             return False
+        num_emails = len(email_addresses)
 
         subject, message, html_message = cls.create_message_context(event=event)
 
+        failed = set()
         for email_address in email_addresses:
-            send_email_safely(
+            sent = send_email_safely(
                 send_mail,
                 subject=subject,
                 message=message,
@@ -195,5 +197,17 @@ class EmailNotification(NotificationMedium):
                 recipient_list=[email_address],
                 html_message=html_message,
             )
+            if not sent:  # 0 for failure otherwise 1
+                failed.add(email_address)
 
+        if failed:
+            if num_emails == len(failed):
+                LOG.error("Email: Failed to send to any addresses")
+                return False
+            LOG.warn(
+                "Email: Failed to send to %i of %i addresses",
+                len(failed),
+                num_emails,
+            )
+            LOG.debug("Email: Failed to send to:", " ".join(failed))
         return True
