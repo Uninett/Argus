@@ -1,0 +1,16 @@
+<!DOCTYPE html>{% load static %}
+<html lang="en-US">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Argus Server: {{ page_title }}</title>
+  {% block head %}
+  {% endblock head %}
+</head>
+<body>
+  <h1>Argus Server: {{ page_title }}</h1>
+  {% block main %}
+  {% endblock main %}
+  {% block tail %}{% endblock tail %}
+</body>
+</html>
