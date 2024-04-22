@@ -25,6 +25,7 @@ classifiers = [
 dependencies = [
     'importlib-metadata; python_version<"3.8"',
     "Django>=4.2.11,<5.1",
+    "django-htmx",
     "dj-database-url>=0.5.0",
     "django-cors-headers>=3.2",
     "django-filter",

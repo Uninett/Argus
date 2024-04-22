@@ -12,6 +12,7 @@ asgiref==3.7.2
     #   channels-redis
     #   daphne
     #   django
+    #   django-htmx
 async-timeout==4.0.2
     # via redis
 attrs==23.1.0
@@ -69,6 +70,7 @@ django==4.2.11
     #   dj-database-url
     #   django-cors-headers
     #   django-filter
+    #   django-htmx
     #   django-phonenumber-field
     #   djangorestframework
     #   drf-rw-serializers
@@ -77,6 +79,8 @@ django==4.2.11
 django-cors-headers==4.2.0
     # via argus-server (pyproject.toml)
 django-filter==23.2
+    # via argus-server (pyproject.toml)
+django-htmx==1.17.3
     # via argus-server (pyproject.toml)
 django-phonenumber-field[phonenumberslite]==7.1.0
     # via argus-server (pyproject.toml)

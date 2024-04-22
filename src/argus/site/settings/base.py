@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "django_filters",
     "phonenumber_field",
+    "django_htmx",
 
     # Argus apps
     "argus.auth",
@@ -58,6 +59,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "corsheaders.middleware.CorsMiddleware",
+    "django_htmx.middleware.HtmxMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
