@@ -51,6 +51,7 @@ dynamic = ["version"]
 [project.optional-dependencies]
 docs = ["sphinx>=2.2.0"]
 dev = [
+    "django-debug-toolbar",
     "black",
     "coverage",
     "django-extensions",
