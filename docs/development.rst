@@ -4,6 +4,8 @@ Development
 
 
 .. toctree::
+   :glob:
+
    development/notes
-   development/release-checklist
    development/management-commands
+   development/howtos
