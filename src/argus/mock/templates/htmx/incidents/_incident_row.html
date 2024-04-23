@@ -1,0 +1,11 @@
+  <li>
+	  MOCK-app
+	  {% block start_time %}
+	  {% include "htmx/incidents/_incident_start_time.html" %}
+	  {% endblock %}
+	  {% block description %}
+	  {% include "htmx/incidents/_incident_description.html" %}
+	  {% endblock %}
+	  {{ incident.pk }}
+	  #<a href="{% url 'guest_mock:mock_detail' pk=incident.pk %}">{{ incident.pk }}</a>
+  </li>

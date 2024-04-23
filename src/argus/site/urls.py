@@ -27,6 +27,8 @@ from argus.notificationprofile.views import SchemaView
 from argus.site.views import error, index, MetadataView
 from argus.htmx import urls as htmx_urls
 
+from argus.mock import urls as mock_urls
+
 
 psa_urls = [
     # Overrides social_django's `complete` view
@@ -48,3 +50,7 @@ urlpatterns = [
     path("json-schema/<slug:slug>", SchemaView.as_view(), name="json-schema"),
     path("", index, name="api-home"),
 ] + htmx_urls.urlpatterns
+
+urlpatterns += [
+    path("mock/", include("argus.mock.urls")),
+]

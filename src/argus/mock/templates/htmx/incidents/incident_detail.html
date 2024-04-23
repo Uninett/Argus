@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block main %}
+<h1>{{ incident.pk }}: {{ incident.description }}</h1>
+
+{% block incident_detail %}
+<section id="metadata">
+<h2>Metadata</h2>
+<p>{{ incident.metadata }}</p>
+</section>
+{% endblock incident_detail %}
+{% endblock main %}
