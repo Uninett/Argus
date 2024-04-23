@@ -22,7 +22,7 @@ def incidents(request):
 def incident(request, pk: int):
     incident = get_object_or_404(id=pk)
     context = {"incident": incident}
-    return render(request, "htmx/incidents/detail.html", context=context)
+    return render(request, "htmx/incidents/_incident_row.html", context=context)
 
 
 #

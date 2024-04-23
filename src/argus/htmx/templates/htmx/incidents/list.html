@@ -6,7 +6,7 @@
 <ul>
   {% for incident in qs|slice:5 %}
   {% block incident %}
-  {% include "htmx/incidents/detail.html" %}
+  {% include "htmx/incidents/_incident_row.html" %}
   {% endblock incident %}
   {% empty %}
   <li>None found</li>
