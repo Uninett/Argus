@@ -8,7 +8,7 @@ This project uses [*towncrier*](https://towncrier.readthedocs.io/) and the chang
 
 <!-- towncrier release notes start -->
 
-## [v1.16.0] - 2024-04-23
+## [1.16.0] - 2024-04-23
 
 ### Added
 

@@ -2,7 +2,7 @@
 This file documents changes to Argus that are relevant for operations and
 end-users.
 
-## [v1.16.0] - 2024-04-23
+## [1.16.0] - 2024-04-23
 
 The official docker image has been changed so if you use it in production have
 a peak first.
