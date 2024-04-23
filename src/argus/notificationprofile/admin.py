@@ -140,6 +140,15 @@ class NotificationProfileAdmin(admin.ModelAdmin):
         # Reduce number of database calls
         return qs.prefetch_related("timeslot__user", "filters")
 
+    def get_form(self, request, obj=None, **kwargs):
+        self.instance = obj
+        return super(NotificationProfileAdmin, self).get_form(request, obj=obj, **kwargs)
+
+    def formfield_for_manytomany(self, db_field, request, **kwargs):
+        if db_field.name == "filters" and self.instance:
+            kwargs["queryset"] = Filter.objects.filter(user=NotificationProfile.objects.get(pk=self.instance.pk).user)
+        return super(NotificationProfileAdmin, self).formfield_for_manytomany(db_field, request, **kwargs)
+
 
 admin.site.register(Timeslot, TimeslotAdmin)
 admin.site.register(Filter, FilterAdmin)
