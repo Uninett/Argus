@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from urllib.parse import urljoin
 import asyncio
 import itertools
-from typing import Any, Dict, AnyStr, List
+from typing import Any, Dict, AnyStr, List, Tuple
 
 from httpx import AsyncClient, TimeoutException, HTTPStatusError, post
 
@@ -35,7 +35,7 @@ class StressTester:
     def _get_incidents_v2_url(self) -> AnyStr:
         return urljoin(self.url, "/api/v2/incidents/")
 
-    def run(self, seconds: int) -> tuple[List[int], timedelta]:
+    def run(self, seconds: int) -> Tuple[List[int], timedelta]:
         """Runs a stresstest against the configured URL.
         The test will continually send requests for `seconds` seconds and stop when all requests have gotten a response.
         Returns a list containing the IDs of all created incidents and a timedelta detailing how long the test ran for.
