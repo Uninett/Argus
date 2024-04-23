@@ -223,3 +223,73 @@ arguments:
         $ python manage.py toggle_profile_activation 1 2 3 4
 
 It will lead to an error if no ids are given.
+
+
+.. _stresstest:
+
+Stresstest
+----------
+.. warning::
+    You should be careful using the `stresstest` command against a production environment,
+    as the incidents created during the stresstest can trigger notifications
+    like any other real incidents.
+
+You can run stresstests against the incident creation API with the command `stresstest`:
+
+    .. code:: console
+
+        $ python manage.py stresstest
+
+The stresstest will create as many incidents as it can during a given timespan by
+sending requests to the incident creation API. Afterwards, it will verify that the
+incidents added to the database by the stresstest were created correctly.
+
+`stresstest` requires a URL to the target host and a token related to a source system
+as positional arguments. The URL can point to a local or remote argus instance.
+A valid token can be generated via the Django admin interface.
+
+Example usage pointing to a local testing instance of Argus:
+
+    .. code:: console
+
+        $ python manage.py stresstest http://localhost:8000 $TOKEN
+
+See the inbuilt help for flags and toggles:
+
+    .. code:: console
+
+        $ python manage.py stresstest --help
+
+The duration of the stresstest in seconds can be set using the `-s` flag:
+
+    .. code:: console
+
+        $ python manage.py stresstest http://localhost:8000 $TOKEN -s 10
+
+Timeout of requests in seconds can be set with the `-t` flag:
+
+    .. code:: console
+
+        $ python manage.py stresstest http://localhost:8000 $TOKEN -t 5
+
+
+Multiple asynchronous workers can be used to send requests in parallel
+using the -w flag:
+
+    .. code:: console
+
+        $ python manage.py stresstest http://localhost:8000 $TOKEN -w 5
+
+The created incidents can be bulk ACKed at the end of the test by setting
+the `-b` flag:
+
+    .. code:: console
+
+        $ python manage.py stresstest http://localhost:8000 $TOKEN -b
+
+
+If you are running Argus inside a Docker container, the stresstest can be run with:
+
+    .. code:: console
+
+        $ docker compose exec api python manage.py stresstest
