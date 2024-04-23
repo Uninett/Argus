@@ -8,6 +8,46 @@ This project uses [*towncrier*](https://towncrier.readthedocs.io/) and the chang
 
 <!-- towncrier release notes start -->
 
+## [v1.16.0] - 2024-04-23
+
+### Added
+
+- Added development dependency on django-debug-toolbar to make it easy to use.
+- Adds more capability to the stresstest command, including incident creation
+  verification, bulk ACKing and timeout configuration.
+  ([#641](https://github.com/Uninett/Argus/issues/641))
+- Add possibility to set fields when creating fake incidents in Django admin
+  ([#669](https://github.com/Uninett/Argus/issues/669))
+- Show user and filter by user in notification profile admin
+  ([#734](https://github.com/Uninett/Argus/issues/734))
+- Add cli command to toggle notification profile activation
+  ([#747](https://github.com/Uninett/Argus/issues/747))
+- Add admin action to change activation of profiles
+  ([#748](https://github.com/Uninett/Argus/issues/748))
+- Add API documentation for GET responses
+  ([#752](https://github.com/Uninett/Argus/issues/752))
+- Added an informational page on /, with favicon, in order to cut down on some
+  common 404 log messages and set up the static files system properly.
+
+### Changed
+
+- Switched official Docker image to serve using gunicorn+uvicorn
+  ([#766](https://github.com/Uninett/Argus/issues/766))
+- Changed how tristates (open, acked, stateful) are logged in order to improve
+  debuggability.
+- Return False and log if sms-to-email has trouble with the email server.
+- To improve debugability: Change how sending notifications are logged so that
+  there's a log both when sending succeds and when it fails.
+
+### Fixed
+
+- Changed references to docs for Django 4.2
+  ([#746](https://github.com/Uninett/Argus/issues/746))
+- Do not allow used destinations to be deleted
+  ([#753](https://github.com/Uninett/Argus/issues/753))
+- Fix typo in admin that prevented sorting on incident id
+
+
 ## [1.15.0] - 2024-04-10
 
 Due to the removal of the django-multiselectfield dependency it is vitally

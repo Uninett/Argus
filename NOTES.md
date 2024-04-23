@@ -2,6 +2,21 @@
 This file documents changes to Argus that are relevant for operations and
 end-users.
 
+## [v1.16.0] - 2024-04-23
+
+The official docker image has been changed so if you use it in production have
+a peak first.
+
+The stresstest command is now a lot more useful: it is handy for even more
+lazily creating a lot of fake incidents in the database where you don't care
+about he contents. Just remember to turn off sending of notifications first!
+You can turn it of or on for specific profiles with a new cli command:
+`toggle_profile_activation`. It is now also easier to toggle, activate and
+deactivate profiles in the admin. Have a look.
+
+`django-debug-toolbar` has been added as a dev dependency but it is not in use
+in the included dev settings yet.
+
 ## [1.15.0] - 2024-04-10
 
 This release finishes the process started in 1.14.3. Make sure to run
