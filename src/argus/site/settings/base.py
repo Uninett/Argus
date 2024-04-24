@@ -26,6 +26,13 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
+_overriding_apps_env = get_json_env("ARGUS_OVERRIDING_APPS", [])
+OVERRIDING_APPS = validate_app_setting(_overriding_apps_env)
+del _overriding_apps_env
+_extra_apps_env = get_json_env("ARGUS_EXTRA_APPS", [])
+EXTRA_APPS = validate_app_setting(_extra_apps_env)
+del _extra_apps_env
+
 # fmt: off
 # fsck off, black
 INSTALLED_APPS = [
@@ -54,6 +61,15 @@ INSTALLED_APPS = [
     "argus.dev",
 ]
 # fmt: on
+
+# override themes, urls
+if OVERRIDING_APPS:
+    _overriding_app_names = [app.app_name for app in OVERRIDING_APPS]
+    INSTALLED_APPS = _overriding_app_names + INSTALLED_APPS
+# add extra functionality without overrides
+if EXTRA_APPS:
+    _extra_app_names = [app.app_name for app in EXTRA_APPS]
+    INSTALLED_APPS += _extra_app_names
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",

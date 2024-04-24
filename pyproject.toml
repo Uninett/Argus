@@ -42,6 +42,7 @@ dependencies = [
     "channels[daphne]>=4.0.0,<5",
     "channels-redis>=4",
     "httpx",
+    "pydantic>=2",
 ]
 dynamic = ["version"]
 

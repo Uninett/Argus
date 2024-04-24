@@ -1,11 +1,14 @@
 from __future__ import annotations
 
+import json
 import logging.config
 from os import getenv
 from pathlib import Path
 from urllib.parse import urlsplit, urlunsplit
 
 from django.utils.module_loading import import_string
+
+from ._serializers import ListAppSetting
 
 
 __all__ = [
@@ -15,6 +18,8 @@ __all__ = [
     "get_bool_env",
     "get_str_env",
     "get_int_env",
+    "get_json_env",
+    "validate_app_setting",
     "setup_logging",
     "update_loglevels",
     "normalize_url",
@@ -29,6 +34,7 @@ BASE_DIR = SITE_DIR.parent
 
 # deserialize environment variables. There are libraries to do this,
 # but we haven't settled on one (they tend to be bloated)
+
 
 def get_any_env(envname, required=False):
     env = getenv(envname)
@@ -66,7 +72,29 @@ def get_int_env(envname, default=0, required=False):
     return int(env)
 
 
+def get_json_env(envname, default=None, required=False, quiet=True):
+    if default is None:
+        default = {}
+    env = get_any_env(envname, required)
+    if env is None:
+        return default
+    try:
+        return json.loads(env)
+    except json.JSONDecodeError as e:
+        if quiet:
+            return default
+        raise AttributeError(e) from e
+
+
+def validate_app_setting(jsonblob):
+    if not jsonblob:
+        return []
+    app_setting = ListAppSetting.model_validate(jsonblob)
+    return app_setting.root
+
+
 # fixes
+
 
 def _add_missing_scheme_to_url(url):
     parsed_url = urlsplit(url)
@@ -77,9 +105,9 @@ def _add_missing_scheme_to_url(url):
         return url
     port = parsed_url.port
     if port == 80:
-        scheme = 'http'
+        scheme = "http"
     elif port == 443:
-        scheme = 'https'
+        scheme = "https"
     else:
         return url  # nothing to guess
     fixed_url = parsed_url._replace(scheme=scheme)
@@ -97,12 +125,13 @@ def normalize_url(url):
     if port == None or port not in (80, 443):
         # nothing to normalize
         return url
-    netloc = ''.join(netloc.rsplit(':', 1)[0])
+    netloc = "".join(netloc.rsplit(":", 1)[0])
     fixed_url = parsed_url._replace(netloc=netloc)
     return urlunsplit(fixed_url)
 
 
 # logging-helpers, we want the logging-setup separate from the rest
+
 
 def setup_logging(dotted_path=None):
     """Use the dictionary on the dotted path to set up logging
