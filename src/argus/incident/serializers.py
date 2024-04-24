@@ -104,6 +104,7 @@ class IncidentSerializer(serializers.ModelSerializer):
     end_time = fields.DateTimeInfinitySerializerField(required=False, allow_null=True)
     source = SourceSystemSerializer(read_only=True)
     tags = IncidentTagRelationSerializer(many=True, write_only=True)
+    metadata = serializers.JSONField(required=False, allow_null=True)
 
     class Meta:
         model = Incident
@@ -118,6 +119,7 @@ class IncidentSerializer(serializers.ModelSerializer):
             "level",
             "ticket_url",
             "tags",
+            "metadata",
         ]
         read_only_fields = ["source"]
 

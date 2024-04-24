@@ -413,6 +413,7 @@ class Incident(models.Model):
         help_text="URL to existing ticket in a ticketing system.",
     )
     search_text = models.TextField(blank=True, default="", verbose_name="Search Text")
+    metadata = models.JSONField(blank=True, default=dict)
 
     objects = IncidentQuerySet.as_manager()
 
