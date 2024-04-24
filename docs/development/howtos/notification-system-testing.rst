@@ -23,7 +23,7 @@ destination type. Adapt or create a profile accordingly.
 Automated tests
 ---------------
 
-Use the ``override_settings`` decorator to override the setting
+Use the `override_settings`_ decorator to override the setting
 ``MEDIA_PLUGINS`` with the exact list of media the test will need.
 
 Redirect email to console
@@ -57,8 +57,8 @@ development-setup regardless.
 Automated tests
 ---------------
 
-Use the ``override_settings`` decorator to override the ``EMAIL_BACKEND``
-setting and use method 1 above.
+Use the `override_settings`_ decorator to override the setting
+``EMAIL_BACKEND`` and use method 1 above.
 
 Testing something that fails in production
 ==========================================
@@ -66,7 +66,7 @@ Testing something that fails in production
 Copy the profiles to your debugging-setup. You can just reuse your
 development-setup for this: move the dev-database out of the way (for instance
 with the ``ALTER DATABASE .. RENAME`` statement), dump the production database,
-then import the dump into your dev database.
+then import the dump into your dev-database.
 
 Deactivate profiles you are not testing
 =======================================
@@ -152,4 +152,6 @@ methods:
    manage.py``.
 
 We do not recommend making an incident directly in the database, because the
-event that triggers the notification is made by python.
+event that triggers the notification is made by Python.
+
+.. _override_settings: https://docs.djangoproject.com/en/4.2/topics/testing/tools/#django.test.override_settings
