@@ -19,10 +19,20 @@ def incidents(request):
     return render(request, "htmx/incidents/list.html", context=context)
 
 
-def incident(request, pk: int):
-    incident = get_object_or_404(id=pk)
+# fetch with htmx
+def incident_row(request, pk: int):
+    incident = get_object_or_404(Incident, d=pk)
     context = {"incident": incident}
     return render(request, "htmx/incidents/_incident_row.html", context=context)
+
+
+def incident_detail(request, pk: int):
+    incident = get_object_or_404(Incident, id=pk)
+    context = {
+        "incident": incident,
+        "page_title": str(incident),
+    }
+    return render(request, "htmx/incidents/incident_detail.html", context=context)
 
 
 #
