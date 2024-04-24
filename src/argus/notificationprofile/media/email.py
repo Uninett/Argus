@@ -160,6 +160,7 @@ class EmailNotification(NotificationMedium):
         incident_dict = modelinstance_to_dict(event.incident)
         for field in ("id", "source_id"):
             incident_dict.pop(field)
+        incident_dict["details_url"] = event.incident.pp_details_url()
 
         template_context = {
             "title": title,
