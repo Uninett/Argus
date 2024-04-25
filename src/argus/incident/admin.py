@@ -112,6 +112,10 @@ class IncidentAdmin(TextWidgetsOverrideModelAdmin):
         "get_open",
         "get_shown",
     )
+    list_display_links = (
+        "source_incident_id",
+        "start_time",
+    )
     search_fields = (
         "description",
         "source_incident_id",
