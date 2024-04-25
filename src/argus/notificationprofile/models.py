@@ -77,8 +77,7 @@ class TimeRecurrence(models.Model):
     """
 
     def __str__(self):
-        days_string = ", ".join(f"{day}s" for day in self.get_days_list())
-        return f"{self.start}-{self.end} on {days_string}"
+        return f"{self.start}-{self.end} on {self.get_days_display()}"
 
     @property
     def isoweekdays(self):
