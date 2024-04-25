@@ -225,9 +225,12 @@ AUTH_TOKEN_EXPIRES_AFTER_DAYS = 14
 
 ASGI_APPLICATION = "argus.ws.asgi.application"
 
+# Disable using Redis in Channels and fall back to an InMemoryChannel
+# WARNING: This should only ever be used during development/testing and never
+# in production. To enforce this it is only ever activated when DEBUG is also set
 # fmt: off
 ARGUS_DISABLE_REDIS = get_bool_env("ARGUS_DISABLE_REDIS", False)
-if ARGUS_DISABLE_REDIS:
+if ARGUS_DISABLE_REDIS and DEBUG:
     CHANNEL_LAYERS = {
         "default": {
             "BACKEND": "channels.layers.InMemoryChannelLayer",
