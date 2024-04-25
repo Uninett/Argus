@@ -124,6 +124,7 @@ class IncidentAdmin(TextWidgetsOverrideModelAdmin):
         "incident_tag_relations__tag__key",
         "incident_tag_relations__tag__value",
     )
+    date_hierarchy = "start_time"
     list_filter = (
         list_filter_factory("stateful", lambda qs, yes_filter: qs.stateful() if yes_filter else qs.stateless()),
         list_filter_factory("open", lambda qs, yes_filter: qs.open() if yes_filter else qs.closed()),
