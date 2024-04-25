@@ -30,7 +30,12 @@
     {{ adminform.form.non_field_errors }}
 {% endif %}
 
-<div>Note: Fake incidents are mainly used for testing. The fields in this form can be customized. If not customized the fields "description" and "level" will be filled randomly. "stateful" will be true by default and the tags "location=argus", "object={incident.id}" and  "problem_type=test" will be added to each fake incident. All other fields of the incident will be filled with random data as well.</div>
+<div>Note: Fake incidents are mainly used for testing. The fields in this form
+can be customized. If not customized the fields "description" and "level"
+will be filled randomly. "stateful" will be true by default and the tags
+"location=argus", "object={incident.id}" and  "problem_type=test" will be added
+to each fake incident. "metadata" will be an empty dictionary. All other fields
+of the incident will be filled with random data as well.</div>
 
 {% block field_sets %}
 {% for fieldset in adminform %}

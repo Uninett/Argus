@@ -30,7 +30,7 @@ def get_or_create_default_instances():
     return (argus_user, sst, ss)
 
 
-def create_fake_incident(tags=None, description=None, stateful=True, level=None):
+def create_fake_incident(tags=None, description=None, stateful=True, level=None, metadata=None):
     argus_user, _, source_system = get_or_create_default_instances()
     end_time = INFINITY_REPR if stateful else None
 
@@ -50,6 +50,7 @@ def create_fake_incident(tags=None, description=None, stateful=True, level=None)
         source=source_system,
         description=description,
         level=level or randint(MIN_INCIDENT_LEVEL, MAX_INCIDENT_LEVEL),
+        metadata=metadata or {},
     )
 
     taglist = [("location", "argus"), ("object", f"{incident.id}"), ("problem_type", "test")]

@@ -75,6 +75,7 @@ class FakeIncidentForm(forms.ModelForm):
             "description",
             "level",
             "tags",
+            "metadata",
         ]
 
     def clean_tags(self):
