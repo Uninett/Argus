@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block main %}
+<h1>{{ incident.pk }}: {{ incident.description }}</h1>
+
+{% block incident_detail %}
+<section id="status">
+<h2>Status</h2>
+<p>
+{{ incident.level }}
+{{ incident.is_open }}
+{{ incident.ticket_url }}
+</p>
+</section>
+
+<section id="tags">
+<h2>Tags</h2>
+<p>
+{{ incident.level }}
+{{ incident.is_open }}
+{{ incident.ticket_url }}
+</p>
+</section>
+
+<section id="primary-details">
+<h2>Primary details #{{ incident.pk }}</h2>
+
+<h3>Description</h3>
+<p>{{ incident.description }}</p>
+
+<h3>Start time</h3>
+<p>{{ incident.start_time }}</p>
+
+<h3>Source id</h3>
+<p>{{ incident.source_incident_id }}</p>
+
+<h3>Details url</h3>
+<p>{{ incident.details_url }}</p>
+
+<h3>Ticket url</h3>
+<p>{{ incident.ticket_url }}</p>
+</section>
+{% endblock incident_detail %}
+{% endblock main %}
