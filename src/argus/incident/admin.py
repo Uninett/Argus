@@ -198,7 +198,14 @@ class IncidentAdmin(TextWidgetsOverrideModelAdmin):
                 description = form.cleaned_data.get("description", None)
                 stateful = form.cleaned_data.get("stateful")
                 level = form.cleaned_data.get("level", None)
-                create_fake_incident(tags=tags, description=description, stateful=stateful, level=level)
+                metadata = form.cleaned_data.get("metadata", None)
+                create_fake_incident(
+                    tags=tags,
+                    description=description,
+                    stateful=stateful,
+                    level=level,
+                    metadata=metadata,
+                )
                 return HttpResponseRedirect("../")
         else:
             form = FakeIncidentForm()

@@ -1,4 +1,6 @@
 import argparse
+import json
+from pathlib import Path
 from random import randint
 
 from django.core.management.base import BaseCommand
@@ -39,6 +41,17 @@ class Command(BaseCommand):
         )
         parser.add_argument("-t", "--tags", nargs="+", type=str, help="Add the listed tags to the incident")
         parser.add_argument("--stateless", action="store_true", help="Create a stateless incident (end_time = None)")
+        metadata_parser = parser.add_mutually_exclusive_group()
+        metadata_parser.add_argument(
+            "--metadata",
+            type=str,
+            help="Store json in the metadata field",
+        )
+        metadata_parser.add_argument(
+            "--metadata-file",
+            type=lambda p: Path(p).absolute(),
+            help="Path to json-file to store in the metadata field",
+        )
 
     def handle(self, *args, **options):
         tags = options.get("tags") or []
@@ -46,5 +59,17 @@ class Command(BaseCommand):
         batch_size = options.get("batch_size") or 1
         level = options.get("level") or None
         stateful = False if options.get("stateless") else True
+        if metadata := options.get("metadata", "{}"):
+            metadata = json.loads(metadata)
+        if metadata_path := options.get("metadata_file", ""):
+            if metadata_path:
+                with metadata_path.open() as jsonfile:
+                    metadata = json.load(jsonfile)
         for i in range(batch_size):
-            create_fake_incident(tags=tags, description=description, stateful=stateful, level=level)
+            create_fake_incident(
+                tags=tags,
+                description=description,
+                stateful=stateful,
+                level=level,
+                metadata=metadata,
+            )
