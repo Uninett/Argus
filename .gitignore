@@ -1,0 +1,12 @@
+.*
+
+*.egg
+*.egg-info
+*.py[cio]
+*.sw?
+
+__pycache__/
+build/
+dist/
+
+!.gitignore
