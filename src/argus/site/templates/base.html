@@ -4,14 +4,21 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Argus Server: {{ page_title }}</title>
+  {% block title %}<title>Argus Server: {{ page_title }}</title>{% endblock %}
   {% block head %}
   {% endblock head %}
 </head>
 <body>
+  {% block header %}
   <h1>Argus Server: {{ page_title }}</h1>
+  {% endblock header %}
+
   {% block main %}
   {% endblock main %}
+
+  {% block footer %}
+  {% endblock footer %}
+
   {% block tail %}{% endblock tail %}
 </body>
 </html>
