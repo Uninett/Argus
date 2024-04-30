@@ -1,0 +1,18 @@
+{% extends "htmx/base.html" %}
+
+{% block main %}
+<h2>Log In</h2>
+<section>
+<form method="post">
+  {% csrf_token %}
+  {{ form }}
+  <button type="submit">Log In</button>
+</form>
+</section>
+<section>
+<h3>Federated logins</h3>
+{% for backend in oauth2_backends %}
+<a href="/oidc/login/{{ backend }}/">{{ backend }}</a>
+{% endfor %}
+</section>
+{% endblock main %}

@@ -1,7 +1,33 @@
 {% extends "base.html" %}
 
 {% block head %}
+<script src="https://unpkg.com/htmx.org@1.9.12" integrity="sha384-ujb1lZYygJmzgSwoxRggbCHcjc0rB2XoQrxeTUQyRjrOnlCoYta87iKBWq3EsdM2" crossorigin="anonymous"></script>
 <style>
 section { border: 1px solid blue; }
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+header > * { background-color: lightgrey }
 </style>
 {% endblock head %}
+
+{% block header %}
+<header>
+<h1><span>Logo</span> Argus: {{ page_title }}</h1>
+<div>Timeslots</div>
+<div>Profiles</div>
+<div>{% block userlink %}
+{% if request.user.is_authenticated %}
+{{ request.user }}
+<form action="{% url "htmx:logout" %}" method="POST">
+{% csrf_token %}
+<button>Log out</button>
+</form>
+{% else %}
+<a href="{% url 'htmx:login' %}">Log in</a>
+{% endif %}
+{% endblock %}</div>
+</header>
+{% endblock header %}
