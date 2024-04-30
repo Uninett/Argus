@@ -9,6 +9,9 @@
 	  {% block acknowledgement %}
 	  {% include "htmx/incidents/_incident_ack.html" %}
 	  {% endblock %}
+	  {% block tag %}
+	  {% include "htmx/incidents/_incident_tag.html" with tag="location" %}
+	  {% endblock %}
 	  {% block start_time %}
 	  {% include "htmx/incidents/_incident_start_time.html" %}
 	  {% endblock %}

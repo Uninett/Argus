@@ -16,9 +16,9 @@
 <section id="tags">
 <h2>Tags</h2>
 <p>
-{{ incident.level }}
-{{ incident.is_open }}
-{{ incident.ticket_url }}
+{% for tag in incident.deprecated_tags %}
+{{ tag }}
+{% endfor %}
 </p>
 </section>
 
