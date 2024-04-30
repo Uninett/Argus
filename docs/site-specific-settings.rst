@@ -118,8 +118,10 @@ There are two possible formats:
 
        {
            "app_name": "myapp",
-           "url_path": "myapp/",
-           "urlpatterns_path": "myapp.urls",
+           "urls": {
+               "path": "myapp/",
+               "urlpatterns_module": "myapp.urls",
+           }
        }
 
    This is translated to::
@@ -129,10 +131,12 @@ There are two possible formats:
 2. With namespace::
 
        {
-            "app_name": "myapp",
-            "url_path": "myapp/",
-            "urlpatterns_path": "myapp.urls",
-            "url_namespace": "mynamespace",
+           "app_name": "myapp",
+           "urls": {
+               "path": "myapp/",
+               "urlpatterns_module": "myapp.urls",
+               "namespace": "mynamespace",
+           }
        }
 
    This is translated to::
