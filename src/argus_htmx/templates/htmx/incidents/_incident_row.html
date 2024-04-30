@@ -1,8 +1,13 @@
   <li>
 	  HTMX-app
-    <a href="{% url 'htmx:htmx_incident_detail' pk=incident.pk %}">
 	  {% block incident_pk %}
 	  {% include "htmx/incidents/_incident_pk.html" %}
+	  {% endblock %}
+	  {% block status %}
+	  {% include "htmx/incidents/_incident_status.html" %}
+	  {% endblock %}
+	  {% block acknowledgement %}
+	  {% include "htmx/incidents/_incident_ack.html" %}
 	  {% endblock %}
 	  {% block start_time %}
 	  {% include "htmx/incidents/_incident_start_time.html" %}
@@ -10,5 +15,4 @@
 	  {% block description %}
 	  {% include "htmx/incidents/_incident_description.html" %}
 	  {% endblock %}
-    </a>
   </li>
