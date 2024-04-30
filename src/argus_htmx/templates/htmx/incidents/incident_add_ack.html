@@ -1,0 +1,39 @@
+{% extends "htmx/base.html" %}
+
+{% block main %}
+<h1>Add ack</h1>
+
+{% block list_of_acks %}
+<section id="acks">
+<h2>Acks</h2>
+{% for ack in incident.acks %}
+<p>Description: {{ ack.event.description }}</p>
+<p>Expiration: {{ ack.expiration }}</p>
+<p>Acked by: {{ ack.event.actor }}
+{% if ack.event.actor.groups.exists %}
+<p>Groups:
+{% for group in ack.event.actor.groups.all %}
+{{ group }}
+{% endfor %}
+</p>
+{% endif %}
+</p>
+{% endfor %}
+</section>
+{% endblock list_of_acks %}
+
+{% block add_ack %}
+<section id="add-ack">
+<h2>Add ack</h2>
+{% if request.user.is_authenticated %}
+<form action="." method="post">
+{% csrf_token %}
+{{ form }}
+<input type="submit" value="Acknowledge">
+</form>
+{% else %}
+You need to <a href="/admin/">Log in</a>
+{% endif %}
+</section>
+{% endblock add_ack %}
+{% endblock main %}

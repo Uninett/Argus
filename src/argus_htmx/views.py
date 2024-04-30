@@ -5,6 +5,8 @@ from django.shortcuts import render, reverse, get_object_or_404
 
 from argus.incident.models import Incident
 
+from .forms import AckForm
+
 LOG = logging.getLogger(__name__)
 
 
@@ -34,6 +36,19 @@ def incident_detail(request, pk: int):
     }
     return render(request, "htmx/incidents/incident_detail.html", context=context)
 
-
-#
-# incident.tags.key
+def incident_add_ack(request, pk: int):
+    incident = get_object_or_404(Incident, id=pk)
+    context = {
+        "form": AckForm,
+        "incident": incident,
+        "page_title": str(incident),
+    }
+    if request.POST:
+        form = AckForm(request.POST)
+        if form.is_valid():
+            incident.create_ack(
+                request.user,
+                description=form.cleaned_data["description"],
+                expiration=form.cleaned_data["expiration"],
+            )
+    return render(request, "htmx/incidents/incident_add_ack.html", context=context)
