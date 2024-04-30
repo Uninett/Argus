@@ -7,9 +7,14 @@
 <section id="status">
 <h2>Status</h2>
 <p>
+{% if incident.open %}Open{% else %}Closed{% endif %}
+</p>
+</section>
+
+<section id="level">
+<h2>Level</h2>
+<p>
 {{ incident.level }}
-{{ incident.is_open }}
-{{ incident.ticket_url }}
 </p>
 </section>
 
