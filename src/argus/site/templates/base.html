@@ -8,7 +8,7 @@
   {% block head %}
   {% endblock head %}
 </head>
-<body>
+<body {% block body_overrides %}{% endblock %}>
   {% block header %}
   <h1>Argus Server: {{ page_title }}</h1>
   {% endblock header %}
