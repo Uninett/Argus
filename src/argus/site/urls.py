@@ -14,6 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
+from django.conf import settings
 from django.contrib import admin
 from django.urls import include, path, re_path
 from django.views.generic.base import RedirectView
@@ -24,6 +25,7 @@ from social_django.urls import extra
 from argus.auth.views import ObtainNewAuthToken, AuthMethodListView
 from argus.dataporten import views as dataporten_views
 from argus.notificationprofile.views import SchemaView
+from argus.site.utils import get_urlpatterns_from_setting
 from argus.site.views import error, index, MetadataView
 
 
@@ -47,3 +49,11 @@ urlpatterns = [
     path("json-schema/<slug:slug>", SchemaView.as_view(), name="json-schema"),
     path("", index, name="api-home"),
 ]
+
+prefixed_urlpatterns = get_urlpatterns_from_setting(settings.OVERRIDING_APPS)
+if prefixed_urlpatterns:
+    urlpatterns = prefixed_urlpatterns + urlpatterns
+
+postfixed_urlpatterns = get_urlpatterns_from_setting(settings.EXTRA_APPS)
+if postfixed_urlpatterns:
+    urlpatterns += postfixed_urlpatterns

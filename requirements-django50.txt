@@ -4,6 +4,8 @@
 #
 #    pip-compile --output-file=requirements-django50.txt constraints.txt pyproject.toml requirements/django50.txt
 #
+annotated-types==0.6.0
+    # via pydantic
 anyio==4.2.0
     # via httpx
 asgiref==3.7.2
@@ -39,7 +41,6 @@ cffi==1.16.0
 channels[daphne]==4.0.0
     # via
     #   argus-server (pyproject.toml)
-    #   channels
     #   channels-redis
 channels-redis==4.2.0
     # via argus-server (pyproject.toml)
@@ -70,7 +71,6 @@ django==5.0.2
     #   dj-database-url
     #   django-cors-headers
     #   django-filter
-    #   django-multiselectfield
     #   django-phonenumber-field
     #   djangorestframework
     #   drf-rw-serializers
@@ -79,8 +79,6 @@ django==5.0.2
 django-cors-headers==4.3.1
     # via argus-server (pyproject.toml)
 django-filter==23.5
-    # via argus-server (pyproject.toml)
-django-multiselectfield==0.1.12
     # via argus-server (pyproject.toml)
 django-phonenumber-field[phonenumberslite]==7.3.0
     # via argus-server (pyproject.toml)
@@ -141,6 +139,10 @@ pyasn1-modules==0.3.0
     # via service-identity
 pycparser==2.21
     # via cffi
+pydantic==2.7.1
+    # via argus-server (pyproject.toml)
+pydantic-core==2.18.2
+    # via pydantic
 pyjwt==2.8.0
     # via social-auth-core
 pyopenssl==24.0.0
@@ -195,9 +197,7 @@ social-auth-core==4.5.2
 sqlparse==0.5.0
     # via django
 twisted[tls]==23.10.0
-    # via
-    #   daphne
-    #   twisted
+    # via daphne
 txaio==23.1.1
     # via autobahn
 typing-extensions==4.9.0
@@ -205,6 +205,8 @@ typing-extensions==4.9.0
     #   anyio
     #   asgiref
     #   dj-database-url
+    #   pydantic
+    #   pydantic-core
     #   twisted
 uritemplate==4.1.1
     # via drf-spectacular

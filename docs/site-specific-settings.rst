@@ -79,6 +79,73 @@ Django-specific settings
   .. warning:: Keep the :setting:`SECRET_KEY` secret, as it is relevant to the
     security and integrity of your Argus instance.
 
+Settings for adding additional Django apps
+------------------------------------------
+
+.. setting:: OVERRIDING_APPS
+
+* :setting:`OVERRIDING_APPS` is a list of dicts of additional apps added
+  *before* the default list of :setting:`INSTALLED_APPS` which means that
+  templates and static files found here can *override* what comes later.
+  Environment variable: ``ARGUS_OVERRIDING_APPS``
+
+.. setting:: EXTRA_APPS
+
+* :setting:`EXTRA_APPS` is a list of dicts of additional apps added *after* the
+  default list of :setting:`INSTALLED_APPS` which means that templates and
+  static files found here add extra templates and static files *without*
+  overriding what is already there. Environment variable: ``ARGUS_EXTRA_APPS``
+
+Format of the app settings
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Both settings are a list of dicts. The minimal content of the dict is::
+
+    { "app_name": "myapp" }
+
+"myapp" is the same string you would normally put into
+:setting:`INSTALLED_APPS`.
+
+There is an experimental way of also overriding or extending the root
+``urls.py`` in ``argus.site``.
+
+.. warning:: This format is subject to change. Do not override the urls this
+   way in production just yet.
+
+There are two possible formats:
+
+1. Without namespace::
+
+       {
+           "app_name": "myapp",
+           "urls": {
+               "path": "myapp/",
+               "urlpatterns_module": "myapp.urls",
+           }
+       }
+
+   This is translated to::
+
+       path("myapp/", include("myapp.urls"))
+
+2. With namespace::
+
+       {
+           "app_name": "myapp",
+           "urls": {
+               "path": "myapp/",
+               "urlpatterns_module": "myapp.urls",
+               "namespace": "mynamespace",
+           }
+       }
+
+   This is translated to::
+
+       path("myapp/", include("myapp.urls", "mynamespace"))
+
+This assumes that ``myapp.urls`` contains a variable named ``urlpatterns`` with
+the defined urls of the app.
+
 Dataporten
 ----------
 
