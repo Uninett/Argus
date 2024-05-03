@@ -9,6 +9,7 @@ readme = "README.rst"
 authors = [{name = "Hanne Moa", email = "hanne.moa@sikt.no"}]
 requires-python = ">=3.8"
 classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
     "Framework :: Django",
     "Framework :: Django :: 4.2",
     "Programming Language :: Python :: 3 :: Only",
