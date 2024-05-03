@@ -4,7 +4,7 @@ build-backend = "flit_core.buildapi"
 
 [project]
 description = "HTTP Frontend as a django app for argus-server using HTMx"
-name = "argus_htmx"
+name = "argus-htmx-frontend"
 readme = "README.rst"
 authors = [{name = "Hanne Moa", email = "hanne.moa@sikt.no"}]
 requires-python = ">=3.8"
@@ -26,3 +26,6 @@ Github = "https://github.com/Uninett/argus-htmx-frontend"
 
 [project.optional-dependencies]
 docs = ["sphinx"]
+
+[tool.flit.module]
+name = "argus_htmx"
