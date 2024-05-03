@@ -8,6 +8,43 @@ This project uses [*towncrier*](https://towncrier.readthedocs.io/) and the chang
 
 <!-- towncrier release notes start -->
 
+## [1.17.0] - 2024-05-03
+
+
+### Added
+
+- Add a possibility to filter incidents by start time in incident admin list
+  ([#739](https://github.com/Uninett/Argus/issues/739))
+- Added an optional JSONField "metadata" to incident. This can be used for any
+  additional info the glue-service would like to store on the incident that
+  needs more structure than tags. The field has been added to the V2
+  IncidentSerializer but we do not plan to expose it in the frontend.
+- Added documentation on how to safely test notifications.
+- Added simple support for pluggable django-apps. The setting `OVERRIDING_APPS`
+  is loaded first in `INSTALLED_APPS` and `urls.py`, and can override templates
+  and views. The setting `EXTRA_APPS` is safer, it is loaded last in
+  `INSTALLED_APPS` and `urls.py` and can therefore only add additional
+  templates and views.
+
+### Changed
+
+- When editing a notification profile in the admin UI, only the profile owner's
+  own filters are now listed as available for selection.
+  ([#735](https://github.com/Uninett/Argus/issues/735))
+- Linked up the second column in the admin incident list to the details view in
+  addition to the default first column because the first column is currently an
+  optional field. If the field has no value there can also not be a link.
+- Update the release checklist in `docs/` to current practices and turn it into
+  a howto.
+
+### Fixed
+
+- Show fully qualified details URL in emails
+  ([#744](https://github.com/Uninett/Argus/issues/744))
+- Fix internal server error in timeslot admin due to removed method
+  ([#797](https://github.com/Uninett/Argus/issues/797))
+
+
 ## [1.16.0] - 2024-04-23
 
 ### Added

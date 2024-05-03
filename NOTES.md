@@ -2,6 +2,21 @@
 This file documents changes to Argus that are relevant for operations and
 end-users.
 
+## [1.17.0] - 2024-05-03
+
+This release marks the start of The Great HTMx Experiment and a cooperation
+with Geant.
+
+Incidents have a gotten a new field so remember to run migrations.
+
+There's a new "How To"-section in the docs, we expect it to grow rapidly.
+
+There's lots of quality of life improvements in the admin.
+
+There's a new way to add additional django apps to your own instance of
+argus-server. Currently this is only via two new environment variables, see the
+settings-documentation.
+
 ## [1.16.0] - 2024-04-23
 
 The official docker image has been changed so if you use it in production have
