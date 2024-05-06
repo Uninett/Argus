@@ -1,5 +1,6 @@
+from copy import deepcopy
 from collections import OrderedDict
-from typing import List, Tuple
+from typing import List, Tuple, Any, Dict
 
 from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
@@ -171,7 +172,7 @@ class IncidentSerializer(serializers.ModelSerializer):
 
 
 class IncidentPureDeserializer(serializers.ModelSerializer):
-    EDITABLE_FIELDS = set(["ticket_url", "details_url", "level"])
+    EDITABLE_FIELDS = set(["ticket_url", "details_url", "level", "metadata"])
 
     tags = IncidentTagRelationSerializer(many=True, write_only=True)
 
@@ -182,6 +183,7 @@ class IncidentPureDeserializer(serializers.ModelSerializer):
             "details_url",
             "ticket_url",
             "level",
+            "metadata",
         ]
 
     def update(self, instance: Incident, validated_data: dict):
