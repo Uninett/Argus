@@ -297,6 +297,8 @@ class IncidentViewSetV1TestCase(IncidentAPITestCase):
         # Check that incident and tag are linked
         self.assertTrue(IncidentTagRelation.objects.filter(incident=incident).filter(tag=tag).exists())
 
+
+class SourceSystemV1TestCase(IncidentAPITestCase):
     def test_can_get_all_source_types(self):
         source_type_names = set([type.name for type in SourceSystemType.objects.all()])
 
