@@ -334,7 +334,7 @@ class IncidentViewSet(
             old_url = incident.ticket_url
             new_url = serializer.data["ticket_url"]
             if old_url != new_url:
-                description = f"Change: ticket_url {old_url} → {new_url}"
+                description = ChangeEvent.format_description("ticket_url", old_url, new_url)
                 ChangeEvent.objects.create(
                     incident=incident, actor=request.user, timestamp=timezone.now(), description=description
                 )
@@ -419,7 +419,7 @@ class TicketPluginViewSet(viewsets.ViewSet):
             )
 
         if url:
-            description = f"Change: ticket_url → {url}"
+            description = ChangeEvent.format_description("ticket_url", "", url)
             ChangeEvent.objects.create(
                 incident=incident, actor=request.user, timestamp=timezone.now(), description=description
             )

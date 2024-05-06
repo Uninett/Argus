@@ -3,7 +3,7 @@ from django.test import override_settings, tag
 from rest_framework import status
 from rest_framework.test import APITestCase
 from argus.incident.factories import StatefulIncidentFactory
-from argus.incident.models import Event
+from argus.incident.models import Event, ChangeEvent
 from argus.util.testing import disconnect_signals, connect_signals
 
 from . import IncidentBasedAPITestCaseHelper
@@ -25,7 +25,7 @@ class ChangeEventTests(APITestCase, IncidentBasedAPITestCaseHelper):
         data = {
             "level": 2,
         }
-        description = "Change: level 1 → 2"
+        description = ChangeEvent.format_description("level", 1, 2)
         response = self.user1_rest_client.patch(
             path=f"/api/v2/incidents/{self.incident.pk}/",
             data=data,
@@ -39,7 +39,7 @@ class ChangeEventTests(APITestCase, IncidentBasedAPITestCaseHelper):
 
     def test_change_event_is_created_on_ticket_url_changes(self):
         new_ticket_url = "http://www.example.com/repository/issues/other-issue"
-        description = f"Change: ticket_url {self.url} → {new_ticket_url}"
+        description = ChangeEvent.format_description("ticket_url", self.url, new_ticket_url)
 
         response = self.user1_rest_client.patch(
             path=f"/api/v2/incidents/{self.incident.pk}/",
@@ -56,7 +56,7 @@ class ChangeEventTests(APITestCase, IncidentBasedAPITestCaseHelper):
 
     def test_change_event_is_created_on_ticket_url_changes_for_ticket_url_endpoint(self):
         new_ticket_url = "http://www.example.com/repository/issues/other-issue"
-        description = f"Change: ticket_url {self.url} → {new_ticket_url}"
+        description = ChangeEvent.format_description("ticket_url", self.url, new_ticket_url)
 
         response = self.user1_rest_client.put(
             path=f"/api/v2/incidents/{self.incident.pk}/ticket_url/",
@@ -88,13 +88,13 @@ class ChangeEventTests(APITestCase, IncidentBasedAPITestCaseHelper):
         self.assertTrue(change_events)
 
         new_ticket_url = response.data["ticket_url"]
-        description = f"Change: ticket_url → {new_ticket_url}"
+        description = ChangeEvent.format_description("ticket_url", "", new_ticket_url)
         self.assertIn(description, change_events_descriptions)
         self.assertEqual(change_events.get(description=description).actor, self.user1)
 
     def test_change_event_is_created_on_details_url_changes(self):
         new_details_url = "http://www.example.com/repository/issues/other-issue"
-        description = f"Change: details_url {self.url} → {new_details_url}"
+        description = ChangeEvent.format_description("details_url", self.url, new_details_url)
 
         response = self.user1_rest_client.patch(
             path=f"/api/v2/incidents/{self.incident.pk}/",
@@ -111,7 +111,7 @@ class ChangeEventTests(APITestCase, IncidentBasedAPITestCaseHelper):
 
     def test_change_event_is_created_on_tag_changes(self):
         new_tag = "a=b"
-        description = f"Change: tags [] → ['{new_tag}']"
+        description = ChangeEvent.format_description("tags", "[]", [new_tag])
 
         response = self.user1_rest_client.patch(
             path=f"/api/v2/incidents/{self.incident.pk}/",

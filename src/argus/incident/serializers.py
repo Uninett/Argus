@@ -204,7 +204,8 @@ class IncidentPureDeserializer(serializers.ModelSerializer):
             if attr in validated_data and validated_data[attr] != getattr(instance, attr):
                 old_value = getattr(instance, attr)
                 new_value = validated_data[attr]
-                description = f"Change: {attr} {old_value} → {new_value}"
+                description = ChangeEvent.format_description(attr, old_value, new_value)
+
                 ChangeEvent.objects.create(
                     incident=instance, actor=user, timestamp=timezone.now(), description=description
                 )
@@ -230,7 +231,11 @@ class IncidentPureDeserializer(serializers.ModelSerializer):
 
         # Post change events
         if remove_tag_relations or add_tags:
-            description = f"Change: tags {[str(tag) for tag in existing_tags]} → {[str(tag) for tag in posted_tags]}"
+            description = ChangeEvent.format_description(
+                "tags",
+                [str(tag) for tag in existing_tags],
+                [str(tag) for tag in posted_tags],
+            )
             ChangeEvent.objects.create(incident=instance, actor=user, timestamp=timezone.now(), description=description)
 
         for tag_relation in remove_tag_relations:
