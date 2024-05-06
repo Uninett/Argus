@@ -190,6 +190,15 @@ A common value in development would be::
 
   DATABASE_URL=postgresql://argus_user:superSecretPassword@localhost:5432/argus_db
 
+Incident settings
+-----------------
+
+.. setting:: INDELIBLE_INCIDENTS
+
+* :setting:`INDELIBLE_INCIDENTS` protects incidents from being deleted. The
+  default is ``True``. This can also be set via the environment variable
+  ``ARGUS_INDELIBLE_INCIDENTS``.
+
 Notification settings
 ---------------------
 
