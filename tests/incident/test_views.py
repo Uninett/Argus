@@ -2,7 +2,7 @@ import datetime
 
 from django.urls import reverse
 from django.utils.timezone import now
-from django.test import TestCase, RequestFactory
+from django.test import TestCase, RequestFactory, override_settings
 
 from rest_framework import serializers, status, versioning
 from rest_framework.test import APITestCase
@@ -296,6 +296,12 @@ class IncidentViewSetV1TestCase(IncidentAPITestCase):
         tag = Tag.objects.get(key=key, value=value)
         # Check that incident and tag are linked
         self.assertTrue(IncidentTagRelation.objects.filter(incident=incident).filter(tag=tag).exists())
+
+    @override_settings(INDELIBLE_INCIDENTS=False)
+    def test_cannot_delete_incident_if_indelible_is_true(self):
+        incident_pk = self.add_open_incident_with_start_event_and_tag().pk
+        response = self.client.delete(path=f"/api/v2/incidents/{incident_pk}/")
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 class SourceSystemV1TestCase(IncidentAPITestCase):
