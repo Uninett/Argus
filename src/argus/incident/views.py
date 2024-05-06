@@ -10,10 +10,11 @@ from django_filters import rest_framework as filters
 from rest_framework.filters import SearchFilter
 from drf_rw_serializers import viewsets as rw_viewsets
 from drf_spectacular.types import OpenApiTypes
-from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter
+from drf_spectacular.utils import extend_schema, extend_schema_view
+from drf_spectacular.utils import OpenApiParameter, OpenApiResponse
 from rest_framework import mixins, serializers, status, viewsets
 from rest_framework.decorators import action
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import ValidationError, PermissionDenied
 from rest_framework.generics import get_object_or_404
 from rest_framework.pagination import CursorPagination
 from rest_framework.permissions import IsAuthenticated
@@ -231,6 +232,7 @@ class IncidentViewSet(
     mixins.CreateModelMixin,
     mixins.RetrieveModelMixin,
     mixins.UpdateModelMixin,
+    mixins.DestroyModelMixin,
     viewsets.GenericViewSet,
 ):
     """All incidents
@@ -286,6 +288,27 @@ class IncidentViewSet(
 
     def perform_update(self, serializer):
         serializer.save(user=self.request.user)
+
+    @extend_schema(
+        responses={
+            204: OpenApiResponse(response=None),
+            403: OpenApiResponse(response=None),
+        }
+    )
+    def destroy(self, request, *args, **kwargs):
+        """Delete an existing incident
+
+        Can only be done by:
+
+        * The same source that created the incident
+        * Superuser
+        """
+        instance = self.get_object()
+        source = self.request.user.source_system
+        if source == instance.source or self.request.user.is_superuser:
+            self.perform_destroy(instance)
+            return
+        raise PermissionDenied(detail="{source} is not originating source, may not delete incident #{instance.id}")
 
     @extend_schema(request=IncidentTicketUrlSerializer, responses=IncidentTicketUrlSerializer)
     @action(detail=True, methods=["put"])

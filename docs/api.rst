@@ -347,6 +347,9 @@ Incident endpoints
       -  ``ticket_url``
       -  ``tags``
 
+   - ``DELETE``: deletes an incident. Limited to the source of the incident or
+     superuser.
+
 
 -  ``/api/v1/incidents/<int:pk>/ticket_url/``:
 
