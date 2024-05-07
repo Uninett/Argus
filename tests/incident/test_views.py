@@ -323,36 +323,44 @@ class IncidentViewSetV1DeleteTestCase(IncidentAPITestCase):
     def test_superuser_can_delete_incident_if_indelible_is_False(self):
         incident_pk = add_open_incident_with_start_event_and_tag(self.source).pk
         self.client.force_authenticate(user=self.admin)
+        self.assertTrue(Incident.objects.filter(pk=incident_pk).exists())
         response = self.client.delete(path=f"/api/v2/incidents/{incident_pk}/")
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(Incident.objects.filter(pk=incident_pk).exists())
 
     @override_settings(INDELIBLE_INCIDENTS=False)
     def test_source_can_delete_owned_incident_if_indelible_is_False(self):
         incident_pk = add_open_incident_with_start_event_and_tag(self.source).pk
+        self.assertTrue(Incident.objects.filter(pk=incident_pk).exists())
         response = self.client.delete(path=f"/api/v2/incidents/{incident_pk}/")
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(Incident.objects.filter(pk=incident_pk).exists())
 
     @override_settings(INDELIBLE_INCIDENTS=False)
     def test_source_cannot_delete_unowned_incident_if_indelible_is_False(self):
         incident_pk = add_open_incident_with_start_event_and_tag(self.source).pk
+        self.assertTrue(Incident.objects.filter(pk=incident_pk).exists())
 
         source_type = SourceSystemTypeFactory()
         user = SourceUserFactory()
         source = SourceSystemFactory(type=source_type, user=user)
-
         self.client.force_authenticate(user=user)
+
         response = self.client.delete(path=f"/api/v2/incidents/{incident_pk}/")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertTrue(Incident.objects.filter(pk=incident_pk).exists())
 
     @override_settings(INDELIBLE_INCIDENTS=False)
-    def test_nonsource_cannot_delete_incident(self):
+    def test_nonsource_nonsuperuser_cannot_delete_incident(self):
         incident_pk = add_open_incident_with_start_event_and_tag(self.source).pk
+        self.assertTrue(Incident.objects.filter(pk=incident_pk).exists())
 
         user = PersonUserFactory()
-
         self.client.force_authenticate(user=user)
+
         response = self.client.delete(path=f"/api/v2/incidents/{incident_pk}/")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertTrue(Incident.objects.filter(pk=incident_pk).exists())
 
 
 class SourceSystemV1TestCase(IncidentAPITestCase):
