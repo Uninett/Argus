@@ -14,7 +14,7 @@ from drf_spectacular.utils import extend_schema, extend_schema_view
 from drf_spectacular.utils import OpenApiParameter, OpenApiResponse
 from rest_framework import mixins, serializers, status, viewsets
 from rest_framework.decorators import action
-from rest_framework.exceptions import ValidationError, PermissionDenied
+from rest_framework.exceptions import ValidationError, PermissionDenied, MethodNotAllowed
 from rest_framework.generics import get_object_or_404
 from rest_framework.pagination import CursorPagination
 from rest_framework.permissions import IsAuthenticated
@@ -298,16 +298,23 @@ class IncidentViewSet(
     def destroy(self, request, *args, **kwargs):
         """Delete an existing incident
 
+        Can only be done if: the setting "INDELIBLE_INCIDENTS" is False.
+
         Can only be done by:
 
         * The same source that created the incident
         * Superuser
         """
+        if getattr(settings, "INDELIBLE_INCIDENTS", True):
+            raise MethodNotAllowed(
+                "DELETE", detail="Deletion of incidents is turned off, see setting INDELIBLE_INCIDENTS"
+            )
         instance = self.get_object()
-        source = self.request.user.source_system
-        if source == instance.source or self.request.user.is_superuser:
+        source = getattr(self.request.user, "source_system", None)
+        if self.request.user.is_superuser or (source and source == instance.source):
+            instance.events.all().delete()
             self.perform_destroy(instance)
-            return
+            return Response(status=status.HTTP_204_NO_CONTENT)
         raise PermissionDenied(detail="{source} is not originating source, may not delete incident #{instance.id}")
 
     @extend_schema(request=IncidentTicketUrlSerializer, responses=IncidentTicketUrlSerializer)

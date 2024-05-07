@@ -297,7 +297,7 @@ class IncidentViewSetV1TestCase(IncidentAPITestCase):
         # Check that incident and tag are linked
         self.assertTrue(IncidentTagRelation.objects.filter(incident=incident).filter(tag=tag).exists())
 
-    @override_settings(INDELIBLE_INCIDENTS=False)
+    @override_settings(INDELIBLE_INCIDENTS=True)
     def test_cannot_delete_incident_if_indelible_is_true(self):
         incident_pk = self.add_open_incident_with_start_event_and_tag().pk
         response = self.client.delete(path=f"/api/v2/incidents/{incident_pk}/")
