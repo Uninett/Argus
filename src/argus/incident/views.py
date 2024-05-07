@@ -23,6 +23,7 @@ from rest_framework.reverse import reverse
 
 from argus.auth.models import User
 from argus.drf.permissions import IsSuperuserOrReadOnly
+from argus.incident.models import Acknowledgement, Event
 from argus.incident.ticket.base import (
     TicketClientException,
     TicketCreationException,
@@ -314,6 +315,8 @@ class IncidentViewSet(
         source = getattr(self.request.user, "source_system", None)
         owns_instance = source and source == instance.source
         if self.request.user.is_superuser or owns_instance:
+            ack_events = instance.events.filter(type=Event.Type.ACKNOWLEDGE)
+            Acknowledgement.objects.filter(event__in=ack_events).delete()
             instance.events.all().delete()
             self.perform_destroy(instance)
             return Response(status=status.HTTP_204_NO_CONTENT)

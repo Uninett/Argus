@@ -337,6 +337,17 @@ class IncidentViewSetV1DeleteTestCase(IncidentAPITestCase):
         self.assertFalse(Incident.objects.filter(pk=incident_pk).exists())
 
     @override_settings(INDELIBLE_INCIDENTS=False)
+    def test_can_delete_acknowledged_incidente(self):
+        incident = add_open_incident_with_start_event_and_tag(self.source)
+        self.assertTrue(Incident.objects.filter(pk=incident.pk).exists())
+        ack = incident.create_ack(actor=self.user)
+        self.assertTrue(Acknowledgement.objects.filter(pk=ack.pk).exists())
+        response = self.client.delete(path=f"/api/v2/incidents/{incident.pk}/")
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(Incident.objects.filter(pk=incident.pk).exists())
+        self.assertFalse(Acknowledgement.objects.filter(pk=ack.pk).exists())
+
+    @override_settings(INDELIBLE_INCIDENTS=False)
     def test_source_cannot_delete_unowned_incident_if_indelible_is_False(self):
         incident_pk = add_open_incident_with_start_event_and_tag(self.source).pk
         self.assertTrue(Incident.objects.filter(pk=incident_pk).exists())
