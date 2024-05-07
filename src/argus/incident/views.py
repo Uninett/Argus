@@ -312,11 +312,14 @@ class IncidentViewSet(
             )
         instance = self.get_object()
         source = getattr(self.request.user, "source_system", None)
-        if self.request.user.is_superuser or (source and source == instance.source):
+        owns_instance = source and source == instance.source
+        if self.request.user.is_superuser or owns_instance:
             instance.events.all().delete()
             self.perform_destroy(instance)
             return Response(status=status.HTTP_204_NO_CONTENT)
-        raise PermissionDenied(detail="{source} is not originating source, may not delete incident #{instance.id}")
+        if not owns_instance:
+            raise PermissionDenied(detail="{source} is not originating source, may not delete incident #{instance.id}")
+        raise PermissionDenied(detail="Only superusers may delete any incident")
 
     @extend_schema(request=IncidentTicketUrlSerializer, responses=IncidentTicketUrlSerializer)
     @action(detail=True, methods=["put"])
