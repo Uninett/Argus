@@ -245,6 +245,8 @@ CHANNEL_LAYERS = {
 
 # Project specific settings
 
+INDELIBLE_INCIDENTS = get_bool_env("ARGUS_INDELIBLE_INCIDENTS", True)
+
 NOTIFICATION_SUBJECT_PREFIX = "[Argus] "
 
 SEND_NOTIFICATIONS = False  # Don't spam by accident

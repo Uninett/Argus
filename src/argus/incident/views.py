@@ -10,10 +10,11 @@ from django_filters import rest_framework as filters
 from rest_framework.filters import SearchFilter
 from drf_rw_serializers import viewsets as rw_viewsets
 from drf_spectacular.types import OpenApiTypes
-from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter
+from drf_spectacular.utils import extend_schema, extend_schema_view
+from drf_spectacular.utils import OpenApiParameter, OpenApiResponse
 from rest_framework import mixins, serializers, status, viewsets
 from rest_framework.decorators import action
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import ValidationError, PermissionDenied, MethodNotAllowed
 from rest_framework.generics import get_object_or_404
 from rest_framework.pagination import CursorPagination
 from rest_framework.permissions import IsAuthenticated
@@ -22,6 +23,7 @@ from rest_framework.reverse import reverse
 
 from argus.auth.models import User
 from argus.drf.permissions import IsSuperuserOrReadOnly
+from argus.incident.models import Acknowledgement, Event
 from argus.incident.ticket.base import (
     TicketClientException,
     TicketCreationException,
@@ -231,6 +233,7 @@ class IncidentViewSet(
     mixins.CreateModelMixin,
     mixins.RetrieveModelMixin,
     mixins.UpdateModelMixin,
+    mixins.DestroyModelMixin,
     viewsets.GenericViewSet,
 ):
     """All incidents
@@ -286,6 +289,40 @@ class IncidentViewSet(
 
     def perform_update(self, serializer):
         serializer.save(user=self.request.user)
+
+    @extend_schema(
+        responses={
+            204: OpenApiResponse(response=None),
+            403: OpenApiResponse(response=None),
+            405: OpenApiResponse(response=None),
+        }
+    )
+    def destroy(self, request, *args, **kwargs):
+        """Delete an existing incident
+
+        Can only be done if: the setting "INDELIBLE_INCIDENTS" is False.
+
+        Can only be done by:
+
+        * The same source that created the incident
+        * Superuser
+        """
+        if getattr(settings, "INDELIBLE_INCIDENTS", True):
+            raise MethodNotAllowed(
+                "DELETE", detail="Deletion of incidents is turned off, see setting INDELIBLE_INCIDENTS"
+            )
+        instance = self.get_object()
+        source = getattr(self.request.user, "source_system", None)
+        owns_instance = source and source == instance.source
+        if self.request.user.is_superuser or owns_instance:
+            ack_events = instance.events.filter(type=Event.Type.ACKNOWLEDGE)
+            Acknowledgement.objects.filter(event__in=ack_events).delete()
+            instance.events.all().delete()
+            self.perform_destroy(instance)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        if not owns_instance:
+            raise PermissionDenied(detail="{source} is not originating source, may not delete incident #{instance.id}")
+        raise PermissionDenied(detail="Only superusers may delete any incident")
 
     @extend_schema(request=IncidentTicketUrlSerializer, responses=IncidentTicketUrlSerializer)
     @action(detail=True, methods=["put"])

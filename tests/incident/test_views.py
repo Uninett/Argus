@@ -2,12 +2,17 @@ import datetime
 
 from django.urls import reverse
 from django.utils.timezone import now
-from django.test import TestCase, RequestFactory
+from django.test import TestCase, RequestFactory, override_settings
 
 from rest_framework import serializers, status, versioning
 from rest_framework.test import APITestCase
 
-from argus.auth.factories import AdminUserFactory, BaseUserFactory, SourceUserFactory
+from argus.auth.factories import (
+    AdminUserFactory,
+    BaseUserFactory,
+    PersonUserFactory,
+    SourceUserFactory,
+)
 from argus.incident.factories import (
     AcknowledgementFactory,
     EventFactory,
@@ -31,6 +36,14 @@ from argus.incident.views import EventViewSet
 from argus.notificationprofile.factories import FilterFactory
 from argus.notificationprofile.models import Filter
 from argus.util.testing import disconnect_signals, connect_signals
+
+
+def add_open_incident_with_start_event_and_tag(source, description="incident"):
+    incident = StatefulIncidentFactory(source=source, description=description)
+    tag = TagFactory(key="a", value="b")
+    IncidentTagRelationFactory(incident=incident, tag=tag)
+    incident.create_first_event()
+    return incident
 
 
 class EventViewSetTestCase(TestCase):
@@ -70,11 +83,7 @@ class IncidentAPITestCase(APITestCase):
 
 class IncidentViewSetV1TestCase(IncidentAPITestCase):
     def add_open_incident_with_start_event_and_tag(self, description="incident"):
-        incident = StatefulIncidentFactory(source=self.source, description=description)
-        tag = TagFactory(key="a", value="b")
-        IncidentTagRelationFactory(incident=incident, tag=tag)
-        incident.create_first_event()
-        return incident
+        return add_open_incident_with_start_event_and_tag(self.source, description)
 
     def add_acknowledgement_with_incident_and_event(self):
         return AcknowledgementFactory()
@@ -296,6 +305,73 @@ class IncidentViewSetV1TestCase(IncidentAPITestCase):
         tag = Tag.objects.get(key=key, value=value)
         # Check that incident and tag are linked
         self.assertTrue(IncidentTagRelation.objects.filter(incident=incident).filter(tag=tag).exists())
+
+
+class IncidentViewSetV1DeleteTestCase(IncidentAPITestCase):
+    @override_settings(INDELIBLE_INCIDENTS=True)
+    def test_cannot_delete_incident_if_indelible_is_True(self):
+        incident_pk = add_open_incident_with_start_event_and_tag(self.source).pk
+        # source
+        response = self.client.delete(path=f"/api/v2/incidents/{incident_pk}/")
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+        # superuser
+        self.client.force_authenticate(user=self.admin)
+        response = self.client.delete(path=f"/api/v2/incidents/{incident_pk}/")
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    @override_settings(INDELIBLE_INCIDENTS=False)
+    def test_superuser_can_delete_incident_if_indelible_is_False(self):
+        incident_pk = add_open_incident_with_start_event_and_tag(self.source).pk
+        self.client.force_authenticate(user=self.admin)
+        self.assertTrue(Incident.objects.filter(pk=incident_pk).exists())
+        response = self.client.delete(path=f"/api/v2/incidents/{incident_pk}/")
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(Incident.objects.filter(pk=incident_pk).exists())
+
+    @override_settings(INDELIBLE_INCIDENTS=False)
+    def test_source_can_delete_owned_incident_if_indelible_is_False(self):
+        incident_pk = add_open_incident_with_start_event_and_tag(self.source).pk
+        self.assertTrue(Incident.objects.filter(pk=incident_pk).exists())
+        response = self.client.delete(path=f"/api/v2/incidents/{incident_pk}/")
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(Incident.objects.filter(pk=incident_pk).exists())
+
+    @override_settings(INDELIBLE_INCIDENTS=False)
+    def test_can_delete_acknowledged_incidente(self):
+        incident = add_open_incident_with_start_event_and_tag(self.source)
+        self.assertTrue(Incident.objects.filter(pk=incident.pk).exists())
+        ack = incident.create_ack(actor=self.user)
+        self.assertTrue(Acknowledgement.objects.filter(pk=ack.pk).exists())
+        response = self.client.delete(path=f"/api/v2/incidents/{incident.pk}/")
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(Incident.objects.filter(pk=incident.pk).exists())
+        self.assertFalse(Acknowledgement.objects.filter(pk=ack.pk).exists())
+
+    @override_settings(INDELIBLE_INCIDENTS=False)
+    def test_source_cannot_delete_unowned_incident_if_indelible_is_False(self):
+        incident_pk = add_open_incident_with_start_event_and_tag(self.source).pk
+        self.assertTrue(Incident.objects.filter(pk=incident_pk).exists())
+
+        source_type = SourceSystemTypeFactory()
+        user = SourceUserFactory()
+        source = SourceSystemFactory(type=source_type, user=user)
+        self.client.force_authenticate(user=user)
+
+        response = self.client.delete(path=f"/api/v2/incidents/{incident_pk}/")
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertTrue(Incident.objects.filter(pk=incident_pk).exists())
+
+    @override_settings(INDELIBLE_INCIDENTS=False)
+    def test_nonsource_nonsuperuser_cannot_delete_incident(self):
+        incident_pk = add_open_incident_with_start_event_and_tag(self.source).pk
+        self.assertTrue(Incident.objects.filter(pk=incident_pk).exists())
+
+        user = PersonUserFactory()
+        self.client.force_authenticate(user=user)
+
+        response = self.client.delete(path=f"/api/v2/incidents/{incident_pk}/")
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertTrue(Incident.objects.filter(pk=incident_pk).exists())
 
 
 class SourceSystemV1TestCase(IncidentAPITestCase):
