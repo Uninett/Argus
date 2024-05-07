@@ -293,6 +293,7 @@ class IncidentViewSet(
         responses={
             204: OpenApiResponse(response=None),
             403: OpenApiResponse(response=None),
+            405: OpenApiResponse(response=None),
         }
     )
     def destroy(self, request, *args, **kwargs):
