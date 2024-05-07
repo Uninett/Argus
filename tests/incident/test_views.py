@@ -630,6 +630,24 @@ class IncidentViewSetTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(Incident.objects.get(pk=incident_pk).level, 2)
 
+    def test_can_update_incident_metadata(self):
+        incident = self.add_open_incident_with_start_event_and_tag()
+        start_metadata = {"foo": "xux"}
+        incident.metadata = start_metadata
+        incident.save()
+        incident_path = reverse("v2:incident:incident-detail", args=[incident.pk])
+        changed_metadata = {"bar": "gurba"}
+        response = self.client.patch(
+            path=incident_path,
+            data={
+                "metadata": changed_metadata,
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        changed_incident = Incident.objects.get(pk=incident.pk)
+        self.assertNotEqual(changed_incident.metadata, start_metadata)
+        self.assertEqual(changed_incident.metadata, changed_metadata)
+
     def test_can_get_all_acknowledgements_of_incident(self):
         ack = self.add_acknowledgement_with_incident_and_event()
         incident = ack.event.incident
