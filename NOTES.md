@@ -1,6 +1,21 @@
 # Release Notes
+
 This file documents changes to Argus that are relevant for operations and
 end-users.
+
+## [1.18.0] - 2024-05-07
+
+There's a new API endpoint allowing the deletion of an existing incident and
+its events. The new setting `INDELIBLE_INCIDENTS` controls this, the backwards
+compatible setting is `True`. Toggle to `False` to allow deletion. The plan
+forward is to limit deletion according to some rule we haven't decided on:
+
+* limit it to "new" incidents, for an unfinished definition of "new"
+* have an (optional) flag on incident controllable by the source
+* so.. many.. ideas, hence, running code now, hard decisions later.
+
+Smaller change: the data in Incident.metadata can now be replaced with HTTP
+PATCH/PUT, in line with `ticket_url`, `details_url` and `level`.
 
 ## [1.17.0] - 2024-05-03
 

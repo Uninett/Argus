@@ -8,6 +8,22 @@ This project uses [*towncrier*](https://towncrier.readthedocs.io/) and the chang
 
 <!-- towncrier release notes start -->
 
+## [1.18.0] - 2024-05-07
+
+
+### Added
+
+- New in the API: Allow sources to delete their own incidents, as well as allow
+  superusers to delete any incident.
+  ([#804](https://github.com/Uninett/Argus/issues/804))
+
+### Changed
+
+- Allow replacing Incident.metadata with another json blob via API, no
+  questions asked, nothing to see here.
+  ([#807](https://github.com/Uninett/Argus/issues/807))
+
+
 ## [1.17.0] - 2024-05-03
 
 
