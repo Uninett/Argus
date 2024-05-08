@@ -119,6 +119,7 @@ def incidents_table(request: HtmxHttpRequest) -> HttpResponse:
         "base": base_template,
         "page": page,
         "last_refreshed": last_refreshed,
+        "update_interval": 30,
     }
 
     return render(
