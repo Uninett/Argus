@@ -27,10 +27,10 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
-_overriding_apps_env = get_json_env("ARGUS_OVERRIDING_APPS", [])
+_overriding_apps_env = get_json_env("ARGUS_OVERRIDING_APPS", [], quiet=False)
 OVERRIDING_APPS = validate_app_setting(_overriding_apps_env)
 del _overriding_apps_env
-_extra_apps_env = get_json_env("ARGUS_EXTRA_APPS", [])
+_extra_apps_env = get_json_env("ARGUS_EXTRA_APPS", [], quiet=False)
 EXTRA_APPS = validate_app_setting(_extra_apps_env)
 del _extra_apps_env
 
