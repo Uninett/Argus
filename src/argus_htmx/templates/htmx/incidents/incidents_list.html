@@ -8,7 +8,9 @@
     </section>
 
     <section>
-        {% include "htmx/incidents/_incidents_table.html" %}
+        {% block table %}
+            {% include "htmx/incidents/_incidents_table.html" %}
+        {% endblock table %}
     </section>
 
     <section>

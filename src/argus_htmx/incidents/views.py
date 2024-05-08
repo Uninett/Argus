@@ -108,7 +108,7 @@ def incidents_table(request: HtmxHttpRequest) -> HttpResponse:
     # requests, allowing us to skip rendering the unchanging parts of the
     # template.
     if request.htmx:
-        base_template = "htmx/incidents/_incidents_table.html"
+        base_template = "htmx/incidents/responses/_incidents_table_refresh.html"
     else:
         base_template = "htmx/incidents/_base.html"
 
