@@ -89,34 +89,56 @@ class GetUrlPatternsFromSettingsTest(unittest.TestCase):
 
 
 class UpdateContextProcessorsListTests(unittest.TestCase):
-    def test_do_nothing_if_empty_list(self):
-        old_setting = deepcopy(settings.TEMPLATES)
-        result = update_context_processors_list([])
-        self.assertTrue(result)
-        new_setting = deepcopy(settings.TEMPLATES)
-        self.assertEqual(old_setting, new_setting)
+    def test_do_nothing_if_cp_setting_not_set(self):
+        raw_setting = {
+            "app_name": "foo",
+            "urls": {
+                "path": "fghfh",
+                "urlpatterns_module": "django",  # must be a dotted path to a module in python path!
+                "namespace": "blbl",
+            },
+            # NO "context_processors"-key!
+        }
+        TEMPLATES = []
+        result = update_context_processors_list(TEMPLATES, None)
+        self.assertEqual(result, TEMPLATES)
 
-    @override_settings(TEMPLATES=[{"BACKEND": "foo", "OPTIONS": {"context_processors": ["alpha"]}}])
+    def test_do_nothing_if_template_setting_is_falsey(self):
+        TEMPLATES = []
+        raw_setting = {
+            "app_name": "foo",
+            "context_processors": ["omega"],
+        }
+        app_setting = AppSetting(**raw_setting)
+        result = update_context_processors_list(TEMPLATES, [app_setting])
+        self.assertEqual(result, TEMPLATES)
+
     def test_only_update_DjangoTemplates_section(self):
-        old_setting = deepcopy(settings.TEMPLATES)[0]
-        result = update_context_processors_list(["omega"])
-        self.assertFalse(result)
-        new_setting = deepcopy(settings.TEMPLATES[0])
-        self.assertEqual(old_setting, new_setting)
+        raw_setting = {
+            "app_name": "foo",
+            "context_processors": ["omega"],
+        }
+        app_setting = AppSetting(**raw_setting)
+        TEMPLATES = [
+            {"BACKEND": "django.template.backends.jinja2.Jinja2", "OPTIONS": {"context_processors": ["alpha"]}}
+        ]
+        result = update_context_processors_list(TEMPLATES, [app_setting])
+        self.assertEqual(result, TEMPLATES)
 
-    @override_settings(TEMPLATES=[])
-    def test_return_None_if_no_setting(self):
-        result = update_context_processors_list(["n"])
-        self.assertEqual(result, None)
-
-    def test_append_list_to_DjangoTemplates_context_processors(self):
-        old_setting = deepcopy(settings.TEMPLATES[0])
-        new_cps = ["a", "b"]
-        result = update_context_processors_list(new_cps)
+    def test_append_cp_in_app_settings_to_DjangoTemplates_context_processors(self):
+        raw_setting = {
+            "app_name": "foo",
+            "context_processors": ["omega"],
+        }
+        app_setting = AppSetting(**raw_setting)
+        TEMPLATES = [
+            {"BACKEND": "django.template.backends.django.DjangoTemplates", "OPTIONS": {"context_processors": ["alpha"]}}
+        ]
+        result = update_context_processors_list(TEMPLATES, [app_setting])
         self.assertTrue(result)
-        new_setting = deepcopy(settings.TEMPLATES[0])
-        self.assertNotEqual(old_setting, new_setting)
-        old_cps = old_setting["OPTIONS"].pop("context_processors")
-        new_cps = new_setting["OPTIONS"].pop("context_processors")
-        self.assertEqual(old_setting, new_setting)
+        self.assertNotEqual(TEMPLATES, result)
+        old_cps = TEMPLATES[0]["OPTIONS"].pop("context_processors")
+        new_cps = result[0]["OPTIONS"].pop("context_processors")
+        self.assertEqual(TEMPLATES, result)
         self.assertNotEqual(old_cps, new_cps)
+        self.assertEqual(new_cps, ["alpha", "omega"])

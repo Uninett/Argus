@@ -1,4 +1,5 @@
 # nothing that imports models here!
+from copy import deepcopy
 
 from django.conf import settings
 from django.urls import include, path
@@ -23,16 +24,19 @@ def get_urlpatterns_from_setting(setting):
     return urlpatterns
 
 
-def update_context_processors_list(new_context_processors):
-    setting = getattr(settings, "TEMPLATES", None)
-    if not setting:
-        return None
+def update_context_processors_list(templates_setting, app_settings):
+    if not templates_setting:
+        return templates_setting
+    safety_copy = deepcopy(templates_setting)
     correct_engine = None
-    for engine in setting:
+    for engine in safety_copy:
         if engine["BACKEND"] == "django.template.backends.django.DjangoTemplates":
             correct_engine = engine
             break
-    if not correct_engine:
-        return False
-    correct_engine["OPTIONS"]["context_processors"].extend(new_context_processors)
-    return True
+    else:
+        return templates_setting
+    for app in app_settings:
+        if not app.context_processors:
+            continue
+        correct_engine["OPTIONS"]["context_processors"].extend(app.context_processors)
+    return safety_copy
