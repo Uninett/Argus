@@ -15,5 +15,10 @@
         <p>
             Total, all time: {{ qs|length }}
         </p>
+        
+        {% block refresh_info %}
+            {% include "htmx/incidents/_incidents_refresh_info.html" %}
+        {% endblock refresh_info %}
     </section>
+
 {% endblock main %}

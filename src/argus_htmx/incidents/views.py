@@ -1,5 +1,6 @@
 import logging
 from typing import Optional
+from datetime import datetime
 
 from django.conf import settings
 from django.contrib.auth.models import Group
@@ -12,6 +13,7 @@ from django.http import HttpRequest, HttpResponse
 from django_htmx.middleware import HtmxDetails
 
 from argus.incident.models import Incident
+from argus.util.datetime_utils import make_aware
 
 from .forms import AckForm
 
@@ -96,6 +98,7 @@ def incidents_table(request: HtmxHttpRequest) -> HttpResponse:
     # Load incidents
     qs = Incident.objects.all().order_by("-start_time")
     latest = qs.latest("start_time").start_time
+    last_refreshed = make_aware(datetime.now())
 
     # Standard Django pagination
     page_num = request.GET.get("page", "1")
@@ -115,6 +118,7 @@ def incidents_table(request: HtmxHttpRequest) -> HttpResponse:
         "page_title": "Incidents",
         "base": base_template,
         "page": page,
+        "last_refreshed": last_refreshed,
     }
 
     return render(

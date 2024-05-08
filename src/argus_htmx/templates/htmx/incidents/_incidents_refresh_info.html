@@ -1,0 +1,4 @@
+<p id="table-refresh-info" hx-swap-oob='{{ oob|default:"false" }}'>
+    Last refreshed {{ last_refreshed|date:"DATETIME_FORMAT"|default:"?" }}.
+    Updating every: {{ update_interval|default:"?" }}s.
+</p>
