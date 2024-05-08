@@ -623,6 +623,8 @@ class IncidentRelation(models.Model):
 
 
 class ChangeEvent(Event):
+    DESCRIPTION_FORMAT = 'Change: "{attribute}": {old} → {new}'
+
     class Meta:
         proxy = True
 
@@ -631,9 +633,18 @@ class ChangeEvent(Event):
         super().save(*args, **kwargs)
 
     @classmethod
+    def format_description(cls, attribute, old, new):
+        context = {
+            "attribute": attribute,
+            "old": old if old is not None else "",
+            "new": new if new is not None else "",
+        }
+        return cls.DESCRIPTION_FORMAT.format(**context)
+
+    @classmethod
     def change_level(cls, incident, actor, new_level, timestamp=None):
         timestamp = timestamp if timestamp else timezone.now()
-        description = f"Change: level {incident.level} → {new_level}"
+        description = cls.format_description("level", incident.level, new_level)
         event = cls(incident=incident, actor=actor, timestamp=timestamp, description=description)
         event.save()
         return event
