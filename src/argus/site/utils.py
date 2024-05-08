@@ -29,7 +29,7 @@ def update_context_processors_list(new_context_processors):
         return None
     correct_engine = None
     for engine in setting:
-        if setting["BACKEND"] == "django.template.backends.django.DjangoTemplates":
+        if engine["BACKEND"] == "django.template.backends.django.DjangoTemplates":
             correct_engine = engine
             break
     if not correct_engine:

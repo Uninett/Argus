@@ -12,7 +12,7 @@ class AppUrlSetting(BaseModel):
 class AppSetting(BaseModel):
     app_name: str
     urls: Optional[AppUrlSetting] = None
-    context_processors: Optional[List(str)] = None
+    context_processors: Optional[List[str]] = None
 
 
 class ListAppSetting(RootModel):
