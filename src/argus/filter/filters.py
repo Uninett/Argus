@@ -1,9 +1,15 @@
+"""
+Used for handling direct GET-queries in the API
+
+Depends on django-filter
+"""
+
 from django import forms
 from django_filters import rest_framework as filters
 
-from .fields import KeyValueField
-from .models import Incident
 from argus.notificationprofile.models import Filter, NotificationProfile
+from argus.incident.fields import KeyValueField
+from argus.incident.models import Incident
 
 
 __all__ = [

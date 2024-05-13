@@ -290,6 +290,7 @@ class IncidentQuerySet(models.QuerySet):
 
         return self.filter(source_id=argus_source_system.id).filter(incident_tag_relations__tag=token_expiry_tag)
 
+    # XXX wrong location?
     def filter_pk(self, pk):
         """
         Returns all incidents that are included in the filter with the given primary
@@ -297,6 +298,7 @@ class IncidentQuerySet(models.QuerySet):
 
         If no filter with that pk exists it returns no incidents
         """
+        # XXX: must be swappable
         filtr = Filter.objects.filter(pk=pk).first()
 
         if not filtr:
@@ -304,6 +306,7 @@ class IncidentQuerySet(models.QuerySet):
 
         return self.filter(pk__in=filtr.filtered_incidents.values_list("pk", flat=True))
 
+    # XXX wrong location?
     def notificationprofile_pk(self, pk):
         """
         Returns all incidents that are included in the filters connected to the profile

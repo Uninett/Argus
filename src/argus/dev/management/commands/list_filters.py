@@ -1,8 +1,8 @@
 from django.contrib.auth.hashers import check_password
 from django.core.management.base import BaseCommand
 
+from argus.filter.serializers import FilterSerializer
 from argus.notificationprofile.models import Filter
-from argus.notificationprofile.serializers import FilterSerializer
 
 
 class Command(BaseCommand):

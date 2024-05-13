@@ -13,7 +13,6 @@ __all__ = [
     "MaximalTimeRecurrenceFactory",
     "DestinationConfigFactory",
     "NotificationProfileFactory",
-    "FilterFactory",
 ]
 
 
@@ -79,12 +78,3 @@ class NotificationProfileFactory(factory.django.DjangoModelFactory):
     user = factory.LazyAttribute(lambda profile: profile.timeslot.user)
     timeslot = factory.SubFactory(TimeslotFactory)
     active = factory.Faker("boolean")
-
-
-class FilterFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = models.Filter
-
-    user = factory.SubFactory(PersonUserFactory)
-    name = factory.Sequence(lambda s: "Filter %s" % s)
-    filter = dict()

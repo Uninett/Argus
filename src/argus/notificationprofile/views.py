@@ -14,14 +14,16 @@ from rest_framework.views import APIView
 from drf_rw_serializers import viewsets as rw_viewsets
 
 from argus.drf.permissions import IsOwner
+from argus.filter.serializers import (
+    FilterSerializer,
+    FilterBlobSerializer,
+)
 from argus.incident.serializers import IncidentSerializer
 from argus.notificationprofile.media import api_safely_get_medium_object
 from argus.notificationprofile.media.base import NotificationMedium
 from .models import DestinationConfig, Filter, Media, NotificationProfile, Timeslot
 from .serializers import (
     DuplicateDestinationSerializer,
-    FilterSerializer,
-    FilterBlobSerializer,
     JSONSchemaSerializer,
     MediaSerializer,
     ResponseDestinationConfigSerializer,

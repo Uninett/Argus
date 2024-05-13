@@ -7,12 +7,14 @@ from rest_framework.response import Response
 from drf_rw_serializers import viewsets as rw_viewsets
 
 from argus.drf.permissions import IsOwner
-from argus.incident.serializers import IncidentSerializer
-from ..models import Filter, NotificationProfile
-from .serializers import (
+from argus.filter.V1.serializers import (
     FilterSerializerV1,
     FilterBlobSerializerV1,
     FilterPreviewSerializer,
+)
+from argus.incident.serializers import IncidentSerializer
+from ..models import Filter, NotificationProfile
+from .serializers import (
     ResponseNotificationProfileSerializerV1,
     RequestNotificationProfileSerializerV1,
 )

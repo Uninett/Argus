@@ -1,33 +1,11 @@
 from rest_framework import fields, serializers
 
+from argus.filter.primitive_serializers import CustomMultipleChoiceField
+from argus.filter.serializers import FilterSerializer
 from argus.incident.constants import INCIDENT_LEVELS
 from argus.incident.models import Event
-from .primitive_serializers import CustomMultipleChoiceField
 from .media import api_safely_get_medium_object
-from .models import DestinationConfig, Filter, Media, NotificationProfile, TimeRecurrence, Timeslot
-
-
-class FilterBlobSerializer(serializers.Serializer):
-    sourceSystemIds = serializers.ListField(
-        child=serializers.IntegerField(min_value=1),
-        allow_empty=True,
-        required=False,
-    )
-    tags = serializers.ListField(
-        child=serializers.CharField(min_length=3),
-        allow_empty=True,
-        required=False,
-    )
-    open = serializers.BooleanField(required=False, allow_null=True)
-    acked = serializers.BooleanField(required=False, allow_null=True)
-    stateful = serializers.BooleanField(required=False, allow_null=True)
-    maxlevel = serializers.IntegerField(
-        required=False, allow_null=True, max_value=max(INCIDENT_LEVELS), min_value=min(INCIDENT_LEVELS)
-    )
-    event_types = CustomMultipleChoiceField(
-        choices=Event.Type.choices,
-        required=False,
-    )
+from .models import DestinationConfig, Media, NotificationProfile, TimeRecurrence, Timeslot
 
 
 class TimeRecurrenceSerializer(serializers.ModelSerializer):
@@ -116,18 +94,6 @@ class TimeslotSerializer(serializers.ModelSerializer):
                 TimeRecurrence.objects.create(timeslot=timeslot, **time_recurrence_data)
 
         return timeslot
-
-
-class FilterSerializer(serializers.ModelSerializer):
-    filter = FilterBlobSerializer(required=False)
-
-    class Meta:
-        model = Filter
-        fields = [
-            "pk",
-            "name",
-            "filter",
-        ]
 
 
 class MediaSerializer(serializers.ModelSerializer):
