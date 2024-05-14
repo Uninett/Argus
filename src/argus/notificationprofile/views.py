@@ -18,7 +18,6 @@ from argus.incident.serializers import IncidentSerializer
 from argus.notificationprofile.media import api_safely_get_medium_object
 from argus.notificationprofile.media.base import NotificationMedium
 from .models import DestinationConfig, Filter, Media, NotificationProfile, Timeslot
-from .primitive_serializers import FilterPreviewSerializer
 from .serializers import (
     DuplicateDestinationSerializer,
     FilterSerializer,
@@ -245,7 +244,6 @@ class FilterViewSet(viewsets.ModelViewSet):
 
 # TODO: change HTTP method to GET, and get query data from URL
 class FilterPreviewView(APIView):
-    @extend_schema(request=FilterPreviewSerializer, responses={"200": IncidentSerializer})
     def post(self, request, format=None):
         """
         POST a filter, get a list of filtered incidents back

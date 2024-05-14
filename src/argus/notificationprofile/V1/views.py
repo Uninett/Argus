@@ -12,10 +12,10 @@ from ..models import Filter, NotificationProfile
 from .serializers import (
     FilterSerializerV1,
     FilterBlobSerializerV1,
+    FilterPreviewSerializer,
     ResponseNotificationProfileSerializerV1,
     RequestNotificationProfileSerializerV1,
 )
-from ..primitive_serializers import FilterPreviewSerializer
 
 
 class FilterViewSetV1(viewsets.ModelViewSet):

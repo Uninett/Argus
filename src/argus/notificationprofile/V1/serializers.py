@@ -10,6 +10,11 @@ from ..serializers import TimeslotSerializer
 from ..validators import validate_filter_string
 
 
+class FilterPreviewSerializer(serializers.Serializer):
+    sourceSystemIds = serializers.ListField(child=serializers.IntegerField(min_value=1), allow_empty=True)
+    tags = serializers.ListField(child=serializers.CharField(min_length=3), allow_empty=True)
+
+
 class FilterBlobSerializerV1(serializers.Serializer):
     sourceSystemIds = serializers.ListField(
         child=serializers.IntegerField(min_value=1),

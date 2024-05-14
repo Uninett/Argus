@@ -2,7 +2,7 @@ from rest_framework import fields, serializers
 
 from argus.incident.constants import INCIDENT_LEVELS
 from argus.incident.models import Event
-from .primitive_serializers import CustomMultipleChoiceField, FilterPreviewSerializer
+from .primitive_serializers import CustomMultipleChoiceField
 from .media import api_safely_get_medium_object
 from .models import DestinationConfig, Filter, Media, NotificationProfile, TimeRecurrence, Timeslot
 
