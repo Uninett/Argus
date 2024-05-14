@@ -46,10 +46,10 @@ class NormalizeUrlTests(unittest.TestCase):
 
 
 class GetUrlPatternsFromSettingsTest(unittest.TestCase):
-    def test_if_falsey_setting_return_empty_list(self):
+    def test_when_setting_is_falsey_return_empty_list(self):
         self.assertEqual(get_urlpatterns_from_setting(None), [])
 
-    def test_if_falsey_urls_return_empty_list(self):
+    def test_when_setting_contains_falsey_urls_should_return_empty_list(self):
         class Obj:
             pass
 
@@ -58,7 +58,12 @@ class GetUrlPatternsFromSettingsTest(unittest.TestCase):
 
         self.assertEqual(get_urlpatterns_from_setting([obj]), [])
 
-    def test_urls_without_namspace_return_list_of_paths_without_namespace(self):
+    def test_urls_without_namespace_return_list_of_paths_without_namespace(self):
+        # django.urls.include has one obligatory positional argument that is
+        # either an urlpatterns-list or a dotted path to a module that contains
+        # an urlpatterns list that is labeled "urlpatterns". It also has
+        # a keyword argument "namespace". This tests including urlpatterns that
+        # DOES NOT have namespace set.
         raw_setting = {
             "app_name": "foo",
             "urls": {
@@ -72,7 +77,12 @@ class GetUrlPatternsFromSettingsTest(unittest.TestCase):
         self.assertTrue(isinstance(result[0], URLResolver))
         self.assertFalse(result[0].namespace)
 
-    def test_urls_with_namspace_return_list_of_paths_with_namespace(self):
+    def test_urls_with_namespace_return_list_of_paths_with_namespace(self):
+        # django.urls.include has one obligatory positional argument that is
+        # either an urlpatterns-list or a dotted path to a module that contains
+        # an urlpatterns list that is labeled "urlpatterns". It also has
+        # a keyword argument "namespace". This tests including urlpatterns that
+        # DO have namespace set.
         raw_setting = {
             "app_name": "foo",
             "urls": {
@@ -89,7 +99,7 @@ class GetUrlPatternsFromSettingsTest(unittest.TestCase):
 
 
 class UpdateContextProcessorsListTests(unittest.TestCase):
-    def test_do_nothing_if_cp_setting_not_set(self):
+    def test_when_context_processor_setting_is_unset_it_should_do_nothing(self):
         raw_setting = {
             "app_name": "foo",
             "urls": {
@@ -103,7 +113,7 @@ class UpdateContextProcessorsListTests(unittest.TestCase):
         result = update_context_processors_list(TEMPLATES, None)
         self.assertEqual(result, TEMPLATES)
 
-    def test_do_nothing_if_template_setting_is_falsey(self):
+    def test_when_template_setting_is_falsey_it_should_do_nothing(self):
         TEMPLATES = []
         raw_setting = {
             "app_name": "foo",
@@ -113,7 +123,7 @@ class UpdateContextProcessorsListTests(unittest.TestCase):
         result = update_context_processors_list(TEMPLATES, [app_setting])
         self.assertEqual(result, TEMPLATES)
 
-    def test_only_update_DjangoTemplates_section(self):
+    def test_when_it_is_not_a_DjangoTemplates_section_it_should_do_nothing(self):
         raw_setting = {
             "app_name": "foo",
             "context_processors": ["omega"],
@@ -125,7 +135,7 @@ class UpdateContextProcessorsListTests(unittest.TestCase):
         result = update_context_processors_list(TEMPLATES, [app_setting])
         self.assertEqual(result, TEMPLATES)
 
-    def test_append_cp_in_app_settings_to_DjangoTemplates_context_processors(self):
+    def test_append_context_processors_in_setting_to_DjangoTemplates_context_processors_list(self):
         raw_setting = {
             "app_name": "foo",
             "context_processors": ["omega"],
