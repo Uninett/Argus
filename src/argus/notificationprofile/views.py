@@ -18,11 +18,11 @@ from argus.incident.serializers import IncidentSerializer
 from argus.notificationprofile.media import api_safely_get_medium_object
 from argus.notificationprofile.media.base import NotificationMedium
 from .models import DestinationConfig, Filter, Media, NotificationProfile, Timeslot
-from .primitive_serializers import FilterBlobSerializer
+from .primitive_serializers import FilterPreviewSerializer
 from .serializers import (
     DuplicateDestinationSerializer,
     FilterSerializer,
-    FilterPreviewSerializer,
+    FilterBlobSerializer,
     JSONSchemaSerializer,
     MediaSerializer,
     ResponseDestinationConfigSerializer,
