@@ -3,10 +3,30 @@ from typing import List
 
 from rest_framework import fields, serializers
 
+from argus.incident.constants import INCIDENT_LEVELS
 from ..models import DestinationConfig, Filter, NotificationProfile
-from ..primitive_serializers import FilterBlobSerializer
+from ..primitive_serializers import CustomMultipleChoiceField
 from ..serializers import TimeslotSerializer
 from ..validators import validate_filter_string
+
+
+class FilterBlobSerializerV1(serializers.Serializer):
+    sourceSystemIds = serializers.ListField(
+        child=serializers.IntegerField(min_value=1),
+        allow_empty=True,
+        required=False,
+    )
+    tags = serializers.ListField(
+        child=serializers.CharField(min_length=3),
+        allow_empty=True,
+        required=False,
+    )
+    open = serializers.BooleanField(required=False, allow_null=True)
+    acked = serializers.BooleanField(required=False, allow_null=True)
+    stateful = serializers.BooleanField(required=False, allow_null=True)
+    maxlevel = serializers.IntegerField(
+        required=False, allow_null=True, max_value=max(INCIDENT_LEVELS), min_value=min(INCIDENT_LEVELS)
+    )
 
 
 class FilterSerializerV1(serializers.ModelSerializer):
@@ -15,7 +35,7 @@ class FilterSerializerV1(serializers.ModelSerializer):
         help_text='Deprecated: Use "filter" instead',
         required=False,
     )
-    filter = FilterBlobSerializer(required=False)
+    filter = FilterBlobSerializerV1(required=False)
 
     class Meta:
         model = Filter

@@ -9,13 +9,13 @@ from drf_rw_serializers import viewsets as rw_viewsets
 from argus.drf.permissions import IsOwner
 from argus.incident.serializers import IncidentSerializer
 from ..models import Filter, NotificationProfile
-from ..primitive_serializers import FilterBlobSerializer
 from .serializers import (
     FilterSerializerV1,
+    FilterBlobSerializerV1,
     ResponseNotificationProfileSerializerV1,
     RequestNotificationProfileSerializerV1,
 )
-from ..serializers import FilterPreviewSerializer
+from ..primitive_serializers import FilterPreviewSerializer
 
 
 class FilterViewSetV1(viewsets.ModelViewSet):
@@ -110,7 +110,7 @@ class NotificationProfileViewSetV1(rw_viewsets.ModelViewSet):
         Will eventually take over for the filterpreview endpoint
         """
         filter_dict = request.data
-        serializer = FilterBlobSerializer(data=filter_dict)
+        serializer = FilterBlobSerializerV1(data=filter_dict)
         if not serializer.is_valid():
             raise ValidationError(serializer.errors)
 
