@@ -13,8 +13,10 @@ from django.utils import timezone
 from django.utils.text import slugify
 
 from argus.auth.models import User
+from argus.compat import StrEnum
 
 from .constants import DEPRECATED_FILTER_NAMES
+
 
 if TYPE_CHECKING:
     from argus.incident.models import Event, Incident
@@ -25,55 +27,46 @@ TriState = Optional[bool]
 LOG = logging.getLogger(__name__)
 
 
+class FilterKey(StrEnum):
+    OPEN = "open"
+    ACKED = "acked"
+    STATEFUL = "stateful"
+    SOURCE_SYSTEM_IDS = "sourceSystemIds"
+    TAGS = "tags"
+    EVENT_TYPES = "event_types"
+    MAXLEVEL = "maxlevel"
+
+
 class FilterWrapper:
-    TRINARY_FILTERS = ("open", "acked", "stateful")
+    TRINARY_FILTERS = (FilterKey.OPEN, FilterKey.ACKED, FilterKey.STATEFUL)
+    LIST_FILTERS = (FilterKey.SOURCE_SYSTEM_IDS, FilterKey.TAGS, FilterKey.EVENT_TYPES)
+    INT_FILTERS = (FilterKey.MAXLEVEL,)
+    FILTER_KEYS = TRINARY_FILTERS + LIST_FILTERS + INT_FILTERS
 
     def __init__(self, filterblob):
         self.fallback_filter = getattr(settings, "ARGUS_FALLBACK_FILTER", {})
         self.filter = filterblob.copy()
 
-    def _get_tristate(self, tristate):
-        fallback_filter = self.fallback_filter.get(tristate, None)
-        return self.filter.get(tristate, fallback_filter)
+    def _get_filter_value(self, key):
+        fallback_filter = self.fallback_filter.get(key, None)
+        return self.filter.get(key, fallback_filter)
 
-    def are_tristates_empty(self):
-        for tristate in self.TRINARY_FILTERS:
-            if self._get_tristate(tristate) is not None:
-                return False
-        return True
-
-    def is_maxlevel_empty(self):
-        fallback_filter = self.fallback_filter.get("maxlevel", None)
-        return not self.filter.get("maxlevel", fallback_filter)
-
-    def is_event_types_empty(self):
-        fallback_filter = self.fallback_filter.get("event_types", None)
-        return not self.filter.get("event_types", fallback_filter)
-
-    def are_source_system_ids_empty(self):
-        fallback_filter = self.fallback_filter.get("sourceSystemIds", None)
-        return not self.filter.get("sourceSystemIds", fallback_filter)
-
-    def are_tags_empty(self):
-        fallback_filter = self.fallback_filter.get("tags", None)
-        return not self.filter.get("tags", fallback_filter)
+    def _get_filter_value_and_ignored_status(self, key):
+        filter_ = self._get_filter_value(key)
+        if key in self.TRINARY_FILTERS:
+            return filter_, filter_ is None
+        return filter_, not filter_
 
     @property
     def is_empty(self):
-        return (
-            self.are_source_system_ids_empty()
-            and self.are_tags_empty()
-            and self.are_tristates_empty()
-            and self.is_maxlevel_empty()
-            and self.is_event_types_empty()
-        )
+        return all(self._get_filter_value_and_ignored_status(key)[1] for key in self.FILTER_KEYS)
 
     def get_incident_tristate_checks(self, incident) -> Dict[str, TriState]:
-        if self.are_tristates_empty():
+        if all(self._get_filter_value_and_ignored_status(key)[1] for key in self.TRINARY_FILTERS):
             return {}
         fits_tristates = {}
         for tristate in self.TRINARY_FILTERS:
-            filter_tristate = self._get_tristate(tristate)
+            filter_tristate = self._get_filter_value(tristate)
             if filter_tristate is None:
                 LOG.debug('Tristates: "%s" not in filter, ignoring', tristate)
                 fits_tristates[tristate] = None
@@ -84,13 +77,13 @@ class FilterWrapper:
         return fits_tristates
 
     def incident_fits_maxlevel(self, incident):
-        if self.is_maxlevel_empty():
+        filter_, ignored = self._get_filter_value_and_ignored_status(FilterKey.MAXLEVEL)
+        if ignored:
             return None
-        fallback_filter = self.fallback_filter.get("maxlevel", None)
-        return incident.level <= min(filter(None, (self.filter["maxlevel"], fallback_filter)))
+        return incident.level <= filter_
 
     def event_fits(self, event):
-        if self.is_event_types_empty():
+        filter_, ignored = self._get_filter_value_and_ignored_status(FilterKey.EVENT_TYPES)
+        if ignored:
             return True
-        fallback_filter = self.fallback_filter.get("event_types", [])
-        return event.type in self.filter.get("event_types", fallback_filter)
+        return event.type in filter_
