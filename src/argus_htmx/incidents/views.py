@@ -18,6 +18,10 @@ from .forms import AckForm
 LOG = logging.getLogger(__name__)
 
 
+class HtmxHttpRequest(HttpRequest):
+    htmx: HtmxDetails
+
+
 def incidents(request):
     qs = Incident.objects.all().order_by("-start_time")
     latest = qs.latest("start_time").start_time
@@ -73,10 +77,6 @@ def incident_add_ack(request, pk: int, group: Optional[str] = None):
     return render(request, "htmx/incidents/incident_add_ack.html", context=context)
 
 
-class HtmxHttpRequest(HttpRequest):
-    htmx: HtmxDetails
-
-
 @require_GET
 def incidents_table(request: HtmxHttpRequest) -> HttpResponse:
     # Load incidents
@@ -108,6 +108,3 @@ def incidents_table(request: HtmxHttpRequest) -> HttpResponse:
         "htmx/incidents/incidents_list.html",
         context=context
     )
-
-# def login(request):
-#

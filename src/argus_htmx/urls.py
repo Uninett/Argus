@@ -4,8 +4,10 @@ from django.contrib.auth import views as auth_views
 from argus.auth.utils import get_psa_authentication_names
 from argus.auth.views import LogoutView
 
-from . import views
-
+from .incidents.urls import urlpatterns as incident_urls
+from .timeslots.urls import urlpatterns as timeslot_urls
+from .notificationprofiles.urls import urlpatterns as notificationprofile_urls
+from .destinations.urls import urlpatterns as destination_urls
 
 app_name = "htmx"
 urlpatterns = [
@@ -16,8 +18,8 @@ urlpatterns = [
     ),
     path("accounts/logout/", auth_views.LogoutView.as_view(), name="logout"),
     #path("accounts/", include("django.contrib.auth.urls")),
-    path("incidents/", views.incidents, name="htmx_incidents"),
-    path("incidents/<int:pk>/", views.incident_detail, name="htmx_incident_detail"),
-    path("incidents/<int:pk>/ack/", views.incident_add_ack, name="htmx-incident-add-ack"),
-    path("incidents/table/", views.incidents_table, name="htmx_incidents_table"),
+    path("incidents/", include(incident_urls)),
+    path("timeslots/", include(timeslot_urls)),
+    path("notificationprofiles/", include(notificationprofile_urls)),
+    path("destinations/", include(destination_urls)),
 ]

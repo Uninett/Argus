@@ -31,9 +31,9 @@ section { border: 1px solid blue; }
 
 {% block header %}
 <header>
-<h1><span>Logo</span> Argus: {{ page_title }}</h1>
-<div>Timeslots</div>
-<div>Profiles</div>
+<h1><a href="{% url 'htmx:incidents' %}"><span>Logo</span> Argus: {{ page_title }}</a></h1>
+<div><a href="{% url 'htmx:timeslot-placeholder' %}">Timeslots</a></div>
+<div><a href="{% url 'htmx:notificationprofile-placeholder' %}">Profiles</a></div>
 <div>{% block userlink %}
 Theme: "{{ theme }}"
 {% if request.user.is_authenticated %}
