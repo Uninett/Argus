@@ -45,6 +45,11 @@ In your local settings that star-imports from an `argus-server`_ settings file::
     ROOT_URLCONF = "urls.py"
     MIDDLEWARE += ["django_htmx.middleware.HtmxMiddleware"]
 
+In the same file, add a copy of the entirety of ``TEMPLATES``. Choose one of
+the functions in ``argus_htmx.context_processors``. In the entry for
+``django.template.backends.django.DjangoTemplates``, append the full dotted
+path to the end of the ``context_processors`` list.
+
 Next to ``localsettings.py`` create an ``urls.py`` containing::
 
    from argus.site.urls import urlpatterns
@@ -56,9 +61,12 @@ Next to ``localsettings.py`` create an ``urls.py`` containing::
 With EXTRA_APPS
 ~~~~~~~~~~~~~~~
 
+Choose one of the functions in ``argus_htmx.context_processors``, exemplified
+by "theme_via_GET" below.
+
 In your environment variables::
 
-    ARGUS_EXTRA_APPS = '[{"app_name": "django_htmx"},{"app_name": "argus_htmx","urls": {"path": "", "urlpatterns_module": "argus_htmx.urls"}}]'
+    ARGUS_EXTRA_APPS = '[{"app_name": "django_htmx"}, {"app_name": "argus_htmx", "urls": {"path": "", "urlpatterns_module": "argus_htmx.urls"}, "context_processors": ["arguss_htmx.context_processor.theme_via_GET"]}]'
 
 In your local settings that star-imports from an `argus-server`_ settings file::
 

@@ -27,7 +27,9 @@ def incidents(request):
 # fetch with htmx
 def incident_row(request, pk: int):
     incident = get_object_or_404(Incident, d=pk)
-    context = {"incident": incident}
+    context = {
+        "incident": incident,
+    }
     return render(request, "htmx/incidents/_incident_row.html", context=context)
 
 
