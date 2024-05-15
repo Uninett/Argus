@@ -1,4 +1,9 @@
-<table id="table">
+<table id="table"
+       hx-get="?page={{ page.number }}"
+       hx-target="#table-body"
+       hx-swap="innerHTML"
+       hx-trigger="every {{ update_interval|default:'30' }}s"
+>
     <thead>
     <tr>
         <th>actions</th>
@@ -12,18 +17,12 @@
         <th>tag</th>
     </tr>
     </thead>
-    <tbody>
-    {% for incident in page.object_list %}
-        {% block incident %}
-            {% include 'htmx/incidents/_incident_table_row.html' %}
-        {% endblock incident %}
-        {% empty %}
-        <tr>
-            <td colspan="2">
-                No incidents on this page.
-            </td>
-        </tr>
-    {% endfor %}
+    <tbody
+            id="table-body"
+    >
+    {% block incident_rows %}
+        {% include 'htmx/incidents/_incident_table_rows.html' with incident_list=page.object_list %}
+    {% endblock incident_rows %}
     </tbody>
     <tfoot>
     <tr>
