@@ -99,12 +99,18 @@ Settings for adding additional Django apps
 Format of the app settings
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+App
+...
+
 Both settings are a list of dicts. The minimal content of the dict is::
 
     { "app_name": "myapp" }
 
 "myapp" is the same string you would normally put into
 :setting:`INSTALLED_APPS`.
+
+Urls
+....
 
 There is an experimental way of also overriding or extending the root
 ``urls.py`` in ``argus.site``.
@@ -145,6 +151,23 @@ There are two possible formats:
 
 This assumes that ``myapp.urls`` contains a variable named ``urlpatterns`` with
 the defined urls of the app.
+
+Context processors
+..................
+
+Optionally, one or more context processors can be added to the end of the
+context processors list of the
+``django.template.backends.django.DjangoTemplates`` template backend.
+
+Format::
+
+    {
+        "app_name": "holiday_cheer",
+        "context_processors": [
+            "holiday_cheer.context_processors.date_context",
+            "holiday_cheer.context_processors.holidays"
+        ],
+    }
 
 Dataporten
 ----------
