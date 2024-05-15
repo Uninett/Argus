@@ -49,7 +49,7 @@ class GetUrlPatternsFromSettingsTest(unittest.TestCase):
     def test_when_setting_is_falsey_return_empty_list(self):
         self.assertEqual(get_urlpatterns_from_setting(None), [])
 
-    def test_when_setting_contains_falsey_urls_should_return_empty_list(self):
+    def test_when_setting_urls_is_falsey_it_should_return_empty_list(self):
         class Obj:
             pass
 
