@@ -18,16 +18,30 @@ from .forms import AckForm
 LOG = logging.getLogger(__name__)
 
 
+def prefetch_incident_daughters():
+    return (
+        Incident.objects
+        .select_related("source")
+        .prefetch_related(
+            "incident_tag_relations",
+            "incident_tag_relations__tag",
+            "events",
+            "events__ack",
+        )
+    )
+
+
 class HtmxHttpRequest(HttpRequest):
     htmx: HtmxDetails
 
 
 def incidents(request):
-    qs = Incident.objects.all().order_by("-start_time")
+    qs = prefetch_incident_daughters().order_by("-start_time")
     latest = qs.latest("start_time").start_time
     context = {
-        "qs": qs,
+        "qs": qs[:5],
         "latest": latest,
+        "count": qs.count(),
         "page_title": "Incidents",
     }
     return render(request, "htmx/incidents/list.html", context=context)
