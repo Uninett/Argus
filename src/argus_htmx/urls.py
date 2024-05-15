@@ -19,4 +19,5 @@ urlpatterns = [
     path("incidents/", views.incidents, name="htmx_incidents"),
     path("incidents/<int:pk>/", views.incident_detail, name="htmx_incident_detail"),
     path("incidents/<int:pk>/ack/", views.incident_add_ack, name="htmx-incident-add-ack"),
+    path("incidents/table/", views.incidents_table, name="htmx_incidents_table"),
 ]

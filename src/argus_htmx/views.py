@@ -6,6 +6,11 @@ from django.contrib.auth.models import Group
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import render, reverse, get_object_or_404
 
+from django.views.decorators.http import require_GET
+from django.core.paginator import Paginator
+from django.http import HttpRequest, HttpResponse
+from django_htmx.middleware import HtmxDetails
+
 from argus.incident.models import Incident
 
 from .forms import AckForm
@@ -41,6 +46,7 @@ def incident_detail(request, pk: int):
     }
     return render(request, "htmx/incidents/incident_detail.html", context=context)
 
+
 def incident_add_ack(request, pk: int, group: Optional[str] = None):
     incident = get_object_or_404(Incident, id=pk)
     is_group_member = None
@@ -67,5 +73,41 @@ def incident_add_ack(request, pk: int, group: Optional[str] = None):
     return render(request, "htmx/incidents/incident_add_ack.html", context=context)
 
 
+class HtmxHttpRequest(HttpRequest):
+    htmx: HtmxDetails
+
+
+@require_GET
+def incidents_table(request: HtmxHttpRequest) -> HttpResponse:
+    # Load incidents
+    qs = Incident.objects.all().order_by("-start_time")
+    latest = qs.latest("start_time").start_time
+
+    # Standard Django pagination
+    page_num = request.GET.get("page", "1")
+    page = Paginator(object_list=qs, per_page=10).get_page(page_num)
+
+    # The htmx magic - use a different, minimal base template for htmx
+    # requests, allowing us to skip rendering the unchanging parts of the
+    # template.
+    if request.htmx:
+        base_template = "htmx/incidents/_incidents_table.html"
+    else:
+        base_template = "htmx/incidents/_base.html"
+
+    context = {
+        "qs": qs,
+        "latest": latest,
+        "page_title": "Incidents",
+        "base": base_template,
+        "page": page,
+    }
+
+    return render(
+        request,
+        "htmx/incidents/incidents_list.html",
+        context=context
+    )
+
 # def login(request):
-#     
+#

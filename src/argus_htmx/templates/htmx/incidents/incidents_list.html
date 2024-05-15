@@ -1,0 +1,21 @@
+{% extends base %}
+
+{% block main %}
+    <main>
+        <section>
+            <p>
+                Latest: {{ latest }}
+            </p>
+        </section>
+
+        <section>
+            {% include "htmx/incidents/_incidents_table.html" %}
+        </section>
+
+        <section>
+            <p>
+                Total, all time: {{ qs|length }}
+            </p>
+        </section>
+    </main>
+{% endblock main %}

@@ -1,0 +1,41 @@
+<tr
+        id="incident-{{ incident.pk }}-row"
+>
+    <td>
+        {% block row_select %}
+            <p>X</p>
+        {% endblock row_select %}
+    </td>
+    <td>
+        {% block incident_pk %}
+            {% include "htmx/incidents/_incident_pk.html" %}
+        {% endblock %}
+    </td>
+    <td>
+        {% block start_time %}
+            {% include "htmx/incidents/_incident_start_time.html" %}
+        {% endblock %}
+    </td>
+    <td>
+        {% block status %}
+            {% include "htmx/incidents/_incident_status.html" %}
+        {% endblock %}
+    </td>
+    <td>{{ incident.level }}</td>
+    <td>{{ incident.source }}</td>
+    <td>
+        {% block description %}
+            {% include "htmx/incidents/_incident_description.html" %}
+        {% endblock %}
+    </td>
+    <td>
+        {% block acknowledgement %}
+            {% include "htmx/incidents/_incident_ack.html" %}
+        {% endblock %}
+    </td>
+    <td>
+        {% block tag %}
+            {% include "htmx/incidents/_incident_tag.html" with tag="location" %}
+        {% endblock %}
+    </td>
+</tr>
