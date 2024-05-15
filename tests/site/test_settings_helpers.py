@@ -135,7 +135,9 @@ class UpdateContextProcessorsListTests(unittest.TestCase):
         result = update_context_processors_list(TEMPLATES, [app_setting])
         self.assertEqual(result, TEMPLATES)
 
-    def test_append_context_processors_in_setting_to_DjangoTemplates_context_processors_list(self):
+    def test_when_app_settings_contain_context_processors_it_should_append_them_to_DjangoTemplates_context_processors_list(
+        self,
+    ):
         raw_setting = {
             "app_name": "foo",
             "context_processors": ["omega"],
