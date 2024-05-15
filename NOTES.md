@@ -3,6 +3,31 @@
 This file documents changes to Argus that are relevant for operations and
 end-users.
 
+## [1.19.0] - 2024-05-15
+
+Remember to migrate!
+
+*Backwards-incompatible change*: Because it is now possible to filter on
+multiple event types instead of just one, both API V1 and API V2 has changed
+its schema for Filter.filter.
+
+* The key `"event_type"` is gone from V1. It never should have been there in
+  the first place since it's new functionality.
+* The key `"event_type"` has been *replaced* with a new key `"event_types"` in
+  V2. Where `"event_type"` was a single string, `"event_types"` is a list of
+  strings.
+
+Luckily, the frontend at https://github.com/Uninett/argus-frontend never added
+support for this feature.
+
+Behavior does not change as the key not being set (or set to None/empty list)
+will ignore the key when sending notifications.
+
+Existing instances of `"event_type"` in the database is automatically changed
+to `"event_types"` iff `"event_type"` was not falsey. Reversing the migration
+will set `"event_type"` to the first string in `"event_types"` hence might lose
+data: *don't reverse the migration in production!*
+
 ## [1.18.0] - 2024-05-07
 
 There's a new API endpoint allowing the deletion of an existing incident and

@@ -8,6 +8,36 @@ This project uses [*towncrier*](https://towncrier.readthedocs.io/) and the chang
 
 <!-- towncrier release notes start -->
 
+## [1.19.0] - 2024-05-15
+
+*Backwards-incompatible change*: Because it is now possible to filter on
+multiple event types instead of just one, both API V1 and API V2 has changed
+its schema for Filter.filter. See NOTES.md for details.
+
+### Removed
+
+- Removed `"event_type"` from the V1 Filter API, it should only have been
+  available in V2 (since it was new) and it has never been in use by the
+  frontend. ([#699](https://github.com/Uninett/Argus/issues/699))
+
+### Added
+
+- Add filtering of events by a list of event types
+  ([#699](https://github.com/Uninett/Argus/issues/699))
+- Add howto about how to set up and test federated login, using GitHub as an
+  example. ([#803](https://github.com/Uninett/Argus/issues/803))
+- Extend the usefulness of `OVERRIDE_APPS` and `EXTRA_APPS` by adding support
+  for Django template engine context processors. Any context processors are
+  added to the end of the list.
+  ([#810](https://github.com/Uninett/Argus/issues/810))
+
+### Changed
+
+- Change how the description of a change event is formatted so that it is
+  always consistent (not to mention DRY).
+  ([#809](https://github.com/Uninett/Argus/issues/809))
+
+
 ## [1.18.0] - 2024-05-07
 
 
