@@ -853,8 +853,7 @@ Notification profile endpoints
                   "open": true,
                   "acked": false,
                   "stateful": true,
-                  "maxlevel": 1,
-                  "event_type": "STA"
+                  "maxlevel": 1
               }
           }
 
@@ -1842,7 +1841,7 @@ Notification profile endpoints
                   "acked": false,
                   "stateful": true,
                   "maxlevel": 1,
-                  "event_type": "STA"
+                  "event_types": ["STA"]
               }
           }
 

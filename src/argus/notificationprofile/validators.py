@@ -4,7 +4,7 @@ from typing import Union
 from rest_framework import serializers
 
 from .constants import DEPRECATED_FILTER_NAMES
-from .primitive_serializers import FilterBlobSerializer
+from .serializers import FilterBlobSerializer
 
 
 def validate_filter_string(value: Union[str, dict]):

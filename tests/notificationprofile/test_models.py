@@ -185,11 +185,11 @@ class FilterWrapperEventTypeEmptyTests(unittest.TestCase):
 
     def test_when_filter_is_empty_is_event_type_empty_should_return_true(self):
         empty_filter = FilterWrapper({})
-        self.assertTrue(empty_filter.is_event_type_empty())
+        self.assertTrue(empty_filter.is_event_types_empty())
 
     def test_when_event_filter_exists_is_event_type_empty_should_return_false(self):
-        empty_filter = FilterWrapper({"event_type": "whatever"})
-        self.assertFalse(empty_filter.is_event_type_empty())
+        empty_filter = FilterWrapper({"event_types": ["whatever"]})
+        self.assertFalse(empty_filter.is_event_types_empty())
 
 
 @tag("unittest")
@@ -204,15 +204,15 @@ class FilterWrapperIncidentFitsEventTypeTests(unittest.TestCase):
 
     def test_when_event_filter_is_set_event_with_matching_type_should_fit(self):
         event = Mock()
-        event_type = ("CHI", "Incident change")
+        event_type = Event.Type.INCIDENT_CHANGE
         event.type = event_type
-        filter = FilterWrapper({"event_type": event_type})
+        filter = FilterWrapper({"event_types": [event_type]})
         self.assertTrue(filter.event_fits(event))
 
     def test_when_event_filter_is_set_event_with_not_matching_type_should_not_fit(self):
         event = Mock()
-        event.type = ("CHI", "Incident change")
-        filter = FilterWrapper({"event_type": ("ACK", "Acknowledge")})
+        event.type = Event.Type.INCIDENT_CHANGE
+        filter = FilterWrapper({"event_types": [Event.Type.ACKNOWLEDGE]})
         self.assertFalse(filter.event_fits(event))
 
 
