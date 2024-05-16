@@ -72,6 +72,11 @@ In your local settings that star-imports from an `argus-server`_ settings file::
 
     MIDDLEWARE += ["django_htmx.middleware.HtmxMiddleware"]
 
+Update
+------
+
+On every new version, reinstall the dependencies since there might be new ones.
+
 Themes
 ------
 
