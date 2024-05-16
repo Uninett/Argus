@@ -1,0 +1,23 @@
+{% extends "htmx/base.html" %}
+
+{% block main %}
+<section>
+<h1>Switch theme</h1>
+{% if theme %}
+<p>Theme is set to: {{ theme }}</p>
+{% else %}
+<p>No theme set</p>
+{% endif  %}
+<ul>
+  {% for item in object_list %}
+  <li>
+    <form method="POST" action=".">
+      {% csrf_token %}
+      <input type="hidden" name="theme" value="{{ item }}">
+      <button>{{ item }}</button>
+    </form>
+  </li>
+  {% endfor %}
+</ul>
+</section>
+{% endblock main %}

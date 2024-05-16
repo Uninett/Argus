@@ -19,6 +19,8 @@ dynamic = ["version"]
 dependencies = [
     "argus-server",
     "django-htmx",
+    # The next is for python_version < 3.12 but we simplify code by always needing it
+    "importlib_resources>=5.12",
 ]
 
 [project.urls]

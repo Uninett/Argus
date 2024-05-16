@@ -3,18 +3,23 @@
 {% block head %}
 <script src="https://unpkg.com/htmx.org@1.9.12" integrity="sha384-ujb1lZYygJmzgSwoxRggbCHcjc0rB2XoQrxeTUQyRjrOnlCoYta87iKBWq3EsdM2" crossorigin="anonymous"></script>
 {% if theme %}
-<link rel="stylesheet" href="/static/color-schemes/{{ theme }}.css" />
+<link rel="stylesheet" href="/static/themes/{{ theme }}.css" />
 {% else %}
 <link rel="stylesheet" href="/static/color-schemes/light.css" media="(prefers-color-scheme: light)" />
 <link rel="stylesheet" href="/static/color-schemes/dark.css" media="(prefers-color-scheme: dark)" />
 {% endif %}
+{% comment %}
 <style>
 * {
   background-color: var(--main-bg-color);
   color: var(--main-fg-color);
 }
-
-header {
+a {
+  color: var(--main-link-color);
+  background-color: var(--main-bg-color);
+}
+header nav ul {
+  list-style-type: none;
   display: flex;
   justify-content: space-between;
   align-items: baseline;
@@ -22,20 +27,19 @@ header {
   background-color: var(--nav-bg-color);
   color: var(--nav-fg-color);
 }
-
-a { color: var(--main-link-color); }
-
-section { border: 1px solid blue; }
 </style>
+{% endcomment %}
 {% endblock head %}
 
 {% block header %}
 <header>
-<h1><a href="{% url 'htmx:incidents' %}"><span>Logo</span> Argus: {{ page_title }}</a></h1>
-<div><a href="{% url 'htmx:timeslot-placeholder' %}">Timeslots</a></div>
-<div><a href="{% url 'htmx:notificationprofile-placeholder' %}">Profiles</a></div>
-<div>{% block userlink %}
-Theme: "{{ theme }}"
+<nav>
+<ul>
+<li><a href="{% url 'htmx:incidents' %}"><span>Logo</span> Argus: {{ page_title }}</a></li>
+<li><a href="{% url 'htmx:timeslot-placeholder' %}">Timeslots</a></li>
+<li><a href="{% url 'htmx:notificationprofile-placeholder' %}">Profiles</a></li>
+<li>Theme: <a href="{% url 'htmx:theme-list' %}">{{ theme }}"</a></li>
+<li>{% block userlink %}
 {% if request.user.is_authenticated %}
 {{ request.user }}
 <form action="{% url "htmx:logout" %}" method="POST">
@@ -45,6 +49,8 @@ Theme: "{{ theme }}"
 {% else %}
 <a href="{% url 'htmx:login' %}">Log in</a>
 {% endif %}
-{% endblock %}</div>
+{% endblock %}</li>
+</ul>
+</nav>
 </header>
 {% endblock header %}
