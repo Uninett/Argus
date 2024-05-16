@@ -77,12 +77,16 @@ class TimeRecurrence(models.Model):
     """
 
     def __str__(self):
-        return f"{self.start}-{self.end} on {self.get_days_display()}"
+        days = self.get_days_list()
+        return f"{self.start}-{self.end} on {days}"
 
     @property
     def isoweekdays(self):
         # `days` are stored as strings in the db
         return {int(day) for day in self.days}
+
+    def get_days_list(self):
+        return [self.Day(day).label for day in self.days]
 
     def timestamp_is_within(self, timestamp: datetime):
         # FIXME: Might affect performance negatively if calling this method frequently
