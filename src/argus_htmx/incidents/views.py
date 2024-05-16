@@ -96,7 +96,7 @@ def incident_add_ack(request, pk: int, group: Optional[str] = None):
 @require_GET
 def incidents_table(request: HtmxHttpRequest) -> HttpResponse:
     # Load incidents
-    qs = Incident.objects.all().order_by("-start_time")
+    qs = prefetch_incident_daughters().order_by("-start_time")
     latest = qs.latest("start_time").start_time
     last_refreshed = make_aware(datetime.now())
 
@@ -117,7 +117,7 @@ def incidents_table(request: HtmxHttpRequest) -> HttpResponse:
         base_template = "htmx/incidents/_base.html"
 
     context = {
-        "qs": qs,
+        "count": qs.count(),
         "page_title": "Incidents",
         "base": base_template,
         "page": page,
