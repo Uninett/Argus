@@ -3,6 +3,10 @@
 This file documents changes to Argus that are relevant for operations and
 end-users.
 
+## [1.19.1] - 2024-05-16
+
+Tiny bugfix-release, nothing to see here.
+
 ## [1.19.0] - 2024-05-15
 
 Remember to migrate!

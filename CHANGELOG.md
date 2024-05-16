@@ -8,6 +8,13 @@ This project uses [*towncrier*](https://towncrier.readthedocs.io/) and the chang
 
 <!-- towncrier release notes start -->
 
+## [1.19.1] - 2024-05-16
+
+### Fixed
+
+- Fixed bug preventing naive printing of TimeRecurrences, triggering
+  a traceback
+
 ## [1.19.0] - 2024-05-15
 
 *Backwards-incompatible change*: Because it is now possible to filter on
