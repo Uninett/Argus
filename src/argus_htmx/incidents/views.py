@@ -118,7 +118,6 @@ def incidents_table(request: HtmxHttpRequest) -> HttpResponse:
 
     context = {
         "qs": qs,
-        "latest": latest,
         "page_title": "Incidents",
         "base": base_template,
         "page": page,

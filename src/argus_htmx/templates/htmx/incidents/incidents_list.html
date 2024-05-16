@@ -2,12 +2,6 @@
 
 {% block main %}
     <section>
-        <p>
-            Latest: {{ latest }}
-        </p>
-    </section>
-
-    <section>
         {% block table %}
             {% include "htmx/incidents/_incidents_table.html" %}
         {% endblock table %}
