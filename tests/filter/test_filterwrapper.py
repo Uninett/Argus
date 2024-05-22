@@ -137,6 +137,76 @@ class FilterWrapperIncidentFitsMaxlevelTests(unittest.TestCase):
 
 
 @tag("unittest")
+class FilterWrapperIncidentFitsSourceSystemTests(unittest.TestCase):
+    # Validation is handled before the data gets to FilterWrapper
+    # A maxlevel must be one of the integers in Incident.LEVELS if it is set at all.
+
+    def test_incident_fits_source_system_is_None_if_not_mentioned_in_filter(self):
+        incident = Mock()
+        incident.source = True
+        empty_filter = FilterWrapper({})
+        result = empty_filter._incident_fits_source_system(incident)
+        self.assertEqual(result, None)
+
+    def test_incident_fits_source_system_is_True_if_incident_source_system_is_the_same_as_filter_source_system(self):
+        incident = Mock()
+        source = Mock()
+        source.id = 1
+        incident.source = source
+        filter = FilterWrapper({FilterKey.SOURCE_SYSTEM_IDS: [source.id, 2]})
+        result = filter._incident_fits_source_system(incident)
+        self.assertTrue(result)
+
+    def test_incident_fits_source_system_is_False_if_incident_source_system_is_not_in_filter_source_system(self):
+        incident = Mock()
+        source = Mock()
+        source.id = 1
+        incident.source = source
+        filter = FilterWrapper({FilterKey.SOURCE_SYSTEM_IDS: [4]})
+        result = filter._incident_fits_source_system(incident)
+        self.assertFalse(result)
+
+
+@tag("unittest")
+class FilterWrapperIncidentFitsTagsTests(unittest.TestCase):
+    # Validation is handled before the data gets to FilterWrapper
+    # A maxlevel must be one of the integers in Incident.LEVELS if it is set at all.
+
+    def test_incident_fits_tags_is_None_if_not_mentioned_in_filter(self):
+        incident = Mock()
+        empty_filter = FilterWrapper({})
+        result = empty_filter._incident_fits_tags(incident)
+        self.assertEqual(result, None)
+
+    def test_incident_fits_tags_is_False_if_no_incident_tags(self):
+        incident = Mock()
+        incident.deprecated_tags = []
+        filter = FilterWrapper({FilterKey.TAGS: ["a=b"]})
+        result = filter._incident_fits_tags(incident)
+        self.assertFalse(result)
+
+    def test_incident_fits_tags_is_True_if_incident_tags_is_in_filter_tags(self):
+        incident = Mock()
+        tag1 = Mock()
+        tag1.representation = "b=c"
+        tag2 = Mock()
+        tag2.representation = "e=f"
+        incident.deprecated_tags = [tag2, tag1]
+        filter = FilterWrapper({FilterKey.TAGS: ["b=c", "e=f"]})
+        result = filter._incident_fits_tags(incident)
+        self.assertTrue(result)
+
+    def test_incident_fits_tags_is_False_if_incident_tags_is_not_in_filter_tags(self):
+        incident = Mock()
+        tag = Mock()
+        tag.representation = "e=f"
+        incident.deprecated_tags = [tag]
+        filter = FilterWrapper({FilterKey.TAGS: ["a=b"]})
+        result = filter._incident_fits_tags(incident)
+        self.assertFalse(result)
+
+
+@tag("unittest")
 class FilterWrapperEventFitsEventTypeTests(unittest.TestCase):
     # Validation is handled before the data gets to FilterWrapper
     # An event type must be one of the types in Event.Type if it is set at all.

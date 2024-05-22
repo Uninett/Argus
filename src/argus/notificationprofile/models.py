@@ -132,7 +132,7 @@ class Filter(models.Model):
     def filtered_incidents(self):
         if self.is_empty:
             return self.all_incidents.none().distinct()
-        data = self.filter
+        data = self.filter.copy()
         filtered_by_source = self.incidents_with_source_systems(data=data)
         filtered_by_tags = self.incidents_with_tags(data=data)
         filtered_by_tristates = self.incidents_fitting_tristates(data=data)
@@ -144,7 +144,7 @@ class Filter(models.Model):
     def incidents_with_source_systems(self, data=None):
         if not data:
             data = self.filter.copy()
-        source_list = data.pop("sourceSystemIds", [])
+        source_list = data.get("sourceSystemIds", [])
         if source_list:
             return self.all_incidents.filter(source__in=source_list).distinct()
         return self.all_incidents.distinct()
@@ -153,7 +153,7 @@ class Filter(models.Model):
     def incidents_with_tags(self, data=None):
         if not data:
             data = self.filter.copy()
-        tags_list = data.pop("tags", [])
+        tags_list = data.get("tags", [])
         if tags_list:
             return self.all_incidents.from_tags(*tags_list)
         return self.all_incidents.distinct()
@@ -166,9 +166,9 @@ class Filter(models.Model):
         if not data:
             data = self.filter.copy()
         fitting_incidents = self.all_incidents
-        filter_open = data.pop("open", None)
-        filter_acked = data.pop("acked", None)
-        filter_stateful = data.pop("stateful", None)
+        filter_open = data.get("open", None)
+        filter_acked = data.get("acked", None)
+        filter_stateful = data.get("stateful", None)
 
         if filter_open is True:
             fitting_incidents = fitting_incidents.open()
@@ -188,16 +188,10 @@ class Filter(models.Model):
     def incidents_fitting_maxlevel(self, data=None):
         if not data:
             data = self.filter.copy()
-        maxlevel = data.pop("maxlevel", None)
+        maxlevel = data.get("maxlevel", None)
         if not maxlevel:
             return self.all_incidents.distinct()
         return self.all_incidents.filter(level__lte=maxlevel).distinct()
-
-    def incident_fits(self, incident: Incident):
-        return self.filter_wrapper.incident_fits(incident)
-
-    def event_fits(self, event: Event):
-        return self.filter_wrapper.event_fits(event)
 
 
 class Media(models.Model):
@@ -281,9 +275,3 @@ class NotificationProfile(models.Model):
     def filtered_incidents(self):
         qs = [filter_.filtered_incidents for filter_ in self.filters.all()]
         return reduce(or_, qs)
-
-    def incident_fits(self, incident: Incident):
-        return self.filter_wrapper.incident_fits(incident)
-
-    def event_fits(self, event: Event):
-        return self.filter_wrapper.event_fits(event)

@@ -125,11 +125,16 @@ class ComplexFilterWrapper:
         is_selected_by_time = self.profile.timeslot.timestamp_is_within_time_recurrences(incident.start_time)
         if not is_selected_by_time:
             return False
-        checks = {f: f.incident_fits(incident) for f in self.profile.filters.all()}
-        is_selected_by_filters = False not in checks.values()
-        return is_selected_by_filters
+        for f in self.profile.filters.only("filter"):
+            if not FilterWrapper(f.filter).incident_fits(incident):
+                return False
+        return True
 
     def event_fits(self, event: Event):
         if not self.profile.active:
             return False
-        return any(f.event_fits(event) for f in self.profile.filters.all())
+        # return as early as possible
+        for f in self.profile.filters.only("filter"):
+            if FilterWrapper(f.filter).event_fits(event):
+                return True
+        return False

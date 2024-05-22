@@ -8,8 +8,10 @@ from django.conf import settings
 from django.db import connections
 from rest_framework.exceptions import ValidationError
 
-from ..models import DestinationConfig, Media, NotificationProfile
+from argus.filter.filterwrapper import ComplexFilterWrapper
 from argus.util.utils import import_class_from_dotted_path
+
+from ..models import DestinationConfig, Media, NotificationProfile
 
 if TYPE_CHECKING:
     import sys
@@ -77,8 +79,9 @@ def find_destinations_for_event(event: Event):
     incident = event.incident
     qs = NotificationProfile.objects.filter(active=True)
     for profile in qs.prefetch_related("destinations").select_related("user"):
+        fw = ComplexFilterWrapper(profile=profile)
         LOG.debug('Notification: checking profile "%s" (%s) for event "%s"', profile, profile.user.username, event)
-        if profile.incident_fits(incident) and profile.event_fits(event):
+        if fw.incident_fits(incident) and fw.event_fits(event):
             destinations.update(profile.destinations.all())
     LOG.info('Notification: found %i listeners for "%s"', len(destinations), event)
     return destinations
