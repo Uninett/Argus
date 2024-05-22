@@ -1,4 +1,3 @@
-from random import choice
 import unittest
 from unittest.mock import Mock
 
@@ -137,20 +136,31 @@ class FilterWrapperIncidentFitsMaxlevelTests(unittest.TestCase):
     # Validation is handled before the data gets to FilterWrapper
     # A maxlevel must be one of the integers in Incident.LEVELS if it is set at all.
 
-    def test_incident_fits_maxlevel_no_maxlevel_set(self):
+    def test_incident_fits_maxlevel_is_None_if_not_mentioned_in_filter(self):
         incident = Mock()
         empty_filter = FilterWrapper({})
-        result = empty_filter.incident_fits_maxlevel(incident)
+        result = empty_filter._incident_fits_maxlevel(incident)
         self.assertEqual(result, None)
 
-    def test_incident_fits_maxlevel(self):
+    def test_incident_fits_maxlevel_is_True_if_incident_level_is_lte_maxlevel(self):
         incident = Mock()
-        level = choice(Incident.LEVELS)
-        maxlevel = choice(Incident.LEVELS)
+        level = 1
+        maxlevel = 2
         incident.level = level
         filter = FilterWrapper({FilterKey.MAXLEVEL: maxlevel})
-        result = filter.incident_fits_maxlevel(incident)
+        result = filter._incident_fits_maxlevel(incident)
+        self.assertTrue(result)
         self.assertEqual(result, level <= maxlevel)
+
+    def test_incident_fits_maxlevel_is_False_if_incident_level_is_gt_maxlevel(self):
+        incident = Mock()
+        level = 2
+        maxlevel = 1
+        incident.level = level
+        filter = FilterWrapper({FilterKey.MAXLEVEL: maxlevel})
+        result = filter._incident_fits_maxlevel(incident)
+        self.assertFalse(result)
+        self.assertNotEqual(result, level > maxlevel)
 
 
 @tag("unittest")
