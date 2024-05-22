@@ -113,3 +113,23 @@ class FilterWrapper:
         else:
             LOG.debug("Filter: %s: HIT!", self)
         return not any_failed
+
+
+class ComplexFilterWrapper:
+    def __init__(self, **kwargs):
+        self.profile = kwargs.pop("profile", None)
+
+    def incident_fits(self, incident: Incident):
+        if not self.profile.active:
+            return False
+        is_selected_by_time = self.profile.timeslot.timestamp_is_within_time_recurrences(incident.start_time)
+        if not is_selected_by_time:
+            return False
+        checks = {f: f.incident_fits(incident) for f in self.profile.filters.all()}
+        is_selected_by_filters = False not in checks.values()
+        return is_selected_by_filters
+
+    def event_fits(self, event: Event):
+        if not self.profile.active:
+            return False
+        return any(f.event_fits(event) for f in self.profile.filters.all())

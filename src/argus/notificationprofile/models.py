@@ -13,7 +13,7 @@ from django.utils import timezone
 from django.utils.text import slugify
 
 from argus.auth.models import User
-from argus.filter.filterwrapper import FilterWrapper
+from argus.filter.filterwrapper import FilterWrapper, ComplexFilterWrapper
 from argus.filter.constants import DEPRECATED_FILTER_NAMES
 
 if TYPE_CHECKING:
@@ -193,11 +193,9 @@ class Filter(models.Model):
             return self.all_incidents.distinct()
         return self.all_incidents.filter(level__lte=maxlevel).distinct()
 
-    # XXX wrong location
     def incident_fits(self, incident: Incident):
         return self.filter_wrapper.incident_fits(incident)
 
-    # XXX wrong location
     def event_fits(self, event: Event):
         return self.filter_wrapper.event_fits(event)
 
@@ -269,29 +267,23 @@ class NotificationProfile(models.Model):
         blank=True,
     )
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.filter_wrapper = ComplexFilterWrapper(profile=self)
+
     def __str__(self):
         if self.name:
             return f"{self.name}"
         return f"{self.timeslot}: {', '.join(str(f) for f in self.filters.all())}"
 
-    # XXX wrong location
+    # XXX wrong location?
     @property
     def filtered_incidents(self):
         qs = [filter_.filtered_incidents for filter_ in self.filters.all()]
         return reduce(or_, qs)
 
-    # XXX wrong location
     def incident_fits(self, incident: Incident):
-        assert incident.source, "incident does not have a source -2"
-        if not self.active:
-            return False
-        is_selected_by_time = self.timeslot.timestamp_is_within_time_recurrences(incident.start_time)
-        checks = {f: f.incident_fits(incident) for f in self.filters.all()}
-        is_selected_by_filters = False not in checks.values()
-        return is_selected_by_time and is_selected_by_filters
+        return self.filter_wrapper.incident_fits(incident)
 
-    # XXX wrong location
     def event_fits(self, event: Event):
-        if not self.active:
-            return False
-        return any(f.event_fits(event) for f in self.filters.all())
+        return self.filter_wrapper.event_fits(event)
