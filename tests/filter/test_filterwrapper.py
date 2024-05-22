@@ -64,71 +64,44 @@ class FilterWrapperIsEmptyTests(unittest.TestCase):
 
 
 @tag("unittest")
-class FilterWrapperIncidentFitsTristatesTests(unittest.TestCase):
+class FilterWrapperIncidentFitsTristateTests(unittest.TestCase):
     # Validation is handled before the data gets to FilterWrapper
     # A tristate must be one of True, False, None
     # "None" is equivalent to the tristate not being mentioned in the filter at all
 
-    def test_get_incident_tristate_checks_no_tristates_set(self):
+    def test_incident_fits_tristate_is_None_for_non_tristates_filters(self):
         incident = Mock()
-        empty_filter = FilterWrapper({})
-        result = empty_filter.get_incident_tristate_checks(incident)
-        self.assertEqual(result, {})
+        empty_filter = FilterWrapper({FilterKey.MAXLEVEL: 2})
+        result = empty_filter._incident_fits_tristate(incident, FilterKey.MAXLEVEL)
+        self.assertEqual(result, None)
 
-    @override_settings(ARGUS_FALLBACK_FILTER={"acked": True})
-    def test_get_incident_tristate_checks_no_tristates_set_with_fallback(self):
+    def test_incident_fits_tristate_is_None_if_not_mentioned_in_filter(self):
         incident = Mock()
-        # Shouldn't match
-        incident.acked = False
-        empty_filter = FilterWrapper({})
-        result = empty_filter.get_incident_tristate_checks(incident)
-        self.assertEqual(result["open"], None)
-        self.assertEqual(result["acked"], False)
-        self.assertEqual(result["stateful"], None)
-        # Should match
+        incident.open = True
+        filter_ = FilterWrapper({"blbl": True})
+        result = filter_._incident_fits_tristate(incident, FilterKey.OPEN)
+        self.assertEqual(result, None)
+
+    def test_incident_fits_tristate_is_True_if_True_in_filter_and_incident_tristate_is_True(self):
+        incident = Mock()
         incident.acked = True
-        empty_filter = FilterWrapper({})
-        result = empty_filter.get_incident_tristate_checks(incident)
-        self.assertNotIn(False, result.values())
-        self.assertEqual(result["open"], None)
-        self.assertEqual(result["acked"], True)
-        self.assertEqual(result["stateful"], None)
+        filter_ = FilterWrapper({FilterKey.ACKED: True})
+        result = filter_._incident_fits_tristate(incident, FilterKey.ACKED)
+        self.assertTrue(result)
 
-    def test_get_incident_tristate_checks_is_true(self):
+    def test_incident_fits_tristate_is_False_if_False_in_filter_and_incident_tristate_is_True(self):
         incident = Mock()
-        incident.open = True
-        incident.acked = False
         incident.stateful = True
-        filter = FilterWrapper({"open": True, "acked": False})
-        result = filter.get_incident_tristate_checks(incident)
-        self.assertTrue(set(result.values()))  # result not empty
-        self.assertEqual(result["open"], True)
-        self.assertEqual(result["acked"], True)
-        self.assertEqual(result["stateful"], None)
+        filter_ = FilterWrapper({FilterKey.STATEFUL: False})
+        result = filter_._incident_fits_tristate(incident, FilterKey.STATEFUL)
+        self.assertFalse(result)
 
-    def test_get_incident_tristate_checks_is_false(self):
+    def test_incident_fits_tristate_is_False_if_True_in_filter_and_incident_tristate_is_False(self):
         incident = Mock()
-        incident.open = True
-        incident.acked = False
-        incident.stateful = True
-        filter = FilterWrapper({"open": False, "acked": False})
-        result = filter.get_incident_tristate_checks(incident)
-        self.assertIn(False, result.values())
-        self.assertEqual(result["open"], False)
-        self.assertEqual(result["acked"], True)
-        self.assertEqual(result["stateful"], None)
-
-    @override_settings(ARGUS_FALLBACK_FILTER={"acked": True})
-    def test_get_incident_tristate_checks_fallback_should_not_override(self):
-        incident = Mock()
-        # Should match
-        incident.acked = False
-        filter = FilterWrapper({"acked": False})
-        result = filter.get_incident_tristate_checks(incident)
-        self.assertNotIn(False, result.values())
-        self.assertEqual(result["open"], None)
-        self.assertEqual(result["acked"], True)
-        self.assertEqual(result["stateful"], None)
+        incident.stateful = False
+        filter_ = FilterWrapper({FilterKey.STATEFUL: True})
+        result = filter_._incident_fits_tristate(incident, FilterKey.STATEFUL)
+        self.assertFalse(result)
 
 
 @tag("unittest")

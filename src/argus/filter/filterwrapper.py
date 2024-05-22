@@ -61,21 +61,6 @@ class FilterWrapper:
     def is_empty(self):
         return all(self._get_filter_value_and_ignored_status(key)[1] for key in self.FILTER_KEYS)
 
-    def get_incident_tristate_checks(self, incident) -> Dict[str, TriState]:
-        if all(self._get_filter_value_and_ignored_status(key)[1] for key in self.TRINARY_FILTERS):
-            return {}
-        fits_tristates = {}
-        for tristate in self.TRINARY_FILTERS:
-            filter_tristate = self._get_filter_value(tristate)
-            if filter_tristate is None:
-                LOG.debug('Tristates: "%s" not in filter, ignoring', tristate)
-                fits_tristates[tristate] = None
-                continue
-            incident_tristate = getattr(incident, tristate, None)
-            LOG.debug('Tristates: "%s": filter = %s, incident = %s', tristate, filter_tristate, incident_tristate)
-            fits_tristates[tristate] = filter_tristate == incident_tristate
-        return fits_tristates
-
     def _incident_fits_maxlevel(self, incident: Incident):
         filter_, ignored = self._get_filter_value_and_ignored_status(FilterKey.MAXLEVEL)
         if ignored:
@@ -95,6 +80,15 @@ class FilterWrapper:
         tags = set(tag.representation for tag in incident.deprecated_tags)
         return tags.issuperset(filter_)
 
+    def _incident_fits_tristate(self, incident: Incident, tristate: str):
+        if tristate not in self.TRINARY_FILTERS:
+            return None
+        filter_, ignored = self._get_filter_value_and_ignored_status(tristate)
+        if ignored:
+            return None
+        incident_tristate = getattr(incident, tristate, None)
+        return incident_tristate is filter_
+
     # public
 
     def event_fits(self, event):
@@ -110,8 +104,8 @@ class FilterWrapper:
         checks["source"] = self._incident_fits_source_system(incident)
         checks["tags"] = self._incident_fits_tags(incident)
         checks["max_level"] = self._incident_fits_maxlevel(incident)
-        tristate_checks = self.get_incident_tristate_checks(incident)
-        checks.update(tristate_checks)
+        for tristate in self.TRINARY_FILTERS:
+            checks[tristate.value] = self._incident_fits_tristate(incident, tristate)
 
         any_failed = False in checks.values()
         if any_failed:
