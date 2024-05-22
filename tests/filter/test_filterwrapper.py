@@ -164,7 +164,7 @@ class FilterWrapperIncidentFitsMaxlevelTests(unittest.TestCase):
 
 
 @tag("unittest")
-class FilterWrapperIncidentFitsEventTypeTests(unittest.TestCase):
+class FilterWrapperEventFitsEventTypeTests(unittest.TestCase):
     # Validation is handled before the data gets to FilterWrapper
     # An event type must be one of the types in Event.Type if it is set at all.
 
