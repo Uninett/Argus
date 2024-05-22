@@ -150,16 +150,6 @@ class Filter(models.Model):
         return self.all_incidents.distinct()
 
     # XXX wrong location
-    def source_system_fits(self, incident: Incident, data=None):
-        if not data:
-            data = self.filter.copy()
-        source_list = data.pop("sourceSystemIds", [])
-        if not source_list:
-            # We're not limiting on sources!
-            return None
-        return incident.source.id in source_list
-
-    # XXX wrong location
     def incidents_with_tags(self, data=None):
         if not data:
             data = self.filter.copy()
@@ -167,17 +157,6 @@ class Filter(models.Model):
         if tags_list:
             return self.all_incidents.from_tags(*tags_list)
         return self.all_incidents.distinct()
-
-    # XXX wrong location
-    def tags_fit(self, incident: Incident, data=None):
-        if not data:
-            data = self.filter.copy()
-        tags_list = data.pop("tags", [])
-        if not tags_list:
-            # We're not limiting on tags!
-            return None
-        tags = set(tag.representation for tag in incident.deprecated_tags)
-        return tags.issuperset(tags_list)
 
     # XXX wrong location
     def incidents_fitting_tristates(
@@ -216,27 +195,10 @@ class Filter(models.Model):
 
     # XXX wrong location
     def incident_fits(self, incident: Incident):
-        if self.is_empty:
-            return False  # Filter is empty!
-        data = self.filter.copy()
-        checks = {}
-        checks["source"] = self.source_system_fits(incident, data)
-        checks["tags"] = self.tags_fit(incident, data)
-        tristate_checks = self.filter_wrapper.get_incident_tristate_checks(incident)
-        for tristate, result in tristate_checks.items():
-            checks[tristate] = result
-        checks["max_level"] = self.filter_wrapper.incident_fits_maxlevel(incident)
-        any_failed = False in checks.values()
-        if any_failed:
-            LOG.debug("Filter: %s: MISS! checks: %r", self, checks)
-        else:
-            LOG.debug("Filter: %s: HIT!", self)
-        return not any_failed
+        return self.filter_wrapper.incident_fits(incident)
 
     # XXX wrong location
     def event_fits(self, event: Event):
-        if self.is_empty:
-            return False  # Filter is empty!
         return self.filter_wrapper.event_fits(event)
 
 

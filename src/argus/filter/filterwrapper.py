@@ -76,14 +76,46 @@ class FilterWrapper:
             fits_tristates[tristate] = filter_tristate == incident_tristate
         return fits_tristates
 
-    def incident_fits_maxlevel(self, incident):
+    def _incident_fits_maxlevel(self, incident: Incident):
         filter_, ignored = self._get_filter_value_and_ignored_status(FilterKey.MAXLEVEL)
         if ignored:
             return None
         return incident.level <= filter_
+
+    def _incident_fits_source_system(self, incident: Incident):
+        filter_, ignored = self._get_filter_value_and_ignored_status(FilterKey.SOURCE_SYSTEM_IDS)
+        if ignored:
+            return None
+        return incident.source.id in filter_
+
+    def _incident_fits_tags(self, incident: Incident):
+        filter_, ignored = self._get_filter_value_and_ignored_status(FilterKey.TAGS)
+        if ignored:
+            return None
+        tags = set(tag.representation for tag in incident.deprecated_tags)
+        return tags.issuperset(filter_)
+
+    # public
 
     def event_fits(self, event):
         filter_, ignored = self._get_filter_value_and_ignored_status(FilterKey.EVENT_TYPES)
         if ignored:
             return True
         return event.type in filter_
+
+    def incident_fits(self, incident: Incident):
+        if self.is_empty:
+            return False  # Filter is empty!
+        checks = {}
+        checks["source"] = self._incident_fits_source_system(incident)
+        checks["tags"] = self._incident_fits_tags(incident)
+        checks["max_level"] = self._incident_fits_maxlevel(incident)
+        tristate_checks = self.get_incident_tristate_checks(incident)
+        checks.update(tristate_checks)
+
+        any_failed = False in checks.values()
+        if any_failed:
+            LOG.debug("Filter: %s: MISS! checks: %r", self, checks)
+        else:
+            LOG.debug("Filter: %s: HIT!", self)
+        return not any_failed
