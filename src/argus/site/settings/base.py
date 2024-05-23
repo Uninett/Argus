@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     "argus.auth",
     "argus.incident",
     "argus.ws",
+    "argus.filter",
     "argus.notificationprofile",
     "argus.dev",
 ]
