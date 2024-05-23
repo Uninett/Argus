@@ -4,7 +4,7 @@ from rest_framework import fields, serializers
 
 from argus.filter.primitive_serializers import CustomMultipleChoiceField
 from argus.filter.V1.serializers import FilterSerializerV1
-from argus.filter.validators import validate_filter_string
+from argus.filter.V1.validators import validate_filter_string
 from ..models import DestinationConfig, NotificationProfile
 from ..serializers import TimeslotSerializer
 

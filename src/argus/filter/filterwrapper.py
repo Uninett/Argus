@@ -15,8 +15,6 @@ from django.utils.text import slugify
 from argus.auth.models import User
 from argus.compat import StrEnum
 
-from .constants import DEPRECATED_FILTER_NAMES
-
 
 if TYPE_CHECKING:
     from argus.incident.models import Event, Incident

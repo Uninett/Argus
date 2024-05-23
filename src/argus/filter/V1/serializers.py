@@ -8,7 +8,7 @@ from argus.incident.constants import INCIDENT_LEVELS
 from argus.notificationprofile.models import Filter
 
 from ..primitive_serializers import CustomMultipleChoiceField
-from ..validators import validate_filter_string
+from .validators import validate_filter_string
 
 
 class FilterPreviewSerializer(serializers.Serializer):

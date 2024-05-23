@@ -14,7 +14,6 @@ from django.utils.text import slugify
 
 from argus.auth.models import User
 from argus.filter.filterwrapper import FilterWrapper, ComplexFilterWrapper
-from argus.filter.constants import DEPRECATED_FILTER_NAMES
 
 if TYPE_CHECKING:
     from argus.incident.models import Event, Incident
@@ -101,7 +100,6 @@ class TimeRecurrence(models.Model):
 
 
 class Filter(models.Model):
-    FILTER_NAMES = set(DEPRECATED_FILTER_NAMES)
     user = models.ForeignKey(to=User, on_delete=models.CASCADE, related_name="filters")
     name = models.CharField(max_length=40)
     filter = models.JSONField(default=dict)
