@@ -4,6 +4,7 @@ from functools import reduce
 import logging
 from operator import and_
 from random import randint
+import sys
 from urllib.parse import urljoin
 
 from django.core.exceptions import ValidationError
@@ -634,11 +635,15 @@ class ChangeEvent(Event):
 
     @classmethod
     def format_description(cls, attribute, old, new):
-        context = {
-            "attribute": attribute,
-            "old": old if old is not None else "",
-            "new": new if new is not None else "",
-        }
+        context = {"attribute": attribute}
+        if attribute == "metadata":
+            old = "{}b".format(sys.getsizeof(old))
+            new = "{}b".format(sys.getsizeof(new))
+        else:
+            old = (old if old is not None else "",)
+            old = (new if new is not None else "",)
+        context[old] = old
+        context[new] = new
         return cls.DESCRIPTION_FORMAT.format(**context)
 
     @classmethod
