@@ -243,7 +243,7 @@ class IncidentViewSet(
 
     pagination_class = IncidentPagination
     permission_classes = [IsAuthenticated]
-    queryset = Incident.objects.prefetch_default_related().prefetch_related("source")
+    queryset = Incident.objects.prefetch_default_related().select_related("source").prefetch_related("events__ack")
     filter_backends = [filters.DjangoFilterBackend, SearchFilter]
     filterset_class = IncidentFilter
     search_fields = ["description", "search_text"]
