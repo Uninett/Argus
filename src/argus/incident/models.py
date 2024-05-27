@@ -634,11 +634,15 @@ class ChangeEvent(Event):
 
     @classmethod
     def format_description(cls, attribute, old, new):
-        context = {
-            "attribute": attribute,
-            "old": old if old is not None else "",
-            "new": new if new is not None else "",
-        }
+        context = {"attribute": attribute}
+        if attribute == "metadata":
+            oldstr = "{} item(s)".format(len(old) if old else 0)
+            newstr = "{} item(s)".format(len(new) if new else 0)
+        else:
+            oldstr = old if old is not None else ""
+            newstr = new if new is not None else ""
+        context["old"] = oldstr
+        context["new"] = newstr
         return cls.DESCRIPTION_FORMAT.format(**context)
 
     @classmethod
