@@ -230,7 +230,10 @@ class Event(models.Model):
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
         # update incident.search_text
-        self.incident.save()
+        if self.description in self.incident.search_text:
+            return
+        self.incident.search_text += " " + self.description
+        self.incident.save(force_update=True, update_fields=["search_text"])
 
     def __str__(self):
         return f"'{self.get_type_display()}': {self.incident.description}, {self.actor} @ {self.timestamp}"
@@ -435,8 +438,6 @@ class Incident(models.Model):
     def save(self, *args, **kwargs):
         # Parse and replace `end_time`, to avoid having to call `refresh_from_db()`
         self.end_time = self._meta.get_field("end_time").to_python(self.end_time)
-        if self.id:
-            self.search_text = self.generate_search_text()
         super().save(*args, **kwargs)
 
     @property
@@ -593,12 +594,6 @@ class Incident(models.Model):
         if base_url:
             return urljoin(base_url, path)
         return path  # Just show the relative url
-
-    def generate_search_text(self):
-        search_fields = []
-        for event in self.events.all():
-            search_fields.append(event.description)
-        return " ".join(search_fields)
 
 
 class IncidentRelationType(models.Model):
