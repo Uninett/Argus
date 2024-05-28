@@ -8,6 +8,22 @@ This project uses [*towncrier*](https://towncrier.readthedocs.io/) and the chang
 
 <!-- towncrier release notes start -->
 
+## [1.19.2] - 2024-05-28
+
+### Added
+
+- There is now a commented line in `argus.site.urls.urlpatterns` that if
+  uncommented will allow logging into the API with username/password. This
+  allows the use of the DRF HTML api to change records. This partially works
+  with django-debug-toolbar and should ease some debugging sessions.
+
+### Changed
+
+- Optimized PUT/PATCH of incidents in API v2. Mainly by no longer replacing
+  `Incident.search_text` on every Incident save, thereby avoiding looking up
+  all events for that incident. The old behavior was fine when there was only
+  a handful of events per incident but we can no longer assume that.
+
 ## [1.19.1] - 2024-05-16
 
 ### Fixed
