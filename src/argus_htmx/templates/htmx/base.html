@@ -38,7 +38,7 @@ header nav ul {
 <li><a href="{% url 'htmx:incidents' %}"><span>Logo</span> Argus: {{ page_title }}</a></li>
 <li><a href="{% url 'htmx:timeslot-placeholder' %}">Timeslots</a></li>
 <li><a href="{% url 'htmx:notificationprofile-placeholder' %}">Profiles</a></li>
-<li>Theme: <a href="{% url 'htmx:theme-list' %}">{{ theme }}"</a></li>
+<li>Theme: <a href="{% url 'htmx:theme-list' %}">{{ theme }}</a></li>
 <li>{% block userlink %}
 {% if request.user.is_authenticated %}
 {{ request.user }}
