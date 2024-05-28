@@ -243,7 +243,7 @@ class IncidentViewSet(
 
     pagination_class = IncidentPagination
     permission_classes = [IsAuthenticated]
-    queryset = Incident.objects.prefetch_default_related().select_related("source").prefetch_related("events__ack")
+    queryset = Incident.objects.all()
     filter_backends = [filters.DjangoFilterBackend, SearchFilter]
     filterset_class = IncidentFilter
     search_fields = ["description", "search_text"]
@@ -252,6 +252,13 @@ class IncidentViewSet(
         if self.request.method in {"PUT", "PATCH"}:
             return IncidentPureDeserializer
         return IncidentSerializer
+
+    def get_queryset(self):
+        if self.request.method != "GET":
+            return super().get_queryset()
+        return (
+            Incident.objects.prefetch_default_related().select_related("source").prefetch_related("events__ack").all()
+        )
 
     def list(self, request, *args, **kwargs):
         if "count" in request.query_params:
