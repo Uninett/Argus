@@ -232,7 +232,7 @@ class Event(models.Model):
         # update incident.search_text
         if self.description in self.incident.search_text:
             return
-        self.incident.search_text += self.description
+        self.incident.search_text += " " + self.description
         self.incident.save(force_update=True, update_fields=["search_text"])
 
     def __str__(self):
