@@ -7,11 +7,13 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from argus.filter.filters import BooleanStringOAEnum
 from argus.filter.filters import SourceLockedIncidentFilter
+from argus.filter.filters import SOURCE_LOCKED_INCIDENT_OPENAPI_PARAMETER_DESCRIPTIONS
 
 from ..models import Incident, SourceSystem
 from ..serializers import IncidentPureDeserializer, SourceSystemSerializer
-from ..views import IncidentViewSet, BooleanStringOAEnum
+from ..views import IncidentViewSet
 from .serializers import (
     AcknowledgementSerializerV1,
     IncidentSerializerV1,
@@ -118,6 +120,11 @@ class IncidentViewSetV1(IncidentViewSet):
         return Response(data)
 
 
+@extend_schema_view(
+    list=extend_schema(
+        parameters=SOURCE_LOCKED_INCIDENT_OPENAPI_PARAMETER_DESCRIPTIONS,
+    )
+)
 class SourceLockedIncidentViewSetV1(IncidentViewSetV1):
     """All incidents added by the currently logged in user
 
