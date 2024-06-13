@@ -7,9 +7,9 @@ jobs:
     runs-on: ubuntu-latest
     name: Lint
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
-    - uses: actions/cache@v3
+    - uses: actions/cache@v4
       id: cache
       with:
         path: ~/.cache/pip
@@ -18,7 +18,7 @@ jobs:
           ${{ runner.os }}-pip-
 
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: 3.11
 
@@ -44,9 +44,9 @@ jobs:
         python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
-    - uses: actions/cache@v3
+    - uses: actions/cache@v4
       id: cache
       with:
         path: ~/.cache/pip
@@ -55,7 +55,7 @@ jobs:
           ${{ runner.os }}-pip-
 
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
 
@@ -104,8 +104,8 @@ jobs:
 
     - name: Upload test reports (${{ matrix.python-version }})
       if: always()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
-        name: test-reports
+        name: test-reports-${{ matrix.python-version }}
         path: |
           test-reports/**/*
