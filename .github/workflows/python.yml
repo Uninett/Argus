@@ -86,20 +86,6 @@ jobs:
       run: |
         python -m tox
 
-    - name: "Combine coverage"
-      if: "contains(env.USING_COVERAGE, matrix.python-version)"
-      run: |
-        set -xe
-        python -m coverage combine
-        python -m coverage xml
-
-    - name: Upload to Codecov
-      if: "github.repository_owner == 'Uninett' && contains(env.USING_COVERAGE, matrix.python-version)"
-      uses: codecov/codecov-action@v4
-      with:
-        token: ${{ secrets.CODECOV_TOKEN }}
-        fail_ci_if_error: true
-
     - name: Upload test reports (${{ matrix.python-version }})
       if: always()
       uses: actions/upload-artifact@v4

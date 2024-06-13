@@ -1,4 +1,4 @@
-name: Publish test results
+name: Publish test and coverage results
 
 on:
   workflow_run:
@@ -8,11 +8,19 @@ on:
 
 jobs:
   publish-test-results:
-    name: "Publish test results"
+    name: "Publish test and coverage results"
     runs-on: ubuntu-latest
     if: github.event.workflow_run.conclusion != 'skipped'
 
     steps:
+      # Checking out the repo is necessary codecov/codecov-action@v4 to work properly
+      # Codecov requires source code to process the coverage file and generate coverage
+      # reports
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
       - name: Download and Extract Artifacts
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
@@ -34,3 +42,9 @@ jobs:
           commit: ${{ github.event.workflow_run.head_sha }}
           check_name: "Test results"
           files: artifacts/**/*-results.xml
+
+      - name: Upload to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true
