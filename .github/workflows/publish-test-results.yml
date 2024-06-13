@@ -10,7 +10,7 @@ jobs:
   publish-test-results:
     name: "Publish test and coverage results"
     runs-on: ubuntu-latest
-    if: github.event.workflow_run.conclusion != 'skipped'
+    if: github.event.workflow_run.conclusion != 'skipped' && github.repository_owner == 'Uninett'
 
     steps:
       # Checking out the repo is necessary codecov/codecov-action@v4 to work properly
