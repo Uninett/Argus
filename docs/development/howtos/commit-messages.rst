@@ -7,10 +7,10 @@ First line
 
 The first line of the commit message should strive to be 50 characters or less.
 It is always better to spend those characters on a good, short summary of what
-the commit does. Avoid prefixes like "fix" or issue numbers/pull request
-numbers.
+the commit does. Avoid prefixes like "feat:" or adding issue numbers/pull
+request numbers.
 
-Complete the sentence "Merging this commit will ..".
+Complete the sentence "Merging this commit will…".
 
 Examples:
 
@@ -24,18 +24,23 @@ Examples:
 * Split up test file
 * Move Bar to separate file
 
+Feel free to use a thesaurus to find a good verb.
+
 More info
 =========
 
 If there is more to add, have a blank line after the first line then describe
 away. Issue numbers, pull request numbers, links to more info can all go here.
 
-Explanations as to what is actually is going on is especially welcome.
+Explanations as to what is actually going on is especially welcome.
+
+If this a pull request with a good and beefy explanation, copy the explanation
+to the body of the commit so that the explanation stays with the code.
 
 Collaborators
 =============
 
-If you worked together with someone else on a commi, add them to the bottom
+If you worked together with someone else on a commit, add them to the bottom
 like this::
 
     ---------
@@ -47,11 +52,12 @@ like this::
 Squashed commits
 ================
 
+This repo prefers a linear commit history, so squash early, squash often.
+
 Let the first line describe the set of commits as a whole. Then, after a blank
 line, you can list the original messages, just remember to remove any "Fix
-typo" (especially if it fixes a typo introduced earlier in this set of
-commits), "fixup", "whoops", random letters knuckle-rolled in frustration and
-similar.
+typo" (if it fixes a typo introduced earlier in this set of commits), "fixup",
+"whoops", random letters knuckle-rolled in frustration and similar.
 
 If the same message occurs more than once, keep only one. Remove it entirely
 if it is a frustration-commit.
