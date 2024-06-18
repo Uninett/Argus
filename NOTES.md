@@ -3,6 +3,10 @@
 This file documents changes to Argus that are relevant for operations and
 end-users.
 
+## [1.19.2] - 2024-05-28
+
+Optimization of API Incident PUT/PATCH.
+
 ## [1.19.1] - 2024-05-16
 
 Tiny bugfix-release, nothing to see here.

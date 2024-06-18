@@ -9,6 +9,10 @@ from argus.util.testing import disconnect_signals, connect_signals
 from . import IncidentBasedAPITestCaseHelper
 
 
+# format_description tests here, one for each outlier (now metadata), one for
+# the normal ones
+
+
 @tag("integration")
 class ChangeEventTests(APITestCase, IncidentBasedAPITestCaseHelper):
     def setUp(self):
@@ -117,6 +121,23 @@ class ChangeEventTests(APITestCase, IncidentBasedAPITestCaseHelper):
             path=f"/api/v2/incidents/{self.incident.pk}/",
             data={
                 "tags": [{"tag": new_tag}],
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        change_events = self.incident.events.filter(type=Event.Type.INCIDENT_CHANGE)
+        change_events_descriptions = [event.description for event in change_events]
+        self.assertTrue(change_events)
+        self.assertIn(description, change_events_descriptions)
+        self.assertEqual(change_events.get(description=description).actor, self.user1)
+
+    def test_change_event_is_created_on_metadata_changes(self):
+        new_metadata = {1: 2}
+        description = ChangeEvent.format_description("metadata", {}, new_metadata)
+
+        response = self.user1_rest_client.patch(
+            path=f"/api/v2/incidents/{self.incident.pk}/",
+            data={
+                "metadata": new_metadata,
             },
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)

@@ -230,7 +230,10 @@ class Event(models.Model):
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
         # update incident.search_text
-        self.incident.save()
+        if self.description in self.incident.search_text:
+            return
+        self.incident.search_text += " " + self.description
+        self.incident.save(force_update=True, update_fields=["search_text"])
 
     def __str__(self):
         return f"'{self.get_type_display()}': {self.incident.description}, {self.actor} @ {self.timestamp}"
@@ -435,8 +438,6 @@ class Incident(models.Model):
     def save(self, *args, **kwargs):
         # Parse and replace `end_time`, to avoid having to call `refresh_from_db()`
         self.end_time = self._meta.get_field("end_time").to_python(self.end_time)
-        if self.id:
-            self.search_text = self.generate_search_text()
         super().save(*args, **kwargs)
 
     @property
@@ -594,12 +595,6 @@ class Incident(models.Model):
             return urljoin(base_url, path)
         return path  # Just show the relative url
 
-    def generate_search_text(self):
-        search_fields = []
-        for event in self.events.all():
-            search_fields.append(event.description)
-        return " ".join(search_fields)
-
 
 class IncidentRelationType(models.Model):
     name = models.TextField()
@@ -634,11 +629,15 @@ class ChangeEvent(Event):
 
     @classmethod
     def format_description(cls, attribute, old, new):
-        context = {
-            "attribute": attribute,
-            "old": old if old is not None else "",
-            "new": new if new is not None else "",
-        }
+        context = {"attribute": attribute}
+        if attribute == "metadata":
+            oldstr = "{} item(s)".format(len(old) if old else 0)
+            newstr = "{} item(s)".format(len(new) if new else 0)
+        else:
+            oldstr = old if old is not None else ""
+            newstr = new if new is not None else ""
+        context["old"] = oldstr
+        context["new"] = newstr
         return cls.DESCRIPTION_FORMAT.format(**context)
 
     @classmethod

@@ -45,6 +45,7 @@ urlpatterns = [
     path("api/schema/swagger-ui/", SpectacularSwaggerView.as_view(url_name="schema-v1-old"), name="swagger-ui-v1-old"),
     path("api/v1/", include(("argus.site.api_v1_urls", "api"), namespace="v1")),
     path("api/v2/", include(("argus.site.api_v2_urls", "api"), namespace="v2")),
+    # path('api/sessionauth/', include('rest_framework.urls', namespace='rest_framework')),
     path("api/", MetadataView.as_view(), name="metadata"),
     path("json-schema/<slug:slug>", SchemaView.as_view(), name="json-schema"),
     path("", index, name="api-home"),
