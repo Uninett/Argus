@@ -28,7 +28,7 @@ This allows the use of more complex Python data types than environment variables
 A settings file will override any environment variables.
 
 ``argus.site.settings.dev`` and ``argus.site.settings.prod`` provide reasonable defaults
-for development and production environment. You can use and/or override them by
+for development and production environments. You can use and/or override them by
 importing them to your ``localsettings.py`` as follows::
 
   from argus.site.settings.prod import *
