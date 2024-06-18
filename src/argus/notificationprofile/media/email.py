@@ -12,6 +12,7 @@ from rest_framework.exceptions import ValidationError
 from argus.incident.models import Event
 from .base import NotificationMedium
 from ..models import DestinationConfig
+from argus.util.datetime_utils import INFINITY, LOCAL_INFINITY
 
 if TYPE_CHECKING:
     import sys
@@ -161,6 +162,8 @@ class EmailNotification(NotificationMedium):
         for field in ("id", "source_id"):
             incident_dict.pop(field)
         incident_dict["details_url"] = event.incident.pp_details_url()
+        if event.incident.end_time in {INFINITY, LOCAL_INFINITY}:
+            incident_dict["end_time"] = "Still open"
 
         template_context = {
             "title": title,

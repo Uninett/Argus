@@ -20,7 +20,7 @@ class DestinationConfigInline(admin.TabularInline):
 
 
 class UserAdmin(BaseUserAdmin):
-    inlines = [DestinationConfigInline]
+    # inlines = [DestinationConfigInline]
 
     def has_delete_permission(self, request, obj=None):
         return False
