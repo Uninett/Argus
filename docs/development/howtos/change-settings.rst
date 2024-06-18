@@ -23,7 +23,7 @@ own way of setting environment variables.
 Variant 2: Using a ``settings.py`` file
 =======================================
 
-A settings file is a regular python file.
+A settings file is a regular Python file.
 This allows the use of more complex Python data types than environment variables.
 A settings file will override any environment variables.
 
