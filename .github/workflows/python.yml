@@ -35,6 +35,8 @@ jobs:
 
     name: "Python ${{ matrix.python-version }}"
     runs-on: ubuntu-latest
+    env:
+      USING_COVERAGE: '3.8'
 
     strategy:
       max-parallel: 4
@@ -85,6 +87,13 @@ jobs:
         DATABASE_URL: "postgresql://${{ env.POSTGRES_USER }}:${{ env.POSTGRES_PASSWORD }}@localhost/${{ env.POSTGRES_DB }}"
       run: |
         python -m tox
+
+    - name: "Combine coverage"
+      if: contains(env.USING_COVERAGE, matrix.python-version)
+      run: |
+        set -xe
+        python -m coverage combine
+        python -m coverage xml
 
     - name: Upload test reports (${{ matrix.python-version }})
       if: always()
