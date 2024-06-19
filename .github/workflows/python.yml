@@ -93,7 +93,7 @@ jobs:
       run: |
         set -xe
         python -m coverage combine
-        python -m coverage xml
+        python -m coverage xml -o test-reports/${{ matrix.python-version }}/coverage.xml
 
     - name: Upload test reports (${{ matrix.python-version }})
       if: always()
