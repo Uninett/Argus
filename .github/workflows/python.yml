@@ -1,6 +1,9 @@
 name: Test django site
 
-on: [push, pull_request]
+on:
+  push:
+    branches: master
+  pull_request:
 
 jobs:
   lint:
@@ -85,6 +88,12 @@ jobs:
         DATABASE_URL: "postgresql://${{ env.POSTGRES_USER }}:${{ env.POSTGRES_PASSWORD }}@localhost/${{ env.POSTGRES_DB }}"
       run: |
         python -m tox
+
+    - name: "Combine coverage"
+      run: |
+        set -xe
+        python -m coverage combine
+        python -m coverage xml -o test-reports/${{ matrix.python-version }}/coverage.xml
 
     - name: Upload test reports (${{ matrix.python-version }})
       if: always()
