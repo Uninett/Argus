@@ -32,7 +32,7 @@ More info
 If there is more to add, have a blank line after the first line then describe
 away. Issue numbers, pull request numbers, links to more info can all go here.
 
-Explanations as to what is actually going on is especially welcome.
+Explanations as to what is actually going on are especially welcome.
 
 If this a pull request with a good and beefy explanation, copy the explanation
 to the body of the commit so that the explanation stays with the code.
