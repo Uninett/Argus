@@ -2,7 +2,7 @@
 How to change site-specific settings
 ====================================
 
-Two ways to define these site-specific settings follows.
+Two ways to define these site-specific settings follow.
 
 Variant 1: Using environment variables in the shell
 ===================================================
