@@ -37,18 +37,6 @@ class HtmxHttpRequest(HttpRequest):
     htmx: HtmxDetails
 
 
-def incidents(request):
-    qs = prefetch_incident_daughters().order_by("-start_time")
-    latest = qs.latest("start_time").start_time
-    context = {
-        "qs": qs[:5],
-        "latest": latest,
-        "count": qs.count(),
-        "page_title": "Incidents",
-    }
-    return render(request, "htmx/incidents/list.html", context=context)
-
-
 # fetch with htmx
 def incident_row(request, pk: int):
     incident = get_object_or_404(Incident, d=pk)
@@ -94,7 +82,7 @@ def incident_add_ack(request, pk: int, group: Optional[str] = None):
 
 
 @require_GET
-def incidents_table(request: HtmxHttpRequest) -> HttpResponse:
+def incident_list(request: HtmxHttpRequest) -> HttpResponse:
     # Load incidents
     qs = prefetch_incident_daughters().order_by("-start_time")
     latest = qs.latest("start_time").start_time
@@ -127,6 +115,6 @@ def incidents_table(request: HtmxHttpRequest) -> HttpResponse:
 
     return render(
         request,
-        "htmx/incidents/incidents_list.html",
+        "htmx/incidents/incident_list.html",
         context=context
     )

@@ -26,7 +26,7 @@ def get_theme_files(request):
     for f in absolute_filenames:
         if not f.suffix == '.css':
             continue
-        filename = f.name.rstrip('.css')
+        filename = f.name[:-len('.css')]
         theme_names.append(filename)
     return sorted(theme_names)
 
