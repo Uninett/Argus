@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "django_filters",
     "phonenumber_field",
+    "django_q",
 
     # Argus apps
     "argus.auth",
@@ -229,13 +230,14 @@ REST_FRAMEWORK = {
 
 AUTH_TOKEN_EXPIRES_AFTER_DAYS = 14
 
+# Redis
+_REDIS = urlsplit("//" + get_str_env("ARGUS_REDIS_SERVER", "127.0.0.1:6379"))
 
 # django-channels
 
 ASGI_APPLICATION = "argus.ws.asgi.application"
 
 # fmt: off
-_REDIS = urlsplit("//" + get_str_env("ARGUS_REDIS_SERVER", "127.0.0.1:6379"))
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
@@ -323,3 +325,18 @@ SOCIAL_AUTH_NEW_USER_REDIRECT_URL = SOCIAL_AUTH_LOGIN_REDIRECT_URL
 #
 # SOCIAL_AUTH_DATAPORTEN_FEIDE_KEY = SOCIAL_AUTH_DATAPORTEN_KEY
 # SOCIAL_AUTH_DATAPORTEN_FEIDE_SECRET = SOCIAL_AUTH_DATAPORTEN_SECRET
+
+# Django-Q2
+
+Q_CLUSTER = {
+    "name": "events",
+    "timeout": 60,
+    "time_zone": "UTC",
+    "cpu_affinity": 1,
+    "label": "Django Q2 Queue",
+    "redis": {
+        "host": _REDIS.hostname,
+        "port": _REDIS.port or 6379,
+        "db": 0,
+    },
+}

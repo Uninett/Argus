@@ -1,6 +1,6 @@
 # Defines a production image for the Argus API server
 # Needs the repository root directory as its context
-FROM python:3.9
+FROM python:3.11
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get install -y --no-install-recommends tini build-essential
@@ -19,5 +19,6 @@ ENV DJANGO_SETTINGS_MODULE=dockersettings
 
 ENV PORT=8000
 EXPOSE 8000
-COPY docker/docker-entrypoint.sh /api-entrypoint.sh
-ENTRYPOINT ["/usr/bin/tini", "-v", "--", "/api-entrypoint.sh"]
+COPY docker/docker-entrypoint-api.sh /api-entrypoint-api.sh
+COPY docker/docker-entrypoint-qcluster.sh /api-entrypoint-qcluster.sh
+ENTRYPOINT ["/usr/bin/tini", "-v", "--", "/api-entrypoint-api.sh"]

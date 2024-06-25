@@ -31,6 +31,7 @@ dependencies = [
     "django-phonenumber-field[phonenumberslite]",
     "djangorestframework>=3.14",
     "drf-rw-serializers>=1.1",
+    "django-q2",
     "drf-spectacular>=0.17",
     "factory_boy",
     "psycopg2",
