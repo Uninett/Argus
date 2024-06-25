@@ -1,5 +1,6 @@
 import logging
 from typing import Optional
+from datetime import datetime
 
 from django.conf import settings
 from django.contrib.auth.models import Group
@@ -12,6 +13,7 @@ from django.http import HttpRequest, HttpResponse
 from django_htmx.middleware import HtmxDetails
 
 from argus.incident.models import Incident
+from argus.util.datetime_utils import make_aware
 
 from .forms import AckForm
 
@@ -82,8 +84,9 @@ def incident_add_ack(request, pk: int, group: Optional[str] = None):
 @require_GET
 def incident_list(request: HtmxHttpRequest) -> HttpResponse:
     # Load incidents
-    qs = Incident.objects.all().order_by("-start_time")
+    qs = prefetch_incident_daughters().order_by("-start_time")
     latest = qs.latest("start_time").start_time
+    last_refreshed = make_aware(datetime.now())
 
     # Standard Django pagination
     page_num = request.GET.get("page", "1")
@@ -93,16 +96,21 @@ def incident_list(request: HtmxHttpRequest) -> HttpResponse:
     # requests, allowing us to skip rendering the unchanging parts of the
     # template.
     if request.htmx:
-        base_template = "htmx/incidents/_incident_table.html"
+        # HX-Trigger == HTML tag id that iniated the request
+        if request.headers.get("HX-Trigger", "") == "table":
+            base_template = "htmx/incidents/responses/_incidents_table_poll.html"
+        else:
+            base_template = "htmx/incidents/responses/_incidents_table_refresh.html"
     else:
         base_template = "htmx/incidents/_base.html"
 
     context = {
-        "qs": qs,
-        "latest": latest,
+        "count": qs.count(),
         "page_title": "Incidents",
         "base": base_template,
         "page": page,
+        "last_refreshed": last_refreshed,
+        "update_interval": 30,
     }
 
     return render(

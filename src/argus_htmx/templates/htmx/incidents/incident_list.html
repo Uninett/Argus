@@ -2,18 +2,19 @@
 
 {% block main %}
     <section>
-        <p>
-            Latest: {{ latest }}
-        </p>
-    </section>
-
-    <section>
-        {% include "htmx/incidents/_incident_table.html" %}
+        {% block table %}
+            {% include "htmx/incidents/_incident_table.html" %}
+        {% endblock table %}
     </section>
 
     <section>
         <p>
-            Total, all time: {{ qs|length }}
+            Total, all time: {{ count }}
         </p>
+        
+        {% block refresh_info %}
+            {% include "htmx/incidents/_incidents_refresh_info.html" %}
+        {% endblock refresh_info %}
     </section>
+
 {% endblock main %}
