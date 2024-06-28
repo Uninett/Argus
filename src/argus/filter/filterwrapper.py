@@ -1,18 +1,11 @@
 from __future__ import annotations
 
-from datetime import datetime, time
-from functools import reduce
 import logging
 from operator import or_
 from typing import TYPE_CHECKING, Dict, Optional, Any, Tuple
 
 from django.conf import settings
-from django.contrib.postgres.fields import ArrayField
-from django.db import models
-from django.utils import timezone
-from django.utils.text import slugify
 
-from argus.auth.models import User
 from argus.compat import StrEnum
 
 
