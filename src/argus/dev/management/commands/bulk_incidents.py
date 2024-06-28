@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 
 from argus.auth.models import User
-from argus.filter.filterwrapper import FilterWrapper
+from argus.filter.queryset_filterwrapper import IncidentQuerySetFilterWrapper
 from argus.incident.models import Incident
 from argus.notificationprofile.models import Filter
 
@@ -112,13 +112,12 @@ class Command(BaseCommand):
             self.stderr.write(self.style.WARNING("No filter with the given pk or name could be found."))
             return
 
-        fw = FilterWrapper(filter.filter)
-        first_filtered_incidents = filter.filtered_incidents
-        incident_pks = [incident.pk for incident in first_filtered_incidents if fw.incident_fits(incident=incident)]
+        incident_qs = IncidentQuerySetFilterWrapper.filtered_incidents(Incident.objects.all(), filter.filter)
+        # Continue with a clean queryset with no filters set
+        incident_pks = [incident.pk for incident in incident_qs]
         if not incident_pks:
             self.stdout.write(self.style.WARNING("No incidents for the given filter could be found."))
             return
-
         incident_qs = Incident.objects.filter(pk__in=incident_pks)
 
         if action == "ticket_url":

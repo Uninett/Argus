@@ -1,12 +1,12 @@
 import unittest
 from unittest.mock import Mock
 
-from django.test import tag, override_settings
-from django.utils.dateparse import parse_time
+from django.test import override_settings
+from django.test import tag
 
-from argus.filter.filterwrapper import FilterWrapper, FilterKey
-from argus.filter.factories import FilterFactory
-from argus.incident.models import Incident, Event
+from argus.filter.filterwrapper import FilterKey
+from argus.filter.filterwrapper import FilterWrapper
+from argus.incident.models import Event
 
 
 @tag("unittest")

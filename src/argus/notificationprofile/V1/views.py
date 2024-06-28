@@ -7,11 +7,13 @@ from rest_framework.response import Response
 from drf_rw_serializers import viewsets as rw_viewsets
 
 from argus.drf.permissions import IsOwner
+from argus.filter.queryset_filterwrapper import IncidentQuerySetFilterWrapper
 from argus.filter.V1.serializers import (
     FilterSerializerV1,
     FilterBlobSerializerV1,
     FilterPreviewSerializer,
 )
+from argus.incident.models import Incident
 from argus.incident.serializers import IncidentSerializer
 from ..models import Filter, NotificationProfile
 from .serializers import (
@@ -80,11 +82,14 @@ class NotificationProfileViewSetV1(rw_viewsets.ModelViewSet):
     )
     @action(methods=["get"], detail=True)
     def incidents(self, request, pk, *args, **kwargs):
+        incident_qs = Incident.objects.all()
         try:
             notification_profile = request.user.notification_profiles.get(pk=pk)
         except NotificationProfile.DoesNotExist:
             raise ValidationError(f"Notification profile with pk={pk} does not exist.")
-        serializer = IncidentSerializer(notification_profile.filtered_incidents, many=True)
+        serializer = IncidentSerializer(
+            IncidentQuerySetFilterWrapper.incidents_by_notificationprofile_pk(incident_qs, pk), many=True
+        )
         return Response(serializer.data)
 
     @extend_schema(
@@ -112,10 +117,15 @@ class NotificationProfileViewSetV1(rw_viewsets.ModelViewSet):
         Will eventually take over for the filterpreview endpoint
         """
         filter_dict = request.data
-        serializer = FilterBlobSerializerV1(data=filter_dict)
-        if not serializer.is_valid():
-            raise ValidationError(serializer.errors)
+        filter_serializer = FilterBlobSerializerV1(data=filter_dict)
+        if not filter_serializer.is_valid():
+            raise ValidationError(filter_serializer.errors)
 
-        mock_filter = Filter(filter=serializer.data)
-        serializer = IncidentSerializer(mock_filter.filtered_incidents, many=True)
+        serializer = IncidentSerializer(
+            IncidentQuerySetFilterWrapper.filtered_incidents(
+                Incident.objects.all(),
+                filter_serializer.data,
+            ),
+            many=True,
+        )
         return Response(serializer.data)

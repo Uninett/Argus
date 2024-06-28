@@ -7,6 +7,7 @@ from rest_framework.test import APITestCase
 from rest_framework.test import APIClient
 
 from argus.filter.factories import FilterFactory
+from argus.filter.queryset_filterwrapper import IncidentQuerySetFilterWrapper
 from argus.notificationprofile.factories import (
     DestinationConfigFactory,
     NotificationProfileFactory,
@@ -25,6 +26,7 @@ from argus.incident.factories import (
     StatelessIncidentFactory,
     TagFactory,
 )
+from argus.incident.models import Incident
 from argus.auth.factories import PersonUserFactory, SourceUserFactory
 from argus.util.testing import disconnect_signals, connect_signals
 
@@ -87,7 +89,10 @@ class ViewTests(APITestCase):
             f"/api/v1/notificationprofiles/{self.notification_profile1.pk}/incidents/"
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        all_incidents = self.notification_profile1.filtered_incidents
+        all_incidents = IncidentQuerySetFilterWrapper.incidents_by_notificationprofile(
+            Incident.objects.all(),
+            self.notification_profile1,
+        )
         self.assertEqual(len(response.data), len(all_incidents))
         all_incident_pks = set([incident.pk for incident in all_incidents])
         all_response_pks = set([incident["pk"] for incident in response.data])
