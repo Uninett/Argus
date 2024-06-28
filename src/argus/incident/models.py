@@ -506,7 +506,7 @@ class Incident(models.Model):
 
         return self.events.filter((acks_query & acks_not_expired_query) | ack_is_just_being_created).exists()
 
-    def acked_by(self, group: str):
+    def is_acked_by(self, group: str) -> bool:
         return Acknowledgement.objects.filter(event__incident=self, event__actor__groups__name=group).exists()
 
     def create_first_event(self):
