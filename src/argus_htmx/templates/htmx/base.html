@@ -20,18 +20,23 @@ margin-bottom: 0;
 margin-left: 0;
 margin-right: 0;
 }
-.override > header > nav > ul {
-  padding: 1rem;
+
+.override nav {
+  margin-bottom: 0;
 }
-.override > header > nav > ul {
+
+.override > header > nav > ul, .override nav > ul {
   max-width: 100%;
   display: flex;
-  justify-content: space-between;
   align-items: baseline;
   font-weight: bold;
   list-style: none;
+  gap: 1rem;
 }
 
+.override > header > nav > ul {
+  justify-content: space-between;
+}
 
 .override > footer, .override > header {
 width: 100%;
