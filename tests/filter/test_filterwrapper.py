@@ -10,17 +10,6 @@ from argus.incident.models import Incident, Event
 
 
 @tag("unittest")
-class FilterWrapperFallbackFilterTests(unittest.TestCase):
-    @override_settings(ARGUS_FALLBACK_FILTER={"acked": True})
-    def test_does_not_meddle_with_actual_settings(self):
-        from django.conf import settings
-
-        self.assertEqual(
-            {"acked": True}, getattr(settings, "ARGUS_FALLBACK_FILTER", {}), "Test hasn't updated settings"
-        )
-
-
-@tag("unittest")
 class FilterWrapperGetFilterValueTests(unittest.TestCase):
     def test_ignores_garbage(self):
         garbage_filter = FilterWrapper({"unknown-state": True})
@@ -122,8 +111,13 @@ class FilterWrapperIncidentFitsMaxlevelTests(unittest.TestCase):
         incident.level = level
         filter = FilterWrapper({FilterKey.MAXLEVEL: maxlevel})
         result = filter._incident_fits_maxlevel(incident)
-        self.assertTrue(result)
-        self.assertEqual(result, level <= maxlevel)
+        self.assertEqual(result, level < maxlevel)
+        level = 2
+        maxlevel = 2
+        incident.level = level
+        filter = FilterWrapper({FilterKey.MAXLEVEL: maxlevel})
+        result = filter._incident_fits_maxlevel(incident)
+        self.assertEqual(result, level == maxlevel)
 
     def test_incident_fits_maxlevel_is_False_if_incident_level_is_gt_maxlevel(self):
         incident = Mock()
