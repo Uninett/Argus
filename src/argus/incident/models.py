@@ -13,7 +13,6 @@ from django.db.models import F, Q
 from django.utils import timezone
 
 from argus.auth.models import User
-from argus.notificationprofile.models import Filter, NotificationProfile
 from argus.util.datetime_utils import INFINITY_REPR, get_infinity_repr
 from .constants import INCIDENT_LEVELS, INCIDENT_LEVEL_CHOICES, MIN_INCIDENT_LEVEL, MAX_INCIDENT_LEVEL
 from .fields import DateTimeInfinityField
@@ -289,38 +288,6 @@ class IncidentQuerySet(models.QuerySet):
         token_expiry_tag = Tag.objects.filter((Q(key="problem_type") & Q(value="token_expiry"))).first()
 
         return self.filter(source_id=argus_source_system.id).filter(incident_tag_relations__tag=token_expiry_tag)
-
-    def filter_pk(self, pk):
-        """
-        Returns all incidents that are included in the filter with the given primary
-        key
-
-        If no filter with that pk exists it returns no incidents
-        """
-        filtr = Filter.objects.filter(pk=pk).first()
-
-        if not filtr:
-            return self.none()
-
-        return self.filter(pk__in=filtr.filtered_incidents.values_list("pk", flat=True))
-
-    def notificationprofile_pk(self, pk):
-        """
-        Returns all incidents that are included in the filters connected to the profile
-        with the given primary key
-        """
-        notification_profile = NotificationProfile.objects.filter(pk=pk).first()
-
-        if not notification_profile:
-            return self.none()
-
-        filters = notification_profile.filters.all()
-
-        filtered_incidents_pks = set()
-        for filtr in filters:
-            filtered_incidents_pks.update(filtr.filtered_incidents.values_list("pk", flat=True))
-
-        return self.filter(pk__in=filtered_incidents_pks)
 
     # Cannot be a constant, because `timezone.now()` would have been evaluated at compile time
     @staticmethod

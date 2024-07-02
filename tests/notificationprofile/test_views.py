@@ -3,6 +3,7 @@ from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
 from argus.auth.factories import PersonUserFactory, SourceUserFactory
+from argus.filter.factories import FilterFactory
 from argus.incident.factories import (
     IncidentTagRelationFactory,
     SourceSystemFactory,
@@ -12,7 +13,6 @@ from argus.incident.factories import (
 )
 from argus.notificationprofile.factories import (
     DestinationConfigFactory,
-    FilterFactory,
     NotificationProfileFactory,
     TimeRecurrenceFactory,
     TimeslotFactory,

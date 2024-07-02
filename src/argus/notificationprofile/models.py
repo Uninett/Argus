@@ -13,8 +13,7 @@ from django.utils import timezone
 from django.utils.text import slugify
 
 from argus.auth.models import User
-
-from .constants import DEPRECATED_FILTER_NAMES
+from argus.filter.filterwrapper import FilterWrapper, ComplexFilterWrapper
 
 if TYPE_CHECKING:
     from argus.incident.models import Event, Incident
@@ -100,79 +99,7 @@ class TimeRecurrence(models.Model):
         super().save(*args, **kwargs)
 
 
-class FilterWrapper:
-    TRINARY_FILTERS = ("open", "acked", "stateful")
-
-    def __init__(self, filterblob):
-        self.fallback_filter = getattr(settings, "ARGUS_FALLBACK_FILTER", {})
-        self.filter = filterblob.copy()
-
-    def _get_tristate(self, tristate):
-        fallback_filter = self.fallback_filter.get(tristate, None)
-        return self.filter.get(tristate, fallback_filter)
-
-    def are_tristates_empty(self):
-        for tristate in self.TRINARY_FILTERS:
-            if self._get_tristate(tristate) is not None:
-                return False
-        return True
-
-    def is_maxlevel_empty(self):
-        fallback_filter = self.fallback_filter.get("maxlevel", None)
-        return not self.filter.get("maxlevel", fallback_filter)
-
-    def is_event_types_empty(self):
-        fallback_filter = self.fallback_filter.get("event_types", None)
-        return not self.filter.get("event_types", fallback_filter)
-
-    def are_source_system_ids_empty(self):
-        fallback_filter = self.fallback_filter.get("sourceSystemIds", None)
-        return not self.filter.get("sourceSystemIds", fallback_filter)
-
-    def are_tags_empty(self):
-        fallback_filter = self.fallback_filter.get("tags", None)
-        return not self.filter.get("tags", fallback_filter)
-
-    @property
-    def is_empty(self):
-        return (
-            self.are_source_system_ids_empty()
-            and self.are_tags_empty()
-            and self.are_tristates_empty()
-            and self.is_maxlevel_empty()
-            and self.is_event_types_empty()
-        )
-
-    def get_incident_tristate_checks(self, incident) -> Dict[str, TriState]:
-        if self.are_tristates_empty():
-            return {}
-        fits_tristates = {}
-        for tristate in self.TRINARY_FILTERS:
-            filter_tristate = self._get_tristate(tristate)
-            if filter_tristate is None:
-                LOG.debug('Tristates: "%s" not in filter, ignoring', tristate)
-                fits_tristates[tristate] = None
-                continue
-            incident_tristate = getattr(incident, tristate, None)
-            LOG.debug('Tristates: "%s": filter = %s, incident = %s', tristate, filter_tristate, incident_tristate)
-            fits_tristates[tristate] = filter_tristate == incident_tristate
-        return fits_tristates
-
-    def incident_fits_maxlevel(self, incident):
-        if self.is_maxlevel_empty():
-            return None
-        fallback_filter = self.fallback_filter.get("maxlevel", None)
-        return incident.level <= min(filter(None, (self.filter["maxlevel"], fallback_filter)))
-
-    def event_fits(self, event):
-        if self.is_event_types_empty():
-            return True
-        fallback_filter = self.fallback_filter.get("event_types", None)
-        return event.type in self.filter.get("event_types", fallback_filter)
-
-
 class Filter(models.Model):
-    FILTER_NAMES = set(DEPRECATED_FILTER_NAMES)
     user = models.ForeignKey(to=User, on_delete=models.CASCADE, related_name="filters")
     name = models.CharField(max_length=40)
     filter = models.JSONField(default=dict)
@@ -198,11 +125,12 @@ class Filter(models.Model):
 
         return Incident.objects.all()
 
+    # XXX wrong location
     @property
     def filtered_incidents(self):
         if self.is_empty:
             return self.all_incidents.none().distinct()
-        data = self.filter
+        data = self.filter.copy()
         filtered_by_source = self.incidents_with_source_systems(data=data)
         filtered_by_tags = self.incidents_with_tags(data=data)
         filtered_by_tristates = self.incidents_fitting_tristates(data=data)
@@ -210,41 +138,25 @@ class Filter(models.Model):
 
         return filtered_by_source & filtered_by_tags & filtered_by_tristates & filtered_by_maxlevel
 
+    # XXX wrong location
     def incidents_with_source_systems(self, data=None):
         if not data:
             data = self.filter.copy()
-        source_list = data.pop("sourceSystemIds", [])
+        source_list = data.get("sourceSystemIds", [])
         if source_list:
             return self.all_incidents.filter(source__in=source_list).distinct()
         return self.all_incidents.distinct()
 
-    def source_system_fits(self, incident: Incident, data=None):
-        if not data:
-            data = self.filter.copy()
-        source_list = data.pop("sourceSystemIds", [])
-        if not source_list:
-            # We're not limiting on sources!
-            return None
-        return incident.source.id in source_list
-
+    # XXX wrong location
     def incidents_with_tags(self, data=None):
         if not data:
             data = self.filter.copy()
-        tags_list = data.pop("tags", [])
+        tags_list = data.get("tags", [])
         if tags_list:
             return self.all_incidents.from_tags(*tags_list)
         return self.all_incidents.distinct()
 
-    def tags_fit(self, incident: Incident, data=None):
-        if not data:
-            data = self.filter.copy()
-        tags_list = data.pop("tags", [])
-        if not tags_list:
-            # We're not limiting on tags!
-            return None
-        tags = set(tag.representation for tag in incident.deprecated_tags)
-        return tags.issuperset(tags_list)
-
+    # XXX wrong location
     def incidents_fitting_tristates(
         self,
         data=None,
@@ -252,9 +164,9 @@ class Filter(models.Model):
         if not data:
             data = self.filter.copy()
         fitting_incidents = self.all_incidents
-        filter_open = data.pop("open", None)
-        filter_acked = data.pop("acked", None)
-        filter_stateful = data.pop("stateful", None)
+        filter_open = data.get("open", None)
+        filter_acked = data.get("acked", None)
+        filter_stateful = data.get("stateful", None)
 
         if filter_open is True:
             fitting_incidents = fitting_incidents.open()
@@ -270,36 +182,14 @@ class Filter(models.Model):
             fitting_incidents = fitting_incidents.stateless()
         return fitting_incidents.distinct()
 
+    # XXX wrong location
     def incidents_fitting_maxlevel(self, data=None):
         if not data:
             data = self.filter.copy()
-        maxlevel = data.pop("maxlevel", None)
+        maxlevel = data.get("maxlevel", None)
         if not maxlevel:
             return self.all_incidents.distinct()
         return self.all_incidents.filter(level__lte=maxlevel).distinct()
-
-    def incident_fits(self, incident: Incident):
-        if self.is_empty:
-            return False  # Filter is empty!
-        data = self.filter.copy()
-        checks = {}
-        checks["source"] = self.source_system_fits(incident, data)
-        checks["tags"] = self.tags_fit(incident, data)
-        tristate_checks = self.filter_wrapper.get_incident_tristate_checks(incident)
-        for tristate, result in tristate_checks.items():
-            checks[tristate] = result
-        checks["max_level"] = self.filter_wrapper.incident_fits_maxlevel(incident)
-        any_failed = False in checks.values()
-        if any_failed:
-            LOG.debug("Filter: %s: MISS! checks: %r", self, checks)
-        else:
-            LOG.debug("Filter: %s: HIT!", self)
-        return not any_failed
-
-    def event_fits(self, event: Event):
-        if self.is_empty:
-            return False  # Filter is empty!
-        return self.filter_wrapper.event_fits(event)
 
 
 class Media(models.Model):
@@ -369,26 +259,17 @@ class NotificationProfile(models.Model):
         blank=True,
     )
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.filter_wrapper = ComplexFilterWrapper(profile=self)
+
     def __str__(self):
         if self.name:
             return f"{self.name}"
         return f"{self.timeslot}: {', '.join(str(f) for f in self.filters.all())}"
 
+    # XXX wrong location?
     @property
     def filtered_incidents(self):
         qs = [filter_.filtered_incidents for filter_ in self.filters.all()]
         return reduce(or_, qs)
-
-    def incident_fits(self, incident: Incident):
-        assert incident.source, "incident does not have a source -2"
-        if not self.active:
-            return False
-        is_selected_by_time = self.timeslot.timestamp_is_within_time_recurrences(incident.start_time)
-        checks = {f: f.incident_fits(incident) for f in self.filters.all()}
-        is_selected_by_filters = False not in checks.values()
-        return is_selected_by_time and is_selected_by_filters
-
-    def event_fits(self, event: Event):
-        if not self.active:
-            return False
-        return any(f.event_fits(event) for f in self.filters.all())

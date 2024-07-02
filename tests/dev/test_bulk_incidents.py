@@ -6,9 +6,9 @@ from django.test import TestCase
 from django.utils import timezone
 
 from argus.auth.factories import PersonUserFactory
+from argus.filter.factories import FilterFactory
 from argus.incident.factories import StatefulIncidentFactory
 from argus.incident.models import Event
-from argus.notificationprofile.factories import FilterFactory
 from argus.util.testing import connect_signals, disconnect_signals
 
 
