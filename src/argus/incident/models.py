@@ -473,6 +473,10 @@ class Incident(models.Model):
 
         return self.events.filter((acks_query & acks_not_expired_query) | ack_is_just_being_created).exists()
 
+    def is_acked_by(self, group: str) -> bool:
+        ack_not_expired_query = Q(expiration__isnull=True) | Q(expiration__gt=timezone.now())
+        return self.acks.filter(ack_not_expired_query, event__actor__groups__name=group).exists()
+
     def create_first_event(self):
         """Create the correct type of first event for an incident
 
