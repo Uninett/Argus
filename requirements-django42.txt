@@ -30,7 +30,7 @@ autobahn==23.1.2
     #   daphne
 automat==22.10.0
     # via twisted
-certifi==2023.7.22
+certifi==2024.7.4
     # via
     #   httpcore
     #   httpx
