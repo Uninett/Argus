@@ -63,7 +63,7 @@ defusedxml==0.8.0rc2
     #   social-auth-core
 dj-database-url==2.1.0
     # via argus-server (pyproject.toml)
-django==5.0.2
+django==4.2.14
     # via
     #   -r requirements/django50.txt
     #   argus-server (pyproject.toml)
