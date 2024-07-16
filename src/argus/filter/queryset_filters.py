@@ -49,7 +49,7 @@ def incidents_by_notificationprofile_pk(incident_queryset, notificationprofile_p
     return incidents_by_notificationprofile(incident_queryset, notification_profile)
 
 
-def incidents_with_source_systems(self, incident_queryset, data=None):
+def _incidents_with_source_systems(self, incident_queryset, data=None):
     if not data:
         data = self.filter.copy()
     source_list = data.get("sourceSystemIds", [])
@@ -58,7 +58,7 @@ def incidents_with_source_systems(self, incident_queryset, data=None):
     return incident_queryset.distinct()
 
 
-def incidents_with_tags(self, incident_queryset, data=None):
+def _incidents_with_tags(self, incident_queryset, data=None):
     if not data:
         data = self.filter.copy()
     tags_list = data.get("tags", [])
@@ -67,7 +67,7 @@ def incidents_with_tags(self, incident_queryset, data=None):
     return incident_queryset.distinct()
 
 
-def incidents_fitting_tristates(
+def _incidents_fitting_tristates(
     self,
     incident_queryset,
     data=None,
@@ -94,7 +94,7 @@ def incidents_fitting_tristates(
     return fitting_incidents.distinct()
 
 
-def incidents_fitting_maxlevel(self, incident_queryset, data=None):
+def _incidents_fitting_maxlevel(self, incident_queryset, data=None):
     if not data:
         data = self.filter.copy()
     maxlevel = data.get("maxlevel", None)
@@ -109,10 +109,10 @@ def filtered_incidents(filter: Filter, incident_queryset=None):
     if filter.is_empty:
         return Incident.objects.none().distinct()
     data = filter.filter.copy()
-    filtered_by_source = incidents_with_source_systems(filter, incident_queryset, data=data)
-    filtered_by_tags = incidents_with_tags(filter, incident_queryset, data=data)
-    filtered_by_tristates = incidents_fitting_tristates(filter, incident_queryset, data=data)
-    filtered_by_maxlevel = incidents_fitting_maxlevel(filter, incident_queryset, data=data)
+    filtered_by_source = _incidents_with_source_systems(filter, incident_queryset, data=data)
+    filtered_by_tags = _incidents_with_tags(filter, incident_queryset, data=data)
+    filtered_by_tristates = _incidents_fitting_tristates(filter, incident_queryset, data=data)
+    filtered_by_maxlevel = _incidents_fitting_maxlevel(filter, incident_queryset, data=data)
 
     return filtered_by_source & filtered_by_tags & filtered_by_tristates & filtered_by_maxlevel
 
