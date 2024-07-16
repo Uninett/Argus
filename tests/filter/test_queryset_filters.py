@@ -4,6 +4,7 @@ from django.utils.timezone import make_aware
 
 from argus.filter.factories import FilterFactory
 from argus.incident.factories import SourceSystemFactory, TagFactory
+from argus.incident.models import Incident
 from argus.filter.queryset_filters import (
     filtered_incidents,
     incidents_fitting_maxlevel,
@@ -59,6 +60,7 @@ class FilterTests(TestCase, IncidentAPITestCaseHelper):
             user=self.user1,
             filter={"sourceSystemIds": [self.source1.pk], "tags": [str(self.tag1)]},
         )
+        self.all_incidents = Incident.objects.all()
 
     def teardown(self):
         connect_signals()
@@ -69,10 +71,14 @@ class FilterTests(TestCase, IncidentAPITestCaseHelper):
             user=self.user1,
             filter={"sourceSystemIds": [source3.pk]},
         )
-        self.assertFalse(incidents_with_source_systems(filter_source3))
+        self.assertFalse(incidents_with_source_systems(filter_source3, self.all_incidents))
 
     def test_incidents_with_source_systems_finds_incidents_with_these_source_systems(self):
-        source1_filtered_incidents = list(incidents_with_source_systems(self.filter_source1))
+        filter_source1 = FilterFactory(
+            user=self.user1,
+            filter={"sourceSystemIds": [self.source1.pk]},
+        )
+        source1_filtered_incidents = list(incidents_with_source_systems(filter_source1, self.all_incidents))
         self.assertIn(self.incident1, source1_filtered_incidents)
         self.assertNotIn(self.incident2, source1_filtered_incidents)
 
@@ -82,10 +88,10 @@ class FilterTests(TestCase, IncidentAPITestCaseHelper):
             user=self.user1,
             filter={"tags": [str(tag4)]},
         )
-        self.assertFalse(incidents_with_tags(filter_tag4))
+        self.assertFalse(incidents_with_tags(filter_tag4, self.all_incidents))
 
     def test_incidents_with_tags_finds_incidents_with_these_tags(self):
-        tags1_filtered_incidents = list(incidents_with_tags(self.filter_tags1))
+        tags1_filtered_incidents = list(incidents_with_tags(self.filter_tags1, self.all_incidents))
         self.assertIn(self.incident1, tags1_filtered_incidents)
         self.assertNotIn(self.incident2, tags1_filtered_incidents)
 
@@ -95,14 +101,14 @@ class FilterTests(TestCase, IncidentAPITestCaseHelper):
             filter={"stateful": True},
         )
 
-        self.assertFalse(incidents_fitting_tristates(filter_stateful))
+        self.assertFalse(incidents_fitting_tristates(filter_stateful, self.all_incidents))
 
     def test_incidents_fitting_tristates_finds_incidents_with_these_tristates(self):
         filter_stateless = FilterFactory(
             user=self.user1,
             filter={"stateful": False},
         )
-        stateless_filtered_incidents = list(incidents_fitting_tristates(filter_stateless))
+        stateless_filtered_incidents = list(incidents_fitting_tristates(filter_stateless, self.all_incidents))
         self.assertIn(self.incident1, stateless_filtered_incidents)
         self.assertIn(self.incident2, stateless_filtered_incidents)
 
@@ -116,14 +122,14 @@ class FilterTests(TestCase, IncidentAPITestCaseHelper):
             filter={"maxlevel": 1},
         )
 
-        self.assertFalse(incidents_fitting_maxlevel(filter_maxlevel1))
+        self.assertFalse(incidents_fitting_maxlevel(filter_maxlevel1, self.all_incidents))
 
     def test_incidents_fitting_maxlevel_finds_incidents_with_this_maxlevel(self):
         filter_maxlevel5 = FilterFactory(
             user=self.user1,
             filter={"maxlevel": 5},
         )
-        maxlevel_filtered_incidents = list(incidents_fitting_maxlevel(filter_maxlevel5))
+        maxlevel_filtered_incidents = list(incidents_fitting_maxlevel(filter_maxlevel5, self.all_incidents))
         self.assertIn(self.incident1, maxlevel_filtered_incidents)
         self.assertIn(self.incident2, maxlevel_filtered_incidents)
 
