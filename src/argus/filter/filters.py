@@ -287,34 +287,34 @@ class IncidentFilter(filters.FilterSet):
                 return queryset.open()
             else:
                 return queryset.closed()
-        elif name == "acked":
+        if name == "acked":
             if value:
                 return queryset.acked()
             else:
                 return queryset.not_acked()
-        elif name == "stateful":
+        if name == "stateful":
             if value:
                 return queryset.stateful()
             else:
                 return queryset.stateless()
-        elif name == "tags":
+        if name == "tags":
             if value:
                 if isinstance(value, str):
                     value = [value]
                 return queryset.from_tags(*value)
-        elif name == "ticket":
+        if name == "ticket":
             if value:
                 return queryset.has_ticket()
             else:
                 return queryset.lacks_ticket()
-        elif name == "duration__gte":
+        if name == "duration__gte":
             if value:
                 return queryset.is_longer_than_minutes(int(value))
-        elif name == "token_expiry":
+        if name == "token_expiry":
             return queryset.token_expiry()
-        elif name == "filter_pk":
+        if name == "filter_pk":
             return incidents_by_filter_pk(queryset, value)
-        elif name == "notificationprofile_pk":
+        if name == "notificationprofile_pk":
             return incidents_by_notificationprofile_pk(queryset, value)
         return queryset
 
