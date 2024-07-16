@@ -1,6 +1,7 @@
 from functools import reduce
 from operator import or_
 
+from argus.filter.filterwrapper import FilterBlobType
 from argus.incident.models import Incident
 from argus.notificationprofile.models import Filter
 from argus.notificationprofile.models import NotificationProfile
@@ -49,35 +50,25 @@ def incidents_by_notificationprofile_pk(incident_queryset, notificationprofile_p
     return incidents_by_notificationprofile(incident_queryset, notification_profile)
 
 
-def _incidents_with_source_systems(self, incident_queryset, data=None):
-    if not data:
-        data = self.filter.copy()
-    source_list = data.get("sourceSystemIds", [])
+def _incidents_with_source_systems(incident_queryset, filterblob: FilterBlobType):
+    source_list = filterblob.get("sourceSystemIds", [])
     if source_list:
         return incident_queryset.filter(source__in=source_list).distinct()
     return incident_queryset.distinct()
 
 
-def _incidents_with_tags(self, incident_queryset, data=None):
-    if not data:
-        data = self.filter.copy()
-    tags_list = data.get("tags", [])
+def _incidents_with_tags(incident_queryset, filterblob: FilterBlobType):
+    tags_list = filterblob.get("tags", [])
     if tags_list:
         return incident_queryset.from_tags(*tags_list)
     return incident_queryset.distinct()
 
 
-def _incidents_fitting_tristates(
-    self,
-    incident_queryset,
-    data=None,
-):
-    if not data:
-        data = self.filter.copy()
+def _incidents_fitting_tristates(incident_queryset, filterblob: FilterBlobType):
     fitting_incidents = incident_queryset
-    filter_open = data.get("open", None)
-    filter_acked = data.get("acked", None)
-    filter_stateful = data.get("stateful", None)
+    filter_open = filterblob.get("open", None)
+    filter_acked = filterblob.get("acked", None)
+    filter_stateful = filterblob.get("stateful", None)
 
     if filter_open is True:
         fitting_incidents = fitting_incidents.open()
@@ -94,10 +85,8 @@ def _incidents_fitting_tristates(
     return fitting_incidents.distinct()
 
 
-def _incidents_fitting_maxlevel(self, incident_queryset, data=None):
-    if not data:
-        data = self.filter.copy()
-    maxlevel = data.get("maxlevel", None)
+def _incidents_fitting_maxlevel(incident_queryset, filterblob: FilterBlobType):
+    maxlevel = filterblob.get("maxlevel", None)
     if not maxlevel:
         return incident_queryset.distinct()
     return incident_queryset.filter(level__lte=maxlevel).distinct()
@@ -108,11 +97,11 @@ def filtered_incidents(filter: Filter, incident_queryset=None):
         incident_queryset = Incident.objects.all()
     if filter.is_empty:
         return Incident.objects.none().distinct()
-    data = filter.filter.copy()
-    filtered_by_source = _incidents_with_source_systems(filter, incident_queryset, data=data)
-    filtered_by_tags = _incidents_with_tags(filter, incident_queryset, data=data)
-    filtered_by_tristates = _incidents_fitting_tristates(filter, incident_queryset, data=data)
-    filtered_by_maxlevel = _incidents_fitting_maxlevel(filter, incident_queryset, data=data)
+    filterblob = filter.filter.copy()
+    filtered_by_source = _incidents_with_source_systems(incident_queryset, filterblob)
+    filtered_by_tags = _incidents_with_tags(incident_queryset, filterblob)
+    filtered_by_tristates = _incidents_fitting_tristates(incident_queryset, filterblob)
+    filtered_by_maxlevel = _incidents_fitting_maxlevel(incident_queryset, filterblob)
 
     return filtered_by_source & filtered_by_tags & filtered_by_tristates & filtered_by_maxlevel
 

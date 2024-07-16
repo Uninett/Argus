@@ -34,52 +34,29 @@ class FilteredIncidentsHelpersTests(TestCase, IncidentAPITestCaseHelper):
 
     def test_incidents_with_source_systems_empty_if_no_incidents_with_these_source_systems(self):
         source3 = SourceSystemFactory()
-        filter_source3 = FilterFactory(
-            user=self.user1,
-            filter={"sourceSystemIds": [source3.pk]},
-        )
-        self.assertFalse(_incidents_with_source_systems(filter_source3, self.all_incidents))
+        self.assertFalse(_incidents_with_source_systems(self.all_incidents, {"sourceSystemIds": [source3.pk]}))
 
     def test_incidents_with_source_systems_finds_incidents_with_these_source_systems(self):
-        filter_source1 = FilterFactory(
-            user=self.user1,
-            filter={"sourceSystemIds": [self.source1.pk]},
+        source1_filtered_incidents = list(
+            _incidents_with_source_systems(self.all_incidents, {"sourceSystemIds": [self.source1.pk]})
         )
-        source1_filtered_incidents = list(_incidents_with_source_systems(filter_source1, self.all_incidents))
         self.assertIn(self.incident1, source1_filtered_incidents)
         self.assertNotIn(self.incident2, source1_filtered_incidents)
 
     def test_incidents_with_tags_empty_if_no_incidents_with_these_tags(self):
         tag4 = TagFactory()
-        filter_tag4 = FilterFactory(
-            user=self.user1,
-            filter={"tags": [str(tag4)]},
-        )
-        self.assertFalse(_incidents_with_tags(filter_tag4, self.all_incidents))
+        self.assertFalse(_incidents_with_tags(self.all_incidents, {"tags": [str(tag4)]}))
 
     def test_incidents_with_tags_finds_incidents_with_these_tags(self):
-        filter_tags1 = FilterFactory(
-            user=self.user1,
-            filter={"tags": [str(self.tag1)]},
-        )
-        tags1_filtered_incidents = list(_incidents_with_tags(filter_tags1, self.all_incidents))
+        tags1_filtered_incidents = list(_incidents_with_tags(self.all_incidents, {"tags": [str(self.tag1)]}))
         self.assertIn(self.incident1, tags1_filtered_incidents)
         self.assertNotIn(self.incident2, tags1_filtered_incidents)
 
     def test_incidents_fitting_tristates_empty_if_no_incidents_with_these_tristates(self):
-        filter_stateful = FilterFactory(
-            user=self.user1,
-            filter={"stateful": True},
-        )
-
-        self.assertFalse(_incidents_fitting_tristates(filter_stateful, self.all_incidents))
+        self.assertFalse(_incidents_fitting_tristates(self.all_incidents, {"stateful": True}))
 
     def test_incidents_fitting_tristates_finds_incidents_with_these_tristates(self):
-        filter_stateless = FilterFactory(
-            user=self.user1,
-            filter={"stateful": False},
-        )
-        stateless_filtered_incidents = list(_incidents_fitting_tristates(filter_stateless, self.all_incidents))
+        stateless_filtered_incidents = list(_incidents_fitting_tristates(self.all_incidents, {"stateful": False}))
         self.assertIn(self.incident1, stateless_filtered_incidents)
         self.assertIn(self.incident2, stateless_filtered_incidents)
 
@@ -88,19 +65,11 @@ class FilteredIncidentsHelpersTests(TestCase, IncidentAPITestCaseHelper):
         self.incident1.save(update_fields=["level"])
         self.incident2.level = 5
         self.incident2.save(update_fields=["level"])
-        filter_maxlevel1 = FilterFactory(
-            user=self.user1,
-            filter={"maxlevel": 1},
-        )
 
-        self.assertFalse(_incidents_fitting_maxlevel(filter_maxlevel1, self.all_incidents))
+        self.assertFalse(_incidents_fitting_maxlevel(self.all_incidents, {"maxlevel": 1}))
 
     def test_incidents_fitting_maxlevel_finds_incidents_with_this_maxlevel(self):
-        filter_maxlevel5 = FilterFactory(
-            user=self.user1,
-            filter={"maxlevel": 5},
-        )
-        maxlevel_filtered_incidents = list(_incidents_fitting_maxlevel(filter_maxlevel5, self.all_incidents))
+        maxlevel_filtered_incidents = list(_incidents_fitting_maxlevel(self.all_incidents, {"maxlevel": 5}))
         self.assertIn(self.incident1, maxlevel_filtered_incidents)
         self.assertIn(self.incident2, maxlevel_filtered_incidents)
 
