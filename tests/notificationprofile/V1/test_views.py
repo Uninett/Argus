@@ -80,6 +80,7 @@ class ViewTests(APITestCase):
     def teardown(self):
         connect_signals()
 
+    @tag("queryset-filter")
     def test_can_get_all_incidents_of_notification_profile(self):
         StatelessIncidentFactory(source=self.source1)
         StatelessIncidentFactory(source=self.source1)
