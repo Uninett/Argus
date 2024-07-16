@@ -116,20 +116,6 @@ class Filter(models.Model):
     def is_empty(self):
         return self.filter_wrapper.is_empty
 
-    @property
-    def all_incidents(self):
-        # Prevent cyclical import
-        from argus.incident.models import Incident  # noqa: F811
-
-        return Incident.objects.all()
-
-    # XXX wrong location
-    @property
-    def filtered_incidents(self):
-        from argus.filter.queryset_filters import filtered_incidents
-
-        return filtered_incidents(self)
-
 
 class Media(models.Model):
     class Meta:
@@ -206,10 +192,3 @@ class NotificationProfile(models.Model):
         if self.name:
             return f"{self.name}"
         return f"{self.timeslot}: {', '.join(str(f) for f in self.filters.all())}"
-
-    # XXX wrong location?
-    @property
-    def filtered_incidents(self):
-        from argus.filter.queryset_filters import np_filtered_incidents
-
-        return np_filtered_incidents(self)

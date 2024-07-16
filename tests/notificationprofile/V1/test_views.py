@@ -7,6 +7,7 @@ from rest_framework.test import APITestCase
 from rest_framework.test import APIClient
 
 from argus.filter.factories import FilterFactory
+from argus.filter.queryset_filters import np_filtered_incidents
 from argus.notificationprofile.factories import (
     DestinationConfigFactory,
     NotificationProfileFactory,
@@ -88,7 +89,7 @@ class ViewTests(APITestCase):
             f"/api/v1/notificationprofiles/{self.notification_profile1.pk}/incidents/"
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        all_incidents = self.notification_profile1.filtered_incidents
+        all_incidents = np_filtered_incidents(self.notification_profile1)
         self.assertEqual(len(response.data), len(all_incidents))
         all_incident_pks = set([incident.pk for incident in all_incidents])
         all_response_pks = set([incident["pk"] for incident in response.data])

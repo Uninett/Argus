@@ -1,13 +1,14 @@
 from functools import reduce
 from operator import or_
 
+from argus.incident.models import Incident
 from argus.notificationprofile.models import Filter
 from argus.notificationprofile.models import NotificationProfile
 
 
 def incidents_by_filter(incident_queryset, filter: Filter):
     "Returns all incidents that are included in the filter instance"
-    return filter.filtered_incidents.all()
+    return filtered_incidents(filter).all()
 
 
 def incidents_by_filter_pk(incident_queryset, filter_pk: int):
@@ -30,7 +31,7 @@ def incidents_by_notificationprofile(incident_queryset, notificationprofile):
 
     filtered_incidents_pks = set()
     for filtr in filters:
-        filtered_incidents_pks.update(filtr.filtered_incidents.values_list("pk", flat=True))
+        filtered_incidents_pks.update(filtered_incidents(filtr).values_list("pk", flat=True))
 
     return incident_queryset.filter(pk__in=filtered_incidents_pks)
 
@@ -48,13 +49,17 @@ def incidents_by_notificationprofile_pk(incident_queryset, notificationprofile_p
     return incidents_by_notificationprofile(incident_queryset, notification_profile)
 
 
+def _all_incidents():
+    return Incident.objects.all()
+
+
 def incidents_with_source_systems(self, data=None):
     if not data:
         data = self.filter.copy()
     source_list = data.get("sourceSystemIds", [])
     if source_list:
-        return self.all_incidents.filter(source__in=source_list).distinct()
-    return self.all_incidents.distinct()
+        return _all_incidents().filter(source__in=source_list).distinct()
+    return _all_incidents().distinct()
 
 
 def incidents_with_tags(self, data=None):
@@ -62,8 +67,8 @@ def incidents_with_tags(self, data=None):
         data = self.filter.copy()
     tags_list = data.get("tags", [])
     if tags_list:
-        return self.all_incidents.from_tags(*tags_list)
-    return self.all_incidents.distinct()
+        return _all_incidents().from_tags(*tags_list)
+    return _all_incidents().distinct()
 
 
 def incidents_fitting_tristates(
@@ -72,7 +77,7 @@ def incidents_fitting_tristates(
 ):
     if not data:
         data = self.filter.copy()
-    fitting_incidents = self.all_incidents
+    fitting_incidents = _all_incidents()
     filter_open = data.get("open", None)
     filter_acked = data.get("acked", None)
     filter_stateful = data.get("stateful", None)
@@ -97,13 +102,13 @@ def incidents_fitting_maxlevel(self, data=None):
         data = self.filter.copy()
     maxlevel = data.get("maxlevel", None)
     if not maxlevel:
-        return self.all_incidents.distinct()
-    return self.all_incidents.filter(level__lte=maxlevel).distinct()
+        return _all_incidents().distinct()
+    return _all_incidents().filter(level__lte=maxlevel).distinct()
 
 
 def filtered_incidents(filter: Filter):
     if filter.is_empty:
-        return filter.all_incidents.none().distinct()
+        return _all_incidents().none().distinct()
     data = filter.filter.copy()
     filtered_by_source = incidents_with_source_systems(filter, data=data)
     filtered_by_tags = incidents_with_tags(filter, data=data)
@@ -114,5 +119,5 @@ def filtered_incidents(filter: Filter):
 
 
 def np_filtered_incidents(notificationprofile: NotificationProfile):
-    qs = [filter_.filtered_incidents for filter_ in notificationprofile.filters.all()]
+    qs = [filtered_incidents(filter_) for filter_ in notificationprofile.filters.all()]
     return reduce(or_, qs)
