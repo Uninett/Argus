@@ -1,6 +1,3 @@
-from functools import reduce
-from operator import or_
-
 from argus.filter.filterwrapper import FilterBlobType
 from argus.incident.models import Incident
 from argus.notificationprofile.models import Filter
@@ -104,8 +101,3 @@ def filtered_incidents(filter: Filter, incident_queryset=None):
     filtered_by_maxlevel = _incidents_fitting_maxlevel(incident_queryset, filterblob)
 
     return filtered_by_source & filtered_by_tags & filtered_by_tristates & filtered_by_maxlevel
-
-
-def np_filtered_incidents(notificationprofile: NotificationProfile):
-    qs = [filtered_incidents(filter_) for filter_ in notificationprofile.filters.all()]
-    return reduce(or_, qs)
