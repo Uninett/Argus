@@ -11,7 +11,7 @@ from django.utils import timezone
 from django.utils.text import slugify
 
 from argus.auth.models import User
-from argus.filter.filterwrapper import FilterWrapper, ComplexFilterWrapper
+from argus.filter.filterwrapper import FallbackFilterWrapper, ComplexFallbackFilterWrapper
 
 if TYPE_CHECKING:
     from argus.incident.models import Event, Incident  # noqa: F401
@@ -107,7 +107,7 @@ class Filter(models.Model):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.filter_wrapper = FilterWrapper(self.filter)
+        self.filter_wrapper = FallbackFilterWrapper(self.filter)
 
     def __str__(self):
         return f"{self.name} [{self.filter}]"
@@ -186,7 +186,7 @@ class NotificationProfile(models.Model):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.filter_wrapper = ComplexFilterWrapper(profile=self)
+        self.filter_wrapper = ComplexFallbackFilterWrapper(profile=self)
 
     def __str__(self):
         if self.name:
