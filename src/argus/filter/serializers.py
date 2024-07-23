@@ -6,6 +6,12 @@ from argus.notificationprofile.models import Filter
 from .primitive_serializers import CustomMultipleChoiceField
 
 
+__all__ = [
+    "FilterBlobSerializer",
+    "FilterSerializer",
+]
+
+
 class FilterBlobSerializer(serializers.Serializer):
     sourceSystemIds = serializers.ListField(
         child=serializers.IntegerField(min_value=1),

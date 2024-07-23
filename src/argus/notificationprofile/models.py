@@ -17,7 +17,6 @@ if TYPE_CHECKING:
 
 TriState = Optional[bool]
 
-
 LOG = logging.getLogger(__name__)
 
 

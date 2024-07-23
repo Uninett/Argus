@@ -1,9 +1,12 @@
 from django.core.management.base import BaseCommand
 
 from argus.auth.models import User
-from argus.filter.queryset_filters import QuerySetFilter
+from argus.filter import get_filter_backend
 from argus.incident.models import Incident
 from argus.notificationprofile.models import Filter
+
+filter_backend = get_filter_backend()
+QuerySetFilter = filter_backend.QuerySetFilter
 
 
 class Command(BaseCommand):

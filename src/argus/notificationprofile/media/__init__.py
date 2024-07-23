@@ -8,7 +8,7 @@ from django.conf import settings
 from django.db import connections
 from rest_framework.exceptions import ValidationError
 
-from argus.filter.filterwrapper import ComplexFallbackFilterWrapper
+from argus.filter import get_filter_backend
 from argus.util.utils import import_class_from_dotted_path
 
 from ..models import DestinationConfig, Media, NotificationProfile
@@ -22,6 +22,10 @@ if TYPE_CHECKING:
         from collections.abc import Iterable
 
     from argus.incident.models import Event  # noqa: Break circular import
+
+
+filter_backend = get_filter_backend()
+ComplexFallbackFilterWrapper = filter_backend.ComplexFallbackFilterWrapper
 
 LOG = logging.getLogger(__name__)
 

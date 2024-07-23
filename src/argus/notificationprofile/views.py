@@ -14,11 +14,7 @@ from rest_framework.views import APIView
 from drf_rw_serializers import viewsets as rw_viewsets
 
 from argus.drf.permissions import IsOwner
-from argus.filter.queryset_filters import QuerySetFilter
-from argus.filter.serializers import (
-    FilterSerializer,
-    FilterBlobSerializer,
-)
+from argus.filter import get_filter_backend
 from argus.incident.serializers import IncidentSerializer
 from argus.notificationprofile.media import api_safely_get_medium_object
 from argus.notificationprofile.media.base import NotificationMedium
@@ -33,6 +29,12 @@ from .serializers import (
     RequestNotificationProfileSerializer,
     TimeslotSerializer,
 )
+
+
+filter_backend = get_filter_backend()
+QuerySetFilter = filter_backend.QuerySetFilter
+FilterSerializer = filter_backend.FilterSerializer
+FilterBlobSerializer = filter_backend.FilterBlobSerializer
 
 
 @extend_schema_view(
