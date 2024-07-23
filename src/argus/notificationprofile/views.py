@@ -14,7 +14,7 @@ from rest_framework.views import APIView
 from drf_rw_serializers import viewsets as rw_viewsets
 
 from argus.drf.permissions import IsOwner
-from argus.filter.queryset_filters import filtered_incidents, incidents_by_notificationprofile
+from argus.filter.queryset_filters import QuerySetFilter
 from argus.filter.serializers import (
     FilterSerializer,
     FilterBlobSerializer,
@@ -69,7 +69,9 @@ class NotificationProfileViewSet(rw_viewsets.ModelViewSet):
             notification_profile = request.user.notification_profiles.get(pk=pk)
         except NotificationProfile.DoesNotExist:
             raise ValidationError(f"Notification profile with pk={pk} does not exist.")
-        serializer = IncidentSerializer(incidents_by_notificationprofile(None, notification_profile), many=True)
+        serializer = IncidentSerializer(
+            QuerySetFilter.incidents_by_notificationprofile(None, notification_profile), many=True
+        )
         return Response(serializer.data)
 
     @extend_schema(
@@ -101,7 +103,7 @@ class NotificationProfileViewSet(rw_viewsets.ModelViewSet):
         if not serializer.is_valid():
             raise ValidationError(serializer.errors)
 
-        serializer = IncidentSerializer(filtered_incidents(serializer.data), many=True)
+        serializer = IncidentSerializer(QuerySetFilter.filtered_incidents(serializer.data), many=True)
         return Response(serializer.data)
 
 
@@ -268,7 +270,7 @@ class FilterPreviewView(APIView):
         if not serializer.is_valid():
             raise ValidationError(serializer.errors)
 
-        serializer = IncidentSerializer(filtered_incidents(serializer.data), many=True)
+        serializer = IncidentSerializer(QuerySetFilter.filtered_incidents(serializer.data), many=True)
         return Response(serializer.data)
 
 

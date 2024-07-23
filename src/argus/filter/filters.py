@@ -14,8 +14,7 @@ from argus.notificationprofile.models import Filter, NotificationProfile
 from argus.incident.fields import KeyValueField
 from argus.incident.models import Incident
 
-from .queryset_filters import incidents_by_filter_pk
-from .queryset_filters import incidents_by_notificationprofile_pk
+from .queryset_filters import QuerySetFilter
 
 
 __all__ = [
@@ -282,9 +281,9 @@ class IncidentFilter(filters.FilterSet):
         if name == "token_expiry":
             return queryset.token_expiry()
         if name == "filter_pk":
-            return incidents_by_filter_pk(queryset, value)
+            return QuerySetFilter.incidents_by_filter_pk(queryset, value)
         if name == "notificationprofile_pk":
-            return incidents_by_notificationprofile_pk(queryset, value)
+            return QuerySetFilter.incidents_by_notificationprofile_pk(queryset, value)
         return queryset
 
     class Meta:

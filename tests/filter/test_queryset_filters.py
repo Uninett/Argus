@@ -6,7 +6,7 @@ from argus.filter.factories import FilterFactory
 from argus.incident.factories import SourceSystemFactory, TagFactory
 from argus.incident.models import Incident
 from argus.filter.queryset_filters import (
-    filtered_incidents,
+    QuerySetFilter,
     _incidents_fitting_maxlevel,
     _incidents_fitting_tristates,
     _incidents_with_source_systems,
@@ -84,15 +84,20 @@ class FilteredIncidentsTests(TestCase, IncidentAPITestCaseHelper):
         connect_signals()
 
     def test_filtered_incidents_returns_empty_if_no_incident_fits_filter(self):
-        self.assertEqual(set(filtered_incidents(dict())), set())
+        self.assertEqual(set(QuerySetFilter.filtered_incidents(dict())), set())
 
     def test_filtered_incidents_returns_incident_if_incident_fits_filter(self):
-        self.assertEqual(set(filtered_incidents({"sourceSystemIds": [self.source1.pk]})), {self.incident1})
-        self.assertEqual(set(filtered_incidents({"sourceSystemIds": [self.source2.pk]})), {self.incident2})
+        self.assertEqual(
+            set(QuerySetFilter.filtered_incidents({"sourceSystemIds": [self.source1.pk]})), {self.incident1}
+        )
+        self.assertEqual(
+            set(QuerySetFilter.filtered_incidents({"sourceSystemIds": [self.source2.pk]})), {self.incident2}
+        )
 
-        self.assertEqual(set(filtered_incidents({"tags": [str(self.tag1)]})), {self.incident1})
-        self.assertEqual(set(filtered_incidents({"tags": [str(self.tag2)]})), {self.incident2})
+        self.assertEqual(set(QuerySetFilter.filtered_incidents({"tags": [str(self.tag1)]})), {self.incident1})
+        self.assertEqual(set(QuerySetFilter.filtered_incidents({"tags": [str(self.tag2)]})), {self.incident2})
 
         self.assertEqual(
-            set(filtered_incidents({"sourceSystemIds": [self.source1.pk], "tags": [str(self.tag1)]})), {self.incident1}
+            set(QuerySetFilter.filtered_incidents({"sourceSystemIds": [self.source1.pk], "tags": [str(self.tag1)]})),
+            {self.incident1},
         )

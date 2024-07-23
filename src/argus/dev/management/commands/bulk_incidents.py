@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 
 from argus.auth.models import User
-from argus.filter.queryset_filters import filtered_incidents
+from argus.filter.queryset_filters import QuerySetFilter
 from argus.incident.models import Incident
 from argus.notificationprofile.models import Filter
 
@@ -112,7 +112,7 @@ class Command(BaseCommand):
             self.stderr.write(self.style.WARNING("No filter with the given pk or name could be found."))
             return
 
-        first_filtered_incidents = filtered_incidents(filter.filter)
+        first_filtered_incidents = QuerySetFilter.filtered_incidents(filter.filter)
         incident_pks = [incident.pk for incident in first_filtered_incidents]
         if not incident_pks:
             self.stdout.write(self.style.WARNING("No incidents for the given filter could be found."))
