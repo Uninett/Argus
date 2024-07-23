@@ -6,15 +6,17 @@
 >
     <thead>
     <tr>
-        <th>actions</th>
-        <th>id</th>
-        <th>timestamp</th>
-        <th>status</th>
-        <th>severity</th>
-        <th>source</th>
-        <th>description</th>
-        <th>ack</th>
-        <th>tag</th>
+        {% block columns %}
+            {% for col in columns %}
+                <th>
+                    {{ col.label }}
+                </th>
+            {% empty %}
+                <th>
+                    No columns configured
+                </th>
+            {% endfor %}
+        {% endblock columns %}
     </tr>
     </thead>
     <tbody
@@ -26,7 +28,7 @@
     </tbody>
     <tfoot>
     <tr>
-        <td colspan="{{ column_count }}">
+        <td colspan="{{ columns|length }}">
             <!--
             The htmx attributes set on the nav here are inherited by the child links.
             hx-target tells where htmx to swap the fetched content in, and hx-swap

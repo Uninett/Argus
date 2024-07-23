@@ -2,10 +2,9 @@ import logging
 from typing import Optional
 from datetime import datetime
 
-from django.conf import settings
 from django.contrib.auth.models import Group
 from django.core.exceptions import PermissionDenied
-from django.shortcuts import render, reverse, get_object_or_404
+from django.shortcuts import render, get_object_or_404
 
 from django.views.decorators.http import require_GET
 from django.core.paginator import Paginator
@@ -14,6 +13,8 @@ from django_htmx.middleware import HtmxDetails
 
 from argus.incident.models import Incident
 from argus.util.datetime_utils import make_aware
+
+from argus_htmx.incidents.customization import get_incident_table_columns
 
 from .forms import AckForm
 
@@ -83,9 +84,10 @@ def incident_add_ack(request, pk: int, group: Optional[str] = None):
 
 @require_GET
 def incident_list(request: HtmxHttpRequest) -> HttpResponse:
+    columns = get_incident_table_columns()
+
     # Load incidents
     qs = prefetch_incident_daughters().order_by("-start_time")
-    latest = qs.latest("start_time").start_time
     last_refreshed = make_aware(datetime.now())
 
     # Standard Django pagination
@@ -96,17 +98,15 @@ def incident_list(request: HtmxHttpRequest) -> HttpResponse:
     # requests, allowing us to skip rendering the unchanging parts of the
     # template.
     if request.htmx:
-        # HX-Trigger == HTML tag id that iniated the request
+        # HX-Trigger == HTML tag id that initiated the request
         if request.headers.get("HX-Trigger", "") == "table":
             base_template = "htmx/incidents/responses/_incidents_table_poll.html"
         else:
             base_template = "htmx/incidents/responses/_incidents_table_refresh.html"
     else:
         base_template = "htmx/incidents/_base.html"
-
-    number_of_columns = 9  # calculate when customizable columns
     context = {
-        "column_count": number_of_columns,
+        "columns": columns,
         "count": qs.count(),
         "page_title": "Incidents",
         "base": base_template,
@@ -115,8 +115,4 @@ def incident_list(request: HtmxHttpRequest) -> HttpResponse:
         "update_interval": 30,
     }
 
-    return render(
-        request,
-        "htmx/incidents/incident_list.html",
-        context=context
-    )
+    return render(request, "htmx/incidents/incident_list.html", context=context)

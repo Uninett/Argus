@@ -11,4 +11,4 @@ def tagvalues(incident, key) -> list:
     There can be multiple tags with the same key
     """
     tags = incident.deprecated_tags
-    return [str(tag.value) for tag in tags]
+    return [str(tag.value) for tag in tags if tag.key == key]

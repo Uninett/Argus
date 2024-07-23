@@ -4,7 +4,7 @@
     {% endblock incident %}
     {% empty %}
     <tr>
-        <td colspan="2">
+        <td colspan="{{ columns|length }}">
             No incidents on this page.
         </td>
     </tr>

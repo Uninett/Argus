@@ -92,6 +92,44 @@ Icons, pictures, etc. used by the theme MUST be in a subdirectory named the
 same as the theme (minus the ".css") in the same directory as the theme so
 update the paths accordingly. See the included theme "default.css".
 
+
+UI Settings
+-----------
+
+Incident table column customization
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+You can customize which columns are shown in the incidents listing table by overriding the
+``INCIDENT_TABLE_COLUMNS`` setting. This setting takes a list of ``str`` or
+``argus_htmx.incidents.customization.IncidentTableColumn`` instances. when given a ``str``, this
+key must be available in the ``argus_htmx.incidents.customization.BUILTIN_COLUMNS`` dictionary. For
+example::
+
+    from argus_htmx.incidents.customization import BUILTIN_COLUMNS, IncidentTableColumn
+
+    INCIDENT_TABLE_COLUMNS = [
+        "id",
+        "start_time",
+        BUILTIN_COLUMNS["description"], # equivalent to just "description"
+        IncidentTableColumn( # a new column definition
+            name="name",
+            label="Custom"
+            cell_template="/path/to/template.html"
+            context={
+                "additional": "value"
+            }
+        ),
+
+        # For reading incident tag values you can use the _incident_tag.html template. eg:
+        IncidentTableColumn(
+            "location",
+            "Location",
+            "htmx/incidents/_incident_tag.html",
+            context={"tag": "location"},
+        ),
+    ]
+
+
+
 .. _CSS Bed: https://www.cssbed.com/
 .. _django-htmx: https://github.com/adamchainz/django-htmx
 .. _argus-server: https://github.com/Uninett/Argus
