@@ -101,8 +101,7 @@ class NotificationProfileViewSet(rw_viewsets.ModelViewSet):
         if not serializer.is_valid():
             raise ValidationError(serializer.errors)
 
-        mock_filter = Filter(filter=serializer.data)
-        serializer = IncidentSerializer(filtered_incidents(mock_filter), many=True)
+        serializer = IncidentSerializer(filtered_incidents(serializer.data), many=True)
         return Response(serializer.data)
 
 
@@ -269,8 +268,7 @@ class FilterPreviewView(APIView):
         if not serializer.is_valid():
             raise ValidationError(serializer.errors)
 
-        mock_filter = Filter(filter=serializer.data)
-        serializer = IncidentSerializer(filtered_incidents(mock_filter), many=True)
+        serializer = IncidentSerializer(filtered_incidents(serializer.data), many=True)
         return Response(serializer.data)
 
 

@@ -79,53 +79,20 @@ class FilteredIncidentsTests(TestCase, IncidentAPITestCaseHelper):
     def setUp(self):
         disconnect_signals()
         super().init_test_objects()
-        self.filter_no_source = FilterFactory(
-            user=self.user1,
-            filter=dict(),
-        )
-        self.filter_source1 = FilterFactory(
-            user=self.user1,
-            filter={"sourceSystemIds": [self.source1.pk]},
-        )
-        self.filter_source2 = FilterFactory(
-            user=self.user1,
-            filter={"sourceSystemIds": [self.source2.pk]},
-        )
-        self.filter_no_tags = FilterFactory(
-            user=self.user1,
-            filter=dict(),
-        )
-        self.filter_tags1 = FilterFactory(
-            user=self.user1,
-            filter={"tags": [str(self.tag1)]},
-        )
-        self.filter_tags2 = FilterFactory(
-            user=self.user1,
-            filter={"tags": [str(self.tag2)]},
-        )
-        self.filter_no_source_no_tags = FilterFactory(
-            user=self.user1,
-            filter=dict(),
-        )
-        self.filter_source1_tags1 = FilterFactory(
-            user=self.user1,
-            filter={"sourceSystemIds": [self.source1.pk], "tags": [str(self.tag1)]},
-        )
-        self.all_incidents = Incident.objects.all()
 
     def teardown(self):
         connect_signals()
 
     def test_filtered_incidents_returns_empty_if_no_incident_fits_filter(self):
-        self.assertEqual(set(filtered_incidents(self.filter_no_source)), set())
-        self.assertEqual(set(filtered_incidents(self.filter_no_tags)), set())
-        self.assertEqual(set(filtered_incidents(self.filter_no_source_no_tags)), set())
+        self.assertEqual(set(filtered_incidents(dict())), set())
 
     def test_filtered_incidents_returns_incident_if_incident_fits_filter(self):
-        self.assertEqual(set(filtered_incidents(self.filter_source1)), {self.incident1})
-        self.assertEqual(set(filtered_incidents(self.filter_source2)), {self.incident2})
+        self.assertEqual(set(filtered_incidents({"sourceSystemIds": [self.source1.pk]})), {self.incident1})
+        self.assertEqual(set(filtered_incidents({"sourceSystemIds": [self.source2.pk]})), {self.incident2})
 
-        self.assertEqual(set(filtered_incidents(self.filter_tags1)), {self.incident1})
-        self.assertEqual(set(filtered_incidents(self.filter_tags2)), {self.incident2})
+        self.assertEqual(set(filtered_incidents({"tags": [str(self.tag1)]})), {self.incident1})
+        self.assertEqual(set(filtered_incidents({"tags": [str(self.tag2)]})), {self.incident2})
 
-        self.assertEqual(set(filtered_incidents(self.filter_source1_tags1)), {self.incident1})
+        self.assertEqual(
+            set(filtered_incidents({"sourceSystemIds": [self.source1.pk], "tags": [str(self.tag1)]})), {self.incident1}
+        )

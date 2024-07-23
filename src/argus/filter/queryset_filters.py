@@ -1,4 +1,4 @@
-from argus.filter.filterwrapper import FilterBlobType
+from argus.filter.filterwrapper import FilterWrapper, FilterBlobType
 from argus.incident.models import Incident
 from argus.notificationprofile.models import Filter
 from argus.notificationprofile.models import NotificationProfile
@@ -6,7 +6,7 @@ from argus.notificationprofile.models import NotificationProfile
 
 def incidents_by_filter(incident_queryset, filter: Filter):
     "Returns all incidents that are included in the filter instance"
-    return filtered_incidents(filter, incident_queryset).all()
+    return filtered_incidents(filter.filter, incident_queryset).all()
 
 
 def incidents_by_filter_pk(incident_queryset, filter_pk: int):
@@ -25,11 +25,14 @@ def incidents_by_filter_pk(incident_queryset, filter_pk: int):
 
 
 def incidents_by_notificationprofile(incident_queryset, notificationprofile):
+    if not incident_queryset:
+        incident_queryset = Incident.objects.all()
+
     filters = notificationprofile.filters.all()
 
     filtered_incidents_pks = set()
     for filtr in filters:
-        filtered_incidents_pks.update(filtered_incidents(filtr, incident_queryset).values_list("pk", flat=True))
+        filtered_incidents_pks.update(filtered_incidents(filtr.filter, incident_queryset).values_list("pk", flat=True))
 
     return incident_queryset.filter(pk__in=filtered_incidents_pks)
 
@@ -89,12 +92,13 @@ def _incidents_fitting_maxlevel(incident_queryset, filterblob: FilterBlobType):
     return incident_queryset.filter(level__lte=maxlevel).distinct()
 
 
-def filtered_incidents(filter: Filter, incident_queryset=None):
+def filtered_incidents(filterblob: FilterBlobType, incident_queryset=None):
     if incident_queryset is None:
         incident_queryset = Incident.objects.all()
-    if filter.is_empty:
+    filterblob = filterblob.copy()
+    fw = FilterWrapper(filterblob)
+    if fw.is_empty:
         return Incident.objects.none().distinct()
-    filterblob = filter.filter.copy()
     filtered_by_source = _incidents_with_source_systems(incident_queryset, filterblob)
     filtered_by_tags = _incidents_with_tags(incident_queryset, filterblob)
     filtered_by_tristates = _incidents_fitting_tristates(incident_queryset, filterblob)
