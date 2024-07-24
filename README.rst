@@ -119,15 +119,9 @@ example::
             }
         ),
 
-        # For reading incident tag values you can use the _incident_tag.html template. eg:
-        IncidentTableColumn(
-            "location",
-            "Location",
-            "htmx/incidents/_incident_tag.html",
-            context={"tag": "location"},
-        ),
     ]
 
+For inbuilt support for other types of columns see the howtos in `the local docs <docs/howtos/>`_.
 
 
 .. _CSS Bed: https://www.cssbed.com/
