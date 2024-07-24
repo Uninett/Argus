@@ -69,7 +69,6 @@ from .serializers import (
     TagSerializer,
     IncidentTagRelation,
 )
-from .V1.serializers import IncidentSerializerV1
 
 LOG = logging.getLogger(__name__)
 
@@ -304,7 +303,7 @@ class TicketPluginViewSet(viewsets.ViewSet):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        serialized_incident = IncidentSerializerV1(incident).data
+        serialized_incident = IncidentSerializer(incident).data
         serialized_incident["argus_url"] = urljoin(
             getattr(settings, "FRONTEND_URL", ""),
             f"incidents/{incident_pk}",
