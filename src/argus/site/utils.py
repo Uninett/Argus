@@ -40,3 +40,21 @@ def update_context_processors_list(templates_setting, app_settings):
             continue
         correct_engine["OPTIONS"]["context_processors"].extend(app.context_processors)
     return safety_copy
+
+
+def update_middleware_list(middleware_setting, app_settings):
+    if not middleware_setting:
+        return middleware_setting
+    safety_copy = middleware_setting[:]
+    start_list = []
+    end_list = []
+    for app in app_settings:
+        if not app.middleware:
+            continue
+        for middleware, action in app.middleware.items():
+            if action == "start":
+                start_list.append(middleware)
+            else:
+                end_list.append(middleware)
+    safety_copy = start_list + safety_copy + end_list
+    return safety_copy
