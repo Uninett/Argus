@@ -473,6 +473,9 @@ class Incident(models.Model):
 
         return self.events.filter((acks_query & acks_not_expired_query) | ack_is_just_being_created).exists()
 
+    def is_acked_by(self, group: str) -> bool:
+        return group in self.acks.active().group_names()
+
     def create_first_event(self):
         """Create the correct type of first event for an incident
 
@@ -624,6 +627,9 @@ class AcknowledgementQuerySet(models.QuerySet):
     def active(self, timestamp=None):
         timestamp = timestamp if timestamp else timezone.now()
         return self.exclude(expiration__lte=timestamp)
+
+    def group_names(self):
+        return self.values_list("event__actor__groups__name", flat=True).distinct()
 
 
 class Acknowledgement(models.Model):
