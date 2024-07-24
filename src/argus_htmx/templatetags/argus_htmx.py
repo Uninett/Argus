@@ -12,3 +12,8 @@ def tagvalues(incident, key) -> list:
     """
     tags = incident.deprecated_tags
     return [str(tag.value) for tag in tags if tag.key == key]
+
+
+@register.filter
+def is_acked_by(incident, group: str) -> bool:
+    return incident.is_acked_by()
