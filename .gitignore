@@ -9,5 +9,6 @@ __pycache__/
 build/
 dist/
 
+!.gitattributes
 !.gitignore
 !.pre-commit-config.yaml
