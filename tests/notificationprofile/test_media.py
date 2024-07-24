@@ -1,6 +1,7 @@
 from django.test import TestCase, override_settings
 
 from argus.auth.factories import PersonUserFactory
+from argus.filter.factories import FilterFactory
 from argus.incident.factories import EventFactory
 from argus.incident.models import create_fake_incident, get_or_create_default_instances, Event
 from argus.notificationprofile import factories
@@ -44,12 +45,12 @@ class FindDestinationsTest(TestCase):
         # Create a filter that matches your test incident
         (_, _, argus_source) = get_or_create_default_instances()
         filter_dict1 = {"sourceSystemIds": [argus_source.id]}
-        filter1 = factories.FilterFactory(
+        filter1 = FilterFactory(
             user=self.user1,
             filter=filter_dict1,
         )
         filter_dict2 = {"tags": ["foo=bar"]}
-        filter2 = factories.FilterFactory(
+        filter2 = FilterFactory(
             user=self.user2,
             filter=filter_dict2,
         )
@@ -87,7 +88,7 @@ class FindDestinationsTest(TestCase):
             timeslot=self.timeslot,
             active=True,
         )
-        ack_filter = factories.FilterFactory(
+        ack_filter = FilterFactory(
             user=ack_profile.user,
             filter={"acked": True},
         )
@@ -105,7 +106,7 @@ class FindDestinationsTest(TestCase):
             timeslot=self.timeslot,
             active=True,
         )
-        ack_event_type_filter = factories.FilterFactory(
+        ack_event_type_filter = FilterFactory(
             user=ack_event_type_profile.user,
             filter={"event_types": [Event.Type.ACKNOWLEDGE]},
         )
@@ -124,7 +125,7 @@ class FindDestinationsTest(TestCase):
             timeslot=self.timeslot,
             active=True,
         )
-        ack_event_type_filter = factories.FilterFactory(
+        ack_event_type_filter = FilterFactory(
             user=ack_event_type_profile.user,
             filter={},
         )

@@ -13,6 +13,7 @@ from argus.auth.factories import (
     PersonUserFactory,
     SourceUserFactory,
 )
+from argus.filter.factories import FilterFactory
 from argus.incident.factories import (
     AcknowledgementFactory,
     EventFactory,
@@ -33,7 +34,6 @@ from argus.incident.models import (
     Tag,
 )
 from argus.incident.views import EventViewSet
-from argus.notificationprofile.factories import FilterFactory
 from argus.notificationprofile.models import Filter
 from argus.util.testing import disconnect_signals, connect_signals
 

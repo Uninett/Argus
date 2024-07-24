@@ -4,9 +4,9 @@ from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.test import TestCase
 
-from argus.notificationprofile.factories import FilterFactory
+from argus.filter.factories import FilterFactory
+from argus.filter.serializers import FilterSerializer
 from argus.notificationprofile.models import Filter
-from argus.notificationprofile.serializers import FilterSerializer
 from argus.util.testing import connect_signals, disconnect_signals
 
 

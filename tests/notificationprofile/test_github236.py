@@ -3,6 +3,7 @@ from django.test import TestCase, tag
 import json
 
 from argus.auth.factories import PersonUserFactory
+from argus.filter.factories import FilterFactory
 from argus.incident.models import create_fake_incident, get_or_create_default_instances, Event
 from argus.notificationprofile import factories
 from argus.notificationprofile.media import send_notifications_to_users
@@ -30,7 +31,7 @@ class SendingNotificationTest(TestCase):
         # Create a filter that matches your test incident
         (_, _, argus_source) = get_or_create_default_instances()
         filter_dict = {"sourceSystemIds": [argus_source.id], "tags": []}
-        filter = factories.FilterFactory(
+        filter = FilterFactory(
             user=user,
             filter=filter_dict,
         )

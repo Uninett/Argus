@@ -4,7 +4,6 @@ from typing import Union
 from rest_framework import serializers
 
 from .constants import DEPRECATED_FILTER_NAMES
-from .serializers import FilterBlobSerializer
 
 
 def validate_filter_string(value: Union[str, dict]):
@@ -34,14 +33,3 @@ def validate_filter_string(value: Union[str, dict]):
         errors.append(serializers.ValidationError(f"Unknown fieldname(s) in filterstring: {pp_unknown}", "unknown"))
     if errors:
         raise serializers.ValidationError(errors)
-
-
-def validate_jsonfilter(value: dict):
-    if not isinstance(value, dict):
-        raise serializers.ValidationError("Filter is not a dict")
-    if not value:
-        return True
-    serializer = FilterBlobSerializer(data=value)
-    if serializer.is_valid():
-        return True
-    raise serializers.ValidationError("Filter is not valid")

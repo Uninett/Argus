@@ -16,7 +16,8 @@ from argus.incident.factories import (
 )
 from argus.incident.models import Incident, IncidentTagRelation, SourceSystem, get_or_create_default_instances
 from argus.incident.views import IncidentFilter
-from argus.notificationprofile.factories import FilterFactory, NotificationProfileFactory
+from argus.filter.factories import FilterFactory
+from argus.notificationprofile.factories import NotificationProfileFactory
 from argus.notificationprofile.models import Filter, NotificationProfile
 from argus.util.testing import disconnect_signals, connect_signals
 

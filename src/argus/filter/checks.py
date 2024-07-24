@@ -16,7 +16,7 @@ def fallback_filter_check(app_configs, **kwargs):
                 'The ARGUS_FALLBACK_FILTER setting is invalid and has been set to "{}"',
                 hint="See the docs for the format of the ARGUS_FALLBACK_FILTER setting",
                 obj=fallback_filter,
-                id="argus_notificationprofile.W001",
+                id="argus_filter.W001",
             )
         )
     return errors

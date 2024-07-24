@@ -31,7 +31,7 @@ autobahn==23.6.2
     #   daphne
 automat==22.10.0
     # via twisted
-certifi==2024.2.2
+certifi==2024.7.4
     # via
     #   httpcore
     #   httpx
@@ -63,7 +63,7 @@ defusedxml==0.8.0rc2
     #   social-auth-core
 dj-database-url==2.1.0
     # via argus-server (pyproject.toml)
-django==5.0.2
+django==5.0.7
     # via
     #   -r requirements/django50.txt
     #   argus-server (pyproject.toml)
