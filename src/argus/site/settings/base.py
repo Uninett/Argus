@@ -15,7 +15,7 @@ import dj_database_url
 
 # Import some helpers
 from . import *
-from ..utils import update_context_processors_list
+from ..utils import update_context_processors_list, update_middleware_list
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -104,11 +104,13 @@ if OVERRIDING_APPS:
     _overriding_app_names = [app.app_name for app in OVERRIDING_APPS]
     INSTALLED_APPS = _overriding_app_names + INSTALLED_APPS
     TEMPLATES = update_context_processors_list(TEMPLATES, OVERRIDING_APPS)
+    MIDDLEWARE = update_middleware_list(MIDDLEWARE, OVERRIDING_APPS)
 # add extra functionality without overrides
 if EXTRA_APPS:
     _extra_app_names = [app.app_name for app in EXTRA_APPS]
     INSTALLED_APPS += _extra_app_names
     TEMPLATES = update_context_processors_list(TEMPLATES, EXTRA_APPS)
+    MIDDLEWARE = update_middleware_list(MIDDLEWARE, EXTRA_APPS)
 
 WSGI_APPLICATION = "argus.site.wsgi.application"
 
