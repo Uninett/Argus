@@ -12,6 +12,7 @@ from argus.dev.management.commands.check_token_expiry import (
     find_expiring_tokens,
     get_tokens_without_expiry_incident,
 )
+from argus.auth.factories import SourceUserFactory
 from argus.incident.factories import SourceSystemFactory
 from argus.incident.models import Incident, IncidentTagRelation, Tag, create_token_expiry_incident
 from argus.util.testing import connect_signals, disconnect_signals
@@ -21,10 +22,10 @@ class CheckTokenExpiryTests(TestCase):
     def setUp(self):
         disconnect_signals()
 
-        self.source_system1 = SourceSystemFactory()
-        self.source_system2 = SourceSystemFactory()
-        self.user1 = self.source_system1.user
-        self.user2 = self.source_system2.user
+        self.user1 = SourceUserFactory()
+        self.user2 = SourceUserFactory()
+        self.source_system1 = SourceSystemFactory(user=self.user1)
+        self.source_system2 = SourceSystemFactory(user=self.user2)
         self.expiring_token = Token.objects.create(user=self.user1)
         self.expiring_token.created = self.expiring_token.created - timedelta(days=100)
         self.expiring_token.save()
