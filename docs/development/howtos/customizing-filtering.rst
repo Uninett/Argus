@@ -8,7 +8,7 @@ exposes the names defined there.
 
 The optional setting ``ARGUS_FILTER_BACKEND`` defaults to
 ``"argus.filter.defaults"``, change it to point to your own dotted path to
-a moudle exposing the same names as ``argus.filter.defaults``.
+a module exposing the same names as ``argus.filter.defaults``.
 
 Contents of ``argus.filter.defaults``
 =====================================
