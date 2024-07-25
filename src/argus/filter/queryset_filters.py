@@ -1,7 +1,12 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from argus.filter.filterwrapper import FilterWrapper, FilterBlobType
 from argus.incident.models import Incident
-from argus.notificationprofile.models import Filter
-from argus.notificationprofile.models import NotificationProfile
+
+if TYPE_CHECKING:
+    from argus.notificationprofile.models import Filter, NotificationProfile
 
 
 __all__ = ["QuerySetFilter"]
@@ -78,6 +83,8 @@ class QuerySetFilter:
 
         If no filter with that pk exists it returns no incidents
         """
+        from argus.notificationprofile.models import Filter
+
         filtr = Filter.objects.filter(pk=filter_pk).first()
 
         if not filtr:
@@ -106,6 +113,8 @@ class QuerySetFilter:
         Returns all incidents that are included in the filters connected to the profile
         with the given primary key
         """
+        from argus.notificationprofile.models import NotificationProfile
+
         notification_profile = NotificationProfile.objects.filter(pk=notificationprofile_pk).first()
 
         if not notification_profile:

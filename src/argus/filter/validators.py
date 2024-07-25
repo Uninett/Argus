@@ -3,6 +3,11 @@ from rest_framework import serializers
 from argus.filter.serializers import FilterBlobSerializer
 
 
+__all__ = [
+    "validate_jsonfilter",
+]
+
+
 def validate_jsonfilter(value: dict):
     if not isinstance(value, dict):
         raise serializers.ValidationError("Filter is not a dict")

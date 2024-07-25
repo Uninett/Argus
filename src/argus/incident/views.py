@@ -34,10 +34,7 @@ from argus.notificationprofile.media import (
     send_notifications_to_users,
     background_send_notification,
 )
-from argus.filter.filters import IncidentFilter
-from argus.filter.filters import SourceLockedIncidentFilter
-from argus.filter.filters import INCIDENT_OPENAPI_PARAMETER_DESCRIPTIONS
-from argus.filter.filters import SOURCE_LOCKED_INCIDENT_OPENAPI_PARAMETER_DESCRIPTIONS
+from argus.filter import get_filter_backend
 from argus.util.datetime_utils import INFINITY_REPR
 from argus.util.signals import bulk_changed
 from argus.util.utils import import_class_from_dotted_path
@@ -68,6 +65,14 @@ from .serializers import (
     SourceSystemTypeSerializer,
     TagSerializer,
     IncidentTagRelation,
+)
+
+filter_backend = get_filter_backend()
+IncidentFilter = filter_backend.IncidentFilter
+SourceLockedIncidentFilter = filter_backend.SourceLockedIncidentFilter
+INCIDENT_OPENAPI_PARAMETER_DESCRIPTIONS = filter_backend.INCIDENT_OPENAPI_PARAMETER_DESCRIPTIONS
+SOURCE_LOCKED_INCIDENT_OPENAPI_PARAMETER_DESCRIPTIONS = (
+    filter_backend.SOURCE_LOCKED_INCIDENT_OPENAPI_PARAMETER_DESCRIPTIONS
 )
 
 LOG = logging.getLogger(__name__)

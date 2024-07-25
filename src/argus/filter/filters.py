@@ -14,8 +14,6 @@ from argus.notificationprofile.models import Filter, NotificationProfile
 from argus.incident.fields import KeyValueField
 from argus.incident.models import Incident
 
-from .queryset_filters import QuerySetFilter
-
 
 __all__ = [
     "INCIDENT_OPENAPI_PARAMETER_DESCRIPTIONS",
@@ -250,6 +248,8 @@ class IncidentFilter(filters.FilterSet):
 
     @classmethod
     def incident_filter(cls, queryset, name, value):
+        from .queryset_filters import QuerySetFilter
+
         if name == "open":
             if value:
                 return queryset.open()
