@@ -86,7 +86,11 @@ class NotificationProfileViewSetV1(rw_viewsets.ModelViewSet):
         except NotificationProfile.DoesNotExist:
             raise ValidationError(f"Notification profile with pk={pk} does not exist.")
         serializer = IncidentSerializer(
-            QuerySetFilter.incidents_by_notificationprofile(None, notification_profile), many=True
+            QuerySetFilter.incidents_by_notificationprofile(
+                incident_queryset=None,
+                notificationprofile=notification_profile,
+            ),
+            many=True,
         )
         return Response(serializer.data)
 
