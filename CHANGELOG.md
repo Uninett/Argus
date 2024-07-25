@@ -8,6 +8,56 @@ This project uses [*towncrier*](https://towncrier.readthedocs.io/) and the chang
 
 <!-- towncrier release notes start -->
 
+## [1.20.0] - 2024-07-25
+
+
+### Added
+
+- Added method to check whether incident is acknowledged by a specific user
+  group. ([#838](https://github.com/Uninett/Argus/issues/838))
+- Made it possible to replace how Argus does filtering (for sending
+  notifications and showing a list of incidents). See the howto "How to
+  customize filtering".
+- `OVERRIDING_APPS` and `EXTRA_APPS` now supports changing the
+  MIDDLEWARE-setting. The key is "middleware" and the value is a dictionary of
+  the dotted path of the middleware as the key, and an action as the value.
+  Currently only the actions "start" and "end" is supported, putting the
+  middleware at either the start of the list or the end, depending.
+
+### Changed
+
+BIG filter refactor/cleanup. All filter-stuff except the Filter-model has been
+moved to a new app, argus.filter
+
+- Move `Filter.filtered_incidents` to `argus.filter.queryset_filters.QuerySetFilter`
+  - Change the signature so that it works on a filterblob, not a Filter model
+    instance
+- Ensure that the fallback filter, which is only relevant when sending
+  notifications, is ignored everywhere else. First step in getting rid of this
+  misfeature of a setting.
+- Get rid of `NotificationProfile.filtered_incidents`, instead use
+  `argus.filter.queryset_filters.QuerySetFilter.incidents_by_notificationprofile`
+- Move Filter-dependent methods out of incident/models.py
+- Move filter settings check to argus.filter
+- Keep OpenAPI queryparam descriptions with their filters in argus.filter.filters
+- Update and improve tests
+- Move Filter `*_fits` methods to argus.filter.filterwrapper.FilterWrapper
+- Move NotificationProfile `*_fits` methods to ComplexFilterWrapper
+- Add docstring to argus.filter.filter
+- Simplify/DRY existing filterwrapper methods, including tristate
+
+### Fixed
+
+- Removed one cause for spurious failures of tests
+- Show infinite end_time as 'Still open' instead of datetime representation in
+  email ([#793](https://github.com/Uninett/Argus/issues/793))
+- Temporarily hide DestinationConfig from User admin in order to allow updating
+  Users again. Undo if Django starts allowing JSONFields in UniqueConstraints.
+  ([#822](https://github.com/Uninett/Argus/issues/822))
+- Improve `/incident` endpoint response time by roughly 36% by pre-fetching
+  incident tag data ([#837](https://github.com/Uninett/Argus/issues/837))
+
+
 ## [1.19.2] - 2024-05-28
 
 ### Added
