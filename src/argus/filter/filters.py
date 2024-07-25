@@ -14,6 +14,8 @@ from argus.notificationprofile.models import Filter, NotificationProfile
 from argus.incident.fields import KeyValueField
 from argus.incident.models import Incident
 
+from .queryset_filters import QuerySetFilter
+
 
 __all__ = [
     "INCIDENT_OPENAPI_PARAMETER_DESCRIPTIONS",
@@ -194,40 +196,6 @@ SOURCE_LOCKED_INCIDENT_OPENAPI_PARAMETER_DESCRIPTIONS = [
 ]
 
 
-def incidents_by_filter_pk(incident_queryset, filter_pk):
-    """
-    Returns all incidents that are included in the filter with the given primary
-    key
-
-    If no filter with that pk exists it returns no incidents
-    """
-    filtr = Filter.objects.filter(pk=filter_pk).first()
-
-    if not filtr:
-        return incident_queryset.none()
-
-    return filtr.filtered_incidents.all()
-
-
-def incidents_by_notificationprofile_pk(incident_queryset, notificationprofile_pk):
-    """
-    Returns all incidents that are included in the filters connected to the profile
-    with the given primary key
-    """
-    notification_profile = NotificationProfile.objects.filter(pk=notificationprofile_pk).first()
-
-    if not notification_profile:
-        return incident_queryset.none()
-
-    filters = notification_profile.filters.all()
-
-    filtered_incidents_pks = set()
-    for filtr in filters:
-        filtered_incidents_pks.update(filtr.filtered_incidents.values_list("pk", flat=True))
-
-    return incident_queryset.filter(pk__in=filtered_incidents_pks)
-
-
 class TagFilter(filters.Filter):
     field_class = KeyValueField
 
@@ -287,35 +255,35 @@ class IncidentFilter(filters.FilterSet):
                 return queryset.open()
             else:
                 return queryset.closed()
-        elif name == "acked":
+        if name == "acked":
             if value:
                 return queryset.acked()
             else:
                 return queryset.not_acked()
-        elif name == "stateful":
+        if name == "stateful":
             if value:
                 return queryset.stateful()
             else:
                 return queryset.stateless()
-        elif name == "tags":
+        if name == "tags":
             if value:
                 if isinstance(value, str):
                     value = [value]
                 return queryset.from_tags(*value)
-        elif name == "ticket":
+        if name == "ticket":
             if value:
                 return queryset.has_ticket()
             else:
                 return queryset.lacks_ticket()
-        elif name == "duration__gte":
+        if name == "duration__gte":
             if value:
                 return queryset.is_longer_than_minutes(int(value))
-        elif name == "token_expiry":
+        if name == "token_expiry":
             return queryset.token_expiry()
-        elif name == "filter_pk":
-            return incidents_by_filter_pk(queryset, value)
-        elif name == "notificationprofile_pk":
-            return incidents_by_notificationprofile_pk(queryset, value)
+        if name == "filter_pk":
+            return QuerySetFilter.incidents_by_filter_pk(queryset, value)
+        if name == "notificationprofile_pk":
+            return QuerySetFilter.incidents_by_notificationprofile_pk(queryset, value)
         return queryset
 
     class Meta:

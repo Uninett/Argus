@@ -2,7 +2,7 @@ import datetime
 
 from django.urls import reverse
 from django.utils.timezone import now
-from django.test import TestCase, RequestFactory, override_settings
+from django.test import TestCase, RequestFactory, override_settings, tag
 
 from rest_framework import serializers, status, versioning
 from rest_framework.test import APITestCase
@@ -476,6 +476,7 @@ class IncidentFilterByOpenAndStatefulV1TestCase(IncidentAPITestCase):
         self.assertEqual(len(response.data["results"]), 0, msg=response.data)
 
 
+@tag("queryset-filter")
 class IncidentFilterByFilterPkTestCase(IncidentAPITestCase):
     def setUp(self):
         super().setUp()

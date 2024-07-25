@@ -8,7 +8,7 @@ from django.conf import settings
 from django.db import connections
 from rest_framework.exceptions import ValidationError
 
-from argus.filter.filterwrapper import ComplexFilterWrapper
+from argus.filter.filterwrapper import ComplexFallbackFilterWrapper
 from argus.util.utils import import_class_from_dotted_path
 
 from ..models import DestinationConfig, Media, NotificationProfile
@@ -79,7 +79,7 @@ def find_destinations_for_event(event: Event):
     incident = event.incident
     qs = NotificationProfile.objects.filter(active=True)
     for profile in qs.prefetch_related("destinations").select_related("user"):
-        fw = ComplexFilterWrapper(profile=profile)
+        fw = ComplexFallbackFilterWrapper(profile=profile)
         LOG.debug('Notification: checking profile "%s" (%s) for event "%s"', profile, profile.user.username, event)
         if fw.incident_fits(incident) and fw.event_fits(event):
             destinations.update(profile.destinations.all())

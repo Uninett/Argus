@@ -215,7 +215,7 @@ class NotificationProfileViewTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 
-@tag("API", "integration")
+@tag("API", "queryset-filter", "integration")
 class NotificationIncidentViewTests(APITestCase):
     def setUp(self):
         disconnect_signals()

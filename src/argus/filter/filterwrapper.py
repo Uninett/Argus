@@ -1,18 +1,11 @@
 from __future__ import annotations
 
-from datetime import datetime, time
-from functools import reduce
 import logging
 from operator import or_
 from typing import TYPE_CHECKING, Dict, Optional, Any, Tuple
 
 from django.conf import settings
-from django.contrib.postgres.fields import ArrayField
-from django.db import models
-from django.utils import timezone
-from django.utils.text import slugify
 
-from argus.auth.models import User
 from argus.compat import StrEnum
 
 
@@ -43,12 +36,10 @@ class FilterWrapper:
     FILTER_KEYS = TRINARY_FILTERS + LIST_FILTERS + INT_FILTERS
 
     def __init__(self, filterblob: FilterBlobType):
-        self.fallback_filter = getattr(settings, "ARGUS_FALLBACK_FILTER", {})
         self.filter = filterblob.copy()
 
     def _get_filter_value(self, key: str) -> Optional[Any]:
-        fallback_filter = self.fallback_filter.get(key, None)
-        return self.filter.get(key, fallback_filter)
+        return self.filter.get(key, None)
 
     def _get_filter_value_and_ignored_status(self, key: str) -> Tuple[Optional[Any], bool]:
         filter_ = self._get_filter_value(key)
@@ -114,7 +105,21 @@ class FilterWrapper:
         return not any_failed
 
 
+class FallbackFilterWrapper(FilterWrapper):
+    "Changed by ARGUS_FALLBACK_FILTER setting"
+
+    def __init__(self, filterblob: FilterBlobType):
+        super().__init__(filterblob)
+        self.fallback_filter = getattr(settings, "ARGUS_FALLBACK_FILTER", {})
+
+    def _get_filter_value(self, key: str) -> Optional[Any]:
+        value = super()._get_filter_value(key)
+        return value if value else self.fallback_filter.get(key, None)
+
+
 class ComplexFilterWrapper:
+    filterwrapper = FilterWrapper
+
     def __init__(self, **kwargs):
         self.profile = kwargs.pop("profile", None)
 
@@ -125,7 +130,7 @@ class ComplexFilterWrapper:
         if not is_selected_by_time:
             return False
         for f in self.profile.filters.only("filter"):
-            if not FilterWrapper(f.filter).incident_fits(incident):
+            if not self.filterwrapper(f.filter).incident_fits(incident):
                 return False
         return True
 
@@ -137,3 +142,7 @@ class ComplexFilterWrapper:
             if FilterWrapper(f.filter).event_fits(event):
                 return True
         return False
+
+
+class ComplexFallbackFilterWrapper(ComplexFilterWrapper):
+    filterwrapper = FallbackFilterWrapper

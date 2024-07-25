@@ -1,9 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime, time
-from functools import reduce
 import logging
-from operator import or_
 from typing import TYPE_CHECKING, Dict, Optional
 
 from django.conf import settings
@@ -13,10 +11,9 @@ from django.utils import timezone
 from django.utils.text import slugify
 
 from argus.auth.models import User
-from argus.filter.filterwrapper import FilterWrapper, ComplexFilterWrapper
 
 if TYPE_CHECKING:
-    from argus.incident.models import Event, Incident
+    from argus.incident.models import Event, Incident  # noqa: F401
 
 TriState = Optional[bool]
 
@@ -107,89 +104,8 @@ class Filter(models.Model):
     class Meta:
         constraints = [models.UniqueConstraint(fields=["name", "user"], name="%(class)s_unique_name_per_user")]
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.filter_wrapper = FilterWrapper(self.filter)
-
     def __str__(self):
         return f"{self.name} [{self.filter}]"
-
-    @property
-    def is_empty(self):
-        return self.filter_wrapper.is_empty
-
-    @property
-    def all_incidents(self):
-        # Prevent cyclical import
-        from argus.incident.models import Incident
-
-        return Incident.objects.all()
-
-    # XXX wrong location
-    @property
-    def filtered_incidents(self):
-        if self.is_empty:
-            return self.all_incidents.none().distinct()
-        data = self.filter.copy()
-        filtered_by_source = self.incidents_with_source_systems(data=data)
-        filtered_by_tags = self.incidents_with_tags(data=data)
-        filtered_by_tristates = self.incidents_fitting_tristates(data=data)
-        filtered_by_maxlevel = self.incidents_fitting_maxlevel(data=data)
-
-        return filtered_by_source & filtered_by_tags & filtered_by_tristates & filtered_by_maxlevel
-
-    # XXX wrong location
-    def incidents_with_source_systems(self, data=None):
-        if not data:
-            data = self.filter.copy()
-        source_list = data.get("sourceSystemIds", [])
-        if source_list:
-            return self.all_incidents.filter(source__in=source_list).distinct()
-        return self.all_incidents.distinct()
-
-    # XXX wrong location
-    def incidents_with_tags(self, data=None):
-        if not data:
-            data = self.filter.copy()
-        tags_list = data.get("tags", [])
-        if tags_list:
-            return self.all_incidents.from_tags(*tags_list)
-        return self.all_incidents.distinct()
-
-    # XXX wrong location
-    def incidents_fitting_tristates(
-        self,
-        data=None,
-    ):
-        if not data:
-            data = self.filter.copy()
-        fitting_incidents = self.all_incidents
-        filter_open = data.get("open", None)
-        filter_acked = data.get("acked", None)
-        filter_stateful = data.get("stateful", None)
-
-        if filter_open is True:
-            fitting_incidents = fitting_incidents.open()
-        if filter_open is False:
-            fitting_incidents = fitting_incidents.closed()
-        if filter_acked is True:
-            fitting_incidents = fitting_incidents.acked()
-        if filter_acked is False:
-            fitting_incidents = fitting_incidents.not_acked()
-        if filter_stateful is True:
-            fitting_incidents = fitting_incidents.stateful()
-        if filter_stateful is False:
-            fitting_incidents = fitting_incidents.stateless()
-        return fitting_incidents.distinct()
-
-    # XXX wrong location
-    def incidents_fitting_maxlevel(self, data=None):
-        if not data:
-            data = self.filter.copy()
-        maxlevel = data.get("maxlevel", None)
-        if not maxlevel:
-            return self.all_incidents.distinct()
-        return self.all_incidents.filter(level__lte=maxlevel).distinct()
 
 
 class Media(models.Model):
@@ -259,17 +175,7 @@ class NotificationProfile(models.Model):
         blank=True,
     )
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.filter_wrapper = ComplexFilterWrapper(profile=self)
-
     def __str__(self):
         if self.name:
             return f"{self.name}"
         return f"{self.timeslot}: {', '.join(str(f) for f in self.filters.all())}"
-
-    # XXX wrong location?
-    @property
-    def filtered_incidents(self):
-        qs = [filter_.filtered_incidents for filter_ in self.filters.all()]
-        return reduce(or_, qs)
