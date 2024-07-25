@@ -24,14 +24,18 @@ ERROR_TEMPLATE = """<html>
 LOG = logging.getLogger(__name__)
 
 
+# fmt: off
 def index(request):
     context = {
         "page_title": "Home",
         "frontend": settings.FRONTEND_URL,
     }
     return render(request, "index.html", context=context)
+index.login_required = False
+# fmt: on
 
 
+# fmt: off
 def error(request):
     def render_error_page(code, reason) -> bytes:
         return ERROR_TEMPLATE.format(code=code, reason=reason).encode("utf-8")
@@ -73,12 +77,15 @@ def error(request):
         LOG.error(errormsg)
     content = render_error_page(status_code, "Generated error page")
     return ERROR_MAP[status_code](content=content)
+error.login_required = False
+# fmt: on
 
 
 class MetadataView(APIView):
     http_method_names = ["get", "head", "options", "trace"]
     authentication_classes = []
     permission_classes = [permissions.AllowAny]
+    login_required = False
 
     def get(self, request, format=None):
         try:
