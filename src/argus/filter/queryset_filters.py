@@ -86,7 +86,7 @@ class QuerySetFilter:
         return cls.incidents_by_filter(incident_queryset, filtr)
 
     @classmethod
-    def incidents_by_notificationprofile(cls, incident_queryset, notificationprofile):
+    def incidents_by_notificationprofile(cls, incident_queryset, notificationprofile: NotificationProfile):
         if not incident_queryset:
             incident_queryset = Incident.objects.all()
 
