@@ -8,6 +8,13 @@ This project uses [*towncrier*](https://towncrier.readthedocs.io/) and the chang
 
 <!-- towncrier release notes start -->
 
+## [1.20.1] - 2024-07-26
+
+### Fixed
+
+- `INCIDENT_LEVEL_CHOICES` was behaving oddly when debugging so it has been
+  made a proper immutable constant.
+
 ## [1.20.0] - 2024-07-25
 
 
