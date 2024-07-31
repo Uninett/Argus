@@ -158,13 +158,6 @@ class BaseIncidentViewSet(
             return IncidentPureDeserializer
         return IncidentSerializer
 
-    def get_queryset(self):
-        if self.request.method != "GET":
-            return super().get_queryset()
-        return (
-            Incident.objects.prefetch_default_related().select_related("source").prefetch_related("events__ack").all()
-        )
-
     def list(self, request, *args, **kwargs):
         if "count" in request.query_params:
             count = self.filter_queryset(self.get_queryset()).count()
