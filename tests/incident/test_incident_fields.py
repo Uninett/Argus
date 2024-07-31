@@ -4,13 +4,11 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils import timezone
 from django.utils.timezone import is_aware, make_aware
-from rest_framework.test import APIClient
 
-from argus.auth.models import User
-from argus.util.utils import duplicate
-from argus.util.testing import disconnect_signals, connect_signals
+from argus.incident.factories import StatefulIncidentFactory
 from argus.incident.fields import KeyValueField
-from argus.incident.models import Incident, SourceSystem, SourceSystemType
+from argus.incident.models import Incident
+from argus.util.testing import disconnect_signals, connect_signals
 from . import IncidentBasedAPITestCaseHelper
 
 
@@ -18,14 +16,10 @@ class EndTimeInfinityFieldTests(TestCase, IncidentBasedAPITestCaseHelper):
     def setUp(self):
         disconnect_signals()
         super().init_test_objects()
-
-        self.incident1 = Incident.objects.create(
-            start_time=make_aware(datetime(2000, 1, 1)),
-            source=self.source1,
-            source_incident_id="1",
-        )
-        self.incident2 = duplicate(self.incident1, source_incident_id="2")
-        self.incident3 = duplicate(self.incident1, source_incident_id="3")
+        yesterday = timezone.now() - timedelta(days=1)
+        self.incident1 = StatefulIncidentFactory(start_time=yesterday, source=self.source1, source_incident_id="1")
+        self.incident2 = StatefulIncidentFactory(start_time=yesterday, source=self.source1, source_incident_id="2")
+        self.incident3 = StatefulIncidentFactory(start_time=yesterday, source=self.source1, source_incident_id="3")
 
     def tearDown(self):
         connect_signals()
