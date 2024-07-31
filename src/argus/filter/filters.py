@@ -51,7 +51,7 @@ _INCIDENT_OPENAPI_CUSTOM_FILTER_PARAMETERS = [
     OpenApiParameter(
         name="tags",
         description="Fetch incidents with specified tags",
-        enum=str,
+        type=str,
     ),
     OpenApiParameter(
         name="duration__gte",
