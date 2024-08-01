@@ -272,7 +272,9 @@ class IncidentViewSetV1TestCase(IncidentAPITestCase):
 
     def test_can_get_my_incidents(self):
         incident_pk = self.add_open_incident_with_start_event_and_tag().pk
-        other_incident_pk = StatefulIncidentFactory().pk
+        user = SourceUserFactory()
+        source = SourceSystemFactory(user=user)
+        other_incident_pk = StatefulIncidentFactory(source=source).pk
 
         response = self.client.get(path="/api/v1/incidents/mine/")
 
@@ -815,7 +817,9 @@ class IncidentViewSetTestCase(APITestCase):
 
     def test_can_get_my_incidents(self):
         incident_pk = self.add_open_incident_with_start_event_and_tag().pk
-        other_incident_pk = StatefulIncidentFactory().pk
+        user = SourceUserFactory()
+        source = SourceSystemFactory(user=user)
+        other_incident_pk = StatefulIncidentFactory(source=source).pk
 
         response = self.client.get(path="/api/v2/incidents/mine/")
 
