@@ -82,7 +82,7 @@ django-filter==23.5
     # via argus-server (pyproject.toml)
 django-phonenumber-field[phonenumberslite]==7.3.0
     # via argus-server (pyproject.toml)
-djangorestframework==3.14.0
+djangorestframework==3.15.2
     # via
     #   argus-server (pyproject.toml)
     #   drf-spectacular
