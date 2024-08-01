@@ -50,6 +50,7 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.todo",
     "sphinx.ext.coverage",
+    'sphinx.ext.graphviz',
     "sphinx.ext.viewcode",
     "sphinx.ext.intersphinx",
     "djangodocs",

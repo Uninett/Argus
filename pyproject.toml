@@ -103,6 +103,7 @@ exclude = '''
     | buck-out
     | build
     | dist
+    | docs/conf.py
   )/
   | src/.*/migrations
 )
