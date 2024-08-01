@@ -7,7 +7,12 @@ from rest_framework.test import APIRequestFactory
 from rest_framework import serializers
 
 from argus.auth.factories import PersonUserFactory
-from argus.incident.factories import IncidentTagRelationFactory, StatefulIncidentFactory
+from argus.incident.factories import (
+    IncidentTagRelationFactory,
+    SourceSystemFactory,
+    SourceUserFactory,
+    StatefulIncidentFactory,
+)
 from argus.incident.serializers import (
     EventSerializer,
     IncidentPureDeserializer,
@@ -27,6 +32,8 @@ class AcknowledgementSerializerV1Tests(TestCase):
         disconnect_signals()
         self.user = PersonUserFactory()
         self.request_factory = APIRequestFactory()
+        source_user = SourceUserFactory()
+        self.source = SourceSystemFactory(user=source_user)
 
     def tearDown(self):
         connect_signals()
@@ -34,7 +41,7 @@ class AcknowledgementSerializerV1Tests(TestCase):
     def test_create_golden_path(self):
         request = self.request_factory.post("/")
         request.user = self.user
-        incident = StatefulIncidentFactory()
+        incident = StatefulIncidentFactory(source=self.source)
         timestamp = timezone.now()
         data = {
             "event": {
@@ -59,12 +66,14 @@ class UpdateAcknowledgementSerializerV1Tests(TestCase):
     def setUp(self):
         disconnect_signals()
         self.user = PersonUserFactory()
+        source_user = SourceUserFactory()
+        self.source = SourceSystemFactory(user=source_user)
 
     def tearDown(self):
         connect_signals()
 
     def test_update_golden_path(self):
-        incident = StatefulIncidentFactory()
+        incident = StatefulIncidentFactory(source=self.source)
         ack = incident.create_ack(self.user, expiration=None)
         self.assertFalse(ack.expiration)
         validated_data = {"expiration": timezone.now()}
@@ -74,7 +83,7 @@ class UpdateAcknowledgementSerializerV1Tests(TestCase):
         self.assertTrue(updated_ack.expiration)
 
     def test_update_expired_ack_should_fail(self):
-        incident = StatefulIncidentFactory()
+        incident = StatefulIncidentFactory(source=self.source)
         timestamp_in_the_past = timezone.now() - datetime.timedelta(days=30)
         ack = incident.create_ack(self.user, expiration=timestamp_in_the_past)
         validated_data = {"expiration": None}
@@ -88,6 +97,8 @@ class AcknowledgementSerializerTests(TestCase):
         disconnect_signals()
         self.user = PersonUserFactory()
         self.request_factory = APIRequestFactory()
+        source_user = SourceUserFactory()
+        self.source = SourceSystemFactory(user=source_user)
 
     def tearDown(self):
         connect_signals()
@@ -95,7 +106,7 @@ class AcknowledgementSerializerTests(TestCase):
     def test_create_golden_path(self):
         request = self.request_factory.post("/")
         request.user = self.user
-        incident = StatefulIncidentFactory()
+        incident = StatefulIncidentFactory(source=self.source)
         timestamp = timezone.now()
         data = {
             "actor": {},  # Forced to request.user
@@ -117,12 +128,14 @@ class UpdateAcknowledgementSerializerTests(TestCase):
     def setUp(self):
         disconnect_signals()
         self.user = PersonUserFactory()
+        source_user = SourceUserFactory()
+        self.source = SourceSystemFactory(user=source_user)
 
     def tearDown(self):
         connect_signals()
 
     def test_update_golden_path(self):
-        incident = StatefulIncidentFactory()
+        incident = StatefulIncidentFactory(source=self.source)
         ack = incident.create_ack(self.user, expiration=None)
         self.assertFalse(ack.expiration)
         validated_data = {"expiration": timezone.now()}
@@ -132,7 +145,7 @@ class UpdateAcknowledgementSerializerTests(TestCase):
         self.assertTrue(updated_ack.expiration)
 
     def test_update_expired_ack_should_fail(self):
-        incident = StatefulIncidentFactory()
+        incident = StatefulIncidentFactory(source=self.source)
         timestamp_in_the_past = timezone.now() - datetime.timedelta(days=30)
         ack = incident.create_ack(self.user, expiration=timestamp_in_the_past)
         validated_data = {"expiration": None}

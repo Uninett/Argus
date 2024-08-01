@@ -73,5 +73,7 @@ class IncidentAckedTests(TestCase):
         self.assertFalse(ack.event.incident.acked)
 
     def test_acked_is_false_for_incident_without_acknowledgement(self):
-        incident = StatefulIncidentFactory()
+        source_user = SourceUserFactory()
+        source = SourceSystemFactory(user=source_user)
+        incident = StatefulIncidentFactory(source=source)
         self.assertFalse(incident.acked)

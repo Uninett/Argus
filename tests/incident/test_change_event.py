@@ -20,7 +20,7 @@ class ChangeEventTests(APITestCase, IncidentBasedAPITestCaseHelper):
         super().init_test_objects()
 
         self.url = "http://www.example.com/repository/issues/issue"
-        self.incident = StatefulIncidentFactory(level=1, ticket_url=self.url, details_url=self.url)
+        self.incident = StatefulIncidentFactory(level=1, ticket_url=self.url, details_url=self.url, source=self.source1)
 
     def teardown(self):
         connect_signals()
@@ -79,7 +79,7 @@ class ChangeEventTests(APITestCase, IncidentBasedAPITestCaseHelper):
         TICKET_PLUGIN="argus.incident.ticket.dummy.DummyPlugin",
     )
     def test_change_event_is_created_on_ticket_url_changes_for_automatic_ticket_url_endpoint(self):
-        incident = StatefulIncidentFactory(ticket_url="")
+        incident = StatefulIncidentFactory(ticket_url="", source=self.source1)
         response = self.user1_rest_client.put(
             path=f"/api/v2/incidents/{incident.pk}/automatic-ticket/",
             data={},
