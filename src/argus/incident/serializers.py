@@ -172,7 +172,15 @@ class IncidentSerializer(serializers.ModelSerializer):
 
 
 class IncidentPureDeserializer(serializers.ModelSerializer):
-    EDITABLE_FIELDS = set(["ticket_url", "details_url", "level", "metadata"])
+    EDITABLE_FIELDS = set(
+        [
+            "ticket_url",
+            "details_url",
+            "level",
+            "metadata",
+            "description",
+        ]
+    )
 
     tags = IncidentTagRelationSerializer(many=True, write_only=True)
 
@@ -184,6 +192,7 @@ class IncidentPureDeserializer(serializers.ModelSerializer):
             "ticket_url",
             "level",
             "metadata",
+            "description",
         ]
 
     def update(self, instance: Incident, validated_data: dict):

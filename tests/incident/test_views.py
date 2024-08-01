@@ -147,6 +147,18 @@ class IncidentViewSetV1TestCase(IncidentAPITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(Incident.objects.get(pk=incident_pk).level, 2)
 
+    def test_can_update_incident_description(self):
+        incident_pk = self.add_open_incident_with_start_event_and_tag().pk
+        incident_path = reverse("v1:incident:incident-detail", args=[incident_pk])
+        response = self.client.patch(
+            path=incident_path,
+            data={
+                "description": "new description",
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(Incident.objects.get(pk=incident_pk).description, "new description")
+
     def test_can_get_all_acknowledgements_of_incident(self):
         ack = self.add_acknowledgement_with_incident_and_event()
         incident = ack.event.incident
@@ -648,6 +660,18 @@ class IncidentViewSetTestCase(APITestCase):
         changed_incident = Incident.objects.get(pk=incident.pk)
         self.assertNotEqual(changed_incident.metadata, start_metadata)
         self.assertEqual(changed_incident.metadata, changed_metadata)
+
+    def test_can_update_incident_description(self):
+        incident_pk = self.add_open_incident_with_start_event_and_tag().pk
+        incident_path = reverse("v2:incident:incident-detail", args=[incident_pk])
+        response = self.client.patch(
+            path=incident_path,
+            data={
+                "description": "new description",
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(Incident.objects.get(pk=incident_pk).description, "new description")
 
     def test_can_get_all_acknowledgements_of_incident(self):
         ack = self.add_acknowledgement_with_incident_and_event()
