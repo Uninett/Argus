@@ -450,11 +450,11 @@ class SourceSystemV1TestCase(IncidentAPITestCase):
 class IncidentFilterByOpenAndStatefulV1TestCase(IncidentAPITestCase):
     def setUp(self):
         super().setUp()
-        self.open_pk = StatefulIncidentFactory().pk
+        self.open_pk = StatefulIncidentFactory(source=self.source).pk
         self.closed_pk = StatefulIncidentFactory(
-            start_time="2022-05-23T13:07:29.254Z", end_time="2022-05-24T13:07:29.254Z"
+            start_time="2022-05-23T13:07:29.254Z", end_time="2022-05-24T13:07:29.254Z", source=self.source
         ).pk
-        self.stateless_pk = StatelessIncidentFactory().pk
+        self.stateless_pk = StatelessIncidentFactory(source=self.source).pk
 
     def test_open_true_returns_only_open_incidents(self):
         response = self.client.get("/api/v1/incidents/?open=true")
@@ -494,11 +494,11 @@ class IncidentFilterByOpenAndStatefulV1TestCase(IncidentAPITestCase):
 class IncidentFilterByFilterPkTestCase(IncidentAPITestCase):
     def setUp(self):
         super().setUp()
-        self.open_pk = StatefulIncidentFactory().pk
+        self.open_pk = StatefulIncidentFactory(source=self.source).pk
         self.closed_pk = StatefulIncidentFactory(
-            start_time="2022-05-23T13:07:29.254Z", end_time="2022-05-24T13:07:29.254Z"
+            start_time="2022-05-23T13:07:29.254Z", end_time="2022-05-24T13:07:29.254Z", source=self.source
         ).pk
-        self.stateless_pk = StatelessIncidentFactory().pk
+        self.stateless_pk = StatelessIncidentFactory(source=self.source).pk
 
     def test_filter_by_filter_pk_returns_no_incidents_on_non_existent_filter(self):
         non_existent_filter_pk = Filter.objects.last().pk + 1 if Filter.objects.exists() else 1
@@ -834,7 +834,7 @@ class IncidentViewSetTestCase(APITestCase):
 
     def test_can_get_existing_ticket_url_of_incident(self):
         ticket_url = "www.example.com"
-        pk = StatefulIncidentFactory(ticket_url=ticket_url).pk
+        pk = StatefulIncidentFactory(ticket_url=ticket_url, source=self.source).pk
         response = self.client.put(path=f"/api/v2/incidents/{pk}/automatic-ticket/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["ticket_url"], ticket_url)
@@ -956,13 +956,15 @@ class BulkAcknowledgementViewSetTestCase(APITestCase):
             "description": "acknowledgement",
             "expiration": "2022-08-03T13:04:03.529Z",
         }
+        source_user = SourceUserFactory()
+        self.source = SourceSystemFactory(user=source_user)
 
     def tearDown(self):
         connect_signals()
 
     def test_can_bulk_create_acknowledgements_for_incidents_with_valid_ids(self):
-        incident_1 = StatefulIncidentFactory()
-        incident_2 = StatefulIncidentFactory()
+        incident_1 = StatefulIncidentFactory(source=self.source)
+        incident_2 = StatefulIncidentFactory(source=self.source)
         data = {
             "ids": [incident_1.pk, incident_2.pk],
             "ack": self.ack_data,
@@ -986,8 +988,8 @@ class BulkAcknowledgementViewSetTestCase(APITestCase):
         self.assertTrue(incident_2.events.filter(type="ACK").exists())
 
     def test_can_bulk_create_acknowledgements_without_description_and_expiration_for_incidents_with_valid_ids(self):
-        incident_1 = StatefulIncidentFactory()
-        incident_2 = StatefulIncidentFactory()
+        incident_1 = StatefulIncidentFactory(source=self.source)
+        incident_2 = StatefulIncidentFactory(source=self.source)
         data = {
             "ids": [incident_1.pk, incident_2.pk],
             "ack": {
@@ -1017,8 +1019,8 @@ class BulkAcknowledgementViewSetTestCase(APITestCase):
         self.assertTrue(incident_2.events.filter(type="ACK").exists())
 
     def test_can_bulk_create_acknowledgements_with_empty_description_for_incidents_with_valid_ids(self):
-        incident_1 = StatefulIncidentFactory()
-        incident_2 = StatefulIncidentFactory()
+        incident_1 = StatefulIncidentFactory(source=self.source)
+        incident_2 = StatefulIncidentFactory(source=self.source)
         data = {
             "ids": [incident_1.pk, incident_2.pk],
             "ack": {
@@ -1073,7 +1075,7 @@ class BulkAcknowledgementViewSetTestCase(APITestCase):
         self.assertFalse(Acknowledgement.objects.filter(event__incident_id=invalid_incident_2_pk).exists())
 
     def test_can_partially_bulk_create_acknowledgements_for_incidents_with_some_valid_ids(self):
-        incident_1 = StatefulIncidentFactory()
+        incident_1 = StatefulIncidentFactory(source=self.source)
         highest_incident_pk = Incident.objects.last().id
         invalid_incident_2_pk = highest_incident_pk + 1
         data = {
@@ -1109,13 +1111,15 @@ class BulkEventViewSetTestCase(APITestCase):
             "description": "event",
             "type": "OTH",
         }
+        source_user = SourceUserFactory()
+        self.source = SourceSystemFactory(user=source_user)
 
     def tearDown(self):
         connect_signals()
 
     def test_can_bulk_create_events_for_incidents_with_valid_ids(self):
-        incident_1 = StatefulIncidentFactory()
-        incident_2 = StatefulIncidentFactory()
+        incident_1 = StatefulIncidentFactory(source=self.source)
+        incident_2 = StatefulIncidentFactory(source=self.source)
         data = {
             "ids": [incident_1.pk, incident_2.pk],
             "event": self.event_data,
@@ -1139,8 +1143,8 @@ class BulkEventViewSetTestCase(APITestCase):
         self.assertTrue(incident_2.events.filter(type="OTH").exists())
 
     def test_can_bulk_create_events_without_description_for_incidents_with_valid_ids(self):
-        incident_1 = StatefulIncidentFactory()
-        incident_2 = StatefulIncidentFactory()
+        incident_1 = StatefulIncidentFactory(source=self.source)
+        incident_2 = StatefulIncidentFactory(source=self.source)
         data = {
             "ids": [incident_1.pk, incident_2.pk],
             "event": {
@@ -1169,8 +1173,8 @@ class BulkEventViewSetTestCase(APITestCase):
         self.assertTrue(incident_2.events.filter(type="OTH").exists())
 
     def test_can_bulk_create_events_with_description_empty_string_for_incidents_with_valid_ids(self):
-        incident_1 = StatefulIncidentFactory()
-        incident_2 = StatefulIncidentFactory()
+        incident_1 = StatefulIncidentFactory(source=self.source)
+        incident_2 = StatefulIncidentFactory(source=self.source)
         data = {
             "ids": [incident_1.pk, incident_2.pk],
             "event": {
@@ -1200,8 +1204,8 @@ class BulkEventViewSetTestCase(APITestCase):
         self.assertTrue(incident_2.events.filter(type="OTH").exists())
 
     def test_bulk_close_sets_incident_end_time(self):
-        incident_1 = StatefulIncidentFactory()
-        incident_2 = StatefulIncidentFactory()
+        incident_1 = StatefulIncidentFactory(source=self.source)
+        incident_2 = StatefulIncidentFactory(source=self.source)
         data = {
             "ids": [incident_1.pk, incident_2.pk],
             "event": {
@@ -1235,8 +1239,8 @@ class BulkEventViewSetTestCase(APITestCase):
         self.assertFalse(incident_2.open)
 
     def test_bulk_reopen_removes_incident_end_time(self):
-        incident_1 = StatefulIncidentFactory(end_time=now())
-        incident_2 = StatefulIncidentFactory(end_time=now())
+        incident_1 = StatefulIncidentFactory(end_time=now(), source=self.source)
+        incident_2 = StatefulIncidentFactory(end_time=now(), source=self.source)
         data = {
             "ids": [incident_1.pk, incident_2.pk],
             "event": {
@@ -1298,7 +1302,7 @@ class BulkEventViewSetTestCase(APITestCase):
         self.assertFalse(Event.objects.filter(incident_id=invalid_incident_2_pk).exists())
 
     def test_can_partially_bulk_create_events_for_incidents_with_some_valid_ids(self):
-        incident_1 = StatefulIncidentFactory()
+        incident_1 = StatefulIncidentFactory(source=self.source)
         highest_incident_pk = Incident.objects.last().id
         invalid_incident_2_pk = highest_incident_pk + 1
         data = {
@@ -1330,13 +1334,15 @@ class BulkTicketUrlViewSetTestCase(APITestCase):
         self.user = BaseUserFactory(username="user1")
         self.client.force_authenticate(user=self.user)
         self.ticket_url = "www.example.com"
+        source_user = SourceUserFactory()
+        self.source = SourceSystemFactory(user=source_user)
 
     def tearDown(self):
         connect_signals()
 
     def test_can_bulk_set_ticket_url_for_incidents_with_valid_ids(self):
-        incident_1 = StatefulIncidentFactory()
-        incident_2 = StatefulIncidentFactory()
+        incident_1 = StatefulIncidentFactory(source=self.source)
+        incident_2 = StatefulIncidentFactory(source=self.source)
         data = {
             "ids": [incident_1.pk, incident_2.pk],
             "ticket_url": self.ticket_url,
@@ -1385,7 +1391,7 @@ class BulkTicketUrlViewSetTestCase(APITestCase):
         self.assertTrue(invalid_incident_2_changes["errors"])
 
     def test_can_partially_bulk_set_ticket_url_for_incidents_with_some_valid_ids(self):
-        incident_1 = StatefulIncidentFactory()
+        incident_1 = StatefulIncidentFactory(source=self.source)
         highest_incident_pk = Incident.objects.last().id
         invalid_incident_2_pk = highest_incident_pk + 1
         data = {

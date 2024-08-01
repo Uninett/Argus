@@ -7,7 +7,7 @@ from django.utils import timezone
 
 from argus.auth.factories import PersonUserFactory
 from argus.filter.factories import FilterFactory
-from argus.incident.factories import StatefulIncidentFactory
+from argus.incident.factories import SourceSystemFactory, SourceUserFactory, StatefulIncidentFactory
 from argus.incident.models import Event
 from argus.util.testing import connect_signals, disconnect_signals
 
@@ -19,7 +19,9 @@ class BulkIncidentsTests(TestCase):
 
         self.username = "username"
         self.user = PersonUserFactory(username=self.username)
-        self.incident = StatefulIncidentFactory(start_time=timezone.now() - timedelta(days=1))
+        source_user = SourceUserFactory()
+        source = SourceSystemFactory(user=source_user)
+        self.incident = StatefulIncidentFactory(start_time=timezone.now() - timedelta(days=1), source=source)
         self.open_filter = FilterFactory(filter={"open": True})
         self.closed_filter = FilterFactory(filter={"open": False})
 
