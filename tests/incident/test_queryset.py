@@ -3,7 +3,12 @@ from django.utils import timezone
 
 from argus.auth.factories import PersonUserFactory
 from argus.util.testing import disconnect_signals, connect_signals
-from argus.incident.factories import StatefulIncidentFactory, StatelessIncidentFactory, SourceSystemFactory
+from argus.incident.factories import (
+    SourceSystemFactory,
+    SourceUserFactory,
+    StatefulIncidentFactory,
+    StatelessIncidentFactory,
+)
 from argus.incident.models import Incident, Event
 
 
@@ -13,7 +18,8 @@ class IncidentQuerySetTestCase(TestCase):
         # Lock in timestamps
         self.timestamp = timezone.now()
         # We don't care about source but let's ensure it is unique
-        source = SourceSystemFactory()
+        source_user = SourceUserFactory()
+        source = SourceSystemFactory(user=source_user)
         self.incident1 = StatelessIncidentFactory(source=source, start_time=self.timestamp, ticket_url="")
         self.incident2 = StatefulIncidentFactory(source=source, start_time=self.timestamp, ticket_url="")
         self.incident3 = StatefulIncidentFactory(source=source, start_time=self.timestamp, ticket_url="")
@@ -70,7 +76,8 @@ class IncidentQuerySetUpdatingTestCase(TestCase):
         # Lock in timestamps
         self.timestamp = timezone.now()
         # We don't care about source but let's ensure it is unique
-        source = SourceSystemFactory()
+        source_user = SourceUserFactory()
+        source = SourceSystemFactory(user=source_user)
         self.incident1 = StatelessIncidentFactory(source=source, start_time=self.timestamp, ticket_url="")
         self.incident2 = StatefulIncidentFactory(source=source, start_time=self.timestamp, ticket_url="")
         self.incident3 = StatefulIncidentFactory(source=source, start_time=self.timestamp, ticket_url="")
@@ -92,9 +99,7 @@ class IncidentQuerySetUpdatingTestCase(TestCase):
     def test_create_events(self):
         qs = Incident.objects.filter(id__in=(self.incident3.id, self.incident4.id))
         qs.create_events(self.user, Event.Type.OTHER, description="foo")
-        result = set(
-            e.incident for e in Event.objects.filter(type=Event.Type.OTHER)
-        )
+        result = set(e.incident for e in Event.objects.filter(type=Event.Type.OTHER))
         self.assertEqual(result, set(qs.all()))
 
     @tag("bulk")
@@ -108,9 +113,7 @@ class IncidentQuerySetUpdatingTestCase(TestCase):
     def test_close_incidents(self):
         qs = Incident.objects.filter(id__in=(self.incident2.id, self.incident3.id))
         qs.close(self.user, description="Boo")
-        result = set(
-            e.incident for e in Event.objects.filter(type=Event.Type.CLOSE, description="Boo")
-        )
+        result = set(e.incident for e in Event.objects.filter(type=Event.Type.CLOSE, description="Boo"))
         self.assertEqual(result, set(qs.all()))
 
     @tag("bulk")
@@ -119,7 +122,5 @@ class IncidentQuerySetUpdatingTestCase(TestCase):
         self.incident3.set_closed(self.user)
         qs = Incident.objects.filter(id__in=(self.incident2.id, self.incident3.id))
         qs.reopen(self.user, description="Bar")
-        result = set(
-            e.incident for e in Event.objects.filter(type=Event.Type.REOPEN, description="Bar")
-        )
+        result = set(e.incident for e in Event.objects.filter(type=Event.Type.REOPEN, description="Bar"))
         self.assertEqual(result, set(qs.all()))

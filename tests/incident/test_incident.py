@@ -3,29 +3,28 @@ from datetime import timedelta
 from django.test import TestCase
 from django.utils import timezone
 
-from argus.incident.factories import AcknowledgementFactory, EventFactory, StatefulIncidentFactory
-from argus.incident.models import Incident, Event
-from argus.incident.factories import SourceSystemFactory
-from argus.util import datetime_utils
+from argus.incident.factories import (
+    AcknowledgementFactory,
+    EventFactory,
+    StatefulIncidentFactory,
+    StatelessIncidentFactory,
+)
+from argus.incident.models import Event
+from argus.incident.factories import SourceSystemFactory, SourceUserFactory
 from argus.util.testing import disconnect_signals, connect_signals
 
 
 class CreateIncidentTests(TestCase):
     def setUp(self):
         disconnect_signals()
+        source_user = SourceUserFactory()
+        self.source = SourceSystemFactory(user=source_user)
 
     def tearDown(self):
         connect_signals()
 
     def test_new_stateful_incident_has_single_start_event(self):
-        source_incident_id = "abcknekkebrod"
-        incident = Incident.objects.create(
-            start_time=timezone.now(),
-            end_time=datetime_utils.INFINITY_REPR,
-            source_incident_id=source_incident_id,
-            source=SourceSystemFactory(),
-            description=f"Incident #{source_incident_id} created for testing",
-        )
+        incident = StatefulIncidentFactory(source=self.source)
         incident.create_first_event()
         events = incident.events.filter(type=Event.Type.INCIDENT_START)
 
@@ -33,14 +32,7 @@ class CreateIncidentTests(TestCase):
         self.assertEqual(events.get().description, incident.description)
 
     def test_new_stateless_incident_has_single_stateless_event(self):
-        source_incident_id = "abcknekkebrod"
-        incident = Incident.objects.create(
-            start_time=timezone.now(),
-            end_time=None,
-            source_incident_id=source_incident_id,
-            source=SourceSystemFactory(),
-            description=f"Incident #{source_incident_id} created for testing",
-        )
+        incident = StatelessIncidentFactory(source=self.source)
         incident.create_first_event()
         events = incident.events.filter(type=Event.Type.STATELESS)
 
