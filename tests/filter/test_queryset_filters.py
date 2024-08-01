@@ -1,9 +1,6 @@
 from django.test import TestCase, tag
-from django.utils.dateparse import parse_datetime, parse_time
-from django.utils.timezone import make_aware
 
-from argus.filter.factories import FilterFactory
-from argus.incident.factories import SourceSystemFactory, TagFactory
+from argus.incident.factories import SourceSystemFactory, SourceUserFactory, TagFactory
 from argus.incident.models import Incident
 from argus.filter.queryset_filters import (
     QuerySetFilter,
@@ -11,11 +8,6 @@ from argus.filter.queryset_filters import (
     _incidents_fitting_tristates,
     _incidents_with_source_systems,
     _incidents_with_tags,
-)
-from argus.notificationprofile.models import TimeRecurrence
-from argus.notificationprofile.factories import (
-    TimeslotFactory,
-    TimeRecurrenceFactory,
 )
 from argus.util.testing import disconnect_signals, connect_signals
 
@@ -33,7 +25,8 @@ class FilteredIncidentsHelpersTests(TestCase, IncidentAPITestCaseHelper):
         connect_signals()
 
     def test_incidents_with_source_systems_empty_if_no_incidents_with_these_source_systems(self):
-        source3 = SourceSystemFactory()
+        source_user3 = SourceUserFactory()
+        source3 = SourceSystemFactory(user=source_user3)
         self.assertFalse(_incidents_with_source_systems(self.all_incidents, {"sourceSystemIds": [source3.pk]}))
 
     def test_incidents_with_source_systems_finds_incidents_with_these_source_systems(self):
