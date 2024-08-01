@@ -172,7 +172,7 @@ class GetNotificationMediaTests(TestCase):
         disconnect_signals()
 
         self.installed_media = Media.objects.all()
-        self.not_installed_medium = Media.objects.create(slug="missing", name="Missing medium", installed=True)
+        self.not_installed_medium = factories.MediaFactory(slug="missing", name="Missing medium", installed=True)
 
         self.user = PersonUserFactory()
 

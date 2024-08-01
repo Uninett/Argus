@@ -9,9 +9,8 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from argus.util import datetime_utils
-from argus.util.utils import duplicate
 from argus.util.testing import disconnect_signals, connect_signals
-from argus.incident.factories import StatefulIncidentFactory
+from argus.incident.factories import StatefulIncidentFactory, StatelessIncidentFactory
 from argus.incident.models import Event, Incident
 from . import IncidentBasedAPITestCaseHelper
 
@@ -29,7 +28,9 @@ class EventAPITests(APITestCase, IncidentBasedAPITestCaseHelper):
             source_incident_id="1",
         )
         self.stateful_incident1.create_first_event()
-        self.stateless_incident1 = duplicate(self.stateful_incident1, end_time=None, source_incident_id="2")
+        self.stateless_incident1 = StatelessIncidentFactory(
+            source_incident_id="2", source=self.stateful_incident1.source
+        )
         self.stateless_incident1.create_first_event()
 
         self.events_url = lambda incident: reverse("v1:incident:incident-events", args=[incident.pk])

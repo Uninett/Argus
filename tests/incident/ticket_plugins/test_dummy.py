@@ -2,7 +2,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
 from django.test import TestCase
 
-from argus.incident.factories import StatefulIncidentFactory
+from argus.incident.factories import SourceSystemFactory, SourceUserFactory, StatefulIncidentFactory
 from argus.incident.ticket.dummy import created_tickets
 from argus.incident.V1.serializers import IncidentSerializerV1
 from argus.util.utils import import_class_from_dotted_path
@@ -19,7 +19,9 @@ class DummyTicketSystemTests(TestCase):
     def test_create_ticket_writes_to_local_variable(self):
         dummy_class = import_class_from_dotted_path("argus.incident.ticket.dummy.DummyPlugin")
 
-        incident = StatefulIncidentFactory()
+        source_user = SourceUserFactory()
+        source = SourceSystemFactory(user=source_user)
+        incident = StatefulIncidentFactory(source=source)
 
         ticket_data = {
             "title": incident.description,

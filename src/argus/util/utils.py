@@ -1,16 +1,5 @@
 import importlib
 
-from django.db.models import Model
-
-
-def duplicate(obj: Model, **set_attrs):
-    obj_copy = obj._meta.model.objects.get(pk=obj.pk)
-    obj_copy.pk = None
-    for attr, value in set_attrs.items():
-        setattr(obj_copy, attr, value)
-    obj_copy.save()
-    return obj_copy
-
 
 class AttrGetter:
     def __init__(self, attr_name: str):

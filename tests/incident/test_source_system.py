@@ -5,7 +5,7 @@ from rest_framework.test import APIClient, APITestCase
 
 from argus.auth.models import User
 from argus.auth.factories import AdminUserFactory
-from argus.incident.factories import SourceSystemTypeFactory
+from argus.incident.factories import SourceSystemFactory, SourceSystemTypeFactory, SourceUserFactory
 from argus.incident.models import SourceSystem
 
 
@@ -132,9 +132,9 @@ class SourceSystemPostingTests(APITestCase):
         )
 
     def test_admin_change_form_should_change_fields(self):
-        source1_user = User.objects.create_user(username="gw1.sikt")
-        source1_user2 = User.objects.create_user(username="new.gw1.sikt")
-        source1 = SourceSystem.objects.create(name="gw1.sikt", type=self.type1, user=source1_user)
+        source1_user = SourceUserFactory()
+        source1_user2 = SourceUserFactory()
+        source1 = SourceSystemFactory(user=source1_user, type=self.type1)
 
         source1_dict = {
             "name": "new.gw1.sikt",
