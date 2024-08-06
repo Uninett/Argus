@@ -5,7 +5,7 @@ How to make a column for an ack with a known group
 You need a template for the cell, in ``src/argus_htmx/templates/htmx/incidents/_incident_ack_by_group.html``::
 
     {% load argus_htmx %}
-    {% if incident.is_acked_by|{{ group }} %}X{% endif %}
+    {% if incident|is_acked_by:column.context.group %}X{% endif %}
 
 You also need to add the column to the column config::
 
