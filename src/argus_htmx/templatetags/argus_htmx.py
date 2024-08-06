@@ -16,4 +16,4 @@ def tagvalues(incident, key) -> list:
 
 @register.filter
 def is_acked_by(incident, group: str) -> bool:
-    return incident.is_acked_by()
+    return incident.is_acked_by(group)
