@@ -10,19 +10,21 @@ QuerySetFilter = filter_backend.QuerySetFilter
 
 
 class IncidentFilterForm(forms.Form):
-    open = forms.BooleanField(required=False)
-    closed = forms.BooleanField(required=False)
-    acked = forms.BooleanField(required=False)
-    unacked = forms.BooleanField(required=False)
+    open = forms.BooleanField(required=False, widget=forms.CheckboxInput(attrs={"class": "checkbox checkbox-sm"}))
+    closed = forms.BooleanField(required=False, widget=forms.CheckboxInput(attrs={"class": "checkbox checkbox-sm"}))
+    acked = forms.BooleanField(required=False, widget=forms.CheckboxInput(attrs={"class": "checkbox checkbox-sm"}))
+    unacked = forms.BooleanField(required=False, widget=forms.CheckboxInput(attrs={"class": "checkbox checkbox-sm"}))
     source = forms.MultipleChoiceField(
         choices=tuple(SourceSystem.objects.values_list("id", "name")),
         required=False,
+        widget=forms.SelectMultiple(attrs={"class": "select select-sm", "size": 1}),
     )
     maxlevel = forms.ChoiceField(
         choices=INCIDENT_LEVEL_CHOICES,
         label="Level <=",
         initial=MAX_INCIDENT_LEVEL,
         required=False,
+        widget=forms.Select(attrs={"class": "select select-sm"}),
     )
 
     def _tristate(self, onkey, offkey):

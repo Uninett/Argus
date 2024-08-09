@@ -1,5 +1,5 @@
 <!DOCTYPE html>{% load static %}
-<html lang="en-US">
+<html lang="en-US" data-theme="aqua">
 <!-- argus/site/templates/base.html -->
 <head>
   <meta charset="utf-8" />
@@ -9,18 +9,18 @@
   {% endblock head %}
 </head>
 <body {% block body_overrides %}class="override"{% endblock %}>
-  {% block header %}
-  <h1>Argus Server: {{ page_title }}</h1>
-  {% endblock header %}
+{% block header %}
+    <h1>Argus Server: {{ page_title }}</h1>
+{% endblock header %}
 
-  <main>
-  {% block main %}
-  {% endblock main %}
-  </main>
+<main>
+    {% block main %}
+    {% endblock main %}
+</main>
 
-  {% block footer %}
-  {% endblock footer %}
+{% block footer %}
+{% endblock footer %}
 
-  {% block tail %}{% endblock tail %}
+{% block tail %}{% endblock tail %}
 </body>
 </html>

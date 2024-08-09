@@ -1,5 +1,6 @@
 <form>
   <fieldset
+          class="menu bg-base-200 menu-horizontal rounded-box w-full"
           hx-get="{% url 'htmx:incident-list' %}"
           hx-include="this"
           hx-trigger="change delay:100ms"
@@ -7,6 +8,9 @@
           hx-swap="outerHTML"
           hx-push-url="true"
   >
-  {{ filter_form }}
+      <legend class="menu-title">Filter incidents</legend>
+      <ul>
+          {{ filter_form }}
+      </ul>
   </fieldset>
 </form>

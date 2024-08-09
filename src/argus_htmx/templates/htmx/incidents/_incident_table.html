@@ -5,6 +5,7 @@
        hx-trigger="every {{ update_interval|default:'30' }}s"
        hx-push-url="true"
        hx-include=".filterbox fieldset"
+       class="table"
 >
     <thead>
     <tr>
@@ -31,16 +32,19 @@
     <tfoot>
     <tr>
         <td colspan="{{ columns|length }}">
-            <!--
-            The htmx attributes set on the nav here are inherited by the child links.
-            hx-target tells where htmx to swap the fetched content in, and hx-swap
-            tells it how to swap it - by replacing the 'outerHTML' attribute of the
-            target, i.e. replacing the target's actual DOM node. hx-push-url tells
-            htmx to push the fetched URL into the browser history, so we can use
-            the backwards/forwards buttons to navigate these subpages.
-            -->
-            <nav class="paginator" hx-target="#table" hx-swap="outerHTML" hx-push-url="true">
-                <ul>
+            <div class="flex justify-between items-center">
+                {% block refresh_info %}
+                    {% include "htmx/incidents/_incidents_refresh_info.html" %}
+                {% endblock refresh_info %}
+                <!--
+                The htmx attributes set on the nav here are inherited by the child links.
+                hx-target tells where htmx to swap the fetched content in, and hx-swap
+                tells it how to swap it - by replacing the 'outerHTML' attribute of the
+                target, i.e. replacing the target's actual DOM node. hx-push-url tells
+                htmx to push the fetched URL into the browser history, so we can use
+                the backwards/forwards buttons to navigate these subpages.
+                -->
+                <ul class="join" hx-target="#table" hx-swap="outerHTML" hx-push-url="true">
                     {% if page.number != 1 %}
                         <li>
                             <!--
@@ -49,7 +53,7 @@
                               page works without JavaScript, and to ensure the link is
                               displayed as clickable.
                             -->
-                            <a hx-get="?page=1" href="?page=1">
+                            <a hx-get="?page=1" href="?page=1" class="join-item btn">
                                 &laquo; First
                             </a>
                         </li>
@@ -57,18 +61,25 @@
                     {% if page.has_previous %}
                         <li>
                             <a hx-get="?page={{ page.previous_page_number }}"
-                               href="?page={{ page.previous_page_number }}">
+                               href="?page={{ page.previous_page_number }}" class="join-item btn">
                                 {{ page.previous_page_number }}
                             </a>
                         </li>
                     {% endif %}
-                    <li>
-                        {{ page.number }}
-                    </li>
+                    {% if page.paginator.num_pages > 1 %}
+                        <li>
+                            <button class="join-item btn btn-active">{{ page.number }}</button>
+                        </li>
+                    {% else %}
+                        <li>
+                            <button class="btn btn-active">{{ page.number }}</button>
+                        </li>
+                    {% endif %}
+
                     {% if page.has_next %}
                         <li>
                             <a hx-get="?page={{ page.next_page_number }}"
-                               href="?page={{ page.next_page_number }}">
+                               href="?page={{ page.next_page_number }}" class="join-item btn">
                                 {{ page.next_page_number }}
                             </a>
                         </li>
@@ -76,14 +87,13 @@
                     {% if page.number != page.paginator.num_pages %}
                         <li>
                             <a hx-get="?page={{ page.paginator.num_pages }}"
-                               href="?page={{ page.paginator.num_pages }}">
+                               href="?page={{ page.paginator.num_pages }}" class="join-item btn">
                                 &raquo; Last
                             </a>
                         </li>
                     {% endif %}
                 </ul>
-            </nav>
-
+            </div>
         </td>
     </tr>
     </tfoot>

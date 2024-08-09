@@ -1,12 +1,22 @@
-<dl id="table-refresh-info" hx-swap-oob={{ oob|default:"false" }}>
-    <dt>Total, all time</dt>
-    <dd> {{ count }}</dd>
-    <dt>After filtering</dt>
-    <dd> {{ filtered_count }}</dd>
-    <dt>Per page</dt>
-    <dd>{{ per_page }}</dd>
-    <dt>Last refreshed</dt>
-    <dd>{{ last_refreshed|date:"DATETIME_FORMAT"|default:"?" }}</dd>
-    <dt>Updating every</dt>
-    <dd>{{ update_interval|default:"?" }}s</dd>
+<dl id="table-refresh-info" class="stats stats-horizontal shadow leading-none overflow-x-auto">
+    <div class="stat">
+        <dt class="stat-title">Total, all time</dt>
+        <dd class="stat-value text-2xl"> {{ count }}</dd>
+    </div>
+    <div class="stat">
+        <dt class="stat-title">After filtering</dt>
+        <dd class="stat-value text-2xl"> {{ filtered_count }}</dd>
+    </div>
+    <div class="stat">
+        <dt class="stat-title">Per page</dt>
+        <dd class="stat-value text-2xl">{{ per_page }}</dd>
+    </div>
+    <div class="stat">
+        <dt class="stat-title">Last refreshed</dt>
+        <dd class="stat-value text-2xl">{{ last_refreshed|date:"DATETIME_FORMAT"|default:"?" }}</dd>
+    </div>
+    <div class="stat">
+        <dt class="stat-title">Updating every</dt>
+        <dd class="stat-value text-2xl">{{ update_interval|default:"?" }}s</dd>
+    </div>
 </dl>
