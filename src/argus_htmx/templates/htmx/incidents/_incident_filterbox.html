@@ -1,17 +1,34 @@
 {% load widget_tweaks %}
 <form>
-  <fieldset
-          class="menu bg-base-200 menu-horizontal rounded-box w-full"
-          hx-get="{% url 'htmx:incident-list' %}"
-          hx-include="this"
-          hx-trigger="change delay:100ms"
-          hx-target="#table"
-          hx-swap="outerHTML"
-          hx-push-url="true"
-  >
-      <legend class="menu-title">Filter incidents</legend>
-      <ul>
-          {{ filter_form }}
-      </ul>
-  </fieldset>
+    <fieldset
+            class="menu bg-base-200 menu-horizontal rounded-box"
+            hx-get="{% url 'htmx:incident-list' %}"
+            hx-include="this"
+            hx-trigger="change delay:100ms"
+            hx-target="#table"
+            hx-swap="outerHTML"
+            hx-push-url="true"
+    >
+        <legend class="menu-title">Filter incidents</legend>
+        <ul class="menu bg-base-200 menu-horizontal rounded-box">
+            {% for field in filter_form %}
+                <li class="form-control">
+                    <div class="label cursor-pointer">
+                        {{ field|add_label_class:"label-text" }}
+                        {% if field|field_type == "booleanfield" %}
+                            {{ field|add_class:"checkbox" }}
+                        {% elif field|field_type == "choicefield" %}
+                            {{ field|add_class:"select select-xs" }}
+                        {% elif field|field_type == "multiplechoicefield" %}
+                            {{ field|attr:"size:1"|add_class:"select select-xs" }}
+                        {% endif %}
+                    </div>
+                </li>
+            {% empty %}
+                <li>
+                    No filter fields configured
+                </li>
+            {% endfor %}
+        </ul>
+    </fieldset>
 </form>
