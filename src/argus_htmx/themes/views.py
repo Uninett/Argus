@@ -20,14 +20,10 @@ THEMES_PATH = "static/themes/"
 
 
 def get_theme_files(request):
-    theme_files_dir = importlib_resources.files(THEMES_MODULE).joinpath(THEMES_PATH)
-    absolute_filenames = (path for path in theme_files_dir.iterdir())
     theme_names = []
-    for f in absolute_filenames:
-        if not f.suffix == '.css':
-            continue
-        filename = f.name[:-len('.css')]
-        theme_names.append(filename)
+    TW_THEMES = getattr(settings, "DAISYUI_THEMES", [])
+    for f in TW_THEMES:
+        theme_names.append(f)
     return sorted(theme_names)
 
 

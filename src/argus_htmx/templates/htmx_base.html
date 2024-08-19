@@ -1,19 +1,22 @@
 <!DOCTYPE html>{% load static %}
-<html lang="en-US" data-theme="aqua">
+<html lang="en-US" data-theme="{{ theme }}">
 <!-- argus/site/templates/base.html -->
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  {% block title %}<title>Argus Server: {{ page_title }}</title>{% endblock %}
-  {% block head %}
-  {% endblock head %}
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {% block title %}<title>Argus Server: {{ page_title }}</title>{% endblock %}
+
+    <link rel="stylesheet" href="{% static path_to_stylesheet|default:"styles.css" %}">
+
+    {% block head %}
+    {% endblock head %}
 </head>
-<body {% block body_overrides %}class="override"{% endblock %}>
+<body {% block body_overrides %}class="override bg-base-100"{% endblock %}>
 {% block header %}
     <h1>Argus Server: {{ page_title }}</h1>
 {% endblock header %}
 
-<main>
+<main class="space-y-2 p-1">
     {% block main %}
     {% endblock main %}
 </main>

@@ -1,22 +1,22 @@
-<dl id="table-refresh-info" class="stats stats-horizontal shadow leading-none overflow-x-auto">
-    <div class="stat">
-        <dt class="stat-title">Total, all time</dt>
-        <dd class="stat-value text-2xl"> {{ count }}</dd>
+<dl id="table-refresh-info" class="stats stats-horizontal shadow leading-none overflow-x-auto font-medium bg-neutral text-neutral-content">
+    <div class="stat py-2">
+        <dt class="stat-title text-neutral-content/80">Total, all time</dt>
+        <dd class="stat-value text-2xl text-base"> {{ count }}</dd>
     </div>
-    <div class="stat">
-        <dt class="stat-title">After filtering</dt>
-        <dd class="stat-value text-2xl"> {{ filtered_count }}</dd>
+    <div class="stat py-2">
+        <dt class="stat-title text-neutral-content/80">After filtering</dt>
+        <dd class="stat-value text-2xl text-base"> {{ filtered_count }}</dd>
     </div>
-    <div class="stat">
-        <dt class="stat-title">Per page</dt>
-        <dd class="stat-value text-2xl">{{ per_page }}</dd>
+    <div class="stat py-2">
+        <dt class="stat-title text-neutral-content/80">Per page</dt>
+        <dd class="stat-value text-2xl text-base">{{ per_page }}</dd>
     </div>
-    <div class="stat">
-        <dt class="stat-title">Last refreshed</dt>
-        <dd class="stat-value text-2xl">{{ last_refreshed|date:"DATETIME_FORMAT"|default:"?" }}</dd>
+    <div class="stat py-2">
+        <dt class="stat-title text-neutral-content/80">Last refreshed</dt>
+        <dd class="stat-value text-2xl text-base">{{ last_refreshed|date:"DATETIME_FORMAT"|default:"?" }}</dd>
     </div>
-    <div class="stat">
-        <dt class="stat-title">Updating every</dt>
-        <dd class="stat-value text-2xl">{{ update_interval|default:"?" }}s</dd>
+    <div class="stat py-2">
+        <dt class="stat-title text-neutral-content/80">Updating every</dt>
+        <dd class="stat-value text-2xl text-base">{{ update_interval|default:"?" }}s</dd>
     </div>
 </dl>
