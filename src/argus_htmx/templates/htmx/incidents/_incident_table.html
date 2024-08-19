@@ -1,8 +1,10 @@
 <table id="table"
        hx-get="?page={{ page.number }}"
-       hx-target="#table-body"
-       hx-swap="innerHTML"
+       hx-target="this"
+       hx-swap="outerHTML"
        hx-trigger="every {{ update_interval|default:'30' }}s"
+       hx-push-url="true"
+       hx-include=".filterbox fieldset"
 >
     <thead>
     <tr>

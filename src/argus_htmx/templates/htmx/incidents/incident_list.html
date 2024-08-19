@@ -1,6 +1,10 @@
 {% extends base %}
 
 {% block main %}
+    <section class="filterbox">
+      {% include "htmx/incidents/_incident_filterbox.html" %}
+    </section>
+
     <section>
         {% block table %}
             {% include "htmx/incidents/_incident_table.html" %}
@@ -8,10 +12,6 @@
     </section>
 
     <section>
-        <p>
-            Total, all time: {{ count }}
-        </p>
-        
         {% block refresh_info %}
             {% include "htmx/incidents/_incidents_refresh_info.html" %}
         {% endblock refresh_info %}

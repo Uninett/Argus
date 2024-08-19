@@ -1,0 +1,12 @@
+<form>
+  <fieldset
+          hx-get="{% url 'htmx:incident-list' %}"
+          hx-include="this"
+          hx-trigger="change delay:100ms"
+          hx-target="#table"
+          hx-swap="outerHTML"
+          hx-push-url="true"
+  >
+  {{ filter_form }}
+  </fieldset>
+</form>

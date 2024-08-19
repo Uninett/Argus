@@ -1,4 +1,12 @@
-<p id="table-refresh-info" hx-swap-oob='{{ oob|default:"false" }}'>
-    Last refreshed {{ last_refreshed|date:"DATETIME_FORMAT"|default:"?" }}.
-    Updating every: {{ update_interval|default:"?" }}s.
-</p>
+<dl id="table-refresh-info" hx-swap-oob={{ oob|default:"false" }}>
+    <dt>Total, all time</dt>
+    <dd> {{ count }}</dd>
+    <dt>After filtering</dt>
+    <dd> {{ filtered_count }}</dd>
+    <dt>Per page</dt>
+    <dd>{{ per_page }}</dd>
+    <dt>Last refreshed</dt>
+    <dd>{{ last_refreshed|date:"DATETIME_FORMAT"|default:"?" }}</dd>
+    <dt>Updating every</dt>
+    <dd>{{ update_interval|default:"?" }}s</dd>
+</dl>
