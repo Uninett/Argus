@@ -20,7 +20,12 @@ class ChangeEventTests(APITestCase, IncidentBasedAPITestCaseHelper):
         super().init_test_objects()
 
         self.url = "http://www.example.com/repository/issues/issue"
-        self.incident = StatefulIncidentFactory(level=1, ticket_url=self.url, details_url=self.url)
+        self.incident = StatefulIncidentFactory(
+            level=1,
+            ticket_url=self.url,
+            details_url=self.url,
+            description="old_description",
+        )
 
     def teardown(self):
         connect_signals()
@@ -139,6 +144,22 @@ class ChangeEventTests(APITestCase, IncidentBasedAPITestCaseHelper):
             data={
                 "metadata": new_metadata,
             },
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        change_events = self.incident.events.filter(type=Event.Type.INCIDENT_CHANGE)
+        change_events_descriptions = [event.description for event in change_events]
+        self.assertTrue(change_events)
+        self.assertIn(description, change_events_descriptions)
+        self.assertEqual(change_events.get(description=description).actor, self.user1)
+
+    def test_change_event_is_created_on_description_changes(self):
+        data = {
+            "description": "new_description",
+        }
+        description = ChangeEvent.format_description("description", "old_description", "new_description")
+        response = self.user1_rest_client.patch(
+            path=f"/api/v2/incidents/{self.incident.pk}/",
+            data=data,
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         change_events = self.incident.events.filter(type=Event.Type.INCIDENT_CHANGE)
