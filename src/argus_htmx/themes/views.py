@@ -13,18 +13,10 @@ from django.views.generic import ListView
 from django.views.decorators.http import require_GET
 from django.http import HttpResponseRedirect
 
+from argus_htmx.themes.utils import get_theme_names
 
 LOG = logging.getLogger(__name__)
 THEMES_MODULE = 'argus_htmx'
-THEMES_PATH = "static/themes/"
-
-
-def get_theme_files(request):
-    theme_names = []
-    TW_THEMES = getattr(settings, "DAISYUI_THEMES", [])
-    for f in TW_THEMES:
-        theme_names.append(f)
-    return sorted(theme_names)
 
 
 class ThemeListView(ListView):
@@ -33,7 +25,7 @@ class ThemeListView(ListView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.themes = get_theme_files(request)
+        self.themes = sorted(get_theme_names())
 
     def get_queryset(self):
         return self.themes
