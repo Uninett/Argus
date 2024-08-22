@@ -1,12 +1,35 @@
+{% load widget_tweaks %}
 <form>
-  <fieldset
-          hx-get="{% url 'htmx:incident-list' %}"
-          hx-include="this"
-          hx-trigger="change delay:100ms"
-          hx-target="#table"
-          hx-swap="outerHTML"
-          hx-push-url="true"
-  >
-  {{ filter_form }}
-  </fieldset>
+    <fieldset
+            class="rounded-box border border-accent"
+            hx-get="{% url 'htmx:incident-list' %}"
+            hx-include="this"
+            hx-trigger="change delay:100ms"
+            hx-target="#table"
+            hx-swap="outerHTML"
+            hx-push-url="true"
+    >
+        <legend class="menu-title pb-0">Filter incidents</legend>
+        <ul class="menu menu-horizontal menu-sm flex items-center gap-2 py-1.5">
+            {% for field in filter_form %}
+                <li class="form-control">
+                    <label class="cursor-pointer label">
+                        <span class="label-text">{{ field.label }}</span>
+                        {% if field|field_type == "booleanfield" %}
+                            {{ field|add_class:"checkbox checkbox-accent border" }}
+                        {% elif field|field_type == "choicefield" %}
+                            {{ field|add_class:"select select-accent border" }}
+                        {% elif field|field_type == "multiplechoicefield" %}
+                            {{ field|attr:"size:1"|add_class:"select select-accent border" }}
+                        {% endif %}
+                    </label>
+                </li>
+            {% empty %}
+                <li>
+                    No filter fields configured
+                </li>
+            {% endfor %}
+        </ul>
+
+    </fieldset>
 </form>

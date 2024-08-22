@@ -1,102 +1,48 @@
 {% extends "htmx_base.html" %}
 
 {% block head %}
-<script src="https://unpkg.com/htmx.org@1.9.12" integrity="sha384-ujb1lZYygJmzgSwoxRggbCHcjc0rB2XoQrxeTUQyRjrOnlCoYta87iKBWq3EsdM2" crossorigin="anonymous"></script>
-<!-- HTMX Config -->
-<meta name="htmx-config" content='{"useTemplateFragments":"true"}'>
-{% if theme %}
-<link rel="stylesheet" href="/static/themes/{{ theme }}.css" />
-{% else %}
-<link rel="stylesheet" href="/static/color-schemes/light.css" media="(prefers-color-scheme: light)" />
-<link rel="stylesheet" href="/static/color-schemes/dark.css" media="(prefers-color-scheme: dark)" />
-{% endif %}
-<style>
-body.override {
-padding: 0;
-width: 100%;
-max-width: 100%;
-margin-top: 0;
-margin-bottom: 0;
-margin-left: 0;
-margin-right: 0;
-}
-
-.override td, .override th {
-  padding-left: 0.5rem;
-  padding-right: 0.5rem;
-}
-
-.override nav {
-  margin-bottom: 0;
-}
-
-.override > header > nav > ul, .override nav > ul {
-  max-width: 100%;
-  display: flex;
-  align-items: baseline;
-  font-weight: bold;
-  list-style: none;
-  gap: 1rem;
-}
-
-.override > header > nav > ul {
-  justify-content: space-between;
-}
-
-.override > footer, .override > header {
-width: 100%;
-max-width: 100%;
-margin-top: 0;
-margin-bottom: 0;
-margin-left: 0;
-margin-right: 0;
-}
-.override > main {
-padding: 1em;
-max-width: 100%;
-}
-.override section {
-width: 100%;
-max-width: 100%;
-}
-
-{% comment %}
-* {
-  background-color: var(--main-bg-color);
-  color: var(--main-fg-color);
-}
-a {
-  color: var(--main-link-color);
-  background-color: var(--main-bg-color);
-}
-header nav ul {
-  background-color: var(--nav-bg-color);
-  color: var(--nav-fg-color);
-}
-{% endcomment %}
-</style>
+    <script src="https://unpkg.com/htmx.org@1.9.12"
+            integrity="sha384-ujb1lZYygJmzgSwoxRggbCHcjc0rB2XoQrxeTUQyRjrOnlCoYta87iKBWq3EsdM2"
+            crossorigin="anonymous"></script>
+    <!-- HTMX Config -->
+    <meta name="htmx-config" content='{"useTemplateFragments":"true"}'>
 {% endblock head %}
 
 {% block header %}
-<header>
-<nav>
-<ul>
-<li><a href="{% url 'htmx:incident-list' %}"><span>Logo</span> Argus: {{ page_title }}</a></li>
-<li><a href="{% url 'htmx:timeslot-placeholder' %}">Timeslots</a></li>
-<li><a href="{% url 'htmx:notificationprofile-placeholder' %}">Profiles</a></li>
-<li>Theme: <a href="{% url 'htmx:theme-list' %}">{{ theme }}</a></li>
-<li>{% block userlink %}
-{% if request.user.is_authenticated %}
-{{ request.user }}
-<form action="{% url "htmx:logout" %}" method="POST">
-{% csrf_token %}
-<button>Log out</button>
-</form>
-{% else %}
-<a href="{% url 'htmx:login' %}">Log in</a>
-{% endif %}
-{% endblock %}</li>
-</ul>
-</nav>
-</header>
+    <header class="bg-neutral text-neutral-content">
+        <nav class="navbar">
+            <div class="navbar-start">
+                <a class="btn btn-ghost text-xl" href="{% url 'htmx:incident-list' %}">Argus Logo</a>
+            </div>
+            <div class="navbar-center flex">
+                <ul class="menu menu-horizontal px-1">
+                    <li><a href="{% url 'htmx:incident-list' %}">Incidents</a></li>
+                    <li><a href="{% url 'htmx:timeslot-placeholder' %}">Timeslots</a></li>
+                    <li><a href="{% url 'htmx:notificationprofile-placeholder' %}">Profiles</a></li>
+                </ul>
+            </div>
+            <div class="navbar-end">
+                {% block userlink %}
+
+                    {% if request.user.is_authenticated %}
+                        <details>
+                            <summary>{{ request.user }}</summary>
+                            <ul class="p-2">
+                                <li>Theme: <a class="link" href="{% url 'htmx:theme-list' %}">{{ theme }}</a></li>
+                                <li>
+                                    <form action="{% url "htmx:logout" %}" method="POST">
+                                        {% csrf_token %}
+                                        <button class="btn btn-ghost">Log out</button>
+                                    </form>
+                                </li>
+                            </ul>
+
+                        </details>
+                    {% else %}
+                        <a class="btn" href="{% url 'htmx:login' %}">Log in</a>
+                    {% endif %}
+                {% endblock %}
+            </div>
+        </nav>
+    </header>
 {% endblock header %}
