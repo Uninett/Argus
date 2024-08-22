@@ -129,7 +129,11 @@ Customization
 How to customize the look:
 
 
-1. Override Argus' Tailwind CSS theme defaults and/or choose which daisyUI color themes to include. You can do so by updating the default ``TAILWIND_THEME_OVERRIDE`` and ``DAISYUI_THEMES`` values respectively before running a ``tailwind_config`` management command::
+1. Override Argus' Tailwind CSS theme defaults and/or choose which daisyUI
+   color themes to include. You can do so by updating the default
+   ``TAILWIND_THEME_OVERRIDE`` and ``DAISYUI_THEMES`` values respectively
+   before running a ``tailwind_config`` management command:
+
   Via environment variables, for example::
 
     TAILWIND_THEME_OVERRIDE = '
