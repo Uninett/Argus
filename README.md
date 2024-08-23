@@ -33,7 +33,7 @@ There are several ways to install Argus.
   Redis backs the websockets, in order to push realtime updates to the frontend.
 * [Argus-frontend](https://github.com/Uninett/Argus-frontend/)
 * PostgreSQL
-* Docker and docker-compose to run Argus in Docker
+* Docker and Docker Compose to run Argus in Docker
 
 #### Optional: Dataporten registration
 
@@ -98,15 +98,15 @@ $ git clone https://github.com/Uninett/Argus.git
 $ cd Argus
 ```
 
-Running Argus with docker-compose is as simple as
+Running Argus with Docker Compose is as simple as
 ```console
-$ docker-compose up
+$ docker compose up
 ```
 
 Run the initial Argus setup, and make note of the admin password that is generated:
 
 ```console
-$ docker-compose exec api django-admin initial_setup
+$ docker compose exec api django-admin initial_setup
 ******************************************************************************
 
   Created Argus superuser "admin" with password "ns6bfoKquW12koIP".
@@ -133,7 +133,7 @@ documentation section on
 
 ### Step 1: Installation
 
-You can use docker-compose to conveniently setup a complete dev environment for Argus,
+You can use Docker Compose to conveniently setup a complete dev environment for Argus,
 including PostgreSQL. Instructions
 [are provided above](#setup-argus-using-docker-compose).
 
