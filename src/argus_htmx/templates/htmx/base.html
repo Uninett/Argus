@@ -28,20 +28,33 @@
             </div>
             <div class="navbar-end">
                 {% block userlink %}
-
                     {% if request.user.is_authenticated %}
-                        <details>
-                            <summary>{{ request.user }}</summary>
-                            <ul class="p-2">
-                                <li>Theme: <a class="link" href="{% url 'htmx:theme-list' %}">{{ theme }}</a></li>
+                        <details class="dropdown dropdown-end">
+                            <summary class="btn btn-base-200 btn-circle avatar placeholder"
+                                     aria-description="User menu">
+                                <span aria-hidden="true"
+                                      class="size-10 rounded-full ring-base-200 ring-offset-primary ring ring-offset-2 text-2xl capitalize leading-9">
+                                    {{ request.user|make_list|first }}
+                                </span>
+                            </summary>
+                            <ul class="menu menu-sm dropdown-content bg-base-200 text-base-content rounded-box z-[1] mt-3 w-52 p-2 shadow">
+                                <li class="menu-title">
+                                    Logged in as: <span class="text-info">{{ request.user }}</span>
+                                    <div class="divider divider-secondary my-0"></div>
+                                </li>
                                 <li>
-                                    <form action="{% url "htmx:logout" %}" method="POST">
+                                    <a class="justify-between" href="{% url 'htmx:theme-list' %}">
+                                        Theme
+                                        <span class="badge badge-primary">{{ theme }}</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <form class="flex" action="{% url "htmx:logout" %}" method="POST">
                                         {% csrf_token %}
-                                        <button class="btn btn-ghost">Log out</button>
+                                        <button class="flex-1 text-start" type="submit">Log out</button>
                                     </form>
                                 </li>
                             </ul>
-
                         </details>
                     {% else %}
                         <a class="btn" href="{% url 'htmx:login' %}">Log in</a>
