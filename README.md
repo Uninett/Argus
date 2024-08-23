@@ -39,7 +39,7 @@ There are several ways to install Argus.
 
 Dataporten authentication is supported by Argus and can be used to log into
 Argus-frontend.
-Refer to the [Dataporten](http://argus-server.rtfd.io/en/latest/dataporten.html) section of the documentation to learn
+Refer to the [Dataporten](https://argus-server.rtfd.io/en/latest/authentication.html#dataporten) section of the documentation to learn
 about Dataporten registration, and how to set it up with Argus.
 
 ### Install Argus using pip
