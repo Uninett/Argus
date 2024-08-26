@@ -1,1 +1,7 @@
-<input type="checkbox" class="checkbox checkbox-sm checkbox-accent border">
+<label for="select-incident-{{ incident.pk }}" class="sr-only">Select all visible</label>
+<input id="select-incident-{{ incident.pk }}" 
+       hx-preserve 
+       type="checkbox" 
+       class="row-select checkbox checkbox-sm checkbox-accent border"
+       hx-on:change="event.target.checked ? htmx.find('.tab-select').checked = event.target.checked : null;"
+>

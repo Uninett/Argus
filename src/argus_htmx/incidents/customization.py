@@ -27,12 +27,13 @@ class IncidentTableColumn:
     name: str  # identifier
     label: str  # display value
     cell_template: str
+    header_template: Optional[str] = None
     context: Optional[dict] = None
 
 
 _BUILTIN_COLUMN_LIST = [
     IncidentTableColumn(
-        "row_select", "Selected", "htmx/incidents/_incident_checkbox.html"
+        "row_select", "Selected", "htmx/incidents/_incident_checkbox.html", "htmx/incidents/_selected_incidents_header.html"
     ),
     IncidentTableColumn("id", "ID", "htmx/incidents/_incident_pk.html"),
     IncidentTableColumn(

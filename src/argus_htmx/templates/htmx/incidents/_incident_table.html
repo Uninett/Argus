@@ -12,7 +12,11 @@
         {% block columns %}
             {% for col in columns %}
                 <th class="border-b border-primary">
-                    {{ col.label }}
+                    {% if col.header_template %}
+                        {% include col.header_template with label=col.label %}
+                    {% else %}
+                        {{ col.label }}
+                    {% endif %}
                 </th>
             {% empty %}
                 <th class="border-b border-primary">

@@ -1,7 +1,6 @@
 {% load widget_tweaks %}
 <form>
     <fieldset
-            class="rounded-box border border-accent"
             hx-get="{% url 'htmx:incident-list' %}"
             hx-include="this"
             hx-trigger="change delay:100ms"
@@ -9,7 +8,7 @@
             hx-swap="outerHTML"
             hx-push-url="true"
     >
-        <legend class="menu-title pb-0">Filter incidents</legend>
+        <legend class="sr-only">Filter incidents</legend>
         <ul class="menu menu-horizontal menu-sm flex items-center gap-2 py-1.5">
             {% for field in filter_form %}
                 <li class="form-control">
