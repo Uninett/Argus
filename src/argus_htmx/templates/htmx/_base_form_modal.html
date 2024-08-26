@@ -1,0 +1,17 @@
+<label for="{{ dialog_id }}" class="btn btn-primary">{{ button_title }}</label>
+<input type="checkbox" id="{{ dialog_id }}" class="modal-toggle" />
+<div class="modal" role="{{ dialog_id }}">
+  <div class="modal-box">
+    <h3 class="text-lg font-bold">{{ header }}</h3>
+    <p>{{ explanation }}</p>
+    <form class="py-4" method="post" action="{{ endpoint }}">
+      {% csrf_token %}
+      {% block dialogform %}
+      {% endblock dialogform %}
+      <div class="modal-action">
+        <label class="btn" for="{{ dialog_id }}">{{ cancel_text }}</label>
+        <button type="submit" class="btn btn-primary">{{ submit_text }}</button>
+      </div>
+    </form>
+  </div>
+</div>
