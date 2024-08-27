@@ -13,9 +13,13 @@
     <header class="bg-neutral text-neutral-content">
         <nav class="navbar">
             <div class="navbar-start">
-                <a class="link" href="{% url 'htmx:incident-list' %}">
-                    <img class="object-scale-down h-14" src="{% static "logo_white.svg" %}" alt="go to homepage">
-                </a>
+                {% block logo %}
+                    <a class="link" href="{% url logo.url|default:'htmx:incident-list' %}">
+                        <img class="object-scale-down h-14"
+                             src="{% static logo.file|default:'logo_white.svg' %}"
+                             alt="{{ logo.alt|default:'go to homepage' }}">
+                    </a>
+                {% endblock logo %}
             </div>
             <div class="navbar-center flex">
                 <ul class="menu menu-horizontal px-1">
