@@ -1,9 +1,11 @@
 {% extends 'htmx/_base_form_modal.html' %}
 {% block dialogform %}
-<label>Reason for acknowledging incident
-<input name="description" type="text" placeholder="Acknowledgment message" required class="input input-bordered w-full max-w-xs" />
-</label>
-<label>Expiration date (optional)
-<input name="expiration" type="date" placeholder="Expiry date" class="input input-bordered w-full max-w-xs" />
-</label>
+    <label class="indicator input input-bordered flex items-center gap-2 w-full">Message
+        <span class="indicator-item indicator-top indicator-start badge border-none mask mask-circle text-warning text-base">＊</span>
+        <input name="description" type="text" placeholder="Acknowledgment message" required
+               class="appearance-none grow border-none"/>
+    </label>
+    <label class="input input-bordered flex items-center gap-2 w-full">Expiration
+        <input name="expiration" type="date" placeholder="Expiry date" class="appearance-none grow border-none"/>
+    </label>
 {% endblock dialogform %}
