@@ -1,6 +1,6 @@
 repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v3.2.0
+    rev: v4.6.0
     hooks:
     -   id: trailing-whitespace
     -   id: mixed-line-ending
@@ -8,14 +8,14 @@ repos:
         exclude: &exclude_pattern '^changelog.d/'
     -   id: debug-statements
 -   repo: https://github.com/pycqa/flake8
-    rev: 3.9.2
+    rev: 7.1.1
     hooks:
     -   id: flake8
         name: "Flake8: critical"
         args: ['--count', '--select=E9,F63,F7,F82', '--show-source', '--statistics']
         types: [file, python]
 -   repo: https://github.com/psf/black
-    rev: 22.3.0
+    rev: 24.8.0
     hooks:
     -   id: black
         exclude: migrations/
