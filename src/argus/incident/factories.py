@@ -1,4 +1,5 @@
-import factory, factory.fuzzy
+import factory
+import factory.fuzzy
 import pytz
 
 from argus.auth.factories import SourceUserFactory

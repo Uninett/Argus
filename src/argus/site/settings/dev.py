@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-from .base import *
+from .base import *  # noqa
 
 
 DEBUG = get_bool_env("DEBUG", True)
