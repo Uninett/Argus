@@ -4,13 +4,11 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils import timezone
 from django.utils.timezone import is_aware, make_aware
-from rest_framework.test import APIClient
 
-from argus.auth.models import User
 from argus.util.utils import duplicate
 from argus.util.testing import disconnect_signals, connect_signals
 from argus.incident.fields import KeyValueField
-from argus.incident.models import Incident, SourceSystem, SourceSystemType
+from argus.incident.models import Incident
 from . import IncidentBasedAPITestCaseHelper
 
 

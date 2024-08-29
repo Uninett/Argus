@@ -1,6 +1,5 @@
 from django.apps import AppConfig
-from django.contrib.auth.signals import user_logged_in
-from django.db.models.signals import post_save, pre_save, post_migrate
+from django.db.models.signals import post_save, post_migrate
 
 
 class NotificationprofileConfig(AppConfig):

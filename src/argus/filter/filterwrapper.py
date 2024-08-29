@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import logging
-from operator import or_
 from typing import TYPE_CHECKING, Dict, Optional, Any, Tuple
 
 from django.conf import settings

@@ -1,6 +1,5 @@
 from django.core import mail
 from django.test import TestCase, tag
-import json
 
 from argus.auth.factories import PersonUserFactory
 from argus.filter.factories import FilterFactory

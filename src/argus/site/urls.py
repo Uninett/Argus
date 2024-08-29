@@ -22,11 +22,11 @@ from django.views.generic.base import RedirectView
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from social_django.urls import extra
 
-from argus.auth.views import ObtainNewAuthToken, AuthMethodListView
+from argus.auth.views import AuthMethodListView
 from argus.dataporten import views as dataporten_views
 from argus.notificationprofile.views import SchemaView
 from argus.site.utils import get_urlpatterns_from_setting
-from argus.site.views import error, index, MetadataView
+from argus.site.views import index, MetadataView
 
 
 psa_urls = [

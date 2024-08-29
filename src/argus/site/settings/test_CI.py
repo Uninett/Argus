@@ -2,7 +2,6 @@ import os
 import subprocess
 import logging.config
 
-from django.utils.log import DEFAULT_LOGGING
 
 from .base import *
 

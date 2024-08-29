@@ -1,7 +1,6 @@
 import argparse
 import json
 from pathlib import Path
-from random import randint
 
 from django.core.management.base import BaseCommand
 

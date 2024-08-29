@@ -1,4 +1,4 @@
-from rest_framework import fields, serializers
+from rest_framework import serializers
 
 from argus.incident.constants import INCIDENT_LEVELS
 from argus.incident.models import Event

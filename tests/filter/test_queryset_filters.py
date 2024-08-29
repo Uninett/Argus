@@ -1,8 +1,5 @@
 from django.test import TestCase, tag
-from django.utils.dateparse import parse_datetime, parse_time
-from django.utils.timezone import make_aware
 
-from argus.filter.factories import FilterFactory
 from argus.incident.factories import SourceSystemFactory, TagFactory
 from argus.incident.models import Incident
 from argus.filter.queryset_filters import (
@@ -11,11 +8,6 @@ from argus.filter.queryset_filters import (
     _incidents_fitting_tristates,
     _incidents_with_source_systems,
     _incidents_with_tags,
-)
-from argus.notificationprofile.models import TimeRecurrence
-from argus.notificationprofile.factories import (
-    TimeslotFactory,
-    TimeRecurrenceFactory,
 )
 from argus.util.testing import disconnect_signals, connect_signals
 

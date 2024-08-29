@@ -9,7 +9,6 @@ from django.utils import timezone
 from django_filters import rest_framework as filters
 from rest_framework.filters import SearchFilter
 from drf_rw_serializers import viewsets as rw_viewsets
-from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from drf_spectacular.utils import OpenApiParameter, OpenApiResponse
 from rest_framework import mixins, serializers, status, viewsets
@@ -29,10 +28,6 @@ from argus.incident.ticket.base import (
     TicketCreationException,
     TicketPluginException,
     TicketSettingsException,
-)
-from argus.notificationprofile.media import (
-    send_notifications_to_users,
-    background_send_notification,
 )
 from argus.filter import get_filter_backend
 from argus.util.datetime_utils import INFINITY_REPR

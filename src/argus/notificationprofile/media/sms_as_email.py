@@ -27,8 +27,7 @@ if TYPE_CHECKING:
     else:
         from collections.abc import Iterable
 
-    from typing import Union, Set
-    from types import NoneType
+    from typing import Set
     from django.db.models.query import QuerySet
     from argus.auth.models import User
     from ..models import DestinationConfig

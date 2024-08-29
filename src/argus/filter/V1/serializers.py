@@ -1,13 +1,11 @@
 import json
-from typing import List
 
-from rest_framework import fields, serializers
+from rest_framework import serializers
 from rest_framework import serializers
 
 from argus.incident.constants import INCIDENT_LEVELS
 from argus.notificationprofile.models import Filter
 
-from ..primitive_serializers import CustomMultipleChoiceField
 from .validators import validate_filter_string
 
 

@@ -1,9 +1,6 @@
 import unittest
-from copy import deepcopy
 
-from django.conf import settings
 from django.urls.resolvers import URLResolver
-from django.test import override_settings
 
 from argus.site.settings import normalize_url, _add_missing_scheme_to_url
 from argus.site.settings._serializers import AppSetting
