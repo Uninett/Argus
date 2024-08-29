@@ -52,7 +52,7 @@ class TagSerializer(serializers.Serializer):
     tag = serializers.CharField()
 
     def to_internal_value(self, data: dict):
-        if not "tag" in data:
+        if "tag" not in data:
             raise serializers.ValidationError('Tags need to follow the format {"tag": key=value}')
 
         key, value = clean_tag(data.pop("tag"))
@@ -81,7 +81,7 @@ class IncidentTagRelationSerializer(serializers.ModelSerializer):
         return Tag.objects.create(key=key, value=value, **validated_data)
 
     def to_internal_value(self, data: dict):
-        if not "tag" in data:
+        if "tag" not in data:
             raise serializers.ValidationError('Tags need to follow the format {"tag": key=value}')
 
         key, value = clean_tag(data.pop("tag"))

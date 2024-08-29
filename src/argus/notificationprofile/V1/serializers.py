@@ -110,11 +110,11 @@ class RequestNotificationProfileSerializerV1(serializers.ModelSerializer):
                     default_email_destination = instance.user.destinations.filter(media_id="email").get(
                         settings__email_address=instance.user.email
                     )
-                    if not default_email_destination in instance.destinations.all():
+                    if default_email_destination not in instance.destinations.all():
                         instance.destinations.add(default_email_destination)
 
         first_sms_destination = instance.destinations.filter(media_id="sms").order_by("pk").first()
-        if (not phone_number == None) and ((not media and first_sms_destination) or "SM" in media):
+        if (phone_number is not None) and ((not media and first_sms_destination) or "SM" in media):
             given_sms_destination = DestinationConfig.objects.filter(media_id="sms").filter(pk=phone_number).first()
             if not given_sms_destination:
                 raise serializers.ValidationError(
@@ -122,7 +122,7 @@ class RequestNotificationProfileSerializerV1(serializers.ModelSerializer):
                 )
             if not first_sms_destination:
                 instance.destinations.add(given_sms_destination)
-            elif not first_sms_destination.pk == given_sms_destination.pk:
+            elif first_sms_destination.pk != given_sms_destination.pk:
                 instance.destinations.remove(first_sms_destination)
                 instance.destinations.add(given_sms_destination)
 
