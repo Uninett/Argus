@@ -18,9 +18,9 @@ class MigrationTest(TestCase):
         user = User.objects.create(username="foo", password="vbnh")
 
         filter_ = Filter.objects.create(
-            user = user,
-            name = "1",
-            filter = {},
+            user=user,
+            name="1",
+            filter={},
         )
         self.migrator.migrate(*self.test_migration)
         result = Filter.objects.get(id=filter_.pk)
@@ -33,9 +33,9 @@ class MigrationTest(TestCase):
         user = User.objects.create(username="foo", password="vbnh")
 
         filter_ = Filter.objects.create(
-            user = user,
-            name = "1",
-            filter = {"event_type": None},
+            user=user,
+            name="1",
+            filter={"event_type": None},
         )
         self.migrator.migrate(*self.test_migration)
         result = Filter.objects.get(id=filter_.pk)
@@ -48,13 +48,13 @@ class MigrationTest(TestCase):
         user = User.objects.create(username="foo", password="vbnh")
 
         filter_ = Filter.objects.create(
-            user = user,
-            name = "1",
-            filter = {"event_type": "BAH HUMBUG"},
+            user=user,
+            name="1",
+            filter={"event_type": "BAH HUMBUG"},
         )
         self.migrator.migrate(*self.test_migration)
         result = Filter.objects.get(id=filter_.pk)
-        self.assertEqual(result.filter, {'event_types': ['BAH HUMBUG']})
+        self.assertEqual(result.filter, {"event_types": ["BAH HUMBUG"]})
 
     def test_backward_empty_changes_nothing(self):
         # Cannot use factories :(
@@ -63,9 +63,9 @@ class MigrationTest(TestCase):
         user = User.objects.create(username="foo", password="vbnh")
 
         filter_ = Filter.objects.create(
-            user = user,
-            name = "1",
-            filter = {},
+            user=user,
+            name="1",
+            filter={},
         )
         self.migrator.migrate(*self.test_migration)
         self.migrator.migrate(*self.base_migration)
@@ -79,9 +79,9 @@ class MigrationTest(TestCase):
         user = User.objects.create(username="foo", password="vbnh")
 
         filter_ = Filter.objects.create(
-            user = user,
-            name = "1",
-            filter = {},
+            user=user,
+            name="1",
+            filter={},
         )
         self.migrator.migrate(*self.test_migration)
         filter_.filter = {"event_types": []}
@@ -96,9 +96,9 @@ class MigrationTest(TestCase):
         user = User.objects.create(username="foo", password="vbnh")
 
         filter_ = Filter.objects.create(
-            user = user,
-            name = "1",
-            filter = {"event_type": None},
+            user=user,
+            name="1",
+            filter={"event_type": None},
         )
         self.migrator.migrate(*self.test_migration)
         self.migrator.migrate(*self.base_migration)
@@ -112,11 +112,11 @@ class MigrationTest(TestCase):
         user = User.objects.create(username="foo", password="vbnh")
 
         filter_ = Filter.objects.create(
-            user = user,
-            name = "1",
-            filter = {"event_type": "BAH HUMBUG"},
+            user=user,
+            name="1",
+            filter={"event_type": "BAH HUMBUG"},
         )
         self.migrator.migrate(*self.test_migration)
         self.migrator.migrate(*self.base_migration)
         result = Filter.objects.get(id=filter_.pk)
-        self.assertEqual(result.filter, {'event_type': 'BAH HUMBUG'})
+        self.assertEqual(result.filter, {"event_type": "BAH HUMBUG"})
