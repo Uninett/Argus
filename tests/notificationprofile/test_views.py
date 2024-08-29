@@ -233,7 +233,7 @@ class NotificationIncidentViewTests(APITestCase):
         self.source2 = SourceSystemFactory(name="System 2", type=source_type2, user=source2_user)
 
         self.incident1 = StatelessIncidentFactory(source=self.source1)
-        incident2 = StatelessIncidentFactory(source=self.source2)
+        StatelessIncidentFactory(source=self.source2)
 
         timeslot1 = TimeslotFactory(user=user1, name="Never")
         filter1 = FilterFactory(

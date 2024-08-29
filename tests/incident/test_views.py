@@ -366,7 +366,7 @@ class IncidentViewSetV1DeleteTestCase(IncidentAPITestCase):
 
         source_type = SourceSystemTypeFactory()
         user = SourceUserFactory()
-        source = SourceSystemFactory(type=source_type, user=user)
+        SourceSystemFactory(type=source_type, user=user)
         self.client.force_authenticate(user=user)
 
         response = self.client.delete(path=f"/api/v2/incidents/{incident_pk}/")

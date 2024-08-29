@@ -117,7 +117,7 @@ class IncidentFilterTestCase(IncidentBasedAPITestCaseHelper, TestCase):
         for incident in (self.incident1, self.incident2, self.incident3):
             IncidentTagRelation.objects.get_or_create(tag=tag1, incident=incident, added_by=user)
         for incident in (self.incident3, self.incident4, incident5):
-            IncidentTagRelation.objects.get_or_create(tag=tag1, incident=incident, added_by=user)
+            IncidentTagRelation.objects.get_or_create(tag=tag2, incident=incident, added_by=user)
 
         qs = Incident.objects.order_by("pk")
 

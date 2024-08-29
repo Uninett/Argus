@@ -117,31 +117,31 @@ class KeyValueFieldTest(TestCase):
     def test_key_value_must_not_be_empty(self):
         f = KeyValueField()
         with self.assertRaises(ValidationError):
-            result = f.clean("")
+            f.clean("")
 
     def test_key_value_must_not_be_just_equals(self):
         f = KeyValueField()
         with self.assertRaises(ValidationError):
-            result = f.clean("=")
+            f.clean("=")
 
     def test_key_value_must_contain_at_least_one_equals(self):
         f = KeyValueField()
         with self.assertRaises(ValidationError):
-            result = f.clean("boo")
+            f.clean("boo")
 
     def test_value_cannot_be_empty(self):
         f = KeyValueField()
         with self.assertRaises(ValidationError):
-            result = f.clean("a=")
+            f.clean("a=")
 
     def test_key_must_fit_regex(self):
         # [a-z0-9_]+
         f = KeyValueField()
         with self.assertRaises(ValidationError):
-            result = f.clean("=v")
+            f.clean("=v")
         with self.assertRaises(ValidationError):
-            result = f.clean(" =v")
+            f.clean(" =v")
         with self.assertRaises(ValidationError):
-            result = f.clean("A=v")
+            f.clean("A=v")
         with self.assertRaises(ValidationError):
-            result = f.clean("-=v")
+            f.clean("-=v")
