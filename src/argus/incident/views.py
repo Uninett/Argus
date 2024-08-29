@@ -339,12 +339,7 @@ class TicketPluginViewSet(viewsets.ViewSet):
             )
 
         if url:
-            description = ChangeEvent.format_description("ticket_url", "", url)
-            ChangeEvent.objects.create(
-                incident=incident, actor=request.user, timestamp=timezone.now(), description=description
-            )
-            incident.ticket_url = url
-            incident.save(update_fields=["ticket_url"])
+            incident.change_ticket_url(request.user, url, timezone.now())
             serializer = self.serializer_class(data={"ticket_url": incident.ticket_url})
             if serializer.is_valid():
                 return Response(serializer.data, status=status.HTTP_200_OK)
