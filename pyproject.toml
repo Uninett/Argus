@@ -89,7 +89,8 @@ write_to = "src/argus/version.py"
 
 [tool.black]
 line-length = 120
-exclude = '''
+# Exclude files even when passed directly as argument (for MegaLinter)
+force-exclude = '''
 (
   /(
       \.eggs         # exclude a few common directories in the
