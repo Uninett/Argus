@@ -123,16 +123,20 @@ class Command(BaseCommand):
 
         incident_qs = Incident.objects.filter(pk__in=incident_pks)
 
+        timestamp = options.get("timestamp") or None
+        description = options.get("description") or ""
+
         if action == "ticket_url":
             url = options.get("url") or None
             if not url:
                 self.stderr.write(self.style.WARNING("A ticket url is needed."))
                 return
 
-            incident_qs.update_ticket_url(url=url)
-
-        timestamp = options.get("timestamp") or None
-        description = options.get("description") or ""
+            incident_qs.update_ticket_url(
+                actor=actor,
+                url=url,
+                timestamp=timestamp,
+            )
 
         if action == "ack":
             expiration = options.get("expiration") or None

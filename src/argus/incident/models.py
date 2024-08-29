@@ -349,9 +349,12 @@ class IncidentQuerySet(models.QuerySet):
         events = qs.create_events(actor, event_type, timestamp, description)
         return events
 
-    def update_ticket_url(self, url: str):
-        self.update(ticket_url=url)
-        return self.all()  # Return updated qs
+    def update_ticket_url(self, actor: User, url: str, timestamp=None):
+        events = set()
+        for incident in self:
+            event = incident.change_ticket_url(actor, url, timestamp)
+            events.add(event.pk)
+        return self.all()
 
 
 # TODO: review whether fields should be nullable, and on_delete modes

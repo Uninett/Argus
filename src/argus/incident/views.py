@@ -722,7 +722,7 @@ class BulkTicketUrlViewSet(BulkHelper, viewsets.ViewSet):
 
         qs, changes, status_codes_seen = self.bulk_setup(incident_ids)
 
-        incidents = qs.update_ticket_url(ticket_url)
+        incidents = qs.update_ticket_url(request.user, ticket_url, timestamp=timezone.now())
         for incident in incidents:
             changes[str(incident.id)] = {
                 "ticket_url": ticket_url,
