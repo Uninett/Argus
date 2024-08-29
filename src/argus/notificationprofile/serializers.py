@@ -146,7 +146,7 @@ class RequestDestinationConfigSerializer(serializers.ModelSerializer):
         if self.instance and "media" in attrs.keys() and not attrs["media"].slug == self.instance.media.slug:
             raise serializers.ValidationError("Media cannot be updated, only settings.")
         if "settings" in attrs.keys():
-            if type(attrs["settings"]) != dict:
+            if not isinstance(attrs["settings"], dict):
                 raise serializers.ValidationError("Settings has to be a dictionary.")
             if self.instance:
                 medium = api_safely_get_medium_object(self.instance.media.slug)
