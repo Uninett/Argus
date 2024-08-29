@@ -60,6 +60,7 @@ dev = [
     "ipython",
     "pre-commit",
     "python-dotenv",
+    "ruff",
     "towncrier",
     "werkzeug",
     "tox<4",  # does not work on tox 4 for some reason
