@@ -22,7 +22,6 @@ from rest_framework.reverse import reverse
 
 from argus.auth.models import User
 from argus.drf.permissions import IsSuperuserOrReadOnly
-from argus.incident.models import Acknowledgement, Event
 from argus.incident.ticket.base import (
     TicketClientException,
     TicketCreationException,
@@ -36,6 +35,7 @@ from argus.util.utils import import_class_from_dotted_path
 
 from .forms import AddSourceSystemForm
 from .models import (
+    Acknowledgement,
     ChangeEvent,
     Event,
     Incident,
