@@ -57,6 +57,7 @@ dev = [
     "coverage",
     "django-extensions",
     "ipython",
+    "isort",
     "pre-commit",
     "python-dotenv",
     "ruff",
@@ -121,6 +122,11 @@ force-exclude = true
 [tool.ruff.lint]
 select = ["E4", "E7", "E9", "F"]
 ignore = ["E731", "F403", "F405"]
+
+[tool.isort]
+profile = "black"
+src_paths = ["src", "tests"]
+extend_skip_glob = ["src/**/migrations"]
 
 [tool.towncrier]
 directory = "changelog.d"

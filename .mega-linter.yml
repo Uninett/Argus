@@ -5,10 +5,12 @@ LINTER_RULES_PATH: .
 
 ENABLE_LINTERS:
   - PYTHON_BLACK
+  - PYTHON_ISORT
   - PYTHON_RUFF
 
 # Make workflow fail even on non blocking errors
 FORMATTERS_DISABLE_ERRORS: false
 
 PYTHON_BLACK_CONFIG_FILE: pyproject.toml
+PYTHON_ISORT_CONFIG_FILE: pyproject.toml
 PYTHON_RUFF_CONFIG_FILE: pyproject.toml
