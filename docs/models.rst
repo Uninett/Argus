@@ -26,7 +26,7 @@ Terms used in Argus are loosely based on the `ITIL standard`_ for IT service man
 
    -  If the value is an instance of ``datetime``: the incident is
       stateful, and was resolved or closed at the given time. If the
-      end time is in the future, the incident is onsidered still open.
+      end time is in the future, the incident is considered still open.
    -  If ``null``: the incident is stateless (i.e. it cannot be closed).
    -  If ``"infinity"``: the incident is stateful, but has not yet been
       resolved or closed - for example, if it is still open.
