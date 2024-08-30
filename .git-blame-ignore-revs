@@ -6,3 +6,5 @@ a3b18cfbf32a2f0e6a9c55ead043fea12a71883e
 46131516c31bd6ba3575482872f6b2d524661c9b
 # Hide changes in single file
 17c099c3b99172f4f623f22ddc374abcf692ee5d
+# Re-run black with new version 24.8.0 @johannaengland 29/08/2024
+10dc8b7b612dddb042462718eea5b62f9d6455ea
