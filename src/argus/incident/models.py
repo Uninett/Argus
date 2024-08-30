@@ -553,9 +553,10 @@ class Incident(models.Model):
 
     # @transaction.atomic
     def change_level(self, actor, new_level, timestamp=None):
+        old_level = self.level
         self.level = new_level
         self.save(update_fields=["level"])
-        event = ChangeEvent.change_level(self, actor, new_level, timestamp)
+        event = ChangeEvent.change_level(self, actor, old_level, new_level, timestamp)
         return event
 
     # @transaction.atomic
@@ -625,9 +626,9 @@ class ChangeEvent(Event):
         return cls.DESCRIPTION_FORMAT.format(**context)
 
     @classmethod
-    def change_level(cls, incident, actor, new_level, timestamp=None):
+    def change_level(cls, incident, actor, old_level, new_level, timestamp=None):
         timestamp = timestamp if timestamp else timezone.now()
-        description = cls.format_description("level", incident.level, new_level)
+        description = cls.format_description("level", old_level, new_level)
         event = cls(incident=incident, actor=actor, timestamp=timestamp, description=description)
         event.save()
         return event
