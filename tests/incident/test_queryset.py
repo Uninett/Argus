@@ -105,7 +105,7 @@ class IncidentQuerySetUpdatingTestCase(TestCase):
     @tag("bulk")
     def test_update_ticket_url(self):
         qs = Incident.objects.filter(id__in=(self.incident1.id, self.incident2.id))
-        qs.update_ticket_url("http://vg.no")
+        qs.update_ticket_url(self.user, "http://vg.no")
         result = qs.has_ticket()
         self.assertEqual(set(result), set(qs.all()))
 

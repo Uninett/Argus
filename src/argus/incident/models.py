@@ -349,9 +349,12 @@ class IncidentQuerySet(models.QuerySet):
         events = qs.create_events(actor, event_type, timestamp, description)
         return events
 
-    def update_ticket_url(self, url: str):
-        self.update(ticket_url=url)
-        return self.all()  # Return updated qs
+    def update_ticket_url(self, actor: User, url: str, timestamp=None):
+        events = set()
+        for incident in self:
+            event = incident.change_ticket_url(actor, url, timestamp)
+            events.add(event.pk)
+        return self.all()
 
 
 # TODO: review whether fields should be nullable, and on_delete modes
@@ -555,6 +558,14 @@ class Incident(models.Model):
         event = ChangeEvent.change_level(self, actor, new_level, timestamp)
         return event
 
+    # @transaction.atomic
+    def change_ticket_url(self, actor, url="", timestamp=None):
+        old_ticket_url = self.ticket_url
+        self.ticket_url = url
+        self.save(update_fields=["ticket_url"])
+        event = ChangeEvent.change_ticket_url(self, actor, old_ticket_url, url, timestamp)
+        return event
+
     def pp_details_url(self):
         "Merge Incident.details_url with Source.base_url"
         path = self.details_url.strip()
@@ -614,6 +625,14 @@ class ChangeEvent(Event):
     def change_level(cls, incident, actor, new_level, timestamp=None):
         timestamp = timestamp if timestamp else timezone.now()
         description = cls.format_description("level", incident.level, new_level)
+        event = cls(incident=incident, actor=actor, timestamp=timestamp, description=description)
+        event.save()
+        return event
+
+    @classmethod
+    def change_ticket_url(cls, incident, actor, old_ticket="", new_ticket="", timestamp=None):
+        timestamp = timestamp if timestamp else timezone.now()
+        description = cls.format_description("ticket_url", old_ticket, new_ticket)
         event = cls(incident=incident, actor=actor, timestamp=timestamp, description=description)
         event.save()
         return event

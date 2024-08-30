@@ -1,6 +1,5 @@
 import logging
 import secrets
-from urllib.parse import urljoin
 
 from django.conf import settings
 from django.db import IntegrityError
@@ -29,6 +28,10 @@ from argus.incident.ticket.base import (
     TicketCreationException,
     TicketPluginException,
     TicketSettingsException,
+)
+from argus.incident.ticket.utils import (
+    get_autocreate_ticket_plugin,
+    serialize_incident_for_ticket_autocreation,
 )
 from argus.notificationprofile.media import (
     send_notifications_to_users,
@@ -285,38 +288,23 @@ class TicketPluginViewSet(viewsets.ViewSet):
     def update(self, request, incident_pk=None):
         incident = get_object_or_404(self.queryset, pk=incident_pk)
 
+        # never overwrite existing url
         if incident.ticket_url:
             serializer = self.serializer_class(data={"ticket_url": incident.ticket_url})
             if serializer.is_valid():
                 return Response(serializer.data, status=status.HTTP_200_OK)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        plugin = getattr(settings, "TICKET_PLUGIN", None)
+        try:
+            ticket_plugin = get_autocreate_ticket_plugin()
+        except TicketSettingsException as e:
+            # shouldn't this be a 500 Server Error?
+            return Response(data=str(e), status=status.HTTP_400_BAD_REQUEST)
 
-        if not plugin:
-            return Response(
-                data="No path to ticket plugin can be found in the settings. Please update the setting 'TICKET_PLUGIN'.",
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+        serialized_incident = serialize_incident_for_ticket_autocreation(incident, request.user)
 
         try:
-            ticket_class = import_class_from_dotted_path(plugin)
-        except Exception:
-            LOG.exception("Could not import ticket plugin from path %s", plugin)
-            return Response(
-                data="Ticket plugins are incorrectly configured.",
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        serialized_incident = IncidentSerializer(incident).data
-        serialized_incident["argus_url"] = urljoin(
-            getattr(settings, "FRONTEND_URL", ""),
-            f"incidents/{incident_pk}",
-        )
-        serialized_incident["user"] = request.user.get_full_name()
-
-        try:
-            url = ticket_class.create_ticket(serialized_incident)
+            url = ticket_plugin.create_ticket(serialized_incident)
         except TicketSettingsException as e:
             return Response(
                 data=str(e),
@@ -339,12 +327,7 @@ class TicketPluginViewSet(viewsets.ViewSet):
             )
 
         if url:
-            description = ChangeEvent.format_description("ticket_url", "", url)
-            ChangeEvent.objects.create(
-                incident=incident, actor=request.user, timestamp=timezone.now(), description=description
-            )
-            incident.ticket_url = url
-            incident.save(update_fields=["ticket_url"])
+            incident.change_ticket_url(request.user, url, timezone.now())
             serializer = self.serializer_class(data={"ticket_url": incident.ticket_url})
             if serializer.is_valid():
                 return Response(serializer.data, status=status.HTTP_200_OK)
@@ -727,7 +710,7 @@ class BulkTicketUrlViewSet(BulkHelper, viewsets.ViewSet):
 
         qs, changes, status_codes_seen = self.bulk_setup(incident_ids)
 
-        incidents = qs.update_ticket_url(ticket_url)
+        incidents = qs.update_ticket_url(request.user, ticket_url, timestamp=timezone.now())
         for incident in incidents:
             changes[str(incident.id)] = {
                 "ticket_url": ticket_url,
