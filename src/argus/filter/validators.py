@@ -2,7 +2,6 @@ from rest_framework import serializers
 
 from argus.filter.serializers import FilterBlobSerializer
 
-
 __all__ = [
     "validate_jsonfilter",
 ]

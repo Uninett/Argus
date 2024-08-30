@@ -1,7 +1,7 @@
 from datetime import datetime
 
-from django.contrib.admin import widgets as admin_widgets
 from django import forms
+from django.contrib.admin import widgets as admin_widgets
 
 from argus.util.datetime_utils import get_infinity_repr
 

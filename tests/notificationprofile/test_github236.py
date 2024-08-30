@@ -1,14 +1,16 @@
 from django.core import mail
 from django.test import TestCase, tag
-import json
 
 from argus.auth.factories import PersonUserFactory
 from argus.filter.factories import FilterFactory
-from argus.incident.models import create_fake_incident, get_or_create_default_instances, Event
+from argus.incident.models import (
+    Event,
+    create_fake_incident,
+    get_or_create_default_instances,
+)
 from argus.notificationprofile import factories
 from argus.notificationprofile.media import send_notifications_to_users
-from argus.util.testing import disconnect_signals, connect_signals
-
+from argus.util.testing import connect_signals, disconnect_signals
 
 """See:
 
@@ -52,7 +54,6 @@ class SendingNotificationTest(TestCase):
         connect_signals()
 
     def test_sending_event_to_multiple_profiles_of_the_same_user_should_not_raise_exception(self):
-        LOG_PREFIX = "INFO:argus.notificationprofile.media:"
         # Send a test event
         self.incident = create_fake_incident()
         event = self.incident.events.get(type=Event.Type.INCIDENT_START)

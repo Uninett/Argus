@@ -1,7 +1,7 @@
+import logging
 from collections import defaultdict
 from datetime import datetime, timedelta
 from functools import reduce
-import logging
 from operator import and_
 from random import randint
 from urllib.parse import urljoin
@@ -14,10 +14,15 @@ from django.utils import timezone
 
 from argus.auth.models import User
 from argus.util.datetime_utils import INFINITY_REPR, get_infinity_repr
-from .constants import INCIDENT_LEVELS, INCIDENT_LEVEL_CHOICES, MIN_INCIDENT_LEVEL, MAX_INCIDENT_LEVEL
-from .fields import DateTimeInfinityField
-from .validators import validate_lowercase, validate_key
 
+from .constants import (
+    INCIDENT_LEVEL_CHOICES,
+    INCIDENT_LEVELS,
+    MAX_INCIDENT_LEVEL,
+    MIN_INCIDENT_LEVEL,
+)
+from .fields import DateTimeInfinityField
+from .validators import validate_key, validate_lowercase
 
 LOG = logging.getLogger(__name__)
 

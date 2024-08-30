@@ -84,7 +84,7 @@ class CreateFakeIncidentTests(TestCase):
 
     def test_create_fake_incident_will_raise_error_for_invalid_level(self):
         with self.assertRaises(CommandError):
-            self.call_command(f"--level=100")
+            self.call_command("--level=100")
 
     def test_create_fake_incident_will_create_single_fake_incident_with_set_tag(self):
         previous_incidents_pks = [incident.id for incident in Incident.objects.all()]
@@ -105,7 +105,7 @@ class CreateFakeIncidentTests(TestCase):
 
     def test_create_fake_incident_will_create_single_fake_stateless_incident(self):
         previous_incidents_pks = [incident.id for incident in Incident.objects.all()]
-        out = self.call_command(f"--stateless")
+        out = self.call_command("--stateless")
 
         self.assertFalse(out)
 

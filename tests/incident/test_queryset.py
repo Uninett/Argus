@@ -2,9 +2,13 @@ from django.test import TestCase, tag
 from django.utils import timezone
 
 from argus.auth.factories import PersonUserFactory
-from argus.util.testing import disconnect_signals, connect_signals
-from argus.incident.factories import StatefulIncidentFactory, StatelessIncidentFactory, SourceSystemFactory
-from argus.incident.models import Incident, Event
+from argus.incident.factories import (
+    SourceSystemFactory,
+    StatefulIncidentFactory,
+    StatelessIncidentFactory,
+)
+from argus.incident.models import Event, Incident
+from argus.util.testing import connect_signals, disconnect_signals
 
 
 class IncidentQuerySetTestCase(TestCase):

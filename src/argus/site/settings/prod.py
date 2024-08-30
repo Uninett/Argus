@@ -1,6 +1,6 @@
-from .base import *
-
 from django.core.exceptions import ImproperlyConfigured
+
+from .base import *
 
 DEBUG = False
 TEMPLATES[0]["OPTIONS"]["debug"] = False

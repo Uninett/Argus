@@ -1,11 +1,10 @@
 import argparse
 import json
 from pathlib import Path
-from random import randint
 
 from django.core.management.base import BaseCommand
 
-from argus.incident.constants import MIN_INCIDENT_LEVEL, MAX_INCIDENT_LEVEL
+from argus.incident.constants import MAX_INCIDENT_LEVEL, MIN_INCIDENT_LEVEL
 from argus.incident.models import create_fake_incident
 
 

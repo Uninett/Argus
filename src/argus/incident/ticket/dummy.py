@@ -8,14 +8,11 @@ Inspired by django.core.mail.outbox, see https://docs.djangoproject.com/en/4.2/t
 
 from __future__ import annotations
 
-from factory import Faker
 import logging
-from typing import TYPE_CHECKING
+
+from factory import Faker
 
 from .base import TicketPlugin
-
-if TYPE_CHECKING:
-    from argus.incident.models import Incident
 
 LOG = logging.getLogger(__name__)
 

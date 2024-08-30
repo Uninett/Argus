@@ -1,11 +1,8 @@
+import logging.config
 import os
 import subprocess
-import logging.config
-
-from django.utils.log import DEFAULT_LOGGING
 
 from .base import *
-
 
 DEBUG = get_bool_env("DEBUG", True)
 TEMPLATES[0]["OPTIONS"]["debug"] = get_bool_env("TEMPLATE_DEBUG", True)

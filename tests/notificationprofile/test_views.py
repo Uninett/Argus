@@ -233,7 +233,7 @@ class NotificationIncidentViewTests(APITestCase):
         self.source2 = SourceSystemFactory(name="System 2", type=source_type2, user=source2_user)
 
         self.incident1 = StatelessIncidentFactory(source=self.source1)
-        incident2 = StatelessIncidentFactory(source=self.source2)
+        StatelessIncidentFactory(source=self.source2)
 
         timeslot1 = TimeslotFactory(user=user1, name="Never")
         filter1 = FilterFactory(
@@ -450,13 +450,13 @@ class MediumViewTests(APITestCase):
         connect_signals()
 
     def test_should_get_all_media(self):
-        response = self.user1_rest_client.get(path=f"/api/v2/notificationprofiles/media/")
+        response = self.user1_rest_client.get(path="/api/v2/notificationprofiles/media/")
         self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
         self.assertEqual(len(response.data), 2)
         self.assertEqual(set([medium["slug"] for medium in response.data]), set(["sms", "email"]))
 
     def test_should_get_specific_medium(self):
-        response = self.user1_rest_client.get(path=f"/api/v2/notificationprofiles/media/email/")
+        response = self.user1_rest_client.get(path="/api/v2/notificationprofiles/media/email/")
         self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
         self.assertEqual(response.data["slug"], "email")
 

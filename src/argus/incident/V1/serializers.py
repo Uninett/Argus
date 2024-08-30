@@ -1,20 +1,13 @@
 from django.utils import timezone
-
 from rest_framework import serializers
 
 from ..fields import DateTimeInfinitySerializerField
-from ..models import (
-    Acknowledgement,
-    Event,
-    Incident,
-    Tag,
-    IncidentTagRelation,
-)
+from ..models import Acknowledgement, Event, Incident, IncidentTagRelation, Tag
 from ..serializers import (
     EventSerializer,
     IncidentSerializer,
-    SourceSystemSerializer,
     IncidentTagRelationSerializer,
+    SourceSystemSerializer,
 )
 
 
@@ -112,7 +105,7 @@ class UpdateAcknowledgementSerializerV1(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         now = self.__class__._later_than_func()
         if instance.expiration and instance.expiration < now:  # expired are readonly
-            raise serializers.ValidationError(f"Cannot change expired Acknowledgement")
+            raise serializers.ValidationError("Cannot change expired Acknowledgement")
         expiration = validated_data.get("expiration")
         instance.expiration = expiration
         instance.save()

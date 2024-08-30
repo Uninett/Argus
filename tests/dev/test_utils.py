@@ -1,7 +1,6 @@
 from django.test import TestCase
 
-from argus.dev.utils import StressTester, DatabaseMismatchError
-
+from argus.dev.utils import DatabaseMismatchError, StressTester
 from argus.util.testing import connect_signals, disconnect_signals
 
 
@@ -52,7 +51,7 @@ class StressTesterTests(TestCase):
         self.stresstester._verify_description(actual_data, expected_data)
 
     def test_get_auth_header_returns_correct_header_values(self):
-        self.assertEqual(self.stresstester._get_auth_header(), {"Authorization": f"Token token"})
+        self.assertEqual(self.stresstester._get_auth_header(), {"Authorization": "Token token"})
 
     def test_get_incidents_v1_url_returns_correct_url(self):
         self.assertEqual(self.stresstester._get_incidents_v1_url(), "http://localhost.com/api/v1/incidents/")

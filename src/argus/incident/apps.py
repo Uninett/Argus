@@ -7,11 +7,11 @@ class IncidentConfig(AppConfig):
     label = "argus_incident"
 
     def ready(self):
+        from .signals import task_send_notification  # noqa
         from .signals import (
             close_token_incident,
-            delete_associated_user,
             delete_associated_event,
-            task_send_notification,  # noqa
+            delete_associated_user,
             task_background_send_notification,
         )
 

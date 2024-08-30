@@ -56,10 +56,11 @@ dev = [
     "black",
     "coverage",
     "django-extensions",
-    "flake8",
     "ipython",
+    "isort",
     "pre-commit",
     "python-dotenv",
+    "ruff",
     "towncrier",
     "werkzeug",
     "tox<4",  # does not work on tox 4 for some reason
@@ -89,7 +90,8 @@ write_to = "src/argus/version.py"
 
 [tool.black]
 line-length = 120
-exclude = '''
+# Exclude files even when passed directly as argument (for MegaLinter)
+force-exclude = '''
 (
   /(
       \.eggs         # exclude a few common directories in the
@@ -107,6 +109,24 @@ exclude = '''
   | src/.*/migrations
 )
 '''
+
+[tool.ruff]
+line-length = 120
+target-version = "py39"
+exclude = [
+    "src/**/migrations"
+]
+# Exclude files even when passed directly as argument (for MegaLinter)
+force-exclude = true
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F"]
+ignore = ["E731", "F403", "F405"]
+
+[tool.isort]
+profile = "black"
+src_paths = ["src", "tests"]
+extend_skip_glob = ["src/**/migrations"]
 
 [tool.towncrier]
 directory = "changelog.d"

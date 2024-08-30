@@ -8,11 +8,12 @@ from django.utils.timezone import make_aware
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from argus.util import datetime_utils
-from argus.util.utils import duplicate
-from argus.util.testing import disconnect_signals, connect_signals
 from argus.incident.factories import StatefulIncidentFactory
 from argus.incident.models import Event, Incident
+from argus.util import datetime_utils
+from argus.util.testing import connect_signals, disconnect_signals
+from argus.util.utils import duplicate
+
 from . import IncidentBasedAPITestCaseHelper
 
 

@@ -3,7 +3,11 @@ from rest_framework import status
 from rest_framework.test import APIClient, APIRequestFactory, APITestCase
 
 from argus.auth.factories import PersonUserFactory
-from argus.notificationprofile.factories import DestinationConfigFactory, NotificationProfileFactory, TimeslotFactory
+from argus.notificationprofile.factories import (
+    DestinationConfigFactory,
+    NotificationProfileFactory,
+    TimeslotFactory,
+)
 from argus.notificationprofile.media.email import EmailNotification
 from argus.notificationprofile.models import DestinationConfig, Media
 from argus.notificationprofile.serializers import RequestDestinationConfigSerializer
@@ -238,12 +242,12 @@ class EmailMediumViewTests(APITestCase):
             }
         }
 
-        response = self.user1_rest_client.get(path=f"/api/v2/notificationprofiles/media/email/json_schema/")
+        response = self.user1_rest_client.get(path="/api/v2/notificationprofiles/media/email/json_schema/")
         self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
         self.assertEqual(response.data, schema)
 
     def test_should_get_email_medium(self):
-        response = self.user1_rest_client.get(path=f"/api/v2/notificationprofiles/media/email/")
+        response = self.user1_rest_client.get(path="/api/v2/notificationprofiles/media/email/")
         self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
         self.assertEqual(response.data["name"], "Email")
 

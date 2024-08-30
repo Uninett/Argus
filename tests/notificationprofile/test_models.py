@@ -4,12 +4,9 @@ from django.test import TestCase, tag
 from django.utils.dateparse import parse_datetime, parse_time
 from django.utils.timezone import make_aware
 
+from argus.notificationprofile.factories import TimeRecurrenceFactory, TimeslotFactory
 from argus.notificationprofile.models import TimeRecurrence
-from argus.notificationprofile.factories import (
-    TimeslotFactory,
-    TimeRecurrenceFactory,
-)
-from argus.util.testing import disconnect_signals, connect_signals
+from argus.util.testing import connect_signals, disconnect_signals
 
 from . import IncidentAPITestCaseHelper
 

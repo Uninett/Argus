@@ -9,11 +9,9 @@ from django.http import (
     HttpResponseServerError,
 )
 from django.shortcuts import render, reverse
-
-from rest_framework.views import APIView
 from rest_framework import permissions
 from rest_framework.response import Response
-
+from rest_framework.views import APIView
 
 ERROR_TEMPLATE = """<html>
 <head><title>{code} {reason}</title></head>

@@ -16,4 +16,4 @@ class Command(BaseCommand):
         source = options["source"]
         source_type = options.get("source_type") or "argus"
         sst = SourceSystemTypeFactory(name=source_type)
-        ss = SourceSystemFactory(name=source, type=sst)
+        SourceSystemFactory(name=source, type=sst)

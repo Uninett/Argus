@@ -14,9 +14,10 @@ from urllib.parse import urlsplit
 
 import dj_database_url
 
+from ..utils import update_context_processors_list, update_middleware_list
+
 # Import some helpers
 from . import *
-from ..utils import update_context_processors_list, update_middleware_list
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/

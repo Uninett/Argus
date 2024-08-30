@@ -6,14 +6,12 @@ Depends on django-filter
 
 from django import forms
 from django_filters import rest_framework as filters
-
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter
 
-from argus.notificationprofile.models import Filter, NotificationProfile
 from argus.incident.fields import KeyValueField
 from argus.incident.models import Incident
-
+from argus.notificationprofile.models import Filter, NotificationProfile
 
 __all__ = [
     "INCIDENT_OPENAPI_PARAMETER_DESCRIPTIONS",

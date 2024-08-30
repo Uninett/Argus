@@ -1,12 +1,12 @@
 from datetime import datetime
 
+import rest_framework.fields as rest_framework_fields
 from django import forms
 from django.db import models
 from django.forms import fields
 
-import rest_framework.fields as rest_framework_fields
-
 import argus.util.datetime_utils as utils
+
 from .validators import validate_key_value
 
 

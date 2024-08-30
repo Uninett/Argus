@@ -3,7 +3,10 @@ from unittest.mock import patch
 from django.contrib.auth.backends import ModelBackend
 from django.test import TestCase
 
-from argus.auth.utils import get_authentication_backend_name_and_type, get_psa_authentication_names
+from argus.auth.utils import (
+    get_authentication_backend_name_and_type,
+    get_psa_authentication_names,
+)
 from argus.dataporten.social import DataportenFeideOAuth2
 
 

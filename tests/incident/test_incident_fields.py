@@ -4,13 +4,12 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils import timezone
 from django.utils.timezone import is_aware, make_aware
-from rest_framework.test import APIClient
 
-from argus.auth.models import User
-from argus.util.utils import duplicate
-from argus.util.testing import disconnect_signals, connect_signals
 from argus.incident.fields import KeyValueField
-from argus.incident.models import Incident, SourceSystem, SourceSystemType
+from argus.incident.models import Incident
+from argus.util.testing import connect_signals, disconnect_signals
+from argus.util.utils import duplicate
+
 from . import IncidentBasedAPITestCaseHelper
 
 
@@ -119,31 +118,31 @@ class KeyValueFieldTest(TestCase):
     def test_key_value_must_not_be_empty(self):
         f = KeyValueField()
         with self.assertRaises(ValidationError):
-            result = f.clean("")
+            f.clean("")
 
     def test_key_value_must_not_be_just_equals(self):
         f = KeyValueField()
         with self.assertRaises(ValidationError):
-            result = f.clean("=")
+            f.clean("=")
 
     def test_key_value_must_contain_at_least_one_equals(self):
         f = KeyValueField()
         with self.assertRaises(ValidationError):
-            result = f.clean("boo")
+            f.clean("boo")
 
     def test_value_cannot_be_empty(self):
         f = KeyValueField()
         with self.assertRaises(ValidationError):
-            result = f.clean("a=")
+            f.clean("a=")
 
     def test_key_must_fit_regex(self):
         # [a-z0-9_]+
         f = KeyValueField()
         with self.assertRaises(ValidationError):
-            result = f.clean("=v")
+            f.clean("=v")
         with self.assertRaises(ValidationError):
-            result = f.clean(" =v")
+            f.clean(" =v")
         with self.assertRaises(ValidationError):
-            result = f.clean("A=v")
+            f.clean("A=v")
         with self.assertRaises(ValidationError):
-            result = f.clean("-=v")
+            f.clean("-=v")

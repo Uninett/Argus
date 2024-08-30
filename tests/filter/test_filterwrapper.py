@@ -1,11 +1,9 @@
 import unittest
 from unittest.mock import Mock
 
-from django.test import override_settings
-from django.test import tag
+from django.test import override_settings, tag
 
-from argus.filter.filterwrapper import FilterKey
-from argus.filter.filterwrapper import FallbackFilterWrapper
+from argus.filter.filterwrapper import FallbackFilterWrapper, FilterKey
 from argus.incident.models import Event
 
 

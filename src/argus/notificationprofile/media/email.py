@@ -10,9 +10,10 @@ from django.template.loader import render_to_string
 from rest_framework.exceptions import ValidationError
 
 from argus.incident.models import Event
-from .base import NotificationMedium
-from ..models import DestinationConfig
 from argus.util.datetime_utils import INFINITY, LOCAL_INFINITY
+
+from ..models import DestinationConfig
+from .base import NotificationMedium
 
 if TYPE_CHECKING:
     import sys
@@ -23,9 +24,12 @@ if TYPE_CHECKING:
         from collections.abc import Iterable
 
     from types import NoneType
-    from typing import Union, Set
+    from typing import Set, Union
+
     from django.db.models.query import QuerySet
+
     from argus.auth.models import User
+
     from ..serializers import RequestDestinationConfigSerializer
 
 LOG = logging.getLogger(__name__)
@@ -46,7 +50,7 @@ def send_email_safely(function, additional_error=None, *args, **kwargs) -> int:
     try:
         result = function(*args, **kwargs)
         return result
-    except ConnectionRefusedError as e:
+    except ConnectionRefusedError:
         EMAIL_HOST = getattr(settings, "EMAIL_HOST", None)
         if not EMAIL_HOST:
             LOG.error("Notification: Email: EMAIL_HOST not set, cannot send")

@@ -1,9 +1,8 @@
-from collections import OrderedDict
 import datetime
+from collections import OrderedDict
 
 from django.db import IntegrityError
-from django.test import tag, TestCase
-
+from django.test import TestCase, tag
 from rest_framework.test import APIRequestFactory
 
 from argus.auth.factories import PersonUserFactory
@@ -91,7 +90,7 @@ class TimeslotSerializerTests(TestCase):
         )
         # serializer.create works on already validated data
         with self.assertRaises(IntegrityError):
-            obj = serializer.create(validated_data)
+            serializer.create(validated_data)
 
     def test_can_update_timeslot(self):
         timeslot = TimeslotFactory(name="existing name", user=self.user)
@@ -127,4 +126,4 @@ class TimeslotSerializerTests(TestCase):
         )
         # serializer.create works on already validated data
         with self.assertRaises(IntegrityError):
-            obj = serializer.update(timeslot, validated_data)
+            serializer.update(timeslot, validated_data)

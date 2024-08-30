@@ -1,15 +1,17 @@
 from django_filters import rest_framework as filters
 from drf_spectacular.types import OpenApiTypes
-from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter
+from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view
 from rest_framework import generics, mixins, viewsets
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from argus.filter.filters import BooleanStringOAEnum
-from argus.filter.filters import SourceLockedIncidentFilter
-from argus.filter.filters import SOURCE_LOCKED_INCIDENT_OPENAPI_PARAMETER_DESCRIPTIONS
+from argus.filter.filters import (
+    SOURCE_LOCKED_INCIDENT_OPENAPI_PARAMETER_DESCRIPTIONS,
+    BooleanStringOAEnum,
+    SourceLockedIncidentFilter,
+)
 
 from ..models import Incident, SourceSystem
 from ..serializers import IncidentPureDeserializer, SourceSystemSerializer

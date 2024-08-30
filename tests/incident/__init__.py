@@ -1,6 +1,6 @@
 from rest_framework.test import APIClient
 
-from argus.auth.factories import SourceUserFactory, AdminUserFactory
+from argus.auth.factories import AdminUserFactory, SourceUserFactory
 from argus.incident.factories import SourceSystemFactory, SourceSystemTypeFactory
 
 

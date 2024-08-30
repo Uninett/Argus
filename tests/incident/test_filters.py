@@ -1,12 +1,11 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
 from unittest.mock import Mock
 
-from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils import timezone
-from django.utils.timezone import is_aware, make_aware
 
 from argus.auth.factories import PersonUserFactory, SourceUserFactory
+from argus.filter.factories import FilterFactory
 from argus.incident.factories import (
     SourceSystemFactory,
     SourceSystemTypeFactory,
@@ -14,12 +13,16 @@ from argus.incident.factories import (
     StatelessIncidentFactory,
     TagFactory,
 )
-from argus.incident.models import Incident, IncidentTagRelation, SourceSystem, get_or_create_default_instances
+from argus.incident.models import (
+    Incident,
+    IncidentTagRelation,
+    SourceSystem,
+    get_or_create_default_instances,
+)
 from argus.incident.views import IncidentFilter
-from argus.filter.factories import FilterFactory
 from argus.notificationprofile.factories import NotificationProfileFactory
 from argus.notificationprofile.models import Filter, NotificationProfile
-from argus.util.testing import disconnect_signals, connect_signals
+from argus.util.testing import connect_signals, disconnect_signals
 
 
 class IncidentBasedAPITestCaseHelper:
@@ -119,7 +122,7 @@ class IncidentFilterTestCase(IncidentBasedAPITestCaseHelper, TestCase):
         for incident in (self.incident1, self.incident2, self.incident3):
             IncidentTagRelation.objects.get_or_create(tag=tag1, incident=incident, added_by=user)
         for incident in (self.incident3, self.incident4, incident5):
-            IncidentTagRelation.objects.get_or_create(tag=tag1, incident=incident, added_by=user)
+            IncidentTagRelation.objects.get_or_create(tag=tag2, incident=incident, added_by=user)
 
         qs = Incident.objects.order_by("pk")
 

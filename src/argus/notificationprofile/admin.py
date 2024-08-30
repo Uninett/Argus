@@ -2,7 +2,14 @@ from django.contrib import admin
 from django.db.models.functions import Concat
 from django.utils.html import format_html_join
 
-from .models import DestinationConfig, Filter, Media, NotificationProfile, TimeRecurrence, Timeslot
+from .models import (
+    DestinationConfig,
+    Filter,
+    Media,
+    NotificationProfile,
+    TimeRecurrence,
+    Timeslot,
+)
 
 
 @admin.action(description="Toggle activation for selected profiles")

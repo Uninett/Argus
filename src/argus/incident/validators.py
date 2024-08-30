@@ -1,6 +1,5 @@
-from django.core.validators import RegexValidator, _lazy_re_compile
 from django.core.exceptions import ValidationError
-
+from django.core.validators import RegexValidator, _lazy_re_compile
 
 __all__ = [
     "validate_lowercase",

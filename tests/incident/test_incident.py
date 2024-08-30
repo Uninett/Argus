@@ -3,11 +3,15 @@ from datetime import timedelta
 from django.test import TestCase
 from django.utils import timezone
 
-from argus.incident.factories import AcknowledgementFactory, EventFactory, StatefulIncidentFactory
-from argus.incident.models import Incident, Event
-from argus.incident.factories import SourceSystemFactory
+from argus.incident.factories import (
+    AcknowledgementFactory,
+    EventFactory,
+    SourceSystemFactory,
+    StatefulIncidentFactory,
+)
+from argus.incident.models import Event, Incident
 from argus.util import datetime_utils
-from argus.util.testing import disconnect_signals, connect_signals
+from argus.util.testing import connect_signals, disconnect_signals
 
 
 class CreateIncidentTests(TestCase):

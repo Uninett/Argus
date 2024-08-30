@@ -1,18 +1,22 @@
-from django.contrib.auth import logout
 from django.conf import settings
+from django.contrib.auth import logout
 from django.db import transaction
-
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import generics
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.exceptions import ValidationError
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import User
-from .serializers import BasicUserSerializer, EmptySerializer, RefreshTokenSerializer, UserSerializer
+from .serializers import (
+    BasicUserSerializer,
+    EmptySerializer,
+    RefreshTokenSerializer,
+    UserSerializer,
+)
 from .utils import get_authentication_backend_name_and_type
 
 

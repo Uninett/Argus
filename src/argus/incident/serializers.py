@@ -1,16 +1,15 @@
-from copy import deepcopy
 from collections import OrderedDict
-from typing import List, Tuple, Any, Dict
+from typing import List, Tuple
 
 from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
 from django.utils import timezone
-
 from rest_framework import serializers
 
 from argus.auth.models import User
 from argus.auth.serializers import UsernameSerializer
 from argus.util.datetime_utils import INFINITY_REPR
+
 from . import fields
 from .models import (
     Acknowledgement,
@@ -52,7 +51,7 @@ class TagSerializer(serializers.Serializer):
     tag = serializers.CharField()
 
     def to_internal_value(self, data: dict):
-        if not "tag" in data:
+        if "tag" not in data:
             raise serializers.ValidationError('Tags need to follow the format {"tag": key=value}')
 
         key, value = clean_tag(data.pop("tag"))
@@ -81,7 +80,7 @@ class IncidentTagRelationSerializer(serializers.ModelSerializer):
         return Tag.objects.create(key=key, value=value, **validated_data)
 
     def to_internal_value(self, data: dict):
-        if not "tag" in data:
+        if "tag" not in data:
             raise serializers.ValidationError('Tags need to follow the format {"tag": key=value}')
 
         key, value = clean_tag(data.pop("tag"))
@@ -341,7 +340,7 @@ class UpdateAcknowledgementSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         now = self.__class__._later_than_func()
         if instance.expiration and instance.expiration < now:  # expired are readonly
-            raise serializers.ValidationError(f"Cannot change expired Acknowledgement")
+            raise serializers.ValidationError("Cannot change expired Acknowledgement")
         expiration = validated_data.get("expiration")
         instance.expiration = expiration
         instance.save()

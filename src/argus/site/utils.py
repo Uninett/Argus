@@ -1,7 +1,6 @@
 # nothing that imports models here!
 from copy import deepcopy
 
-from django.conf import settings
 from django.urls import include, path
 
 

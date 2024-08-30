@@ -1,10 +1,8 @@
 from django.urls import path
-
 from rest_framework import routers
 
-from . import views as views_V1
 from .. import views
-
+from . import views as views_V1
 
 router = routers.SimpleRouter()
 router.register(r"sources", views.SourceSystemViewSet)

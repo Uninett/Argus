@@ -3,7 +3,10 @@ from rest_framework import status
 from rest_framework.test import APIClient, APIRequestFactory, APITestCase
 
 from argus.auth.factories import PersonUserFactory
-from argus.notificationprofile.factories import DestinationConfigFactory, NotificationProfileFactory
+from argus.notificationprofile.factories import (
+    DestinationConfigFactory,
+    NotificationProfileFactory,
+)
 from argus.notificationprofile.media.sms_as_email import SMSNotification
 from argus.notificationprofile.models import DestinationConfig, Media
 from argus.notificationprofile.serializers import RequestDestinationConfigSerializer
@@ -198,12 +201,12 @@ class SMSMediumViewTests(APITestCase):
             }
         }
 
-        response = self.user1_rest_client.get(path=f"/api/v2/notificationprofiles/media/sms/json_schema/")
+        response = self.user1_rest_client.get(path="/api/v2/notificationprofiles/media/sms/json_schema/")
         self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
         self.assertEqual(response.data, schema)
 
     def test_should_get_sms_medium(self):
-        response = self.user1_rest_client.get(path=f"/api/v2/notificationprofiles/media/sms/")
+        response = self.user1_rest_client.get(path="/api/v2/notificationprofiles/media/sms/")
         self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
         self.assertEqual(response.data["name"], "SMS")
 
