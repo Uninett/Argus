@@ -8,3 +8,5 @@ a3b18cfbf32a2f0e6a9c55ead043fea12a71883e
 17c099c3b99172f4f623f22ddc374abcf692ee5d
 # Re-run black with new version 24.8.0 @johannaengland 29/08/2024
 10dc8b7b612dddb042462718eea5b62f9d6455ea
+# Re-format files using isort @johannaengland 30/08/2024
+975ab295654ef926379c9cfaef2017e1367e4877
