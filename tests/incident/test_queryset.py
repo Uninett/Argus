@@ -92,9 +92,7 @@ class IncidentQuerySetUpdatingTestCase(TestCase):
     def test_create_events(self):
         qs = Incident.objects.filter(id__in=(self.incident3.id, self.incident4.id))
         qs.create_events(self.user, Event.Type.OTHER, description="foo")
-        result = set(
-            e.incident for e in Event.objects.filter(type=Event.Type.OTHER)
-        )
+        result = set(e.incident for e in Event.objects.filter(type=Event.Type.OTHER))
         self.assertEqual(result, set(qs.all()))
 
     @tag("bulk")
@@ -108,9 +106,7 @@ class IncidentQuerySetUpdatingTestCase(TestCase):
     def test_close_incidents(self):
         qs = Incident.objects.filter(id__in=(self.incident2.id, self.incident3.id))
         qs.close(self.user, description="Boo")
-        result = set(
-            e.incident for e in Event.objects.filter(type=Event.Type.CLOSE, description="Boo")
-        )
+        result = set(e.incident for e in Event.objects.filter(type=Event.Type.CLOSE, description="Boo"))
         self.assertEqual(result, set(qs.all()))
 
     @tag("bulk")
@@ -119,7 +115,5 @@ class IncidentQuerySetUpdatingTestCase(TestCase):
         self.incident3.set_closed(self.user)
         qs = Incident.objects.filter(id__in=(self.incident2.id, self.incident3.id))
         qs.reopen(self.user, description="Bar")
-        result = set(
-            e.incident for e in Event.objects.filter(type=Event.Type.REOPEN, description="Bar")
-        )
+        result = set(e.incident for e in Event.objects.filter(type=Event.Type.REOPEN, description="Bar"))
         self.assertEqual(result, set(qs.all()))
