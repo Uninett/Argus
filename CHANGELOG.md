@@ -8,6 +8,31 @@ This project uses [*towncrier*](https://towncrier.readthedocs.io/) and the chang
 
 <!-- towncrier release notes start -->
 
+## [1.22.0] - 2024-08-30
+
+
+### Changed
+
+- Refactored ticket creation code so the actual changing of the incident
+  happens only in one place. Also moved the actual autocreation magic to
+  utility functions (sans error-handling since that is response-type
+  dependent). Made bulk changes of tickets actually create the ChangeEvents so
+  that it behaves like other bulk actions and make it possible to get notified
+  of changed ticket urls.
+- Replace the setting `STATICFILES_STORAGE` with `STORAGES` to prepare for
+  running on newer Djangos. See NOTES for details.
+
+### Fixed
+
+- Hopefully there will be fewer spurious test-failures thanks to explicitly
+  creating the user connected to a sourcesystem. UniqueError, you won't be
+  missd.
+- Fixed broken link to dataporten authentication docs in README
+  ([#broken-dataporten-link](https://github.com/Uninett/Argus/issues/broken-dataporten-link))
+- Renamed 'docker-compose' to 'Docker Compose' in README
+  ([#update-readme-command-naming](https://github.com/Uninett/Argus/issues/update-readme-command-naming))
+
+
 ## [1.21.0] - 2024-08-20
 
 

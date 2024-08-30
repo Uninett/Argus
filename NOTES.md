@@ -3,6 +3,18 @@
 This file documents changes to Argus that are relevant for operations and
 end-users.
 
+## [1.22.0] - 2024-08-30
+
+There's a backwards incompatible change to prepare for the next Django LTS
+(5.2): The setting `STATICFILES_STORAGE` has been replaced with `STORAGES`. If
+`STATICFILES_STORAGE` has been changed from the provided default in
+a deployment, it will have to be updated. See `STORAGES["staticfiles"]` in for
+instance `argus.site.settings.base`.
+
+Changing ticket urls in bulk now sends out change events, behaving like other
+bulk changes. This means there will be an overall increase in events if bulk
+changing tickets is common.
+
 ## [1.21.0] - 2024-08-20
 
 The "description" field on Incident is now editable via API.
