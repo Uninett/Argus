@@ -8,6 +8,22 @@ This project uses [*towncrier*](https://towncrier.readthedocs.io/) and the chang
 
 <!-- towncrier release notes start -->
 
+## [1.21.0] - 2024-08-20
+
+
+### Changed
+
+- Make description editable
+  ([#811](https://github.com/Uninett/Argus/issues/811))
+
+
+## [1.20.1] - 2024-07-26
+
+### Fixed
+
+- `INCIDENT_LEVEL_CHOICES` was behaving oddly when debugging so it has been
+  made a proper immutable constant.
+
 ## [1.20.0] - 2024-07-25
 
 
@@ -49,8 +65,8 @@ moved to a new app, argus.filter
 ### Fixed
 
 - Removed one cause for spurious failures of tests
-- Show infinite end_time as 'Still open' instead of datetime representation in
-  email ([#793](https://github.com/Uninett/Argus/issues/793))
+- Show infinite `end_time` as 'Still open' instead of datetime representation
+  in email ([#793](https://github.com/Uninett/Argus/issues/793))
 - Temporarily hide DestinationConfig from User admin in order to allow updating
   Users again. Undo if Django starts allowing JSONFields in UniqueConstraints.
   ([#822](https://github.com/Uninett/Argus/issues/822))
