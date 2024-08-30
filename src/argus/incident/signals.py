@@ -6,7 +6,12 @@ from argus.notificationprofile.media import send_notifications_to_users
 from argus.notificationprofile.media import background_send_notification
 from argus.notificationprofile.media import send_notification
 from .models import (
-    Acknowledgement, ChangeEvent, Event, Incident, SourceSystem, Tag,
+    Acknowledgement,
+    ChangeEvent,
+    Event,
+    Incident,
+    SourceSystem,
+    Tag,
     get_or_create_default_instances,
 )
 

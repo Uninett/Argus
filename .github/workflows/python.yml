@@ -4,6 +4,8 @@ on:
   push:
     branches: master
   pull_request:
+  schedule: # Run daily at 08:00 CEST (06:00 UST)
+    - cron: '0 6 * * *'
 
 jobs:
   lint:
