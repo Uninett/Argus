@@ -2,9 +2,8 @@ import datetime
 
 from django.test import TestCase
 from django.utils import timezone
-
-from rest_framework.test import APIRequestFactory
 from rest_framework import serializers
+from rest_framework.test import APIRequestFactory
 
 from argus.auth.factories import PersonUserFactory
 from argus.incident.factories import IncidentTagRelationFactory, StatefulIncidentFactory
@@ -17,9 +16,12 @@ from argus.incident.serializers import (
     TagSerializer,
     UpdateAcknowledgementSerializer,
 )
-from argus.incident.V1.serializers import AcknowledgementSerializerV1, UpdateAcknowledgementSerializerV1
+from argus.incident.V1.serializers import (
+    AcknowledgementSerializerV1,
+    UpdateAcknowledgementSerializerV1,
+)
 from argus.util.datetime_utils import INFINITY_REPR
-from argus.util.testing import disconnect_signals, connect_signals
+from argus.util.testing import connect_signals, disconnect_signals
 
 
 class AcknowledgementSerializerV1Tests(TestCase):

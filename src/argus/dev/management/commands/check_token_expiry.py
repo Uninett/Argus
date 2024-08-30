@@ -7,10 +7,10 @@ from django.utils import timezone
 from rest_framework.authtoken.models import Token
 
 from argus.incident.models import (
-    create_token_expiry_incident,
-    get_or_create_default_instances,
     Incident,
     Tag,
+    create_token_expiry_incident,
+    get_or_create_default_instances,
 )
 
 

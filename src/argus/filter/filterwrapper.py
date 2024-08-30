@@ -1,12 +1,11 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Dict, Optional, Any, Tuple
+from typing import TYPE_CHECKING, Any, Dict, Optional, Tuple
 
 from django.conf import settings
 
 from argus.compat import StrEnum
-
 
 if TYPE_CHECKING:
     from argus.incident.models import Event, Incident

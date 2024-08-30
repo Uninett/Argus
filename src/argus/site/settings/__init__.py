@@ -10,7 +10,6 @@ from django.utils.module_loading import import_string
 
 from ._serializers import ListAppSetting
 
-
 __all__ = [
     "SETTINGS_DIR",
     "SITE_DIR",

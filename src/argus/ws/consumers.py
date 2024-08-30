@@ -3,6 +3,7 @@ from channels.generic.websocket import JsonWebsocketConsumer
 
 from argus.incident.models import Incident
 from argus.incident.serializers import IncidentSerializer
+
 from .models import SUBSCRIBED_OPEN_INCIDENTS
 
 

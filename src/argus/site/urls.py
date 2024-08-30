@@ -18,7 +18,6 @@ from django.conf import settings
 from django.contrib import admin
 from django.urls import include, path, re_path
 from django.views.generic.base import RedirectView
-
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from social_django.urls import extra
 
@@ -26,8 +25,7 @@ from argus.auth.views import AuthMethodListView
 from argus.dataporten import views as dataporten_views
 from argus.notificationprofile.views import SchemaView
 from argus.site.utils import get_urlpatterns_from_setting
-from argus.site.views import index, MetadataView
-
+from argus.site.views import MetadataView, index
 
 psa_urls = [
     # Overrides social_django's `complete` view

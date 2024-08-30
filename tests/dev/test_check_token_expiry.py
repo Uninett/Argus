@@ -1,18 +1,18 @@
 from datetime import datetime, timedelta
 from io import StringIO
-import pytz
 
+import pytz
 from django.conf import settings
 from django.core.management import call_command
 from django.test import TestCase
 from rest_framework.authtoken.models import Token
 
+from argus.auth.factories import SourceUserFactory
 from argus.dev.management.commands.check_token_expiry import (
     close_expiry_incidents_without_expiring_tokens,
     find_expiring_tokens,
     get_tokens_without_expiry_incident,
 )
-from argus.auth.factories import SourceUserFactory
 from argus.incident.factories import SourceSystemFactory
 from argus.incident.models import Incident, Tag, create_token_expiry_incident
 from argus.util.testing import connect_signals, disconnect_signals

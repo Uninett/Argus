@@ -1,6 +1,7 @@
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.views.generic import DetailView
+from drf_rw_serializers import viewsets as rw_viewsets
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
@@ -9,25 +10,24 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from rest_framework.views import APIView
-from drf_rw_serializers import viewsets as rw_viewsets
 
 from argus.drf.permissions import IsOwner
 from argus.filter import get_filter_backend
 from argus.incident.serializers import IncidentSerializer
 from argus.notificationprofile.media import api_safely_get_medium_object
 from argus.notificationprofile.media.base import NotificationMedium
+
 from .models import DestinationConfig, Filter, Media, NotificationProfile, Timeslot
 from .serializers import (
     DuplicateDestinationSerializer,
     JSONSchemaSerializer,
     MediaSerializer,
-    ResponseDestinationConfigSerializer,
     RequestDestinationConfigSerializer,
-    ResponseNotificationProfileSerializer,
     RequestNotificationProfileSerializer,
+    ResponseDestinationConfigSerializer,
+    ResponseNotificationProfileSerializer,
     TimeslotSerializer,
 )
-
 
 filter_backend = get_filter_backend()
 QuerySetFilter = filter_backend.QuerySetFilter

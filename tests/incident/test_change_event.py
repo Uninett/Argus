@@ -1,13 +1,12 @@
 from django.test import override_settings, tag
-
 from rest_framework import status
 from rest_framework.test import APITestCase
+
 from argus.incident.factories import StatefulIncidentFactory
-from argus.incident.models import Event, ChangeEvent
-from argus.util.testing import disconnect_signals, connect_signals
+from argus.incident.models import ChangeEvent, Event
+from argus.util.testing import connect_signals, disconnect_signals
 
 from . import IncidentBasedAPITestCaseHelper
-
 
 # format_description tests here, one for each outlier (now metadata), one for
 # the normal ones

@@ -3,8 +3,8 @@ from django.urls import reverse
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient, APITestCase
 
-from argus.auth.models import User
 from argus.auth.factories import AdminUserFactory
+from argus.auth.models import User
 from argus.incident.factories import SourceSystemTypeFactory
 from argus.incident.models import SourceSystem
 

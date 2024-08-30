@@ -1,9 +1,9 @@
 from argus.incident.factories import (
     IncidentTagRelationFactory,
-    StatelessIncidentFactory,
-    SourceSystemTypeFactory,
     SourceSystemFactory,
+    SourceSystemTypeFactory,
     SourceUserFactory,
+    StatelessIncidentFactory,
     TagFactory,
 )
 

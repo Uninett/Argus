@@ -5,6 +5,7 @@ from django.test import TestCase
 from django.utils import timezone
 
 from argus.auth.factories import PersonUserFactory, SourceUserFactory
+from argus.filter.factories import FilterFactory
 from argus.incident.factories import (
     SourceSystemFactory,
     SourceSystemTypeFactory,
@@ -12,12 +13,16 @@ from argus.incident.factories import (
     StatelessIncidentFactory,
     TagFactory,
 )
-from argus.incident.models import Incident, IncidentTagRelation, SourceSystem, get_or_create_default_instances
+from argus.incident.models import (
+    Incident,
+    IncidentTagRelation,
+    SourceSystem,
+    get_or_create_default_instances,
+)
 from argus.incident.views import IncidentFilter
-from argus.filter.factories import FilterFactory
 from argus.notificationprofile.factories import NotificationProfileFactory
 from argus.notificationprofile.models import Filter, NotificationProfile
-from argus.util.testing import disconnect_signals, connect_signals
+from argus.util.testing import connect_signals, disconnect_signals
 
 
 class IncidentBasedAPITestCaseHelper:

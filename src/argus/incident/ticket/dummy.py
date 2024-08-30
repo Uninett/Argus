@@ -8,8 +8,9 @@ Inspired by django.core.mail.outbox, see https://docs.djangoproject.com/en/4.2/t
 
 from __future__ import annotations
 
-from factory import Faker
 import logging
+
+from factory import Faker
 
 from .base import TicketPlugin
 

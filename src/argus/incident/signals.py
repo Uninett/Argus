@@ -1,9 +1,12 @@
 from django.db.models import Q
 from rest_framework.authtoken.models import Token
 
-from argus.notificationprofile.media import send_notifications_to_users
-from argus.notificationprofile.media import background_send_notification
-from argus.notificationprofile.media import send_notification
+from argus.notificationprofile.media import (
+    background_send_notification,
+    send_notification,
+    send_notifications_to_users,
+)
+
 from .models import (
     Acknowledgement,
     Event,
@@ -12,7 +15,6 @@ from .models import (
     Tag,
     get_or_create_default_instances,
 )
-
 
 __all__ = [
     "delete_associated_user",

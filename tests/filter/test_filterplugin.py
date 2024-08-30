@@ -1,4 +1,4 @@
-from django.test import override_settings, TestCase
+from django.test import TestCase, override_settings
 
 from argus.filter import get_filter_backend
 

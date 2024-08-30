@@ -4,7 +4,6 @@ from django.conf import settings
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 
-
 INFINITY_REPR = "infinity"
 NEGATIVE_INFINITY_REPR = f"-{INFINITY_REPR}"
 

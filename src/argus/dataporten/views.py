@@ -1,6 +1,5 @@
 from django.conf import settings
 from django.shortcuts import redirect
-
 from rest_framework.authtoken.models import Token
 from social_django import views as social_views
 

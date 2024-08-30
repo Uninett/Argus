@@ -1,20 +1,13 @@
 from django.utils import timezone
-
 from rest_framework import serializers
 
 from ..fields import DateTimeInfinitySerializerField
-from ..models import (
-    Acknowledgement,
-    Event,
-    Incident,
-    Tag,
-    IncidentTagRelation,
-)
+from ..models import Acknowledgement, Event, Incident, IncidentTagRelation, Tag
 from ..serializers import (
     EventSerializer,
     IncidentSerializer,
-    SourceSystemSerializer,
     IncidentTagRelationSerializer,
+    SourceSystemSerializer,
 )
 
 

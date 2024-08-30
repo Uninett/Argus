@@ -3,7 +3,6 @@ import factory
 from argus.auth.factories import PersonUserFactory
 from argus.notificationprofile import models
 
-
 __all__ = [
     "FilterFactory",
 ]

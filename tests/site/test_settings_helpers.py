@@ -2,9 +2,12 @@ import unittest
 
 from django.urls.resolvers import URLResolver
 
-from argus.site.settings import normalize_url, _add_missing_scheme_to_url
+from argus.site.settings import _add_missing_scheme_to_url, normalize_url
 from argus.site.settings._serializers import AppSetting
-from argus.site.utils import get_urlpatterns_from_setting, update_context_processors_list
+from argus.site.utils import (
+    get_urlpatterns_from_setting,
+    update_context_processors_list,
+)
 
 
 class NormalizeUrlTests(unittest.TestCase):

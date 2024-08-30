@@ -3,7 +3,6 @@ from django.core.checks import Warning
 
 from argus.filter import get_filter_backend
 
-
 filter_backend = get_filter_backend()
 validate_jsonfilter = filter_backend.validate_jsonfilter
 

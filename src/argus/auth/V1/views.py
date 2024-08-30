@@ -8,7 +8,12 @@ from rest_framework.views import APIView
 from argus.drf.permissions import IsOwner
 from argus.notificationprofile.models import DestinationConfig
 from argus.notificationprofile.serializers import RequestDestinationConfigSerializer
-from .serializers import RequestPhoneNumberSerializerV1, ResponsePhoneNumberSerializerV1, UserSerializerV1
+
+from .serializers import (
+    RequestPhoneNumberSerializerV1,
+    ResponsePhoneNumberSerializerV1,
+    UserSerializerV1,
+)
 
 
 class CurrentUserViewV1(APIView):

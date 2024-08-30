@@ -1,8 +1,7 @@
 from django.test import TestCase
 
-
 from argus.incident.models import IncidentTagRelation, create_fake_incident
-from argus.util.testing import disconnect_signals, connect_signals
+from argus.util.testing import connect_signals, disconnect_signals
 
 
 class EventViewSetTestCase(TestCase):

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from argus.filter.filterwrapper import FilterWrapper, FilterBlobType
+from argus.filter.filterwrapper import FilterBlobType, FilterWrapper
 from argus.incident.models import Incident
 
 if TYPE_CHECKING:

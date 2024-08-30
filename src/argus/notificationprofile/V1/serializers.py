@@ -3,6 +3,7 @@ from typing import List
 from rest_framework import fields, serializers
 
 from argus.filter.V1.serializers import FilterSerializerV1
+
 from ..models import DestinationConfig, NotificationProfile
 from ..serializers import TimeslotSerializer
 

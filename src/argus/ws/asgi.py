@@ -17,12 +17,12 @@ from django.urls import path
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "argus.site.settings.dev")
 
 django_http = get_asgi_application()  # Sets up Django. DO NOT REORDER
-from .consumers import OpenIncidentConsumer
+from channels.auth import AuthMiddlewareStack
 
 # MAGIC! DO NOT MOVE THESE BEFORE ANY OTHER IMPORT
 from channels.routing import ProtocolTypeRouter, URLRouter
-from channels.auth import AuthMiddlewareStack
 
+from .consumers import OpenIncidentConsumer
 
 application = ProtocolTypeRouter({
     "http": django_http,

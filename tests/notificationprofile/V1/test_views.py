@@ -1,24 +1,12 @@
 import json
 
 from django.test import tag
-
 from rest_framework import status
-from rest_framework.test import APITestCase
-from rest_framework.test import APIClient
+from rest_framework.test import APIClient, APITestCase
 
+from argus.auth.factories import PersonUserFactory, SourceUserFactory
 from argus.filter.factories import FilterFactory
 from argus.filter.queryset_filters import QuerySetFilter
-from argus.notificationprofile.factories import (
-    DestinationConfigFactory,
-    NotificationProfileFactory,
-    TimeslotFactory,
-)
-from argus.notificationprofile.models import (
-    Media,
-    NotificationProfile,
-    Filter,
-    Timeslot,
-)
 from argus.incident.factories import (
     IncidentTagRelationFactory,
     SourceSystemFactory,
@@ -26,8 +14,18 @@ from argus.incident.factories import (
     StatelessIncidentFactory,
     TagFactory,
 )
-from argus.auth.factories import PersonUserFactory, SourceUserFactory
-from argus.util.testing import disconnect_signals, connect_signals
+from argus.notificationprofile.factories import (
+    DestinationConfigFactory,
+    NotificationProfileFactory,
+    TimeslotFactory,
+)
+from argus.notificationprofile.models import (
+    Filter,
+    Media,
+    NotificationProfile,
+    Timeslot,
+)
+from argus.util.testing import connect_signals, disconnect_signals
 
 
 @tag("API", "integration")

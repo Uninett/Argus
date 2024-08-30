@@ -28,8 +28,11 @@ if TYPE_CHECKING:
         from collections.abc import Iterable
 
     from typing import Set
+
     from django.db.models.query import QuerySet
+
     from argus.auth.models import User
+
     from ..models import DestinationConfig
     from ..serializers import RequestDestinationConfigSerializer
 

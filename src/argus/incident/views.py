@@ -5,15 +5,22 @@ from urllib.parse import urljoin
 from django.conf import settings
 from django.db import IntegrityError
 from django.utils import timezone
-
 from django_filters import rest_framework as filters
-from rest_framework.filters import SearchFilter
 from drf_rw_serializers import viewsets as rw_viewsets
-from drf_spectacular.utils import extend_schema, extend_schema_view
-from drf_spectacular.utils import OpenApiParameter, OpenApiResponse
+from drf_spectacular.utils import (
+    OpenApiParameter,
+    OpenApiResponse,
+    extend_schema,
+    extend_schema_view,
+)
 from rest_framework import mixins, serializers, status, viewsets
 from rest_framework.decorators import action
-from rest_framework.exceptions import ValidationError, PermissionDenied, MethodNotAllowed
+from rest_framework.exceptions import (
+    MethodNotAllowed,
+    PermissionDenied,
+    ValidationError,
+)
+from rest_framework.filters import SearchFilter
 from rest_framework.generics import get_object_or_404
 from rest_framework.pagination import CursorPagination
 from rest_framework.permissions import IsAuthenticated
@@ -22,13 +29,13 @@ from rest_framework.reverse import reverse
 
 from argus.auth.models import User
 from argus.drf.permissions import IsSuperuserOrReadOnly
+from argus.filter import get_filter_backend
 from argus.incident.ticket.base import (
     TicketClientException,
     TicketCreationException,
     TicketPluginException,
     TicketSettingsException,
 )
-from argus.filter import get_filter_backend
 from argus.util.datetime_utils import INFINITY_REPR
 from argus.util.signals import bulk_changed
 from argus.util.utils import import_class_from_dotted_path
@@ -44,11 +51,11 @@ from .models import (
     Tag,
 )
 from .serializers import (
-    UpdateAcknowledgementSerializer,
     EmptySerializer,
     EventSerializer,
     IncidentPureDeserializer,
     IncidentSerializer,
+    IncidentTagRelation,
     IncidentTicketUrlSerializer,
     RequestAcknowledgementSerializer,
     RequestBulkAcknowledgementSerializer,
@@ -59,7 +66,7 @@ from .serializers import (
     SourceSystemSerializer,
     SourceSystemTypeSerializer,
     TagSerializer,
-    IncidentTagRelation,
+    UpdateAcknowledgementSerializer,
 )
 
 filter_backend = get_filter_backend()

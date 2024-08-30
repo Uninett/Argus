@@ -4,8 +4,8 @@ import pytz
 
 from argus.auth.factories import SourceUserFactory
 from argus.util.datetime_utils import INFINITY_REPR
-from . import models
 
+from . import models
 
 __all__ = [
     "SourceSystemTypeFactory",

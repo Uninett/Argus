@@ -1,7 +1,6 @@
 from django.conf import settings
 from django.contrib.auth.backends import ModelBackend
 from django.utils.module_loading import import_string
-
 from rest_framework.reverse import reverse
 from social_core.backends.base import BaseAuth
 from social_core.backends.oauth import BaseOAuth2

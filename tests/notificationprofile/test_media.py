@@ -3,14 +3,20 @@ from django.test import TestCase, override_settings
 from argus.auth.factories import PersonUserFactory
 from argus.filter.factories import FilterFactory
 from argus.incident.factories import EventFactory
-from argus.incident.models import create_fake_incident, get_or_create_default_instances, Event
+from argus.incident.models import (
+    Event,
+    create_fake_incident,
+    get_or_create_default_instances,
+)
 from argus.notificationprofile import factories
-from argus.notificationprofile.media import find_destinations_for_event
-from argus.notificationprofile.media import find_destinations_for_many_events
-from argus.notificationprofile.media import get_notification_media
+from argus.notificationprofile.media import (
+    find_destinations_for_event,
+    find_destinations_for_many_events,
+    get_notification_media,
+)
 from argus.notificationprofile.media.email import modelinstance_to_dict
 from argus.notificationprofile.models import Media
-from argus.util.testing import disconnect_signals, connect_signals
+from argus.util.testing import connect_signals, disconnect_signals
 
 
 class SerializeModelTest(TestCase):

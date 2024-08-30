@@ -1,7 +1,6 @@
 from django.test import TestCase
 
-from argus.dev.utils import StressTester, DatabaseMismatchError
-
+from argus.dev.utils import DatabaseMismatchError, StressTester
 from argus.util.testing import connect_signals, disconnect_signals
 
 

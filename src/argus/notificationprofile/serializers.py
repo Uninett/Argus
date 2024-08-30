@@ -1,8 +1,15 @@
 from rest_framework import fields, serializers
 
 from argus.filter import get_filter_backend
+
 from .media import api_safely_get_medium_object
-from .models import DestinationConfig, Media, NotificationProfile, TimeRecurrence, Timeslot
+from .models import (
+    DestinationConfig,
+    Media,
+    NotificationProfile,
+    TimeRecurrence,
+    Timeslot,
+)
 
 filter_backend = get_filter_backend()
 FilterSerializer = filter_backend.FilterSerializer

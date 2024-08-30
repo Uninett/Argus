@@ -1,8 +1,7 @@
-from httpx import TimeoutException, HTTPStatusError, HTTPError
-
 from django.core.management.base import BaseCommand
+from httpx import HTTPError, HTTPStatusError, TimeoutException
 
-from argus.dev.utils import StressTester, DatabaseMismatchError
+from argus.dev.utils import DatabaseMismatchError, StressTester
 
 
 class Command(BaseCommand):

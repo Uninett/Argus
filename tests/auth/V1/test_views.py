@@ -1,12 +1,11 @@
 from django.test import tag
-
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
 from argus.auth.factories import AdminUserFactory, BaseUserFactory
 from argus.notificationprofile.factories import DestinationConfigFactory
 from argus.notificationprofile.models import DestinationConfig, Media
-from argus.util.testing import disconnect_signals, connect_signals
+from argus.util.testing import connect_signals, disconnect_signals
 
 
 @tag("API", "integration")

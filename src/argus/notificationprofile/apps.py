@@ -1,5 +1,5 @@
 from django.apps import AppConfig
-from django.db.models.signals import post_save, post_migrate
+from django.db.models.signals import post_migrate, post_save
 
 
 class NotificationprofileConfig(AppConfig):
@@ -8,11 +8,7 @@ class NotificationprofileConfig(AppConfig):
 
     def ready(self):
         # Signals
-        from .signals import (
-            create_default_timeslot,
-            sync_email_destination,
-            sync_media,
-        )
+        from .signals import create_default_timeslot, sync_email_destination, sync_media
 
         post_save.connect(create_default_timeslot, "argus_auth.User")
         post_save.connect(sync_email_destination, "argus_auth.User")

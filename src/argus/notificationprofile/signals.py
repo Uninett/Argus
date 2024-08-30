@@ -2,8 +2,8 @@ import logging
 
 from django.db.utils import ProgrammingError
 
-
 from argus.auth.models import User
+
 from .models import DestinationConfig, TimeRecurrence, Timeslot
 
 LOG = logging.getLogger(__name__)

@@ -1,9 +1,8 @@
 import datetime
 
+from django.test import RequestFactory, TestCase, override_settings, tag
 from django.urls import reverse
 from django.utils.timezone import now
-from django.test import TestCase, RequestFactory, override_settings, tag
-
 from rest_framework import serializers, status, versioning
 from rest_framework.test import APITestCase
 
@@ -18,8 +17,8 @@ from argus.incident.factories import (
     AcknowledgementFactory,
     EventFactory,
     IncidentTagRelationFactory,
-    SourceSystemTypeFactory,
     SourceSystemFactory,
+    SourceSystemTypeFactory,
     StatefulIncidentFactory,
     StatelessIncidentFactory,
     TagFactory,
@@ -35,7 +34,7 @@ from argus.incident.models import (
 )
 from argus.incident.views import EventViewSet
 from argus.notificationprofile.models import Filter
-from argus.util.testing import disconnect_signals, connect_signals
+from argus.util.testing import connect_signals, disconnect_signals
 
 
 def add_open_incident_with_start_event_and_tag(source, description="incident"):

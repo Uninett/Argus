@@ -2,7 +2,6 @@ import importlib
 
 from django.conf import settings
 
-
 DEFAULT_BACKEND = "argus.filter.default"
 
 

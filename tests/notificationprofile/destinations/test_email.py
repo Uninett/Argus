@@ -3,7 +3,11 @@ from rest_framework import status
 from rest_framework.test import APIClient, APIRequestFactory, APITestCase
 
 from argus.auth.factories import PersonUserFactory
-from argus.notificationprofile.factories import DestinationConfigFactory, NotificationProfileFactory, TimeslotFactory
+from argus.notificationprofile.factories import (
+    DestinationConfigFactory,
+    NotificationProfileFactory,
+    TimeslotFactory,
+)
 from argus.notificationprofile.media.email import EmailNotification
 from argus.notificationprofile.models import DestinationConfig, Media
 from argus.notificationprofile.serializers import RequestDestinationConfigSerializer

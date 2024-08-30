@@ -5,10 +5,11 @@ from django.test import TestCase
 from django.utils import timezone
 from django.utils.timezone import is_aware, make_aware
 
-from argus.util.utils import duplicate
-from argus.util.testing import disconnect_signals, connect_signals
 from argus.incident.fields import KeyValueField
 from argus.incident.models import Incident
+from argus.util.testing import connect_signals, disconnect_signals
+from argus.util.utils import duplicate
+
 from . import IncidentBasedAPITestCaseHelper
 
 

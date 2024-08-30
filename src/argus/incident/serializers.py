@@ -4,12 +4,12 @@ from typing import List, Tuple
 from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
 from django.utils import timezone
-
 from rest_framework import serializers
 
 from argus.auth.models import User
 from argus.auth.serializers import UsernameSerializer
 from argus.util.datetime_utils import INFINITY_REPR
+
 from . import fields
 from .models import (
     Acknowledgement,

@@ -1,8 +1,8 @@
 from django.contrib.admin.sites import AdminSite
 from django.test import TestCase
 
-from argus.incident.factories import StatefulIncidentFactory, SourceSystemFactory
 from argus.incident.admin import IncidentAdmin
+from argus.incident.factories import SourceSystemFactory, StatefulIncidentFactory
 
 
 class IncidentDetailsUrlTestCase(TestCase):

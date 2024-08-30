@@ -12,10 +12,13 @@ if TYPE_CHECKING:
         from collections.abc import Iterable
 
     from types import NoneType
-    from typing import Union, Set
+    from typing import Set, Union
+
     from django.db.models.query import QuerySet
+
     from argus.auth.models import User
     from argus.incident.models import Event
+
     from ..models import DestinationConfig
     from ..serializers import RequestDestinationConfigSerializer
 

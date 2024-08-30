@@ -1,7 +1,9 @@
-from rest_framework import serializers
 from typing import List
 
+from rest_framework import serializers
+
 from argus.notificationprofile.models import DestinationConfig
+
 from ..models import User
 
 

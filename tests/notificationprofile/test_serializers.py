@@ -1,9 +1,8 @@
-from collections import OrderedDict
 import datetime
+from collections import OrderedDict
 
 from django.db import IntegrityError
-from django.test import tag, TestCase
-
+from django.test import TestCase, tag
 from rest_framework.test import APIRequestFactory
 
 from argus.auth.factories import PersonUserFactory
