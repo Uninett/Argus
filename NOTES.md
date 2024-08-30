@@ -3,6 +3,16 @@
 This file documents changes to Argus that are relevant for operations and
 end-users.
 
+## [1.21.0] - 2024-08-20
+
+The "description" field on Incident is now editable via API.
+
+## [1.20.0] - 2024-07-25
+
+This moved around *a lot* of code in order to allow swapping out the filtering
+system. The Filter-model is still used but the bits that uses the contents of
+Filter.filter is independent of the model.
+
 ## [1.19.2] - 2024-05-28
 
 Optimization of API Incident PUT/PATCH.
