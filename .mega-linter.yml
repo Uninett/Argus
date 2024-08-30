@@ -1,6 +1,8 @@
 # All available variables are described in documentation
 # https://megalinter.io/configuration/
 
+FILTER_REGEX_EXCLUDE: "migrations"
+
 LINTER_RULES_PATH: .
 
 ENABLE_LINTERS:
