@@ -5,7 +5,8 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     {% block title %}<title>Argus Server: {{ page_title }}</title>{% endblock %}
-
+    <!-- HTMX -->
+    <script src="{% static "htmx-2.0.2.min.js" %}"></script>
     <link rel="stylesheet" href="{% static path_to_stylesheet|default:"styles.css" %}">
 
     {% block head %}
