@@ -41,16 +41,13 @@
                                     {{ request.user|make_list|first }}
                                 </span>
                             </summary>
-                            <ul class="menu menu-sm dropdown-content bg-base-200 text-base-content rounded-box z-[1] mt-3 w-52 p-2 shadow">
+                            <ul class="menu menu-md dropdown-content bg-base-200 text-base-content rounded-box z-[1] mt-3 w-52 p-2 shadow max-h-svh">
                                 <li class="menu-title">
                                     Logged in as: <span class="text-info">{{ request.user }}</span>
                                     <div class="divider divider-secondary my-0"></div>
                                 </li>
                                 <li>
-                                    <a class="justify-between" href="{% url 'htmx:theme-list' %}">
-                                        Theme
-                                        <span class="badge badge-primary">{{ theme }}</span>
-                                    </a>
+                                    {% include 'htmx/themes/theme_dropdown.html' %}
                                 </li>
                                 <li>
                                     <form class="flex" action="{% url "htmx:logout" %}" method="POST">
