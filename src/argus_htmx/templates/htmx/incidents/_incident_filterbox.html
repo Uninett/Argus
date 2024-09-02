@@ -16,6 +16,15 @@
                         <span class="label-text">{{ field.label }}</span>
                         {% if field|field_type == "booleanfield" %}
                             {{ field|add_class:"checkbox checkbox-accent border" }}
+                        {% elif field.name == "maxlevel" %}
+                            <div>
+                                {{ field|add_class:"range range-primary range-xs" }}
+                                <div class="flex w-full justify-between px-2 text-xs">
+                                    {% for tick in "12345" %}
+                                    <span>{{ tick }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
                         {% elif field|field_type == "choicefield" %}
                             {{ field|add_class:"select select-accent border" }}
                         {% elif field|field_type == "multiplechoicefield" %}

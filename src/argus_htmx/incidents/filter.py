@@ -1,7 +1,7 @@
 from django import forms
 
 from argus.filter import get_filter_backend
-from argus.incident.constants import INCIDENT_LEVEL_CHOICES, MAX_INCIDENT_LEVEL
+from argus.incident.constants import MAX_INCIDENT_LEVEL
 from argus.incident.models import SourceSystem
 
 
@@ -18,8 +18,10 @@ class IncidentFilterForm(forms.Form):
         choices=tuple(SourceSystem.objects.values_list("id", "name")),
         required=False,
     )
-    maxlevel = forms.ChoiceField(
-        choices=INCIDENT_LEVEL_CHOICES,
+    maxlevel = forms.IntegerField(
+        widget=forms.NumberInput(attrs={
+            'type': 'range', 'step': '1', 'min': '1', 'max': MAX_INCIDENT_LEVEL
+        }),
         label="Level <=",
         initial=MAX_INCIDENT_LEVEL,
         required=False,
