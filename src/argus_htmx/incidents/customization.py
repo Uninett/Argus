@@ -37,7 +37,7 @@ _BUILTIN_COLUMN_LIST = [
     ),
     IncidentTableColumn("id", "ID", "htmx/incidents/_incident_pk.html"),
     IncidentTableColumn(
-        "start_time", "Timestamp", "htmx/incidents/_incident_start_time.html"
+        "start_time", "Timestamp", "htmx/incidents/_incident_start_time.html", "htmx/incidents/_incident_start_time_header.html"
     ),
     IncidentTableColumn("status", "Status", "htmx/incidents/_incident_status.html"),
     IncidentTableColumn(
