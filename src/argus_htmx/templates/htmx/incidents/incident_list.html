@@ -2,7 +2,14 @@
 
 {% block main %}
     <section>
-        {% include "htmx/incidents/_incidents_menubar.html" %}
+        {% if incidents_extra_widget %}
+        <div class="flex">
+            <div class="w-2/3">{% include "htmx/incidents/_incidents_menubar.html" %}</div>
+            <div class="w-1/3 ml-2">{% include incidents_extra_widget %}</div>
+        </div>
+        {% else %}
+            {% include "htmx/incidents/_incidents_menubar.html" %}
+        {% endif %}
     </section>
 
     <section class="overflow-x-auto">

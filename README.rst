@@ -238,3 +238,23 @@ For inbuilt support for other types of columns see the howtos in `the local docs
 .. _list of daisyUI color names: https://daisyui.com/docs/colors/#-2
 .. _tailwind-cli-extra: https://github.com/dobicinaitis/tailwind-cli-extra
 .. _Tailwind CSS theme customization: https://tailwindcss.com/docs/theme
+
+Custom widget
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Argus supports showing an extra widget next to the menubar in the incidents listing. This box can
+take the width of 1/3 of the window. You can add widget by creating a context processor that
+injects a ``incidents_extra_widget`` variable that points to a html template::
+
+    def extra_widget(request):
+        return {
+            "incidents_extra_widget": "path/to/_extra_widget.html",
+        }
+
+*note* don't forget to include the context processor in your settings
+
+You could then create ``path/to/_extra_widget.html`` as following::
+
+    <div id="service-status" class="border border-primary rounded-2xl h-full p-2">
+      My custom widget
+    </div>
