@@ -6,6 +6,7 @@ from datetime import datetime
 
 from django.contrib.auth.models import Group
 from django.contrib.auth import get_user_model
+from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import redirect, render, get_object_or_404
 from django.urls import reverse
@@ -20,7 +21,7 @@ from argus.util.datetime_utils import make_aware
 
 from .customization import get_incident_table_columns
 from .utils import get_filter_function
-from .forms import AckForm
+from .forms import AckForm, DescriptionOptionalForm
 
 
 User = get_user_model()
@@ -57,6 +58,8 @@ def incident_detail(request, pk: int):
     incident = get_object_or_404(Incident, id=pk)
     action_endpoints = {
         "ack": reverse("htmx:incident-detail-add-ack", kwargs={"pk": pk}),
+        "close": reverse("htmx:incident-detail-close", kwargs={"pk": pk}),
+        "reopen": reverse("htmx:incident-detail-reopen", kwargs={"pk": pk}),
     }
     context = {
         "incident": incident,
@@ -103,6 +106,40 @@ def incident_add_ack(request, pk: int, group: Optional[str] = None):
 def incident_detail_add_ack(request, pk: int, group: Optional[str] = None):
     formdata = request.POST or None
     _incident_add_ack(pk, formdata, request.user, group)
+    return redirect("htmx:incident-detail", pk=pk)
+
+
+@require_POST
+def incident_detail_close(request, pk: int):
+    incident = get_object_or_404(Incident, id=pk)
+    if not incident.stateful:
+        LOG.warning(f"Attempt at closing the uncloseable {incident}")
+        messages.warning(request, f"Did not close {incident}, stateless incidents cannot be closed.")
+        return redirect("htmx:incident-detail", pk=pk)
+    form = DescriptionOptionalForm(request.POST or None)
+    if form.is_valid():
+        incident.set_closed(
+            request.user,
+            description=form.cleaned_data.get("description", ""),
+        )
+        LOG.info(f"{{ incident }} manually closed by {{ request.user }}")
+    return redirect("htmx:incident-detail", pk=pk)
+
+
+@require_POST
+def incident_detail_reopen(request, pk: int):
+    incident = get_object_or_404(Incident, id=pk)
+    if not incident.stateful:
+        LOG.warning(f"Attempt at reopening the unopenable {incident}")
+        messages.warning(request, f"Did not reopen {incident}, stateless incidents cannot be reopened.")
+        return redirect("htmx:incident-detail", pk=pk)
+    form = DescriptionOptionalForm(request.POST or None)
+    if form.is_valid():
+        incident.set_open(
+            request.user,
+            description=form.cleaned_data.get("description", ""),
+        )
+        LOG.info(f"{{ incident }} manually reopened by {{ request.user }}")
     return redirect("htmx:incident-detail", pk=pk)
 
 
