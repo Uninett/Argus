@@ -36,7 +36,12 @@ Do this in your workdir, which could be the checked out `argus-server`_ repo.
 Django-style
 ~~~~~~~~~~~~
 
-In your local settings that star-imports from an `argus-server`_ settings file::
+This assumes that you have a local settings file (we recommend calling it
+"localsettings.py" since that is hidden by .gitignore) as a sibling of
+``src/``.
+
+In this local settings file (that star-imports from an `argus-server`_ settings
+file) at minimum add::
 
     INSTALLED_APPS += [
         "django_htmx",
@@ -44,14 +49,37 @@ In your local settings that star-imports from an `argus-server`_ settings file::
         "widget_tweaks",
     ]
     ROOT_URLCONF = "urls"
-    MIDDLEWARE += ["django_htmx.middleware.HtmxMiddleware"]
+    MIDDLEWARE += [
+        "django_htmx.middleware.HtmxMiddleware",
+        "argus_htmx.middleware.LoginRequiredMiddleware",
+    ]
+    LOGIN_URL = "/accounts/login"
+    LOGIN_REDIRECT_URL = "/incidents/"
+    PUBLIC_URLS = [
+        "/accounts/login/",
+        "/api/",
+    ]
+    TEMPLATES = [
+        {
+            "BACKEND": "django.template.backends.django.DjangoTemplates",
+            "DIRS": [str(SITE_DIR / "templates")],
+            "APP_DIRS": True,
+            "OPTIONS": {
+                "debug": get_bool_env("TEMPLATE_DEBUG", False),
+                "context_processors": [
+                    "django.template.context_processors.debug",
+                    "django.template.context_processors.request",
+                    "django.contrib.auth.context_processors.auth",
+                    "django.contrib.messages.context_processors.messages",
+                    "social_django.context_processors.backends",
+                    "social_django.context_processors.login_redirect",
+                    "argus_htmx.context_processors.theme_via_session",
+                ],
+            },
+        }
+    ]
 
-In the same file, add a copy of the entirety of ``TEMPLATES``. Choose one of
-the functions in ``argus_htmx.context_processors``. In the entry for
-``django.template.backends.django.DjangoTemplates``, append the full dotted
-path to the end of the ``context_processors`` list.
-
-Next to ``localsettings.py`` create an ``urls.py`` containing::
+As a sibling to ``localsettings.py`` create an ``urls.py`` containing::
 
    from django.urls import path, include
 
@@ -64,16 +92,57 @@ Next to ``localsettings.py`` create an ``urls.py`` containing::
 With EXTRA_APPS
 ~~~~~~~~~~~~~~~
 
-Choose one of the functions in ``argus_htmx.context_processors``, exemplified
-by "theme_via_GET" below.
+It is necessary to override some settings.
 
-In your environment variables::
+In for instance your ``localsettings.py``, add::
 
-    ARGUS_EXTRA_APPS = '[{"app_name": "django_htmx"}, {"app_name": "argus_htmx", "urls": {"path": "", "urlpatterns_module": "argus_htmx.urls"}, "context_processors": ["argus_htmx.context_processor.theme_via_GET"]}, {"app_name": "widget_tweaks"}]'
+    LOGIN_URL = "/accounts/login"
+    LOGIN_REDIRECT_URL = "/incidents/"
+    PUBLIC_URLS = [
+        "/accounts/login/",
+        "/api/",
+    ]
 
-In your local settings that star-imports from an `argus-server`_ settings file::
+If you use a shell script to control ``manage.py``, add the following
+environment variable::
 
-    MIDDLEWARE += ["django_htmx.middleware.HtmxMiddleware"]
+    export ARGUS_EXTRA_APPS=`cat extra.json`
+
+In the file ``extra.json``, (which can be syntax checked with for instance
+``jq``), a sibling to ``localsettings.py``::
+
+    [
+      {
+        "app_name": "django_htmx",
+        "middleware": {
+          "django_htmx.middleware.HtmxMiddleware": "end"
+        }
+      },
+      {
+        "app_name": "argus_htmx",
+        "urls": {
+          "path": "",
+          "urlpatterns_module": "argus_htmx.urls"
+        },
+        "context_processors": [
+          "argus_htmx.context_processors.theme_via_session"
+        ],
+        "middleware": {
+          "argus_htmx.middleware.LoginRequiredMiddleware": "end"
+        }
+      },
+      {
+        "app_name": "template_partials"
+      },
+      {"app_name": "widget_tweaks"},
+      {
+        "app_name": "debug_toolbar",
+        "urls": {
+          "path": "__debug__/",
+          "urlpatterns_module": "debug_toolbar.urls"
+        }
+      }
+    ]
 
 Update
 ------
@@ -83,7 +152,7 @@ On every new version, reinstall the dependencies since there might be new ones.
 Themes and styling
 ------------------
 
-To try out class-less themes use the context processor
+To try out daisyUI themes use the context processor
 ``argus_htmx.context_processor.theme_via_session`` instead of
 ``argus_htmx.context_processor.theme_via_GET``.
 
