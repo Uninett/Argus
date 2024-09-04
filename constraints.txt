@@ -2,6 +2,6 @@
 PyYAML>=5.4
 attrs # needed by twisted
 autobahn>=20.12.3
-cryptography>=42
-pyopenssl>=24
+cryptography>=43.0.1
+pyopenssl>=24.2.1
 urllib3>=2.2
