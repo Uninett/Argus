@@ -14,7 +14,7 @@ from django.utils import timezone
 
 from argus.auth.models import User
 from argus.util.datetime_utils import INFINITY_REPR, get_infinity_repr
-from .constants import INCIDENT_LEVELS, INCIDENT_LEVEL_CHOICES, MIN_INCIDENT_LEVEL, MAX_INCIDENT_LEVEL
+from .constants import INCIDENT_LEVELS, INCIDENT_LEVEL_CHOICES, MIN_INCIDENT_LEVEL, MAX_INCIDENT_LEVEL, Level
 from .fields import DateTimeInfinityField
 from .validators import validate_lowercase, validate_key
 
@@ -575,6 +575,9 @@ class Incident(models.Model):
         if base_url:
             return urljoin(base_url, path)
         return path  # Just show the relative url
+
+    def pp_level(self):
+        return Level(self.level).label
 
 
 class IncidentRelationType(models.Model):
