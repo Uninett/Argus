@@ -145,12 +145,12 @@ In the file ``extra.json``, (which can be syntax checked with for instance
     ]
 
 Update
-------
+======
 
 On every new version, reinstall the dependencies since there might be new ones.
 
 Themes and styling
-------------------
+==================
 
 To try out daisyUI themes use the context processor
 ``argus_htmx.context_processor.theme_via_session`` instead of
@@ -162,12 +162,12 @@ This project supports Tailwind CSS utility classes and daisyUI components for st
 Below is an overview of the stack, installation and build instructions, and configuration details for themes and styles.
 
 Overview
-~~~~~~~~
+--------
 * Tailwind CSS: A utility-first CSS framework for rapidly building custom user interfaces.
 * daisyUI: A component library for Tailwind CSS that provides a set of ready-to-use components as well as color themes.
 
 Installation and build instructions
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------------
 Recommended but open for tweaks and adaptations steps:
 
 1. Get Tailwind standalone CLI bundled with daisyUI from
@@ -195,7 +195,7 @@ Recommended but open for tweaks and adaptations steps:
 
 
 Customization
-~~~~~~~~~~~~~
+-------------
 
 How to customize the look:
 
@@ -270,10 +270,10 @@ How to customize the look:
    values will be injected with reasonable defaults.
 
 UI Settings
------------
+===========
 
 Incident table column customization
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------------
 You can customize which columns are shown in the incidents listing table by overriding the
 ``INCIDENT_TABLE_COLUMNS`` setting. This setting takes a list of ``str`` or
 ``argus_htmx.incidents.customization.IncidentTableColumn`` instances. when given a ``str``, this
@@ -309,7 +309,7 @@ For inbuilt support for other types of columns see the howtos in `the local docs
 .. _Tailwind CSS theme customization: https://tailwindcss.com/docs/theme
 
 Custom widget
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------
 
 Argus supports showing an extra widget next to the menubar in the incidents listing. This box can
 take the width of 1/3 of the window. You can add widget by creating a context processor that
