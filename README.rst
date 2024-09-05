@@ -190,7 +190,7 @@ Recommended but open for tweaks and adaptations steps:
 
         tailwindcss -c src/argus_htmx/tailwind/tailwind.config.js -i src/argus_htmx/tailwind/styles.css --output src/argus_htmx/static/styles.css
 
-   We recommend running this is in a separate terminal with the ``--watch``
+   We recommend running this in a separate terminal with the ``--watch``
    flag so that the "styles.css" file is auto-updated when you save a template.
 
 
@@ -263,8 +263,8 @@ How to customize the look:
     * `Tailwind CSS theme customization`_
 
 *  Override the default main stylesheet path by providing a ``path_to_stylesheet`` value in a template ``context``.
-*  Include additional styles/stylesheets using ``head`` block in your templates.
-*  Generate Tailwind config file by running ``tailwind_config`` management
+*  Include additional styles/stylesheets using the ``head`` block in your templates.
+*  Generate a Tailwind config file by running the ``tailwind_config`` management
    command. By default the generated file will be based on
    ``src/argus_htmx/tailwindtheme/tailwind.config.template.js`` and expected
    values will be injected with reasonable defaults.
@@ -312,15 +312,15 @@ Custom widget
 -------------
 
 Argus supports showing an extra widget next to the menubar in the incidents listing. This box can
-take the width of 1/3 of the window. You can add widget by creating a context processor that
-injects a ``incidents_extra_widget`` variable that points to a html template::
+take the width of 1/3 of the window. You can add the widget by creating a context processor that
+injects an ``incidents_extra_widget`` variable that points to an html template::
 
     def extra_widget(request):
         return {
             "incidents_extra_widget": "path/to/_extra_widget.html",
         }
 
-*note* don't forget to include the context processor in your settings
+*note* Don't forget to include the context processor in your settings
 
 You could then create ``path/to/_extra_widget.html`` as following::
 
