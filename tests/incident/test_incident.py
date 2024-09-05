@@ -77,3 +77,15 @@ class IncidentAckedTests(TestCase):
         source = SourceSystemFactory(user=source_user)
         incident = StatefulIncidentFactory(source=source)
         self.assertFalse(incident.acked)
+
+
+class IncidentLevelTests(TestCase):
+    def setup(self):
+        disconnect_signals()
+
+    def tearDown(self):
+        connect_signals()
+
+    def test_level_str_returns_name_of_level(self):
+        incident = StatefulIncidentFactory(level=1)
+        self.assertEqual(incident.pp_level(), "Critical")
