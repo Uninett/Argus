@@ -8,6 +8,15 @@ This project uses [*towncrier*](https://towncrier.readthedocs.io/) and the chang
 
 <!-- towncrier release notes start -->
 
+## [1.22.1] - 2024-09-05
+
+
+### Added
+
+- Add method to get associated names of Incident levels
+  ([#875](https://github.com/Uninett/Argus/issues/875))
+
+
 ## [1.22.0] - 2024-08-30
 
 
