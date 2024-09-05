@@ -13,7 +13,6 @@ INCIDENT_TABLE_COLUMNS = [
     "source",
     "description",
     "ack",
-    "links",
 ]
 
 # Tailwind config template relative to the repository root directory
