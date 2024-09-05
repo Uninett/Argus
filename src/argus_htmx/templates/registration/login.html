@@ -1,18 +1,32 @@
 {% extends "htmx/base.html" %}
+{% load widget_tweaks %}
 
 {% block main %}
-<h2>Log In</h2>
-<section>
-<form method="post">
+<div class="card m-8">
+<h2 class="card-title">Log In</h2>
+
+<section class="card-body">
+<form method="post" class="flex gap-2">
   {% csrf_token %}
-  {{ form }}
-  <button type="submit">Log In</button>
+  {% for field in form %}
+  <label class="indicator input input-bordered flex items-center gap-2">
+    <span class="indicator-item indicator-top indicator-start badge border-none mask mask-circle text-warning text-base">＊</span>
+  {{ field.label }}
+  {{ field|add_class:"appearance-none grow border-none" }}
+  </label>
+  {% endfor %}
+  <button type="submit" class="btn btn-primary">Log In</button>
 </form>
 </section>
+
+{% comment %}
 <section>
 <h3>Federated logins</h3>
 {% for backend in oauth2_backends %}
 <a href="/oidc/login/{{ backend }}/">{{ backend }}</a>
 {% endfor %}
 </section>
+{% endcomment %}
+
+</div>
 {% endblock main %}
