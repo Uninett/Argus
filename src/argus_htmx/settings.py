@@ -12,6 +12,7 @@ INCIDENT_TABLE_COLUMNS = [
     "level",
     "source",
     "description",
+    "ticket",
 ]
 
 # Tailwind config template relative to the repository root directory

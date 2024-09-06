@@ -3605,6 +3605,11 @@ input.tab:checked + .tab-content,
   height: 2.5rem;
 }
 
+.size-5 {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
 .h-14 {
   height: 3.5rem;
 }
@@ -3772,6 +3777,10 @@ input.tab:checked + .tab-content,
 .bg-neutral {
   --tw-bg-opacity: 1;
   background-color: var(--fallback-n,oklch(var(--n)/var(--tw-bg-opacity)));
+}
+
+.fill-accent {
+  fill: var(--fallback-a,oklch(var(--a)/1));
 }
 
 .object-scale-down {
