@@ -65,7 +65,7 @@
 
 <h3 class="font-bold">Ticket</h3>
 <p>
-{% if incident.ticket_url %}<a href="{{ incident.ticket_url }}">{{ incident.ticket_url }}</a>{% else %}—{% endif %}
+{% if incident.ticket_url %}<a href="{{ incident.ticket_url }}" target="_blank">{{ incident.ticket_url }}</a>{% else %}—{% endif %}
 </p>
 
 <div class="card-actions">
