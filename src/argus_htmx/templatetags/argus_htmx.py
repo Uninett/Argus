@@ -17,3 +17,18 @@ def tagvalues(incident, key) -> list:
 @register.filter
 def is_acked_by(incident, group: str) -> bool:
     return incident.is_acked_by(group)
+
+
+@register.filter
+def pp_level(level: int) -> str:
+    level = str(level)
+    mapping = {
+        "1": "Critical",
+        "2": "High",
+        "3": "Moderate",
+        "4": "Low",
+        "5": "Information",
+    }
+    if level not in mapping:
+        return mapping["5"]
+    return mapping[level]
