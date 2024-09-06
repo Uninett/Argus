@@ -23,7 +23,7 @@
 <span class="badge badge-accent">Closed</span>{% endif %}
 {% if incident.acked %}
 <span class="badge badge-primary">Acknowledged</span>{% else %}
-<span class="badge badge-accent">Unanacknowledged</span>{% endif %}
+<span class="badge badge-accent">Unacknowledged</span>{% endif %}
 {% if incident.ticket_url %}
 <span class="badge badge-primary"><a href="{{ incident.ticket_url }}" target="_blank">Ticket {{ incident.ticket_url }}</a></span>{% else %}
 <span class="badge badge-accent">No ticket</span>{% endif %}
