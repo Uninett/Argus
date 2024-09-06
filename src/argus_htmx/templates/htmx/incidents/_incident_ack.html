@@ -1,3 +1,4 @@
 <a class="link" href="{% url 'htmx:incident-add-ack' pk=incident.pk %}">
-	{% if incident.acked %}Acked{% else %}Unacked{% endif %}
+	{% if incident.acked %}<span class="badge badge-primary">Acked</span>
+	{% else %}<span class="badge badge-accent">Unacked</span>{% endif %}
 </a>
