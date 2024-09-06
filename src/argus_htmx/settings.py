@@ -8,11 +8,10 @@ INCIDENT_TABLE_COLUMNS = [
     "row_select",
     "id",
     "start_time",
-    "status",
+    "combined_status",
     "level",
     "source",
     "description",
-    "ack",
 ]
 
 # Tailwind config template relative to the repository root directory

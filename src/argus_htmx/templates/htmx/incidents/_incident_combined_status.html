@@ -1,0 +1,6 @@
+{% if incident.open %}<span class="badge badge-primary">Open</span>
+{% else %}<span class="badge badge-accent">Closed</span>{% endif %}
+<a class="link" href="{% url 'htmx:incident-add-ack' pk=incident.pk %}">
+{% if incident.acked %}<span class="badge badge-primary">Acked</span>
+{% else %}<span class="badge badge-accent">Unacked</span>{% endif %}
+</a>

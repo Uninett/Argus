@@ -48,6 +48,7 @@ _BUILTIN_COLUMN_LIST = [
         "description", "Description", "htmx/incidents/_incident_description.html"
     ),
     IncidentTableColumn("ack", "Ack", "htmx/incidents/_incident_ack.html"),
+    IncidentTableColumn("combined_status", "Status", "htmx/incidents/_incident_combined_status.html"),
     IncidentTableColumn("links", "Actions", "htmx/incidents/_incident_actions.html"),
 ]
 BUILTIN_COLUMNS = {col.name: col for col in _BUILTIN_COLUMN_LIST}
