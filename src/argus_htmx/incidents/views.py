@@ -21,7 +21,7 @@ from argus.util.datetime_utils import make_aware
 
 from .customization import get_incident_table_columns
 from .utils import get_filter_function
-from .forms import AckForm, DescriptionOptionalForm
+from .forms import AckForm, DescriptionOptionalForm, EditTicketUrlForm, AddTicketUrlForm
 
 
 User = get_user_model()
@@ -60,6 +60,8 @@ def incident_detail(request, pk: int):
         "ack": reverse("htmx:incident-detail-add-ack", kwargs={"pk": pk}),
         "close": reverse("htmx:incident-detail-close", kwargs={"pk": pk}),
         "reopen": reverse("htmx:incident-detail-reopen", kwargs={"pk": pk}),
+        "edit_ticket": reverse("htmx:incident-detail-edit-ticket", kwargs={"pk": pk}),
+        "add_ticket": reverse("htmx:incident-detail-add-ticket", kwargs={"pk": pk}),
     }
     context = {
         "incident": incident,
@@ -140,6 +142,32 @@ def incident_detail_reopen(request, pk: int):
             description=form.cleaned_data.get("description", ""),
         )
         LOG.info(f"{{ incident }} manually reopened by {{ request.user }}")
+    return redirect("htmx:incident-detail", pk=pk)
+
+
+@require_POST
+def incident_detail_add_ticket(request, pk: int):
+    incident = get_object_or_404(Incident, id=pk)
+    form = AddTicketUrlForm()
+    if request.POST:
+        form = AddTicketUrlForm(request.POST)
+        if form.is_valid():
+            incident.ticket_url = form.cleaned_data["ticket_url"]
+            incident.save()
+
+    return redirect("htmx:incident-detail", pk=pk)
+
+
+@require_POST
+def incident_detail_edit_ticket(request, pk: int):
+    incident = get_object_or_404(Incident, id=pk)
+    form = EditTicketUrlForm()
+    if request.POST:
+        form = EditTicketUrlForm(request.POST)
+        if form.is_valid():
+            incident.ticket_url = form.cleaned_data["ticket_url"]
+            incident.save()
+
     return redirect("htmx:incident-detail", pk=pk)
 
 

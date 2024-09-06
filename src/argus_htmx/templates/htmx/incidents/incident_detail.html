@@ -79,9 +79,10 @@
 {% endif %}
 
 {% if incident.ticket_url %}
-{% include 'htmx/incidents/_incident_ticket_edit_modal.html' with dialog_id="edit-ticket-dialog" button_title="Edit ticket url" header="Edit ticket" explanation="" cancel_text="Cancel" submit_text="Update" %}
+{% include 'htmx/incidents/_incident_ticket_edit_modal.html' with dialog_id="edit-ticket-dialog" button_title="Edit ticket url" header="Edit ticket" explanation="" endpoint=endpoints.edit_ticket cancel_text="Cancel" submit_text="Update" %}
 {% else %}
-{% include 'htmx/incidents/_incident_ticket_autocreate_modal.html' with dialog_id="create-ticket-dialog" button_title="Create ticket url" header="Create ticket" explanation="Are you sure you want to automatically generate a ticket from this incident?" cancel_text="No" submit_text="Yes" %}
+<!-- Manually create ticket dialog -->
+{% include 'htmx/incidents/_incident_ticket_edit_modal.html' with dialog_id="manual-create-ticket-dialog" button_title="Add ticket url" header="Add url to existing ticket" explanation="Are you sure you want to store this url to an existing ticket on this incident?" endpoint=endpoints.add_ticket cancel_text="Cancel" submit_text="Add ticket" %}
 {% endif %}
 
 </div>
