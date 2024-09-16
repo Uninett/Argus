@@ -1,6 +1,9 @@
 from rest_framework import serializers
 
-from argus.filter.serializers import FilterBlobSerializer
+from argus.filter import get_filter_backend
+
+filter_backend = get_filter_backend()
+FilterBlobSerializer = filter_backend.FilterBlobSerializer
 
 
 __all__ = [
