@@ -27,32 +27,41 @@ __all__ = [
 BooleanStringOAEnum = ("true", "false")
 
 
-INCIDENT_OPENAPI_PARAMETER_DESCRIPTIONS = [
+_INCIDENT_OPENAPI_CUSTOM_FILTER_PARAMETERS = [
+    OpenApiParameter(
+        name="open",
+        description="Fetch open (`true`) or closed (`false`) incidents.",
+        enum=BooleanStringOAEnum,
+    ),
     OpenApiParameter(
         name="acked",
         description="Fetch acked (`true`) or unacked (`false`) incidents.",
         enum=BooleanStringOAEnum,
     ),
     OpenApiParameter(
+        name="stateful",
+        description="Fetch stateful (`true`) or stateless (`false`) incidents.",
+        enum=BooleanStringOAEnum,
+    ),
+    OpenApiParameter(
+        name="ticket",
+        description="Fetch incidents with or without a ticket.",
+        enum=BooleanStringOAEnum,
+    ),
+    OpenApiParameter(
+        name="tags",
+        description="Fetch incidents with specified tags",
+        type=str,
+    ),
+    OpenApiParameter(
         name="duration__gte",
         description="Fetch incidents with a duration longer of equal to `DURATION` minutes",
         type=int,
     ),
-    OpenApiParameter(name="cursor", description="The pagination cursor value.", type=str),
     OpenApiParameter(
-        name="end_time__gte",
-        description="Fetch incidents that ended on or after `END_TIME`",
-        type=OpenApiTypes.DATETIME,
-    ),
-    OpenApiParameter(
-        name="end_time__isnull",
-        description='Fetch incidents that have `end_time` set to None (`true`), a datetime or "infinity" (`false`).',
+        name="token_expiry",
+        description="Fetch incidents that concern expiration of authentication tokens.",
         enum=BooleanStringOAEnum,
-    ),
-    OpenApiParameter(
-        name="end_time__lte",
-        description="Fetch incidents that ended on or before `END_TIME`",
-        type=OpenApiTypes.DATETIME,
     ),
     OpenApiParameter(
         name="filter_pk",
@@ -60,27 +69,59 @@ INCIDENT_OPENAPI_PARAMETER_DESCRIPTIONS = [
         type=int,
     ),
     OpenApiParameter(
-        name="id__in",
-        description="Fetch the incidents with an id in the given id list.",
-    ),
-    OpenApiParameter(name="level__lte", description="Fetch incidents with levels in `LEVEL`", enum=Incident.LEVELS),
-    OpenApiParameter(
         name="notificationprofile_pk",
         description="Fetch incidents that are included in the filters connected to the notificationprofile with the given primary key.",
         type=int,
     ),
+]
+
+
+_INCIDENT_OPENAPI_PAGINATION_FILTER_PARAMETERS = [
+    OpenApiParameter(name="cursor", description="The pagination cursor value.", type=str),
+]
+
+
+_INCIDENT_OPENAPI_COMMON_AUTO_FILTER_PARAMETERS = [
     OpenApiParameter(
-        name="open",
-        description="Fetch open (`true`) or closed (`false`) incidents.",
-        enum=BooleanStringOAEnum,
-    ),
-    OpenApiParameter(
-        name="source__id__in",
-        description="Fetch incidents with a source with numeric id `ID1` or `ID2` or..",
+        name="id__in",
+        description="Fetch the incidents with an id in the given id list.",
     ),
     OpenApiParameter(
         name="source_incident_id",
         description="Fetch incidents with the specific source incident id.",
+    ),
+    OpenApiParameter(
+        name="start_time__gte",
+        description="Fetch incidents that started on or after `START_TIME`",
+        type=OpenApiTypes.DATETIME,
+    ),
+    OpenApiParameter(
+        name="start_time__lte",
+        description="Fetch incidents that started on or before `START_TIME`",
+        type=OpenApiTypes.DATETIME,
+    ),
+    OpenApiParameter(
+        name="end_time__gte",
+        description="Fetch incidents that ended on or after `END_TIME`",
+        type=OpenApiTypes.DATETIME,
+    ),
+    OpenApiParameter(
+        name="end_time__lte",
+        description="Fetch incidents that ended on or before `END_TIME`",
+        type=OpenApiTypes.DATETIME,
+    ),
+    OpenApiParameter(
+        name="end_time__isnull",
+        description='Fetch incidents that have `end_time` set to None (`true`), a datetime or "infinity" (`false`).',
+        enum=BooleanStringOAEnum,
+    ),
+]
+
+
+_INCIDENT_OPENAPI_SOURCE_AUTO_FILTER_PARAMETERS = [
+    OpenApiParameter(
+        name="source__id__in",
+        description="Fetch incidents with a source with numeric id `ID1` or `ID2` or..",
     ),
     OpenApiParameter(
         name="source__name__in",
@@ -90,108 +131,27 @@ INCIDENT_OPENAPI_PARAMETER_DESCRIPTIONS = [
         name="source__type__in",
         description="Fetch incidents with a source of a type with numeric id `ID1` or `ID2` or..",
     ),
-    OpenApiParameter(
-        name="start_time__gte",
-        description="Fetch incidents that started on or after `START_TIME`",
-        type=OpenApiTypes.DATETIME,
-    ),
-    OpenApiParameter(
-        name="start_time__lte",
-        description="Fetch incidents that started on or before `START_TIME`",
-        type=OpenApiTypes.DATETIME,
-    ),
-    OpenApiParameter(
-        name="stateful",
-        description="Fetch stateful (`true`) or stateless (`false`) incidents.",
-        enum=BooleanStringOAEnum,
-    ),
-    OpenApiParameter(
-        name="ticket",
-        description="Fetch incidents with or without a ticket.",
-        enum=BooleanStringOAEnum,
-    ),
-    OpenApiParameter(
-        name="token_expiry",
-        description="Fetch incidents that concern expiration of authentication tokens.",
-        enum=BooleanStringOAEnum,
-    ),
+    OpenApiParameter(name="level__lte", description="Fetch incidents with levels in `LEVEL`", enum=Incident.LEVELS),
 ]
-SOURCE_LOCKED_INCIDENT_OPENAPI_PARAMETER_DESCRIPTIONS = [
-    OpenApiParameter(
-        name="acked",
-        description="Fetch acked (`true`) or unacked (`false`) incidents.",
-        enum=BooleanStringOAEnum,
-    ),
-    OpenApiParameter(
-        name="duration__gte",
-        description="Fetch incidents with a duration longer of equal to `DURATION` minutes",
-        type=int,
-    ),
-    OpenApiParameter(name="cursor", description="The pagination cursor value.", type=str),
-    OpenApiParameter(
-        name="end_time__gte",
-        description="Fetch incidents that ended on or after `END_TIME`",
-        type=OpenApiTypes.DATETIME,
-    ),
-    OpenApiParameter(
-        name="end_time__isnull",
-        description='Fetch incidents that have `end_time` set to None (`true`), a datetime or "infinity" (`false`).',
-        enum=BooleanStringOAEnum,
-    ),
-    OpenApiParameter(
-        name="end_time__lte",
-        description="Fetch incidents that ended on or before `END_TIME`",
-        type=OpenApiTypes.DATETIME,
-    ),
-    OpenApiParameter(
-        name="filter_pk",
-        description="Fetch incidents that are included in the filter with the given primary key.",
-        type=int,
-    ),
-    OpenApiParameter(
-        name="id__in",
-        description="Fetch the incidents with an id in the given id list.",
-    ),
-    OpenApiParameter(
-        name="notificationprofile_pk",
-        description="Fetch incidents that are included in the filters connected to the notificationprofile with the given primary key.",
-        type=int,
-    ),
-    OpenApiParameter(
-        name="open",
-        description="Fetch open (`true`) or closed (`false`) incidents.",
-        enum=BooleanStringOAEnum,
-    ),
-    OpenApiParameter(
-        name="source_incident_id",
-        description="Fetch incidents with the specific source incident id.",
-    ),
-    OpenApiParameter(
-        name="start_time__gte",
-        description="Fetch incidents that started on or after `START_TIME`",
-        type=OpenApiTypes.DATETIME,
-    ),
-    OpenApiParameter(
-        name="start_time__lte",
-        description="Fetch incidents that started on or before `START_TIME`",
-        type=OpenApiTypes.DATETIME,
-    ),
-    OpenApiParameter(
-        name="stateful",
-        description="Fetch stateful (`true`) or stateless (`false`) incidents.",
-        enum=BooleanStringOAEnum,
-    ),
-    OpenApiParameter(
-        name="ticket",
-        description="Fetch incidents with or without a ticket.",
-        enum=BooleanStringOAEnum,
-    ),
-    OpenApiParameter(
-        name="token_expiry",
-        description="Fetch incidents that concern expiration of authentication tokens.",
-        enum=BooleanStringOAEnum,
-    ),
-]
+
+
+INCIDENT_OPENAPI_PARAMETER_DESCRIPTIONS = sorted(
+    [
+        *_INCIDENT_OPENAPI_CUSTOM_FILTER_PARAMETERS,
+        *_INCIDENT_OPENAPI_COMMON_AUTO_FILTER_PARAMETERS,
+        *_INCIDENT_OPENAPI_SOURCE_AUTO_FILTER_PARAMETERS,
+        *_INCIDENT_OPENAPI_PAGINATION_FILTER_PARAMETERS,
+    ],
+    key=lambda p: p.name,
+)
+SOURCE_LOCKED_INCIDENT_OPENAPI_PARAMETER_DESCRIPTIONS = sorted(
+    [
+        *_INCIDENT_OPENAPI_CUSTOM_FILTER_PARAMETERS,
+        *_INCIDENT_OPENAPI_COMMON_AUTO_FILTER_PARAMETERS,
+        *_INCIDENT_OPENAPI_PAGINATION_FILTER_PARAMETERS,
+    ],
+    key=lambda p: p.name,
+)
 
 
 class TagFilter(filters.Filter):

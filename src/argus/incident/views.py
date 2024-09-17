@@ -139,12 +139,7 @@ class SourceSystemViewSet(
             raise serializers.ValidationError(form.errors)
 
 
-@extend_schema_view(
-    list=extend_schema(
-        parameters=INCIDENT_OPENAPI_PARAMETER_DESCRIPTIONS,
-    )
-)
-class IncidentViewSet(
+class BaseIncidentViewSet(
     mixins.ListModelMixin,
     mixins.CreateModelMixin,
     mixins.RetrieveModelMixin,
@@ -152,29 +147,16 @@ class IncidentViewSet(
     mixins.DestroyModelMixin,
     viewsets.GenericViewSet,
 ):
-    """All incidents
-
-    Paged using a cursor
-    """
 
     pagination_class = IncidentPagination
     permission_classes = [IsAuthenticated]
     queryset = Incident.objects.prefetch_default_related()
-    filter_backends = [filters.DjangoFilterBackend, SearchFilter]
-    filterset_class = IncidentFilter
     search_fields = ["description", "search_text"]
 
     def get_serializer_class(self):
         if self.request.method in {"PUT", "PATCH"}:
             return IncidentPureDeserializer
         return IncidentSerializer
-
-    def get_queryset(self):
-        if self.request.method != "GET":
-            return super().get_queryset()
-        return (
-            Incident.objects.prefetch_default_related().select_related("source").prefetch_related("events__ack").all()
-        )
 
     def list(self, request, *args, **kwargs):
         if "count" in request.query_params:
@@ -266,6 +248,45 @@ class IncidentViewSet(
             return Response(serializer.data)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@extend_schema_view(
+    list=extend_schema(
+        parameters=INCIDENT_OPENAPI_PARAMETER_DESCRIPTIONS,
+    )
+)
+class IncidentViewSet(BaseIncidentViewSet):
+    """All incidents
+
+    Paged using a cursor
+    """
+
+    filter_backends = [filters.DjangoFilterBackend, SearchFilter]
+    filterset_class = IncidentFilter
+
+    def get_queryset(self):
+        if self.request.method != "GET":
+            return super().get_queryset()
+        return (
+            Incident.objects.prefetch_default_related().select_related("source").prefetch_related("events__ack").all()
+        )
+
+
+@extend_schema_view(
+    list=extend_schema(
+        parameters=SOURCE_LOCKED_INCIDENT_OPENAPI_PARAMETER_DESCRIPTIONS,
+    )
+)
+class SourceLockedIncidentViewSet(BaseIncidentViewSet):
+    """All incidents added by the currently logged in user
+
+    Paged using a cursor"""
+
+    filter_backends = [filters.DjangoFilterBackend]
+    filterset_class = SourceLockedIncidentFilter
+
+    def get_queryset(self):
+        return Incident.objects.filter(source__user=self.request.user).prefetch_default_related()
 
 
 @extend_schema_view(
@@ -397,23 +418,6 @@ class IncidentTagViewSet(
             # If the tag is now unused, delete it
             if not IncidentTagRelation.objects.filter(tag=instance).exists():
                 instance.delete()
-
-
-@extend_schema_view(
-    list=extend_schema(
-        parameters=SOURCE_LOCKED_INCIDENT_OPENAPI_PARAMETER_DESCRIPTIONS,
-    )
-)
-class SourceLockedIncidentViewSet(IncidentViewSet):
-    """All incidents added by the currently logged in user
-
-    Paged using a cursor"""
-
-    filter_backends = [filters.DjangoFilterBackend]
-    filterset_class = SourceLockedIncidentFilter
-
-    def get_queryset(self):
-        return Incident.objects.filter(source__user=self.request.user).prefetch_default_related()
 
 
 @extend_schema_view(
