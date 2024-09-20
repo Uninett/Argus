@@ -15,8 +15,7 @@ def exception_handler(exc, context):
     if isinstance(exc, DjangoValidationError):
         data = exc.message_dict
         if DJANGO_NON_FIELD_ERRORS in data:
-            data[DRF_NON_FIELD_ERRORS] = data[DJANGO_NON_FIELD_ERRORS]
-            del data[DJANGO_NON_FIELD_ERRORS]
+            data[DRF_NON_FIELD_ERRORS] = data.pop(DJANGO_NON_FIELD_ERRORS)
 
         exc = DRFValidationError(detail=data)
 
