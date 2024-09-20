@@ -11,8 +11,4 @@ from .filters import (  # noqa: F401
     INCIDENT_OPENAPI_PARAMETER_DESCRIPTIONS,
     SOURCE_LOCKED_INCIDENT_OPENAPI_PARAMETER_DESCRIPTIONS,
 )
-from .serializers import (  # noqa: F401
-    FilterSerializer,
-    FilterBlobSerializer,
-)
-from .validators import validate_jsonfilter  # noqa: F401
+from .swappable.serializers import FilterBlobSerializer  # noqa: F401

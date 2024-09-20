@@ -1,10 +1,7 @@
 from django.conf import settings
 from django.core.checks import Warning
 
-from argus.filter import get_filter_backend
-
-filter_backend = get_filter_backend()
-validate_jsonfilter = filter_backend.validate_jsonfilter
+from argus.filter.validators import validate_jsonfilter
 
 
 __all__ = ["fallback_filter_check"]
