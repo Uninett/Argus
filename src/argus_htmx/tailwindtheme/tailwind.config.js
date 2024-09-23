@@ -1,5 +1,6 @@
 const projectPaths = [
     '../templates/**/*.html',
+    'src/argus_htmx/templates/**/*.html',
 ];
 
 const contentPaths = [...projectPaths];

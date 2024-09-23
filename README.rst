@@ -188,7 +188,7 @@ Recommended but open for tweaks and adaptations steps:
 3. Go to the repo directory (parent of ``src/``)
 4. Build main stylesheet file using ``tailwindcss`` executable from step 1 and pointing to the included config file::
 
-        tailwindcss -c src/argus_htmx/tailwind/tailwind.config.js -i src/argus_htmx/tailwind/styles.css --output src/argus_htmx/static/styles.css
+        tailwindcss -c src/argus_htmx/tailwindtheme/tailwind.config.js -i src/argus_htmx/tailwindtheme/styles.css --output src/argus_htmx/static/styles.css
 
    We recommend running this in a separate terminal with the ``--watch``
    flag so that the "styles.css" file is auto-updated when you save a template.

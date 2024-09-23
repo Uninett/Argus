@@ -3567,10 +3567,6 @@ input.tab:checked + .tab-content,
   margin: 1rem;
 }
 
-.m-8 {
-  margin: 2rem;
-}
-
 .my-0 {
   margin-top: 0px;
   margin-bottom: 0px;
@@ -3630,6 +3626,10 @@ input.tab:checked + .tab-content,
   width: 66.666667%;
 }
 
+.w-24 {
+  width: 6rem;
+}
+
 .w-52 {
   width: 13rem;
 }
@@ -3678,6 +3678,10 @@ input.tab:checked + .tab-content,
           appearance: none;
 }
 
+.flex-row {
+  flex-direction: row;
+}
+
 .flex-col {
   flex-direction: column;
 }
@@ -3690,6 +3694,10 @@ input.tab:checked + .tab-content,
   justify-content: flex-start;
 }
 
+.justify-center {
+  justify-content: center;
+}
+
 .justify-between {
   justify-content: space-between;
 }
@@ -3700,6 +3708,10 @@ input.tab:checked + .tab-content,
 
 .gap-4 {
   gap: 1rem;
+}
+
+.gap-6 {
+  gap: 1.5rem;
 }
 
 .space-y-2 > :not([hidden]) ~ :not([hidden]) {
@@ -3758,6 +3770,11 @@ input.tab:checked + .tab-content,
   border-style: none;
 }
 
+.border-accent {
+  --tw-border-opacity: 1;
+  border-color: var(--fallback-a,oklch(var(--a)/var(--tw-border-opacity)));
+}
+
 .border-primary {
   --tw-border-opacity: 1;
   border-color: var(--fallback-p,oklch(var(--p)/var(--tw-border-opacity)));
@@ -3798,6 +3815,10 @@ input.tab:checked + .tab-content,
 
 .p-2 {
   padding: 0.5rem;
+}
+
+.p-6 {
+  padding: 1.5rem;
 }
 
 .px-1 {
@@ -3934,4 +3955,10 @@ input.tab:checked + .tab-content,
 
 .\[--tab-border\:theme\(borderWidth\.DEFAULT\)\] {
   --tab-border: 2px;
+}
+
+@media (min-width: 640px) {
+  .sm\:w-96 {
+    width: 24rem;
+  }
 }
