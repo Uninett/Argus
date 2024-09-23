@@ -1,0 +1,17 @@
+{% for item in datetime_formats %}
+    <li>
+        <input type="radio"
+               class="btn btn-sm btn-block btn-ghost justify-start"
+               value="{{ item }}"
+               aria-label="{{ item }}"
+               name="dateformat"
+               hx-post="{% url 'htmx:change-dateformat' %}"
+               hx-trigger="change"
+               hx-swap="textContent"
+               hx-target="#dateformat-badge"
+               hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+        />
+    </li>
+{% empty %}
+    <li><p>No date formats configured</p></li>
+{% endfor %}
