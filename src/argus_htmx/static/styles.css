@@ -3618,12 +3618,9 @@ input.tab:checked + .tab-content,
   max-height: 100svh;
 }
 
-.\!w-32 {
-  width: 8rem !important;
-}
-
-.\!w-36 {
-  width: 9rem !important;
+.min-h-fit {
+  min-height: -moz-fit-content;
+  min-height: fit-content;
 }
 
 .w-1\/3 {
