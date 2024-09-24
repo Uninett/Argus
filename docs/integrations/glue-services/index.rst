@@ -1,23 +1,18 @@
-==========================================
-Integrating monitoring software with Argus
-==========================================
+.. index::
+   integration; glue service
+   glue service
+
+=========================================================
+Glue services: Integrating monitoring software with Argus
+=========================================================
+
+A *glue service* is the name we've given to any piece of software capable of
+receiving alerts from your monitoring system and translating these into
+incident state changes that are communicated to the Argus API server.
 
 In essence, to integrate your existing monitoring systems with Argus means to
 ensure your Argus incident database is synchronized with the alerts stemming
 from your monitoring systems.
-
-To ensure this, you will need what is termed a **glue service**.
-
-Glue services
-=============
-
-
-What is a glue service?
------------------------
-
-A *glue service* is any piece of software capable of receiving alerts from your
-monitoring system and translating these into incident state changes that are
-communicated to the Argus API server.
 
 A glue service for your particular monitoring system may already exist, or you
 may need to write your own.
