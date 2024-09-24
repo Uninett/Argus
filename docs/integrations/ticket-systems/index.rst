@@ -8,6 +8,10 @@
 Ticket system plugins: Automatically create a ticket
 ====================================================
 
+.. index::
+   see: case; ticket
+   see: issue; ticket
+
 It is possible to automatically create a :index:`ticket` (aka. issue, case)
 from an Argus incident with a pre-filled title and body.
 
