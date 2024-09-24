@@ -1,18 +1,23 @@
-====================================
-Notifications and their destinations
-====================================
+.. index::
+   integration; destination
+   integration; notification plugin
 
-Notifications are sent with the help of notification plugins to destinations.
+===========================================
+Notification plugins: sending notifications
+===========================================
 
-A notification plugin is a class that inherits from
+Notifications are sent with the help of a notification plugin to one or more
+destinations.
+
+A :index:`notification plugin` is a class that inherits from
 ``argus.notificationprofile.media.base.NotificationMedium``. It has a
 ``send(event, destinations, **kwargs)`` static method that does the actual
 sending.
 
-A destination is a user-specific and plugin-specific instance of the model
-DestinationConfig. In the DestinationConfig there's a field ``settings`` that
-has the necessary configuration for where to send the notification for that
-type of plugin, like an email address, a phone number or a webhook.
+A :index:`destination` is a user-specific and plugin-specific instance of the
+model DestinationConfig. In the DestinationConfig there's a field ``settings``
+that has the necessary configuration for where to send the notification for
+that type of plugin, like an email address, a phone number or a webhook.
 
 A specific type of destination might also need extra settings in the Django
 settings file, this is documented for each plugin.
