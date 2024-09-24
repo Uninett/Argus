@@ -14,10 +14,52 @@ from an Argus incident with a pre-filled title and body.
 How to write a plugin for a desired ticket system is detailed in
 :ref:`writing-ticket-system-plugins`.
 
+Existing ticket system plugins
+==============================
+
+1st party ticket plugins
+------------------------
+
+Request Tracker
+~~~~~~~~~~~~~~~
+Source: https://pypi.org/project/argus-ticket-rt/
+
+pip install argus-ticket-rt
+
+Jira
+~~~~
+Source: https://pypi.org/project/argus-ticket-jira/
+
+pip install argus-ticket-jira
+
+Github
+~~~~~~
+Source: https://github.com/Uninett/argus_ticket_github
+
+pip install argus-ticket-github
+
+Gitlab
+~~~~~~
+Source: https://github.com/Uninett/argus_ticket_gitlab
+
+pip install argus-ticket-gitlab
+
+Other ticket plugins
+--------------------
+
+None known to us at this time.
+
+.. note::
+   Open an issue to have a plugin added to this list. It needs to be publicly
+   accessible (and preferably available on PyPI) so we can check the code. We
+   will link up both the source code repo (or homepage otherwise) and the
+   PyPI-entry.
+
 .. _ticket-systems-settings:
 
 Configuring a ticket plugin
 ===========================
+
 To enable this feature information needs to be added to the
 :ref:`site-specific-settings`.
 
@@ -45,26 +87,6 @@ to Argus.
 
 The specifics for each ticket system plugin is the documentation of the
 specific plugin.
-
-Known ticket system plugins
-===========================
-
-1st party ticket plugins
-------------------------
-
-* Request Tracker: https://pypi.org/project/argus-ticket-rt/, pip install argus-ticket-rt
-* Jira: https://pypi.org/project/argus-ticket-jira/, pip install argus-ticket-jira
-* Github: https://github.com/Uninett/argus_ticket_github, pip install argus-ticket-github
-* Gitlab: https://github.com/Uninett/argus_ticket_gitlab, pip install argus-ticket-gitlab
-
-Other ticket plugins
---------------------
-
-* None known to us at this time
-
-Open an issue to have a plugin added to this list. It needs to be publicly
-accessible (and preferably available on PyPI) so we can check the code. We will link up both the
-source code repo (or homepage otherwise) and the PyPI-entry.
 
 Writing your own ticket system plugin
 =====================================
