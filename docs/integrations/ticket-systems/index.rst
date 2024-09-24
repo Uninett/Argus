@@ -1,11 +1,15 @@
+.. index::
+   integration; ticket system plugin
+   ticket system plugin
+
 .. _ticket-systems:
 
-==============
-Ticket systems
-==============
+====================================================
+Ticket system plugins: Automatically create a ticket
+====================================================
 
-It is possible to automatically create a ticket from an Argus incident with
-a pre-filled title and body.
+It is possible to automatically create a :index:`ticket` (aka. issue, case)
+from an Argus incident with a pre-filled title and body.
 
 How to write a plugin for a desired ticket system is detailed in
 :ref:`writing-ticket-system-plugins`.
