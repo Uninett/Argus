@@ -22,7 +22,7 @@ def theme_via_session(request):
 
 
 def datetime_format_via_session(request):
-    datetime_format_name = request.session.get("datetime_format_name", "LOCALE")  # fallback to locale
+    datetime_format_name = request.session.get("datetime_format_name")
     if datetime_format_name not in DATETIME_FORMATS:
         datetime_format_name = DATETIME_DEFAULT
     # The named format always wins
