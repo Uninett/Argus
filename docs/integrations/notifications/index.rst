@@ -38,9 +38,8 @@ Existing notification plugins
 argus_notification_msteams.MSTeamsNotification
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Source: https://github.com/Uninett/argus_notification_msteams
-
-pip install argus-notification-msteams
+| Source: https://github.com/Uninett/argus_notification_msteams
+| Pypi: `argus-notification-msteams <https://pypi.org/project/argus-notification-msteams/>`_
 
 Other notification plugins
 --------------------------
