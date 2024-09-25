@@ -27,21 +27,25 @@ Existing ticket system plugins
 Request Tracker
 ~~~~~~~~~~~~~~~
 
+| Class: argus_ticket_rt.RequestTrackerPlugin
 | Pypi: `argus-ticket-rt <https://pypi.org/project/argus-ticket-rt/>`_
 
 Jira
 ~~~~
 
+| Class: argus_ticket_jira.JiraPlugin
 | Pypi: `argus-ticket-jira <https://pypi.org/project/argus-ticket-jira/>`_
 
 Github
 ~~~~~~
 
+| Class: argus_ticket_github.GithubPlugin
 | Pypi: `argus-ticket-github <https://pypi.org/project/argus-ticket-github/>`_
 
 Gitlab
 ~~~~~~
 
+| Class: argus_ticket_gitlab.GitlabPlugin
 | Pypi: `argus-ticket-gitlab <https://pypi.org/project/argus-ticket-gitlab/>`_
 
 Other ticket plugins
