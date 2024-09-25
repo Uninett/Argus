@@ -61,3 +61,36 @@ Terms used in Argus are loosely based on the `ITIL standard
       similar. A primary key is a non-negative integer number. It is unique by
       the context it refers to (for example, phone numbers' ``pk``\ s are
       unique for each user).
+
+   filter
+      Filters are used to:
+
+      - Limit which incidents are returned via the API.
+      - Check whether notifications should be sent when a new incident is
+        registered or when an existing incident is changed via an event.
+
+   Filter.filter
+      A single filter is stored in the Filter model's ``filter``-attribute, as
+      JSON.
+
+   FilterBlobSerializer
+      What filters look like and what they do is customizable. This serializer
+      validates and represents the structure of a filter stored in
+      ``Filter.filter``.
+
+   tristate
+      A value that can be one of ``True``, ``False``, or ``None``. Used in
+      filters. A stateful incident can be open or closed, but an incident
+      filter can look for incidents that are either open, closed or ignore the
+      distinction.
+
+   stateful incident
+      A stateful incident can be open (still open to change) or closed
+      (probably won't change). A stateful incident has both a ``start_time``
+      and an ``end_time`` and the time in between is a ``duration``.
+
+   stateless incident
+      A stateless incident can neither be open nor closed, nor can it have
+      a duration. It is a moment in time, well suited for heart-beats and
+      one-off messages. A stateless incident uses the ``start_time``-field to
+      store when it happened.
