@@ -35,9 +35,10 @@ Existing notification plugins
 1st party, other
 ----------------
 
-argus_notification_msteams.MSTeamsNotification
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Microsoft Teams
+~~~~~~~~~~~~~~~
 
+| Class: argus_notification_msteams.MSTeamsNotification
 | Source: https://github.com/Uninett/argus_notification_msteams
 | Pypi: `argus-notification-msteams <https://pypi.org/project/argus-notification-msteams/>`_
 

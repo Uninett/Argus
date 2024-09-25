@@ -1,5 +1,7 @@
-argus.notificationprofile.media.email.EmailNotification
-=======================================================
+Email via Django's email support
+================================
+
+| Class: argus.notificationprofile.media.email.EmailNotification
 
 This plugin is enabled by default.
 
