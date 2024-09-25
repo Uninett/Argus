@@ -1,6 +1,6 @@
-=========
-Endpoints
-=========
+=============
+API Endpoints
+=============
 
 Administration endpoint
 -----------------------

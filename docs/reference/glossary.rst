@@ -1,12 +1,11 @@
-Models
-------
-
 .. _explanation-of-terms:
 
+====================
 Explanation of terms
-~~~~~~~~~~~~~~~~~~~~
+====================
 
-Terms used in Argus are loosely based on the `ITIL standard`_ for IT service management.
+Terms used in Argus are loosely based on the `ITIL standard
+<https://en.wikipedia.org/wiki/ITIL>`_ for IT service management.
 
 -  ``incident``: an unplanned interruption in the source system.
 -  ``event``: something that happened related to an incident.
@@ -47,13 +46,3 @@ Terms used in Argus are loosely based on the `ITIL standard`_ for IT service man
    A primary key is a non-negative integer number. It is unique by the
    context it refers to (for example, phone numbers' ``pk``\ s are unique
    for each user).
-
-ER diagram
-~~~~~~~~~~
-
-.. figure:: img/ER_model.png
-   :alt: ER diagram
-
-   ER diagram
-
-.. _`ITIL standard`: https://en.wikipedia.org/wiki/ITIL
