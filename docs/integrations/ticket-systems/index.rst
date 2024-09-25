@@ -58,10 +58,10 @@ Other ticket plugins
 None known to us at this time.
 
 .. note::
-   Open an issue to have a plugin added to this list. It needs to be publicly
-   accessible (and preferably available on PyPI) so we can check the code. We
-   will link up both the source code repo (or homepage otherwise) and the
-   PyPI-entry.
+   Open an issue (`Github <https://github.com/Uninett/Argus/issues>`_) to have
+   a plugin added to this list. It needs to be publicly accessible (and
+   preferably available on PyPI) so we can check the code. We will link up both
+   the source code repo (or homepage otherwise) and the PyPI-entry.
 
 .. _ticket-systems-settings:
 
