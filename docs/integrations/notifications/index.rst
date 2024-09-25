@@ -25,14 +25,14 @@ settings file, this is documented for each plugin.
 Existing notification plugins
 =============================
 
-Ist party, included on install
+1st party, included on install
 ------------------------------
 
 .. toctree::
    email-plugin
    sms-plugin
 
-Ist party, other
+1st party, other
 ----------------
 
 argus_notification_msteams.MSTeamsNotification
