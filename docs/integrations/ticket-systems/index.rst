@@ -21,8 +21,8 @@ How to write a plugin for a desired ticket system is detailed in
 Existing ticket system plugins
 ==============================
 
-1st party ticket plugins
-------------------------
+Ticket plugins maintained by Argus developers
+---------------------------------------------
 
 Request Tracker
 ~~~~~~~~~~~~~~~

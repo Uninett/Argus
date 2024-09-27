@@ -25,18 +25,18 @@ settings file, this is documented for each plugin.
 Existing notification plugins
 =============================
 
-1st party, included on install
-------------------------------
+Notification plugins maintained by Argus developers, vendored
+-------------------------------------------------------------
 
 .. toctree::
    email-plugin
    sms-plugin
 
-1st party, other
-----------------
+Notification plugins maintained by Argus developers, optional
+-------------------------------------------------------------
 
 Microsoft Teams
-~~~~~~~~~~~~~~~
+
 
 | Class: argus_notification_msteams.MSTeamsNotification
 | Source: https://github.com/Uninett/argus_notification_msteams

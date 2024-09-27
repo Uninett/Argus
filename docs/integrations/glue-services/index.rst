@@ -20,8 +20,8 @@ may need to write your own.
 Existing glue services
 ======================
 
-1st party glue services
------------------------
+Glue services maintained by Argus developers
+--------------------------------------------
 
 Network Administration Visualized
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
