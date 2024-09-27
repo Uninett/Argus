@@ -1,7 +1,7 @@
 SMS via Email
 =============
 
-| Class: argus.notificationprofile.media.sms_as_email.SMSNotification
+| Class: ``argus.notificationprofile.media.sms_as_email.SMSNotification``
 
 This plugin is **not** enabled by default.
 

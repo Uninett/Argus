@@ -38,7 +38,7 @@ Notification plugins maintained by Argus developers, optional
 Microsoft Teams
 
 
-| Class: argus_notification_msteams.MSTeamsNotification
+| Class: ``argus_notification_msteams.MSTeamsNotification``
 | Source: https://github.com/Uninett/argus_notification_msteams
 | PyPI: `argus-notification-msteams <https://pypi.org/project/argus-notification-msteams/>`_
 
