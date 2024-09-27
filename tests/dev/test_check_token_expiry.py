@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 from io import StringIO
-import pytz
+from zoneinfo import ZoneInfo
 
 from django.conf import settings
 from django.core.management import call_command
@@ -118,7 +118,7 @@ class CheckTokenExpiryTests(TestCase):
         self.assertFalse(Incident.objects.get(pk=self.expiry_incident.pk).open)
 
     def test_expiry_incident_is_closed_when_token_updated(self):
-        self.expiring_token.created = datetime.now(pytz.utc)
+        self.expiring_token.created = datetime.now(ZoneInfo("UTC"))
         self.expiring_token.save()
         self.assertFalse(Incident.objects.get(pk=self.expiry_incident.pk).open)
 
