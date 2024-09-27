@@ -4,9 +4,9 @@
 
 .. _ticket-systems:
 
-====================================================
-Ticket system plugins: Automatically create a ticket
-====================================================
+======================================================
+Ticket system plugins: Creating a ticket automatically
+======================================================
 
 .. index::
    see: case; ticket

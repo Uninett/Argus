@@ -3,7 +3,7 @@
    integration; notification plugin
 
 ===========================================
-Notification plugins: sending notifications
+Notification plugins: Sending notifications
 ===========================================
 
 Notifications are sent with the help of a notification plugin to one or more
