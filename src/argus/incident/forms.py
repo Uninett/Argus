@@ -1,10 +1,12 @@
 from django import forms
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.forms import modelform_factory
 
-from argus.auth.models import User
 from .constants import INCIDENT_LEVELS
 from .models import Incident, SourceSystem, Tag
+
+User = get_user_model()
 
 
 class AddSourceSystemForm(forms.ModelForm):

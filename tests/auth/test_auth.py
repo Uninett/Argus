@@ -1,13 +1,16 @@
 from datetime import timedelta
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient, APITestCase
 
 from argus.auth.factories import AdminUserFactory, PersonUserFactory
-from argus.auth.models import User
+
+
+User = get_user_model()
 
 
 class APITests(APITestCase):

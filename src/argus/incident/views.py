@@ -2,6 +2,7 @@ import logging
 import secrets
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.db import IntegrityError
 from django.utils import timezone
 
@@ -20,7 +21,6 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 
-from argus.auth.models import User
 from argus.drf.permissions import IsSuperuserOrReadOnly
 from argus.incident.models import Acknowledgement, Event
 from argus.incident.ticket.base import (
@@ -77,6 +77,8 @@ INCIDENT_OPENAPI_PARAMETER_DESCRIPTIONS = filter_backend.INCIDENT_OPENAPI_PARAME
 SOURCE_LOCKED_INCIDENT_OPENAPI_PARAMETER_DESCRIPTIONS = (
     filter_backend.SOURCE_LOCKED_INCIDENT_OPENAPI_PARAMETER_DESCRIPTIONS
 )
+User = get_user_model()
+
 
 LOG = logging.getLogger(__name__)
 
