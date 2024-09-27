@@ -5,3 +5,4 @@ autobahn>=20.12.3
 cryptography>=43.0.1
 pyopenssl>=24.2.1
 urllib3>=2.2
+pytz>=2024.2
