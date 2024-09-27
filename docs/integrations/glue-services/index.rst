@@ -45,12 +45,12 @@ Other glue services
 NAGIOS
 ~~~~~~
 
-  * There's a python script at https://github.com/SUNET/nagios-argus-glue. It
+  * There is a python script at https://github.com/SUNET/nagios-argus-glue. It
     didn't scale to SUNET's needs.
-  * There's the code for a tiny rust binary at https://github.com/SUNET/nglue
+  * There is code for a tiny rust binary at https://github.com/SUNET/nglue
     that is run by NAGIOS. It sends alerts to
     https://github.com/SUNET/nglue-api, designed to run in a container. The
-    nglue-api pre-filters what to send to argus.
+    ``nglue-api`` pre-filters what to send to Argus.
 
 .. include:: ../_note.rst
 
