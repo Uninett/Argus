@@ -27,7 +27,7 @@ Network Administration Visualized
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 | Source: https://github.com/Uninett/nav-argus-glue.
-| Pypi: `nav-argus-glue <https://pypi.org/project/nav-argus-glue/>`_
+| PyPI: `nav-argus-glue <https://pypi.org/project/nav-argus-glue/>`_
 
 This is an extension of NAV, runs on the same server, and uses the NAV config
 files.
@@ -37,7 +37,7 @@ Mist Systems Administration (Juniper)
 
 | Source: https://gitlab.sikt.no/cnaas/mist-argus
 
-This will be available on Pypi after more polish is done.
+This will be available on PyPI after more polish is done.
 
 Other glue services
 -------------------

@@ -29,28 +29,28 @@ Request Tracker
 
 | Class: argus_ticket_rt.RequestTrackerPlugin
 | Source: https://github.com/Uninett/argus_ticket_rt
-| Pypi: `argus-ticket-rt <https://pypi.org/project/argus-ticket-rt/>`_
+| PyPI: `argus-ticket-rt <https://pypi.org/project/argus-ticket-rt/>`_
 
 Jira
 ~~~~
 
 | Class: argus_ticket_jira.JiraPlugin
 | Source: https://github.com/Uninett/argus_ticket_jira
-| Pypi: `argus-ticket-jira <https://pypi.org/project/argus-ticket-jira/>`_
+| PyPI: `argus-ticket-jira <https://pypi.org/project/argus-ticket-jira/>`_
 
 Github
 ~~~~~~
 
 | Class: argus_ticket_github.GithubPlugin
 | Source: https://github.com/Uninett/argus_ticket_github
-| Pypi: `argus-ticket-github <https://pypi.org/project/argus-ticket-github/>`_
+| PyPI: `argus-ticket-github <https://pypi.org/project/argus-ticket-github/>`_
 
 Gitlab
 ~~~~~~
 
 | Class: argus_ticket_gitlab.GitlabPlugin
 | Source: https://github.com/Uninett/argus_ticket_gitlab
-| Pypi: `argus-ticket-gitlab <https://pypi.org/project/argus-ticket-gitlab/>`_
+| PyPI: `argus-ticket-gitlab <https://pypi.org/project/argus-ticket-gitlab/>`_
 
 Other ticket plugins
 --------------------
