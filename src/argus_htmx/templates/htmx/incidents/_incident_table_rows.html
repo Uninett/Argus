@@ -5,7 +5,11 @@
     {% empty %}
     <tr>
         <td colspan="{{ columns|length }}">
-            No incidents on this page.
+            {% if count %}
+            No incidents found that fit all the filter criteria
+            {% else %}
+            No incidents on record
+            {% endif %}
         </td>
     </tr>
 {% endfor %}
