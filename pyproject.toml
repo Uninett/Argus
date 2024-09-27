@@ -16,14 +16,13 @@ classifiers = [
     "Intended Audience :: System Administrators",
     "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Topic :: System :: Monitoring",
 ]
 dependencies = [
-    'importlib-metadata; python_version<"3.8"',
     "Django>=4.2.16,<5.2",
     "dj-database-url>=0.5.0",
     "django-cors-headers>=3.2",
