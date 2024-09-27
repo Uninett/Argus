@@ -24,7 +24,7 @@ attrs==23.1.0
     #   referencing
     #   service-identity
     #   twisted
-autobahn==23.1.2
+autobahn==24.4.2
     # via
     #   -r constraints.txt
     #   daphne
