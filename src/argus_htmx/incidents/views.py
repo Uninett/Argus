@@ -4,6 +4,7 @@ import logging
 from typing import Optional
 from datetime import datetime
 
+from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.auth import get_user_model
 from django.contrib import messages
@@ -26,7 +27,8 @@ from .forms import AckForm, DescriptionOptionalForm, EditTicketUrlForm, AddTicke
 
 User = get_user_model()
 LOG = logging.getLogger(__name__)
-
+DEFAULT_PAGE_SIZE = getattr(settings, "ARGUS_INCIDENTS_DEFAULT_PAGE_SIZE", 10)
+ALLOWED_PAGE_SIZES = getattr(settings, "ARGUS_INCIDENTS_PAGE_SIZES", [10, 20, 50, 100])
 
 def prefetch_incident_daughters():
     return (
@@ -171,6 +173,14 @@ def incident_detail_edit_ticket(request, pk: int):
     return redirect("htmx:incident-detail", pk=pk)
 
 
+def _get_page_size(params):
+    try:
+        if (page_size:=int(params.pop('page_size', DEFAULT_PAGE_SIZE))) in ALLOWED_PAGE_SIZES:
+            return page_size
+    except ValueError:
+        pass
+    return DEFAULT_PAGE_SIZE
+
 @require_GET
 def incident_list(request: HtmxHttpRequest) -> HttpResponse:
     columns = get_incident_table_columns()
@@ -188,8 +198,8 @@ def incident_list(request: HtmxHttpRequest) -> HttpResponse:
 
     # Standard Django pagination
     page_num = params.pop("page", "1")
-    PAGE_SIZE = 10
-    paginator = Paginator(object_list=qs, per_page=PAGE_SIZE)
+    page_size = _get_page_size(params)
+    paginator = Paginator(object_list=qs, per_page=page_size)
     page = paginator.get_page(page_num)
 
     # The htmx magic - use a different, minimal base template for htmx
@@ -209,7 +219,8 @@ def incident_list(request: HtmxHttpRequest) -> HttpResponse:
         "page": page,
         "last_refreshed": last_refreshed,
         "update_interval": 30,
-        "per_page": PAGE_SIZE,
+        "page_size": page_size,
+        "all_page_sizes": ALLOWED_PAGE_SIZES
     }
 
     return render(request, "htmx/incidents/incident_list.html", context=context)

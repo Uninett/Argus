@@ -335,3 +335,12 @@ You could then create ``path/to/_extra_widget.html`` as following::
     <div id="service-status" class="border border-primary rounded-2xl h-full p-2">
       My custom widget
     </div>
+
+
+Page size
+---------
+
+By default, incidents are shown with a page size of ``10`` (ie. 10 rows at a time), and the user can
+select a different page size from ``[10, 20, 50, 100]``. It possible to override these settings by
+setting the ``ARGUS_INCIDENTS_DEFAULT_PAGE_SIZE`` and ``ARGUS_INCIDENTS_PAGE_SIZES`` setting
+respectively.

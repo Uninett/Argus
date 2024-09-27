@@ -1,13 +1,13 @@
 {% load widget_tweaks %}
-<form>
-    <fieldset
-            hx-get="{% url 'htmx:incident-list' %}"
-            hx-include="this"
-            hx-trigger="change delay:100ms"
-            hx-target="#table"
-            hx-swap="outerHTML"
-            hx-push-url="true"
-    >
+<form id="incident-filter-box"
+      hx-get="{% url 'htmx:incident-list' %}"
+      hx-include="#table-refresh-info, #incident-filter-box"
+      hx-trigger="keydown[keyCode==13], change delay:100ms"
+      hx-target="#table"
+      hx-swap="outerHTML"
+      hx-push-url="true"
+      onkeydown="if (event.keyCode === 13) event.preventDefault();">
+    <fieldset>
         <legend class="sr-only">Filter incidents</legend>
         <ul class="menu menu-horizontal menu-sm flex items-center gap-2 py-1.5">
             {% for field in filter_form %}
