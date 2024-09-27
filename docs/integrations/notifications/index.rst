@@ -47,11 +47,7 @@ Other notification plugins
 
 None known to us at this time.
 
-.. note::
-   Open an issue (`Github <https://github.com/Uninett/Argus/issues>`_) to have
-   a plugin added to this list. It needs to be publicly accessible so we can
-   check the code, and be on PyPI. We will link up both the source code repo
-   (or homepage otherwise) and the PyPI-entry.
+.. include:: ../_note.rst
 
 Configuring which notification plugins to use
 =============================================
