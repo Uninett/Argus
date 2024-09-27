@@ -7,7 +7,7 @@ name = "argus-server"
 description = "Argus is an alert aggregator for monitoring systems"
 authors = [{name="Uninett Opensource", email="opensource@uninett.no"}]
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 license = {text = "GPL-3.0-or-later"}
 classifiers = [
     "Framework :: Django",
