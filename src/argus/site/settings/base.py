@@ -57,6 +57,7 @@ INSTALLED_APPS = [
 
     # Argus apps
     "argus.auth",
+    "argus.base",
     "argus.incident",
     "argus.ws",
     "argus.filter",
@@ -84,7 +85,6 @@ ROOT_URLCONF = "argus.site.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [str(SITE_DIR / "templates")],
         "APP_DIRS": True,
         "OPTIONS": {
             "debug": get_bool_env("TEMPLATE_DEBUG", False),
@@ -174,7 +174,6 @@ TIME_ZONE = "Europe/Oslo"
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = "/static/"
-STATICFILES_DIRS = [SITE_DIR / "static"]
 STORAGES = {
     "default": {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
