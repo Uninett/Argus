@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from functools import reduce
 import logging
 from operator import and_
-from random import randint
+from random import randint, choice
 from urllib.parse import urljoin
 
 from django.contrib.auth import get_user_model
@@ -14,7 +14,7 @@ from django.db.models import F, Q
 from django.utils import timezone
 
 from argus.util.datetime_utils import INFINITY_REPR, get_infinity_repr
-from .constants import INCIDENT_LEVELS, INCIDENT_LEVEL_CHOICES, MIN_INCIDENT_LEVEL, MAX_INCIDENT_LEVEL, Level
+from .constants import INCIDENT_LEVELS, INCIDENT_LEVEL_CHOICES, Level
 from .fields import DateTimeInfinityField
 from .validators import validate_lowercase, validate_key
 
@@ -49,7 +49,7 @@ def create_fake_incident(tags=None, description=None, stateful=True, level=None,
         source_incident_id=source_incident_id,
         source=source_system,
         description=description,
-        level=level or randint(MIN_INCIDENT_LEVEL, MAX_INCIDENT_LEVEL),
+        level=level or choice(Level.values),
         metadata=metadata or {},
     )
 

@@ -1,12 +1,7 @@
 from django.db import models
 
 # Prevent import loops
-# DO NOT import anything here, ever
-
-MIN_INCIDENT_LEVEL = 1  # Do not override
-MAX_INCIDENT_LEVEL = 5
-INCIDENT_LEVELS = tuple(range(MIN_INCIDENT_LEVEL, MAX_INCIDENT_LEVEL + 1))
-INCIDENT_LEVEL_CHOICES = tuple(zip(INCIDENT_LEVELS, map(str, INCIDENT_LEVELS)))
+# DO NOT import anything from argus here, ever
 
 
 class Level(models.IntegerChoices):
@@ -15,3 +10,7 @@ class Level(models.IntegerChoices):
     MODERATE = 3, "Moderate"
     LOW = 4, "Low"
     INFORMATION = 5, "Information"
+
+
+INCIDENT_LEVELS = tuple(Level.values)
+INCIDENT_LEVEL_CHOICES = tuple(zip(INCIDENT_LEVELS, map(str, INCIDENT_LEVELS)))
