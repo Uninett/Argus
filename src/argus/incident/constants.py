@@ -12,5 +12,4 @@ class Level(models.IntegerChoices):
     INFORMATION = 5, "Information"
 
 
-INCIDENT_LEVELS = tuple(Level.values)
-INCIDENT_LEVEL_CHOICES = tuple(zip(INCIDENT_LEVELS, map(str, INCIDENT_LEVELS)))
+INCIDENT_LEVEL_CHOICES = tuple(zip(Level.values, map(str, Level.values)))

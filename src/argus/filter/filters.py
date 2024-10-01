@@ -11,6 +11,7 @@ from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter
 
 from argus.notificationprofile.models import Filter, NotificationProfile
+from argus.incident.constants import Level
 from argus.incident.fields import KeyValueField
 from argus.incident.models import Incident
 
@@ -131,7 +132,7 @@ _INCIDENT_OPENAPI_SOURCE_AUTO_FILTER_PARAMETERS = [
         name="source__type__in",
         description="Fetch incidents with a source of a type with numeric id `ID1` or `ID2` or..",
     ),
-    OpenApiParameter(name="level__lte", description="Fetch incidents with levels in `LEVEL`", enum=Incident.LEVELS),
+    OpenApiParameter(name="level__lte", description="Fetch incidents with levels in `LEVEL`", enum=Level.values),
 ]
 
 

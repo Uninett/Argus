@@ -96,7 +96,7 @@ class FallbackFilterWrapperIncidentFitsTristateTests(unittest.TestCase):
 @tag("unittest")
 class FallbackFilterWrapperIncidentFitsMaxlevelTests(unittest.TestCase):
     # Validation is handled before the data gets to FallbackFilterWrapper
-    # A maxlevel must be one of the integers in Incident.LEVELS if it is set at all.
+    # A maxlevel must be one of the integer values in Incident.Level if it is set at all.
 
     def test_incident_fits_maxlevel_is_None_if_not_mentioned_in_filter(self):
         incident = Mock()

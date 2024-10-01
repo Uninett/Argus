@@ -5,6 +5,7 @@ import factory, factory.fuzzy
 from argus.auth.factories import SourceUserFactory
 from argus.util.datetime_utils import INFINITY_REPR
 from . import models
+from .constants import Level
 
 
 __all__ = [
@@ -56,7 +57,7 @@ class IncidentFactory(factory.django.DjangoModelFactory):
     source_incident_id = factory.Sequence(lambda s: s)
     details_url = factory.Faker("uri")
     description = factory.Faker("sentence")
-    level = factory.fuzzy.FuzzyChoice(models.Incident.LEVELS)  # Random valid level
+    level = factory.fuzzy.FuzzyChoice(Level.values)  # Random valid level
     ticket_url = factory.Faker("uri")
 
 
