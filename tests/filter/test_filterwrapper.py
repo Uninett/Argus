@@ -133,7 +133,6 @@ class FallbackFilterWrapperIncidentFitsMaxlevelTests(unittest.TestCase):
 @tag("unittest")
 class FallbackFilterWrapperIncidentFitsSourceSystemTests(unittest.TestCase):
     # Validation is handled before the data gets to FallbackFilterWrapper
-    # A maxlevel must be one of the integers in Incident.LEVELS if it is set at all.
 
     def test_incident_fits_source_system_is_None_if_not_mentioned_in_filter(self):
         incident = Mock()
@@ -164,7 +163,6 @@ class FallbackFilterWrapperIncidentFitsSourceSystemTests(unittest.TestCase):
 @tag("unittest")
 class FallbackFilterWrapperIncidentFitsTagsTests(unittest.TestCase):
     # Validation is handled before the data gets to FallbackFilterWrapper
-    # A maxlevel must be one of the integers in Incident.LEVELS if it is set at all.
 
     def test_incident_fits_tags_is_None_if_not_mentioned_in_filter(self):
         incident = Mock()
