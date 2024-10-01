@@ -45,7 +45,7 @@ Other glue services
 NAGIOS
 ~~~~~~
 
-  * There is a python script at https://github.com/SUNET/nagios-argus-glue. It
+  * There is a Python script at https://github.com/SUNET/nagios-argus-glue. It
     didn't scale to SUNET's needs.
   * There is code for a tiny rust binary at https://github.com/SUNET/nglue
     that is run by NAGIOS. It sends alerts to
