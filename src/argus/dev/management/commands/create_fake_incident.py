@@ -5,7 +5,7 @@ from random import randint
 
 from django.core.management.base import BaseCommand
 
-from argus.incident.constants import MIN_INCIDENT_LEVEL, MAX_INCIDENT_LEVEL
+from argus.incident.constants import Level
 from argus.incident.models import create_fake_incident
 
 
@@ -34,8 +34,8 @@ class Command(BaseCommand):
             "--level",
             type=int,
             action=Range,
-            minimum=MIN_INCIDENT_LEVEL,
-            maximum=MAX_INCIDENT_LEVEL,
+            minimum=min(Level).value,
+            maximum=max(Level).value,
             default=0,
             help="Set level to <level>, otherwise a random number within the correct range is used",
         )

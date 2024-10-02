@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.forms import modelform_factory
 
-from .constants import INCIDENT_LEVELS
+from .constants import Level
 from .models import Incident, SourceSystem, Tag
 
 User = get_user_model()
@@ -57,7 +57,7 @@ class AddSourceSystemForm(forms.ModelForm):
 
 class FakeIncidentForm(forms.ModelForm):
     level = forms.TypedChoiceField(
-        choices=[("", "")] + [(str(level), str(level)) for level in INCIDENT_LEVELS],
+        choices=[("", "")] + [(str(level), str(level)) for level in Level.values],
         coerce=int,
     )
     stateful = forms.BooleanField(

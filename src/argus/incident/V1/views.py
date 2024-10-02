@@ -11,6 +11,7 @@ from argus.filter.filters import BooleanStringOAEnum
 from argus.filter.filters import SourceLockedIncidentFilter
 from argus.filter.filters import SOURCE_LOCKED_INCIDENT_OPENAPI_PARAMETER_DESCRIPTIONS
 
+from ..constants import Level
 from ..models import Incident, SourceSystem
 from ..serializers import IncidentPureDeserializer, SourceSystemSerializer
 from ..views import IncidentViewSet
@@ -58,7 +59,7 @@ from .serializers import (
             OpenApiParameter(
                 name="level__lte",
                 description="Fetch incidents with levels less than or equal to `LEVEL`",
-                enum=Incident.LEVELS,
+                enum=Level.values,
             ),
             OpenApiParameter(
                 name="open",

@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from functools import reduce
 import logging
 from operator import and_
-from random import randint
+from random import randint, choice
 from urllib.parse import urljoin
 
 from django.contrib.auth import get_user_model
@@ -14,7 +14,7 @@ from django.db.models import F, Q
 from django.utils import timezone
 
 from argus.util.datetime_utils import INFINITY_REPR, get_infinity_repr
-from .constants import INCIDENT_LEVELS, INCIDENT_LEVEL_CHOICES, MIN_INCIDENT_LEVEL, MAX_INCIDENT_LEVEL, Level
+from .constants import Level
 from .fields import DateTimeInfinityField
 from .validators import validate_lowercase, validate_key
 
@@ -49,7 +49,7 @@ def create_fake_incident(tags=None, description=None, stateful=True, level=None,
         source_incident_id=source_incident_id,
         source=source_system,
         description=description,
-        level=level or randint(MIN_INCIDENT_LEVEL, MAX_INCIDENT_LEVEL),
+        level=level or choice(Level.values),
         metadata=metadata or {},
     )
 
@@ -360,9 +360,7 @@ class IncidentQuerySet(models.QuerySet):
 
 # TODO: review whether fields should be nullable, and on_delete modes
 class Incident(models.Model):
-    # Prevent import loop
-    LEVELS = INCIDENT_LEVELS
-    LEVEL_CHOICES = INCIDENT_LEVEL_CHOICES
+    LEVEL_CHOICES = tuple(zip(Level.values, map(str, Level.values)))
 
     start_time = models.DateTimeField(help_text="The time the incident was created.")
     end_time = DateTimeInfinityField(
@@ -380,7 +378,7 @@ class Incident(models.Model):
     source_incident_id = models.TextField(blank=True, default="", verbose_name="source incident ID")
     details_url = models.TextField(blank=True, validators=[URLValidator], verbose_name="details URL")
     description = models.TextField(blank=True)
-    level = models.IntegerField(choices=LEVEL_CHOICES, default=5)
+    level = models.IntegerField(choices=LEVEL_CHOICES, default=max(Level).value)
     ticket_url = models.TextField(
         blank=True,
         validators=[URLValidator],
