@@ -37,7 +37,7 @@ class SourceUserFactory(BaseUserFactory):
         model = User
         django_get_or_create = ("username",)
 
-    username = factory.Faker("word")
+    username = factory.Sequence(lambda n: "source_%d" % n)
     is_staff = False
     is_superuser = False
 
