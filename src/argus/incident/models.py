@@ -378,7 +378,7 @@ class Incident(models.Model):
     source_incident_id = models.TextField(blank=True, default="", verbose_name="source incident ID")
     details_url = models.TextField(blank=True, validators=[URLValidator], verbose_name="details URL")
     description = models.TextField(blank=True)
-    level = models.IntegerField(choices=LEVEL_CHOICES, default=5)
+    level = models.IntegerField(choices=LEVEL_CHOICES, default=max(Level).value)
     ticket_url = models.TextField(
         blank=True,
         validators=[URLValidator],
