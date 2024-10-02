@@ -1,10 +1,13 @@
 import secrets
 import string
 
+from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
 
-from argus.auth.models import User
 from argus.incident.models import get_or_create_default_instances
+
+
+User = get_user_model()
 
 
 def generate_password_string(length=16):

@@ -6,13 +6,13 @@ from operator import and_
 from random import randint
 from urllib.parse import urljoin
 
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
 from django.db import models
 from django.db.models import F, Q
 from django.utils import timezone
 
-from argus.auth.models import User
 from argus.util.datetime_utils import INFINITY_REPR, get_infinity_repr
 from .constants import INCIDENT_LEVELS, INCIDENT_LEVEL_CHOICES, MIN_INCIDENT_LEVEL, MAX_INCIDENT_LEVEL, Level
 from .fields import DateTimeInfinityField
@@ -20,6 +20,7 @@ from .validators import validate_lowercase, validate_key
 
 
 LOG = logging.getLogger(__name__)
+User = get_user_model()
 
 
 def get_or_create_default_instances():

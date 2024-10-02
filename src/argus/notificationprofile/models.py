@@ -5,12 +5,11 @@ import logging
 from typing import TYPE_CHECKING, Dict, Optional
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.utils import timezone
 from django.utils.text import slugify
-
-from argus.auth.models import User
 
 if TYPE_CHECKING:
     from argus.incident.models import Event, Incident  # noqa: F401
@@ -18,6 +17,7 @@ if TYPE_CHECKING:
 TriState = Optional[bool]
 
 LOG = logging.getLogger(__name__)
+User = get_user_model()
 
 
 class Timeslot(models.Model):

@@ -2,13 +2,13 @@ from copy import deepcopy
 from collections import OrderedDict
 from typing import List, Tuple, Any, Dict
 
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
 from django.utils import timezone
 
 from rest_framework import serializers
 
-from argus.auth.models import User
 from argus.auth.serializers import UsernameSerializer
 from argus.util.datetime_utils import INFINITY_REPR
 from . import fields
@@ -22,6 +22,9 @@ from .models import (
     SourceSystemType,
     Tag,
 )
+
+
+User = get_user_model()
 
 
 def clean_tag(value: str) -> Tuple[str, str]:

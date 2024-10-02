@@ -1,12 +1,15 @@
+from django.contrib.auth import get_user_model
 from django.test import Client
 from django.urls import reverse
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient, APITestCase
 
-from argus.auth.models import User
 from argus.auth.factories import AdminUserFactory
 from argus.incident.factories import SourceSystemFactory, SourceSystemTypeFactory, SourceUserFactory
 from argus.incident.models import SourceSystem
+
+
+User = get_user_model()
 
 
 class SourceSystemPostingTests(APITestCase):

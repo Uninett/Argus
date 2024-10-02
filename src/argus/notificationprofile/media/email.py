@@ -24,9 +24,13 @@ if TYPE_CHECKING:
 
     from types import NoneType
     from typing import Union, Set
+
+    from django.contrib.auth import get_user_model
     from django.db.models.query import QuerySet
-    from argus.auth.models import User
+
     from ..serializers import RequestDestinationConfigSerializer
+
+    User = get_user_model()
 
 LOG = logging.getLogger(__name__)
 

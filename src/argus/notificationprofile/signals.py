@@ -1,13 +1,14 @@
 import logging
 
+from django.contrib.auth import get_user_model
 from django.db.utils import ProgrammingError
 
 from rest_framework.exceptions import APIException
 
-from argus.auth.models import User
 from .models import DestinationConfig, TimeRecurrence, Timeslot
 
 LOG = logging.getLogger(__name__)
+User = get_user_model()
 
 __all__ = [
     "sync_media",

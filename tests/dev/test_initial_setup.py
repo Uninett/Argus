@@ -1,11 +1,14 @@
 from io import StringIO
 
+from django.contrib.auth import get_user_model
 from django.core.management import call_command
 from django.test import TestCase
 
-from argus.auth.models import User
 from argus.incident.models import SourceSystem, SourceSystemType
 from argus.util.testing import connect_signals, disconnect_signals
+
+
+User = get_user_model()
 
 
 class CreateFakeIncidentTests(TestCase):

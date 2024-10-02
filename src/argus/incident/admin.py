@@ -2,6 +2,7 @@ from urllib.parse import urlsplit
 
 from django.contrib import admin
 from django.contrib.admin import widgets as admin_widgets
+from django.contrib.auth import get_user_model
 from django.db.models.functions import Concat
 from django.http import HttpResponseRedirect
 from django.template.response import TemplateResponse
@@ -9,7 +10,6 @@ from django.urls import path
 from django.utils.html import format_html_join, format_html
 from django.utils.safestring import mark_safe
 
-from argus.auth.models import User
 from argus.util.admin_utils import add_elements_to_deleted_objects, list_filter_factory
 from . import fields, widgets
 from .forms import AddSourceSystemForm, FakeIncidentForm
@@ -26,6 +26,8 @@ from .models import (
     Tag,
     create_fake_incident,
 )
+
+User = get_user_model()
 
 
 class TextWidgetsOverrideModelAdmin(admin.ModelAdmin):
