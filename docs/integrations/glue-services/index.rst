@@ -1,42 +1,58 @@
-==========================================
-Integrating monitoring software with Argus
-==========================================
+.. index::
+   integration; glue service
+   glue service
+
+=========================================================
+Glue services: Integrating monitoring software with Argus
+=========================================================
+
+A *glue service* is the name we've given to any piece of software capable of
+receiving alerts from your monitoring system and translating these into
+incident state changes that are communicated to the Argus API server.
 
 In essence, to integrate your existing monitoring systems with Argus means to
 ensure your Argus incident database is synchronized with the alerts stemming
 from your monitoring systems.
 
-To ensure this, you will need what is termed a **glue service**.
-
-Glue services
-=============
-
-
-What is a glue service?
------------------------
-
-A *glue service* is any piece of software capable of receiving alerts from your
-monitoring system and translating these into incident state changes that are
-communicated to the Argus API server.
-
 A glue service for your particular monitoring system may already exist, or you
 may need to write your own.
 
 Existing glue services
-----------------------
+======================
 
-* Network Administration Visualized: https://github.com/Uninett/nav-argus-glue.
-  This is an extension of nav, runs on the same server, and uses the NAV config
-  files.
-* NAGIOS:
+Glue services maintained by Argus developers
+--------------------------------------------
 
-  * There's a python script at https://github.com/SUNET/nagios-argus-glue. It
+Network Administration Visualized
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+| Source: https://github.com/Uninett/nav-argus-glue.
+| PyPI: `nav-argus-glue <https://pypi.org/project/nav-argus-glue/>`_
+
+This is an extension of NAV, runs on the same server, and uses the NAV config
+files.
+
+Mist Systems Administration (Juniper)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+| Source: https://gitlab.sikt.no/cnaas/mist-argus
+
+This will be available on PyPI after more polish is done.
+
+Other glue services
+-------------------
+
+NAGIOS
+~~~~~~
+
+  * There is a Python script at https://github.com/SUNET/nagios-argus-glue. It
     didn't scale to SUNET's needs.
-  * There's the code for a tiny rust binary at https://github.com/SUNET/nglue
+  * There is code for a tiny rust binary at https://github.com/SUNET/nglue
     that is run by NAGIOS. It sends alerts to
     https://github.com/SUNET/nglue-api, designed to run in a container. The
-    nglue-api pre-filters what to send to argus.
-* Mist Systems Administration (Juniper): https://gitlab.sikt.no/cnaas/mist-argus
+    ``nglue-api`` pre-filters what to send to Argus.
+
+.. include:: ../_note.rst
 
 Integrating an existing monitoring system
 =========================================
