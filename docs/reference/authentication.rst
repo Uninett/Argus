@@ -40,7 +40,7 @@ Which backends are configured will be available on the JSON endpoint
 ``/login-methods/``.
 
 
-.. _dataporten:
+.. _dataporten-reference:
 
 Dataporten
 ----------
