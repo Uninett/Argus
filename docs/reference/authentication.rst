@@ -1,3 +1,5 @@
+.. _authentication-reference:
+
 ==============
 Authentication
 ==============
