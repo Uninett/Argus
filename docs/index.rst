@@ -11,7 +11,6 @@ Welcome to Argus' documentation!
 .. toctree::
    about-argus
    reference
-   authentication
    integrations/index
    development
    :maxdepth: 2

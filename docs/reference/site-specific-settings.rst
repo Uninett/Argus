@@ -139,7 +139,7 @@ Dataporten
 
 * :setting:`ARGUS_DATAPORTEN_SECRET` holds the dataporten password.
 
-Refer to the section :ref:`dataporten` for more information.
+Refer to the section :ref:`dataporten <dataporten-reference>` for more information.
 
 Domain settings
 ---------------

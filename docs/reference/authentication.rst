@@ -11,6 +11,18 @@ This will yield a bearer token.
 Also supported is logging in via browser to the admin, at ``/admin/``. This
 will set a session cookie.
 
+..
+   User controlled via webserver
+   =============================
+
+   Some web servers have have plugins that talk various authentication
+   protocols like SAML, OAuth2 and others, typically setting an environment
+   variable REMOTE_USER. Django has built in support for this by adding
+   ``"django.contrib.auth.middleware.RemoteUserMiddleware`` to the
+   :setting:`MIDDLEWARE`-setting and
+   ``django.contrib.auth.backends.RemoteUserBackend`` to the
+   :setting:`AUTHENTICATION_BACKENDS`/setting.
+
 .. _oauth2:
 
 OAuth2
@@ -28,7 +40,7 @@ Which backends are configured will be available on the JSON endpoint
 ``/login-methods/``.
 
 
-.. _dataporten:
+.. _dataporten-reference:
 
 Dataporten
 ----------
