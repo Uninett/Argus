@@ -11,7 +11,7 @@ from django.shortcuts import render, reverse, get_object_or_404
 from django.views.generic import ListView
 
 from django.views.decorators.http import require_GET, require_POST
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django_htmx.http import HttpResponseClientRefresh
 
 from argus_htmx.themes.utils import get_theme_names
