@@ -3,7 +3,7 @@ from unittest.mock import patch
 from django.contrib.auth.backends import ModelBackend
 from django.test import TestCase
 
-from argus.auth.utils import get_authentication_backend_name_and_type, get_psa_authentication_names
+from argus.auth.utils import get_authentication_backend_name_and_type
 from argus.dataporten.social import DataportenFeideOAuth2
 
 
@@ -33,8 +33,3 @@ class UtilsTests(TestCase):
                 "name": "dataporten_feide",
             }
         ]
-
-    @patch("argus.auth.utils.get_authentication_backend_classes")
-    def test_get_psa_authentication_names_returns_feide_name(self, mock_get_authentication_backend_classes):
-        mock_get_authentication_backend_classes.return_value = [DataportenFeideOAuth2]
-        assert get_psa_authentication_names() == ["dataporten_feide"]
