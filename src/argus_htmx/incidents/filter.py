@@ -19,9 +19,9 @@ class IncidentFilterForm(forms.Form):
         required=False,
     )
     maxlevel = forms.IntegerField(
-        widget=forms.NumberInput(attrs={
-            'type': 'range', 'step': '1', 'min': min(Level).value, 'max': max(Level).value
-        }),
+        widget=forms.NumberInput(
+            attrs={"type": "range", "step": "1", "min": min(Level).value, "max": max(Level).value}
+        ),
         label="Level <=",
         initial=max(Level).value,
         required=False,

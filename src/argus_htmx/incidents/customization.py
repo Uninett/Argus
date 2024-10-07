@@ -33,20 +33,22 @@ class IncidentTableColumn:
 
 _BUILTIN_COLUMN_LIST = [
     IncidentTableColumn(
-        "row_select", "Selected", "htmx/incidents/_incident_checkbox.html", "htmx/incidents/_selected_incidents_header.html"
+        "row_select",
+        "Selected",
+        "htmx/incidents/_incident_checkbox.html",
+        "htmx/incidents/_selected_incidents_header.html",
     ),
     IncidentTableColumn("id", "ID", "htmx/incidents/_incident_pk.html"),
     IncidentTableColumn(
-        "start_time", "Timestamp", "htmx/incidents/_incident_start_time.html", "htmx/incidents/_incident_start_time_header.html"
+        "start_time",
+        "Timestamp",
+        "htmx/incidents/_incident_start_time.html",
+        "htmx/incidents/_incident_start_time_header.html",
     ),
     IncidentTableColumn("status", "Status", "htmx/incidents/_incident_status.html"),
-    IncidentTableColumn(
-        "level", "Severity level", "htmx/incidents/_incident_level.html"
-    ),
+    IncidentTableColumn("level", "Severity level", "htmx/incidents/_incident_level.html"),
     IncidentTableColumn("source", "Source", "htmx/incidents/_incident_source.html"),
-    IncidentTableColumn(
-        "description", "Description", "htmx/incidents/_incident_description.html"
-    ),
+    IncidentTableColumn("description", "Description", "htmx/incidents/_incident_description.html"),
     IncidentTableColumn("ack", "Ack", "htmx/incidents/_incident_ack.html"),
     IncidentTableColumn("combined_status", "Status", "htmx/incidents/_incident_combined_status.html"),
     IncidentTableColumn("ticket", "Ticket", "htmx/incidents/_incident_ticket.html"),
@@ -56,9 +58,7 @@ BUILTIN_COLUMNS = {col.name: col for col in _BUILTIN_COLUMN_LIST}
 
 
 def get_incident_table_columns() -> List[IncidentTableColumn]:
-    columns = getattr(
-        settings, "INCIDENT_TABLE_COLUMNS", argus_htmx_settings.INCIDENT_TABLE_COLUMNS
-    )
+    columns = getattr(settings, "INCIDENT_TABLE_COLUMNS", argus_htmx_settings.INCIDENT_TABLE_COLUMNS)
     return [_resolve_column(col) for col in columns]
 
 

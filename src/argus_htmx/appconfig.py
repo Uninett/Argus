@@ -25,7 +25,7 @@ _app_settings = [
         },
     },
     {
-        "app_name": "widget_tweaks"
+        "app_name": "widget_tweaks",  # indent for readability
     },
 ]
 

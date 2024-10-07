@@ -8,6 +8,7 @@ class AckForm(forms.Form):
 
 class DescriptionOptionalForm(forms.Form):
     "For closing/reopening"
+
     description = forms.CharField(required=False)
 
 

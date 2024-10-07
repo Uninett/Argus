@@ -30,16 +30,13 @@ LOG = logging.getLogger(__name__)
 DEFAULT_PAGE_SIZE = getattr(settings, "ARGUS_INCIDENTS_DEFAULT_PAGE_SIZE", 10)
 ALLOWED_PAGE_SIZES = getattr(settings, "ARGUS_INCIDENTS_PAGE_SIZES", [10, 20, 50, 100])
 
+
 def prefetch_incident_daughters():
-    return (
-        Incident.objects
-        .select_related("source")
-        .prefetch_related(
-            "incident_tag_relations",
-            "incident_tag_relations__tag",
-            "events",
-            "events__ack",
-        )
+    return Incident.objects.select_related("source").prefetch_related(
+        "incident_tag_relations",
+        "incident_tag_relations__tag",
+        "events",
+        "events__ack",
     )
 
 
@@ -94,8 +91,8 @@ def _incident_add_ack(pk: int, formdata, user: User, group: Optional[str] = None
         "form": form,
         "incident": incident,
         "page_title": str(incident),
-        'group': group,
-        'is_group_member': is_group_member,
+        "group": group,
+        "is_group_member": is_group_member,
     }
     return incident, context
 
@@ -175,7 +172,7 @@ def incident_detail_edit_ticket(request, pk: int):
 
 def _get_page_size(params):
     try:
-        if (page_size:=int(params.pop('page_size', DEFAULT_PAGE_SIZE))) in ALLOWED_PAGE_SIZES:
+        if (page_size := int(params.pop("page_size", DEFAULT_PAGE_SIZE))) in ALLOWED_PAGE_SIZES:
             return page_size
     except ValueError:
         pass
@@ -220,7 +217,7 @@ def incident_list(request: HtmxHttpRequest) -> HttpResponse:
         "last_refreshed": last_refreshed,
         "update_interval": 30,
         "page_size": page_size,
-        "all_page_sizes": ALLOWED_PAGE_SIZES
+        "all_page_sizes": ALLOWED_PAGE_SIZES,
     }
 
     return render(request, "htmx/incidents/incident_list.html", context=context)

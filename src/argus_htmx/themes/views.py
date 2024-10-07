@@ -18,11 +18,11 @@ from argus_htmx.themes.utils import get_theme_names
 from argus_htmx.incidents.views import HtmxHttpRequest
 
 LOG = logging.getLogger(__name__)
-THEMES_MODULE = 'argus_htmx'
+THEMES_MODULE = "argus_htmx"
 
 
 class ThemeListView(ListView):
-    http_method_names = ['get', 'post', 'head', 'options', 'trace']
+    http_method_names = ["get", "post", "head", "options", "trace"]
     template_name = "htmx/themes/themes_list.html"
 
     def setup(self, request, *args, **kwargs):
@@ -55,5 +55,5 @@ def change_theme(request: HtmxHttpRequest) -> HttpResponse:
     if theme in themes:
         request.session["theme"] = theme
         messages.success(request, f'Switched theme to "{theme}"')
-        return HttpResponse(f'{theme}')
+        return HttpResponse(f"{theme}")
     return HttpResponseClientRefresh()
