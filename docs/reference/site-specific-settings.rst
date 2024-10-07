@@ -147,7 +147,7 @@ Subformat::
 
     "dotted-path-to-middleware": ACTION
 
-Adding middleware is tricker than other settings as the order matters. The
+Adding middleware is trickier than other settings as the order matters. The
 default is appending (ACTION is "end" or a random string), but it is also
 possible to prepend (ACTION is "start"). A prepended middleware will be run
 *before* the security- and session middlewares which might not be what you
