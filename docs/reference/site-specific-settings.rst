@@ -128,6 +128,31 @@ Format::
         ],
     }
 
+Middleware
+..........
+
+Optionally, additional middlewares can be added to :setting:`MIDDLEWARE`-setting.
+
+Format::
+
+    {
+        "app_name": "holiday_cheer",
+        "middleware": {
+            "holiday_cheer.appended_middleware": "end",
+            "holiday_cheer.prepended_middleware": "start",
+        },
+    }
+
+Subformat::
+
+    "dotted-path-to-middleware": ACTION
+
+Adding middleware is trickier than other settings as the order matters. The
+default is appending (ACTION is "end" or a random string), but it is also
+possible to prepend (ACTION is "start"). A prepended middleware will be run
+*before* the security- and session middlewares which might not be what you
+want.
+
 Dataporten
 ----------
 
