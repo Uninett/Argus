@@ -16,6 +16,7 @@ src/argus_htmx/tailwindtheme/tailwind.config.js
 # OS specific
 src/argus_htmx/tailwindtheme/tailwindcss
 
+!.git-blame-ignore-revs
 !.gitattributes
 !.gitignore
 !.pre-commit-config.yaml
