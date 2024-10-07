@@ -34,3 +34,9 @@ docs = ["sphinx"]
 
 [tool.flit.module]
 name = "argus_htmx"
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+ignore = ["E731"]
