@@ -1,4 +1,4 @@
-<button class="btn"
+<button class="btn {{ button_class|default:"btn-primary" }}"
         onclick="htmx.find('#{{ dialog_id }}').showModal()"
 >
     {{ button_title }}
@@ -17,8 +17,7 @@
         <div class="modal-action card-actions">
             <form method="dialog" class="w-full">
                 <div class="divider divider-end">
-                    <button type="submit" form="{{ dialog_id }}-form"
-                            class="btn btn-primary">{{ submit_text }}</button>
+                    <button type="submit" form="{{ dialog_id }}-form" class="btn {{ button_class|default:"btn-primary" }}">{{ submit_text }}</button>
                     <button class="btn">{{ cancel_text }}</button>
                 </div>
             </form>

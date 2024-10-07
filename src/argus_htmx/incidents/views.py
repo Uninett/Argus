@@ -181,7 +181,7 @@ def _get_page_size(params):
         pass
     return DEFAULT_PAGE_SIZE
 
-@require_GET
+
 def incident_list(request: HtmxHttpRequest) -> HttpResponse:
     columns = get_incident_table_columns()
 
