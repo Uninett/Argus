@@ -53,3 +53,9 @@ class RefreshTokenSerializer(serializers.Serializer):
 
 class EmptySerializer(serializers.Serializer):
     pass
+
+
+class AuthMethodSerializer(serializers.Serializer):
+    type = serializers.CharField(read_only=True)
+    url = serializers.CharField(read_only=True)
+    name = serializers.CharField(read_only=True)

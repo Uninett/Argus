@@ -12,7 +12,13 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import User
-from .serializers import BasicUserSerializer, EmptySerializer, RefreshTokenSerializer, UserSerializer
+from .serializers import (
+    BasicUserSerializer,
+    EmptySerializer,
+    RefreshTokenSerializer,
+    UserSerializer,
+    AuthMethodSerializer,
+)
 from .utils import get_authentication_backend_name_and_type
 
 
@@ -62,6 +68,11 @@ class BasicUserDetail(generics.RetrieveAPIView):
     queryset = User.objects.all()
 
 
+@extend_schema_view(
+    get=extend_schema(
+        responses=AuthMethodSerializer,
+    ),
+)
 class AuthMethodListView(APIView):
     http_method_names = ["get", "head", "options", "trace"]
     permission_classes = [AllowAny]
