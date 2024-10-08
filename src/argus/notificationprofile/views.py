@@ -253,6 +253,12 @@ class FilterViewSet(viewsets.ModelViewSet):
 
 
 # TODO: change HTTP method to GET, and get query data from URL
+@extend_schema_view(
+    post=extend_schema(
+        request=FilterBlobSerializer,
+        responses={200: IncidentSerializer},
+    ),
+)
 class FilterPreviewView(APIView):
     def post(self, request, format=None):
         """
