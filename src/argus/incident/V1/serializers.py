@@ -131,5 +131,5 @@ class UpdateAcknowledgementSerializerV1(serializers.ModelSerializer):
 
 
 # Get rid of this!
-class MetadataSerializer(serializers.Serializer):
+class MetadataSerializerV1(serializers.Serializer):
     sourceSystems = SourceSystemSerializer(many=True)
