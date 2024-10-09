@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from urllib.parse import urlsplit
 
 import dj_database_url
+from django.core.exceptions import ImproperlyConfigured
 
 # Import some helpers
 from . import *
@@ -120,12 +121,6 @@ AUTH_PASSWORD_VALIDATORS = [
 AUTH_USER_MODEL = "argus_auth.User"
 
 
-LOGIN_URL = "/login/"
-LOGOUT_URL = "/logout/"
-LOGIN_REDIRECT_URL = "/"
-LOGOUT_REDIRECT_URL = "/"
-
-
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
@@ -163,7 +158,6 @@ STORAGES = {
 
 
 AUTHENTICATION_BACKENDS = (
-    "argus.dataporten.social.DataportenFeideOAuth2",
     "django.contrib.auth.backends.RemoteUserBackend",
     "django.contrib.auth.backends.ModelBackend",
 )
@@ -181,8 +175,6 @@ if LOGGING_MODULE:
     STARTUP_LOGGING = setup_logging(LOGGING_MODULE)
 
 # django-cors-headers
-FRONTEND_URL = get_str_env("ARGUS_FRONTEND_URL")
-
 CORS_ALLOWED_ORIGINS = []
 if FRONTEND_URL:
     CORS_ALLOWED_ORIGINS.append(normalize_url(FRONTEND_URL))
