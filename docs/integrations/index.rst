@@ -1,7 +1,4 @@
-.. Argus documentation master file, created by
-   sphinx-quickstart on Fri Apr 24 09:29:51 2020.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+.. _integrations:
 
 ============
 Integrations
@@ -26,6 +23,9 @@ In short:
 * A single ticket system is hooked up via a plugin. It is installed (via pip)
   to the same path as argus. All ticket system plugins are configured via the
   settings file, see :ref:`site-specific-settings`.
+
+For other, more involved ways to customize Argus, see :ref:`customization`.
+
 
 .. toctree::
    glue-services/index

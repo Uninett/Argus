@@ -1,3 +1,5 @@
+.. _howto-customize-filtering:
+
 ==========================
 How to customize filtering
 ==========================
