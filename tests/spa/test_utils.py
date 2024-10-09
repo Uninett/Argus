@@ -3,11 +3,12 @@ from unittest.mock import patch
 from django.contrib.auth.backends import ModelBackend
 from django.test import TestCase
 
-from argus.auth.utils import get_authentication_backend_name_and_type
-from argus.dataporten.social import DataportenFeideOAuth2
+from argus.spa.utils import get_authentication_backend_name_and_type
+from argus.spa.dataporten.social import DataportenFeideOAuth2
 
 
 class UtilsTests(TestCase):
+
     @patch("argus.auth.utils.get_authentication_backend_classes")
     def test_get_authentication_backend_name_and_type_returns_user_name_password_login(
         self, mock_get_authentication_backend_classes

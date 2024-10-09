@@ -185,7 +185,7 @@ STORAGES = {
 
 
 AUTHENTICATION_BACKENDS = (
-    "argus.dataporten.social.DataportenFeideOAuth2",
+    "argus.spa.dataporten.social.DataportenFeideOAuth2",
     "django.contrib.auth.backends.RemoteUserBackend",
     "django.contrib.auth.backends.ModelBackend",
 )
