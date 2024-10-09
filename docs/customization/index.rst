@@ -1,14 +1,21 @@
+.. _customization:
+
 =================
 Customizing Argus
 =================
 
-Argus can be customized further beyond adding glue services, notification
-plugins and choosing a ticket system.
+Beyond :ref:`integrations with sources, ticket systems and notification
+systems <integrations>` Argus can be customized further.
+
+The entries here are for customizations that take much more effort than
+installing some libraries and changing some settings.
 
 Authentication with OAuth2
 ==========================
 
-You can add your own OAuth2 providers, and more than one if necessary.
+You can add your own OAuth2 providers, and more than one if necessary. While
+there are many providers already included with the OAuth2 library we are using,
+we had to write our own.
 
 See :ref:`authentication-reference` for reference.
 
