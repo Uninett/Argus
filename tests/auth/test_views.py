@@ -44,7 +44,6 @@ class ViewTests(APITestCase):
 
     @override_settings(
         AUTHENTICATION_BACKENDS=[
-            "argus.dataporten.social.DataportenFeideOAuth2",
             "django.contrib.auth.backends.RemoteUserBackend",
             "django.contrib.auth.backends.ModelBackend",
         ]
@@ -56,6 +55,5 @@ class ViewTests(APITestCase):
             response.data,
             [
                 {"type": "username_password", "url": "http://testserver/api/v1/token-auth/", "name": "user_pw"},
-                {"type": "OAuth2", "url": "http://testserver/oidc/login/dataporten_feide/", "name": "dataporten_feide"},
             ],
         )
