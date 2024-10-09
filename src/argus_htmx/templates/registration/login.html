@@ -22,14 +22,5 @@
     </form>
     </section>
 
-    {% comment %}
-    <section>
-    <h3>Federated logins</h3>
-    {% for backend in oauth2_backends %}
-    <a href="/oidc/login/{{ backend }}/">{{ backend }}</a>
-    {% endfor %}
-    </section>
-    {% endcomment %}
-
 </div>
 {% endblock main %}
