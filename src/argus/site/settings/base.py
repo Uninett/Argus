@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from urllib.parse import urlsplit
 
 import dj_database_url
+from django.core.exceptions import ImproperlyConfigured
 
 # Import some helpers
 from . import *
@@ -181,9 +182,10 @@ if LOGGING_MODULE:
     LOGGING_CONFIG = None
     STARTUP_LOGGING = setup_logging(LOGGING_MODULE)
 
-# django-cors-headers
+# For links to argus in tickets
 FRONTEND_URL = get_str_env("ARGUS_FRONTEND_URL")
 
+# django-cors-headers
 CORS_ALLOWED_ORIGINS = []
 if FRONTEND_URL:
     CORS_ALLOWED_ORIGINS.append(normalize_url(FRONTEND_URL))

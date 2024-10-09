@@ -4,8 +4,10 @@ import json
 import logging.config
 from os import getenv
 from pathlib import Path
+from typing import Optional
 from urllib.parse import urlsplit, urlunsplit
 
+from django.core.exceptions import ImproperlyConfigured
 from django.utils.module_loading import import_string
 
 from ._serializers import ListAppSetting
@@ -156,5 +158,10 @@ def update_loglevels(loglevel: str = "INFO", loggers=(), handlers=()) -> None:
         handlerdict = {}
         for handler in handlers:
             handlerdict["handler"] = {"level": loglevel}
-        logdict = {"version": 1, "disable_existing_loggers": False, "incremental": True, "handlers": handlerdict}
+        logdict = {
+            "version": 1,
+            "disable_existing_loggers": False,
+            "incremental": True,
+            "handlers": handlerdict,
+        }
         logging.config.dictConfig(logdict)

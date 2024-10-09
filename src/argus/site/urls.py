@@ -20,7 +20,6 @@ from django.urls import include, path, re_path
 from django.views.generic.base import RedirectView
 
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
-from social_django.urls import extra
 
 from argus.auth.views import ObtainNewAuthToken
 from argus.notificationprofile.views import SchemaView
@@ -41,6 +40,8 @@ urlpatterns = [
     path("json-schema/<slug:slug>", SchemaView.as_view(), name="json-schema"),
     path("", index, name="api-home"),
 ]
+
+# Extra/overriding apps
 
 prefixed_urlpatterns = get_urlpatterns(settings.OVERRIDING_APPS)
 if prefixed_urlpatterns:
