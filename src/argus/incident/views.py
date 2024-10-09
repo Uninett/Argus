@@ -424,9 +424,10 @@ class IncidentTagViewSet(
 
 @extend_schema_view(
     list=extend_schema(
+        operation_id="api_v2_events_list",
         parameters=[
             OpenApiParameter(name="cursor", description="The pagination cursor value.", type=str),
-        ]
+        ],
     )
 )
 class AllEventsViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
@@ -439,6 +440,14 @@ class AllEventsViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
         return Event.objects.all()
 
 
+@extend_schema_view(
+    list=extend_schema(
+        operation_id="api_v2_events_per_incident_list",
+        parameters=[
+            OpenApiParameter(name="cursor", description="The pagination cursor value.", type=str),
+        ],
+    )
+)
 class EventViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
     queryset = Incident.objects.none()  # For OpenAPI
     permission_classes = [IsAuthenticated]

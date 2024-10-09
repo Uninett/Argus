@@ -13,6 +13,9 @@ from django.shortcuts import render, reverse
 from rest_framework.views import APIView
 from rest_framework import permissions
 from rest_framework.response import Response
+from drf_spectacular.utils import extend_schema, extend_schema_view
+
+from .serializers import MetadataSerializer
 
 
 ERROR_TEMPLATE = """<html>
@@ -81,6 +84,7 @@ error.login_required = False
 # fmt: on
 
 
+@extend_schema_view(get=extend_schema(responses=MetadataSerializer))
 class MetadataView(APIView):
     http_method_names = ["get", "head", "options", "trace"]
     authentication_classes = []

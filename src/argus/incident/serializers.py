@@ -362,6 +362,7 @@ class UpdateAcknowledgementSerializer(serializers.ModelSerializer):
 
 
 class RequestAcknowledgementSerializer(serializers.ModelSerializer):
+    pk = serializers.IntegerField(required=False)  # Type hint for OpenAPI
     timestamp = serializers.DateTimeField()
     description = serializers.CharField(required=False, allow_blank=True)
     expiration = serializers.DateTimeField(required=False, allow_null=True)
@@ -401,6 +402,7 @@ class RequestAcknowledgementSerializer(serializers.ModelSerializer):
 
 
 class ResponseAcknowledgementSerializer(serializers.ModelSerializer):
+    pk = serializers.IntegerField()  # Type hint for OpenAPI
     event = EventSerializer()
 
     class Meta:

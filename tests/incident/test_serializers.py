@@ -53,7 +53,7 @@ class AcknowledgementSerializerV1Tests(TestCase):
             "expiration": None,
         }
         serializer = AcknowledgementSerializerV1(data=data, context={"request": request})
-        serializer.is_valid()
+        self.assertTrue(serializer.is_valid(), serializer.errors)
         validated_data = serializer.validated_data
         validated_data["actor"] = self.user
         validated_data["incident"] = incident
@@ -115,7 +115,7 @@ class AcknowledgementSerializerTests(TestCase):
             "expiration": None,
         }
         serializer = RequestAcknowledgementSerializer(data=data, context={"request": request})
-        serializer.is_valid()
+        self.assertTrue(serializer.is_valid(), serializer.errors)
         validated_data = serializer.validated_data
         validated_data["actor"] = self.user
         validated_data["incident"] = incident

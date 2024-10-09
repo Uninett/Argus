@@ -56,6 +56,7 @@ class IncidentSerializerV1(IncidentSerializer):
 
 
 class AcknowledgementSerializerV1(serializers.ModelSerializer):
+    pk = serializers.IntegerField(required=False)  # Type hint for OpenAPI
     event = EventSerializer()
 
     class Meta:
@@ -130,5 +131,5 @@ class UpdateAcknowledgementSerializerV1(serializers.ModelSerializer):
 
 
 # Get rid of this!
-class MetadataSerializer(serializers.Serializer):
+class MetadataSerializerV1(serializers.Serializer):
     sourceSystems = SourceSystemSerializer(many=True)

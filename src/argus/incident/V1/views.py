@@ -18,7 +18,7 @@ from ..views import IncidentViewSet
 from .serializers import (
     AcknowledgementSerializerV1,
     IncidentSerializerV1,
-    MetadataSerializer,
+    MetadataSerializerV1,
     UpdateAcknowledgementSerializerV1,
 )
 
@@ -108,7 +108,7 @@ class IncidentViewSetV1(IncidentViewSet):
 
     # DEPRECATED: This view will be removed in V2
     @extend_schema(
-        responses=MetadataSerializer,
+        responses=MetadataSerializerV1,
         description=("Metadata used by incidents.\n\nDeprecated, use the individual endpoints instead"),
         deprecated=True,
     )
