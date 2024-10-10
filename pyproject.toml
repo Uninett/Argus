@@ -19,7 +19,7 @@ classifiers = [
 ]
 dynamic = ["version"]
 dependencies = [
-    "argus-server>=1.22.1",
+    "argus-server>=1.23.0",
     "django-htmx",
     "django-widget-tweaks==1.5.0",
     # The next is for python_version < 3.12 but we simplify code by always needing it
