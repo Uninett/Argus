@@ -15,9 +15,15 @@ INCIDENT_TABLE_COLUMNS = [
     "ticket",
 ]
 
-# Tailwind config template relative to the repository root directory
-TAILWIND_CONFIG_TEMPLATE = "src/argus_htmx/tailwindtheme/tailwind.config.template.js"
+# These templates are auto-discovered by the templating engine and are relative
+# to the argus_htmx's `templates/` directory
+TAILWIND_CONFIG_TEMPLATE = "tailwind/tailwind.config.js"
+TAILWIND_CSS_TEMPLATE = "tailwind/styles.css"
+
+# These targets are relative to the working directory when running the `tailwind_config`
+# management command, which should be done from the repostitory root
 TAILWIND_CONFIG_TARGET = "src/argus_htmx/tailwindtheme/tailwind.config.js"
+TAILWIND_CSS_TARGET = "src/argus_htmx/tailwindtheme/styles.css"
 
 DEFAULT_THEMES = [
     "dark",

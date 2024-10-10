@@ -3298,6 +3298,21 @@ input.tab:checked + .tab-content,
   --filler-offset: 0.4rem;
 }
 
+.select-xs {
+  height: 1.5rem;
+  min-height: 1.5rem;
+  padding-left: 0.5rem;
+  padding-right: 2rem;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  line-height: 1.625;
+}
+
+[dir="rtl"] .select-xs {
+  padding-left: 2rem;
+  padding-right: 0.5rem;
+}
+
 .stats-horizontal {
   grid-auto-flow: column;
 }
@@ -3572,6 +3587,10 @@ input.tab:checked + .tab-content,
   margin-bottom: 0px;
 }
 
+.-ml-2 {
+  margin-left: -0.5rem;
+}
+
 .ml-2 {
   margin-left: 0.5rem;
 }
@@ -3803,6 +3822,10 @@ input.tab:checked + .tab-content,
 .bg-neutral {
   --tw-bg-opacity: 1;
   background-color: var(--fallback-n,oklch(var(--n)/var(--tw-bg-opacity)));
+}
+
+.bg-transparent {
+  background-color: transparent;
 }
 
 .fill-accent {
