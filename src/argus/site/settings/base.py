@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from urllib.parse import urlsplit
 
 import dj_database_url
+from django.core.exceptions import ImproperlyConfigured
 
 # Import some helpers
 from . import *
@@ -28,6 +29,7 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
+RUN_FRONTEND = get_bool_env("ARGUS_RUN_FRONTEND", None)  # Local
 _overriding_apps_env = get_json_env("ARGUS_OVERRIDING_APPS", [], quiet=False)
 OVERRIDING_APPS = validate_app_setting(_overriding_apps_env)
 del _overriding_apps_env
@@ -100,12 +102,38 @@ TEMPLATES = [
     }
 ]
 
+# toggle local frontend
+
+FRONTEND_URL = get_str_env("ARGUS_FRONTEND_URL")  # Used for CORS
+if RUN_FRONTEND:
+    from argus_htmx.appconfig import APP_SETTINGS as FRONTEND_APPS
+
+    _frontend_app_names = [app.app_name for app in FRONTEND_APPS]
+    INSTALLED_APPS = _frontend_app_names + INSTALLED_APPS
+    TEMPLATES = update_context_processors_list(TEMPLATES, FRONTEND_APPS)
+    MIDDLEWARE = update_middleware_list(MIDDLEWARE, FRONTEND_APPS)
+    from argus_htmx.appconfig import (
+        LOGIN_URL,
+        LOGOUT_URL,
+        LOGIN_REDIRECT_URL,
+        LOGOUT_REDIRECT_URL,
+    )
+else:
+    # SPA Frontend
+    LOGIN_URL = "/login/"
+    LOGOUT_URL = "/logout/"
+    LOGIN_REDIRECT_URL = "/"
+    LOGOUT_REDIRECT_URL = "/"
+    # Vendored OAuth2 backend for the SPA
+    AUTHENTICATION_BACKENDS = ("argus.dataporten.social.DataportenFeideOAuth2",) + AUTHENTICATION_BACKENDS
+
 # override themes, urls, context processors
 if OVERRIDING_APPS:
     _overriding_app_names = [app.app_name for app in OVERRIDING_APPS]
     INSTALLED_APPS = _overriding_app_names + INSTALLED_APPS
     TEMPLATES = update_context_processors_list(TEMPLATES, OVERRIDING_APPS)
     MIDDLEWARE = update_middleware_list(MIDDLEWARE, OVERRIDING_APPS)
+
 # add extra functionality without overrides
 if EXTRA_APPS:
     _extra_app_names = [app.app_name for app in EXTRA_APPS]
@@ -140,12 +168,6 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 AUTH_USER_MODEL = "argus_auth.User"
-
-
-LOGIN_URL = "/login/"
-LOGOUT_URL = "/logout/"
-LOGIN_REDIRECT_URL = "/"
-LOGOUT_REDIRECT_URL = "/"
 
 
 # Internationalization
@@ -185,7 +207,6 @@ STORAGES = {
 
 
 AUTHENTICATION_BACKENDS = (
-    "argus.dataporten.social.DataportenFeideOAuth2",
     "django.contrib.auth.backends.RemoteUserBackend",
     "django.contrib.auth.backends.ModelBackend",
 )
@@ -203,8 +224,6 @@ if LOGGING_MODULE:
     STARTUP_LOGGING = setup_logging(LOGGING_MODULE)
 
 # django-cors-headers
-FRONTEND_URL = get_str_env("ARGUS_FRONTEND_URL")
-
 CORS_ALLOWED_ORIGINS = []
 if FRONTEND_URL:
     CORS_ALLOWED_ORIGINS.append(normalize_url(FRONTEND_URL))
