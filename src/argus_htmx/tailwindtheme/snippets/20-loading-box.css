@@ -1,0 +1,18 @@
+@layer components {
+    .loading-box {
+      position: relative;
+    }
+    .loading-box .loading-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .loading-box .loading-overlay:not(.htmx-request) {
+      display: none;
+    }
+  }

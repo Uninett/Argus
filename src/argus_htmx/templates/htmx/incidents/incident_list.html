@@ -1,5 +1,4 @@
 {% extends base %}
-
 {% block main %}
     <section>
         {% if incidents_extra_widget %}
@@ -11,11 +10,12 @@
             {% include "htmx/incidents/_incidents_menubar.html" %}
         {% endif %}
     </section>
-
-    <section class="overflow-x-auto">
+    <section id="incident-list" class="loading-box">
         {% block table %}
             {% include "htmx/incidents/_incident_table.html" %}
         {% endblock table %}
+        <div class="htmx-indicator loading-overlay bg-base-100/70">
+            <div class="loading loading-spinner loading-lg text-primary"></div>
+        </div>
     </section>
-
 {% endblock main %}

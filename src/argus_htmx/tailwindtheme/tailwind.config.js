@@ -15,6 +15,9 @@ module.exports = {
         },
         ...{},
     },
+    safelist: [
+        "htmx-request"
+    ],
     daisyui: {
         themes: [
             "dark",

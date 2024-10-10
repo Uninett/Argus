@@ -15,6 +15,9 @@ module.exports = {
         },
         ...{{ themeoverride }},
     },
+    safelist: [
+        "htmx-request"
+    ],
     daisyui: {
         themes: {{ daisyuithemes }},
     },

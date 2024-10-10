@@ -58,15 +58,20 @@
                               page works without JavaScript, and to ensure the link is
                               displayed as clickable.
                             -->
-                            <a hx-get="?page=1" href="?page=1" class="join-item btn btn-neutral">
-                                &laquo; First
+                            <a hx-get="?page=1"
+                               href="?page=1"
+                               hx-indicator="#incident-list .htmx-indicator"
+                               class="join-item btn btn-neutral">
+                               &laquo; First
                             </a>
                         </li>
                     {% endif %}
                     {% if page.has_previous %}
                         <li>
                             <a hx-get="?page={{ page.previous_page_number }}"
-                               href="?page={{ page.previous_page_number }}" class="join-item btn btn-neutral">
+                               href="?page={{ page.previous_page_number }}"
+                               hx-indicator="#incident-list .htmx-indicator"
+                               class="join-item btn btn-neutral">
                                 {{ page.previous_page_number }}
                             </a>
                         </li>
@@ -84,7 +89,9 @@
                     {% if page.has_next %}
                         <li>
                             <a hx-get="?page={{ page.next_page_number }}"
-                               href="?page={{ page.next_page_number }}" class="join-item btn btn-neutral">
+                               href="?page={{ page.next_page_number }}"
+                               hx-indicator="#incident-list .htmx-indicator"
+                               class="join-item btn btn-neutral">
                                 {{ page.next_page_number }}
                             </a>
                         </li>
@@ -92,7 +99,9 @@
                     {% if page.number != page.paginator.num_pages %}
                         <li>
                             <a hx-get="?page={{ page.paginator.num_pages }}"
-                               href="?page={{ page.paginator.num_pages }}" class="join-item btn btn-neutral">
+                               href="?page={{ page.paginator.num_pages }}"
+                               hx-indicator="#incident-list .htmx-indicator"
+                               class="join-item btn btn-neutral">
                                 &raquo; Last
                             </a>
                         </li>
