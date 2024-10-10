@@ -1,1 +1,0 @@
-Fix OpenAPI parameters for `incidents/` and `incidents/mine/`

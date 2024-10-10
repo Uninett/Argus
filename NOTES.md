@@ -3,6 +3,20 @@
 This file documents changes to Argus that are relevant for operations and
 end-users.
 
+## [1.23.0] - 2024-10-10
+
+This is the first version of Argus to be able to run on Django 5.1.
+
+Support for Python 3.8 has been dropped.
+
+The most visible changes are in the documentation.
+
+The function `get_psa_authentication_names()` has been remooved, it was not in
+use by us.
+
+How to customize filtering has changed, it is no longer necessary to override
+`FilterSerializer` and `validate_jsonfilter`.
+
 ## [1.22.0] - 2024-08-30
 
 There's a backwards incompatible change to prepare for the next Django LTS
