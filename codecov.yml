@@ -12,7 +12,7 @@ ignore:
   - "setup.py"
   - "tests/**"
   - "src/argus/site/settings/**"
-  - "src/argus/dataporten/social.py"
+  - "src/argus/spa/dataporten/social.py"
   - "**/apps.py"
   - "**/wsgi.py"
   - "**/test*.py"

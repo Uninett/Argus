@@ -18,7 +18,7 @@ Have a look at the list of providers included with ``PSA`` at `PSA's list of sup
 <https://python-social-auth.readthedocs.io/en/latest/backends/index.html#supported-backends>`_.
 
 Our default provider ``Feide via OAuth2`` is vendored into the Argus source
-code, the backend path is ``argus.dataporten.social.DataportenFeideOAuth2``.
+code, the backend path is ``argus.spa.dataporten.social.DataportenFeideOAuth2``.
 
 Add the backend path of your chosen provider to the start of the Django setting
 :setting:`AUTHENTICATION_BACKENDS`.
