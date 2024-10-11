@@ -4,12 +4,13 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-from .base import *
-from argus.spa.settings import *
+from . import get_bool_env, get_str_env  # noqa: E402
+from .base import *  # noqa: E402, F403
+from argus.spa.settings import *  # noqa: E402, F403
 
 
 DEBUG = get_bool_env("DEBUG", True)
-TEMPLATES[0]["OPTIONS"]["debug"] = get_bool_env("TEMPLATE_DEBUG", True)
+TEMPLATES[0]["OPTIONS"]["debug"] = get_bool_env("TEMPLATE_DEBUG", True)  # noqa: F405
 
 
 # SECURITY WARNING: keep the secret key used in production secret!
@@ -23,7 +24,7 @@ ALLOWED_HOSTS = [
 ]
 
 
-INSTALLED_APPS += ["django_extensions"]
+INSTALLED_APPS += ["django_extensions"]  # noqa: F405
 
 # Paths to plugins
 MEDIA_PLUGINS = [
@@ -31,9 +32,9 @@ MEDIA_PLUGINS = [
     "argus.notificationprofile.media.sms_as_email.SMSNotification",
 ]
 
-## Logging setup
+# Logging setup
 
 LOGGING_CONFIG = None
-if not LOGGING_MODULE:
+if not LOGGING_MODULE:  # noqa: F405
     LOGGING_MODULE = "argus.site.logging.DEV"
-    DEV_LOGGING = setup_logging(LOGGING_MODULE)
+    DEV_LOGGING = setup_logging(LOGGING_MODULE)  # noqa: F405
