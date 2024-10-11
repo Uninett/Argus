@@ -4,12 +4,13 @@ import logging.config
 
 from django.utils.log import DEFAULT_LOGGING
 
-from .base import *
-from argus.spa.settings import *
+from . import get_bool_env, get_str_env
+from .base import *  # noqa: F403
+from argus.spa.settings import *  # noqa: F403
 
 
 DEBUG = get_bool_env("DEBUG", True)
-TEMPLATES[0]["OPTIONS"]["debug"] = get_bool_env("TEMPLATE_DEBUG", True)
+TEMPLATES[0]["OPTIONS"]["debug"] = get_bool_env("TEMPLATE_DEBUG", True)  # noqa: F405
 
 
 # SECURITY WARNING: keep the secret key used in production secret!
@@ -37,7 +38,7 @@ TEST_OUTPUT_VERBOSE = 2
 TEST_OUTPUT_DIR = os.path.join("test-reports", os.getenv("TOX_ENV_NAME", ""))
 TEST_OUTPUT_FILE_NAME = "test-results.xml"
 
-## Logging setup
+# Logging setup
 
 _LOGGER = logging.getLogger(__name__)
 
