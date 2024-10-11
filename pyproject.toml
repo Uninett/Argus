@@ -55,7 +55,7 @@ dev = [
     "black",
     "coverage",
     "django-extensions",
-    "flake8",
+    "ruff",
     "ipython",
     "pre-commit",
     "python-dotenv",
@@ -106,6 +106,14 @@ exclude = '''
   | src/.*/migrations
 )
 '''
+
+[tool.ruff]
+line-length = 120
+extend-exclude = [
+    ".egg-info",
+    "migrations",
+    "templates",
+]
 
 [tool.towncrier]
 directory = "changelog.d"

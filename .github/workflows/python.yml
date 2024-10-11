@@ -30,10 +30,10 @@ jobs:
     - name: Install dependencies
       run: |
         pip install -U pip
-        pip install tox flake8
+        pip install tox ruff
 
     - name: flake8 critical lint
-      run: tox -e flake8-critical
+      run: tox -e ruff-critical
 
   test:
     needs: lint
