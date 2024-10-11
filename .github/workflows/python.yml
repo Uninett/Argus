@@ -31,9 +31,13 @@ jobs:
       run: |
         pip install -U pip
         pip install tox ruff
+      with:
+        python-version: 3.11
 
-    - name: flake8 critical lint
+    - name: ruff critical lint
       run: tox -e ruff-critical
+      with:
+        python-version: 3.11
 
   test:
     needs: lint
