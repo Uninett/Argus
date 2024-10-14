@@ -6,7 +6,7 @@ from django.urls import include, path
 
 
 def get_app_names(app_settings):
-    return [app.app_name for app in app_settings]
+    return [app.app_name for app in app_settings if app.app_name]
 
 
 def get_urlpatterns(app_settings):
