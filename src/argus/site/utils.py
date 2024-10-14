@@ -58,3 +58,12 @@ def update_middleware_list(middleware_setting, app_settings):
                 end_list.append(middleware)
     safety_copy = start_list + safety_copy + end_list
     return safety_copy
+
+
+def get_settings(app_settings):
+    settings = {}
+    for app in app_settings:
+        if not getattr(app, "settings", None):
+            continue
+        settings.update(app.settings)
+    return settings
