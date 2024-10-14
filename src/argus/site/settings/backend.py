@@ -16,8 +16,6 @@ STORAGES["staticfiles"]["BACKEND"] = "whitenoise.storage.CompressedManifestStati
 if not CORS_ALLOWED_ORIGINS:
     raise ImproperlyConfigured('"FRONTEND_URL" has not been set in production!')
 
-COOKIE_DOMAIN = get_str_env("ARGUS_COOKIE_DOMAIN", required=True)
-
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = get_str_env("EMAIL_HOST", required=True)
 DEFAULT_FROM_EMAIL = get_str_env("DEFAULT_FROM_EMAIL", required=True)

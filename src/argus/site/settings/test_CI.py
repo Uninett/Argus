@@ -6,7 +6,9 @@ from django.utils.log import DEFAULT_LOGGING
 
 from . import get_bool_env, get_str_env
 from .base import *  # noqa: F403
-from argus.spa.settings import *  # noqa: F403
+
+os.environ.setdefault("ARGUS_SPA_COOKIE_DOMAIN", "localhost")
+from argus.spa.spa_settings import *  # noqa: F403
 
 
 DEBUG = get_bool_env("DEBUG", True)
