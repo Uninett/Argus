@@ -26,7 +26,6 @@ from argus.auth.views import ObtainNewAuthToken
 from argus.notificationprofile.views import SchemaView
 from argus.site.utils import get_urlpatterns_from_setting
 from argus.site.views import error, index, MetadataView
-from argus.spa import urls as spa_urls
 
 
 urlpatterns = [
@@ -40,7 +39,6 @@ urlpatterns = [
     # path('api/sessionauth/', include('rest_framework.urls', namespace='rest_framework')),
     path("api/", MetadataView.as_view(), name="metadata"),
     path("json-schema/<slug:slug>", SchemaView.as_view(), name="json-schema"),
-    path("", include(spa_urls)),
     path("", index, name="api-home"),
 ]
 
