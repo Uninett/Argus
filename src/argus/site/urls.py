@@ -25,7 +25,7 @@ from social_django.urls import extra
 from argus.auth.views import ObtainNewAuthToken, AuthMethodListView
 from argus.dataporten import views as dataporten_views
 from argus.notificationprofile.views import SchemaView
-from argus.site.utils import get_urlpatterns_from_setting
+from argus.site.utils import get_urlpatterns
 from argus.site.views import error, index, MetadataView
 
 
@@ -51,10 +51,10 @@ urlpatterns = [
     path("", index, name="api-home"),
 ]
 
-prefixed_urlpatterns = get_urlpatterns_from_setting(settings.OVERRIDING_APPS)
+prefixed_urlpatterns = get_urlpatterns(settings.OVERRIDING_APPS)
 if prefixed_urlpatterns:
     urlpatterns = prefixed_urlpatterns + urlpatterns
 
-postfixed_urlpatterns = get_urlpatterns_from_setting(settings.EXTRA_APPS)
+postfixed_urlpatterns = get_urlpatterns(settings.EXTRA_APPS)
 if postfixed_urlpatterns:
     urlpatterns += postfixed_urlpatterns
