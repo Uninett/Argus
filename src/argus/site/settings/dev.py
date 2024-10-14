@@ -6,7 +6,7 @@ load_dotenv()
 
 from . import get_bool_env, get_str_env  # noqa: E402
 from .base import *  # noqa: E402, F403
-from argus.spa.settings import *  # noqa: E402, F403
+from argus.spa.spa_settings import *  # noqa: E402, F403
 
 
 DEBUG = get_bool_env("DEBUG", True)
