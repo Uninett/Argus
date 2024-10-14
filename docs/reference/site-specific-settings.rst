@@ -58,15 +58,39 @@ Settings for adding additional Django apps
 Format of the app settings
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Both settings are a list of dicts.
+
 App
 ...
 
-Both settings are a list of dicts. The minimal content of the dict is::
+To add an app, the minimal content of the dict is::
 
     { "app_name": "myapp" }
 
 "myapp" is the same string you would normally put into
 :setting:`INSTALLED_APPS`.
+
+Settings
+........
+
+You can overwrite any setting with the "settings"-key::
+
+    {
+        "settings": {
+            "LOGIN_URL": "/magic/"
+        }
+    }
+
+This is useful for settings that do not belong to specific apps.
+
+You can set settings for an app too::
+
+       {
+           "app_name": "myapp",
+           "settings": {
+               "MYAPP_MAGIC_NUMBER": 785464279385649275692
+           }
+       }
 
 Urls
 ....
@@ -85,7 +109,7 @@ There are two possible formats:
            "app_name": "myapp",
            "urls": {
                "path": "myapp/",
-               "urlpatterns_module": "myapp.urls",
+               "urlpatterns_module": "myapp.urls"
            }
        }
 
@@ -100,7 +124,7 @@ There are two possible formats:
            "urls": {
                "path": "myapp/",
                "urlpatterns_module": "myapp.urls",
-               "namespace": "mynamespace",
+               "namespace": "mynamespace"
            }
        }
 
@@ -125,13 +149,21 @@ Format::
         "context_processors": [
             "holiday_cheer.context_processors.date_context",
             "holiday_cheer.context_processors.holidays"
-        ],
+        ]
+    }
+
+Context processors that are not specific to an app can also be set::
+
+    {
+        "context_processors": [
+            "django.template.context_processors.debug"
+        ]
     }
 
 Middleware
 ..........
 
-Optionally, additional middlewares can be added to :setting:`MIDDLEWARE`-setting.
+Optionally, additional middlewares can be added to the :setting:`MIDDLEWARE`-setting.
 
 Format::
 
@@ -139,8 +171,8 @@ Format::
         "app_name": "holiday_cheer",
         "middleware": {
             "holiday_cheer.appended_middleware": "end",
-            "holiday_cheer.prepended_middleware": "start",
-        },
+            "holiday_cheer.prepended_middleware": "start"
+        }
     }
 
 Subformat::
@@ -152,6 +184,14 @@ default is appending (ACTION is "end" or a random string), but it is also
 possible to prepend (ACTION is "start"). A prepended middleware will be run
 *before* the security- and session middlewares which might not be what you
 want.
+
+Middleware not belonging to an app can also be added::
+
+    {
+        "middleware": {
+            "django.middleware.cache.GZipMiddleware": "end"
+        }
+    }
 
 Database settings
 -----------------
