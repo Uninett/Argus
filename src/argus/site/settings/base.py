@@ -16,7 +16,7 @@ import dj_database_url
 
 # Import some helpers
 from . import *
-from ..utils import update_context_processors_list, update_middleware_list, get_settings
+from ..utils import update_settings
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -320,22 +320,10 @@ SOCIAL_AUTH_NEW_USER_REDIRECT_URL = SOCIAL_AUTH_LOGIN_REDIRECT_URL
 _overriding_apps_env = get_json_env("ARGUS_OVERRIDING_APPS", [], quiet=False)
 OVERRIDING_APPS = validate_app_setting(_overriding_apps_env)
 del _overriding_apps_env
-if OVERRIDING_APPS:
-    _overriding_app_names = [app.app_name for app in OVERRIDING_APPS]
-    INSTALLED_APPS = _overriding_app_names + INSTALLED_APPS
-    TEMPLATES = update_context_processors_list(TEMPLATES, OVERRIDING_APPS)
-    MIDDLEWARE = update_middleware_list(MIDDLEWARE, OVERRIDING_APPS)
-    for setting, value in get_settings(OVERRIDING_APPS).items():
-        globals()[setting] = value
+update_settings(globals(), OVERRIDING_APPS, override=True)
 
 # add extra functionality without overrides
 _extra_apps_env = get_json_env("ARGUS_EXTRA_APPS", [], quiet=False)
 EXTRA_APPS = validate_app_setting(_extra_apps_env)
 del _extra_apps_env
-if EXTRA_APPS:
-    _extra_app_names = [app.app_name for app in EXTRA_APPS]
-    INSTALLED_APPS += _extra_app_names
-    TEMPLATES = update_context_processors_list(TEMPLATES, EXTRA_APPS)
-    MIDDLEWARE = update_middleware_list(MIDDLEWARE, EXTRA_APPS)
-    for setting, value in get_settings(EXTRA_APPS).items():
-        globals()[setting] = value
+update_settings(globals(), EXTRA_APPS)

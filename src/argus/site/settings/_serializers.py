@@ -10,7 +10,7 @@ class AppUrlSetting(BaseModel):
 
 
 class AppSetting(BaseModel):
-    app_name: str
+    app_name: Optional[str] = None
     urls: Optional[AppUrlSetting] = None
     context_processors: Optional[List[str]] = None
     middleware: Optional[Dict[str, str]] = None
