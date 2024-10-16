@@ -95,7 +95,8 @@ def get_version():
     try:
         return version("argus-server")
     except PackageNotFoundError as e:
-        return e
+        return str(e)
+    return "version not found"
 
 
 @extend_schema_view(get=extend_schema(responses=MetadataSerializer))
