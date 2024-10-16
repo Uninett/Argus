@@ -305,24 +305,6 @@ SOCIAL_AUTH_NEW_USER_REDIRECT_URL = SOCIAL_AUTH_LOGIN_REDIRECT_URL
 # SOCIAL_AUTH_DATAPORTEN_FEIDE_KEY = SOCIAL_AUTH_DATAPORTEN_KEY
 # SOCIAL_AUTH_DATAPORTEN_FEIDE_SECRET = SOCIAL_AUTH_DATAPORTEN_SECRET
 
-FRONTEND_URL = get_str_env("ARGUS_FRONTEND_URL")  # Used for CORS
-
-# toggle local frontend
-RUN_FRONTEND = get_bool_env("ARGUS_RUN_FRONTEND", None)  # Local
-
-if RUN_FRONTEND:
-    from argus_htmx.appconfig import APP_SETTINGS as FRONTEND_APPS
-
-    update_settings(globals(), FRONTEND_APPS)
-else:
-    # SPA Frontend
-    LOGIN_URL = "/login/"
-    LOGOUT_URL = "/logout/"
-    LOGIN_REDIRECT_URL = "/"
-    LOGOUT_REDIRECT_URL = "/"
-    # Vendored OAuth2 backend for the SPA
-    AUTHENTICATION_BACKENDS = ("argus.dataporten.social.DataportenFeideOAuth2",) + AUTHENTICATION_BACKENDS
-
 # App settings: override themes, urls, context processors
 
 # add apps that may override other apps
