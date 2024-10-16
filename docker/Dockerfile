@@ -1,6 +1,6 @@
 # Defines a production image for the Argus API server
 # Needs the repository root directory as its context
-FROM python:3.9
+FROM python:3.10
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get install -y --no-install-recommends tini build-essential
