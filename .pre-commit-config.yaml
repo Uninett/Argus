@@ -7,12 +7,16 @@ repos:
     -   id: end-of-file-fixer
         exclude: &exclude_pattern '^changelog.d/'
     -   id: debug-statements
--   repo: https://github.com/pycqa/flake8
-    rev: 7.1.1
+-   repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.6.9
     hooks:
-    -   id: flake8
-        name: "Flake8: critical"
-        args: ['--count', '--select=E9,F63,F7,F82', '--show-source', '--statistics']
+    -   id: ruff
+        name: "Ruff: critical"
+        args: [
+          '--select=E9,F63,F7,F82',
+          '--output-format=full',
+          '--statistics'
+        ]
         types: [file, python]
 -   repo: https://github.com/psf/black
     rev: 24.8.0
