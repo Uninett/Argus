@@ -10,6 +10,7 @@ repos:
 -   repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.6.9
     hooks:
+        # Run the linter
     -   id: ruff
         name: "Ruff: critical"
         args: [
@@ -18,11 +19,8 @@ repos:
           '--statistics'
         ]
         types: [file, python]
--   repo: https://github.com/psf/black
-    rev: 24.8.0
-    hooks:
-    -   id: black
-        exclude: migrations/
+        # Run the formatter
+    -   id: ruff-format
 -   repo: https://github.com/twisted/towncrier
     rev: 24.8.0
     hooks:
