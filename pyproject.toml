@@ -52,7 +52,6 @@ dynamic = ["version"]
 docs = ["sphinx>=2.2.0"]
 dev = [
     "django-debug-toolbar",
-    "black",
     "coverage",
     "django-extensions",
     "ruff",
@@ -85,27 +84,6 @@ exclude = ["tests*"]
 
 [tool.setuptools_scm]
 write_to = "src/argus/version.py"
-
-[tool.black]
-line-length = 120
-exclude = '''
-(
-  /(
-      \.eggs         # exclude a few common directories in the
-    | \.git          # root of the project
-    | \.hg
-    | \.mypy_cache
-    | \.nox
-    | \.tox
-    | \.venv
-    | _build
-    | buck-out
-    | build
-    | dist
-  )/
-  | src/.*/migrations
-)
-'''
 
 [tool.ruff]
 line-length = 120

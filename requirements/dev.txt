@@ -1,6 +1,6 @@
 Sphinx>=2.2.0
 python-dotenv
-black
+ruff
 pre-commit
 ipython
 django-extensions

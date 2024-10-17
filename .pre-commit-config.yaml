@@ -21,11 +21,6 @@ repos:
         types: [file, python]
         # Run the formatter
     -   id: ruff-format
--   repo: https://github.com/psf/black
-    rev: 24.8.0
-    hooks:
-    -   id: black
-        exclude: migrations/
 -   repo: https://github.com/twisted/towncrier
     rev: 24.8.0
     hooks:
