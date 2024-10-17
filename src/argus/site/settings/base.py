@@ -270,8 +270,6 @@ NOTIFICATION_SUBJECT_PREFIX = "[Argus] "
 # Don't spam by accident
 SEND_NOTIFICATIONS = get_bool_env("ARGUS_SEND_NOTIFICATIONS", default=False)
 
-ARGUS_SPA_TOKEN_COOKIE_NAME = "token"
-
 # 3rd party settings
 
 # Python social auth

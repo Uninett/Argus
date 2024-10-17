@@ -1,5 +1,7 @@
 from django.conf import settings
+from django.contrib.auth import logout
 from django.shortcuts import redirect
+
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
@@ -50,3 +52,21 @@ def login_wrapper(request, backend, *args, **kwargs):
     response = redirect(settings.FRONTEND_URL, permanent=True)
     response.set_cookie(settings.ARGUS_SPA_TOKEN_COOKIE_NAME, token.key, domain=settings.SPA_COOKIE_DOMAIN)
     return response
+
+
+class LogoutView(APIView):
+    permission_classes = []
+
+    @extend_schema(request=None, responses={"200": None})
+    def post(self, request, *args, **kwargs):
+        "Log out the logged in user"
+        user = request.user
+        if hasattr(user, "auth_token"):
+            user_token = request.user.auth_token
+            user_token.delete()
+        # Log out from session
+        logout(request)
+
+        response = Response()
+        response.delete_cookie(settings.ARGUS_SPA_TOKEN_COOKIE_NAME)
+        return response

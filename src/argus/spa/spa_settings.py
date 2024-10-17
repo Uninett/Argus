@@ -8,6 +8,7 @@ LOGOUT_URL = "/logout/"
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
 
+ARGUS_SPA_TOKEN_COOKIE_NAME = "token"
 SPA_COOKIE_DOMAIN = get_str_env("ARGUS_SPA_COOKIE_DOMAIN", required=True)
 
 # PSA for login
