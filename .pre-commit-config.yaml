@@ -6,13 +6,6 @@ repos:
     -   id: mixed-line-ending
     -   id: end-of-file-fixer
     -   id: debug-statements
--   repo: https://github.com/pycqa/flake8
-    rev: 3.9.2
-    hooks:
-    -   id: flake8
-        name: "Flake8: critical"
-        args: ['--count', '--select=E9,F63,F7,F82', '--show-source', '--statistics']
-        types: [file, python]
 -   repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.6.4
     hooks:
