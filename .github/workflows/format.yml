@@ -1,0 +1,19 @@
+name: Format codebase
+
+on:
+  push:
+    branches: master
+  pull_request:
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    name: Format
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Format
+      uses: astral-sh/ruff-action@v1
+      with:
+        args: "format --check"
+        # changed-files: 'true'
