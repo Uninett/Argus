@@ -47,7 +47,7 @@ class LogoutView(APIView):
         logout(request)
 
         response = Response()
-        response.delete_cookie(settings.ARGUS_TOKEN_COOKIE_NAME)
+        response.delete_cookie(settings.ARGUS_SPA_TOKEN_COOKIE_NAME)
         return response
 
 
