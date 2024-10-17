@@ -107,7 +107,6 @@ class MetadataView(APIView):
     login_required = False
 
     def get(self, request, format=None):
-
         metadata = {
             "server-version": get_version(),
             "api-version": {

@@ -149,7 +149,6 @@ class BaseIncidentViewSet(
     mixins.DestroyModelMixin,
     viewsets.GenericViewSet,
 ):
-
     pagination_class = IncidentPagination
     permission_classes = [IsAuthenticated]
     queryset = Incident.objects.prefetch_default_related()

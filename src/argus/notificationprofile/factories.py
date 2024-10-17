@@ -38,6 +38,7 @@ class TimeRecurrenceFactory(factory.django.DjangoModelFactory):
 
 class MinimalTimeRecurrenceFactory(TimeRecurrenceFactory):
     "A TimeRecurrence that should just about never occur"
+
     start = time(hour=5, minute=0)
     end = start
     days = [7]
