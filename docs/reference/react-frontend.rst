@@ -28,8 +28,9 @@ Domain settings
 
 In production, Argus requires the frontend and the backend to either be
 deployed on the same domain, or the frontend to be on a subdomain of the
-:setting:`ARGUS_SPA_COOKIE_DOMAIN`. When running Argus on localhost for development
-and testing, :setting:`ARGUS_SPA_COOKIE_DOMAIN` can be empty (and will default to
+:setting:`ARGUS_SPA_COOKIE_DOMAIN`. When running Argus on localhost for
+development and testing using the `dev`, `dockerdev` or `test_CI` settings-file
+as a base, :setting:`ARGUS_SPA_COOKIE_DOMAIN` can be empty (and will default to
 localhost).
 
 Dataporten via OAuth2
