@@ -4,6 +4,12 @@
 REACT Frontend
 ==============
 
+The classic frontend is a single page application (SPA) written in REACT. See
+the `Github repo of Argus-frontend <https://github.com/uninett/Argus-frontend>`_
+
+It needs its own specific settings and has a handful of API endpoints that are
+not needed if running headless.
+
 Settings
 ========
 
@@ -45,3 +51,17 @@ Dataporten via OAuth2
 * :setting:`ARGUS_DATAPORTEN_SECRET` holds the dataporten password.
 
 Refer to the section :ref:`dataporten <dataporten-reference>` for more information.
+
+API Endpoints
+=============
+
+The following endpoints are only used by this frontend:
+
+* ``/login-methods/``
+* ``/api/v1/login/``
+* ``/api/v2/login/``
+* ``/api/v1/logout/``
+* ``/api/v2/logout/``
+
+Furthermore, visiting ``/oidc/login/dataporten_feide/`` when dataporten is set
+up will trigger a login via dataporten.
