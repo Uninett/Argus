@@ -41,3 +41,7 @@ output-format = "full"
 
 [tool.ruff.lint]
 select = ["E9", "F63", "F7", "F82"]
+
+[tool.djlint]
+profile="django"
+indent = 2
