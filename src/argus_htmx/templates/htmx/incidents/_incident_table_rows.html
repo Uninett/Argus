@@ -1,6 +1,6 @@
 {% for incident in incident_list %}
     {% block incident %}
-        {% include 'htmx/incidents/_incident_table_row.html' %}
+        {% include "htmx/incidents/_incident_table_row.html" %}
     {% endblock incident %}
     {% empty %}
     <tr>

@@ -72,17 +72,17 @@
 
 {% if incident.stateful %}
 {% if incident.open %}
-{% include 'htmx/incidents/_incident_close_modal.html' with dialog_id="close-incident-dialog" button_title="Close" header="Manually close incident" explanation="Write a message describing why the incident was manually closed" endpoint=endpoints.close cancel_text="Cancel" submit_text="Close now" %}
+{% include "htmx/incidents/_incident_close_modal.html" with dialog_id="close-incident-dialog" button_title="Close" header="Manually close incident" explanation="Write a message describing why the incident was manually closed" endpoint=endpoints.close cancel_text="Cancel" submit_text="Close now" %}
 {% else %}
-{% include 'htmx/incidents/_incident_reopen_modal.html' with dialog_id="reopen-incident-dialog" button_title="Reopen" header="Manually reopen incident" explanation="Write a message describing why the incident was manually reopend" endpoint=endpoints.reopen cancel_text="Cancel" submit_text="Reopen now" %}
+{% include "htmx/incidents/_incident_reopen_modal.html" with dialog_id="reopen-incident-dialog" button_title="Reopen" header="Manually reopen incident" explanation="Write a message describing why the incident was manually reopend" endpoint=endpoints.reopen cancel_text="Cancel" submit_text="Reopen now" %}
 {% endif %}
 {% endif %}
 
 {% if incident.ticket_url %}
-{% include 'htmx/incidents/_incident_ticket_edit_modal.html' with dialog_id="edit-ticket-dialog" button_title="Edit ticket url" header="Edit ticket" explanation="" endpoint=endpoints.edit_ticket cancel_text="Cancel" submit_text="Update" %}
+{% include "htmx/incidents/_incident_ticket_edit_modal.html" with dialog_id="edit-ticket-dialog" button_title="Edit ticket url" header="Edit ticket" explanation="" endpoint=endpoints.edit_ticket cancel_text="Cancel" submit_text="Update" %}
 {% else %}
 <!-- Manually create ticket dialog -->
-{% include 'htmx/incidents/_incident_ticket_edit_modal.html' with dialog_id="manual-create-ticket-dialog" button_title="Add ticket url" header="Add url to existing ticket" explanation="Are you sure you want to store this url to an existing ticket on this incident?" endpoint=endpoints.add_ticket cancel_text="Cancel" submit_text="Add ticket" %}
+{% include "htmx/incidents/_incident_ticket_edit_modal.html" with dialog_id="manual-create-ticket-dialog" button_title="Add ticket url" header="Add url to existing ticket" explanation="Are you sure you want to store this url to an existing ticket on this incident?" endpoint=endpoints.add_ticket cancel_text="Cancel" submit_text="Add ticket" %}
 {% endif %}
 
 </div>
@@ -107,7 +107,7 @@
     {% endfor %}
   <div class="card-actions divide-none">
 
-{% include 'htmx/incidents/_incident_acknowledge_modal.html' with dialog_id="create-acknowledgment-dialog" button_title="Create acknowledgment" header="Submit acknowledgment" explanation="Write a message describing why this incident was acknowledged" endpoint=endpoints.ack cancel_text="Cancel" submit_text="Submit" %}
+{% include "htmx/incidents/_incident_acknowledge_modal.html" with dialog_id="create-acknowledgment-dialog" button_title="Create acknowledgment" header="Submit acknowledgment" explanation="Write a message describing why this incident was acknowledged" endpoint=endpoints.ack cancel_text="Cancel" submit_text="Submit" %}
 
   </div>
 </div>
