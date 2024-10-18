@@ -87,7 +87,7 @@ TEMPLATES = [
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "APP_DIRS": True,
         "OPTIONS": {
-            "debug": get_bool_env("TEMPLATE_DEBUG", False),
+            "debug": get_bool_env("TEMPLATE_DEBUG", DEBUG),
             "context_processors": [
                 "django.template.context_processors.debug",
                 "django.template.context_processors.request",
@@ -141,13 +141,6 @@ AUTH_PASSWORD_VALIDATORS = [
 
 AUTH_USER_MODEL = "argus_auth.User"
 
-
-LOGIN_URL = "/login/"
-LOGOUT_URL = "/logout/"
-LOGIN_REDIRECT_URL = "/"
-LOGOUT_REDIRECT_URL = "/"
-
-
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
@@ -173,7 +166,7 @@ TIME_ZONE = "Europe/Oslo"
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = "/static/"
+STATIC_URL = get_str_env("STATIC_URL", "/static/")
 STORAGES = {
     "default": {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
@@ -183,17 +176,25 @@ STORAGES = {
     },
 }
 
-
 AUTHENTICATION_BACKENDS = (
-    "argus.dataporten.social.DataportenFeideOAuth2",
     "django.contrib.auth.backends.RemoteUserBackend",
     "django.contrib.auth.backends.ModelBackend",
 )
 
-
 SILENCED_SYSTEM_CHECKS = [
     "rest_framework.W001",  # Turns off warning about PAGE_SIZE without DEFAULT_PAGINATION_CLASS
 ]
+
+
+# Email
+
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+EMAIL_HOST = get_str_env("EMAIL_HOST", "localhost")
+EMAIL_HOST_USER = get_str_env("EMAIL_HOST_USER")
+EMAIL_PORT = get_int_env("EMAIL_PORT", 587)
+EMAIL_USE_TLS = True
+EMAIL_HOST_PASSWORD = get_str_env("EMAIL_HOST_PASSWORD")
+DEFAULT_FROM_EMAIL = get_str_env("DEFAULT_FROM_EMAIL", "argus@localhost")
 
 # Logging
 
@@ -259,15 +260,15 @@ CHANNEL_LAYERS = {
 
 # Project specific settings
 
+# Set this to be able to send notifications
+# MEDIA_PLUGINS = []
+
 INDELIBLE_INCIDENTS = get_bool_env("ARGUS_INDELIBLE_INCIDENTS", True)
 
 NOTIFICATION_SUBJECT_PREFIX = "[Argus] "
 
-SEND_NOTIFICATIONS = False  # Don't spam by accident
-
-COOKIE_DOMAIN = get_str_env("ARGUS_COOKIE_DOMAIN", None)
-
-ARGUS_TOKEN_COOKIE_NAME = "token"
+# Don't spam by accident
+SEND_NOTIFICATIONS = get_bool_env("ARGUS_SEND_NOTIFICATIONS", default=False)
 
 # 3rd party settings
 
