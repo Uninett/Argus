@@ -45,7 +45,7 @@
                                     {% include 'htmx/dateformat/_dateformat_dropdown.html' %}
                                 </li>
                                 <li>
-                                    <form class="flex" action="{% url "htmx:logout" %}" method="POST">
+                                    <form class="flex" action="{% url "htmx:logout" %}" method="post">
                                         {% csrf_token %}
                                         <button class="flex-1 text-start" type="submit">Log out</button>
                                     </form>
