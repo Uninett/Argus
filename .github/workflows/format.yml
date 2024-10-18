@@ -16,3 +16,20 @@ jobs:
       with:
         args: "format --check"
         changed-files: 'true'
+
+  djlint:
+    runs-on: ubuntu-latest
+    name: Check HTML formatting
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+
+    - name: Install dependencies
+      run: |
+        pip install -U pip
+        pip install djlint
+
+    - name: Format HTML
+      run: djlint . --check
