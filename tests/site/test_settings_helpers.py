@@ -7,7 +7,7 @@ from django.test import override_settings
 
 from argus.site.settings import normalize_url, _add_missing_scheme_to_url
 from argus.site.settings._serializers import AppSetting
-from argus.site.utils import get_urlpatterns_from_setting, update_context_processors_list
+from argus.site.utils import get_urlpatterns, update_context_processors_list
 
 
 class NormalizeUrlTests(unittest.TestCase):
@@ -47,7 +47,7 @@ class NormalizeUrlTests(unittest.TestCase):
 
 class GetUrlPatternsFromSettingsTest(unittest.TestCase):
     def test_when_setting_is_falsey_return_empty_list(self):
-        self.assertEqual(get_urlpatterns_from_setting(None), [])
+        self.assertEqual(get_urlpatterns(None), [])
 
     def test_when_setting_urls_is_falsey_it_should_return_empty_list(self):
         class Obj:
@@ -56,7 +56,7 @@ class GetUrlPatternsFromSettingsTest(unittest.TestCase):
         obj = Obj()
         obj.urls = None
 
-        self.assertEqual(get_urlpatterns_from_setting([obj]), [])
+        self.assertEqual(get_urlpatterns([obj]), [])
 
     def test_urls_without_namespace_return_list_of_paths_without_namespace(self):
         # django.urls.include has one obligatory positional argument that is
@@ -72,7 +72,7 @@ class GetUrlPatternsFromSettingsTest(unittest.TestCase):
             },
         }
         setting = AppSetting(**raw_setting)
-        result = get_urlpatterns_from_setting([setting])
+        result = get_urlpatterns([setting])
         self.assertEqual(len(result), 1)
         self.assertTrue(isinstance(result[0], URLResolver))
         self.assertFalse(result[0].namespace)
@@ -92,7 +92,7 @@ class GetUrlPatternsFromSettingsTest(unittest.TestCase):
             },
         }
         setting = AppSetting(**raw_setting)
-        result = get_urlpatterns_from_setting([setting])
+        result = get_urlpatterns([setting])
         self.assertEqual(len(result), 1)
         self.assertTrue(isinstance(result[0], URLResolver))
         self.assertEqual(result[0].namespace, "blbl")
