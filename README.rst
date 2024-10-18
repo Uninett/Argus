@@ -74,6 +74,7 @@ file) at minimum add::
                     "social_django.context_processors.backends",
                     "social_django.context_processors.login_redirect",
                     "argus_htmx.context_processors.theme_via_session",
+                    "argus_htmx.context_processors.datetime_format_via_session",
                 ],
             },
         }
@@ -125,7 +126,8 @@ In the file ``extra.json``, (which can be syntax checked with for instance
           "urlpatterns_module": "argus_htmx.urls"
         },
         "context_processors": [
-          "argus_htmx.context_processors.theme_via_session"
+          "argus_htmx.context_processors.theme_via_session",
+          "argus_htmx.context_processors.datetime_format_via_session"
         ],
         "middleware": {
           "argus_htmx.middleware.LoginRequiredMiddleware": "end"
