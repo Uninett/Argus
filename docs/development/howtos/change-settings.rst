@@ -1,3 +1,5 @@
+.. _howto-change-settings:
+
 ====================================
 How to change site-specific settings
 ====================================

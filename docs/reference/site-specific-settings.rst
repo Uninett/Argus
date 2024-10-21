@@ -12,7 +12,7 @@ There are several settings that need to be defined within Argus, for example:
 * :setting:`DATABASE_URL`
 * :setting:`DEFAULT_FROM_EMAIL`
 
-See `How to change site-specific settings <development/howtos/change-settings>`_
+See :ref:`howto-change-settings`
 
 List of settings and environment variables
 ==========================================
