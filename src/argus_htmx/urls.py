@@ -8,6 +8,7 @@ from .notificationprofiles.urls import urlpatterns as notificationprofile_urls
 from .destinations.urls import urlpatterns as destination_urls
 from .themes.urls import urlpatterns as theme_urls
 from .dateformat.urls import urlpatterns as dateformat_urls
+from .user.urls import urlpatterns as user_urls
 
 app_name = "htmx"
 urlpatterns = [
@@ -20,4 +21,5 @@ urlpatterns = [
     path("destinations/", include(destination_urls)),
     path("themes/", include(theme_urls)),
     path("dateformat/", include(dateformat_urls)),
+    path("user/", include(user_urls)),
 ]
