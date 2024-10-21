@@ -1,8 +1,6 @@
 from django.urls import path, include
 from django.contrib.auth import views as auth_views
 
-from argus.auth.views import LogoutView
-
 from .incidents.urls import urlpatterns as incident_urls
 from .timeslots.urls import urlpatterns as timeslot_urls
 from .notificationprofiles.urls import urlpatterns as notificationprofile_urls
