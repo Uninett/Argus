@@ -5,11 +5,15 @@ from django.conf import settings
 from django.urls import include, path
 
 
-def get_urlpatterns_from_setting(setting):
-    if not setting:
+def get_app_names(app_settings):
+    return [app.app_name for app in app_settings if app.app_name]
+
+
+def get_urlpatterns(app_settings):
+    if not app_settings:
         return []
     urlpatterns = []
-    for app in setting:
+    for app in app_settings:
         if not app.urls:
             continue
         if app.urls.namespace:
@@ -58,3 +62,34 @@ def update_middleware_list(middleware_setting, app_settings):
                 end_list.append(middleware)
     safety_copy = start_list + safety_copy + end_list
     return safety_copy
+
+
+def get_settings(app_settings):
+    settings = {}
+    for app in app_settings:
+        if not getattr(app, "settings", None):
+            continue
+        settings.update(app.settings)
+    return settings
+
+
+def update_settings(current_settings, app_settings, override=False):
+    if not app_settings:
+        return
+    TEMPLATES = current_settings["TEMPLATES"]
+    INSTALLED_APPS = current_settings["INSTALLED_APPS"]
+    MIDDLEWARE = current_settings["MIDDLEWARE"]
+
+    _app_names = get_app_names(app_settings)
+    if override:
+        INSTALLED_APPS = _app_names + INSTALLED_APPS
+    else:
+        INSTALLED_APPS += _app_names
+    current_settings["INSTALLED_APPS"] = INSTALLED_APPS
+    TEMPLATES = update_context_processors_list(TEMPLATES, app_settings)
+    current_settings["TEMPLATES"] = TEMPLATES
+    MIDDLEWARE = update_middleware_list(MIDDLEWARE, app_settings)
+    current_settings["MIDDLEWARE"] = MIDDLEWARE
+
+    for setting, value in get_settings(app_settings).items():
+        current_settings[setting] = value
