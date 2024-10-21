@@ -1,3 +1,5 @@
+.. _howto-federated-logins:
+
 ===================================
 How to add federated login (OAuth2)
 ===================================
