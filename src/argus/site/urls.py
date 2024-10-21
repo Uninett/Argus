@@ -22,25 +22,16 @@ from django.views.generic.base import RedirectView
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from social_django.urls import extra
 
-from argus.auth.views import ObtainNewAuthToken, AuthMethodListView
-from argus.dataporten import views as dataporten_views
+from argus.auth.views import ObtainNewAuthToken
 from argus.notificationprofile.views import SchemaView
 from argus.site.utils import get_urlpatterns_from_setting
 from argus.site.views import error, index, MetadataView
 
 
-psa_urls = [
-    # Overrides social_django's `complete` view
-    re_path(rf"^complete/(?P<backend>[^/]+){extra}$", dataporten_views.login_wrapper, name="complete"),
-    path("", include("social_django.urls", namespace="social")),
-]
-
 urlpatterns = [
     path("favicon.ico", RedirectView.as_view(url="/static/favicon.svg", permanent=True)),
     # path(".error/", error),  # Only needed when testing error pages and error behavior
     path("admin/", admin.site.urls),
-    path("oidc/", include(psa_urls)),
-    path("login-methods/", AuthMethodListView.as_view(), name="login-methods"),
     path("api/schema/", SpectacularAPIView.as_view(api_version="v1"), name="schema-v1-old"),
     path("api/schema/swagger-ui/", SpectacularSwaggerView.as_view(url_name="schema-v1-old"), name="swagger-ui-v1-old"),
     path("api/v1/", include(("argus.site.api_v1_urls", "api"), namespace="v1")),

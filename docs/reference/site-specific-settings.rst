@@ -153,38 +153,6 @@ possible to prepend (ACTION is "start"). A prepended middleware will be run
 *before* the security- and session middlewares which might not be what you
 want.
 
-Dataporten
-----------
-
-.. setting:: ARGUS_DATAPORTEN_KEY
-
-* :setting:`ARGUS_DATAPORTEN_KEY` holds the id/key for using dataporten for authentication.
-
-.. setting:: ARGUS_DATAPORTEN_SECRET
-
-* :setting:`ARGUS_DATAPORTEN_SECRET` holds the dataporten password.
-
-Refer to the section :ref:`dataporten <dataporten-reference>` for more information.
-
-Domain settings
----------------
-
-.. setting:: ARGUS_COOKIE_DOMAIN
-
-* :setting:`ARGUS_COOKIE_DOMAIN` holds the domain of the Argus instance. This is the domain
-  that the cookie is set for. It is needed to log into the frontend.
-
-.. setting:: ARGUS_FRONTEND_URL
-
-* :setting:`ARGUS_FRONTEND_URL` is used for redirecting back to frontend after logging in
-  through Feide and CORS. Must either be a subdomain of or the same as
-  :setting:`ARGUS_COOKIE_DOMAIN`.
-
-In production, Argus requires the frontend and the backend to either be deployed on the
-same domain, or the frontend to be on a subdomain of the :setting:`ARGUS_COOKIE_DOMAIN`.
-When running Argus on localhost for development and testing, :setting:`ARGUS_COOKIE_DOMAIN` can
-be empty (and will default to localhost).
-
 Database settings
 -----------------
 
@@ -333,9 +301,9 @@ Other settings
 Normally, you shouldn't need to ever change these. If you do need to touch
 them, do it via a new settings file containing overrides.
 
-.. setting:: ARGUS_TOKEN_COOKIE_NAME
+.. setting:: ARGUS_SPA_TOKEN_COOKIE_NAME
 
-* :setting:`ARGUS_TOKEN_COOKIE_NAME` is to control the name of the cookie that
+* :setting:`ARGUS_SPA_TOKEN_COOKIE_NAME` is to control the name of the cookie that
   contains a copy of the authentication token which is used when logging in via
   the frontend. The default is ``token``, and you can change this to
   something else if something you cannot change in the same system also creates
