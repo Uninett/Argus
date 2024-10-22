@@ -7,7 +7,6 @@ from pathlib import Path
 from typing import Optional
 from urllib.parse import urlsplit, urlunsplit
 
-from django.core.exceptions import ImproperlyConfigured
 from django.utils.module_loading import import_string
 
 from ._serializers import ListAppSetting
