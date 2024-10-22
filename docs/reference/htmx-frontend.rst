@@ -4,7 +4,7 @@
 HTMx Frontend
 =============
 
-The new frontend s old-new school and uses HTMx to boost HTML pages. See the
+The new frontend is old-new school and uses HTMx to boost HTML pages. See the
 `Github repo of argus-htmx-frontend <https://github.com/uninett/argus-htmx-frontend>`_
 
 It has its own specific settings and currently depends on an app.
@@ -33,8 +33,8 @@ Domain settings
 
 .. setting:: ARGUS_FRONTEND_URL
 
-* :setting:`ARGUS_FRONTEND_URL` is used for builidng links to point back to
-  incidents in the dashboard when autocreating tickets.
+* :setting:`ARGUS_FRONTEND_URL` is used for builidng permalinks to point back
+  to incidents in the dashboard.
 
 The setting must point to the publicly visible domain where the frontend is
 running. This might be different from where the backend is running.
