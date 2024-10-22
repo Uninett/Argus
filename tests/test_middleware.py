@@ -16,26 +16,34 @@ class TestLoginRequiredMiddleware(test.TestCase):
         self.request = request
 
     def test_process_view_login_required_false(self):
-        view_func = lambda: None
+        def view_func():
+            return None
+
         view_func.login_required = False
         result = LoginRequiredMiddleware(lambda x: x).process_view(self.request, view_func, None, {})
         self.assertIsNone(result)
 
     @test.override_settings(PUBLIC_URLS=("/foo",))
     def test_process_view_public_urls(self):
-        view_func = lambda: None
+        def view_func():
+            return None
+
         result = LoginRequiredMiddleware(lambda x: x).process_view(self.request, view_func, None, {})
         self.assertIsNone(result)
 
     def test_process_view_authenticated(self):
-        view_func = lambda: None
+        def view_func():
+            return None
+
         self.request.user.is_authenticated = True
         result = LoginRequiredMiddleware(lambda x: x).process_view(self.request, view_func, None, {})
         self.assertIsNone(result)
         delattr(self.request.user, "is_authenticated")
 
     def test_process_view_redirect(self):
-        view_func = lambda: None
+        def view_func():
+            return None
+
         self.request.user.is_authenticated = False
         result = LoginRequiredMiddleware(lambda x: x).process_view(self.request, view_func, None, {})
         self.assertIsNotNone(result)
