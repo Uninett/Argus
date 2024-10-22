@@ -102,7 +102,7 @@
     {{ ack.event.actor }}
     {{ ack.event.timestamp|date:datetime_format }}
     </p>
-    {% if ack.expiration%}<p>Expires: {{ ack.expiration|date:datetime_format }}</p>{% endif %}
+    {% if ack.expiration %}<p>Expires: {{ ack.expiration|date:datetime_format }}</p>{% endif %}
     </div>
     {% endfor %}
   <div class="card-actions divide-none">
