@@ -5,6 +5,19 @@ __all__ = ["APP_SETTINGS"]
 
 _app_settings = [
     {
+        "settings": {
+            "LOGIN_URL": "/accounts/login/",
+            "LOGOUT_URL": "/accounts/logout/",
+            "LOGIN_REDIRECT_URL": "/incidents/",
+            "LOGOUT_REDIRECT_URL": "/incidents/",
+            "PUBLIC_URLS": [
+                "/accounts/login/",
+                "/api/",
+                "/oidc/",
+            ],
+        },
+    },
+    {
         "app_name": "argus_htmx",
         "urls": {
             "path": "",
@@ -30,14 +43,3 @@ _app_settings = [
 ]
 
 APP_SETTINGS = ListAppSetting(_app_settings).root
-
-LOGIN_URL = "/accounts/login/"
-LOGOUT_URL = "/accounts/logout/"
-LOGIN_REDIRECT_URL = "/incidents/"
-LOGOUT_REDIRECT_URL = "/"
-
-PUBLIC_URLS = [
-    "/accounts/login/",
-    "/api/",
-    "/oidc/",
-]
