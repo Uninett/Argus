@@ -33,7 +33,7 @@ Domain settings
 
 .. setting:: ARGUS_FRONTEND_URL
 
-* :setting:`ARGUS_FRONTEND_URL` is used for builidng permalinks to point back
+* :setting:`ARGUS_FRONTEND_URL` is used for building permalinks to point back
   to incidents in the dashboard.
 
 The setting must point to the publicly visible domain where the frontend is
