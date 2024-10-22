@@ -3,6 +3,29 @@
 This file documents changes to Argus that are relevant for operations and
 end-users.
 
+## [1.24.0] - 2024-10-22
+
+### Deployment changes!
+
+All the hard coded support for the REACT SPA frontend has been split out into
+a library.
+
+In the process, the following renames were done:
+
+- `ARGUS_COOKIE_DOMAIN` -> `ARGUS_SPA_COOKIE_DOMAIN` (environment variable)
+- `COOKIE_DOMAIN` -> `SPA_COOKIE_DOMAIN` (setting)
+- `ARGUS_TOKEN_COOKIE_NAME` -> `ARGUS_SPA_TOKEN_COOKIE_NAME` (hidden setting)
+
+How to deploy argus-server with support for this frontend has also changed, see
+the new documentation section "REACT Frontend". In short, it is necessary to
+change which settings-file to base the deployment on.
+
+You might have to rebuild docker images: ours uses a newer Python (3.10) and
+PostgreSQL (14) than they used to.
+
+Any setting can now be changed via the (EXTRA|OVERRIDING)\_APPS-machinery.
+
+
 ## [1.23.0] - 2024-10-10
 
 This is the first version of Argus to be able to run on Django 5.1.

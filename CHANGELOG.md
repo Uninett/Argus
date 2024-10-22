@@ -8,6 +8,33 @@ This project uses [*towncrier*](https://towncrier.readthedocs.io/) and the chang
 
 <!-- towncrier release notes start -->
 
+## [1.24.0] - 2024-10-22
+
+
+### Added
+
+- There's a new courtesy method on the User-model: `is_member_of_group()`.
+
+### Changed
+
+- Switched to running docker image on python 3.10 and postgres v14.
+  ([#908](https://github.com/Uninett/Argus/issues/908))
+- Make it possible to change any setting via the
+  (EXTRA|OVERRIDING)\_APPS-machinery.
+- Split out all the hard coded support for the REACT SPA frontend into
+  a library.
+
+  In the process, the following renames were done:
+
+  - `ARGUS_COOKIE_DOMAIN` -> `ARGUS_SPA_COOKIE_DOMAIN` (environment variable)
+  - `COOKIE_DOMAIN` -> `SPA_COOKIE_DOMAIN` (setting)
+  - `ARGUS_TOKEN_COOKIE_NAME` -> `ARGUS_SPA_TOKEN_COOKIE_NAME` (hidden setting)
+
+  How to deploy with support for this frontend has also changed, see the new
+  documentation section "REACT Frontend". In short, it is necessary to change
+  which settings-file to base the deployment on.
+
+
 ## [1.23.0] - 2024-10-10
 
 This is the first version of Argus to be able to run on Django 5.1.
