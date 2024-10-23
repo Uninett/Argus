@@ -1,10 +1,10 @@
 {% extends "htmx/base.html" %}
 
 {% block main %}
-    <section id="user-settings">
-        <h2>{{ page_title }}</h2>
-
-        <ul class="menu menu-md dropdown-content bg-base-200 text-base-content rounded-box mt-3 w-auto p-2">
+    <h1 class="sr-only">{{ page_title }}</h1>
+    <section id="user-settings" class="card">
+        <h2 class="card-title">User settings</h2>
+        <ul class="menu card-body">
             <li class="menu-title">
                 Logged in as: <span class="text-info">{{ request.user }}</span>
                 <div class="divider divider-secondary my-0"></div>
