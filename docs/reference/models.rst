@@ -90,7 +90,6 @@ Handling notifications
 ER diagram
 ==========
 
-.. figure:: img/ER_model.png
+.. graphviz:: img/ER_model.dot
    :alt: ER diagram
-
-   ER diagram
+   :caption: ER diagram
