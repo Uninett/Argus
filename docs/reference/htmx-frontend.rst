@@ -55,12 +55,16 @@ understand the the package and the editable install does the same job.
 Settings
 ========
 
-Base the settings file on ``argus.htmx.settings``. We mutate some of the
-existing settings with the same system used for extra apps and overriding apps
-so have a look at ``argus_htmx.appconfig`` for the individual settings. Note
-especially that :setting:`ROOT_URLCONF` is set to ``argus.htmx.urls``. If you
-prefer to make your own root ``urls.py``, the frontend-specific urls can be
-imported from ``argus.htmx.htmx_urls``.
+If you don't need to override any settings wth a file at all (maybe there are
+environment variables for everything you need to change) you can use
+``argus.htmx.settings`` directly. If not, copy the contents of
+``argus.htmx.settings`` into the top of your tuned settings file.
+
+We mutate some of the existing settings with the same system used for extra
+apps and overriding apps so have a look at ``argus_htmx.appconfig`` for the
+individual settings. Note especially that :setting:`ROOT_URLCONF` is set to
+``argus.htmx.urls``. If you prefer to make your own root ``urls.py``, the
+frontend-specific urls can be imported from ``argus.htmx.htmx_urls``.
 
 Domain settings
 ---------------
