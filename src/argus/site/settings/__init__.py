@@ -4,7 +4,6 @@ import json
 import logging.config
 from os import getenv
 from pathlib import Path
-from typing import Optional
 from urllib.parse import urlsplit, urlunsplit
 
 from django.utils.module_loading import import_string
