@@ -5,7 +5,7 @@ repos:
     -   id: trailing-whitespace
     -   id: mixed-line-ending
     -   id: end-of-file-fixer
-        exclude: &exclude_pattern '^changelog.d/'
+        exclude: &exclude_pattern '(^changelog.d/)|(^docs/reference/img/ER_model.dot)'
     -   id: debug-statements
 -   repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.6.9
