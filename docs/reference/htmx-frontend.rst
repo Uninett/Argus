@@ -14,9 +14,43 @@ It is not needed if running headless.
 Setup
 =====
 
-Install the app with pip::
+Production
+----------
 
-    pip install argus-htmx
+Install the app directly::
+
+    pip install argus-frontend-htmx
+
+... or indirectly via argus-server::
+
+    pip install argus-server[htmx]
+
+Development
+-----------
+
+If you're working just on argus-server::
+
+    cd argus-server-repo && pip install -e .[htmx]
+
+This will install the frontend as a package and it will not be editable.
+
+If you're working just on argus-frontend-htmx::
+
+    cd argus-htmx-repo && pip install -e .
+
+This will install the server as a package and it will not be editable.
+
+If you want to work on both in tandem::
+
+    cd argus-htmx-repo && pip install -e .
+    cd argus-server-repo && pip uninstall argus-server && pip install -e .
+
+Since argus-frontend-htmx depends on argus-server it will install the latter
+from a package, which is probably not what you want. That's why it might be
+necessary to uninstall the package before you install the editable version you
+will be working on. If you install argus-server first, then installing the
+frontend will still drag in the argus-server package since pip doesn't
+understand the the package and the editable install does the same job.
 
 Settings
 ========
