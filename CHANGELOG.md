@@ -8,6 +8,15 @@ This project uses [*towncrier*](https://towncrier.readthedocs.io/) and the chang
 
 <!-- towncrier release notes start -->
 
+## [1.25.0] - 2024-10-24
+
+### Added
+
+- Make it easier to use the new HTMx-based frontend, with docs. The new
+  frontend cannot be run simultaneously with the REACT SPA frontend as some
+  settings conflict.
+
+
 ## [1.24.0] - 2024-10-22
 
 

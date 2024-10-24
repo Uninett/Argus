@@ -3,6 +3,14 @@
 This file documents changes to Argus that are relevant for operations and
 end-users.
 
+## [1.25.0] - 2024-10-24
+
+There's a new library `argus.htmx` that exists to make it easier to develop the
+new frontend. The new frontend cannot be run simultaneously with the REACT SPA
+frontend as some settings conflict.
+
+See the new docs in `docs/reference/htmx-frontend.rst` for details.
+
 ## [1.24.0] - 2024-10-22
 
 ### Deployment changes!
