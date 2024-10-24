@@ -8,7 +8,7 @@
                hx-post="{% url 'htmx:change-theme' %}"
                hx-trigger="change"
                hx-swap="textContent"
-               hx-target="#theme-badge"
+               hx-target="previous summary .badge"
                hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
         />
     </li>
