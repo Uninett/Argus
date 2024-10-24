@@ -8,6 +8,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends tini build-esse
 # Install some dev requirements that aren't part of the minimal dependencies:
 RUN pip install psycopg2-binary django-extensions python-dotenv gunicorn 'uvicorn[standard]'
 
+# Make an unprivileged user to run the server
+RUN useradd --system argus
+# Ensure this user has privileges to collect static resources in /static
+RUN mkdir -p /static && chown argus /static
+ENV STATIC_ROOT=/static
+
 COPY . /src
 RUN pip install /src && rm -rf /src
 
@@ -20,4 +26,5 @@ ENV DJANGO_SETTINGS_MODULE=dockersettings
 ENV PORT=8000
 EXPOSE 8000
 COPY docker/docker-entrypoint.sh /api-entrypoint.sh
+USER argus
 ENTRYPOINT ["/usr/bin/tini", "-v", "--", "/api-entrypoint.sh"]
