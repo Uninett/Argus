@@ -15,7 +15,7 @@ from urllib.parse import urlsplit
 import dj_database_url
 
 # Import some helpers
-from . import *
+from . import get_bool_env, get_str_env, get_int_env, setup_logging, normalize_url, get_json_env, validate_app_setting
 from ..utils import update_settings
 
 # Quick-start development settings - unsuitable for production
@@ -181,9 +181,10 @@ if LOGGING_MODULE:
     LOGGING_CONFIG = None
     STARTUP_LOGGING = setup_logging(LOGGING_MODULE)
 
-# django-cors-headers
+# For permalinks to incidents in argus dashboard
 FRONTEND_URL = get_str_env("ARGUS_FRONTEND_URL")
 
+# django-cors-headers
 CORS_ALLOWED_ORIGINS = []
 if FRONTEND_URL:
     CORS_ALLOWED_ORIGINS.append(normalize_url(FRONTEND_URL))

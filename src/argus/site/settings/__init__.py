@@ -156,5 +156,10 @@ def update_loglevels(loglevel: str = "INFO", loggers=(), handlers=()) -> None:
         handlerdict = {}
         for handler in handlers:
             handlerdict["handler"] = {"level": loglevel}
-        logdict = {"version": 1, "disable_existing_loggers": False, "incremental": True, "handlers": handlerdict}
+        logdict = {
+            "version": 1,
+            "disable_existing_loggers": False,
+            "incremental": True,
+            "handlers": handlerdict,
+        }
         logging.config.dictConfig(logdict)
