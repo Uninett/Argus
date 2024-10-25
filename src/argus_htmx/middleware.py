@@ -1,5 +1,9 @@
+import json
+
 from django.conf import settings
 from django.contrib.auth.views import redirect_to_login
+from django.contrib.messages import get_messages
+from django.http import HttpRequest, HttpResponse
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.encoding import force_str
 
@@ -41,4 +45,49 @@ class LoginRequiredMiddleware:
             return None
 
         # Redirect unauthenticated users to login page
-        return redirect_to_login(request.get_full_path(), self.login_url, "next")
+        return redirect_to_login(request.get_full_path(), self.login_url, 'next')
+
+
+class HtmxMessageMiddleware(MiddlewareMixin):
+    """
+    Add messages to HX-Trigger header if request was via HTMX
+    """
+
+    def process_response(self, request: HttpRequest, response: HttpResponse) -> HttpResponse:
+
+        # The HX-Request header indicates that the request was made with HTMX
+        if "HX-Request" not in request.headers:
+            return response
+
+        # Ignore redirections because HTMX cannot read the headers
+        if 300 <= response.status_code < 400:
+            return response
+
+        # Extract the messages
+        messages = [
+            {"message": message.message, "tags": message.tags}
+            for message in get_messages(request)
+        ]
+        if not messages:
+            return response
+
+        # Get the existing HX-Trigger that could have been defined by the view
+        hx_trigger = response.headers.get("HX-Trigger")
+
+        if hx_trigger is None:
+            # If the HX-Trigger is not set, start with an empty object
+            hx_trigger = {}
+        elif hx_trigger.startswith("{"):
+            # If the HX-Trigger uses the string syntax, convert to the object syntax
+            hx_trigger = json.loads(hx_trigger)
+        else:
+            # If the HX-Trigger uses the object syntax, parse the object
+            hx_trigger = {hx_trigger: True}
+
+        # Add the messages array in the HX-Trigger object
+        hx_trigger["messages"] = messages
+
+        # Add or update the HX-Trigger
+        response.headers["HX-Trigger"] = json.dumps(hx_trigger)
+
+        return response
