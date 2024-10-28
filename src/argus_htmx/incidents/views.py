@@ -147,7 +147,7 @@ def incidents_update(request: HtmxHttpRequest, action: str):
 def incident_detail_close(request, pk: int):
     incident = get_object_or_404(Incident, id=pk)
     if not incident.stateful:
-        LOG.warning(f"Attempt at closing the uncloseable {incident}")
+        LOG.warning("Attempt at closing the uncloseable %s", incident)
         messages.warning(request, f"Did not close {incident}, stateless incidents cannot be closed.")
         return redirect("htmx:incident-detail", pk=pk)
     form = DescriptionOptionalForm(request.POST or None)
@@ -156,7 +156,7 @@ def incident_detail_close(request, pk: int):
             request.user,
             description=form.cleaned_data.get("description", ""),
         )
-        LOG.info(f"{{ incident }} manually closed by {{ request.user }}")
+        LOG.info("%s manually closed by %s", incident, request.user)
     return redirect("htmx:incident-detail", pk=pk)
 
 
@@ -164,7 +164,7 @@ def incident_detail_close(request, pk: int):
 def incident_detail_reopen(request, pk: int):
     incident = get_object_or_404(Incident, id=pk)
     if not incident.stateful:
-        LOG.warning(f"Attempt at reopening the unopenable {incident}")
+        LOG.warning("Attempt at reopening the unopenable %s", incident)
         messages.warning(request, f"Did not reopen {incident}, stateless incidents cannot be reopened.")
         return redirect("htmx:incident-detail", pk=pk)
     form = DescriptionOptionalForm(request.POST or None)
@@ -173,7 +173,7 @@ def incident_detail_reopen(request, pk: int):
             request.user,
             description=form.cleaned_data.get("description", ""),
         )
-        LOG.info(f"{{ incident }} manually reopened by {{ request.user }}")
+        LOG.info("%s manually reopened by %s", incident, request.user)
     return redirect("htmx:incident-detail", pk=pk)
 
 
