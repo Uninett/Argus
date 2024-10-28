@@ -1,13 +1,7 @@
-import importlib_resources
 import logging
-from pathlib import Path
-from typing import Optional
 
-from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth.models import Group
-from django.core.exceptions import PermissionDenied
-from django.shortcuts import render, reverse, get_object_or_404
+from django.shortcuts import render
 from django.views.generic import ListView
 
 from django.views.decorators.http import require_GET, require_POST

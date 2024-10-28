@@ -1,4 +1,3 @@
-from argus.site.settings import get_json_env, validate_app_setting
 from django.conf import settings
 from argus_htmx import settings as argus_htmx_settings
 
