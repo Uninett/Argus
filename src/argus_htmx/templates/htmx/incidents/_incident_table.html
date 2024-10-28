@@ -58,7 +58,7 @@
                 <a hx-get="?page=1"
                    href="?page=1"
                    hx-indicator="#incident-list .htmx-indicator"
-                   class="join-item btn btn-neutral">&laquo; First</a>
+                   class="join-item btn btn-neutral">« First</a>
               </li>
             {% endif %}
             {% if page.has_previous %}
@@ -91,7 +91,7 @@
                 <a hx-get="?page={{ page.paginator.num_pages }}"
                    href="?page={{ page.paginator.num_pages }}"
                    hx-indicator="#incident-list .htmx-indicator"
-                   class="join-item btn btn-neutral">&raquo; Last</a>
+                   class="join-item btn btn-neutral">» Last</a>
               </li>
             {% endif %}
           </ul>
