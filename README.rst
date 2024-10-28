@@ -53,16 +53,18 @@ file) at minimum add::
         "django_htmx.middleware.HtmxMiddleware",
         "argus_htmx.middleware.LoginRequiredMiddleware",
     ]
-    LOGIN_URL = "/accounts/login"
+    LOGIN_URL = "/accounts/login/"
     LOGIN_REDIRECT_URL = "/incidents/"
+    LOGIN_REDIRECT_URL = "/incidents/"
+    LOGOUT_REDIRECT_URL = "/"
     PUBLIC_URLS = [
         "/accounts/login/",
         "/api/",
+        "/oidc/",
     ]
     TEMPLATES = [
         {
             "BACKEND": "django.template.backends.django.DjangoTemplates",
-            "DIRS": [str(SITE_DIR / "templates")],
             "APP_DIRS": True,
             "OPTIONS": {
                 "debug": get_bool_env("TEMPLATE_DEBUG", False),
@@ -145,6 +147,20 @@ In the file ``extra.json``, (which can be syntax checked with for instance
         }
       }
     ]
+
+Optional authentication backend settings
+----------------------------------------
+
+If using ``django.contrib.auth.backends.RemoteUserBackend`` (which depends on
+the middleware ``django.contrib.auth.middleware.RemoteUserMiddleware``) there's
+an optional setting ``ARGUS_REMOTE_USER_METHOD_NAME`` to choose what to show on
+the button.
+
+If using ``social_core.backends.open_id_connect.OpenIdConnectAuth`` there's an
+optional setting ``ARGUS_OIDC_METHOD_NAME`` to choose what to show on the
+button.
+
+Both can be set via environment variables.
 
 Update
 ======
