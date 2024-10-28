@@ -4,6 +4,7 @@ import logging
 from typing import Optional
 from datetime import datetime
 
+from django import forms
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.auth import get_user_model
@@ -14,8 +15,9 @@ from django.urls import reverse
 
 from django.views.decorators.http import require_GET, require_POST
 from django.core.paginator import Paginator
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpRequest, HttpResponse, HttpResponseBadRequest
 from django_htmx.middleware import HtmxDetails
+from django_htmx.http import HttpResponseClientRefresh
 
 from argus.incident.models import Incident
 from argus.util.datetime_utils import make_aware
@@ -23,12 +25,26 @@ from argus.util.datetime_utils import make_aware
 from .customization import get_incident_table_columns
 from .utils import get_filter_function
 from .forms import AckForm, DescriptionOptionalForm, EditTicketUrlForm, AddTicketUrlForm
-
+from ..utils import (
+    bulk_change_incidents,
+    bulk_ack_queryset,
+    bulk_close_queryset,
+    bulk_reopen_queryset,
+    bulk_change_ticket_url_queryset,
+)
 
 User = get_user_model()
 LOG = logging.getLogger(__name__)
 DEFAULT_PAGE_SIZE = getattr(settings, "ARGUS_INCIDENTS_DEFAULT_PAGE_SIZE", 10)
 ALLOWED_PAGE_SIZES = getattr(settings, "ARGUS_INCIDENTS_PAGE_SIZES", [10, 20, 50, 100])
+
+# Map request trigger to parameters for incidents update
+INCIDENT_UPDATE_ACTIONS = {
+    "ack": (AckForm, bulk_ack_queryset),
+    "close": (DescriptionOptionalForm, bulk_close_queryset),
+    "reopen": (DescriptionOptionalForm, bulk_reopen_queryset),
+    "update-ticket": (EditTicketUrlForm, bulk_change_ticket_url_queryset),
+}
 
 
 def prefetch_incident_daughters():
@@ -100,6 +116,32 @@ def incident_detail_add_ack(request, pk: int, group: Optional[str] = None):
     formdata = request.POST or None
     _incident_add_ack(pk, formdata, request.user, group)
     return redirect("htmx:incident-detail", pk=pk)
+
+
+def get_form_data(request, formclass: forms.Form):
+    formdata = request.POST or None
+    incident_ids = []
+    cleaned_form = None
+    if formdata:
+        incident_ids = request.POST.getlist("selected_incidents", [])
+        form = formclass(formdata)
+        if form.is_valid():
+            cleaned_form = form.cleaned_data
+    return cleaned_form, incident_ids
+
+
+@require_POST
+def incidents_update(request: HtmxHttpRequest):
+    form_name = request.POST.get("action")
+    try:
+        formclass, callback_func = INCIDENT_UPDATE_ACTIONS[form_name]
+    except KeyError:
+        LOG.error("Unrecognized form name %s when updating incidents.", form_name)
+        return HttpResponseBadRequest("Invalid form name")
+    formdata, incident_ids = get_form_data(request, formclass)
+    if formdata:
+        bulk_change_incidents(request.user, incident_ids, formdata, callback_func)
+    return HttpResponseClientRefresh()
 
 
 @require_POST

@@ -6,7 +6,11 @@
 <dialog id="{{ dialog_id }}" class="modal">
     <div class="modal-box card card-compact shadow-xl">
         <div class="divider divider-start"><h3 class="card-title">{{ header }}</h3></div>
-        <form id="{{ dialog_id }}-form" class="card-body" method="post" action="{{ endpoint }}">
+        <form id="{{ dialog_id }}-form" class="card-body"
+            {% block form_control %}
+              method="post" action="{{ endpoint }}"
+            {% endblock form_control %}
+        >
             {% csrf_token %}
             <fieldset class="menu menu-vertical gap-4">
                 <legend class="antialiased text-base font-bold py-2">{{ explanation }}</legend>
