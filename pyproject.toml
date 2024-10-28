@@ -22,8 +22,6 @@ dependencies = [
     "argus-server>=1.25.0",
     "django-htmx",
     "django-widget-tweaks==1.5.0",
-    # The next is for python_version < 3.12 but we simplify code by always needing it
-    "importlib_resources>=5.12",
 ]
 
 [project.urls]
