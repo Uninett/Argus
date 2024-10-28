@@ -2,7 +2,7 @@
 
 {% block form_control %}
   {% if action_type == "bulk-update" %}
-    hx-post="{% url endpoint|default:'htmx:incident-list' %}"
+    hx-post="{% url endpoint|default:'htmx:incident-list' action=action %}"
     hx-include="[name='selected_incidents']"
   {% else %}
     {{ block.super }}

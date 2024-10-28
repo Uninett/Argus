@@ -131,13 +131,12 @@ def get_form_data(request, formclass: forms.Form):
 
 
 @require_POST
-def incidents_update(request: HtmxHttpRequest):
-    form_name = request.POST.get("action")
+def incidents_update(request: HtmxHttpRequest, action: str):
     try:
-        formclass, callback_func = INCIDENT_UPDATE_ACTIONS[form_name]
+        formclass, callback_func = INCIDENT_UPDATE_ACTIONS[action]
     except KeyError:
-        LOG.error("Unrecognized form name %s when updating incidents.", form_name)
-        return HttpResponseBadRequest("Invalid form name")
+        LOG.error("Unrecognized action name %s when updating incidents.", action)
+        return HttpResponseBadRequest("Invalid update action")
     formdata, incident_ids = get_form_data(request, formclass)
     if formdata:
         bulk_change_incidents(request.user, incident_ids, formdata, callback_func)
