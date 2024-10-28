@@ -1,14 +1,14 @@
 <details>
-    <summary>
-        Theme
-        <span class="badge badge-primary">{{ theme }}</span>
-    </summary>
-    <ul class="max-h-64 overflow-y-scroll">
-        <li
-                hx-get="{% url 'htmx:theme-names' %}"
-                hx-target="closest ul"
-                hx-swap="innerHTML"
-                hx-trigger="load"
-        ><p>loading...</p></li>
-    </ul>
+  <summary>
+    Theme
+    <span class="badge badge-primary">{{ theme }}</span>
+  </summary>
+  <ul class="max-h-64 overflow-y-scroll">
+    <li hx-get="{% url 'htmx:theme-names' %}"
+        hx-target="closest ul"
+        hx-swap="innerHTML"
+        hx-trigger="load">
+      <p>loading...</p>
+    </li>
+  </ul>
 </details>

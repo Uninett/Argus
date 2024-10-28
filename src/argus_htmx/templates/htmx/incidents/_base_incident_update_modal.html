@@ -1,5 +1,4 @@
 {% extends 'htmx/_base_form_modal.html' %}
-
 {% block form_control %}
   {% if action_type == "bulk-update" %}
     hx-post="{% url endpoint|default:'htmx:incident-list' action=action %}"

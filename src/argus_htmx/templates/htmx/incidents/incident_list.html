@@ -1,21 +1,21 @@
 {% extends base %}
 {% block main %}
-    <section>
-        {% if incidents_extra_widget %}
-        <div class="flex">
-            <div class="w-2/3">{% include "htmx/incidents/_incidents_menubar.html" %}</div>
-            <div class="w-1/3 ml-2">{% include incidents_extra_widget %}</div>
-        </div>
-        {% else %}
-            {% include "htmx/incidents/_incidents_menubar.html" %}
-        {% endif %}
-    </section>
-    <section id="incident-list" class="loading-box">
-        {% block table %}
-            {% include "htmx/incidents/_incident_table.html" %}
-        {% endblock table %}
-        <div class="htmx-indicator loading-overlay bg-base-100/70">
-            <div class="loading loading-spinner loading-lg text-primary"></div>
-        </div>
-    </section>
+  <section>
+    {% if incidents_extra_widget %}
+      <div class="flex">
+        <div class="w-2/3">{% include "htmx/incidents/_incidents_menubar.html" %}</div>
+        <div class="w-1/3 ml-2">{% include incidents_extra_widget %}</div>
+      </div>
+    {% else %}
+      {% include "htmx/incidents/_incidents_menubar.html" %}
+    {% endif %}
+  </section>
+  <section id="incident-list" class="loading-box">
+    {% block table %}
+      {% include "htmx/incidents/_incident_table.html" %}
+    {% endblock table %}
+    <div class="htmx-indicator loading-overlay bg-base-100/70">
+      <div class="loading loading-spinner loading-lg text-primary"></div>
+    </div>
+  </section>
 {% endblock main %}
