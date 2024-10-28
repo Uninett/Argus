@@ -35,7 +35,7 @@ Update urls.py
 
 You must add the ``social_django.urls`` to your ``ROOT_URLCONF`` urlpatterns. The
 ``python-social-auth`` docs state to place the urls directly in your url root, but for better
-namespacing/isolation you can add them under ``oidc/``. eg::
+namespacing/isolation you can add them under ``oidc/``. ie::
 
   urlpatterns = [
     ...
@@ -51,6 +51,7 @@ base off of `Python Social Auth: Github backend <https://python-social-auth.read
 with a few minor differences
 
 The backend path is ``social_core.backends.github.GithubOAuth2``::
+
   AUTHENTICATION_BACKENDS = [
     "social_core.backends.github.GithubOAuth2",
     "django.contrib.auth.backends.ModelBackend",
