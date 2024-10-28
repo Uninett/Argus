@@ -1,2 +1,4 @@
 # Format all python with ruff
 47f713ddce20e3c751e3cbd05a8671dda8f9a054
+# Format all HTML with djLint
+0cd2a6561291dabccf435f19aca3f96323097e8b
