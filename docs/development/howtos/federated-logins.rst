@@ -73,8 +73,8 @@ Now create client credentials in the applications' settings page.
 
 Update your settings.py with the following keys::
 
-  SOCIAL_AUTH_GITHUB_KEY=<github app client id>
-  SOCIAL_AUTH_GITHUB_SECRET=<github app client secret>
+  SOCIAL_AUTH_GITHUB_KEY = <github app client id>
+  SOCIAL_AUTH_GITHUB_SECRET = <github app client secret>
 
 These settings differ per authentication backend but generally it is only the ``GITHUB`` part that
 changes
