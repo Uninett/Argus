@@ -154,10 +154,10 @@ STORAGES = {
     },
 }
 
-AUTHENTICATION_BACKENDS = (
+AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.RemoteUserBackend",
     "django.contrib.auth.backends.ModelBackend",
-)
+]
 
 SILENCED_SYSTEM_CHECKS = [
     "rest_framework.W001",  # Turns off warning about PAGE_SIZE without DEFAULT_PAGINATION_CLASS
