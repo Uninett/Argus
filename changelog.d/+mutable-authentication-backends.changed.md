@@ -1,1 +1,0 @@
-Make `AUTHENTICATION_BACKENDS` setting mutable

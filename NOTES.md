@@ -3,6 +3,10 @@
 This file documents changes to Argus that are relevant for operations and
 end-users.
 
+## [1.26.0] - 2024-10-29
+
+This release is mainly to wrangle dependencies to the in-progress new frontend.
+
 ## [1.25.0] - 2024-10-24
 
 There's a new library `argus.htmx` that exists to make it easier to develop the

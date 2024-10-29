@@ -8,6 +8,22 @@ This project uses [*towncrier*](https://towncrier.readthedocs.io/) and the chang
 
 <!-- towncrier release notes start -->
 
+## [1.26.0] - 2024-10-29
+
+This release is mainly to wrangle dependencies to the in-progress new frontend.
+
+### Changed
+
+- There's more detail on how to set up federated logins in the docs.
+- Make `AUTHENTICATION_BACKENDS` setting mutable by making it a list, not
+  a tuple.
+
+### Fixed
+
+- Do not run processes as `root` in Docker production container
+  ([#921](https://github.com/Uninett/Argus/issues/921))
+
+
 ## [1.25.0] - 2024-10-24
 
 ### Added
