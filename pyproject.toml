@@ -51,9 +51,7 @@ dynamic = ["version"]
 [project.optional-dependencies]
 docs = ["sphinx>=2.2.0"]
 htmx = [
-    "argus-htmx-frontend>=0.14",
-    "social-auth-core>=4.1",
-    "social-auth-app-django>=5.0",
+    "argus-htmx-frontend>=0.15",
 ]
 dev = [
     "django-debug-toolbar",
