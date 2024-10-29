@@ -3563,23 +3563,41 @@ input.tab:checked + .tab-content,
   --tw-divide-x-reverse: 1;
 }
 
+/*
+   * Example usage:
+   * <div class="loading-box">
+   *   <!-- Any content tag here -->
+   *   <div class="htmx-indicator">
+   *     <!-- Any optional feedback widget here -->
+   *   </div>
+   * </div>
+   */
+
 .loading-box {
-  position: relative;
+  display: grid;
+  place-items: center;
 }
 
-.loading-box .loading-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+/* Stacks direct children on top of each other */
+
+.loading-box > * {
+  grid-column-start: 1;
+  grid-row-start: 1;
 }
 
-.loading-box .loading-overlay:not(.htmx-request) {
-  display: none;
+/* Adds overlay */
+
+.loading-box:has(> .htmx-indicator.htmx-request) > *:not(.htmx-indicator) {
+  opacity: 0.3;
+}
+
+/* Disables mouse interactions */
+
+.loading-box:has(> .htmx-indicator.htmx-request) * {
+  pointer-events: none;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
 }
 
 .sr-only {
@@ -3840,10 +3858,6 @@ input.tab:checked + .tab-content,
 .bg-base-100 {
   --tw-bg-opacity: 1;
   background-color: var(--fallback-b1,oklch(var(--b1)/var(--tw-bg-opacity)));
-}
-
-.bg-base-100\/70 {
-  background-color: var(--fallback-b1,oklch(var(--b1)/0.7));
 }
 
 .bg-base-200 {
