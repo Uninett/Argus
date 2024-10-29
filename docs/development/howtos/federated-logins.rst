@@ -23,29 +23,61 @@ Our default provider ``Feide via OAuth2`` is vendored into the Argus source
 code, the backend path is ``argus.spa.dataporten.social.DataportenFeideOAuth2``.
 
 Add the backend path of your chosen provider to the start of the Django setting
-:setting:`AUTHENTICATION_BACKENDS`.
+:setting:`AUTHENTICATION_BACKENDS`. eg::
 
-We'll use the GitHub OAuth2-provider for users as an example for the rest of
-this howto. The backend path is ``social_core.backends.github.GithubOAuth2``.
+  AUTHENTICATION_BACKENDS = [
+    "argus.spa.dataporten.social.DataportenFeideOAuth2",
+    "django.contrib.auth.backends.ModelBackend",
+  ]
+
+Update urls.py
+==============
+
+You must add the ``social_django.urls`` to your ``ROOT_URLCONF`` urlpatterns. The
+``python-social-auth`` docs state to place the urls directly in your url root, but for better
+namespacing/isolation you can add them under ``oidc/``. ie::
+
+  urlpatterns = [
+    ...
+    path("oidc/", include("social_django.urls", namespace="social")),
+    ...
+  ]
+
+Example: Github Backend
+=======================
+
+For the rest of this how-to we'll use the GitHub OAuth2-provider for users as an example. We'll
+base off of `Python Social Auth: Github backend <https://python-social-auth.readthedocs.io/en/latest/backends/github.html>`_
+with a few minor differences
+
+The backend path is ``social_core.backends.github.GithubOAuth2``::
+
+  AUTHENTICATION_BACKENDS = [
+    "social_core.backends.github.GithubOAuth2",
+    "django.contrib.auth.backends.ModelBackend",
+  ]
 
 Get the key and secret for the provider
-=======================================
+---------------------------------------
 
-You need to set two Django settings per provider in addition to updating
-:setting:`AUTHENTICATION_BACKENDS`, these are backend-dependent, for our
-example they are:
+First, you must create a GH Oauth app. See `Github: Creating an OAuth app <https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app>`_
 
-* SOCIAL_AUTH_GITHUB_KEY
-* SOCIAL_AUTH_GITHIB_SECRET
+The Authorization callback url must match the ``social_django.urls`` path in your urlpatterns (ie.
+``/oidc``). The protocol, hostname and port must match the deployed Argus instance.
 
-The "GITHUB"-part is the one that varies.
+.. note:: Github also supports 127.0.0.1 as a callback url, which is useful during developmeent. In
+  that case the port does not need to match, and in fact, you should not specify a port in the
+  authorization callback url (ie. ``http://127.0.0.1/oidc``)
 
-How to get these differs between backends. With GitHub you need a GitHub user.
-See `Github: Creating an OAuth app <https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app>`_
-for how to get the key and secret for GitHub.
+Now create client credentials in the applications' settings page.
 
-Github wants a callback url when configuring OAuth2, this will always be
-``https://YOURDOMAIN/oidc/``. Github only supports one callback url.
+Update your settings.py with the following keys::
+
+  SOCIAL_AUTH_GITHUB_KEY = <github app client id>
+  SOCIAL_AUTH_GITHUB_SECRET = <github app client secret>
+
+These settings differ per authentication backend but generally it is only the ``GITHUB`` part that
+changes
 
 Test
 ====
