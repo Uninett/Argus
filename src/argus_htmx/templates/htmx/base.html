@@ -46,6 +46,9 @@
                 <li>{% include "htmx/themes/theme_dropdown.html" %}</li>
                 <li>{% include "htmx/dateformat/_dateformat_dropdown.html" %}</li>
                 <li>
+                  <a href="{% url 'htmx:user-settings' %}">Settings…</a>
+                </li>
+                <li>
                   <form class="flex" action="{% url "htmx:logout" %}" method="post">
                     {% csrf_token %}
                     <button class="flex-1 text-start" type="submit">Log out</button>
