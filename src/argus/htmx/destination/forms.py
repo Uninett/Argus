@@ -20,6 +20,9 @@ class DestinationFormCreate(ModelForm):
         labels = {
             "label": "Name",
         }
+        widgets = {
+            "media": forms.Select(attrs={"class": "select input-bordered w-full max-w-xs"}),
+        }
 
     def clean(self):
         super().clean()
