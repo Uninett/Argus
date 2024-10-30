@@ -1,0 +1,7 @@
+<form action="{% url 'htmx:destination-delete' form.instance.id %}"
+      method="post">
+  {% csrf_token %}
+  <fieldset class="menu menu-horizontal menu-md items-center gap-4">
+    <input type="submit" value="Delete" class="btn btn-secondary">
+  </fieldset>
+</form>
