@@ -76,6 +76,48 @@ class DestinationFormCreate(ModelForm):
         return self.cleaned_data
 
 
+class DestinationFormUpdate(DestinationFormCreate):
+    def __init__(self, *args, **kwargs):
+        if instance := kwargs.get("instance"):
+            settings_key = _get_settings_key_for_media(instance.media)
+            # Extract settings value (email address etc.) from JSONField
+            instance.settings = instance.settings.get(settings_key)
+        super().__init__(*args, **kwargs)
+
+    class Meta:
+        model = DestinationConfig
+        fields = ["label", "media", "settings"]
+        labels = {
+            "label": "Name",
+        }
+        widgets = {
+            "media": forms.HiddenInput(),
+        }
+
+    def _init_serializer(self):
+        # self.instance is modified in __init__,
+        # so get unmodified version here for the serializer
+        destination = DestinationConfig.objects.get(pk=self.instance.pk)
+        settings_key = _get_settings_key_for_media(destination.media)
+        data = {}
+
+        if "label" in self.cleaned_data:
+            label = self.cleaned_data["label"]
+            if label != destination.label:
+                data["label"] = label
+
+        settings = self.cleaned_data["settings"]
+        if settings.get(settings_key) != destination.settings.get(settings_key):
+            data["settings"] = settings
+
+        self.serializer = RequestDestinationConfigSerializer(
+            destination,
+            data=data,
+            context={"request": self.request},
+            partial=True,
+        )
+
+
 def _get_settings_key_for_media(media: Media) -> str:
     """Returns the required settings key for the given media,
     e.g. "email_address", "phone_number"
