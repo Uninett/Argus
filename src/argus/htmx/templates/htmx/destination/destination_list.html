@@ -1,4 +1,5 @@
 {% extends "htmx/base.html" %}
 {% block main %}
   {% include "htmx/destination/_create_form.html" %}
+  {% for error in errors %}<p class="text-error">{{ error }}</p>{% endfor %}
 {% endblock main %}
