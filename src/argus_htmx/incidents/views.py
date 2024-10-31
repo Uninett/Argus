@@ -8,7 +8,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.shortcuts import render, get_object_or_404
 
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_POST, require_GET
 from django.core.paginator import Paginator
 from django.http import HttpRequest, HttpResponse, HttpResponseBadRequest
 from django_htmx.middleware import HtmxDetails
@@ -98,6 +98,14 @@ def _get_page_size(params):
     except ValueError:
         pass
     return DEFAULT_PAGE_SIZE
+
+
+@require_GET
+def filter_form(request: HtmxHttpRequest):
+    incident_list_filter = get_filter_function()
+    filter_form, _ = incident_list_filter(request, None)
+    context = {"filter_form": filter_form}
+    return render(request, "htmx/incidents/_incident_filterbox.html", context=context)
 
 
 def incident_list(request: HtmxHttpRequest) -> HttpResponse:

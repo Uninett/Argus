@@ -1,0 +1,28 @@
+<div class="dropdown dropdown-bottom "
+     {% block field_control %}
+     hx-trigger="change from:#{{ widget.attrs.id }}"
+     hx-swap="outerHTML"
+     hx-target="find .show-selected-box"
+     hx-select=".show-selected-box"
+     {% endblock field_control %}>
+  <div tabindex="0"
+       role="button"
+       class="show-selected-box input input-accent input-bordered input-md border overflow-y-auto min-h-8 h-auto max-h-16 max-w-xs leading-tight flex flex-wrap items-center gap-0.5">
+    <p class="text-base-content/50">{{ widget.attrs.placeholder }}</p>
+    {% for _, options, _ in widget.optgroups %}
+      {% for option in options %}
+        {% if option.selected %}
+          {% block show_selected %}
+            <p class="text-primary italic font-medium">{{ option.label }},</p>
+          {% endblock show_selected %}
+        {% endif %}
+      {% endfor %}
+    {% endfor %}
+  </div>
+  <div tabindex="0"
+       class="dropdown-content bg-base-100 rounded-box z-[1] min-w-fit w-full max-h-80 overflow-y-auto p-2 mt-0.5 shadow">
+    {% block field_template %}
+      {% include "django/forms/widgets/multiple_input.html" %}
+    {% endblock field_template %}
+  </div>
+</div>

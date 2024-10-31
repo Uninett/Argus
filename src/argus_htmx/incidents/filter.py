@@ -9,14 +9,21 @@ filter_backend = get_filter_backend()
 QuerySetFilter = filter_backend.QuerySetFilter
 
 
+class DropdownMultiSelect(forms.CheckboxSelectMultiple):
+    template_name = "htmx/incidents/_incident_source_select.html"
+    option_template_name = "htmx/forms/checkbox_select_multiple.html"
+
+
 class IncidentFilterForm(forms.Form):
     open = forms.BooleanField(required=False)
     closed = forms.BooleanField(required=False)
     acked = forms.BooleanField(required=False)
     unacked = forms.BooleanField(required=False)
     source = forms.MultipleChoiceField(
+        widget=DropdownMultiSelect(attrs={"placeholder": "select sources..."}),
         choices=tuple(SourceSystem.objects.values_list("id", "name")),
         required=False,
+        label="Sources",
     )
     maxlevel = forms.IntegerField(
         widget=forms.NumberInput(
