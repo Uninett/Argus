@@ -4,3 +4,5 @@
 0cd2a6561291dabccf435f19aca3f96323097e8b
 # Format login form with djLint
 07313f9fbb9384489c6aa57885f3fecba358f288
+# Reformat middleware file using ruff
+bc456a556e0df11b0f25420c5c6933c068adef10
