@@ -19,3 +19,21 @@ class User(AbstractUser):
             except Group.DoesNotExist:
                 return None
         return group in self.groups.all()
+
+    def is_used(self):
+        # user has created events
+        if self.caused_events.exists():
+            return True
+
+        # user is a source system that has created incidents
+        source = getattr(self, "source_system", None)
+        if source and source.incidents.exists():
+            return True
+
+        # notification_profiles: manually created but user is safe to
+        # delete
+        # timeslots: autocreated per person user
+        # destinations: autocreated per user with email via social auth
+
+        # user is not considered in use
+        return False
