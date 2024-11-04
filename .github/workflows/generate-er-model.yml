@@ -1,0 +1,58 @@
+name: Regenerate ER model
+
+on: workflow_dispatch
+
+jobs:
+  regenerate-er-model:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.11
+
+      - name: Install dependencies
+        run: |
+          pip install -U pip
+          pip install tox
+          sudo apt-get install -y --no-install-recommends graphviz
+
+      - name: Create and switch to new branch
+        # run_number here is used to get unique branch names
+        run: |
+          git switch -c update-er-model-${{ github.run_number }}
+
+      - name: Generate ER-model
+        run: tox -e generate-er-model
+
+      - name: Get user information from Github API
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        run: |
+          echo "USER_INFO=$(gh api /users/${{ github.actor }})" >> "$GITHUB_ENV"
+
+      - name: Add, commit and push changes
+        run: |
+          if [ ${{ fromJson(env.USER_INFO).email }} ]; then
+            git config user.email "${{ fromJson(env.USER_INFO).email }}"
+          else
+            git config user.email "${{ github.actor }}@users.noreply.github.com"
+          fi
+          git config user.name "${{ fromJson(env.USER_INFO).name || github.actor }}"
+          git add "docs/reference/img/ER_model.png"
+          git commit -m "Update ER model"
+          git push -u origin update-er-model-${{ github.run_number }}
+
+      - name: Create pull request
+        run: |
+          gh pr create -B master -H update-er-model-${{ github.run_number }} \
+          --title 'Update ER model' \
+          --body 'Created by GitHub action, triggered manually by @${{ github.actor }}'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
