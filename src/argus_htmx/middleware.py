@@ -45,7 +45,7 @@ class LoginRequiredMiddleware:
             return None
 
         # Redirect unauthenticated users to login page
-        return redirect_to_login(request.get_full_path(), self.login_url, 'next')
+        return redirect_to_login(request.get_full_path(), self.login_url, "next")
 
 
 class HtmxMessageMiddleware(MiddlewareMixin):
@@ -54,7 +54,6 @@ class HtmxMessageMiddleware(MiddlewareMixin):
     """
 
     def process_response(self, request: HttpRequest, response: HttpResponse) -> HttpResponse:
-
         # The HX-Request header indicates that the request was made with HTMX
         if "HX-Request" not in request.headers:
             return response
@@ -64,10 +63,7 @@ class HtmxMessageMiddleware(MiddlewareMixin):
             return response
 
         # Extract the messages
-        messages = [
-            {"message": message.message, "tags": message.tags}
-            for message in get_messages(request)
-        ]
+        messages = [{"message": message.message, "tags": message.tags} for message in get_messages(request)]
         if not messages:
             return response
 
