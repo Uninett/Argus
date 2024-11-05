@@ -39,3 +39,7 @@ class UserTests(TestCase):
         user = PersonUserFactory()
         group = Group.objects.create(name="foobar")
         self.assertFalse(user.is_member_of_group(group))
+
+    def test_is_dormant_if_no_actions_taken(self):
+        user = PersonUserFactory()
+        self.assertFalse(user.is_used())
