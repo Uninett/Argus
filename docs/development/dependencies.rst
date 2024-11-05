@@ -20,5 +20,11 @@ To upgrade the HTMX to a new version, follow these steps:
    <script src="{% static "new-htmx-filename.js" %}"></script>
 
 
+Upgrading Hyperscript to a new version
+======================================
+
+To upgrade Hyperscript to a new version, use the same steps as for upgrading HTMX but for the
+latest version of Hyperscript on `UNPKG`_, for example:
+`https://unpkg.com/hyperscript.org@0.9.13/dist/_hyperscript.min.js`
 
 .. _UNPKG: https://unpkg.com
