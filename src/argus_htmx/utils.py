@@ -80,7 +80,7 @@ def bulk_change_incidents(actor, incident_ids: List[int], data: Dict[str, Any], 
     - We're working on a subset of incidents and the ids are not in that subset
     """
     qs, missing_ids = get_qs_for_incident_ids(incident_ids, qs)
-    if "timestamp" not in data:
+    if not data.get("timestamp"):
         data["timestamp"] = timezone.now()
     incidents = func(actor, qs, data)
     send_changed_incidents(incidents)
