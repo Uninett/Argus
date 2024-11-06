@@ -145,7 +145,7 @@ class PreferencesTests(TestCase):
         # hardcoded in class
         self.assertEqual(result["jazzpunk"], "For Great Justice!")
 
-    def test_get_foobar_context_overrides_foobar_preference(self):
+    def test_update_context_overrides_preference(self):
         user = PersonUserFactory()
 
         Preferences.ensure_for_user(user)

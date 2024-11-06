@@ -56,5 +56,5 @@ class MyOtherPreferences(Preferences):
         context["jazzpunk"] = "For Great Justice!"
         return context
 
-    def get_foobar_context(self):
+    def update_context(self, _):
         return {"foobar": "xux"}

@@ -111,16 +111,18 @@ class Preferences(models.Model):
         for namespace, subclass in cls.NAMESPACES.items():
             subclass.objects.get_or_create(user=user, namespace=namespace)
 
+    def update_context(self, context):
+        "Override this to change what is put in context"
+        return {}
+
     def get_context(self):
         """Preferences are put into context via a context_processor
 
-        It can be useful to override or add what is put into the context.
+        Note that we *copy* the preferences here. If overriding this method,
+        ensure to run super() to get a clean copy.
         """
         context = self.preferences.copy()
-        for field in self.preferences:
-            field_context = getattr(self, f"get_{field}_context", None)
-            if field_context:
-                context.update(**field_context())
+        context.update(self.update_context(context))
         return context
 
     def save_preference(self, name, value):
