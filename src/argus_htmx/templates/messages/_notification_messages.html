@@ -1,0 +1,7 @@
+<div id="notification-messages">
+  <div class="toast items-end">
+    {% for message in messages %}
+      {% include "./_notification_message.html" %}
+    {% endfor %}
+  </div>
+</div>

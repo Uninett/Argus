@@ -1,0 +1,5 @@
+<div hx-swap-oob="beforeend:#notification-messages .toast">
+  {% for message in messages %}
+    {% include "./_notification_message.html" %}
+  {% endfor %}
+</div>

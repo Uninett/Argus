@@ -1,0 +1,19 @@
+/* use color-mix to give the illusion of transparency while not actually being transparent */
+@layer components {
+  .alert.info {
+    @apply border-info;
+    background-color: color-mix(in srgb, oklch(var(--in)), oklch(var(--b1)) 85%);
+  }
+  .alert.success {
+    @apply border-success;
+    background-color: color-mix(in srgb, oklch(var(--su)), oklch(var(--b1)) 85%);
+  }
+  .alert.warning {
+    @apply border-warning;
+    background-color: color-mix(in srgb, oklch(var(--wa)), oklch(var(--b1)) 85%);
+  }
+  .alert.error {
+    @apply border-error;
+    background-color: color-mix(in srgb, oklch(var(--er)), oklch(var(--b1)) 85%);
+  }
+}

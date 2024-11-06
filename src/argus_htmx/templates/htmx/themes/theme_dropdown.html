@@ -1,7 +1,7 @@
 <details>
   <summary>
     Theme
-    <span class="badge badge-primary">{{ theme }}</span>
+    {% include "./_current_theme.html" %}
   </summary>
   <ul class="max-h-64 overflow-y-scroll">
     <li hx-get="{% url 'htmx:theme-names' %}"

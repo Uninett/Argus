@@ -49,5 +49,5 @@ def change_theme(request: HtmxHttpRequest) -> HttpResponse:
     if theme in themes:
         request.session["theme"] = theme
         messages.success(request, f'Switched theme to "{theme}"')
-        return HttpResponse(f"{theme}")
+        return render(request, "htmx/themes/_current_theme.html")
     return HttpResponseClientRefresh()

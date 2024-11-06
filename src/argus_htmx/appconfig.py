@@ -29,6 +29,7 @@ _app_settings = [
         ],
         "middleware": {
             "argus_htmx.middleware.LoginRequiredMiddleware": "end",
+            "argus_htmx.middleware.HtmxMessageMiddleware": "end",
         },
     },
     {

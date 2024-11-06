@@ -34,5 +34,8 @@
     {% endblock footer %}
     {% block tail %}
     {% endblock tail %}
+    {% block messages %}
+      {% include "messages/_notification_messages.html" %}
+    {% endblock messages %}
   </body>
 </html>
