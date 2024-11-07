@@ -1,8 +1,13 @@
+import logging
+
 from django.conf import settings
 from django.contrib.auth.backends import ModelBackend, RemoteUserBackend
+from django.contrib import messages
 from django.utils.module_loading import import_string
 
 from social_core.backends.oauth import BaseOAuth2
+
+from argus.auth.models import Preferences, SessionPreferences
 
 
 _all__ = [
@@ -10,7 +15,13 @@ _all__ = [
     "has_model_backend",
     "has_remote_user_backend",
     "get_psa_authentication_backends",
+    "get_preference_obj",
+    "get_preference",
+    "save_preference",
 ]
+
+
+LOG = logging.getLogger(__name__)
 
 
 def get_authentication_backend_classes():
@@ -30,3 +41,37 @@ def has_remote_user_backend(backends):
 def get_psa_authentication_backends(backends=None):
     backends = backends if backends else get_authentication_backend_classes()
     return [backend for backend in backends if issubclass(backend, BaseOAuth2)]
+
+
+def get_preference_obj(request, namespace):
+    if request.user.is_authenticated:
+        prefs = request.user.get_namespaced_preferences(namespace)
+    else:
+        prefs = SessionPreferences(request.session, namespace)
+    return prefs
+
+
+def get_preference(request, namespace, preference):
+    prefs = get_preference_obj(request, namespace)
+    return prefs.get_preference(preference)
+
+
+def save_preference(request, data, namespace, preference):
+    prefs = get_preference_obj(request, namespace)
+    value = prefs.get_preference(preference)
+    if not data.get(preference, None):
+        messages.warning(request, f"Failed to change {preference}, not in input")
+        LOG.debug("Failed to change %s, not in input: %s", preference, data)
+        return value
+    old_value = value
+    LOG.debug("Changing %s: currently %s", preference, old_value)
+    form = prefs.FORMS[preference](data)
+    if form.is_valid():
+        value = form.cleaned_data[preference]
+        prefs.save_preference(preference, value)
+        messages.success(request, f"Changed {preference}: {old_value} → {value}")
+        LOG.info("Changed %s: %s → %s", preference, old_value, value)
+    else:
+        messages.warning(request, f"Failed to change {preference}")
+        LOG.warning("Failed to change %s", preference)
+    return value

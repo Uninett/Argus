@@ -74,6 +74,42 @@ class PreferencesManager(models.Manager):
         return prefdict
 
 
+class SessionPreferences:
+    def __init__(self, session, namespace):
+        self.session = session
+        self._namespace = namespace
+        self.namespace = namespace
+        self.prefclass = Preferences.NAMESPACES[namespace]
+        self.FORMS = self.prefclass.FORMS.copy()
+        self.FIELD_DEFAULTS = self.prefclass.FIELD_DEFAULTS.copy()
+        self.session.setdefault("preferences", dict())
+        self.session["preferences"].setdefault(namespace, self.FIELD_DEFAULTS)
+        self.preferences = self.session["preferences"][namespace]
+
+    def __str__(self):
+        return f"anonymous' {self._namespace}"
+
+    def natural_key(self):
+        raise NotImplementedError
+
+    @classmethod
+    def ensure_for_user(cls, _):
+        pass
+
+    def update_context(self, context):
+        return self.prefclass.update_context(context)
+
+    def get_context(self):
+        return self.prefclass.get_context()
+
+    def get_preference(self, name):
+        return self.prefclass.get_preference(name)
+
+    def save_preference(self, name, value):
+        self.preferences[name] = value
+        self.session["preferences"][self._namespace][name] = value
+
+
 class Preferences(models.Model):
     class Meta:
         verbose_name = "User Preferences"
