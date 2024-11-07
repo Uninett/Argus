@@ -55,6 +55,13 @@ class PreferencesManager(models.Manager):
                 Preferences.ensure_for_user(user)
         return (precount, Preferences.objects.count())
 
+    def get_all_defaults(self):
+        prefdict = {}
+        for namespace, subclass in Preferences.NAMESPACES.items():
+            if subclass.FIELD_DEFAULTS:
+                prefdict[namespace] = subclass.FIELD_DEFAULTS
+        return prefdict
+
 
 class Preferences(models.Model):
     class Meta:
@@ -72,8 +79,10 @@ class Preferences(models.Model):
 
     objects = PreferencesManager()
 
-    # storage for forms in preference
+    # storage for field forms in preference
     FORMS = None
+    # storage for field defaults in preference
+    FIELD_DEFAULTS = None
 
     # django methods
 
@@ -102,7 +111,10 @@ class Preferences(models.Model):
     @classmethod
     def ensure_for_user(cls, user):
         for namespace, subclass in cls.NAMESPACES.items():
-            subclass.objects.get_or_create(user=user, namespace=namespace)
+            obj, _ = subclass.objects.get_or_create(user=user, namespace=namespace)
+            if not obj.preferences and subclass.FIELD_DEFAULTS:
+                obj.preferences = subclass.FIELD_DEFAULTS
+                obj.save()
 
     def update_context(self, context):
         "Override this to change what is put in context"
@@ -114,9 +126,13 @@ class Preferences(models.Model):
         Note that we *copy* the preferences here. If overriding this method,
         ensure to run super() to get a clean copy.
         """
+        context = self.FIELD_DEFAULTS.copy() if self.FIELD_DEFAULTS else {}
         context = self.preferences.copy()
         context.update(self.update_context(context))
         return context
+
+    def get_preference(self, name):
+        return self.preferences.get(name, self.FIELD_DEFAULTS.get(name, None))
 
     def save_preference(self, name, value):
         self.preferences[name] = value

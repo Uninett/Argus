@@ -22,6 +22,9 @@ class MyPreferences(Preferences):
     FORMS = {
         "magic_number": MagicNumberForm,
     }
+    FIELD_DEFAULTS = {
+        "magic_number": 42,
+    }
 
     class Meta:
         proxy = True
@@ -43,6 +46,9 @@ class MyOtherPreferences(Preferences):
     _namespace = "myotherpref"
     FORMS = {
         "magic_number": MagicNumberForm,
+    }
+    FIELD_DEFAULTS = {
+        "magic_number": 5,
     }
 
     class Meta:

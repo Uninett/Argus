@@ -149,13 +149,21 @@ class PreferencesTests(TestCase):
         self.assertNotEqual(result["foobar"], "gurba")
         self.assertEqual(result["foobar"], "xux")
 
+    def test_get_preference_always_succeeds(self):
+        user = PersonUserFactory()
+
+        Preferences.ensure_for_user(user)
+        pref_set = user.get_preferences(namespace=MyPreferences._namespace)
+        self.assertEqual(pref_set.get_preference("magic_number"), 42)
+        self.assertEqual(pref_set.get_preference("unknown_preference"), None)
+
     def test_save_preference_saves_named_preference(self):
         user = PersonUserFactory()
 
         Preferences.ensure_for_user(user)
         pref_set = user.get_preferences(namespace=MyPreferences._namespace)
 
-        self.assertFalse(pref_set.preferences)  # no prefs set
+        self.assertTrue(pref_set.preferences)  # default prefs set
         pref_set.save_preference("filifjonka", "gubbelur")
         self.assertEqual(pref_set.preferences["filifjonka"], "gubbelur")
 
@@ -207,3 +215,10 @@ class PreferencesManagerTests(TestCase):
         # two each
         self.assertEqual(Preferences.objects.filter(user=user1).count(), 2)
         self.assertEqual(Preferences.objects.filter(user=user2).count(), 2)
+
+    def test_get_all_defaults_returns_all_prefs_defaults(self):
+        defaults = Preferences.objects.get_all_defaults()
+        self.assertIsInstance(defaults, dict)
+        self.assertEqual(len(defaults), len(Preferences.NAMESPACES))
+        self.assertEqual(defaults[MyPreferences._namespace]["magic_number"], 42)
+        self.assertEqual(defaults[MyOtherPreferences._namespace]["magic_number"], 5)
