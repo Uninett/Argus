@@ -5,6 +5,18 @@ from django.core.exceptions import ValidationError
 from django.db import models
 
 
+def preferences_manager_factory(namespace):
+    class Manager(PreferencesManager):
+        def get_queryset(self):
+            return super().get_queryset().filter(namespace=namespace)
+
+        def create(self, **kwargs):
+            kwargs["namespace"] = namespace
+            return super().create(**kwargs)
+
+    return Manager
+
+
 class User(AbstractUser):
     @property
     def is_source_system(self):

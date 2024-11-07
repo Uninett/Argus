@@ -1,20 +1,11 @@
 from django.db import models
 from django import forms
 
-from argus.auth.models import Preferences, PreferencesManager
+from argus.auth.models import Preferences, preferences_manager_factory
 
 
 class MagicNumberForm(forms.Form):
     magic_number = forms.IntegerField()
-
-
-class MyPreferencesManager(PreferencesManager):
-    def get_queryset(self):
-        return super().get_queryset().filter(namespace=MyPreferences._namespace)
-
-    def create(self, **kwargs):
-        kwargs["namespace"] = MyPreferences._namespace
-        return super().create(**kwargs)
 
 
 class MyPreferences(Preferences):
@@ -30,16 +21,7 @@ class MyPreferences(Preferences):
         proxy = True
         app_label = "auth"  # not needed outside tests
 
-    objects = MyPreferencesManager()
-
-
-class MyOtherPreferencesManager(PreferencesManager):
-    def get_queryset(self):
-        return super().get_queryset().filter(namespace=MyOtherPreferences._namespace)
-
-    def create(self, **kwargs):
-        kwargs["namespace"] = MyOtherPreferences._namespace
-        return super().create(**kwargs)
+    objects = preferences_manager_factory(_namespace)()
 
 
 class MyOtherPreferences(Preferences):
@@ -55,7 +37,7 @@ class MyOtherPreferences(Preferences):
         proxy = True
         app_label = "auth"  # not needed outside tests
 
-    objects = MyOtherPreferencesManager()
+    objects = preferences_manager_factory(_namespace)()
 
     def get_context(self):
         context = super().get_context()
