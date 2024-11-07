@@ -97,15 +97,6 @@ class PreferencesTests(TestCase):
         self.assertIn(namespace2, Preferences.NAMESPACES)
         self.assertEqual(Preferences.NAMESPACES[namespace2], MyOtherPreferences)
 
-    def test_get_namespace_mapping_is_a_reverse_dict_of_NAMESPACES(self):
-        mapping = Preferences.get_namespace_mapping()
-
-        self.assertIn(MyPreferences, mapping)
-        self.assertEqual(mapping[MyPreferences], MyPreferences._namespace)
-
-        self.assertIn(MyOtherPreferences, mapping)
-        self.assertEqual(mapping[MyOtherPreferences], MyOtherPreferences._namespace)
-
     def test_ensure_for_user_creates_all_installed_namespaces_for_user(self):
         user = PersonUserFactory()
 

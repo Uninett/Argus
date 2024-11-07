@@ -94,13 +94,6 @@ class Preferences(models.Model):
 
     # our methods
 
-    @classmethod
-    def get_namespace_mapping(cls):
-        mapping = {}
-        for namespace, subclass in cls.NAMESPACES.items():
-            mapping[subclass] = namespace
-        return mapping
-
     def get_instance(self):
         subclass = self.NAMESPACES.get(self.namespace, None)
         if subclass:
