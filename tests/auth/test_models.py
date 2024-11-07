@@ -70,6 +70,17 @@ class UserIsUsedTests(TestCase):
         self.assertTrue(user.is_used())
 
 
+class UserMiscMethodTests(TestCase):
+    def test_get_preferences_context_returns_dict_of_all_preferences(self):
+        user = PersonUserFactory()
+
+        results = user.get_preferences_context()
+        self.assertIsInstance(results, dict)
+        self.assertEqual(len(results), len(Preferences.NAMESPACES))
+        self.assertEqual(results[MyPreferences._namespace]["magic_number"], 42)
+        self.assertEqual(results[MyOtherPreferences._namespace]["magic_number"], 5)
+
+
 class PreferencesTests(TestCase):
     def test_natural_key_should_return_username_and_namespace(self):
         user = PersonUserFactory()
@@ -116,8 +127,7 @@ class PreferencesTests(TestCase):
     def test_vanilla_get_context_dumps_preferences_field(self):
         user = PersonUserFactory()
 
-        Preferences.ensure_for_user(user)
-        pref_set = user.get_preferences(namespace=MyPreferences._namespace)
+        pref_set = user.get_namespaced_preferences(namespace=MyPreferences._namespace)
         preferences = {"a": 1}
         pref_set.preferences = preferences
         pref_set.save()
@@ -126,8 +136,7 @@ class PreferencesTests(TestCase):
     def test_overriden_get_context_dumps_preferences_field_and_more(self):
         user = PersonUserFactory()
 
-        Preferences.ensure_for_user(user)
-        pref_set = user.get_preferences(namespace=MyOtherPreferences._namespace)
+        pref_set = user.get_namespaced_preferences(namespace=MyOtherPreferences._namespace)
         preferences = {"a": 1}
         pref_set.preferences = preferences
         pref_set.save()
@@ -139,8 +148,7 @@ class PreferencesTests(TestCase):
     def test_update_context_overrides_preference(self):
         user = PersonUserFactory()
 
-        Preferences.ensure_for_user(user)
-        pref_set = user.get_preferences(namespace=MyOtherPreferences._namespace)
+        pref_set = user.get_namespaced_preferences(namespace=MyOtherPreferences._namespace)
         preferences = {"foobar": "gurba"}
         pref_set.preferences = preferences
         pref_set.save()
@@ -152,16 +160,14 @@ class PreferencesTests(TestCase):
     def test_get_preference_always_succeeds(self):
         user = PersonUserFactory()
 
-        Preferences.ensure_for_user(user)
-        pref_set = user.get_preferences(namespace=MyPreferences._namespace)
+        pref_set = user.get_namespaced_preferences(namespace=MyPreferences._namespace)
         self.assertEqual(pref_set.get_preference("magic_number"), 42)
         self.assertEqual(pref_set.get_preference("unknown_preference"), None)
 
     def test_save_preference_saves_named_preference(self):
         user = PersonUserFactory()
 
-        Preferences.ensure_for_user(user)
-        pref_set = user.get_preferences(namespace=MyPreferences._namespace)
+        pref_set = user.get_namespaced_preferences(namespace=MyPreferences._namespace)
 
         self.assertTrue(pref_set.preferences)  # default prefs set
         pref_set.save_preference("filifjonka", "gubbelur")
@@ -169,9 +175,8 @@ class PreferencesTests(TestCase):
 
     def test_define_specific_preferences_via_forms_to_validate(self):
         user = PersonUserFactory()
-        Preferences.ensure_for_user(user)
 
-        pref_set1 = user.get_preferences(namespace=MyPreferences._namespace)
+        pref_set1 = user.get_namespaced_preferences(namespace=MyPreferences._namespace)
         Form1 = pref_set1.FORMS["magic_number"]
         pref_dict1 = {"foo": "bar", "magic_number": 2}
         query_dict1 = QueryDict("", mutable=True)
@@ -181,7 +186,7 @@ class PreferencesTests(TestCase):
         self.assertNotIn("foo", form1.cleaned_data)
         self.assertEqual(form1.cleaned_data["magic_number"], pref_dict1["magic_number"])
 
-        pref_set2 = user.get_preferences(namespace=MyOtherPreferences._namespace)
+        pref_set2 = user.get_namespaced_preferences(namespace=MyOtherPreferences._namespace)
         Form2 = pref_set2.FORMS["magic_number"]
         pref_dict2 = {"foo": "bar", "magic_number": 3}
         query_dict2 = QueryDict("", mutable=True)
@@ -198,8 +203,7 @@ class PreferencesManagerTests(TestCase):
     def test_get_by_natural_key_fetches_preference_of_correct_namespace(self):
         user = PersonUserFactory()
 
-        Preferences.ensure_for_user(user)
-        prefs = user.get_preferences(MyPreferences._namespace)
+        prefs = user.get_namespaced_preferences(MyPreferences._namespace)
         result = Preferences.objects.get_by_natural_key(user, MyPreferences._namespace)
         self.assertEqual(prefs, result)
 

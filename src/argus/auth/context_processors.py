@@ -11,8 +11,16 @@ from argus.auth.models import Preferences
 
 
 def preferences(request):
-    pref_sets = Preferences.objects.filter(user=request.user)
-    prefdict = {}
-    for pref_set in pref_sets:
-        prefdict[pref_set._namespace] = pref_set.get_context()
+    # Try stored preferences first
+    if request.user.is_authenticated:
+        return {"preferences": request.user.get_preferences_context()}
+
+    # Use defaults if available
+    prefdict = Preferences.objects.get_all_defaults()
+
+    # Override with session
+    if "preferences" in request.session:
+        for namespace, values in request.session["preferences"].items():
+            prefdict[namespace].update(values)
+
     return {"preferences": prefdict}

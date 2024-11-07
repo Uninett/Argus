@@ -40,8 +40,19 @@ class User(AbstractUser):
         # user is not considered in use
         return False
 
-    def get_preferences(self, namespace):
-        return self.preferences.get(namespace=namespace)
+    def get_or_create_preferences(self):
+        Preferences.ensure_for_user(self)
+        return self.preferences.all()
+
+    def get_preferences_context(self):
+        pref_sets = self.get_or_create_preferences()
+        prefdict = {}
+        for pref_set in pref_sets:
+            prefdict[pref_set._namespace] = pref_set.get_context()
+        return prefdict
+
+    def get_namespaced_preferences(self, namespace):
+        return self.get_or_create_preferences().get(namespace=namespace)
 
 
 class PreferencesManager(models.Manager):
