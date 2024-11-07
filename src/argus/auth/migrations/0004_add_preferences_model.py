@@ -6,7 +6,6 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("argus_auth", "0003_delete_phonenumber"),
     ]
@@ -30,6 +29,7 @@ class Migration(migrations.Migration):
                     "user",
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.CASCADE,
+                        related_name="preferences",
                         to=settings.AUTH_USER_MODEL,
                     ),
                 ),
@@ -41,8 +41,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AddConstraint(
             model_name="preferences",
-            constraint=models.UniqueConstraint(
-                fields=("user", "namespace"), name="unique_preference"
-            ),
+            constraint=models.UniqueConstraint(fields=("user", "namespace"), name="unique_preference"),
         ),
     ]
