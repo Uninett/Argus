@@ -131,7 +131,7 @@ class PreferencesTests(TestCase):
         preferences = {"a": 1}
         pref_set.preferences = preferences
         pref_set.save()
-        prefs_and_defaults = MyPreferences.FIELD_DEFAULTS.copy()
+        prefs_and_defaults = MyPreferences.get_defaults()
         prefs_and_defaults.update(pref_set.preferences)
         self.assertEqual(pref_set.get_context(), prefs_and_defaults)
 

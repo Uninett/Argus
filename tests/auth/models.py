@@ -13,7 +13,7 @@ class MyPreferences(Preferences):
     FORMS = {
         "magic_number": MagicNumberForm,
     }
-    FIELD_DEFAULTS = {
+    _FIELD_DEFAULTS = {
         "magic_number": 42,
     }
 
@@ -29,7 +29,7 @@ class MyOtherPreferences(Preferences):
     FORMS = {
         "magic_number": MagicNumberForm,
     }
-    FIELD_DEFAULTS = {
+    _FIELD_DEFAULTS = {
         "magic_number": 5,
     }
 

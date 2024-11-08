@@ -81,8 +81,8 @@ class PreferencesManager(models.Manager):
     def get_all_defaults(self):
         prefdict = {}
         for namespace, subclass in Preferences.NAMESPACES.items():
-            if subclass.FIELD_DEFAULTS:
-                prefdict[namespace] = subclass.FIELD_DEFAULTS
+            if defaults := subclass.get_defaults():
+                prefdict[namespace] = defaults
         return prefdict
 
 
@@ -93,9 +93,9 @@ class SessionPreferences:
         self.namespace = namespace
         self.prefclass = Preferences.NAMESPACES[namespace]
         self.FORMS = self.prefclass.FORMS.copy()
-        self.FIELD_DEFAULTS = self.prefclass.FIELD_DEFAULTS.copy()
+        self._FIELD_DEFAULTS = self.prefclass._FIELD_DEFAULTS.copy()
         self.session.setdefault("preferences", dict())
-        self.session["preferences"].setdefault(namespace, self.FIELD_DEFAULTS)
+        self.session["preferences"].setdefault(namespace, self.get_defaults())
         self.preferences = self.session["preferences"][namespace]
 
     def __str__(self):
@@ -107,6 +107,12 @@ class SessionPreferences:
     @classmethod
     def ensure_for_user(cls, _):
         pass
+
+    def get_instance(self):
+        raise NotImplementedError
+
+    def get_defaults(self):
+        return self.prefclass.get_defaults()
 
     def update_context(self, context):
         return self.prefclass.update_context(context)
@@ -141,7 +147,7 @@ class Preferences(models.Model):
     # storage for field forms in preference
     FORMS = None
     # storage for field defaults in preference
-    FIELD_DEFAULTS = None
+    _FIELD_DEFAULTS = None
 
     # django methods
 
@@ -168,11 +174,16 @@ class Preferences(models.Model):
             self.__class__ = subclass
 
     @classmethod
+    def get_defaults(cls):
+        "Override to add magic"
+        return cls._FIELD_DEFAULTS.copy() or {}
+
+    @classmethod
     def ensure_for_user(cls, user):
         for namespace, subclass in cls.NAMESPACES.items():
             obj, _ = subclass.objects.get_or_create(user=user, namespace=namespace)
-            if not obj.preferences and subclass.FIELD_DEFAULTS:
-                obj.preferences = subclass.FIELD_DEFAULTS
+            if not obj.preferences and (defaults := subclass.get_defaults()):
+                obj.preferences = defaults
                 obj.save()
 
     def update_context(self, context):
@@ -185,13 +196,13 @@ class Preferences(models.Model):
         Note that we *copy* the preferences here. If overriding this method,
         ensure to run super() to get a clean copy.
         """
-        context = self.FIELD_DEFAULTS.copy() if self.FIELD_DEFAULTS else {}
+        context = self.get_defaults() or {}
         context.update(self.preferences.copy())
         context.update(self.update_context(context))
         return context
 
     def get_preference(self, name):
-        return self.preferences.get(name, self.FIELD_DEFAULTS.get(name, None))
+        return self.preferences.get(name, self.get_defaults().get(name, None))
 
     def save_preference(self, name, value):
         self.preferences[name] = value
