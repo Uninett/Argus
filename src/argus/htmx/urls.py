@@ -3,7 +3,7 @@ from django.urls import path, include
 
 from .auth import views as auth_views
 from .incidents.urls import urlpatterns as incident_urls
-from .timeslots.urls import urlpatterns as timeslot_urls
+from .timeslot.urls import urlpatterns as timeslot_urls
 from .notificationprofile.urls import urlpatterns as notificationprofile_urls
 from .destination.urls import urlpatterns as destination_urls
 from .themes.urls import urlpatterns as theme_urls
@@ -16,8 +16,8 @@ urlpatterns = [
     path("accounts/logout/", django_auth_views.LogoutView.as_view(), name="logout"),
     # path("accounts/", include("django.contrib.auth.urls")),
     path("incidents/", include(incident_urls)),
-    path("timeslots/", include(timeslot_urls)),
-    path("notificationprofiles/", include(notificationprofile_urls)),
+    path("timeslot/", include(timeslot_urls)),
+    path("notificationprofile/", include(notificationprofile_urls)),
     path("destinations/", include(destination_urls)),
     path("themes/", include(theme_urls)),
     path("dateformat/", include(dateformat_urls)),
