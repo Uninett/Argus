@@ -57,12 +57,16 @@ def get_preference(request, namespace, preference):
 
 
 def save_preference(request, data, namespace, preference):
+    """Save the single preference given in data to the given namespace
+
+    Returns True on success, otherwise False
+    """
     prefs = get_preference_obj(request, namespace)
     value = prefs.get_preference(preference)
     if not data.get(preference, None):
         messages.warning(request, f"Failed to change {preference}, not in input")
         LOG.debug("Failed to change %s, not in input: %s", preference, data)
-        return value
+        return False
     old_value = value
     LOG.debug("Changing %s: currently %s", preference, old_value)
     form = prefs.FORMS[preference](data)
@@ -74,4 +78,4 @@ def save_preference(request, data, namespace, preference):
     else:
         messages.warning(request, f"Failed to change {preference}")
         LOG.warning("Failed to change %s", preference)
-    return value
+    return True
