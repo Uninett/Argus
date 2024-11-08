@@ -124,14 +124,16 @@ class PreferencesTests(TestCase):
         instance = instances[0]
         self.assertIsInstance(instance, MyPreferences)
 
-    def test_vanilla_get_context_dumps_preferences_field(self):
+    def test_vanilla_get_context_dumps_preferences_field_including_defaults(self):
         user = PersonUserFactory()
 
         pref_set = user.get_namespaced_preferences(namespace=MyPreferences._namespace)
         preferences = {"a": 1}
         pref_set.preferences = preferences
         pref_set.save()
-        self.assertEqual(pref_set.get_context(), pref_set.preferences)
+        prefs_and_defaults = MyPreferences.FIELD_DEFAULTS.copy()
+        prefs_and_defaults.update(pref_set.preferences)
+        self.assertEqual(pref_set.get_context(), prefs_and_defaults)
 
     def test_overriden_get_context_dumps_preferences_field_and_more(self):
         user = PersonUserFactory()
@@ -142,7 +144,7 @@ class PreferencesTests(TestCase):
         pref_set.save()
         result = pref_set.get_context()
         self.assertEqual(pref_set.preferences["a"], result["a"])
-        # hardcoded in class
+        # added via get_context
         self.assertEqual(result["jazzpunk"], "For Great Justice!")
 
     def test_update_context_overrides_preference(self):
@@ -153,8 +155,8 @@ class PreferencesTests(TestCase):
         pref_set.preferences = preferences
         pref_set.save()
         result = pref_set.get_context()
-        # hardcoded in class
         self.assertNotEqual(result["foobar"], "gurba")
+        # overridden via update_context
         self.assertEqual(result["foobar"], "xux")
 
     def test_get_preference_always_succeeds(self):
@@ -226,3 +228,20 @@ class PreferencesManagerTests(TestCase):
         self.assertEqual(len(defaults), len(Preferences.NAMESPACES))
         self.assertEqual(defaults[MyPreferences._namespace]["magic_number"], 42)
         self.assertEqual(defaults[MyOtherPreferences._namespace]["magic_number"], 5)
+
+
+class SubclassPreferencesManagerTests(TestCase):
+    def test_create_adds_instance_with_correct_namespace(self):
+        user = PersonUserFactory()
+
+        obj = MyPreferences.objects.create(user=user)
+        self.assertEqual(obj.namespace, MyPreferences._namespace)
+
+    def test_default_queryset_only_includes_own_instances(self):
+        user = PersonUserFactory()
+
+        obj1 = MyPreferences.objects.create(user=user)
+        obj2 = MyOtherPreferences.objects.create(user=user)
+
+        self.assertIn(obj1, MyPreferences.objects.all())
+        self.assertNotIn(obj2, MyPreferences.objects.all())
