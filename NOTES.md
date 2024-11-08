@@ -3,6 +3,16 @@
 This file documents changes to Argus that are relevant for operations and
 end-users.
 
+## [1.26.1] - 2024-11-08
+
+Bugfix release, logout via the React SPA frontend should now work again.
+
+### Admin improvement
+
+It is now possible to delete "dormant" users, defined as: users that have never
+created an event or incident. Such users may be autocreated when testing new
+login methods.
+
 ## [1.26.0] - 2024-10-29
 
 This release is mainly to wrangle dependencies to the in-progress new frontend.

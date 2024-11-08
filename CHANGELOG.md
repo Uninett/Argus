@@ -8,6 +8,19 @@ This project uses [*towncrier*](https://towncrier.readthedocs.io/) and the chang
 
 <!-- towncrier release notes start -->
 
+## [1.26.1] - 2024-11-08
+
+### Changed
+
+- Allow deletion in admin of "dormant" users, that is: users that have never
+  created an event or incident. These frequently occur when testing new login
+  methods.
+
+### Fixed
+
+- Logout via the React SPA frontend works again, the url has been corrected.
+
+
 ## [1.26.0] - 2024-10-29
 
 This release is mainly to wrangle dependencies to the in-progress new frontend.
