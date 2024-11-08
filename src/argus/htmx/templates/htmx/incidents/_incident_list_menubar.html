@@ -1,0 +1,23 @@
+<div role="tablist" class="tabs tabs-lifted">
+  {% block menu_tabs %}
+    <input type="radio"
+           name="incident_menus"
+           role="tab"
+           class="tab [--tab-border:theme(borderWidth.DEFAULT)] [--tab-border-color:theme(colors.primary)] text-nowrap min-h-fit"
+           aria-label="Filter Incidents"
+           checked="checked" />
+    <div role="tabpanel"
+         class="filterbox tab-content border-primary [--tab-border:theme(borderWidth.DEFAULT)] rounded-box p-2">
+      {% include "htmx/incidents/_incident_filterbox.html" %}
+    </div>
+    <input type="radio"
+           name="incident_menus"
+           role="tab"
+           class="tab tab-select [--tab-border:theme(borderWidth.DEFAULT)] [--tab-border-color:theme(colors.primary)] text-nowrap min-h-fit"
+           aria-label="Update Incidents" />
+    <div role="tabpanel"
+         class="tab-content border-primary [--tab-border:theme(borderWidth.DEFAULT)] rounded-box p-2">
+      {% include "htmx/incidents/_incident_list_update_menu.html" %}
+    </div>
+  {% endblock menu_tabs %}
+</div>
