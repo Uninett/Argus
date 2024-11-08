@@ -186,7 +186,7 @@ class Preferences(models.Model):
         ensure to run super() to get a clean copy.
         """
         context = self.FIELD_DEFAULTS.copy() if self.FIELD_DEFAULTS else {}
-        context = self.preferences.copy()
+        context.update(self.preferences.copy())
         context.update(self.update_context(context))
         return context
 
