@@ -24,7 +24,6 @@ ComplexFallbackFilterWrapper = filter_backend.ComplexFallbackFilterWrapper
 
 LOG = logging.getLogger(__name__)
 
-
 __all__ = [
     "api_safely_get_medium_object",
     "send_notification",
@@ -40,6 +39,17 @@ __all__ = [
 MEDIA_PLUGINS = getattr(settings, "MEDIA_PLUGINS")
 _media_classes = [import_class_from_dotted_path(media_plugin) for media_plugin in MEDIA_PLUGINS]
 MEDIA_CLASSES_DICT = {media_class.MEDIA_SLUG: media_class for media_class in _media_classes}
+
+
+class DestinationPluginError(Exception):
+    pass
+
+
+def get_medium_object(media_slug: str):
+    try:
+        return MEDIA_CLASSES_DICT[str(media_slug)]
+    except KeyError as e:
+        raise DestinationPluginError(f'Medium "{media_slug}" is not installed.') from e
 
 
 def api_safely_get_medium_object(media_slug):
