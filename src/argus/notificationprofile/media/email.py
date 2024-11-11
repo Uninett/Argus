@@ -17,10 +17,7 @@ from argus.util.datetime_utils import INFINITY, LOCAL_INFINITY
 if TYPE_CHECKING:
     import sys
 
-    if sys.version_info[:2] < (3, 9):
-        from typing import Iterable
-    else:
-        from collections.abc import Iterable
+    from collections.abc import Iterable
 
     from types import NoneType
     from typing import Union, Set
