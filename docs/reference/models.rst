@@ -31,6 +31,9 @@ Handling incidents
       ``value`` to make for cheap lookups on either, shown everywhere as
       ``key=value``.
 
+   Preferences
+      A place to store user preferences, not yet in use. Namespaced.
+
    IncidentTagRelation
       Connects ``Tag``\s to their ``Incident``\s. Unnecessarily complicated,
       we haven't gotten around to simplifying it yet.
