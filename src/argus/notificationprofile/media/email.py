@@ -1,36 +1,33 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
 
 from django import forms
 from django.conf import settings
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
-from rest_framework.exceptions import ValidationError
 
 from argus.incident.models import Event
+from argus.util.datetime_utils import INFINITY, LOCAL_INFINITY
+
 from .base import NotificationMedium
 from ..models import DestinationConfig
-from argus.util.datetime_utils import INFINITY, LOCAL_INFINITY
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
-    from types import NoneType
-    from typing import Union
-
     from django.contrib.auth import get_user_model
-    from django.db.models.query import QuerySet
-
-    from ..serializers import RequestDestinationConfigSerializer
 
     User = get_user_model()
+
 
 LOG = logging.getLogger(__name__)
 
 __all__ = [
+    "modelinstance_to_dict",
     "send_email_safely",
+    "BaseEmailNotification",
     "EmailNotification",
 ]
 
@@ -59,99 +56,25 @@ def send_email_safely(function, additional_error=None, *args, **kwargs) -> int:
         # TODO: Store error as incident
 
 
-class EmailNotification(NotificationMedium):
+class BaseEmailNotification(NotificationMedium):
     MEDIA_SLUG = "email"
     MEDIA_NAME = "Email"
+    MEDIA_SETTINGS_KEY = "email_address"
     MEDIA_JSON_SCHEMA = {
         "title": "Email Settings",
         "description": "Settings for a DestinationConfig using email.",
         "type": "object",
-        "required": ["email_address"],
-        "properties": {"email_address": {"type": "string", "title": "Email address"}},
+        "required": [MEDIA_SETTINGS_KEY],
+        "properties": {
+            MEDIA_SETTINGS_KEY: {
+                "type": "string",
+                "title": "Email address",
+            },
+        },
     }
 
     class Form(forms.Form):
-        synced = forms.BooleanField(disabled=True, required=False, initial=False)
         email_address = forms.EmailField()
-
-    @classmethod
-    def validate(cls, instance: RequestDestinationConfigSerializer, email_dict: dict, user: User) -> dict:
-        """
-        Validates the settings of an email destination and returns a dict
-        with validated and cleaned data
-        """
-        form = cls.Form(email_dict["settings"])
-        if not form.is_valid():
-            raise ValidationError(form.errors)
-        if form.cleaned_data["email_address"] == instance.context["request"].user.email:
-            raise ValidationError("This email address is already registered in another destination.")
-        if user.destinations.filter(
-            media_id="email", settings__email_address=form.cleaned_data["email_address"]
-        ).exists():
-            raise ValidationError({"email_address": "Email address already exists"})
-
-        return form.cleaned_data
-
-    @classmethod
-    def raise_if_not_deletable(cls, destination: DestinationConfig) -> NoneType:
-        """
-        Raises a NotDeletableError if the given email destination is not able
-        to be deleted (if it was defined by an outside source or is in use by
-        any notification profiles)
-        """
-        super().raise_if_not_deletable(destination=destination)
-
-        if destination.settings["synced"]:
-            raise cls.NotDeletableError(
-                "Cannot delete this email destination since it was defined by an outside source."
-            )
-
-    @staticmethod
-    def update(destination: DestinationConfig, validated_data: dict) -> Union[DestinationConfig, NoneType]:
-        """
-        Updates the synced email destination by copying its contents to
-        a new destination and updating the given destination with the given
-        validated data and returning the updated destination
-
-        This way the synced destination is not lost
-        """
-        if destination.settings["synced"]:
-            new_synced_destination = DestinationConfig(
-                user=destination.user,
-                media_id=destination.media_id,
-                settings=destination.settings,
-            )
-            destination.settings = validated_data["settings"]
-            DestinationConfig.objects.bulk_update([destination], fields=["settings"])
-            new_synced_destination.save()
-            return destination
-        return None
-
-    @staticmethod
-    def get_label(destination: DestinationConfig) -> str:
-        """
-        Returns the e-mail address represented by this destination
-        """
-        return destination.settings.get("email_address")
-
-    @classmethod
-    def has_duplicate(cls, queryset: QuerySet, settings: dict) -> bool:
-        """
-        Returns True if an email destination with the same email address
-        already exists in the given queryset
-        """
-        return queryset.filter(settings__email_address=settings["email_address"]).exists()
-
-    @classmethod
-    def get_relevant_addresses(cls, destinations: Iterable[DestinationConfig]) -> set[DestinationConfig]:
-        """Returns a list of email addresses the message should be sent to"""
-        email_addresses = [
-            destination.settings["email_address"]
-            for destination in destinations
-            if destination.media_id == cls.MEDIA_SLUG
-        ]
-
-        return set(email_addresses)
 
     @staticmethod
     def create_message_context(event: Event):
@@ -183,7 +106,7 @@ class EmailNotification(NotificationMedium):
         Returns False if no email destinations were given and
         True if emails were sent
         """
-        email_addresses = cls.get_relevant_addresses(destinations=destinations)
+        email_addresses = cls.get_relevant_destination_settings(destinations=destinations)
         if not email_addresses:
             return False
         num_emails = len(email_addresses)
@@ -214,3 +137,71 @@ class EmailNotification(NotificationMedium):
             )
             LOG.debug("Email: Failed to send to:", " ".join(failed))
         return True
+
+
+class EmailNotification(BaseEmailNotification):
+    class Form(forms.Form):
+        synced = forms.BooleanField(disabled=True, required=False, initial=False)
+        email_address = forms.EmailField()
+
+    @classmethod
+    def is_not_deletable(cls, destination: DestinationConfig) -> dict[str, Any]:
+        """
+        Flag if the destination is undeletable due to being defined by an outside source.
+        """
+        errors = super().is_not_deletable(destination)
+        if destination.settings.get("synced", None):
+            errors["synced"] = "Email address is read-only, it is defined by an outside source."
+        return errors
+
+    @classmethod
+    def _clone_if_changing_email_address(cls, destination: DestinationConfig, validated_data: dict):
+        """Clone synced destination"""
+        if not destination.settings.get("synced", None):
+            LOG.warn('Email destination %s does not have "synced" flag in its settings', destination.id)
+            return False
+
+        new_address = validated_data["settings"][cls.MEDIA_SETTINGS_KEY]
+        old_address = destination.settings[cls.MEDIA_SETTINGS_KEY]
+        if new_address == old_address:  # address wasn't changed
+            return False
+
+        settings = {
+            "synced": True,
+            cls.MEDIA_SETTINGS_KEY: old_address,
+        }
+        DestinationConfig.objects.create(
+            user=destination.user,
+            media_id=destination.media_id,
+            settings=settings,
+            label=cls.get_label(destination),
+        )
+        LOG.info("Cloning synced email-address on update: %s", old_address)
+        return True
+
+    @classmethod
+    def clean(cls, form: forms.Form, instance: DestinationConfig = None) -> forms.Form:
+        synced = False
+        if instance:
+            # CYA. The admin currently do no validation of destinations created
+            synced = instance.settings.get("synced", False)
+        form.cleaned_data["synced"] = form.cleaned_data.get("synced", synced)
+        return form
+
+    @classmethod
+    def update(cls, destination: DestinationConfig, validated_data: dict) -> DestinationConfig:
+        """
+        Preserves a synced email destination by cloning its contents to
+        a new destination and updating the given destination with the given
+        validated data and returning the updated destination
+
+        This way the synced destination is not lost
+        """
+        cls._clone_if_changing_email_address(destination, validated_data)
+
+        # We cannot use super() here since this is not an instance method
+        instance = cls._update_destination(destination, validated_data)
+        instance.settings["synced"] = False
+
+        instance.save()
+        return instance
