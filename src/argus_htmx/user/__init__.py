@@ -1,1 +1,1 @@
-"""User settings pages"""
+"""User preferences pages"""

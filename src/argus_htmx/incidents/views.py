@@ -4,7 +4,6 @@ import logging
 from datetime import datetime
 
 from django import forms
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.shortcuts import render, get_object_or_404
 
@@ -14,9 +13,11 @@ from django.http import HttpRequest, HttpResponse, HttpResponseBadRequest
 from django_htmx.middleware import HtmxDetails
 from django_htmx.http import HttpResponseClientRefresh
 
+from argus.auth.utils import save_preference
 from argus.incident.models import Incident
 from argus.util.datetime_utils import make_aware
 
+from .constants import ALLOWED_PAGE_SIZES
 from .customization import get_incident_table_columns
 from .utils import get_filter_function
 from .forms import AckForm, DescriptionOptionalForm, EditTicketUrlForm, AddTicketUrlForm
@@ -30,8 +31,7 @@ from ..utils import (
 
 User = get_user_model()
 LOG = logging.getLogger(__name__)
-DEFAULT_PAGE_SIZE = getattr(settings, "ARGUS_INCIDENTS_DEFAULT_PAGE_SIZE", 10)
-ALLOWED_PAGE_SIZES = getattr(settings, "ARGUS_INCIDENTS_PAGE_SIZES", [10, 20, 50, 100])
+
 
 # Map request trigger to parameters for incidents update
 INCIDENT_UPDATE_ACTIONS = {
@@ -91,15 +91,6 @@ def incidents_update(request: HtmxHttpRequest, action: str):
     return HttpResponseClientRefresh()
 
 
-def _get_page_size(params):
-    try:
-        if (page_size := int(params.pop("page_size", DEFAULT_PAGE_SIZE))) in ALLOWED_PAGE_SIZES:
-            return page_size
-    except ValueError:
-        pass
-    return DEFAULT_PAGE_SIZE
-
-
 @require_GET
 def filter_form(request: HtmxHttpRequest):
     incident_list_filter = get_filter_function()
@@ -123,9 +114,10 @@ def incident_list(request: HtmxHttpRequest) -> HttpResponse:
     filtered_count = qs.count()
 
     # Standard Django pagination
-    page_num = params.pop("page", "1")
-    page_size = _get_page_size(params)
+
+    page_size = save_preference(request, request.GET, "argus_htmx", "page_size")
     paginator = Paginator(object_list=qs, per_page=page_size)
+    page_num = params.pop("page", "1")
     page = paginator.get_page(page_num)
 
     # The htmx magic - use a different, minimal base template for htmx
@@ -145,7 +137,6 @@ def incident_list(request: HtmxHttpRequest) -> HttpResponse:
         "page": page,
         "last_refreshed": last_refreshed,
         "update_interval": 30,
-        "page_size": page_size,
         "all_page_sizes": ALLOWED_PAGE_SIZES,
     }
 

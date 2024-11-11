@@ -1,16 +1,16 @@
-{% for item in datetime_formats %}
+{% for item in page_sizes %}
   <li>
     <input type="radio"
            class="btn btn-sm btn-block btn-ghost justify-start"
            value="{{ item }}"
            aria-label="{{ item }}"
-           name="datetime_format_name"
-           hx-post="{% url 'htmx:change-dateformat' %}"
+           name="page_size"
+           hx-post="{% url 'htmx:change-page-size' %}"
            hx-trigger="change"
            hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' />
   </li>
 {% empty %}
   <li>
-    <p>No date formats configured</p>
+    <p>No page sizes configured</p>
   </li>
 {% endfor %}

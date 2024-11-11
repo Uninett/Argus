@@ -2,8 +2,8 @@
 {% block main %}
   <section>
     <h1>Switch theme</h1>
-    {% if theme %}
-      <p>Theme is set to: {{ theme }}</p>
+    {% if preferences.argus_htmx.theme %}
+      <p>Theme is set to: {{ preferences.argus_htmx.theme }}</p>
     {% else %}
       <p>No theme set</p>
     {% endif %}

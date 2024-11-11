@@ -24,8 +24,7 @@ _app_settings = [
             "urlpatterns_module": "argus_htmx.urls",
         },
         "context_processors": [
-            "argus_htmx.context_processors.theme_via_session",
-            "argus_htmx.context_processors.datetime_format_via_session",
+            "argus.auth.context_processors.preferences",
         ],
         "middleware": {
             "argus_htmx.middleware.LoginRequiredMiddleware": "end",

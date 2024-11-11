@@ -4,6 +4,7 @@ __all__ = [
     "DATETIME_FALLBACK",
     "DATETIME_FORMATS",
     "DATETIME_DEFAULT",
+    "DATETIME_CHOICES",
 ]
 
 
@@ -14,6 +15,7 @@ DATETIME_FORMATS = {
     "RFC5322": "r",
     "EPOCH": "U",
 }
+DATETIME_CHOICES = tuple((format, format) for format in DATETIME_FORMATS)
 
 _datetime_setting = getattr(settings, "ARGUS_FRONTEND_DATETIME_FORMAT", DATETIME_FALLBACK)
 

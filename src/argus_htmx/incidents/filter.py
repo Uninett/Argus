@@ -1,8 +1,8 @@
 from django import forms
 
 from argus.filter import get_filter_backend
-from argus.incident.constants import Level
 from argus.incident.models import SourceSystem
+from argus.incident.constants import Level
 
 
 filter_backend = get_filter_backend()
