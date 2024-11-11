@@ -34,10 +34,13 @@ In order to add more preferences:
            FORMS = {
                "magic_number": MagicNumberForm,
            }
+           _FIELD_DEFAULTS = {
+                "magic_number": 42,
+           }
 
            class Meta:
                proxy = True
-               app_label = "auth"  # should not be needed outside tests
+               app_label = "auth"  # not needed unless only used for tests
 
            objects = MyPreferencesManager()
 
@@ -46,27 +49,19 @@ In order to add more preferences:
 
    There should be one form per preference.
 
-   Either remove the app-label line entirely or make sure the "app_label" is identical to the app label of your app.
-5. The preferences are stored in the database table row in a JSON blob named
+   The app-label line is needed for preference models that only exist for
+   tests. Either remove it entirely or make sure the "app_label" is identical
+   to the app label of your app when making a "real" preference namespace.
+4. The preferences are stored in the database table row in a JSON blob named
    "preferences". The entire blob is copied to the context of all views via the
    context processor ``argus.auth.context_processors.preferences``.
 
-   You can override what is put in context via overriding the method
-   ``get_context()``. By default it looks like the below code::
+   You can override what is put in context per namespace via overriding the
+   method ``update_context()``. By default the former looks like the below
+   code::
 
-       def get_context(self):
-        """Preferences are copied into the context via a context_processor
-
-        That context processor uses this method to safely copy the
-        preferences. It can be useful to change what is put into
-        the context.
-        """
-
-        context = self.preferences.copy()
-        for field in self.preferences:
-            field_context = getattr(self, f"get_{field}_context", None)
-            if field_context:
-                context.update(**field_context())
-        return context
+       def update_context(self, context):
+           "Override this to change what is put in context"
+            return {}
 
 The preferences are currently not available via the API.
