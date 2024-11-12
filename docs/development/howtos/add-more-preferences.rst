@@ -14,35 +14,25 @@ In order to add more preferences:
    of preferences for the app you could use the app name.
 3. Adapt the below boilerplate::
 
-       class MagicNumberForm(forms.Form):
-           magic_number = forms.IntegerField()
+        from argus.auth.models import preferences, PreferencesBase
+
+        class MagicNumberForm(forms.Form):
+            magic_number = forms.IntegerField()
 
 
-       class MyPreferencesManager(PreferencesManager):
-           def get_queryset(self):
-               return super().get_queryset().filter(
-                   namespace=MyPreferences._namespace
-               )
+        @preferences(namespace="mypref")
+        class MyPreferences:  # Optionally you can inherit from PreferencesBase
+                              # here to get method completion
+            FORMS = {
+                "magic_number": MagicNumberForm,
+            }
+            _FIELD_DEFAULTS = {
+                 "magic_number": 42,
+            }
 
-           def create(self, **kwargs):
-               kwargs["namespace"] = MyPreferences._namespace
-               return super().create(**kwargs)
-
-
-       class MyPreferences(Preferences):
-           _namespace = "mypref"
-           FORMS = {
-               "magic_number": MagicNumberForm,
-           }
-           _FIELD_DEFAULTS = {
-                "magic_number": 42,
-           }
-
-           class Meta:
-               proxy = True
-               app_label = "auth"  # not needed unless only used for tests
-
-           objects = MyPreferencesManager()
+            # Optional Meta for testing, not needed unless only used for tests
+            class Meta:
+                app_label = "auth"
 
    The name of the actual preference (in the example this is "magic_number")
    should also be a valid python variable name.
