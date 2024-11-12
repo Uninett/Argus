@@ -1,8 +1,9 @@
 import functools
-from typing import Optional, Union
+from typing import Any, Dict, Optional, Union, Protocol
 
 from django.contrib.auth.models import AbstractUser, Group
 from django.db import models
+from django import forms
 
 
 def preferences_manager(namespace):
@@ -18,6 +19,23 @@ def preferences_manager(namespace):
 
 
 def preferences(cls: Optional[type] = None, namespace: Optional[str] = None):
+    """Use this decorator to declare a namespaced subclass of ``Preferences`` without manually
+    subclassing it. This decorator will add the Preferences model as a base and set the required
+    attributes such as the ``_namespace`` and the the ``objects`` Manager instance. If you specify
+    a Meta attribute, it will use that class to set the ``proxy`` attribute.
+
+    Use like the following:
+
+    @prefrences(namespace="my_namespace")
+    class MyPreferences:
+        _FIELD_DEFAULTS = {
+          "example_pref": "some value"
+        }
+
+    In order to get code/method completion, you can inherit from the ``PreferencesBase`` Protocol,
+    but this is optional
+    """
+
     if cls is None:
         return functools.partial(preferences, namespace=namespace)
     if namespace is None:
@@ -148,6 +166,18 @@ class SessionPreferences:
     def save_preference(self, name, value):
         self.preferences[name] = value
         self.session["preferences"][self._namespace][name] = value
+
+
+class PreferencesBase(Protocol):
+    FORMS: Dict[str, forms.Form]
+    _FIELD_DEFAULTS: Dict[str, Any]
+
+    @classmethod
+    def get_defaults(cls) -> Dict[str, Any]:
+        pass
+
+    def update_context(cls) -> Dict[str, Any]:
+        pass
 
 
 class Preferences(models.Model):
