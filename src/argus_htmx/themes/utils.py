@@ -15,3 +15,7 @@ def get_theme_names():
         elif isinstance(theme, dict):
             theme_names.extend(theme.keys())
     return theme_names
+
+
+def get_theme_default():
+    return getattr(settings, "THEME_DEFAULT", argus_htmx_settings.THEME_DEFAULT)
