@@ -1,3 +1,4 @@
+from copy import deepcopy
 import logging
 
 from django.conf import settings
@@ -63,24 +64,22 @@ def save_preference(request, data, namespace, preference):
     """
     prefs = get_preference_obj(request, namespace)
     value = prefs.get_preference(preference)
+    LOG.debug("Changing %s: currently %s", preference, value)
+
     if not data.get(preference, None):
-        messages.warning(request, f"Failed to change {preference}, not in input")
         LOG.debug("Failed to change %s, not in input: %s", preference, data)
         return False
-
-    old_value = value
-    LOG.debug("Changing %s: currently %s", preference, old_value)
 
     form = prefs.FORMS[preference](data)
     if not form.is_valid():
         messages.warning(request, f"Failed to change {preference}, invalid input")
-        LOG.warning("Failed to change %s, invalid input", preference)
+        LOG.warning("Failed to change %s, invalid input: %s", preference, data)
         return False
 
+    old_value = deepcopy(value)  # Just in case value is mutable..
     value = form.cleaned_data[preference]
     if value == old_value:
-        messages.success(request, f"Did not change {preference}: no change")
-        LOG.info("Did not change %s: no change", preference)
+        LOG.debug("Did not change %s: no change", preference)
         return False
 
     prefs.save_preference(preference, value)
