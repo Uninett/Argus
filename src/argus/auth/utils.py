@@ -67,15 +67,23 @@ def save_preference(request, data, namespace, preference):
         messages.warning(request, f"Failed to change {preference}, not in input")
         LOG.debug("Failed to change %s, not in input: %s", preference, data)
         return False
+
     old_value = value
     LOG.debug("Changing %s: currently %s", preference, old_value)
+
     form = prefs.FORMS[preference](data)
-    if form.is_valid():
-        value = form.cleaned_data[preference]
-        prefs.save_preference(preference, value)
-        messages.success(request, f"Changed {preference}: {old_value} → {value}")
-        LOG.info("Changed %s: %s → %s", preference, old_value, value)
-    else:
-        messages.warning(request, f"Failed to change {preference}")
-        LOG.warning("Failed to change %s", preference)
+    if not form.is_valid():
+        messages.warning(request, f"Failed to change {preference}, invalid input")
+        LOG.warning("Failed to change %s, invalid input", preference)
+        return False
+
+    value = form.cleaned_data[preference]
+    if value == old_value:
+        messages.success(request, f"Did not change {preference}: no change")
+        LOG.info("Did not change %s: no change", preference)
+        return False
+
+    prefs.save_preference(preference, value)
+    messages.success(request, f"Changed {preference}: {old_value} → {value}")
+    LOG.info("Changed %s: %s → %s", preference, old_value, value)
     return True
