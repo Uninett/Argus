@@ -176,7 +176,7 @@ class PreferencesBase(Protocol):
     def get_defaults(cls) -> Dict[str, Any]:
         pass
 
-    def update_context(cls) -> Dict[str, Any]:
+    def update_context(self, context: Dict[str, Any]) -> Dict[str, Any]:
         pass
 
 
