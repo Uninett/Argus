@@ -9,7 +9,6 @@ class MagicNumberForm(forms.Form):
 
 @preferences(namespace="mypref")
 class MyPreferences:
-    _namespace = "mypref"
     FORMS = {
         "magic_number": MagicNumberForm,
     }
@@ -23,7 +22,6 @@ class MyPreferences:
 
 @preferences(namespace="myotherpref")
 class MyOtherPreferences:
-    _namespace = "myotherpref"
     FORMS = {
         "magic_number": MagicNumberForm,
     }
