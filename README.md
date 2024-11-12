@@ -32,19 +32,9 @@ There are several ways to install Argus.
 #### Requirements
 
 * Python 3.10+
-* Django 4.2, 5.1 or 5.2
+* Django 5.2
 * pip
 * PostgreSQL 14+
-
-> [!WARNING]
-> The next [Django LTS](https://docs.djangoproject.com/en/5.2/releases/5.2/)
-> will not support any PostgreSQL older than version 14!
-> [PostgreSQL 17.4](https://www.postgresql.org/docs/17/release-17-4.html) is
-> the newest version as of this writing.
-
-> [!IMPORTANT]
-> Please switch to Django 5.2, we are planning to drop support for anything
-> older.
 
 #### Optional requirements
 
@@ -64,7 +54,7 @@ pip install argus-server[htmx]
 
 will do it.
 
-#### Optional: Old frontend
+#### Optional: Old frontend (DEPRECATED)
 
 > [!WARNING]
 > This frontend is DEPRECATED. We are no longer using this frontend ourselves.
