@@ -1,0 +1,1 @@
+Move User Preferences subclass boilerplate to a decorator
