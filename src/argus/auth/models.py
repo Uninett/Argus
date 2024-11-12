@@ -1,9 +1,8 @@
-from typing import Union
+import functools
+from typing import Optional, Union
 
 from django.contrib.auth.models import AbstractUser, Group
-from django.core.exceptions import ValidationError
 from django.db import models
-import functools
 
 
 def preferences_manager(namespace):
@@ -18,7 +17,7 @@ def preferences_manager(namespace):
     return Manager()
 
 
-def preferences(cls: type | None = None, namespace=str | None):
+def preferences(cls: Optional[type] = None, namespace: Optional[str] = None):
     if cls is None:
         return functools.partial(preferences, namespace=namespace)
     if namespace is None:
