@@ -3,9 +3,10 @@ from typing import Union
 from django.contrib.auth.models import AbstractUser, Group
 from django.core.exceptions import ValidationError
 from django.db import models
+import functools
 
 
-def preferences_manager_factory(namespace):
+def preferences_manager(namespace):
     class Manager(PreferencesManager):
         def get_queryset(self):
             return super().get_queryset().filter(namespace=namespace)
@@ -14,7 +15,29 @@ def preferences_manager_factory(namespace):
             kwargs["namespace"] = namespace
             return super().create(**kwargs)
 
-    return Manager
+    return Manager()
+
+
+def preferences(cls: type | None = None, namespace=str | None):
+    if cls is None:
+        return functools.partial(preferences, namespace=namespace)
+    if namespace is None:
+        raise ValueError("namespace may not be None")
+
+    class Meta:
+        pass
+
+    Meta = getattr(cls, "Meta", Meta)
+    Meta.proxy = True
+
+    attributes = {
+        "_namespace": namespace,
+        "objects": preferences_manager(namespace),
+        "Meta": Meta,
+        "__module__": cls.__module__,
+    }
+
+    return type(cls.__name__, (cls, Preferences), attributes)
 
 
 class User(AbstractUser):

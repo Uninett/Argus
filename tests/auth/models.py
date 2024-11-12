@@ -1,14 +1,14 @@
-from django.db import models
 from django import forms
 
-from argus.auth.models import Preferences, preferences_manager_factory
+from argus.auth.models import preferences
 
 
 class MagicNumberForm(forms.Form):
     magic_number = forms.IntegerField()
 
 
-class MyPreferences(Preferences):
+@preferences(namespace="mypref")
+class MyPreferences:
     _namespace = "mypref"
     FORMS = {
         "magic_number": MagicNumberForm,
@@ -18,13 +18,11 @@ class MyPreferences(Preferences):
     }
 
     class Meta:
-        proxy = True
         app_label = "auth"  # not needed outside tests
 
-    objects = preferences_manager_factory(_namespace)()
 
-
-class MyOtherPreferences(Preferences):
+@preferences(namespace="myotherpref")
+class MyOtherPreferences:
     _namespace = "myotherpref"
     FORMS = {
         "magic_number": MagicNumberForm,
@@ -34,10 +32,7 @@ class MyOtherPreferences(Preferences):
     }
 
     class Meta:
-        proxy = True
         app_label = "auth"  # not needed outside tests
-
-    objects = preferences_manager_factory(_namespace)()
 
     def get_context(self):
         context = super().get_context()
