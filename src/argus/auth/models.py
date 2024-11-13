@@ -94,7 +94,7 @@ class User(AbstractUser):
 
     def get_or_create_preferences(self):
         Preferences.ensure_for_user(self)
-        return self.preferences.all()
+        return self.preferences.filter(namespace__in=Preferences.NAMESPACES)
 
     def get_preferences_context(self):
         pref_sets = self.get_or_create_preferences()
@@ -108,6 +108,9 @@ class User(AbstractUser):
 
 
 class PreferencesManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(namespace__in=Preferences.NAMESPACES)
+
     def get_by_natural_key(self, user, namespace):
         return self.get(user=user, namespace=namespace)
 
@@ -124,6 +127,21 @@ class PreferencesManager(models.Manager):
             if defaults := subclass.get_defaults():
                 prefdict[namespace] = defaults
         return prefdict
+
+
+class UnregisteredPreferencesManager(models.Manager):
+    def get_queryset(self):
+        """Find preferences that are not backed by a subclass
+
+        It *is* possible to create a preference that has no subclass:
+
+        * Directly in database
+        * Preferences().save
+        * Preferences.objects.create()
+
+        Find them so that they can be handled, preferrably deleted.
+        """
+        return super().get_queryset().exclude(namespace__in=Preferences.NAMESPACES)
 
 
 class SessionPreferences:
@@ -195,6 +213,7 @@ class Preferences(models.Model):
     preferences = models.JSONField(blank=True, default=dict)
 
     objects = PreferencesManager()
+    unregistered = UnregisteredPreferencesManager()
 
     # storage for field forms in preference
     FORMS = None
@@ -228,7 +247,7 @@ class Preferences(models.Model):
     @classmethod
     def get_defaults(cls):
         "Override to add magic"
-        return cls._FIELD_DEFAULTS.copy() or {}
+        return cls._FIELD_DEFAULTS.copy() if cls._FIELD_DEFAULTS else {}
 
     @classmethod
     def ensure_for_user(cls, user):

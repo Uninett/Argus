@@ -71,7 +71,7 @@ class UserIsUsedTests(TestCase):
 
 
 class UserMiscMethodTests(TestCase):
-    def test_get_preferences_context_returns_dict_of_all_preferences(self):
+    def test_get_preferences_context_returns_dict_of_all_properly_registered_preferences(self):
         user = PersonUserFactory()
 
         results = user.get_preferences_context()
@@ -79,6 +79,21 @@ class UserMiscMethodTests(TestCase):
         self.assertEqual(len(results), len(Preferences.NAMESPACES))
         self.assertEqual(results[MyPreferences._namespace]["magic_number"], 42)
         self.assertEqual(results[MyOtherPreferences._namespace]["magic_number"], 5)
+
+    def test_get_preferences_context_does_not_return_unregistered_preferences(self):
+        user = PersonUserFactory()
+
+        unregistered_preference = Preferences(
+            namespace="foo",
+            user=user,
+            preferences={
+                "evil": "hackerman",
+                "waxes": "poetically",
+            },
+        )
+        unregistered_preference.save()
+        results = user.get_preferences_context()
+        self.assertNotIn("foo", results)
 
 
 class PreferencesTests(TestCase):
@@ -202,6 +217,19 @@ class PreferencesTests(TestCase):
 
 
 class PreferencesManagerTests(TestCase):
+    def test_all_should_only_return_registered_preferences(self):
+        user = PersonUserFactory()
+        unregistered_preference = Preferences.objects.create(
+            namespace="foo",
+            user=user,
+            preferences={
+                "evil": "hackerman",
+                "waxes": "poetically",
+            },
+        )
+        results = Preferences.objects.all()
+        self.assertNotIn(unregistered_preference, results)
+
     def test_get_by_natural_key_fetches_preference_of_correct_namespace(self):
         user = PersonUserFactory()
 
@@ -245,3 +273,24 @@ class SubclassPreferencesManagerTests(TestCase):
 
         self.assertIn(obj1, MyPreferences.objects.all())
         self.assertNotIn(obj2, MyPreferences.objects.all())
+
+
+class UnregisteredPreferencesManagerTests(TestCase):
+    def setUp(self):
+        user = PersonUserFactory()
+        self.unregistered_preference = Preferences.objects.create(
+            namespace="foo",
+            user=user,
+            preferences={
+                "evil": "hackerman",
+                "waxes": "poetically",
+            },
+        )
+
+    def test_all_does_not_find_registered_preferences(self):
+        results = Preferences.unregistered.all()
+        self.assertNotIn(MyPreferences, results)
+
+    def test_all_finds_all_unregistered_preferences(self):
+        results = Preferences.unregistered.all()
+        self.assertIn(self.unregistered_preference, results)
