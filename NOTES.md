@@ -3,6 +3,18 @@
 This file documents changes to Argus that are relevant for operations and
 end-users.
 
+## [1.27.0] - 2024-11-13
+
+The big but hidden new feature this time is a new database table to hold user
+preferences, in a namespaced fashion. Different apps can have different sets of
+preferences with the same names but different values.
+
+There is as of yet nothing that uses the preferences. The machinery needs to
+be in place for the new frontend.
+
+See the docs and remember to migrate.
+
+
 ## [1.26.1] - 2024-11-08
 
 Bugfix release, logout via the React SPA frontend should now work again.

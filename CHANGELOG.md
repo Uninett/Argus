@@ -8,6 +8,15 @@ This project uses [*towncrier*](https://towncrier.readthedocs.io/) and the chang
 
 <!-- towncrier release notes start -->
 
+## [1.27.0] - 2024-11-13
+
+### Added
+
+- Added a database model to store user preferences. Remember to migrate!
+- Added a new testenv to tox to easily regenerate the ER model. It needs
+  regenerating thanks to the new model.
+
+
 ## [1.26.1] - 2024-11-08
 
 ### Changed
