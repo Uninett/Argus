@@ -43,7 +43,7 @@
                   Logged in as: <span class="text-info">{{ request.user }}</span>
                   <div class="divider divider-secondary my-0"></div>
                 </li>
-                <li>{% include "htmx/themes/theme_dropdown.html" %}</li>
+                <li>{% include "htmx/themes/_theme_dropdown.html" %}</li>
                 <li>{% include "htmx/dateformat/_dateformat_dropdown.html" %}</li>
                 <li>
                   <a href="{% url 'htmx:user-preferences' %}">Preferences…</a>
