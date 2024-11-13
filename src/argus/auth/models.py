@@ -108,6 +108,9 @@ class User(AbstractUser):
 
 
 class PreferencesManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(namespace__in=Preferences.NAMESPACES)
+
     def get_by_natural_key(self, user, namespace):
         return self.get(user=user, namespace=namespace)
 
@@ -125,7 +128,9 @@ class PreferencesManager(models.Manager):
                 prefdict[namespace] = defaults
         return prefdict
 
-    def get_unregistered_preferences(self):
+
+class UnregisteredPreferencesManager(models.Manager):
+    def get_queryset(self):
         """Find preferences that are not backed by a subclass
 
         It *is* possible to create a preference that has no subclass:
@@ -136,7 +141,7 @@ class PreferencesManager(models.Manager):
 
         Find them so that they can be handled, preferrably deleted.
         """
-        return self.exclude(namespace__in=Preferences.NAMESPACES)
+        return super().get_queryset().exclude(namespace__in=Preferences.NAMESPACES)
 
 
 class SessionPreferences:
@@ -208,6 +213,7 @@ class Preferences(models.Model):
     preferences = models.JSONField(blank=True, default=dict)
 
     objects = PreferencesManager()
+    unregistered_preferences = UnregisteredPreferencesManager()
 
     # storage for field forms in preference
     FORMS = None

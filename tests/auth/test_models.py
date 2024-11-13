@@ -217,6 +217,19 @@ class PreferencesTests(TestCase):
 
 
 class PreferencesManagerTests(TestCase):
+    def test_all_should_only_return_registered_preferences(self):
+        user = PersonUserFactory()
+        unregistered_preference = Preferences.objects.create(
+            namespace="foo",
+            user=user,
+            preferences={
+                "evil": "hackerman",
+                "waxes": "poetically",
+            },
+        )
+        results = Preferences.objects.all()
+        self.assertNotIn(unregistered_preference, results)
+
     def test_get_by_natural_key_fetches_preference_of_correct_namespace(self):
         user = PersonUserFactory()
 
@@ -244,20 +257,6 @@ class PreferencesManagerTests(TestCase):
         self.assertEqual(defaults[MyPreferences._namespace]["magic_number"], 42)
         self.assertEqual(defaults[MyOtherPreferences._namespace]["magic_number"], 5)
 
-    def test_get_unregistered_preferences_finds_all_unregistered_preferences(self):
-        user = PersonUserFactory()
-
-        unregistered_preference = Preferences.objects.create(
-            namespace="foo",
-            user=user,
-            preferences={
-                "evil": "hackerman",
-                "waxes": "poetically",
-            },
-        )
-        results = Preferences.objects.get_unregistered_preferences()
-        self.assertIn(unregistered_preference, results)
-
 
 class SubclassPreferencesManagerTests(TestCase):
     def test_create_adds_instance_with_correct_namespace(self):
@@ -274,3 +273,24 @@ class SubclassPreferencesManagerTests(TestCase):
 
         self.assertIn(obj1, MyPreferences.objects.all())
         self.assertNotIn(obj2, MyPreferences.objects.all())
+
+
+class UnregisteredPreferencesManagerTests(TestCase):
+    def setUp(self):
+        user = PersonUserFactory()
+        self.unregistered_preference = Preferences.objects.create(
+            namespace="foo",
+            user=user,
+            preferences={
+                "evil": "hackerman",
+                "waxes": "poetically",
+            },
+        )
+
+    def test_all_does_not_find_registered_preferences(self):
+        results = Preferences.unregistered_preferences.all()
+        self.assertNotIn(MyPreferences, results)
+
+    def test_all_finds_all_unregistered_preferences(self):
+        results = Preferences.unregistered_preferences.all()
+        self.assertIn(self.unregistered_preference, results)
