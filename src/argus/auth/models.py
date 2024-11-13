@@ -213,7 +213,7 @@ class Preferences(models.Model):
     preferences = models.JSONField(blank=True, default=dict)
 
     objects = PreferencesManager()
-    unregistered_preferences = UnregisteredPreferencesManager()
+    unregistered = UnregisteredPreferencesManager()
 
     # storage for field forms in preference
     FORMS = None

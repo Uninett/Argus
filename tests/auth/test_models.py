@@ -288,9 +288,9 @@ class UnregisteredPreferencesManagerTests(TestCase):
         )
 
     def test_all_does_not_find_registered_preferences(self):
-        results = Preferences.unregistered_preferences.all()
+        results = Preferences.unregistered.all()
         self.assertNotIn(MyPreferences, results)
 
     def test_all_finds_all_unregistered_preferences(self):
-        results = Preferences.unregistered_preferences.all()
+        results = Preferences.unregistered.all()
         self.assertIn(self.unregistered_preference, results)
