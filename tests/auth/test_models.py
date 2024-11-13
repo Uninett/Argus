@@ -71,7 +71,7 @@ class UserIsUsedTests(TestCase):
 
 
 class UserMiscMethodTests(TestCase):
-    def test_get_preferences_context_returns_dict_of_all_preferences(self):
+    def test_get_preferences_context_returns_dict_of_all_properly_registered_preferences(self):
         user = PersonUserFactory()
 
         results = user.get_preferences_context()
@@ -79,6 +79,21 @@ class UserMiscMethodTests(TestCase):
         self.assertEqual(len(results), len(Preferences.NAMESPACES))
         self.assertEqual(results[MyPreferences._namespace]["magic_number"], 42)
         self.assertEqual(results[MyOtherPreferences._namespace]["magic_number"], 5)
+
+    def test_get_preferences_context_does_not_return_unregistered_preferences(self):
+        user = PersonUserFactory()
+
+        unregistered_preference = Preferences(
+            namespace="foo",
+            user=user,
+            preferences={
+                "evil": "hackerman",
+                "waxes": "poetically",
+            },
+        )
+        unregistered_preference.save()
+        results = user.get_preferences_context()
+        self.assertNotIn("foo", results)
 
 
 class PreferencesTests(TestCase):
@@ -228,6 +243,20 @@ class PreferencesManagerTests(TestCase):
         self.assertEqual(len(defaults), len(Preferences.NAMESPACES))
         self.assertEqual(defaults[MyPreferences._namespace]["magic_number"], 42)
         self.assertEqual(defaults[MyOtherPreferences._namespace]["magic_number"], 5)
+
+    def test_get_unregistered_preferences_finds_all_unregistered_preferences(self):
+        user = PersonUserFactory()
+
+        unregistered_preference = Preferences.objects.create(
+            namespace="foo",
+            user=user,
+            preferences={
+                "evil": "hackerman",
+                "waxes": "poetically",
+            },
+        )
+        results = Preferences.objects.get_unregistered_preferences()
+        self.assertIn(unregistered_preference, results)
 
 
 class SubclassPreferencesManagerTests(TestCase):
