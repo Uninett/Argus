@@ -125,6 +125,19 @@ class PreferencesManager(models.Manager):
                 prefdict[namespace] = defaults
         return prefdict
 
+    def get_unregistered_preferences(self):
+        """Find preferences that are not backed by a subclass
+
+        It *is* possible to create a preference that has no subclass:
+
+        * Directly in database
+        * Preferences().save
+        * Preferences.objects.create()
+
+        Find them so that they can be handled, preferrably deleted.
+        """
+        return self.exclude(namespace__in=Preferences.NAMESPACES)
+
 
 class SessionPreferences:
     def __init__(self, session, namespace):
