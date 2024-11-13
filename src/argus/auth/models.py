@@ -94,7 +94,7 @@ class User(AbstractUser):
 
     def get_or_create_preferences(self):
         Preferences.ensure_for_user(self)
-        return self.preferences.all()
+        return self.preferences.filter(namespace__in=Preferences.NAMESPACES)
 
     def get_preferences_context(self):
         pref_sets = self.get_or_create_preferences()
