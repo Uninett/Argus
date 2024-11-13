@@ -6,7 +6,7 @@ from django.views.decorators.http import require_GET, require_POST
 from django.http import HttpResponse
 from django_htmx.http import HttpResponseClientRefresh
 
-from argus.auth.utils import get_preference, save_preference
+from argus.auth.utils import save_preference
 
 from argus_htmx.constants import THEME_NAMES
 from argus_htmx.incidents.views import HtmxHttpRequest
@@ -23,9 +23,7 @@ def theme_names(request: HtmxHttpRequest) -> HttpResponse:
 
 @require_POST
 def change_theme(request: HtmxHttpRequest) -> HttpResponse:
-    theme = get_preference(request, "argus_htmx", "theme")
     success = save_preference(request, request.POST, "argus_htmx", "theme")
     if success:
-        theme = get_preference(request, "argus_htmx", "theme")
-        return HttpResponse(theme)
+        return render(request, "htmx/themes/_current_theme.html")
     return HttpResponseClientRefresh()
