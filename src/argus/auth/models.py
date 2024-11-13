@@ -228,7 +228,7 @@ class Preferences(models.Model):
     @classmethod
     def get_defaults(cls):
         "Override to add magic"
-        return cls._FIELD_DEFAULTS.copy() or {}
+        return cls._FIELD_DEFAULTS.copy() if cls._FIELD_DEFAULTS else {}
 
     @classmethod
     def ensure_for_user(cls, user):
