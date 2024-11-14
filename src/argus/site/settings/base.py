@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "django_filters",
     "phonenumber_field",
+    "knox",
 
     # Argus apps
     "argus.auth",
@@ -194,6 +195,7 @@ if FRONTEND_URL:
 # fmt: off
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
+        "knox.auth.TokenAuthentication",
         "argus.auth.authentication.ExpiringTokenAuthentication",
         # For BrowsableAPIRenderer
         "rest_framework.authentication.SessionAuthentication",
