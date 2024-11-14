@@ -51,7 +51,7 @@ dynamic = ["version"]
 [project.optional-dependencies]
 docs = ["sphinx>=2.2.0"]
 htmx = [
-    "argus-htmx-frontend>=0.15",
+    "argus-htmx-frontend>=0.17",
 ]
 dev = [
     "django-debug-toolbar",
