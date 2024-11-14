@@ -25,6 +25,7 @@ TAILWIND_CSS_TEMPLATE = "tailwind/styles.css"
 TAILWIND_CONFIG_TARGET = "src/argus_htmx/tailwindtheme/tailwind.config.js"
 TAILWIND_CSS_TARGET = "src/argus_htmx/tailwindtheme/styles.css"
 
+STYLESHEET_PATH_DEFAULT = "styles.css"
 DEFAULT_THEMES = [
     "dark",
     "light",
@@ -57,3 +58,4 @@ DAISYUI_THEMES = get_json_env("DAISYUI_THEMES", DEFAULT_THEMES, quiet=True)
 THEME_DEFAULT = get_str_env("ARGUS_THEME_DEFAULT", "argus")
 DEFAULT_THEME_OVERRIDE = {}
 TAILWIND_THEME_OVERRIDE = get_json_env("TAILWIND_THEME_OVERRIDE", DEFAULT_THEME_OVERRIDE, quiet=True)
+STYLESHEET_PATH = get_str_env("ARGUS_STYLESHEET_PATH", STYLESHEET_PATH_DEFAULT)

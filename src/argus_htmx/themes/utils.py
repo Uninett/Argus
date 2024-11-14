@@ -1,15 +1,32 @@
+import logging
+from pathlib import Path
+from re import findall
+
 from django.conf import settings
-from argus_htmx import settings as argus_htmx_settings
+from django.core.exceptions import ImproperlyConfigured
+from django.contrib.staticfiles.finders import find
+
+from argus_htmx import settings as fallbacks
 
 
-def get_themes():
-    return getattr(settings, "DAISYUI_THEMES", argus_htmx_settings.DAISYUI_THEMES)
+__all__ = [
+    "get_raw_themes_setting",
+    "get_theme_names",
+    "get_theme_default",
+]
 
 
-def get_theme_names():
-    themes = get_themes()
+LOG = logging.getLogger(__name__)
+
+
+def get_raw_themes_setting():
+    return getattr(settings, "DAISYUI_THEMES", fallbacks.DAISYUI_THEMES)
+
+
+def get_themes_from_setting():
+    themes_setting = get_raw_themes_setting()
     theme_names = []
-    for theme in themes:
+    for theme in themes_setting:
         if isinstance(theme, str):
             theme_names.append(theme)
         elif isinstance(theme, dict):
@@ -17,5 +34,35 @@ def get_theme_names():
     return theme_names
 
 
+def get_stylesheet_path():
+    return getattr(settings, "STYLESHEET_PATH", fallbacks.STYLESHEET_PATH)
+
+
+def get_themes_from_css():
+    THEME_NAME_RE = "(?P<theme>[-_\w]+)"
+    DATA_THEME_RE = f"\[data-theme={THEME_NAME_RE}\]"
+
+    absolute_stylesheet_path = Path(find(get_stylesheet_path()))
+    styles_css = absolute_stylesheet_path.read_text()
+
+    return findall(DATA_THEME_RE, styles_css)
+
+
+def get_theme_names(quiet=True):
+    ERROR_MSG = "Themes in settings are out of sync with themes installed"
+
+    themes_from_setting = set(get_themes_from_setting())
+    themes_from_css = set(get_themes_from_css())
+    installed_themes = themes_from_setting & themes_from_css
+
+    all_themes = themes_from_setting | themes_from_css
+    if all_themes != installed_themes:
+        LOG.warning(ERROR_MSG)
+        if not quiet:
+            raise ImproperlyConfigured(ERROR_MSG)
+
+    return installed_themes
+
+
 def get_theme_default():
-    return getattr(settings, "THEME_DEFAULT", argus_htmx_settings.THEME_DEFAULT)
+    return getattr(settings, "THEME_DEFAULT", fallbacks.THEME_DEFAULT)

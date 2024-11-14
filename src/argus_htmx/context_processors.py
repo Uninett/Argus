@@ -7,12 +7,8 @@ Append the "context_processors" list for the TEMPLATES-backend
 See django settings for ``TEMPLATES``.
 """
 
-from argus.auth.models import Preferences
+from .settings import STYLESHEET_PATH
 
 
-def preferences(request):
-    pref_sets = Preferences.objects.filter(user=request.user)
-    prefdict = {}
-    for pref_set in pref_sets:
-        prefdict[pref_set._namespace] = pref_set.get_context()
-    return {"preferences": prefdict}
+def path_to_stylesheet(request):
+    return {"path_to_stylesheet": STYLESHEET_PATH}

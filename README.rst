@@ -242,7 +242,10 @@ How to customize the look:
     * `list of daisyUI color names`_
     * `Tailwind CSS theme customization`_
 
-*  Override the default main stylesheet path by providing a ``path_to_stylesheet`` value in a template ``context``.
+*  Override the default main stylesheet path by setting
+  ``ARGUS_STYLESHEET_PATH`` in the environment. The path is under
+  ``STATIC_URL``. This depends on the context processor
+  ``argus_htmx.context_processors.path_to_stylesheet``.
 *  Include additional styles/stylesheets using the ``head`` block in your templates.
 *  Generate a Tailwind config file by running the ``tailwind_config`` management
    command. By default the generated file will be based on

@@ -8,7 +8,7 @@ from django.template import engines
 from django.template.context import make_context
 from django.template.loader import get_template
 
-from argus_htmx.themes.utils import get_themes
+from argus_htmx.themes.utils import get_raw_themes_setting
 from argus_htmx import settings as argus_htmx_settings
 
 
@@ -78,7 +78,7 @@ class Command(BaseCommand):
                 argus_htmx_settings.TAILWIND_THEME_OVERRIDE,
             ),
             "daisyuithemes": textwrap.indent(
-                json.dumps(get_themes(), indent=2),
+                json.dumps(get_raw_themes_setting(), indent=2),
                 prefix=10 * " ",
                 predicate=lambda line: line != "[\n",  # this is kinda hacky, but eh
             ),

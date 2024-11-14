@@ -25,6 +25,7 @@ _app_settings = [
         },
         "context_processors": [
             "argus.auth.context_processors.preferences",
+            "argus_htmx.context_processors.path_to_stylesheet",
         ],
         "middleware": {
             "argus_htmx.middleware.LoginRequiredMiddleware": "end",
