@@ -491,7 +491,7 @@ class Incident(models.Model):
 
     @property
     def last_close_or_end_event(self):
-        return self.all_close_events().last()
+        return self.all_closing_events().last()
 
     @property
     def latest_change_event(self):
@@ -531,7 +531,7 @@ class Incident(models.Model):
             LOG.warn("Mismatch between self %s end_time and event type: set stateless", self.pk)
             return True
 
-        close_events = self.all_close_events()
+        close_events = self.all_closing_events()
         if not self.open and close_events.exists():
             # end_time is already set closed (golden path)
             return False
