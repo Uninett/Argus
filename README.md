@@ -42,6 +42,16 @@ Argus-frontend.
 Refer to the [Dataporten](https://argus-server.rtfd.io/en/latest/authentication.html#dataporten) section of the documentation to learn
 about Dataporten registration, and how to set it up with Argus.
 
+#### Optional: New frontend
+
+You need to have `argus_htmx` installed.
+
+If you will just be testing, install with `pip install argus-server[htmx]`.
+
+If you will be developing argus-server *and* HTMx, clone the argus_htmx repo
+and `pip install -e .` into the same virtualenv that you have `pip install -e .`
+argus-server in.
+
 ### Install Argus using pip
 
 You can also install Argus with `pip` via PyPI. The package name is `argus-server`:
@@ -186,6 +196,14 @@ overrides.
 
 Refer to the [development notes](http://argus-server.rtfd.io/en/latest/development.html) for further details and
 useful hints on managing Argus in development mode.
+
+#### Settings for old frontend
+
+See https://argus-server.erfd.io/en/latest/reference/react-frontend.html
+
+#### Settings for new frontend
+
+See http://argus-server.rtfd.io/en/latest/reference/htmx-frontend.html
 
 ### Step 3: Run Argus in development
 
