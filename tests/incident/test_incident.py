@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 from django.test import TestCase
 from django.utils import timezone
@@ -116,8 +116,8 @@ class IncidentRepairEndTimeTests(TestCase):
     def test_closing_event_without_finite_end_time_and_reopen_event_should_fix_endt_time(self):
         incident = StatefulIncidentFactory(level=1)
         end_time = incident.end_time
-        self.assertEqual(incident.end_time, INFINITY_REPR)
+        self.assertEqual(incident.end_time, datetime.max)
         EventFactory(incident=incident, type=Event.Type.INCIDENT_END)
         self.asserTrue(incident.repair_end_time())
         self.assertNotEqual(end_time, incident.end_time)
-        self.assertLessThan(incident.end_time, INFINITY_REPR)
+        self.assertLessThan(incident.end_time, datetime.max)
