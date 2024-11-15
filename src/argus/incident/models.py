@@ -479,7 +479,7 @@ class Incident(models.Model):
 
     @property
     def reopen_event(self):
-        return self.all_reopen_events.last()
+        return self.all_reopen_events().last()
 
     @property
     def end_event(self):
