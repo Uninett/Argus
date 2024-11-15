@@ -4,6 +4,7 @@ from functools import reduce
 import logging
 from operator import and_
 from random import randint, choice
+from typing import Optional
 from urllib.parse import urljoin
 
 from django.contrib.auth import get_user_model
@@ -215,7 +216,28 @@ class Event(models.Model):
         Type.INCIDENT_CHANGE,
         Type.STATELESS,
     }
-    ALLOWED_TYPES_FOR_END_USERS = {Type.CLOSE, Type.REOPEN, Type.ACKNOWLEDGE, Type.OTHER}
+    ALLOWED_TYPES_FOR_END_USERS = {
+        Type.ACKNOWLEDGE,
+        Type.OTHER,
+        Type.CLOSE,
+        Type.REOPEN,
+    }
+    CLOSING_TYPES = {
+        Type.INCIDENT_END,
+        Type.CLOSE,
+    }
+    OPENING_TYPES = {
+        Type.INCIDENT_START,
+        Type.REOPEN,
+    }
+    STATE_TYPES = OPENING_TYPES | CLOSING_TYPES
+    SHARED_TYPES = {
+        Type.ACKNOWLEDGE,
+        Type.OTHER,
+        Type.INCIDENT_CHANGE,
+    }
+    STATELESS_TYPES = SHARED_TYPES | {Type.STATELESS}
+    STATEFUL_TYPES = SHARED_TYPES | STATE_TYPES
 
     incident = models.ForeignKey(to="Incident", on_delete=models.PROTECT, related_name="events")
     actor = models.ForeignKey(to=User, on_delete=models.PROTECT, related_name="caused_events")
@@ -334,8 +356,9 @@ class IncidentQuerySet(models.QuerySet):
 
     def close(self, actor: User, timestamp=None, description=""):
         "Close incidents correctly and create the needed events"
+        timestamp = timestamp or timezone.now()
         qs = self.open()
-        qs.update(end_time=timestamp or timezone.now())
+        qs.update(end_time=timestamp)
         qs = self.all()  # Reload changes from database
         event_type = Event.Type.CLOSE
         events = qs.create_events(actor, event_type, timestamp, description)
@@ -439,17 +462,36 @@ class Incident(models.Model):
     def incident_relations(self):
         return IncidentRelation.objects.filter(Q(incident1=self) | Q(incident2=self))
 
+    def all_opening_events(self):
+        open_events = (Event.Type.INCIDENT_START, Event.Type.REOPEN)
+        return self.events.filter(type__in=open_events).order_by("timestamp")
+
+    def all_reopen_events(self):
+        return self.events.filter(typen=Event.Type.REOPEN).order_by("timestamp")
+
+    def all_closing_events(self):
+        close_events = (Event.Type.CLOSE, Event.Type.INCIDENT_END)
+        return self.events.filter(type__in=close_events).order_by("timestamp")
+
     @property
     def start_event(self):
         return self.events.filter(type=Event.Type.INCIDENT_START).order_by("timestamp").first()
+
+    @property
+    def reopen_event(self):
+        return self.all_reopen_events.last()
 
     @property
     def end_event(self):
         return self.events.filter(type=Event.Type.INCIDENT_END).order_by("timestamp").first()
 
     @property
+    def close_event(self):
+        return self.events.filter(type=Event.Type.CLOSE).order_by("timestamp").first()
+
+    @property
     def last_close_or_end_event(self):
-        return self.events.filter(type__in=(Event.Type.CLOSE, Event.Type.INCIDENT_END)).order_by("timestamp").last()
+        return self.all_close_events().last()
 
     @property
     def latest_change_event(self):
@@ -474,6 +516,37 @@ class Incident(models.Model):
         ack_is_just_being_created = Q(type=Event.Type.ACKNOWLEDGE) & Q(ack__isnull=True)
 
         return self.events.filter((acks_query & acks_not_expired_query) | ack_is_just_being_created).exists()
+
+    def event_already_exists(self, event_type):
+        return self.events.filter(type=event_type).exists()
+
+    def repair_end_time(self) -> Optional[bool]:
+        if not self.stateful:
+            return
+
+        if self.stateless_event:
+            # Weird, stateless event without stateless end_time, fix
+            self.end_time = None
+            self.save()
+            LOG.warn("Mismatch between self %s end_time and event type: set stateless", self.pk)
+            return True
+
+        close_events = self.all_close_events()
+        if not self.open and close_events.exists():
+            # end_time is already set closed (golden path)
+            return False
+
+        reopen_event = self.reopen_event
+        last_close_event = close_events.last()
+        if not reopen_event or reopen_event.timestamp < last_close_event.timestamp:
+            # end_time was not set when making closing event, fix
+            self.end_time = close_events.first().timestamp
+            self.save()
+            LOG.warn("Mismatch between self %s end_time and event type: set end_time to less than infinity", self.pk)
+            return True
+
+        # a reopen event correctly exists and the incident is correctly open
+        return False
 
     def is_acked_by(self, group: str) -> bool:
         return group in self.acks.active().group_names()
