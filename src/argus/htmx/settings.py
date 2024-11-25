@@ -1,7 +1,7 @@
 from argus.site.settings.backend import *
 from argus.site.utils import update_settings
 
-from argus_htmx.appconfig import APP_SETTINGS
+from argus.htmx.appconfig import APP_SETTINGS
 
 
 update_settings(globals(), APP_SETTINGS)

@@ -1,7 +1,7 @@
 # customize the displayed columns in the incident table
 # items in INCIDENT_TABLE_COLUMNS can be either a `str` referring to a key in
-# argus_htmx.incidents.customization.BUILTIN_COLUMNS or an instance of
-# argus_htmx.incidents.customization.IncidentTableColumn
+# argus.htmx.incidents.customization.BUILTIN_COLUMNS or an instance of
+# argus.htmx.incidents.customization.IncidentTableColumn
 from argus.site.settings import get_json_env, get_str_env
 
 INCIDENT_TABLE_COLUMNS = [
@@ -16,7 +16,7 @@ INCIDENT_TABLE_COLUMNS = [
 ]
 
 # These templates are auto-discovered by the templating engine and are relative
-# to the argus_htmx's `templates/` directory
+# to the argus.htmx's `templates/` directory
 TAILWIND_CONFIG_TEMPLATE = "tailwind/tailwind.config.js"
 TAILWIND_CSS_TEMPLATE = "tailwind/styles.css"
 

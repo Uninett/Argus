@@ -8,11 +8,11 @@ from django_htmx.http import HttpResponseClientRefresh
 
 from argus.auth.utils import save_preference
 
-from argus_htmx.constants import THEME_NAMES
-from argus_htmx.incidents.views import HtmxHttpRequest
+from argus.htmx.constants import THEME_NAMES
+from argus.htmx.incidents.views import HtmxHttpRequest
 
 LOG = logging.getLogger(__name__)
-THEMES_MODULE = "argus_htmx"
+THEMES_MODULE = "argus.htmx"
 
 
 @require_GET

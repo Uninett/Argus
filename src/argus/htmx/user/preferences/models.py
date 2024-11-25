@@ -2,7 +2,7 @@ from django import forms
 
 from argus.auth.models import preferences
 
-from argus_htmx.constants import (
+from argus.htmx.constants import (
     DATETIME_FORMATS,
     DATETIME_DEFAULT,
     DATETIME_CHOICES,

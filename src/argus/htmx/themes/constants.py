@@ -1,4 +1,4 @@
-from argus_htmx.themes.utils import get_theme_default, get_theme_names
+from argus.htmx.themes.utils import get_theme_default, get_theme_names
 
 
 __all__ = [

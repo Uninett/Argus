@@ -8,7 +8,7 @@ from django_htmx.http import HttpResponseClientRefresh
 
 from argus.auth.utils import save_preference
 
-from argus_htmx.incidents.views import HtmxHttpRequest
+from argus.htmx.incidents.views import HtmxHttpRequest
 from .constants import DATETIME_FORMATS
 
 LOG = logging.getLogger(__name__)

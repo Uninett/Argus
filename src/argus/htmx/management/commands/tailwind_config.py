@@ -8,7 +8,7 @@ from django.template import engines
 from django.template.context import make_context
 from django.template.loader import get_template
 
-from argus_htmx.themes.utils import get_raw_themes_setting
+from argus.htmx.themes.utils import get_raw_themes_setting
 from argus.htmx import defaults as argus_htmx_settings
 
 
@@ -37,7 +37,7 @@ class Command(BaseCommand):
     contains css files/snippets that should be included in the final css file. Apps
     may define a `tailwind_css_files` method that gives the location (as a str or
     pathlib.Path object) for every css file from this app to include. (see
-    argus_htmx.apps.HtmxFrontendConfig for an example)
+    argus.htmx.apps.HtmxFrontendConfig for an example)
 
     Additional settings that govern the functionality of this command are:
 

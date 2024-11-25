@@ -18,18 +18,18 @@ _app_settings = [
         },
     },
     {
-        "app_name": "argus_htmx",
+        "app_name": "argus.htmx",
         "urls": {
             "path": "",
-            "urlpatterns_module": "argus_htmx.urls",
+            "urlpatterns_module": "argus.htmx.urls",
         },
         "context_processors": [
             "argus.auth.context_processors.preferences",
-            "argus_htmx.context_processors.path_to_stylesheet",
+            "argus.htmx.context_processors.path_to_stylesheet",
         ],
         "middleware": {
-            "argus_htmx.middleware.LoginRequiredMiddleware": "end",
-            "argus_htmx.middleware.HtmxMessageMiddleware": "end",
+            "argus.htmx.middleware.LoginRequiredMiddleware": "end",
+            "argus.htmx.middleware.HtmxMessageMiddleware": "end",
         },
     },
     {

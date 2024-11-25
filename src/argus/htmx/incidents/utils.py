@@ -3,7 +3,7 @@ import importlib
 from django.conf import settings
 
 FUNCTION_NAME = "incident_list_filter"
-DEFAULT_MODULE = "argus_htmx.incidents.filter"
+DEFAULT_MODULE = "argus.htmx.incidents.filter"
 
 
 def get_filter_function():
