@@ -22,8 +22,8 @@ TAILWIND_CSS_TEMPLATE = "tailwind/styles.css"
 
 # These targets are relative to the working directory when running the `tailwind_config`
 # management command, which should be done from the repostitory root
-TAILWIND_CONFIG_TARGET = "src/argus_htmx/tailwindtheme/tailwind.config.js"
-TAILWIND_CSS_TARGET = "src/argus_htmx/tailwindtheme/styles.css"
+TAILWIND_CONFIG_TARGET = "src/argus/htmx/tailwindtheme/tailwind.config.js"
+TAILWIND_CSS_TARGET = "src/argus/htmx/tailwindtheme/styles.css"
 
 STYLESHEET_PATH_DEFAULT = "styles.css"
 DEFAULT_THEMES = [

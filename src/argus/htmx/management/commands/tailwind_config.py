@@ -49,8 +49,8 @@ class Command(BaseCommand):
     """
     DEFAULT_CONFIG_TEMPLATE_NAME = "tailwind/tailwind.config.js"
     DEFAULT_CSS_TEMPLATE_NAME = "tailwind/styles.css"
-    DEFAULT_CONFIG_TARGET = "src/argus_htmx/tailwindtheme/tailwind.config.js"
-    DEFAULT_CSS_TARGET = "src/argus_htmx/tailwindtheme/styles.css"
+    DEFAULT_CONFIG_TARGET = "src/argus/htmx/tailwindtheme/tailwind.config.js"
+    DEFAULT_CSS_TARGET = "src/argus/htmx/tailwindtheme/styles.css"
 
     def handle(self, *args, **options):
         config_template_name = getattr(settings, "TAILWIND_CONFIG_TEMPLATE", self.DEFAULT_CONFIG_TEMPLATE_NAME)

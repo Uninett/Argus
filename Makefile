@@ -1,7 +1,7 @@
 .PHONY: clean testclean distclean coverageclean cacheclean nuke tailwind
 
-TAILWINDDIR=src/argus_htmx/tailwindtheme
-STATICDIR=src/argus_htmx/static
+TAILWINDDIR=src/argus/htmx/tailwindtheme
+STATICDIR=src/argus/htmx/static
 
 clean:
 	-find . -name __pycache__ -print0 | xargs -0 rm -rf
