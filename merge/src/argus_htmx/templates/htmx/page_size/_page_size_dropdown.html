@@ -1,0 +1,14 @@
+<details>
+  <summary>
+    Page size
+    <span class="badge badge-primary">{{ preferences.argus_htmx.page_size }}</span>
+  </summary>
+  <ul class="max-h-64 overflow-y-scroll">
+    <li hx-get="{% url 'htmx:page-sizes' %}"
+        hx-target="closest ul"
+        hx-swap="innerHTML"
+        hx-trigger="load">
+      <p>loading...</p>
+    </li>
+  </ul>
+</details>

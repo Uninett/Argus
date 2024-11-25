@@ -1,0 +1,13 @@
+<tr id="incident-{{ incident.pk }}-row" class="hover">
+  {% block columns %}
+    {% for col in columns %}
+      <td>
+        {% if col.cell_template %}
+          {% include col.cell_template with column=col %}
+        {% else %}
+          UNDEFINED
+        {% endif %}
+      </td>
+    {% endfor %}
+  {% endblock columns %}
+</tr>

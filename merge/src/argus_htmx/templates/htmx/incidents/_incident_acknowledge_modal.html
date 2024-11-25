@@ -1,0 +1,19 @@
+{% extends "htmx/incidents/_base_incident_update_modal.html" %}
+{% block dialogform %}
+  <label class="indicator input input-bordered flex items-center gap-2 w-full">
+    Message
+    <span class="indicator-item indicator-top indicator-start badge border-none mask mask-circle text-warning text-base">＊</span>
+    <input name="description"
+           type="text"
+           placeholder="Acknowledgment message"
+           required
+           class="appearance-none grow border-none" />
+  </label>
+  <label class="input input-bordered flex items-center gap-2 w-full">
+    Expiration
+    <input name="expiration"
+           type="date"
+           placeholder="Expiry date"
+           class="appearance-none grow border-none" />
+  </label>
+{% endblock dialogform %}

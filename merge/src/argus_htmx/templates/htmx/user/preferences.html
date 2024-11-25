@@ -1,0 +1,18 @@
+{% extends "htmx/base.html" %}
+{% block main %}
+  <div class="w-1/2 m-4">
+    <h1 class="sr-only">{{ page_title }}</h1>
+    <section id="user-settings" class="card">
+      <h2 class="card-title">User preferences</h2>
+      <ul class="menu card-body">
+        <li class="menu-title">
+          Logged in as: <span class="text-info">{{ request.user }}</span>
+          <div class="divider divider-secondary my-0"></div>
+        </li>
+        <li>{% include "htmx/themes/_theme_dropdown.html" %}</li>
+        <li>{% include "htmx/dateformat/_dateformat_dropdown.html" %}</li>
+        <li>{% include "htmx/page_size/_page_size_dropdown.html" %}</li>
+      </ul>
+    </section>
+  </div>
+{% endblock main %}

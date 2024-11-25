@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en-US" data-theme="{{ preferences.argus_htmx.theme }}">
+  <!-- argus/site/templates/base.html -->
+  <head>
+    <meta name="description"
+          content="Argus is a tool for aggregating events from multiple monitoring applications into a single, unified dashboard and notification system.">
+    <meta name="keywords"
+          content="monitoring, notifications, dashboard, events, incidents, alerts, alarms, monitoring systems, monitoring applications, monitoring tools, monitoring software">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {% block title %}
+      <title>Argus Server: {{ page_title }}</title>
+    {% endblock title %}
+    <!-- HTMX -->
+    <script src="{% static "htmx-2.0.2.min.js" %}"></script>
+    <script src="{% static "hyperscript-0.9.13.min.js" %}"></script>
+    <link rel="stylesheet"
+          href="{% static path_to_stylesheet|default:"styles.css" %}">
+    {% block head %}
+    {% endblock head %}
+  </head>
+  <body {% block body_overrides %}
+        class="override bg-base-100"
+        {% endblock body_overrides %}>
+    {% block header %}
+      <h1>Argus Server: {{ page_title }}</h1>
+    {% endblock header %}
+    <main class="space-y-2 p-1">
+      {% block main %}
+      {% endblock main %}
+    </main>
+    {% block footer %}
+    {% endblock footer %}
+    {% block tail %}
+    {% endblock tail %}
+    {% block messages %}
+      {% include "messages/_notification_messages.html" %}
+    {% endblock messages %}
+  </body>
+</html>
