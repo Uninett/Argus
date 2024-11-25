@@ -6,7 +6,7 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.contrib.staticfiles.finders import find
 
-from argus_htmx import settings as fallbacks
+from argus.htmx import defaults as fallbacks
 
 
 __all__ = [

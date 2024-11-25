@@ -7,7 +7,7 @@ Append the "context_processors" list for the TEMPLATES-backend
 See django settings for ``TEMPLATES``.
 """
 
-from .settings import STYLESHEET_PATH
+from .defaults import STYLESHEET_PATH
 
 
 def path_to_stylesheet(request):

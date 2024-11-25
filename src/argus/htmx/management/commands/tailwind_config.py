@@ -9,7 +9,7 @@ from django.template.context import make_context
 from django.template.loader import get_template
 
 from argus_htmx.themes.utils import get_raw_themes_setting
-from argus_htmx import settings as argus_htmx_settings
+from argus.htmx import defaults as argus_htmx_settings
 
 
 # Copied from https://github.com/GEANT/geant-argus/pull/15 with minor modifications

@@ -10,7 +10,7 @@ from typing import List, Optional, Union
 
 from django.conf import settings
 
-from argus_htmx import settings as argus_htmx_settings
+from argus.htmx import defaults as argus_htmx_settings
 
 
 @dataclass
