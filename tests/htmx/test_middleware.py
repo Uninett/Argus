@@ -4,7 +4,7 @@ from django import test
 from django.http import HttpResponseRedirect
 from django.test.client import RequestFactory
 
-from argus_htmx.middleware import LoginRequiredMiddleware
+from argus.htmx.middleware import LoginRequiredMiddleware
 
 
 class TestLoginRequiredMiddleware(test.TestCase):
