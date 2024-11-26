@@ -3,6 +3,7 @@ from argus.site.settings._serializers import ListAppSetting
 
 __all__ = ["APP_SETTINGS"]
 
+# Order matters! Later entries can use stuff in earlier entries
 _app_settings = [
     {
         "settings": {
@@ -18,6 +19,15 @@ _app_settings = [
         },
     },
     {
+        "app_name": "django_htmx",
+        "middleware": {
+            "django_htmx.middleware.HtmxMiddleware": "end",
+        },
+    },
+    {
+        "app_name": "widget_tweaks",  # indent for readability
+    },
+    {
         "app_name": "argus.htmx",
         "urls": {
             "path": "",
@@ -31,15 +41,6 @@ _app_settings = [
             "argus.htmx.middleware.LoginRequiredMiddleware": "end",
             "argus.htmx.middleware.HtmxMessageMiddleware": "end",
         },
-    },
-    {
-        "app_name": "django_htmx",
-        "middleware": {
-            "django_htmx.middleware.HtmxMiddleware": "end",
-        },
-    },
-    {
-        "app_name": "widget_tweaks",  # indent for readability
     },
 ]
 
