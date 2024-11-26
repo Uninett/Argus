@@ -6,4 +6,4 @@ from argus.htmx.appconfig import APP_SETTINGS
 
 update_settings(globals(), APP_SETTINGS)
 
-ROOT_URLCONF = "argus.htmx.urls"
+ROOT_URLCONF = "argus.htmx.root_urls"

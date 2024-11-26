@@ -138,9 +138,9 @@ The management command ``printsettings`` (which depends on the app
 ``django-extensions``, a ``dev``-dependency) will print out the complete
 settings used.
 
-Note especially that :setting:`ROOT_URLCONF` is set to ``argus.htmx.urls``. If
-you prefer to make your own root ``urls.py``, the frontend-specific urls can be
-imported from ``argus.htmx.htmx_urls``.
+Note especially that :setting:`ROOT_URLCONF` is set to
+``argus.htmx.root_urls``. If you prefer to make your own root ``urls.py``, the
+frontend-specific urls can be imported from ``argus.htmx.htmx_urls``.
 
 Settings
 ========
