@@ -1,6 +1,7 @@
 from zoneinfo import ZoneInfo
 
-import factory, factory.fuzzy
+import factory
+import factory.fuzzy
 
 from argus.auth.factories import SourceUserFactory
 from argus.util.datetime_utils import INFINITY_REPR
