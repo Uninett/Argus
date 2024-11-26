@@ -19,6 +19,22 @@ pylint.txt
 *~
 src/argus/version.py
 
+# Multiple manual environments since YT is too lazy to work with multiple repos
+# for the same code.
+
+locallogging.py
+cmd-clone-db.sh
+
+cmd-htmx.sh
+htmxsettings.py
+
+cmd.sh
+cmd-prod.sh
+localsettings.py
+
+cmd-spa.sh
+spasettings.py
+
 # Created by https://www.gitignore.io/api/venv,django,pycharm+all
 # Edit at https://www.gitignore.io/?templates=venv,django,pycharm+all
 
