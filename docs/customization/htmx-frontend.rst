@@ -31,7 +31,7 @@ If you want to *override* existing apps the environment variable to use is
 
     export ARGUS_OVERRIDING_APPS=`cat overriding.json`
 
-Have a look at the contents of ``argus_htmx.appconfig._app_settings`` for an
+Have a look at the contents of ``argus.htmx.appconfig._app_settings`` for an
 example of what you can set this way.
 
 You can merge your urlpatterns with the apps' urlpatterns via the
@@ -108,11 +108,11 @@ How to customize the look:
 * Override the default main stylesheet path by setting
   ``ARGUS_STYLESHEET_PATH`` in the environment. The path is under
   ``STATIC_URL``. This depends on the context processor
-  ``argus_htmx.context_processors.path_to_stylesheet``.
+  ``argus.htmx.context_processors.path_to_stylesheet``.
 * Include additional styles/stylesheets using the ``head`` block in your templates.
 * Generate a Tailwind config file by running the ``tailwind_config`` management
   command. By default the generated file will be based on
-  ``src/argus_htmx/tailwindtheme/tailwind.config.template.js`` and expected
+  ``src/argus/htmx/tailwindtheme/tailwind.config.template.js`` and expected
   values will be injected with reasonable defaults.
 
 Incident table column customization
@@ -120,12 +120,12 @@ Incident table column customization
 
 The :setting:`INCIDENT_TABLE_COLUMNS` setting controls which columns are shown
 in the incident table. This setting takes a list of ``str`` or
-``argus_htmx.incidents.customization.IncidentTableColumn`` instances. when
+``argus.htmx.incidents.customization.IncidentTableColumn`` instances. when
 given a ``str``, this key must be available in the
-``argus_htmx.incidents.customization.BUILTIN_COLUMNS`` dictionary. For
+``argus.htmx.incidents.customization.BUILTIN_COLUMNS`` dictionary. For
 example::
 
-    from argus_htmx.incidents.customization import BUILTIN_COLUMNS, IncidentTableColumn
+    from argus.htmx.incidents.customization import BUILTIN_COLUMNS, IncidentTableColumn
 
     INCIDENT_TABLE_COLUMNS = [
         "id",

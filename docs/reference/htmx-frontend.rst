@@ -68,7 +68,7 @@ Build
 
    Manually::
 
-        tailwindcss -c src/argus_htmx/tailwindtheme/tailwind.config.js -i src/argus_htmx/tailwindtheme/styles.css --output src/argus_htmx/static/styles.css
+        tailwindcss -c src/argus/htmx/tailwindtheme/tailwind.config.js -i src/argus/htmx/tailwindtheme/styles.css --output src/argus/htmx/static/styles.css
 
    Running with the ``--watch`` flag for automatic update on change seems
    error-prone so we've made it very easy to run the command, with ``make`` or ``tox``::
@@ -102,7 +102,7 @@ Example, top of settings-file for production::
 
    from argus.site.settings.backend import *
    from argus.site.utils import update_settings
-   from argus_htmx.appconfig import APP_SETTINGS
+   from argus.htmx.appconfig import APP_SETTINGS
 
    update_settings(globals(), APP_SETTINGS)
 
@@ -116,7 +116,7 @@ Example, top of settings-file for development::
 
    from argus.site.settings.dev import *
    from argus.site.utils import update_settings
-   from argus_htmx.appconfig import APP_SETTINGS
+   from argus.htmx.appconfig import APP_SETTINGS
 
    update_settings(globals(), APP_SETTINGS)
 
