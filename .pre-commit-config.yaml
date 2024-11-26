@@ -17,7 +17,6 @@ repos:
           '--output-format=full',
           '--statistics'
         ]
-        types: [file, python]
         # Run the formatter
     -   id: ruff-format
 -   repo: https://github.com/twisted/towncrier
