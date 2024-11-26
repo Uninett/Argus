@@ -39,8 +39,8 @@ def get_stylesheet_path():
 
 
 def get_themes_from_css():
-    THEME_NAME_RE = "(?P<theme>[-_\w]+)"
-    DATA_THEME_RE = f"\[data-theme={THEME_NAME_RE}\]"
+    THEME_NAME_RE = r"(?P<theme>[-_\w]+)"
+    DATA_THEME_RE = rf"\[data-theme={THEME_NAME_RE}\]"
 
     absolute_stylesheet_path = Path(find(get_stylesheet_path()))
     styles_css = absolute_stylesheet_path.read_text()
