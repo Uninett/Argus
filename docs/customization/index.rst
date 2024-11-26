@@ -25,3 +25,10 @@ Filtering system
 The filtering subsystem is replaceable.
 
 See :ref:`howto-customize-filtering`
+
+HTMx frontend
+=============
+
+The HTMx frontend is designed to be very customizable.
+
+See :ref:`customize-htmx-frontend`

@@ -11,60 +11,139 @@ It has its own specific settings and currently depends on an app.
 
 It is not needed if running headless.
 
+It uses Tailwind CSS and daisyUI for looks and layout.
+
+* Tailwind CSS: A utility-first CSS framework for rapidly building custom user interfaces.
+* daisyUI: A component library for Tailwind CSS that provides a set of ready-to-use components as well as color themes.
+
+
 Setup
 =====
 
-Production
-----------
+The app is included in the argus-server codebase, but it is optional to use.
 
-Install the app directly::
+Install python dependencies
+---------------------------
 
-    pip install argus-frontend-htmx
-
-... or indirectly via argus-server::
+Install the dependencies::
 
     pip install argus-server[htmx]
 
-Development
------------
+(The generated requirements-files includes the dependencies already.)
 
-If you're working just on argus-server::
+Install and build Tailwind CSS and daisyUI
+------------------------------------------
 
-    cd argus-server-repo && pip install -e .[htmx]
+If you want to be able to customize the frontend in any way, including changing
+or adding themes, you need to install the support for Tailwind CSS and daisyUI.
+This is not python packages so cannot be streamlined much.
 
-This will install the frontend as a package and it will not be editable.
+Recommended but open for tweaks and adaptations steps:
 
-If you're working just on argus-frontend-htmx::
+Install
+~~~~~~~
 
-    cd argus-htmx-repo && pip install -e .
+1. Get Tailwind standalone CLI bundled with daisyUI from
+   https://github.com/dobicinaitis/tailwind-cli-extra
 
-This will install the server as a package and it will not be editable.
+   Most linux::
 
-If you want to work on both in tandem::
+        $ curl -sL https://github.com/dobicinaitis/tailwind-cli-extra/releases/latest/download/tailwindcss-extra-linux-x64 -o /tmp/tailwindcss
+        $ chmod +x /tmp/tailwindcss
 
-    cd argus-htmx-repo && pip install -e .
-    cd argus-server-repo && pip uninstall argus-server && pip install -e .
+   For other OSes see
+   https://github.com/dobicinaitis/tailwind-cli-extra/releases/latest/ and
+   update the bit after ``download/`` accordingly.
 
-Since argus-frontend-htmx depends on argus-server it will install the latter
-from a package, which is probably not what you want. That's why it might be
-necessary to uninstall the package before you install the editable version you
-will be working on. If you install argus-server first, then installing the
-frontend will still drag in the argus-server package since pip doesn't
-understand the the package and the editable install does the same job.
+   Optionally you can compile tailwind+daisyUI standalone cli bundle yourself as described here:
+   https://github.com/tailwindlabs/tailwindcss/discussions/12294#discussioncomment-8268378.
+2. (Linux/OsX) Move the tailwindcss file to your $PATH, for instance to ``~/bin/`` or ``.local/bin``.
+
+Build
+~~~~~
+
+1. Go to the repo directory (parent of ``src/``)
+2. Build main stylesheet file using ``tailwindcss`` executable from step 1 and
+   pointing to the included config file:
+
+   Manually::
+
+        tailwindcss -c src/argus_htmx/tailwindtheme/tailwind.config.js -i src/argus_htmx/tailwindtheme/styles.css --output src/argus_htmx/static/styles.css
+
+   Running with the ``--watch`` flag for automatic update on change seems
+   error-prone so we've made it very easy to run the command, with ``make`` or ``tox``::
+
+        make tailwind
+        tox -e tailwind
+
+   Either will rebuild the styles for you.
+
+Configure
+---------
+
+If *all the settings you need to change* can be set via environment variables,
+use ``argus.htmx.settings`` as your settings-file. Othwerise, read on.
+
+Do this in your workdir, which could be the checked out `argus-server`_ repo.
+
+This assumes that you have a local settings file (we recommend calling it
+"localsettings.py" since that is hidden by .gitignore) as a sibling of
+``src/``.
+
+At the top of this local settings file, copy the contents of
+``argus.htmx.settings``. This will base the settings-file on
+``argus.site.settings.backend`` and automatically use
+``argus.site.utils.update_settings`` with
+``argus.htmx.appconfig.APP_SETTINGS`` to set/overwrite some settings and
+mutate others. Note the usage of ``globals()``; due to this, inheriting from
+``argus.htmx.settings`` will probably not work as expected.
+
+Example, top of settings-file for production::
+
+   from argus.site.settings.backend import *
+   from argus.site.utils import update_settings
+   from argus_htmx.appconfig import APP_SETTINGS
+
+   update_settings(globals(), APP_SETTINGS)
+
+While developing you will probably prefer to swap out
+``argus.site.settings.backend`` with ``argus.site.settings.dev``, as the former
+is almost production-ready while the latter is tuned for development and
+depends on the optional dependencies you can install via ``pip install
+argus-server[dev]``.
+
+Example, top of settings-file for development::
+
+   from argus.site.settings.dev import *
+   from argus.site.utils import update_settings
+   from argus_htmx.appconfig import APP_SETTINGS
+
+   update_settings(globals(), APP_SETTINGS)
+
+The ``argus.site.utils.update_settings`` function will add or change the settings
+
+* INSTALLED_APPS
+* LOGIN_REDIRECT_URL
+* LOGIN_URL
+* LOGOUT_REDIRECT_URL
+* LOGOUT_URL
+* MIDDLEWARE
+* PUBLIC_URLS
+* ROOT_URLCONF
+* TEMPLATES
+
+See ``argus.htmx.appconfig._app_settings`` for what is being set.
+
+The management command ``printsettings`` (which depends on the app
+``django-extensions``, a ``dev``-dependency) will print out the complete
+settings used.
+
+Note especially that :setting:`ROOT_URLCONF` is set to ``argus.htmx.urls``. If
+you prefer to make your own root ``urls.py``, the frontend-specific urls can be
+imported from ``argus.htmx.htmx_urls``.
 
 Settings
 ========
-
-If you don't need to override any settings with a file at all (maybe there are
-environment variables for everything you need to change) you can use
-``argus.htmx.settings`` directly. If not, copy the contents of
-``argus.htmx.settings`` into the top of your tuned settings file.
-
-We mutate some of the existing settings with the same system used for extra
-apps and overriding apps so have a look at ``argus_htmx.appconfig`` for the
-individual settings. Note especially that :setting:`ROOT_URLCONF` is set to
-``argus.htmx.urls``. If you prefer to make your own root ``urls.py``, the
-frontend-specific urls can be imported from ``argus.htmx.htmx_urls``.
 
 Domain settings
 ---------------
@@ -114,3 +193,53 @@ sense to your end-users.
 You can look inside the JWT (in the model ``UserSocialAuth``, field
 ``extra_data``, key ``id_token``) for a different suitable value to use for
 a username.
+
+Optional authentication backend settings
+----------------------------------------
+
+RemoteUserBackend
+~~~~~~~~~~~~~~~~~
+
+If using ``django.contrib.auth.backends.RemoteUserBackend`` (which depends on
+the middleware ``django.contrib.auth.middleware.RemoteUserMiddleware``) there's
+an optional setting ``ARGUS_REMOTE_USER_METHOD_NAME`` to choose what to show on
+the button.
+
+It can be set via an environment variable of the same name.
+
+OpenIdConnectAuth
+~~~~~~~~~~~~~~~~~
+
+If using ``social_core.backends.open_id_connect.OpenIdConnectAuth`` there's an
+optional setting ``ARGUS_OIDC_METHOD_NAME`` to choose what to show on the
+button.
+
+It can be set via an environment variable of the same name.
+
+Page size
+---------
+
+By default, incidents are shown with a page size of ``10`` (ie. 10 rows at
+a time), and the user can select a different page size from ``[10, 20, 50,
+100]``. It possible to override these settings by setting the
+:setting:`ARGUS_INCIDENTS_DEFAULT_PAGE_SIZE` (an integer) and
+:setting:`ARGUS_INCIDENTS_PAGE_SIZES` setting respectively.
+
+Incident table column customization
+-----------------------------------
+
+You can customize which columns are shown in the incidents listing table by
+overriding the :setting:`INCIDENT_TABLE_COLUMNS` setting. See
+:ref:`customize-htmx-frontend` for examples.
+
+Themes
+------
+
+If you wish to change the available themes, first make sure the suport for
+Tailwind CSS and daisyUI has been installed, then see
+:ref:`customize-htmx-frontend`.
+
+Customization
+=============
+
+See :ref:`customize-htmx-frontend`.
