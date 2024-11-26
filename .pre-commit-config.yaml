@@ -12,13 +12,14 @@ repos:
     hooks:
         # Run the linter
     -   id: ruff
-        name: "Ruff: critical"
+        name: "Ruff linting"
         args: [
           '--output-format=full',
           '--statistics'
         ]
         # Run the formatter
     -   id: ruff-format
+        name: "Ruff formatting"
 -   repo: https://github.com/twisted/towncrier
     rev: 24.8.0
     hooks:
