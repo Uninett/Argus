@@ -1,0 +1,10 @@
+{% extends "htmx/incidents/_base_incident_update_modal.html" %}
+{% block dialogform %}
+  <label>
+    Change ticket
+    <input name="ticket_url"
+           value="{{ incident.ticket_url|default:"" }}"
+           placeholder="valid url or nothing"
+           class="input input-bordered w-full max-w-xs" />
+  </label>
+{% endblock dialogform %}

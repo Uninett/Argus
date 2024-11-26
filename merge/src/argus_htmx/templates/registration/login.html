@@ -1,0 +1,42 @@
+{% extends "htmx/base.html" %}
+{% load widget_tweaks %}
+{% block main %}
+  <div class="p-6 flex flex-col items-center gap-2">
+    <div class="card border border-primary p-2 w-full sm:w-96 flex items-center">
+      <h2 class="card-title">Log In</h2>
+      <section class="card-body">
+        {% if "local" in backends %}
+          <form method="post"
+                class="flex flex-col gap-6"
+                action="{{ backends.local.url }}">
+            {% csrf_token %}
+            {% for field in form %}
+              <label class="flex flex-row items-center gap-2">
+                <span class="w-24">{{ field.label }}:</span>
+                <div class="indicator">
+                  <span class="indicator-item indicator-top indicator-start badge border-none mask mask-circle text-warning text-base">＊</span>
+                  {{ field|add_class:"input input-bordered border-accent grow" }}
+                </div>
+              </label>
+            {% endfor %}
+            <button type="submit" class="btn btn-primary">{{ backends.local.display_name }}</button>
+          </form>
+        {% endif %}
+        {% if backends.external %}
+          <h3>Login with</h3>
+          {% for backend in backends.external %}
+            <a class="btn btn-primary" href="{{ backend.url }}">{{ backend.display_name }}</a>
+          {% endfor %}
+        {% endif %}
+      </section>
+    </div>
+    <div class="w-full sm:w-96">
+      {% for message in messages %}
+        <div class="alert border-2 {% if message.tags %}{{ message.tags }}{% endif %}">{{ message }}</div>
+      {% endfor %}
+    </div>
+  </div>
+{% endblock main %}
+{% comment %} disable default toast messages {% endcomment %}
+{% block messages %}
+{% endblock messages %}

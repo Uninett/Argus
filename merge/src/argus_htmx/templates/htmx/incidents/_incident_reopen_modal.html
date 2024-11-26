@@ -1,0 +1,10 @@
+{% extends "htmx/incidents/_base_incident_update_modal.html" %}
+{% block dialogform %}
+  <label>
+    Reason for reopening
+    <input name="description"
+           type="text"
+           placeholder="Reopening message"
+           class="input input-bordered w-full max-w-xs" />
+  </label>
+{% endblock dialogform %}

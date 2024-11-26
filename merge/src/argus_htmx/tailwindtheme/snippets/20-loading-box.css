@@ -1,0 +1,29 @@
+@layer components {
+  /*
+   * Example usage:
+   * <div class="loading-box">
+   *   <!-- Any content tag here -->
+   *   <div class="htmx-indicator">
+   *     <!-- Any optional feedback widget here -->
+   *   </div>
+   * </div>
+   */
+  .loading-box {
+    display: grid;
+    place-items: center;
+  }
+  /* Stacks direct children on top of each other */
+  .loading-box > * {
+    grid-column-start: 1;
+    grid-row-start: 1;
+  }
+  /* Adds overlay */
+  .loading-box:has(> .htmx-indicator.htmx-request) > *:not(.htmx-indicator) {
+    opacity: 0.3;
+  }
+  /* Disables mouse interactions */
+  .loading-box:has(> .htmx-indicator.htmx-request) * {
+    pointer-events: none;
+    user-select: none;
+  }
+}

@@ -1,0 +1,50 @@
+{% load widget_tweaks %}
+<form id="incident-filter-box"
+      hx-get="{% url 'htmx:incident-list' %}"
+      hx-include="#table-refresh-info, #incident-filter-box"
+      hx-trigger="keydown[keyCode==13], change delay:100ms"
+      hx-target="#table"
+      hx-swap="outerHTML"
+      hx-push-url="true"
+      hx-indicator="#incident-list .htmx-indicator"
+      onkeydown="if (event.keyCode === 13) event.preventDefault();">
+  <fieldset>
+    <legend class="sr-only">Filter incidents</legend>
+    <ul class="menu menu-horizontal menu-sm flex items-center gap-2 py-1.5">
+      {% for field in filter_form %}
+        <li class="form-control">
+          {% if field.name == "source" %}
+            <div class="flex flex-nowrap">
+              <label class="label">
+                <span class="label-text">{{ field.label }}</span>
+              </label>
+              {{ field }}
+            </div>
+          {% else %}
+            <label class="cursor-pointer label">
+              <span class="label-text">{{ field.label }}</span>
+              {% if field|field_type == "booleanfield" %}
+                {{ field|add_class:"checkbox checkbox-accent border" }}
+              {% elif field.name == "maxlevel" %}
+                <div>
+                  {{ field|add_class:"range range-primary range-xs" }}
+                  <div class="flex w-full justify-between px-2 text-xs">
+                    {% for tick in "12345" %}<span>{{ tick }}</span>{% endfor %}
+                  </div>
+                </div>
+              {% elif field|field_type == "choicefield" %}
+                {{ field|add_class:"select select-accent border" }}
+              {% elif field|field_type == "multiplechoicefield" %}
+                {{ field|attr:"size:1"|add_class:"select select-accent border" }}
+              {% elif field|field_type == "charfield" %}
+                {{ field|add_class:"input input-accent input-bordered border" }}
+              {% endif %}
+            </label>
+          {% endif %}
+        </li>
+      {% empty %}
+        <li>No filter fields configured</li>
+      {% endfor %}
+    </ul>
+  </fieldset>
+</form>

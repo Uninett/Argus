@@ -1,0 +1,18 @@
+{% for item in theme_list %}
+  <li>
+    <input type="radio"
+           class="theme-controller btn btn-sm btn-block btn-ghost justify-start"
+           value="{{ item }}"
+           aria-label="{{ item }}"
+           name="theme"
+           hx-post="{% url 'htmx:change-theme' %}"
+           hx-trigger="change"
+           hx-swap="outerHTML"
+           hx-target="previous summary .badge"
+           hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' />
+  </li>
+{% empty %}
+  <li>
+    <p>empty</p>
+  </li>
+{% endfor %}

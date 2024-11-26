@@ -1,0 +1,14 @@
+<details>
+  <summary>
+    Theme
+    {% include "./_current_theme.html" %}
+  </summary>
+  <ul class="max-h-64 overflow-y-scroll">
+    <li hx-get="{% url 'htmx:theme-names' %}"
+        hx-target="closest ul"
+        hx-swap="innerHTML"
+        hx-trigger="load">
+      <p>loading...</p>
+    </li>
+  </ul>
+</details>

@@ -1,0 +1,46 @@
+<form hx-get="{% url 'htmx:incident-list' %}"
+      id="table-refresh-info"
+      hx-trigger="change"
+      hx-target="#table"
+      hx-swap="outerHTML"
+      hx-indicator="#incident-list .htmx-indicator">
+  <dl class="stats stats-horizontal shadow leading-none overflow-x-auto font-medium bg-neutral text-neutral-content">
+    <div class="stat py-2">
+      <dt class="stat-title text-neutral-content/80">Total, all time</dt>
+      <dd class="stat-value text-base">
+        {{ count }}
+      </dd>
+    </div>
+    <div class="stat py-2">
+      <dt class="stat-title text-neutral-content/80">After filtering</dt>
+      <dd class="stat-value text-base">
+        {{ filtered_count }}
+      </dd>
+    </div>
+    <div class="stat py-2">
+      <dt class="stat-title text-neutral-content/80">Per page</dt>
+      <dd class="stat-value text-base">
+        <select class="select select-xs bg-transparent text-base border-none -ml-2"
+                name="page_size">
+          {% for ps in all_page_sizes %}
+            <option class="bg-neutral"
+                    value="{{ ps }}"
+                    {% if ps == preferences.argus_htmx.page_size %}selected{% endif %}>{{ ps }}</option>
+          {% endfor %}
+        </select>
+      </dd>
+    </div>
+    <div class="stat py-2">
+      <dt class="stat-title text-neutral-content/80">Last refreshed</dt>
+      <dd class="stat-value text-base">
+        {{ last_refreshed|date:preferences.argus_htmx.datetime_format|default:"?" }}
+      </dd>
+    </div>
+    <div class="stat py-2">
+      <dt class="stat-title text-neutral-content/80">Updating every</dt>
+      <dd class="stat-value text-base">
+        {{ update_interval|default:"?" }}s
+      </dd>
+    </div>
+  </dl>
+</form>
