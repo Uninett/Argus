@@ -66,7 +66,7 @@ dev = [
     "python-dotenv",
     "towncrier",
     "werkzeug",
-    "tox<4",  # does not work on tox 4 for some reason
+    "tox>=4",
     "build",  # for debugging builds/installs
 ]
 

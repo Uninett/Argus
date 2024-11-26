@@ -58,7 +58,7 @@ jobs:
         python -VV
         python -m site
         python -m pip install --upgrade pip "setuptools<46" wheel
-        python -m pip install --upgrade virtualenv tox tox-gh-actions coverage
+        python -m pip install --upgrade virtualenv "tox>=4" tox-gh-actions coverage
 
     - name: Set up PostgreSQL
       uses: harmon758/postgresql-action@v1

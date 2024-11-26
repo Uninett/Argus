@@ -75,8 +75,8 @@ of sub-dependencies so as to not poison the pyproject.toml.
 To update the dependency lock-files, use `tox`:
 
 ```console
-$ pip install tox
-$ tox -e upgrade-deps -- -U
+$ pip install "tox>=4"
+$ tox run -e upgrade-deps -- -U
 ```
 
 To upgrade a single dependency, replace the `-U` flag with `-P PACKAGENAME`.
