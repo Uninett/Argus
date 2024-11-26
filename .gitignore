@@ -7,6 +7,7 @@
 !.pre-commit-config.yaml
 !.readthedocs.yaml
 !.sonarcloud.properties
+!.mailmap
 
 # local config files
 cmd.sh
