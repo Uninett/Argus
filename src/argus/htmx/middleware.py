@@ -4,6 +4,7 @@ from django.http import HttpRequest, HttpResponse
 from django.template import loader
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.encoding import force_str
+from django_htmx.http import HttpResponseClientRedirect
 
 
 class LoginRequiredMiddleware:
@@ -43,7 +44,11 @@ class LoginRequiredMiddleware:
             return None
 
         # Redirect unauthenticated users to login page
-        return redirect_to_login(request.get_full_path(), self.login_url, "next")
+        response = redirect_to_login(request.get_full_path(), self.login_url, "next")
+        if request.htmx:
+            response = HttpResponseClientRedirect(response.url)
+
+        return response
 
 
 class HtmxMessageMiddleware(MiddlewareMixin):
