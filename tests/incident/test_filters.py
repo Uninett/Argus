@@ -1,10 +1,8 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
 from unittest.mock import Mock
 
-from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils import timezone
-from django.utils.timezone import is_aware, make_aware
 
 from argus.auth.factories import PersonUserFactory, SourceUserFactory
 from argus.incident.factories import (

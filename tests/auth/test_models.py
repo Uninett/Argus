@@ -1,7 +1,6 @@
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
-from django.core.exceptions import ValidationError
 from django.http import QueryDict
 
 from argus.auth.factories import PersonUserFactory, SourceUserFactory
