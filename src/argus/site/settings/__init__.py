@@ -122,7 +122,7 @@ def normalize_url(url):
     if scheme not in ("http", "https"):
         # nothing to normalize
         return url
-    if port == None or port not in (80, 443):
+    if port is None or port not in (80, 443):
         # nothing to normalize
         return url
     netloc = "".join(netloc.rsplit(":", 1)[0])
