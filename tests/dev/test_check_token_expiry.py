@@ -14,7 +14,7 @@ from argus.dev.management.commands.check_token_expiry import (
 )
 from argus.auth.factories import SourceUserFactory
 from argus.incident.factories import SourceSystemFactory
-from argus.incident.models import Incident, IncidentTagRelation, Tag, create_token_expiry_incident
+from argus.incident.models import Incident, Tag, create_token_expiry_incident
 from argus.util.testing import connect_signals, disconnect_signals
 
 
