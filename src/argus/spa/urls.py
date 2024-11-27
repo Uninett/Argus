@@ -1,6 +1,5 @@
-from django.urls import include, path, re_path
+from django.urls import path
 
-from social_django.urls import extra
 
 from argus.spa.views import AuthMethodListView, LogoutView
 
