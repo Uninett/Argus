@@ -10,12 +10,8 @@ from __future__ import annotations
 
 from factory import Faker
 import logging
-from typing import TYPE_CHECKING
 
 from .base import TicketPlugin
-
-if TYPE_CHECKING:
-    from argus.incident.models import Incident
 
 LOG = logging.getLogger(__name__)
 

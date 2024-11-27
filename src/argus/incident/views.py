@@ -33,14 +33,9 @@ from argus.incident.ticket.utils import (
     get_autocreate_ticket_plugin,
     serialize_incident_for_ticket_autocreation,
 )
-from argus.notificationprofile.media import (
-    send_notifications_to_users,
-    background_send_notification,
-)
 from argus.filter import get_filter_backend
 from argus.util.datetime_utils import INFINITY_REPR
 from argus.util.signals import bulk_changed
-from argus.util.utils import import_class_from_dotted_path
 
 from .forms import AddSourceSystemForm
 from .models import (
