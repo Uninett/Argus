@@ -110,7 +110,7 @@ class RequestNotificationProfileSerializerV1(serializers.ModelSerializer):
                     default_email_destination = instance.user.destinations.filter(media_id="email").get(
                         settings__email_address=instance.user.email
                     )
-                    if not default_email_destination in instance.destinations.all():
+                    if default_email_destination not in instance.destinations.all():
                         instance.destinations.add(default_email_destination)
 
         first_sms_destination = instance.destinations.filter(media_id="sms").order_by("pk").first()
