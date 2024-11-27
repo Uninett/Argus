@@ -83,7 +83,8 @@ class APITests(APITestCase):
         self.assertEqual(response.data["username"], self.normal_user1.username)
 
     def test_get_user_returns_the_correct_fields(self):
-        user_path = lambda user: reverse("v1:auth:user", args=[user.pk])
+        def user_path(user: User):
+            return reverse("v1:auth:user", args=[user.pk])
 
         def assert_correct_fields_for_user(user: User):
             response = self.normal_user1_client.get(user_path(user))
