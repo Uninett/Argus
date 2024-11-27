@@ -6,6 +6,8 @@ Source:
 https://channels.readthedocs.io/en/latest/deploying.html#run-protocol-servers
 """
 
+# ruff: noqa: E402 - module level import not on top of file
+
 import os
 
 from django.core.asgi import get_asgi_application
