@@ -1,6 +1,6 @@
 import json
 
-from rest_framework import fields, serializers
+from rest_framework import serializers
 from rest_framework import serializers
 
 from argus.incident.constants import Level

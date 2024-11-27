@@ -9,7 +9,6 @@ from django.utils import timezone
 from django_filters import rest_framework as filters
 from rest_framework.filters import SearchFilter
 from drf_rw_serializers import viewsets as rw_viewsets
-from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from drf_spectacular.utils import OpenApiParameter, OpenApiResponse
 from rest_framework import mixins, serializers, status, viewsets

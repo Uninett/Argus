@@ -1,5 +1,4 @@
 from django.db.models import Q
-from django.utils import timezone
 from rest_framework.authtoken.models import Token
 
 from argus.notificationprofile.media import send_notifications_to_users
