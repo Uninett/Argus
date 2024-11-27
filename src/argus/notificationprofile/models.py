@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime, time
 import logging
-from typing import TYPE_CHECKING, Dict, Optional
+from typing import TYPE_CHECKING, Optional
 
 from django.conf import settings
 from django.contrib.auth import get_user_model

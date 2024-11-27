@@ -1,5 +1,4 @@
 import json
-from typing import List
 
 from rest_framework import fields, serializers
 from rest_framework import serializers

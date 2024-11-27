@@ -15,8 +15,6 @@ from ..models import DestinationConfig
 from argus.util.datetime_utils import INFINITY, LOCAL_INFINITY
 
 if TYPE_CHECKING:
-    import sys
-
     from collections.abc import Iterable
 
     from types import NoneType
