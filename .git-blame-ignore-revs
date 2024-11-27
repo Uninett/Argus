@@ -10,5 +10,13 @@ a3b18cfbf32a2f0e6a9c55ead043fea12a71883e
 10dc8b7b612dddb042462718eea5b62f9d6455ea
 # Strip \r from lineends @hmpf 2024-10-15
 c7b7fa04e832df023f5cbb2f755fb81d172b3200
-# Format codebase using ruff @johannaenglad 17/10/2024
+# Format codebase using ruff @johannaengland 17/10/2024
 80d7bd7eb56b9ecfb16bac48229352efe575a426
+# Format all python with ruff @hmpf 07/10/2024
+47f713ddce20e3c751e3cbd05a8671dda8f9a054
+# Format HTML templates using djLint @johannaengland 28/10/2024
+0cd2a6561291dabccf435f19aca3f96323097e8b
+# Format login form with djLint @johannaengland 29/10/2024
+07313f9fbb9384489c6aa57885f3fecba358f288
+# Reformat middleware file using ruff @johannaengland 04/11/2024
+bc456a556e0df11b0f25420c5c6933c068adef10
