@@ -20,12 +20,9 @@ from .base import NotificationMedium
 from .email import send_email_safely
 
 if TYPE_CHECKING:
-    import sys
-
     from collections.abc import Iterable
 
-    from typing import Union, Set
-    from types import NoneType
+    from typing import Set
 
     from django.contrib.auth import get_user_model
     from django.db.models.query import QuerySet
