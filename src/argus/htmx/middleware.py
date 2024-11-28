@@ -45,7 +45,7 @@ class LoginRequiredMiddleware:
 
         # Redirect unauthenticated users to login page
         response = redirect_to_login(request.get_full_path(), self.login_url, "next")
-        if request.htmx:
+        if getattr(request, "htmx", False):
             response = HttpResponseClientRedirect(response.url)
 
         return response
