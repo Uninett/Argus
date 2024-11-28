@@ -1,5 +1,5 @@
 import functools
-from typing import Any, Dict, Optional, Union, Protocol
+from typing import Any, Optional, Union, Protocol
 
 from django.contrib.auth.models import AbstractUser, Group
 from django.db import models
@@ -187,14 +187,14 @@ class SessionPreferences:
 
 
 class PreferencesBase(Protocol):
-    FORMS: Dict[str, forms.Form]
-    _FIELD_DEFAULTS: Dict[str, Any]
+    FORMS: dict[str, forms.Form]
+    _FIELD_DEFAULTS: dict[str, Any]
 
     @classmethod
-    def get_defaults(cls) -> Dict[str, Any]:
+    def get_defaults(cls) -> dict[str, Any]:
         pass
 
-    def update_context(self, context: Dict[str, Any]) -> Dict[str, Any]:
+    def update_context(self, context: dict[str, Any]) -> dict[str, Any]:
         pass
 
 

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Dict, Optional, Any, Tuple
+from typing import TYPE_CHECKING, Optional, Any
 
 from django.conf import settings
 
@@ -21,7 +21,7 @@ __all__ = [
 
 
 TriState = Optional[bool]
-FilterBlobType = Dict[str, Any]  # Validator: drf serializer, depends on API version
+FilterBlobType = dict[str, Any]  # Validator: drf serializer, depends on API version
 
 
 LOG = logging.getLogger(__name__)
@@ -49,7 +49,7 @@ class FilterWrapper:
     def _get_filter_value(self, key: str) -> Optional[Any]:
         return self.filter.get(key, None)
 
-    def _get_filter_value_and_ignored_status(self, key: str) -> Tuple[Optional[Any], bool]:
+    def _get_filter_value_and_ignored_status(self, key: str) -> tuple[Optional[Any], bool]:
         filter_ = self._get_filter_value(key)
         if key in self.TRINARY_FILTERS:
             return filter_, filter_ is None

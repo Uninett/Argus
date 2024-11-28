@@ -4,7 +4,7 @@
 #
 # Uses composition, see bulk_change_incidents()
 
-from typing import List, Dict, Any
+from typing import Any
 
 from django.utils import timezone
 
@@ -16,7 +16,7 @@ def send_changed_incidents(incidents):
     bulk_changed.send(sender=Incident, instances=incidents)
 
 
-def get_qs_for_incident_ids(incident_ids: List[int], qs=None):
+def get_qs_for_incident_ids(incident_ids: list[int], qs=None):
     # setup
     if qs is None:
         qs = Incident.objects.all()
@@ -28,7 +28,7 @@ def get_qs_for_incident_ids(incident_ids: List[int], qs=None):
     return qs, missing_ids
 
 
-def bulk_ack_queryset(actor, qs, data: Dict[str, Any]):
+def bulk_ack_queryset(actor, qs, data: dict[str, Any]):
     timestamp = data["timestamp"]
     description = data.get("description", "")
     expiration = data.get("expiration", None)
@@ -39,7 +39,7 @@ def bulk_ack_queryset(actor, qs, data: Dict[str, Any]):
     return incidents
 
 
-def bulk_close_queryset(actor, qs, data: Dict[str, Any]):
+def bulk_close_queryset(actor, qs, data: dict[str, Any]):
     timestamp = data["timestamp"]
     description = data.get("description", "")
     events = qs.close(actor, timestamp, description)
@@ -49,7 +49,7 @@ def bulk_close_queryset(actor, qs, data: Dict[str, Any]):
     return incidents
 
 
-def bulk_reopen_queryset(actor, qs, data: Dict[str, Any]):
+def bulk_reopen_queryset(actor, qs, data: dict[str, Any]):
     timestamp = data["timestamp"]
     description = data.get("description", "")
     events = qs.reopen(actor, timestamp, description)
@@ -59,13 +59,13 @@ def bulk_reopen_queryset(actor, qs, data: Dict[str, Any]):
     return incidents
 
 
-def bulk_change_ticket_url_queryset(actor, qs, data: Dict[str, Any]):
+def bulk_change_ticket_url_queryset(actor, qs, data: dict[str, Any]):
     timestamp = data["timestamp"]
     ticket_url = data.get("ticket_url", "")
     return qs.update_ticket_url(actor, ticket_url, timestamp=timestamp)
 
 
-def bulk_change_incidents(actor, incident_ids: List[int], data: Dict[str, Any], func, qs=None):
+def bulk_change_incidents(actor, incident_ids: list[int], data: dict[str, Any], func, qs=None):
     """
     Update incidents in bulk
 

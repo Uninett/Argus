@@ -1,4 +1,4 @@
-from typing import Optional, List, Dict, Any
+from typing import Optional, Any
 
 from pydantic import BaseModel, Field, RootModel
 
@@ -12,10 +12,10 @@ class AppUrlSetting(BaseModel):
 class AppSetting(BaseModel):
     app_name: Optional[str] = None
     urls: Optional[AppUrlSetting] = None
-    context_processors: Optional[List[str]] = None
-    middleware: Optional[Dict[str, str]] = None
-    settings: Optional[Dict[str, Any]] = None
+    context_processors: Optional[list[str]] = None
+    middleware: Optional[dict[str, str]] = None
+    settings: Optional[dict[str, Any]] = None
 
 
 class ListAppSetting(RootModel):
-    root: List[AppSetting]
+    root: list[AppSetting]

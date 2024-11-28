@@ -1,5 +1,4 @@
 from collections import OrderedDict
-from typing import List, Tuple
 
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
@@ -26,7 +25,7 @@ from .models import (
 User = get_user_model()
 
 
-def clean_tag(value: str) -> Tuple[str, str]:
+def clean_tag(value: str) -> tuple[str, str]:
     try:
         [key, value] = Tag.split(value)
     except (ValueError, ValidationError) as e:
@@ -222,7 +221,7 @@ class IncidentPureDeserializer(serializers.ModelSerializer):
                 )
 
     @staticmethod
-    def add_and_remove_tags(instance: Incident, user: User, tags_data: List[dict]):
+    def add_and_remove_tags(instance: Incident, user: User, tags_data: list[dict]):
         posted_tags = {Tag.objects.get_or_create(**tag_data)[0] for tag_data in tags_data}
 
         existing_tag_relations = instance.incident_tag_relations.select_related("tag")

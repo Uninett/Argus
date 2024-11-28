@@ -7,7 +7,7 @@ if TYPE_CHECKING:
     from collections.abc import Iterable
 
     from types import NoneType
-    from typing import Union, Set
+    from typing import Union
 
     from django.contrib.auth import get_user_model
     from django.db.models.query import QuerySet
@@ -56,7 +56,7 @@ class NotificationMedium(ABC):
         pass
 
     @classmethod
-    def get_relevant_addresses(cls, destinations: Iterable[DestinationConfig]) -> Set[DestinationConfig]:
+    def get_relevant_addresses(cls, destinations: Iterable[DestinationConfig]) -> set[DestinationConfig]:
         """Returns a set of addresses the message should be sent to"""
         pass
 
