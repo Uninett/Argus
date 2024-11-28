@@ -44,7 +44,7 @@ but for better namespacing/isolation you can add them under ``oidc/``, ie::
     ...
   ]
 
-If you have the development depnendencies installed you can check if these
+If you have the development dependencies installed you can check if these
 urls are already included via the management command ``show_urls``.
 
 Example: Github Backend
