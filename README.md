@@ -44,13 +44,21 @@ about Dataporten registration, and how to set it up with Argus.
 
 #### Optional: New frontend
 
-You need to have `argus_htmx` installed.
+You need to have the frontend dependencies installed.
 
-If you will just be testing, install with `pip install argus-server[htmx]`.
+Either of
 
-If you will be developing argus-server *and* HTMx, clone the argus_htmx repo
-and `pip install -e .` into the same virtualenv that you have `pip install -e .`
-argus-server in.
+```
+pip install argus-server[htmx]
+```
+
+or
+
+```
+pip install -r requirements/htmx.txt
+```
+
+will do it.
 
 ### Install Argus using pip
 
