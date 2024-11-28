@@ -97,15 +97,6 @@ class GetUrlPatternsFromSettingsTest(unittest.TestCase):
 
 class UpdateContextProcessorsListTests(unittest.TestCase):
     def test_when_context_processor_setting_is_unset_it_should_do_nothing(self):
-        raw_setting = {
-            "app_name": "foo",
-            "urls": {
-                "path": "fghfh",
-                "urlpatterns_module": "django",  # must be a dotted path to a module in python path!
-                "namespace": "blbl",
-            },
-            # NO "context_processors"-key!
-        }
         TEMPLATES = []
         result = update_context_processors_list(TEMPLATES, None)
         self.assertEqual(result, TEMPLATES)
