@@ -27,6 +27,7 @@ class AuthMethodSerializer(serializers.Serializer):
 class AuthMethodListView(APIView):
     http_method_names = ["get", "head", "options", "trace"]
     permission_classes = [AllowAny]
+    login_required = False
 
     def get(self, request, *args, **kwargs):
         data = get_authentication_backend_name_and_type(request=request)
