@@ -108,7 +108,7 @@ extend-exclude = [
 output-format = "full"
 
 [tool.ruff.lint]
-select = ["E7", "E9", "F5", "F6", "F7", "F82", "F9"]
+select = ["E7", "E9", "F4", "F5", "F6", "F7", "F82", "F9"]
 ignore = ["F403", "F405"]
 
 [tool.towncrier]
