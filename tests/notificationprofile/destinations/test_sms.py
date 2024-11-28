@@ -198,12 +198,12 @@ class SMSMediumViewTests(APITestCase):
             }
         }
 
-        response = self.user1_rest_client.get(path=f"/api/v2/notificationprofiles/media/sms/json_schema/")
+        response = self.user1_rest_client.get(path="/api/v2/notificationprofiles/media/sms/json_schema/")
         self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
         self.assertEqual(response.data, schema)
 
     def test_should_get_sms_medium(self):
-        response = self.user1_rest_client.get(path=f"/api/v2/notificationprofiles/media/sms/")
+        response = self.user1_rest_client.get(path="/api/v2/notificationprofiles/media/sms/")
         self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
         self.assertEqual(response.data["name"], "SMS")
 
