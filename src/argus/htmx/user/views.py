@@ -21,6 +21,7 @@ def change_page_size(request: HtmxHttpRequest) -> HttpResponse:
     return HttpResponseClientRefresh()
 
 
+@require_GET
 def user_preferences(request) -> HttpResponse:
     """Renders the main preferences page for a user"""
     context = {
