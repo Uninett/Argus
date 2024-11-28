@@ -91,7 +91,7 @@ class TimeslotSerializerTests(TestCase):
         )
         # serializer.create works on already validated data
         with self.assertRaises(IntegrityError):
-            obj = serializer.create(validated_data)
+            serializer.create(validated_data)
 
     def test_can_update_timeslot(self):
         timeslot = TimeslotFactory(name="existing name", user=self.user)
@@ -127,4 +127,4 @@ class TimeslotSerializerTests(TestCase):
         )
         # serializer.create works on already validated data
         with self.assertRaises(IntegrityError):
-            obj = serializer.update(timeslot, validated_data)
+            serializer.update(timeslot, validated_data)

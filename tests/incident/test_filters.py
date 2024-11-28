@@ -112,7 +112,7 @@ class IncidentFilterTestCase(IncidentBasedAPITestCaseHelper, TestCase):
     def test_tags_single(self):
         user = SourceUserFactory()
         tag1 = TagFactory(key="testkey1", value="testvalue1")
-        tag2 = TagFactory(key="testkey2", value="testvalue2")
+        TagFactory(key="testkey2", value="testvalue2")
         incident5 = StatefulIncidentFactory(source=self.source1)
         for incident in (self.incident1, self.incident2, self.incident3):
             IncidentTagRelation.objects.get_or_create(tag=tag1, incident=incident, added_by=user)
