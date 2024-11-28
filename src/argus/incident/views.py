@@ -21,23 +21,13 @@ from rest_framework.response import Response
 from rest_framework.reverse import reverse
 
 from argus.drf.permissions import IsSuperuserOrReadOnly
-from argus.incident.models import Acknowledgement, Event
-from argus.incident.ticket.base import (
-    TicketClientException,
-    TicketCreationException,
-    TicketPluginException,
-    TicketSettingsException,
-)
-from argus.incident.ticket.utils import (
-    get_autocreate_ticket_plugin,
-    serialize_incident_for_ticket_autocreation,
-)
 from argus.filter import get_filter_backend
 from argus.util.datetime_utils import INFINITY_REPR
 from argus.util.signals import bulk_changed
 
 from .forms import AddSourceSystemForm
 from .models import (
+    Acknowledgement,
     ChangeEvent,
     Event,
     Incident,
@@ -62,6 +52,16 @@ from .serializers import (
     SourceSystemTypeSerializer,
     TagSerializer,
     IncidentTagRelation,
+)
+from .ticket.base import (
+    TicketClientException,
+    TicketCreationException,
+    TicketPluginException,
+    TicketSettingsException,
+)
+from .ticket.utils import (
+    get_autocreate_ticket_plugin,
+    serialize_incident_for_ticket_autocreation,
 )
 
 filter_backend = get_filter_backend()
