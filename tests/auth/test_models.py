@@ -20,7 +20,7 @@ class UserTypeTests(TestCase):
 
     def test_is_source_system(self):
         user = SourceUserFactory()
-        ss = SourceSystemFactory(user=user)
+        SourceSystemFactory(user=user)
         self.assertTrue(user.is_source_system)
 
 
@@ -56,7 +56,7 @@ class UserIsUsedTests(TestCase):
         user = SourceUserFactory()
         source = SourceSystemFactory(user=user)
 
-        incident = StatelessIncidentFactory(source=source)
+        StatelessIncidentFactory(source=source)
         self.assertTrue(user.is_used())
 
     def test_is_not_dormant_if_actor_of_event(self):
