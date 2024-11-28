@@ -8,7 +8,7 @@ from django.utils.module_loading import import_string
 
 from social_core.backends.oauth import BaseOAuth2
 
-from argus.auth.models import Preferences, SessionPreferences
+from argus.auth.models import SessionPreferences
 
 
 _all__ = [

@@ -2,8 +2,6 @@ import os
 import subprocess
 import logging.config
 
-from django.utils.log import DEFAULT_LOGGING
-
 from . import get_bool_env, get_str_env
 from .base import *  # noqa: F403
 from ..utils import update_settings
