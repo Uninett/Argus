@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from urllib.parse import urljoin
 import asyncio
 import itertools
-from typing import Any, Dict, AnyStr, List, Tuple
+from typing import Any, AnyStr
 
 from httpx import AsyncClient, TimeoutException, HTTPStatusError, post
 
@@ -19,14 +19,14 @@ class StressTester:
         self.worker_count = worker_count
         self._loop = asyncio.get_event_loop()
 
-    def _get_incident_data(self) -> Dict[str, Any]:
+    def _get_incident_data(self) -> dict[str, Any]:
         return {
             "start_time": datetime.now().isoformat(),
             "description": "Stresstest",
             "tags": [{"tag": "problem_type=stresstest"}],
         }
 
-    def _get_auth_header(self) -> Dict[str, str]:
+    def _get_auth_header(self) -> dict[str, str]:
         return {"Authorization": f"Token {self.token}"}
 
     def _get_incidents_v1_url(self) -> AnyStr:
@@ -35,7 +35,7 @@ class StressTester:
     def _get_incidents_v2_url(self) -> AnyStr:
         return urljoin(self.url, "/api/v2/incidents/")
 
-    def run(self, seconds: int) -> Tuple[List[int], timedelta]:
+    def run(self, seconds: int) -> tuple[list[int], timedelta]:
         """Runs a stresstest against the configured URL.
         The test will continually send requests for `seconds` seconds and stop when all requests have gotten a response.
         Returns a list containing the IDs of all created incidents and a timedelta detailing how long the test ran for.
@@ -47,12 +47,12 @@ class StressTester:
         runtime = datetime.now() - start_time
         return incident_ids, runtime
 
-    async def _run_stresstest_workers(self, end_time: datetime) -> List[int]:
+    async def _run_stresstest_workers(self, end_time: datetime) -> list[int]:
         async with AsyncClient(timeout=self.timeout) as client:
             results = await asyncio.gather(*(self._post_incidents(end_time, client) for _ in range(self.worker_count)))
             return list(itertools.chain.from_iterable(results))
 
-    async def _post_incidents(self, end_time: datetime, client: AsyncClient) -> List[int]:
+    async def _post_incidents(self, end_time: datetime, client: AsyncClient) -> list[int]:
         created_ids = []
         incident_data = self._get_incident_data()
         url = self._get_incidents_v1_url()
@@ -70,16 +70,16 @@ class StressTester:
                 raise HTTPStatusError(msg, request=e.request, response=e.response)
         return created_ids
 
-    def verify(self, incident_ids: List[int]):
+    def verify(self, incident_ids: list[int]):
         """Verifies that the incidents included in `incident_ids` exist and contain the expected values"""
         self._loop.run_until_complete(self._run_verification_workers(incident_ids))
 
-    async def _run_verification_workers(self, incident_ids: List[int]):
+    async def _run_verification_workers(self, incident_ids: list[int]):
         ids = incident_ids.copy()
         async with AsyncClient(timeout=self.timeout) as client:
             await asyncio.gather(*(self._verify_created_incidents(ids, client) for _ in range(self.worker_count)))
 
-    async def _verify_created_incidents(self, incident_ids: List[int], client: AsyncClient):
+    async def _verify_created_incidents(self, incident_ids: list[int], client: AsyncClient):
         while incident_ids:
             incident_id = incident_ids.pop()
             await self._verify_incident(incident_id, client)
@@ -99,21 +99,21 @@ class StressTester:
         self._verify_tags(response_data, expected_data)
         self._verify_description(response_data, expected_data)
 
-    def _verify_tags(self, response_data: Dict[str, Any], expected_data: Dict[str, Any]):
+    def _verify_tags(self, response_data: dict[str, Any], expected_data: dict[str, Any]):
         expected_tags = set([tag["tag"] for tag in expected_data["tags"]])
         response_tags = set([tag["tag"] for tag in response_data["tags"]])
         if expected_tags != response_tags:
             msg = f'Actual tag(s) "{response_tags}" differ(s) from expected tag(s) "{expected_tags}"'
             raise DatabaseMismatchError(msg)
 
-    def _verify_description(self, response_data: Dict[str, Any], expected_data: Dict[str, Any]):
+    def _verify_description(self, response_data: dict[str, Any], expected_data: dict[str, Any]):
         expected_descr = expected_data["description"]
         response_descr = response_data["description"]
         if response_descr != expected_descr:
             msg = f'Actual description "{response_descr}" differs from expected description "{expected_descr}"'
             raise DatabaseMismatchError(msg)
 
-    def bulk_ack(self, incident_ids: List[int]):
+    def bulk_ack(self, incident_ids: list[int]):
         """Sends a request to ACK all incidents included in `incident_ids`"""
         request_data = {
             "ids": incident_ids,

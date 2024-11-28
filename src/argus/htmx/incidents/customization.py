@@ -6,7 +6,7 @@ Currently customizable UI elements:
 """
 
 from dataclasses import dataclass
-from typing import List, Optional, Union
+from typing import Optional, Union
 
 from django.conf import settings
 
@@ -57,7 +57,7 @@ _BUILTIN_COLUMN_LIST = [
 BUILTIN_COLUMNS = {col.name: col for col in _BUILTIN_COLUMN_LIST}
 
 
-def get_incident_table_columns() -> List[IncidentTableColumn]:
+def get_incident_table_columns() -> list[IncidentTableColumn]:
     columns = getattr(settings, "INCIDENT_TABLE_COLUMNS", argus_htmx_settings.INCIDENT_TABLE_COLUMNS)
     return [_resolve_column(col) for col in columns]
 

@@ -1,5 +1,3 @@
-from typing import List
-
 from rest_framework import fields, serializers
 
 from argus.filter.primitive_serializers import CustomMultipleChoiceField
@@ -26,7 +24,7 @@ class ResponseNotificationProfileSerializerV1(serializers.ModelSerializer):
             "phone_number",
         ]
 
-    def get_media(self, profile: NotificationProfile) -> List[str]:
+    def get_media(self, profile: NotificationProfile) -> list[str]:
         media = []
         if profile.destinations.filter(media_id="email").exists():
             media.append("EM")

@@ -22,8 +22,6 @@ from .email import send_email_safely
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
-    from typing import Set
-
     from django.contrib.auth import get_user_model
     from django.db.models.query import QuerySet
 
@@ -88,7 +86,7 @@ class SMSNotification(NotificationMedium):
         return queryset.filter(settings__phone_number=settings["phone_number"]).exists()
 
     @classmethod
-    def get_relevant_addresses(cls, destinations: Iterable[DestinationConfig]) -> Set[DestinationConfig]:
+    def get_relevant_addresses(cls, destinations: Iterable[DestinationConfig]) -> set[DestinationConfig]:
         """Returns a list of phone numbers the message should be sent to"""
         phone_numbers = [
             destination.settings["phone_number"]
