@@ -106,6 +106,8 @@ Example, top of settings-file for production::
 
    update_settings(globals(), APP_SETTINGS)
 
+   ROOT_URLCONF = "argus.htmx.root_urls"
+
 While developing you will probably prefer to swap out
 ``argus.site.settings.backend`` with ``argus.site.settings.dev``, as the former
 is almost production-ready while the latter is tuned for development and
@@ -119,6 +121,8 @@ Example, top of settings-file for development::
    from argus.htmx.appconfig import APP_SETTINGS
 
    update_settings(globals(), APP_SETTINGS)
+
+   ROOT_URLCONF = "argus.htmx.root_urls"
 
 The ``argus.site.utils.update_settings`` function will add or change the settings
 
