@@ -20,6 +20,11 @@ repos:
         # Run the formatter
     -   id: ruff-format
         name: "Ruff formatting"
+-   repo: https://github.com/djlint/djLint
+    rev: v1.35.4
+    hooks:
+      - id: djlint-reformat-django
+      - id: djlint-django
 -   repo: https://github.com/twisted/towncrier
     rev: 24.8.0
     hooks:

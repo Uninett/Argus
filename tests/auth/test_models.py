@@ -245,9 +245,9 @@ class PreferencesManagerTests(TestCase):
         self.assertFalse(Preferences.objects.filter(user=user2).exists())
 
         Preferences.objects.create_missing_preferences()
-        # two each
-        self.assertEqual(Preferences.objects.filter(user=user1).count(), 2)
-        self.assertEqual(Preferences.objects.filter(user=user2).count(), 2)
+        # three each (two from tests, one from app)
+        self.assertEqual(Preferences.objects.filter(user=user1).count(), 3)
+        self.assertEqual(Preferences.objects.filter(user=user2).count(), 3)
 
     def test_get_all_defaults_returns_all_prefs_defaults(self):
         defaults = Preferences.objects.get_all_defaults()

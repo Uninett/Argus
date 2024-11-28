@@ -33,15 +33,19 @@ Add the backend path of your chosen provider to the start of the Django setting
 Update urls.py
 ==============
 
-You must add the ``social_django.urls`` to your ``ROOT_URLCONF`` urlpatterns. The
-``python-social-auth`` docs state to place the urls directly in your url root, but for better
-namespacing/isolation you can add them under ``oidc/``. ie::
+The urls in ``social_django.urls`` must be reacahable from the ``urls.py``
+pointed to by your :setting:``ROOT_URLCONF`` setting. The
+``python-social-auth`` docs state to place the urls directly in your url root,
+but for better namespacing/isolation you can add them under ``oidc/``, ie::
 
   urlpatterns = [
     ...
     path("oidc/", include("social_django.urls", namespace="social")),
     ...
   ]
+
+If you have the development dependencies installed you can check if these
+urls are already included via the management command ``show_urls``.
 
 Example: Github Backend
 =======================

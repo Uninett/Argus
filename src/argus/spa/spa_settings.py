@@ -28,4 +28,4 @@ AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
 ]
 
-ROOT_URLCONF = "argus.spa.urls"
+ROOT_URLCONF = "argus.spa.root_urls"

@@ -14,9 +14,10 @@ Settings
 ========
 
 Base the settings file on ``argus.spa.settings``. The individual settings are
-in ``argus.spa.spa_settings``, note especially that :setting:`ROOT_URLCONF` is set
-to ``argus.spa.urls``. If you prefer to make your own root ``urls.py``, the
-frontend-specific urls can be imported from ``argus.spa.spa_urls``.
+in ``argus.spa.spa_settings``, note especially that :setting:`ROOT_URLCONF` is
+set to ``argus.spa.root_urls``. If you prefer to make your own root
+``urls.py``, the frontend-specific urls can be imported from
+``argus.spa.spa_urls``.
 
 Domain settings
 ---------------

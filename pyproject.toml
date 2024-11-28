@@ -51,7 +51,10 @@ dynamic = ["version"]
 [project.optional-dependencies]
 docs = ["sphinx>=2.2.0"]
 htmx = [
-    "argus-htmx-frontend>=0.17",
+    "django-htmx",
+    "django-widget-tweaks==1.5.0",
+    "social-auth-core>=4.1",
+    "social-auth-app-django>=5.0",
 ]
 dev = [
     "django-debug-toolbar",
@@ -66,6 +69,11 @@ dev = [
     "tox<4",  # does not work on tox 4 for some reason
     "build",  # for debugging builds/installs
 ]
+
+[tool.djlint]
+profile="django"
+indent = 2
+ignore="H006"
 
 [tool.setuptools]
 include-package-data = true
