@@ -3,7 +3,7 @@
 {% block object-tools-items %}
   {% if has_add_permission %}
     <li>
-      <a href="fake/" class="addlink">Fake incident</a>
+      <a href="{% url "admin:add-fake-incident" %}" class="addlink">Fake incident</a>
     </li>
   {% endif %}
   {{ block.super }}
