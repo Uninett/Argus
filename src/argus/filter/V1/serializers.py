@@ -1,12 +1,10 @@
 import json
 
-from rest_framework import fields, serializers
 from rest_framework import serializers
 
 from argus.incident.constants import Level
 from argus.notificationprofile.models import Filter
 
-from ..primitive_serializers import CustomMultipleChoiceField
 from .validators import validate_filter_string
 
 
