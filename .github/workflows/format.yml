@@ -1,4 +1,4 @@
-name: Format codebase
+name: Verify formatting
 
 on:
   push:
@@ -6,13 +6,29 @@ on:
   pull_request:
 
 jobs:
-  format:
+  ruff:
     runs-on: ubuntu-latest
-    name: Format
+    name: Verify Python formatting
     steps:
     - uses: actions/checkout@v4
 
-    - name: Format
-      uses: astral-sh/ruff-action@v2
+    - uses: astral-sh/ruff-action@v2
       with:
         args: "format --check"
+
+  djlint:
+    runs-on: ubuntu-latest
+    name: Check HTML formatting
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+
+    - name: Install dependencies
+      run: |
+        pip install -U pip
+        pip install djlint
+
+    - name: Format HTML
+      run: djlint . --check
