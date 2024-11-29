@@ -75,6 +75,7 @@ dev = [
 profile="django"
 indent = 2
 ignore="H006"
+use_gitignore=true
 
 [tool.setuptools]
 include-package-data = true
