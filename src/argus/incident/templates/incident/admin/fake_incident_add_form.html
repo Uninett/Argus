@@ -1,67 +1,65 @@
 {% extends "admin/base_site.html" %}
 {% load i18n admin_urls static admin_modify %}
-
-{% block extrahead %}{{ block.super }}
-<script src="{% url 'admin:jsi18n' %}"></script>
+{% block extrahead %}
+  {{ block.super }}
+  <script src="{% url 'admin:jsi18n' %}"></script>
 {% endblock %}
-
-{% block extrastyle %}{{ block.super }}<link rel="stylesheet" href="{% static "admin/css/forms.css" %}">{% endblock %}
-
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static "admin/css/forms.css" %}">
+{% endblock %}
 {% block coltype %}colM{% endblock %}
-
 {% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }} change-form{% endblock %}
-
 {% block breadcrumbs %}
-<div class="breadcrumbs">
-<a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
-&rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
-&rsaquo; <a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
-&rsaquo; {% blocktranslate with name=opts.verbose_name %}Add fake incident{% endblocktranslate %}
-</div>
+  <div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
+    &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+    &rsaquo; <a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+    &rsaquo; {% blocktranslate with name=opts.verbose_name %}Add fake incident{% endblocktranslate %}
+  </div>
 {% endblock %}
-
-{% block content %}<div id="content-main">
-<form method="post" id="{{ opts.model_name }}_form" novalidate>{% csrf_token %}{% block form_top %}{% endblock %}
-<div>
-{% if errors %}
-    <p class="errornote">
-    {% blocktranslate count counter=errors|length %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktranslate %}
-    </p>
-    {{ adminform.form.non_field_errors }}
-{% endif %}
-
-<div>Note: Fake incidents are mainly used for testing. The fields in this form
-can be customized. If not customized the fields "description" and "level"
-will be filled randomly. "stateful" will be true by default and the tags
-"location=argus", "object={incident.id}" and  "problem_type=test" will be added
-to each fake incident. "metadata" will be an empty dictionary. All other fields
-of the incident will be filled with random data as well.</div>
-
-{% block field_sets %}
-{% for fieldset in adminform %}
-  {% include "admin/includes/fieldset.html" %}
-{% endfor %}
-{% endblock %}
-
-{% block after_field_sets %}{% endblock %}
-
-{% block after_related_objects %}{% endblock %}
-
-{% block submit_buttons_bottom %}
-<div class="submit-row"><input type="submit" value="{% translate 'Save' %}" class="default" name="_save"></div>
-{% endblock %}
-
-{% block admin_change_form_document_ready %}
-    <script id="django-admin-form-add-constants"
-            src="{% static 'admin/js/change_form.js' %}"
-            data-model-name="{{ opts.model_name }}"
-            async>
-    </script>
-{% endblock %}
-
-{# JavaScript for prepopulated fields #}
-{% prepopulated_fields_js %}
-
-</div>
-</form></div>
+{% block content %}
+  <div id="content-main">
+    <form method="post" id="{{ opts.model_name }}_form" novalidate>
+      {% csrf_token %}
+      {% block form_top %}{% endblock %}
+      <div>
+        {% if errors %}
+          <p class="errornote">
+            {% blocktranslate count counter=errors|length %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktranslate %}
+          </p>
+          {{ adminform.form.non_field_errors }}
+        {% endif %}
+        <div>
+          Note: Fake incidents are mainly used for testing. The fields in this form
+          can be customized. If not customized the fields "description" and "level"
+          will be filled randomly. "stateful" will be true by default and the tags
+          "location=argus", "object={incident.id}" and  "problem_type=test" will be added
+          to each fake incident. "metadata" will be an empty dictionary. All other fields
+          of the incident will be filled with random data as well.
+        </div>
+        {% block field_sets %}
+          {% for fieldset in adminform %}
+            {% include "admin/includes/fieldset.html" %}
+          {% endfor %}
+        {% endblock %}
+        {% block after_field_sets %}{% endblock %}
+        {% block after_related_objects %}{% endblock %}
+        {% block submit_buttons_bottom %}
+          <div class="submit-row">
+            <input type="submit"
+                   value="{% translate 'Save' %}"
+                   class="default"
+                   name="_save">
+          </div>
+        {% endblock %}
+        {% block admin_change_form_document_ready %}
+          <script id="django-admin-form-add-constants" src="{% static 'admin/js/change_form.js' %}" data-model-name="{{ opts.model_name }}" async>
+          </script>
+        {% endblock %}
+        {# JavaScript for prepopulated fields #}
+        {% prepopulated_fields_js %}
+      </div>
+    </form>
+  </div>
 {% endblock %}
