@@ -8,6 +8,32 @@ This project uses [*towncrier*](https://towncrier.readthedocs.io/) and the chang
 
 <!-- towncrier release notes start -->
 
+## [1.28.0] - 2024-11-29
+
+This version marks the inclusion of our new, alpha web frontend. It does not do
+everything the existing standalone frontend does yet, hence alpha. See docs for
+how to test.
+
+### Added
+
+- We are now linting html with djLint
+- Add new (unfinished) app: argus.htmx. Thiis is a new frontend written quite
+  old-style, with HTML enhanced with HTMx. This used to live in its own app
+  (PyPI: argus-htmx-frontend) and repo
+  (https://github.com/Uninett/argus-htmx-frontend/) and is in the process of
+  being completely merged with argus-server. All new issues and PR's should be
+  made towards the argus-server repo. Unfinished branches and issues should be
+  moved over here. PR's merged after the move will be moved by us.
+- Added a short howto on how to try to fix a broken migration. Remember, it is
+  always less stress to restore a backup!
+
+### Changed
+
+- We're switching from black to ruff, and will both lint and format code going
+  forward.
+- Use tox version 4 to run test suite
+
+
 ## [1.27.0] - 2024-11-13
 
 ### Added

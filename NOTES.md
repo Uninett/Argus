@@ -3,6 +3,12 @@
 This file documents changes to Argus that are relevant for operations and
 end-users.
 
+## [1.28.0] - 2024-11-29
+
+This version marks the inclusion of our new, alpha web frontend. It does not do
+everything the existing standalone frontend does yet, hence alpha. See docs for
+how to test.
+
 ## [1.27.0] - 2024-11-13
 
 The big but hidden new feature this time is a new database table to hold user
