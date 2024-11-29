@@ -12,7 +12,7 @@
 {% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }} change-form{% endblock %}
 {% block breadcrumbs %}
   <div class="breadcrumbs">
-    <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
+    <a href="{% url 'admin:index' %}">{% translate "Home" %}</a>
     &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
     &rsaquo; <a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
     &rsaquo; {% blocktranslate with name=opts.verbose_name %}Add fake incident{% endblocktranslate %}
@@ -48,7 +48,7 @@
         {% block submit_buttons_bottom %}
           <div class="submit-row">
             <input type="submit"
-                   value="{% translate 'Save' %}"
+                   value="{% translate "Save" %}"
                    class="default"
                    name="_save">
           </div>
