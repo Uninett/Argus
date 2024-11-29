@@ -1,48 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
+  <head>
     <meta charset="UTF-8">
     <title>Argus incident #{{ pk }}</title>
-</head>
-
-<body>
+  </head>
+  <body>
     <h1 hidden>Argus incident #{{ pk }}</h1>
     <h2>Description</h2>
     <p>{{ description }}</p>
-
     <h2>Start time</h2>
     <p>{{ start_time }}</p>
-
     {% if end_time != "infinity" %}
-    <h2>End time</h2>
-    <p>{{ end_time }}</p>
+      <h2>End time</h2>
+      <p>{{ end_time }}</p>
     {% endif %}
-
     <h2>Source</h2>
     <p>{{ source.name }}</p>
-
     <h2>Argus URL</h2>
     <p>{{ argus_url }}</p>
-
     <h2>Details URL</h2>
     <p>{{ details_url }}</p>
-
     <h2>Tags</h2>
-    {% for tag in tags %}
-    <p>{{ tag.tag }}</p>
-    {% endfor %}
-
+    {% for tag in tags %}<p>{{ tag.tag }}</p>{% endfor %}
     <h2>Argus User</h2>
     {{ user }}
-
     {% if missing_fields %}
-    <h2>Missing fields/tags</h2>
-    {% for field in missing_fields %}
-    <p>{{ field }}</p>
-    {% endfor %}
+      <h2>Missing fields/tags</h2>
+      {% for field in missing_fields %}<p>{{ field }}</p>{% endfor %}
     {% endif %}
-
-</body>
-
+  </body>
 </html>
