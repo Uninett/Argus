@@ -8,15 +8,32 @@ on:
     - cron: '0 6 * * *'
 
 jobs:
-  lint:
+  ruff:
     runs-on: ubuntu-latest
-    name: Lint
+    name: Lint Python
     steps:
     - uses: actions/checkout@v4
     - uses: astral-sh/ruff-action@v2
 
+  djlint:
+    runs-on: ubuntu-latest
+    name: Lint HTML
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+
+    - name: Install dependencies
+      run: |
+        pip install -U pip
+        pip install djlint
+
+    - name: Lint HTML
+      run: djlint --lint .
+
   test:
-    needs: lint
+    needs: ruff
 
     name: "Python ${{ matrix.python-version }}"
     runs-on: ubuntu-latest
