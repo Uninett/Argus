@@ -9,11 +9,13 @@
           content="monitoring, notifications, dashboard, events, incidents, alerts, alarms, monitoring systems, monitoring applications, monitoring tools, monitoring software">
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    {% block title %}<title>Argus Server: {{ page_title }}</title>{% endblock %}
+    {% block title %}
+      <title>Argus Server: {{ page_title }}</title>
+    {% endblock title %}
     {% block head %}
     {% endblock head %}
   </head>
-  <body {% block body_overrides %}{% endblock %}>
+  <body {% block body_overrides %}{% endblock body_overrides %}>
     {% block header %}
       <h1>Argus Server: {{ page_title }}</h1>
     {% endblock header %}
