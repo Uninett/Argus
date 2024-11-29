@@ -61,6 +61,7 @@ dev = [
     "coverage",
     "django-extensions",
     "ruff",
+    "djlint",
     "ipython",
     "pre-commit",
     "python-dotenv",
