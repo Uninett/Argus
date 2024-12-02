@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
 from django import forms
-from django.core.exceptions import ValidationError as DjangoValidationError
+from django.core.exceptions import ValidationError
 
 from ..models import DestinationConfig
 
@@ -66,7 +66,7 @@ class NotificationMedium(ABC):
 
     @classmethod
     def validate(
-        cls, data: dict, user: User, instance: DestinationConfig = None, exception_class=DjangoValidationError
+        cls, data: dict, user: User, instance: DestinationConfig = None, exception_class=ValidationError
     ) -> dict:
         if instance:
             if data.get("media", None) != instance.media.slug:
@@ -86,7 +86,7 @@ class NotificationMedium(ABC):
         return form
 
     @classmethod
-    def validate_settings(cls, data: dict, user: User, exception_class=DjangoValidationError) -> dict:
+    def validate_settings(cls, data: dict, user: User, exception_class=ValidationError) -> dict:
         """
         Validates the settings of destination and returns a dict with
         validated and cleaned data
