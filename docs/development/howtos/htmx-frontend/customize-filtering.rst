@@ -3,20 +3,23 @@ How to customize filtering the incidents list
 =============================================
 
 Incident list filtering is governed by the ``incident_list_filter`` function. By default, this
-function is imported from ``argus_htmx.incidents.filter``, but that module can be changed by
-overriding the ``ARGUS_HTMX_FILTER_FUNCTION`` to point to a different module. That module should
-contain a ``incident_list_filter`` function. It has the following signature::
+function is located at ``argus.htmx.incidents.filter.incident_list_filter`` but this location
+can be changed by overriding the ``ARGUS_HTMX_FILTER_FUNCTION`` to point to a different function.
+The function has the the following signature::
 
   def incident_list_filter(request: HttpRequest, qs: IncidentQuerySet) -> tuple[Form, IncidentQuerySet]:
       ...
 
-When loading the incidents list, this function is called with the request and the base incident
-queryset, and allows for updating this queryset. This way, the queryset can for example be
-filtered, reordered and/or data may be added (such as through ``annotate``).
+For backwards compatibility, it is also possible to specify a module in
+``ARGUS_HTMX_FILTER_FUNCTION`` instead of a function. Argus will then look for a function called
+``incident_list_filter`` inside that module.
+
+When loading the incidents list, the incident_list_filter function is called with the request and
+the base incident queryset, and allows for updating this queryset. This way, the queryset can for
+example be filtered, reordered and/or data may be added (such as through ``annotate``).
 
 Aside from the updated queryset, ``incident_list_filter`` returns a ``django.forms.Form``. This
 form is used to populate the incident filterbox and any filterable columns
-
 
 Filterable columns
 ------------------
