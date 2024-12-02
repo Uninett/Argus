@@ -14,6 +14,7 @@ INCIDENT_TABLE_COLUMNS = [
     "description",
     "ticket",
 ]
+ARGUS_HTMX_FILTER_FUNCTION = "argus.htmx.incidents.filter.incident_list_filter"
 
 # These templates are auto-discovered by the templating engine and are relative
 # to the argus.htmx's `templates/` directory
