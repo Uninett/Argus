@@ -137,16 +137,25 @@ class RequestDestinationConfigSerializer(serializers.ModelSerializer):
         ]
 
     def validate(self, attrs: dict):
-        if self.instance and "media" in attrs.keys() and not attrs["media"].slug == self.instance.media.slug:
-            raise serializers.ValidationError("Media cannot be updated, only settings.")
-        if "settings" in attrs.keys():
-            if not isinstance(attrs["settings"], dict):
-                raise serializers.ValidationError("Settings has to be a dictionary.")
-            if self.instance:
-                medium = api_safely_get_medium_object(self.instance.media.slug)
-            else:
-                medium = api_safely_get_medium_object(attrs["media"].slug)
-            attrs["settings"] = medium.validate(self, attrs, self.context["request"].user)
+        settings = attrs.get("settings", None)
+        if not settings:
+            return attrs
+
+        if self.instance:
+            medium = api_safely_get_medium_object(self.instance.media.slug)
+            if attrs.get("media", None) != medium.slug:
+                raise serializers.ValidationError(medium.error_messages["readonly_medium"])
+            user = self.instance.user
+            if user != self.context["request"].user:
+                raise serializers.ValidationError(medium.error_messages["readonly_user"])
+        else:
+            medium = api_safely_get_medium_object(attrs["media"].slug)
+            user = self.context["request"].user
+
+        if not isinstance(attrs["settings"], dict):
+            raise serializers.ValidationError(medium.error_messages["settings_type"])
+
+        attrs["settings"] = medium.validate_settings(attrs, user, serializers.ValidationError)
 
         return attrs
 

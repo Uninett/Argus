@@ -3,25 +3,32 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
-from rest_framework.exceptions import ValidationError
+from django import forms
+from django.core.exceptions import ValidationError as DjangoValidationError
+
+from ..models import DestinationConfig
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
     from types import NoneType
-    from typing import Union
+    from typing import Union, Set
 
     from django.contrib.auth import get_user_model
     from django.db.models.query import QuerySet
 
     from argus.incident.models import Event
-    from ..models import DestinationConfig
-    from ..serializers import RequestDestinationConfigSerializer
 
     User = get_user_model()
 
 
 __all__ = ["NotificationMedium"]
+
+
+class CommonDestinationConfigForm(forms.ModelForm):
+    class Meta:
+        model = DestinationConfig
+        fields = ["media", "label"]
 
 
 class NotificationMedium(ABC):
@@ -45,6 +52,12 @@ class NotificationMedium(ABC):
       destinations of type MEDIA_SLUG.
     """
 
+    error_messages = {
+        "readonly_medium": "Media cannot be updated, only settings.",
+        "readonly_user": "User cannot be changed, only settings.",
+        "settings_type": "Settings has to be a dictionary.",
+    }
+
     class NotDeletableError(Exception):
         """
         Custom exception class that is raised when a destination cannot be
@@ -52,20 +65,40 @@ class NotificationMedium(ABC):
         """
 
     @classmethod
-    def validate(cls, instance: RequestDestinationConfigSerializer, dict_: dict, user: User) -> dict:
+    def validate(
+        cls, data: dict, user: User, instance: DestinationConfig = None, exception_class=DjangoValidationError
+    ) -> dict:
+        if instance:
+            if data.get("media", None) != instance.media.slug:
+                raise exception_class(cls.error_messages["readonly_media"])
+            form = CommonDestinationConfigForm(data, instance=instance)
+            if instance.user != user:
+                raise exception_class(cls.error_messages["readonly_user"])
+        else:
+            form = CommonDestinationConfigForm(data)
+
+        if not form.is_valid():
+            raise exception_class(form.errors)
+
+        settings_form = cls.validate_settings(data)
+        form.cleaned_data["settings"] = settings_form.cleaned_data
+        form.cleaned_data["user"] = user
+        return form
+
+    @classmethod
+    def validate_settings(cls, data: dict, user: User, exception_class=DjangoValidationError) -> dict:
         """
         Validates the settings of destination and returns a dict with
         validated and cleaned data
         """
-        form = cls.Form(dict_["settings"])
+        form = cls.Form(data["settings"])
         if not form.is_valid():
-            raise ValidationError(form.errors)
-        return form.cleaned_data
+            raise exception_class(form.errors)
 
         form = cls.clean(form)
 
         if cls.has_duplicate(user.destinations):
-            raise ValidationError(cls.MEDIA_SETTINGS_KEY, f"{cls.MEDIA_NAME} already exists")
+            raise exception_class(cls.MEDIA_SETTINGS_KEY, f"{cls.MEDIA_NAME} already exists")
 
         return form.cleaned_data
 
