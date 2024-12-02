@@ -7,9 +7,13 @@ DEFAULT_MODULE = "argus.htmx.incidents.filter"
 
 
 def get_filter_function():
-    dotted_path = getattr(settings, "ARGUS_HTMX_FILTER_FUNCTION", DEFAULT_MODULE)
-    module = importlib.import_module(dotted_path)
-    function = getattr(module, FUNCTION_NAME, None)
-    if function:
-        return function
-    raise ImportError(f"Could not import {FUNCTION_NAME} from {dotted_path}")
+    setting = getattr(settings, "ARGUS_HTMX_FILTER_FUNCTION", DEFAULT_MODULE)
+    if callable(setting):
+        return setting
+    if isinstance(setting, str):
+        module = importlib.import_module(setting)
+        function = getattr(module, FUNCTION_NAME, None)
+        if function:
+            return function
+        raise ImportError(f"Could not import {FUNCTION_NAME} from {setting}")
+    raise TypeError(f"ARGUS_HTMX_FILTER_FUNCTION must be a callable or string")
