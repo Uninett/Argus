@@ -22,6 +22,9 @@ class IncidentTableColumn:
     :param cell_template: template to use when rendering a cell for this column
     :param context: additional context to pass to the rendering cell. Will be made
         available as ``cell_context`` in the cell template
+    :param filter_field: when given, this column is considered filterable and a filter
+        input is attached to the column header that can provide a query param with `filter_field`
+        as the key
     """
 
     name: str  # identifier
@@ -29,6 +32,7 @@ class IncidentTableColumn:
     cell_template: str
     header_template: Optional[str] = None
     context: Optional[dict] = None
+    filter_field: Optional[str] = None
 
 
 _BUILTIN_COLUMN_LIST = [

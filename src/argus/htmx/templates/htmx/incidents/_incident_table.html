@@ -13,6 +13,8 @@
           <th class="border-b border-primary">
             {% if col.header_template %}
               {% include col.header_template with label=col.label %}
+            {% elif col.filter_field %}
+              {% include "htmx/incidents/_incident_filterable_column.html" with column=col %}
             {% else %}
               {{ col.label }}
             {% endif %}
