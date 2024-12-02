@@ -54,6 +54,7 @@ def prefetch_incident_daughters():
 
 
 # fetch with htmx
+@require_GET
 def incident_detail(request, pk: int):
     incident = get_object_or_404(Incident, id=pk)
     context = {
@@ -96,6 +97,7 @@ def filter_form(request: HtmxHttpRequest):
     return render(request, "htmx/incidents/_incident_filterbox.html", context=context)
 
 
+@require_GET
 def incident_list(request: HtmxHttpRequest) -> HttpResponse:
     columns = get_incident_table_columns()
 
