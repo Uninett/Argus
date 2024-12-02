@@ -1,10 +1,12 @@
 from django.conf import settings
 from django.contrib.auth.views import redirect_to_login
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpResponse
 from django.template import loader
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.encoding import force_str
 from django_htmx.http import HttpResponseClientRedirect
+from django.contrib import messages
+from .request import HtmxHttpRequest
 
 
 class LoginRequiredMiddleware:
@@ -59,7 +61,7 @@ class HtmxMessageMiddleware(MiddlewareMixin):
 
     TEMPLATE = "messages/_notification_messages_htmx_append.html"
 
-    def process_response(self, request: HttpRequest, response: HttpResponse) -> HttpResponse:
+    def process_response(self, request: HtmxHttpRequest, response: HttpResponse) -> HttpResponse:
         if not request.htmx:
             return response
 
@@ -70,5 +72,23 @@ class HtmxMessageMiddleware(MiddlewareMixin):
         if not response.writable():
             return response
 
+        # For HTMX error responses, the view should make sure to write the appropriate message to
+        # django messages framework. However, if it doesn't, we add a (generic) message so that we
+        # can at least send some indication to the user that something has gone wrong.
+        if response.status_code >= 400:
+            storage = messages.get_messages(request)
+            has_error_message = any("error" in message.tags for message in storage)
+            storage.used = False
+            if not has_error_message:
+                messages.error(request, "An error occured while processing your request, please try again")
+            # HTMX doesn't swap content for response codes >=400. However, we do want to show
+            # the new messages, so we need to rewrite the response to 200, and make sure it only
+            # swaps the oob notification content
+            response = HttpResponse(
+                headers={
+                    "HX-Retarget": "#notification-messages .toast",
+                    "HX-Reswap": "beforeend",
+                }
+            )
         response.write(loader.render_to_string(self.TEMPLATE, request=request))
         return response
