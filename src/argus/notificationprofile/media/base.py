@@ -157,11 +157,23 @@ class NotificationMedium(ABC):
                 f"Cannot delete this destination since it is in use in the notification profile(s): {profiles}."
             )
 
-    @staticmethod
-    def update(destination: DestinationConfig, validated_data: dict) -> Union[DestinationConfig, NoneType]:
+    @classmethod
+    def _update_destination(cls, destination: DestinationConfig, validated_data: dict) -> DestinationConfig:
+        # adpated from rest_framework.serializers.ModelSerializer.update
+        # DestinationConfig MUST NOT have any m2m-relations so this is safe
+
+        for attr, value in validated_data.items():
+            setattr(destination, attr, value)
+
+        return destination
+
+    @classmethod
+    def update(cls, destination: DestinationConfig, validated_data: dict) -> Union[DestinationConfig, NoneType]:
         """
-        Updates a destination in case the normal update function is not
-        sufficient and returns the updated destination in that case,
-        returns None otherwise
+        Updates a destination
+
+        Override in case the normal update function is not sufficient
         """
-        return None
+        instance = cls._update_destination(destination, validated_data)
+        instance.save()
+        return instance

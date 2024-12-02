@@ -162,11 +162,7 @@ class RequestDestinationConfigSerializer(serializers.ModelSerializer):
     def update(self, destination: DestinationConfig, validated_data: dict):
         medium = api_safely_get_medium_object(destination.media.slug)
         updated_destination = medium.update(destination, validated_data)
-
-        if updated_destination:
-            return updated_destination
-
-        return super().update(destination, validated_data)
+        return updated_destination
 
 
 class DuplicateDestinationSerializer(serializers.Serializer):

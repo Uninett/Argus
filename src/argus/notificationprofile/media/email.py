@@ -164,23 +164,43 @@ class EmailNotification(BaseEmailNotification):
                 "Cannot delete this email destination since it was defined by an outside source."
             )
 
-    @staticmethod
-    def update(destination: DestinationConfig, validated_data: dict) -> Union[DestinationConfig, NoneType]:
+    @classmethod
+    def _clone_if_changing_email_address(cls, destination: DestinationConfig, validated_data: dict):
+        if not destination.settings["synced"]:
+            return False
+
+        new_address = validated_data["settings"][cls.MEDIA_SETTINGS_KEY]
+        old_address = destination.settings[cls.MEDIA_SETTINGS_KEY]
+        if new_address == old_address:  # address wasn't changed
+            return False
+
+        settings = {
+            "synced": True,
+            cls.MEDIA_SETTINGS_KEY: old_address,
+        }
+        cloned_destination = DestinationConfig.objects.create(
+            user=destination.user,
+            media_id=destination.media_id,
+            settings=settings,
+            label=cls.get_label(destination),
+        )
+        LOG.info("Cloning synced email-address on update: %s", old_address)
+        return True
+
+    @classmethod
+    def update(cls, destination: DestinationConfig, validated_data: dict) -> DestinationConfig:
         """
-        Updates the synced email destination by copying its contents to
+        Preserves a synced email destination by cloning its contents to
         a new destination and updating the given destination with the given
         validated data and returning the updated destination
 
         This way the synced destination is not lost
         """
-        if destination.settings["synced"]:
-            new_synced_destination = DestinationConfig(
-                user=destination.user,
-                media_id=destination.media_id,
-                settings=destination.settings,
-            )
-            destination.settings = validated_data["settings"]
-            DestinationConfig.objects.bulk_update([destination], fields=["settings"])
-            new_synced_destination.save()
-            return destination
-        return None
+        cls._clone_if_changing_email_address(destination, validated_data)
+
+        # We cannot use super() here since this is not an instance method
+        instance = cls._update_destination(destination, validated_data)
+        instance.settings["synced"] = False
+
+        instance.save()
+        return instance
