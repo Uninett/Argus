@@ -45,10 +45,10 @@ class TestRegularColumn(test.TestCase):
         request.htmx = False
         self.response = incident_list(request)
 
-    def test_adds_filter_button_to_header(self):
+    def test_doesnt_add_filter_button_to_header(self):
         self.assertNotContains(self.response, '_="on click toggle .hidden on next .column-filter"')
 
-    def test_doesnt_add_filter_to_filterbox(self):
+    def test_add_filter_to_filterbox(self):
         self.assertContains(self.response, '<span class="label-text">Description</span>')
 
 
