@@ -23,7 +23,10 @@
         <div class="divider divider-end">
           <button type="submit"
                   form="{{ dialog_id }}-form"
-                  class="btn {{ button_class|default:"btn-primary" }}">{{ submit_text }}</button>
+                  class="btn {{ button_class|default:'btn-primary' }} loading-box">
+            <span>{{ submit_text }}</span>
+            <div class="htmx-indicator loading loading-spinner"></div>
+          </button>
           <button class="btn">{{ cancel_text }}</button>
         </div>
       </form>
