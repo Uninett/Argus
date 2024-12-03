@@ -1,0 +1,1 @@
+Return user to login page on unauthenticated HTMX request
