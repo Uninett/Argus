@@ -139,7 +139,7 @@ class RequestDestinationConfigSerializer(serializers.ModelSerializer):
     def validate(self, attrs: dict):
         settings = attrs.get("settings", None)
         if not settings:
-            return attrs
+            raise serializers.ValidationError("Settings cannot be empty")
 
         if self.instance:
             medium = api_safely_get_medium_object(self.instance.media.slug)
