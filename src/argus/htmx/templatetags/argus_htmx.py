@@ -32,3 +32,8 @@ def pp_level(level: int) -> str:
     if level not in mapping:
         return mapping["5"]
     return mapping[level]
+
+
+@register.filter
+def fieldvalue(form, fieldname):
+    return form[fieldname].value() or ""
