@@ -54,6 +54,7 @@ class SMSNotification(NotificationMedium):
     class Form(forms.Form):
         phone_number = PhoneNumberField()
 
+    @classmethod
     def clean(cls, form: Form) -> Form:
         form.cleaned_data[cls.MEDIA_SETTINGS_KEY] = form.cleaned_data[cls.MEDIA_SETTINGS_KEY].as_e164
         return form
