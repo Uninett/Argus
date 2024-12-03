@@ -97,13 +97,13 @@ class NotificationMedium(ABC):
 
         form = cls.clean(form)
 
-        if cls.has_duplicate(user.destinations):
+        if cls.has_duplicate(user.destinations, data["settings"]):
             raise exception_class(cls.MEDIA_SETTINGS_KEY, f"{cls.MEDIA_NAME} already exists")
 
         return form.cleaned_data
 
     @classmethod
-    def clean(cls, form):
+    def clean(cls, form: forms.Form) -> forms.Form:
         """Can change the cleaned data of a valid form"""
         return form
 
