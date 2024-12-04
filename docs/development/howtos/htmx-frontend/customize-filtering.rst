@@ -10,8 +10,9 @@ The function has the the following signature::
   def incident_list_filter(request: HttpRequest, qs: IncidentQuerySet) -> tuple[Form, IncidentQuerySet]:
       ...
 
-For backwards compatibility, it is also possible to specify a module in
-``ARGUS_HTMX_FILTER_FUNCTION`` instead of a function. Argus will then look for a function called
+The ``ARGUS_HTMX_FILTER_FUNCTION`` can either take a function directly or a dotted path to an
+importable function. For backwards compatibility, it is also possible to specify a dotted path
+to a module instead of a function. Argus will then look for a function called
 ``incident_list_filter`` inside that module.
 
 When loading the incidents list, the incident_list_filter function is called with the request and
