@@ -108,7 +108,7 @@ class BaseEmailNotification(NotificationMedium):
         Returns False if no email destinations were given and
         True if emails were sent
         """
-        email_addresses = cls.get_relevant_addresses(destinations=destinations)
+        email_addresses = cls.get_relevant_destination_settings(destinations=destinations)
         if not email_addresses:
             return False
         num_emails = len(email_addresses)
