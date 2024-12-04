@@ -1,12 +1,7 @@
-from unittest.mock import Mock
-
 from django import test
-from django.http import HttpResponseRedirect
-from django.test.client import RequestFactory
 
 from argus.htmx.incidents.filter import incident_list_filter
 from argus.htmx.incidents.utils import get_filter_function
-from argus.htmx.middleware import LoginRequiredMiddleware
 
 
 class TestGetFilterFunction(test.TestCase):
