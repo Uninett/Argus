@@ -1,19 +1,16 @@
 from django import test
 
-from argus.auth.factories import SourceUserFactory
-from argus.htmx.incidents.filter import incident_list_filter
 from argus.htmx.incidents.utils import get_filter_function
-from argus.incident.factories import SourceSystemFactory
 
 
 class TestGetFilterFunction(test.TestCase):
     def setUp(self) -> None:
-        # ensure we have a SourceSystem to keep django happy
-        user = SourceUserFactory()
-        SourceSystemFactory(user=user)
+        from argus.htmx.incidents.filter import incident_list_filter
+
+        self.incident_list_filter = incident_list_filter
 
     def test_gets_incident_list_filter_by_default(self):
-        self.assertIs(get_filter_function(), incident_list_filter)
+        self.assertIs(get_filter_function(), self.incident_list_filter)
 
     def test_gets_callable_directly(self):
         sentinel = object
@@ -22,8 +19,11 @@ class TestGetFilterFunction(test.TestCase):
     def test_gets_incident_list_filter_from_dotted_path(self):
         self.assertIs(
             get_filter_function("argus.htmx.incidents.filter.incident_list_filter"),
-            incident_list_filter,
+            self.incident_list_filter,
         )
 
     def test_gets_incident_list_filter_from_module(self):
-        self.assertIs(get_filter_function("argus.htmx.incidents.filter"), incident_list_filter)
+        self.assertIs(
+            get_filter_function("argus.htmx.incidents.filter"),
+            self.incident_list_filter,
+        )
