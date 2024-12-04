@@ -5,6 +5,9 @@ from argus.htmx.incidents.utils import get_filter_function
 
 class TestGetFilterFunction(test.TestCase):
     def setUp(self) -> None:
+        # importing incident_list_filter requires a fully migrated database. During tests,
+        # especially in CI, this cannot be guaranteed if we import incident_list_filter at the
+        # top of this file. So we postpone importing until the tests are run.
         from argus.htmx.incidents.filter import incident_list_filter
 
         self.incident_list_filter = incident_list_filter
