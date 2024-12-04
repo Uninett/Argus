@@ -38,4 +38,4 @@ def get_filter_function(arg=None):
                 return function
             raise ImportError(f"Could not import {FUNCTION_NAME_DEFAULT} from {arg}")
 
-    raise TypeError(f"ARGUS_HTMX_FILTER_FUNCTION must be a callable or string")
+    raise TypeError("ARGUS_HTMX_FILTER_FUNCTION must be a callable or string")
