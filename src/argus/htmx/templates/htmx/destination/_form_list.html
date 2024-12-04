@@ -1,0 +1,15 @@
+<div id="form-list">
+  {% for media, forms in grouped_forms.items %}
+    <details class="collapse bg-base-200 collapse-arrow" open="">
+      <summary class="collapse-title text-xl font-medium">{{ media.name }} ({{ forms|length }})</summary>
+      <div class="collapse-content">
+        {% for form in forms %}
+          <div class="flex w-full h-fit items-center">
+            {% include "htmx/destination/_edit_form.html" %}
+            {% include "htmx/destination/_delete_form.html" %}
+          </div>
+        {% endfor %}
+      </div>
+    </details>
+  {% endfor %}
+</div>

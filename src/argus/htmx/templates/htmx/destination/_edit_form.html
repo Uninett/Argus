@@ -1,5 +1,6 @@
-<form action="{% url 'htmx:destination-update' form.instance.id %}"
-      method="post"
+<form hx-post="{% url 'htmx:htmx-update' form.instance.id %}"
+      hx-trigger="submit"
+      hx-target="#form-list"
       class="flex flex-nowrap items-center gap-4">
   {% csrf_token %}
   <fieldset class="flex flex-nowrap items-center gap-4">
