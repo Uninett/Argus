@@ -126,6 +126,7 @@ class NotificationMedium(ABC):
 
     # No querysets beyond this point!
 
+    @classmethod
     def _get_relevant_destinations(cls, destinations: Iterable[DestinationConfig]) -> Generator[DestinationConfig]:
         return (destination for destination in destinations if destination.media_id == cls.MEDIA_SLUG)
 
