@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from collections.abc import Iterable
 
     from types import NoneType
-    from typing import Union, Set
+    from typing import Union
 
     from django.contrib.auth import get_user_model
     from django.db.models.query import QuerySet
@@ -69,7 +69,7 @@ class NotificationMedium(ABC):
         cls, data: dict, user: User, instance: DestinationConfig = None, exception_class=ValidationError
     ) -> dict:
         if instance:
-            if data.get("media", None) != instance.media.slug:
+            if data.get("media", "") != instance.media.slug:
                 raise exception_class(cls.error_messages["readonly_media"])
             form = CommonDestinationConfigForm(data, instance=instance)
             if instance.user != user:
@@ -120,14 +120,14 @@ class NotificationMedium(ABC):
     @classmethod
     def get_label(cls, destination: DestinationConfig) -> str:
         """
-        Returns a descriptive label for this destination.
+        Returns a descriptive label for this destination if none is stored
         """
-        return destination.settings.get(cls.MEDIA_SETTINGS_KEY)
+        return destination.label if destination.label else destination.settings.get(cls.MEDIA_SETTINGS_KEY)
 
     # No querysets beyond this point!
 
     @classmethod
-    def get_relevant_destinations(cls, destinations: Iterable[DestinationConfig]) -> Set[DestinationConfig]:
+    def get_relevant_destinations(cls, destinations: Iterable[DestinationConfig]) -> set[DestinationConfig]:
         """Returns a set of addresses the message should be sent to"""
         destinations = [
             destination.settings[cls.MEDIA_SETTINGS_KEY]
@@ -159,7 +159,7 @@ class NotificationMedium(ABC):
 
     @classmethod
     def _update_destination(cls, destination: DestinationConfig, validated_data: dict) -> DestinationConfig:
-        # adpated from rest_framework.serializers.ModelSerializer.update
+        # adapted from rest_framework.serializers.ModelSerializer.update
         # DestinationConfig MUST NOT have any m2m-relations so this is safe
 
         for attr, value in validated_data.items():
