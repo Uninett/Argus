@@ -1,10 +1,17 @@
 from django import test
 
+from argus.auth.factories import SourceUserFactory
 from argus.htmx.incidents.filter import incident_list_filter
 from argus.htmx.incidents.utils import get_filter_function
+from argus.incident.factories import SourceSystemFactory
 
 
 class TestGetFilterFunction(test.TestCase):
+    def setUp(self) -> None:
+        # ensure we have a SourceSystem to keep django happy
+        user = SourceUserFactory()
+        SourceSystemFactory(user=user)
+
     def test_gets_incident_list_filter_by_default(self):
         self.assertIs(get_filter_function(), incident_list_filter)
 
