@@ -144,7 +144,7 @@ class RequestDestinationConfigSerializer(serializers.ModelSerializer):
         if self.instance:
             medium = api_safely_get_medium_object(self.instance.media.slug)
             # A PATCH need not contain the media key
-            if getattr(attrs, "media", None) != self.instance.media:
+            if attrs.get("media", None) != self.instance.media:
                 raise serializers.ValidationError(medium.error_messages["readonly_medium"])
             user = self.instance.user
             if user != self.context["request"].user:
