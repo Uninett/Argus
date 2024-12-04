@@ -133,14 +133,15 @@ update
 
 validate
    The function ``validate`` makes sure that a destination with the given
-   settings can be updated or created.
-   For
-   example for SMS the given phone number will be checked. Django forms can be
-   helpful for validation. A ``ValidationError`` should be raised if the given
-   settings are invalid and the validated and cleaned data should be returned
-   if not. It is unlikely taht you will nedd to ever override this method.
+   settings can be updated or created. It uses the ``validate_settings`` method
+   to validate the settings-field, and a form (CommonDestinationConfigForm) to
+   validate the media and label-fields. The validated form is returned if ok,
+   otherwise a ``ValidationError`` should be raised. It is unlikely that you
+   will ever need to override this method.
 
 validate_settings
    This method validates the actual contents of the settings-field using the
    ``Form`` that is defined. The function ``has_duplicate`` can be used here to
    ensure that not two destinations with the same settings will be created.
+   A ``ValidationError`` should be raised  if the given settings are invalid,
+   and the validated and cleaned data should be returned if not.
