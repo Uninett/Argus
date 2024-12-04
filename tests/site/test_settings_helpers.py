@@ -107,7 +107,8 @@ class UpdateContextProcessorsListTests(unittest.TestCase):
             # NO "context_processors"-key!
         }
         TEMPLATES = []
-        result = update_context_processors_list(TEMPLATES, None)
+        app_setting = AppSetting(**raw_setting)
+        result = update_context_processors_list(TEMPLATES, [app_setting])
         self.assertEqual(result, TEMPLATES)
 
     def test_when_template_setting_is_falsey_it_should_do_nothing(self):
