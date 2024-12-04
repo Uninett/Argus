@@ -141,17 +141,16 @@ class RequestDestinationConfigSerializer(serializers.ModelSerializer):
         if not settings:
             raise serializers.ValidationError("Settings cannot be empty")
 
-        if not attrs["media"]:
-            raise serializers.ValidationError('Key "media" missing from input')
-
         if self.instance:
             medium = api_safely_get_medium_object(self.instance.media.slug)
-            if self.instance.media != attrs["media"]:
+            # A PATCH need not contain the media key
+            if getattr(attrs, "media", None) != self.instance.media:
                 raise serializers.ValidationError(medium.error_messages["readonly_medium"])
             user = self.instance.user
             if user != self.context["request"].user:
                 raise serializers.ValidationError(medium.error_messages["readonly_user"])
         else:
+            # new, not a PATCH
             medium = api_safely_get_medium_object(attrs["media"].slug)
             user = self.context["request"].user
 
