@@ -11,51 +11,51 @@ from argus.notificationprofile.media.base import NotificationMedium
 from .forms import DestinationFormCreate, DestinationFormUpdate
 
 
-@require_http_methods(["GET", "POST"])
+@require_http_methods(["GET"])
 def destination_list(request):
-    if request.method == "GET":
-        return _render_destination_list(request)
-    elif request.method == "POST":
-        return destination_create(request)
-
-
-def destination_create(request) -> HttpResponse:
-    form = DestinationFormCreate(request.POST or None, request=request)
-    if form.is_valid():
-        form.save()
-        return _render_destination_list(request)
-    return _render_destination_list(request, create_form=form)
+    return _render_destination_list(request)
 
 
 @require_http_methods(["POST"])
-def destination_delete(request, pk: int) -> HttpResponse:
-    destination = get_object_or_404(request.user.destinations.all(), pk=pk)
+def create_htmx(request) -> HttpResponse:
+    form = DestinationFormCreate(request.POST or None, request=request)
+    template = "htmx/destination/_content.html"
+    if form.is_valid():
+        form.save()
+        return _render_destination_list(request, template=template)
+    return _render_destination_list(request, create_form=form, template=template)
 
+
+@require_http_methods(["POST"])
+def delete_htmx(request, pk: int) -> HttpResponse:
+    destination = get_object_or_404(request.user.destinations.all(), pk=pk)
+    template = "htmx/destination/_form_list.html"
     try:
         medium = api_safely_get_medium_object(destination.media.slug)
         medium.raise_if_not_deletable(destination)
     except NotificationMedium.NotDeletableError:
         error_msg = "This destination cannot be deleted."
-        return _render_destination_list(request, errors=[error_msg])
+        return _render_destination_list(request, errors=[error_msg], template=template)
     else:
         destination.delete()
-        return _render_destination_list(request)
+        return _render_destination_list(request, template=template)
 
 
 @require_http_methods(["POST"])
-def destination_update(request, pk: int) -> HttpResponse:
+def update_htmx(request, pk: int) -> HttpResponse:
     destination = DestinationConfig.objects.get(pk=pk)
     form = DestinationFormUpdate(request.POST or None, instance=destination, request=request)
+    template = "htmx/destination/_form_list.html"
     if form.is_valid():
         form.save()
-        return _render_destination_list(request)
+        return _render_destination_list(request, template=template)
 
     update_forms = _get_update_forms(request.user)
     for index, update_form in enumerate(update_forms):
         if update_form.instance.pk == pk:
             update_forms[index] = form
             break
-    return _render_destination_list(request, update_forms=update_forms)
+    return _render_destination_list(request, update_forms=update_forms, template=template)
 
 
 def _render_destination_list(
@@ -63,6 +63,7 @@ def _render_destination_list(
     create_form: Optional[DestinationFormCreate] = None,
     update_forms: Optional[Sequence[DestinationFormUpdate]] = None,
     errors: Optional[Sequence[str]] = None,
+    template: str = "htmx/destination/destination_list.html",
 ) -> HttpResponse:
     """Function to render the destinations page.
 
@@ -86,7 +87,7 @@ def _render_destination_list(
         "grouped_forms": grouped_forms,
         "errors": errors,
     }
-    return render(request, "htmx/destination/destination_list.html", context=context)
+    return render(request, template, context=context)
 
 
 def _get_update_forms(user) -> list[DestinationFormUpdate]:
