@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from collections.abc import Iterable
 
     from types import NoneType
-    from typing import Union
+    from typing import Union, Generator
 
     from django.contrib.auth import get_user_model
     from django.db.models.query import QuerySet
@@ -126,17 +126,18 @@ class NotificationMedium(ABC):
 
     # No querysets beyond this point!
 
+    def _get_relevant_destinations(cls, destinations: Iterable[DestinationConfig]) -> Generator[DestinationConfig]:
+        return (destination for destination in destinations if destination.media_id == cls.MEDIA_SLUG)
+
     @classmethod
-    def get_relevant_destinations(cls, destinations: Iterable[DestinationConfig]) -> set[DestinationConfig]:
+    def get_relevant_destination_settings(cls, destinations: Iterable[DestinationConfig]) -> set[str]:
         """Returns a set of addresses the message should be sent to"""
         destinations = [
-            destination.settings[cls.MEDIA_SETTINGS_KEY]
-            for destination in destinations
-            if destination.media_id == cls.MEDIA_SLUG
+            destination.settings[cls.MEDIA_SETTINGS_KEY] for destination in cls._get_relevant_destinations(destinations)
         ]
         return set(destinations)
 
-    get_relevant_addresses = get_relevant_destinations
+    get_relevant_addresses = get_relevant_destination_settings
 
     @classmethod
     @abstractmethod
