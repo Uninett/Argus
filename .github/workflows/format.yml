@@ -16,4 +16,3 @@ jobs:
       uses: astral-sh/ruff-action@v2
       with:
         args: "format --check"
-        changed-files: 'true'
