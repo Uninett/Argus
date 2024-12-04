@@ -18,12 +18,8 @@ if TYPE_CHECKING:
     from collections.abc import Iterable
 
     from types import NoneType
-    from typing import Union, Set
 
     from django.contrib.auth import get_user_model
-    from django.db.models.query import QuerySet
-
-    from ..serializers import RequestDestinationConfigSerializer
 
     User = get_user_model()
 
@@ -178,7 +174,7 @@ class EmailNotification(BaseEmailNotification):
             "synced": True,
             cls.MEDIA_SETTINGS_KEY: old_address,
         }
-        cloned_destination = DestinationConfig.objects.create(
+        DestinationConfig.objects.create(
             user=destination.user,
             media_id=destination.media_id,
             settings=settings,
