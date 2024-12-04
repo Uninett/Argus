@@ -13,7 +13,6 @@ from django import forms
 from django.conf import settings
 from django.core.mail import send_mail
 from phonenumber_field.formfields import PhoneNumberField
-from rest_framework.exceptions import ValidationError
 
 from ...incident.models import Event
 from .base import NotificationMedium
@@ -23,10 +22,8 @@ if TYPE_CHECKING:
     from collections.abc import Iterable
 
     from django.contrib.auth import get_user_model
-    from django.db.models.query import QuerySet
 
     from ..models import DestinationConfig
-    from ..serializers import RequestDestinationConfigSerializer
 
     User = get_user_model()
 
