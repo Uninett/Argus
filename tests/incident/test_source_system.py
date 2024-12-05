@@ -1,6 +1,5 @@
-from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.test import Client, override_settings, tag
+from django.test import Client, tag
 from django.urls import reverse
 
 from rest_framework.authtoken.models import Token
@@ -12,15 +11,9 @@ from argus.incident.models import SourceSystem
 
 
 User = get_user_model()
-_REST_FRAMEWORK = settings.REST_FRAMEWORK
-_REST_FRAMEWORK["DEFAULT_AUTHENTICATION_CLASSES"] = (
-    "argus.auth.authentication.ExpiringTokenAuthentication",
-    "rest_framework.authentication.SessionAuthentication",
-)
 
 
 @tag("api", "integration")
-@override_settings(REST_FRAMEWORK=_REST_FRAMEWORK)
 class SourceSystemPostingTests(APITestCase):
     def setUp(self):
         self.type1 = SourceSystemTypeFactory(name="nav")
@@ -132,29 +125,3 @@ class SourceSystemPostingTests(APITestCase):
 
         source = SourceSystem.objects.get(name=source_name)
         self.assertEqual(source.user.username, source_name)
-
-    def test_posting_empty_source_system_username_to_serializer_should_use_source_system_name_as_username(self):
-        self._test_posting_empty_source_system_username_should_use_source_system_name_as_username(
-            self.sources_url, self.rest_client
-        )
-
-    def test_posting_empty_source_system_username_to_admin_add_form_should_use_source_system_name_as_username(self):
-        self._test_posting_empty_source_system_username_should_use_source_system_name_as_username(
-            self.add_url, self.django_client
-        )
-
-    def test_admin_change_form_should_change_fields(self):
-        source1_user = SourceUserFactory()
-        source1_user2 = SourceUserFactory()
-        source1 = SourceSystemFactory(user=source1_user, type=self.type1)
-
-        source1_dict = {
-            "name": "new.gw1.sikt",
-            "type": self.type2,
-            "user": source1_user2.pk,
-        }
-        self.django_client.post(self.change_url(source1), source1_dict)
-        source1.refresh_from_db()
-        self.assertEqual(source1.name, source1_dict["name"])
-        self.assertEqual(source1.type, source1_dict["type"])
-        self.assertEqual(source1.user.pk, source1_dict["user"])

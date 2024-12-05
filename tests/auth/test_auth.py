@@ -1,5 +1,3 @@
-from django.test import override_settings
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 
@@ -13,14 +11,8 @@ from . import assemble_token_auth_kwarg, expire_token
 
 
 User = get_user_model()
-_REST_FRAMEWORK = settings.REST_FRAMEWORK
-_REST_FRAMEWORK["DEFAULT_AUTHENTICATION_CLASSES"] = (
-    "argus.auth.authentication.ExpiringTokenAuthentication",
-    "rest_framework.authentication.SessionAuthentication",
-)
 
 
-@override_settings(REST_FRAMEWORK=_REST_FRAMEWORK)
 class AuthTokenAPITests(APITestCase):
     def setUp(self):
         self.superuser1_password = "best_admin#1"

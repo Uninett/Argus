@@ -6,7 +6,7 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.exceptions import AuthenticationFailed
 
 
-class ExpiringTokenAuthentication(TokenAuthentication):
+class DeprecatedExpiringTokenAuthentication(TokenAuthentication):
     EXPIRATION_DURATION = timedelta(days=settings.AUTH_TOKEN_EXPIRES_AFTER_DAYS)
 
     def authenticate_credentials(self, key):
