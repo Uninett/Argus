@@ -42,6 +42,7 @@ dependencies = [
     "channels-redis>=4",
     "httpx",
     "pydantic>=2",
+    "django-rest-knox",
 ]
 dynamic = ["version"]
 

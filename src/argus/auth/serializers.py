@@ -3,7 +3,6 @@ from typing import Optional
 from rest_framework import serializers
 from rest_framework.reverse import reverse
 
-
 from .models import User
 
 
@@ -45,10 +44,6 @@ class UsernameSerializer(serializers.ModelSerializer):
             "username",
         ]
         read_only_fields = ["pk", "username"]
-
-
-class RefreshTokenSerializer(serializers.Serializer):
-    token = serializers.CharField(label=("Token"), read_only=True)
 
 
 class EmptySerializer(serializers.Serializer):
