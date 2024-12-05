@@ -1,6 +1,8 @@
+from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.test import Client
+from django.test import Client, override_settings, tag
 from django.urls import reverse
+
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient, APITestCase
 
@@ -10,8 +12,15 @@ from argus.incident.models import SourceSystem
 
 
 User = get_user_model()
+_REST_FRAMEWORK = settings.REST_FRAMEWORK
+_REST_FRAMEWORK["DEFAULT_AUTHENTICATION_CLASSES"] = (
+    "argus.auth.authentication.ExpiringTokenAuthentication",
+    "rest_framework.authentication.SessionAuthentication",
+)
 
 
+@tag("api", "integration")
+@override_settings(REST_FRAMEWORK=_REST_FRAMEWORK)
 class SourceSystemPostingTests(APITestCase):
     def setUp(self):
         self.type1 = SourceSystemTypeFactory(name="nav")

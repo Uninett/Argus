@@ -1,5 +1,8 @@
+from django.test import override_settings
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.urls import reverse
+
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient, APITestCase
@@ -10,9 +13,15 @@ from . import assemble_token_auth_kwarg, expire_token
 
 
 User = get_user_model()
+_REST_FRAMEWORK = settings.REST_FRAMEWORK
+_REST_FRAMEWORK["DEFAULT_AUTHENTICATION_CLASSES"] = (
+    "argus.auth.authentication.ExpiringTokenAuthentication",
+    "rest_framework.authentication.SessionAuthentication",
+)
 
 
-class APITests(APITestCase):
+@override_settings(REST_FRAMEWORK=_REST_FRAMEWORK)
+class AuthTokenAPITests(APITestCase):
     def setUp(self):
         self.superuser1_password = "best_admin#1"
         self.superuser1 = AdminUserFactory(username="superuser1", password=self.superuser1_password)
