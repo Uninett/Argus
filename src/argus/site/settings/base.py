@@ -195,8 +195,8 @@ if FRONTEND_URL:
 # fmt: off
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
-        "knox.auth.TokenAuthentication",
         "argus.auth.authentication.ExpiringTokenAuthentication",
+        "knox.auth.TokenAuthentication",
         # For BrowsableAPIRenderer
         "rest_framework.authentication.SessionAuthentication",
     ),
