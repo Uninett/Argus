@@ -173,3 +173,25 @@ You could then create ``path/to/_extra_widget.html`` as following::
     <div id="service-status" class="border border-primary rounded-2xl h-full p-2">
       My custom widget
     </div>
+
+
+Toast messages
+--------------
+
+``argus_htmx`` uses the `Django Messages`_ framework to dynamically display notifications toast
+messages to the user. Some of these messages stay on screen until the user refreshes, while others
+automatically close (disappear) after a certain time. This can be customized by modifying or
+overriding the ``NOTIFICATION_TOAST_AUTOCLOSE_SECONDS`` setting. The default value for this setting
+is::
+
+  NOTIFICATION_TOAST_AUTOCLOSE_SECONDS = {
+      "success": 10,
+      "autoclose": 10,
+  }
+
+This means that any message that has either the `tag`_ ``"success"`` or ``"autoclose"`` will
+automatically close after 10 seconds. You can update this dictionary with existing tags such as
+``"warning"`` or ``"error"``, or make up your own.
+
+.. _Django Messages: https://docs.djangoproject.com/en/5.1/ref/contrib/messages
+.. _tag: https://docs.djangoproject.com/en/5.1/ref/contrib/messages/#message-tags
