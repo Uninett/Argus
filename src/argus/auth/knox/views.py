@@ -21,6 +21,9 @@ class JsonAuthentication:
 
         return (user, None)
 
+    def authenticate_header(self, request):
+        pass
+
 
 class LoginView(KnoxLoginView):
     authentication_classes = (JsonAuthentication, *KnoxLoginView.authentication_classes)
