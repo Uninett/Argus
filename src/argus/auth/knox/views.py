@@ -46,7 +46,8 @@ class JsonAuthentication(BaseAuthentication):
                 AuthTokenSerializer,
                 EmptySerializer,
             ],
-            resource_type_field_name="blbl",
+            # this is abuse of PolymorphicProxySerializer, must be set
+            resource_type_field_name="random_string",
         ),
         responses={
             200: serializers.KnoxLoginResponseSerializer,
