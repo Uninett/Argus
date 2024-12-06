@@ -16,10 +16,6 @@ class JsonAuthenticationTests(APITestCase):
     def teardown(self):
         connect_signals()
 
-    def test_authenticate_header_returns_None(self):
-        jsonauth = JsonAuthentication()
-        self.assertIsNone(jsonauth.authenticate_header(None))
-
     def test_authenticate_golden_path(self):
         password = "cvbfghcfgvdhyu"
         user = BaseUserFactory(username="user", password=password)

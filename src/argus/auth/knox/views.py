@@ -1,12 +1,13 @@
 import json
 
+from rest_framework.authentication import BaseAuthentication
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework import exceptions
 
 from knox.views import LoginView as KnoxLoginView
 
 
-class JsonAuthentication:
+class JsonAuthentication(BaseAuthentication):
     def authenticate(self, request):
         try:
             payload = json.loads(request.body)
@@ -24,9 +25,6 @@ class JsonAuthentication:
             raise exceptions.AuthenticationFailed("User inactive or deleted.")
 
         return (user, None)
-
-    def authenticate_header(self, request):
-        pass
 
 
 class LoginView(KnoxLoginView):
