@@ -45,7 +45,7 @@ def send_email_safely(function, additional_error=None, *args, **kwargs) -> int:
     try:
         result = function(*args, **kwargs)
         return result
-    except ConnectionRefusedError as e:
+    except ConnectionRefusedError:
         EMAIL_HOST = getattr(settings, "EMAIL_HOST", None)
         if not EMAIL_HOST:
             LOG.error("Notification: Email: EMAIL_HOST not set, cannot send")

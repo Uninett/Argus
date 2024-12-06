@@ -51,7 +51,6 @@ class SendingNotificationTest(TestCase):
         connect_signals()
 
     def test_sending_event_to_multiple_profiles_of_the_same_user_should_not_raise_exception(self):
-        LOG_PREFIX = "INFO:argus.notificationprofile.media:"
         # Send a test event
         self.incident = create_fake_incident()
         event = self.incident.events.get(type=Event.Type.INCIDENT_START)
