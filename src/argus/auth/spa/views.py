@@ -12,6 +12,13 @@ from ..serializers import EmptySerializer
 from .serializers import RefreshTokenSerializer
 
 
+@extend_schema_view(
+    post=extend_schema(
+        deprecated=True,
+        description="This endpoint is replaced by /api/v2/auth/token/login/",
+        request=EmptySerializer,
+    ),
+)
 class ObtainNewAuthToken(ObtainAuthToken):
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data, context={"request": request})
@@ -27,6 +34,8 @@ class ObtainNewAuthToken(ObtainAuthToken):
 
 @extend_schema_view(
     post=extend_schema(
+        deprecated=True,
+        description="This endpoint is replaced by /api/v2/auth/token/login/. Logging in with an old token will generate and a new token.",
         request=EmptySerializer,
     ),
 )
