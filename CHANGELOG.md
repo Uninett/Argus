@@ -8,6 +8,47 @@ This project uses [*towncrier*](https://towncrier.readthedocs.io/) and the chang
 
 <!-- towncrier release notes start -->
 
+## [1.29.0] - 2024-12-06
+
+Mostly changes to the alpha frontend
+
+### Added
+
+- Add support for multple API tokens per user via django-rest-knox. For that
+  reason, the old API endpoints for dealing with token authentication has been
+  deprecated, and new endpoints have been added to v2 of the API.
+
+### Changed
+
+- We've copied the linting rules from argus-htmx, so anything that have not
+  been merged yet might have to be updated to keep the linters happy.
+
+### Deprecated
+
+- All v1 API endpoints for dealing with phone numbers have been deprecated.
+  Please see the v2 endpoints dealing with destinations instead.
+
+### HTMx app
+
+#### Added
+
+- `ARGUS_HTMX_FILTER_FUNCTION` can take a callable or a dotted
+  function path ([#1029](https://github.com/Uninett/Argus/issues/1029))
+- Support incident filtering from incident list table columns
+
+#### Changed
+
+- Return user to login page on unauthenticated HTMx request
+- Automatically close certain notification toasts
+
+#### Fixed
+
+- Keep column filters when autoreloading incident list
+  ([#1033](https://github.com/Uninett/Argus/issues/1033))
+- Fix incorrect width specifier in column filter input
+  ([#1065](https://github.com/Uninett/Argus/issues/1065))
+
+
 ## [1.28.0] - 2024-11-29
 
 This version marks the inclusion of our new, alpha web frontend. It does not do
