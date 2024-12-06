@@ -6,7 +6,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient, APITestCase
 
 from argus.auth.factories import AdminUserFactory
-from argus.incident.factories import SourceSystemFactory, SourceSystemTypeFactory, SourceUserFactory
+from argus.incident.factories import SourceSystemTypeFactory
 from argus.incident.models import SourceSystem
 
 
