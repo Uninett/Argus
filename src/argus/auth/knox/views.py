@@ -13,6 +13,9 @@ class JsonAuthentication(BaseAuthentication):
             # fallback to next authentication method
             return None
 
+        # Because drf ApiRequestFactory does not spit out drf requests but
+        # Django requests we have to do our own json-parsing. TESTING
+        # SOMETIMES SUCK.
         try:
             payload = json.loads(request.body)
         except json.JSONDecodeError as e:
