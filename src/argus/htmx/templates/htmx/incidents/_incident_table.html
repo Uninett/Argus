@@ -35,7 +35,7 @@
       <td colspan="{{ columns|length }}" class="border-t border-primary">
         <div class="flex justify-between items-center">
           {% block refresh_info %}
-            {% include "htmx/incidents/_incidents_refresh_info.html" %}
+            {% include "htmx/incidents/_incident_list_refresh_info.html" %}
           {% endblock refresh_info %}
           <!--
                 The htmx attributes set on the nav here are inherited by the child links.
