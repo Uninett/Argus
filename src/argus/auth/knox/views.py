@@ -9,6 +9,10 @@ from knox.views import LoginView as KnoxLoginView
 
 class JsonAuthentication(BaseAuthentication):
     def authenticate(self, request):
+        if not request.body:
+            # fallback to next authentication method
+            return None
+
         try:
             payload = json.loads(request.body)
         except json.JSONDecodeError as e:
