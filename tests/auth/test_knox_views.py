@@ -16,10 +16,6 @@ class JsonAuthenticationTests(APITestCase):
     def teardown(self):
         connect_signals()
 
-    def test_authenticate_header_returns_None(self):
-        jsonauth = JsonAuthentication()
-        self.assertIsNone(jsonauth.authenticate_header(None))
-
     def test_authenticate_golden_path(self):
         password = "cvbfghcfgvdhyu"
         user = BaseUserFactory(username="user", password=password)
@@ -32,6 +28,13 @@ class JsonAuthenticationTests(APITestCase):
         jsonauth = JsonAuthentication()
         result_user, _ = jsonauth.authenticate(request)
         self.assertEqual(result_user, user)
+
+    def test_authenticate_with_no_request_body_returns_None(self):
+        factory = APIRequestFactory()
+        request = factory.post("", None, format="json")
+        jsonauth = JsonAuthentication()
+        result = jsonauth.authenticate(request)
+        self.assertIsNone(result)  # allows fall back to next method
 
     def test_authenticate_croaks_on_invalid_json(self):
         factory = APIRequestFactory()
