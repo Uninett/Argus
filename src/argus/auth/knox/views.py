@@ -3,8 +3,12 @@ import json
 from rest_framework.authentication import BaseAuthentication
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework import exceptions
+from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiResponse, PolymorphicProxySerializer
 
-from knox.views import LoginView as KnoxLoginView
+from knox import views
+
+from ..serializers import EmptySerializer
+from . import serializers
 
 
 class JsonAuthentication(BaseAuthentication):
@@ -34,5 +38,43 @@ class JsonAuthentication(BaseAuthentication):
         return (user, None)
 
 
-class LoginView(KnoxLoginView):
-    authentication_classes = (JsonAuthentication, *KnoxLoginView.authentication_classes)
+@extend_schema_view(
+    post=extend_schema(
+        request=PolymorphicProxySerializer(
+            component_name="LoginData",
+            serializers=[
+                AuthTokenSerializer,
+                EmptySerializer,
+            ],
+            resource_type_field_name="blbl",
+        ),
+        responses={
+            200: serializers.KnoxLoginResponseSerializer,
+        },
+    ),
+)
+class LoginView(views.LoginView):
+    authentication_classes = (JsonAuthentication, *views.LoginView.authentication_classes)
+    login_required = False
+
+
+@extend_schema_view(
+    post=extend_schema(
+        responses={
+            204: OpenApiResponse(response=None),
+        },
+    ),
+)
+class LogoutView(views.LogoutView):
+    pass
+
+
+@extend_schema_view(
+    post=extend_schema(
+        responses={
+            204: OpenApiResponse(response=None),
+        },
+    ),
+)
+class LogoutAllView(views.LogoutAllView):
+    pass
