@@ -5,7 +5,7 @@ from .auth import views as auth_views
 from .incidents.urls import urlpatterns as incident_urls
 from .timeslots.urls import urlpatterns as timeslot_urls
 from .notificationprofiles.urls import urlpatterns as notificationprofile_urls
-from .destinations.urls import urlpatterns as destination_urls
+from .destination.urls import urlpatterns as destination_urls
 from .themes.urls import urlpatterns as theme_urls
 from .dateformat.urls import urlpatterns as dateformat_urls
 from .user.urls import urlpatterns as user_urls
