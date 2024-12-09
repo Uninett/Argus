@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 import functools
-from typing import Any, Optional, Union, Protocol
+from typing import Any, Dict, Optional, Type, Union, Protocol
 
 from django.contrib.auth.models import AbstractUser, Group
 from django.db import models
@@ -198,7 +200,7 @@ class PreferencesBase(Protocol):
         pass
 
 
-class Preferences(models.Model):
+class Preferences(models.Model, PreferencesBase):
     class Meta:
         verbose_name = "User Preferences"
         verbose_name_plural = "Users' Preferences"
@@ -206,7 +208,7 @@ class Preferences(models.Model):
             models.UniqueConstraint(name="unique_preference", fields=["user", "namespace"]),
         ]
 
-    NAMESPACES = {}
+    NAMESPACES: Dict[str, Type[Preferences]] = {}
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="preferences")
     namespace = models.CharField(blank=False, max_length=255)
@@ -215,15 +217,15 @@ class Preferences(models.Model):
     objects = PreferencesManager()
     unregistered = UnregisteredPreferencesManager()
 
-    # storage for field forms in preference
-    FORMS = None
-    # storage for field defaults in preference
-    _FIELD_DEFAULTS = None
-
     # django methods
 
     # called when subclass is constructing itself
     def __init_subclass__(cls, **kwargs):
+        assert isinstance(getattr(cls, "FORMS", None), dict), f"{cls.__name__}.FORMS must be a dictionary"
+        assert isinstance(
+            getattr(cls, "_FIELD_DEFAULTS", None), dict
+        ), f"{cls.__name__}._FIELD_DEFAULTS must be a dictionary"
+
         super().__init_subclass__(**kwargs)
         cls.NAMESPACES[cls._namespace] = cls
 
