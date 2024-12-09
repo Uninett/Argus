@@ -5,14 +5,7 @@ from django_htmx.http import HttpResponseClientRefresh
 
 from argus.auth.utils import get_or_update_preference
 
-from argus.htmx.constants import ALLOWED_PAGE_SIZES
 from argus.htmx.incidents.views import HtmxHttpRequest
-
-
-@require_GET
-def page_size_names(request: HtmxHttpRequest) -> HttpResponse:
-    page_sizes = sorted(ALLOWED_PAGE_SIZES)
-    return render(request, "htmx/page_size/_page_size_list.html", {"page_sizes": page_sizes})
 
 
 @require_POST
