@@ -474,36 +474,43 @@ class EventViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, mixins.Retrie
     def validate_event_type_for_user(self, event_type: str, user: User):
         if user.is_source_system:
             if event_type not in Event.ALLOWED_TYPES_FOR_SOURCE_SYSTEMS:
-                self._raise_type_validation_error(f"A source system cannot post events of type '{event_type}'.")
+                self._abort_due_to_type_validation_error(f"A source system cannot post events of type '{event_type}'.")
         else:
             if event_type not in Event.ALLOWED_TYPES_FOR_END_USERS:
-                self._raise_type_validation_error(f"An end user cannot post events of type '{event_type}'.")
+                self._abort_due_to_type_validation_error(f"An end user cannot post events of type '{event_type}'.")
 
     def validate_event_type_for_incident(self, event_type: str, incident: Incident):
-        def validate_incident_has_no_relation_to_event_type():
-            if incident.events.filter(type=event_type).exists():
-                self._raise_type_validation_error(f"The incident already has a related event of type '{event_type}'.")
-
-        if incident.stateful:
-            if event_type in {Event.Type.INCIDENT_START, Event.Type.INCIDENT_END}:
-                validate_incident_has_no_relation_to_event_type()
-            if event_type in {Event.Type.INCIDENT_END, Event.Type.CLOSE} and not incident.open:
-                self._raise_type_validation_error("The incident is already closed.")
-            elif event_type == Event.Type.REOPEN and incident.open:
-                self._raise_type_validation_error("The incident is already open.")
-        else:
-            if event_type == Event.Type.STATELESS:
-                validate_incident_has_no_relation_to_event_type()
-            elif event_type == Event.Type.INCIDENT_START:
-                self._raise_type_validation_error("Stateless incident cannot have an INCIDENT_START event.")
-            elif event_type in {Event.Type.INCIDENT_END, Event.Type.CLOSE, Event.Type.REOPEN}:
-                self._raise_type_validation_error("Cannot change the state of a stateless incident.")
+        def abort_due_to_too_many_events(incident, event_type):
+            error_msg = f"Incident #{incident.pk} can only have one event of type '{event_type}'."
+            LOG.warn(error_msg)
+            self._abort_due_to_type_validation_error(error_msg)
 
         if event_type == Event.Type.ACKNOWLEDGE:
             acks_endpoint = reverse("incident:incident-acks", args=[incident.pk], request=self.request)
-            self._raise_type_validation_error(
-                f"Acknowledgements of this incidents should be posted through {acks_endpoint}."
+            self._abort_due_to_type_validation_error(
+                f"Acknowledgement of an incident should be posted through {acks_endpoint}."
             )
+
+        if incident.stateful:
+            if incident.event_already_exists(event_type):
+                if event_type == Event.Type.INCIDENT_START:
+                    abort_due_to_too_many_events(incident, event_type)
+                if event_type == Event.Type.INCIDENT_END:
+                    incident.repair_end_time()
+                    abort_due_to_too_many_events(incident, event_type)
+            if event_type in Event.CLOSING_TYPES and not incident.open:
+                self._abort_due_to_type_validation_error("The incident is already closed.")
+            if event_type == Event.Type.REOPEN and incident.open:
+                self._abort_due_to_type_validation_error("The incident is already open.")
+
+            # type ok for stateful
+            return
+
+        # stateless from here
+        if event_type == Event.Type.STATELESS and incident.event_already_exists(event_type):
+            abort_due_to_too_many_events(incident, event_type)
+        if event_type in Event.STATE_TYPES:
+            self._abort_due_to_type_validation_error("Cannot change the state of a stateless incident.")
 
     def update_incident(self, validated_data: dict, incident: Incident):
         timestamp = validated_data["timestamp"]
@@ -516,7 +523,7 @@ class EventViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, mixins.Retrie
             incident.save()
 
     @staticmethod
-    def _raise_type_validation_error(message: str):
+    def _abort_due_to_type_validation_error(message: str):
         raise serializers.ValidationError({"type": message})
 
 
