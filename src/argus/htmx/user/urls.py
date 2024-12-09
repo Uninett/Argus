@@ -6,5 +6,6 @@ from . import views
 app_name = "htmx"
 urlpatterns = [
     path("", views.user_preferences, name="user-preferences"),
-    path("page_size/change/", views.change_page_size, name="change-page-size"),
+    path("update/<str:namespace>/", views.update_preferences, name="update-preferences"),
+    path("theme/update/", views.update_theme, name="update-theme"),
 ]
