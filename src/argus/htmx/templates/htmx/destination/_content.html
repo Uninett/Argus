@@ -1,0 +1,5 @@
+<div id="destination-content">
+  {% include "htmx/destination/_create_form.html" %}
+  {% for error in errors %}<p class="text-error">{{ error }}</p>{% endfor %}
+  {% include "htmx/destination/_form_list.html" %}
+</div>

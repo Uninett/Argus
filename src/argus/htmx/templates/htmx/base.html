@@ -49,6 +49,9 @@
                   <a href="{% url 'htmx:user-preferences' %}">Preferences…</a>
                 </li>
                 <li>
+                  <a href="{% url 'htmx:destination-list' %}">Destinations</a>
+                </li>
+                <li>
                   <form class="flex" action="{% url "htmx:logout" %}" method="post">
                     {% csrf_token %}
                     <button class="flex-1 text-start" type="submit">Log out</button>
