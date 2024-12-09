@@ -1,18 +1,23 @@
 from copy import deepcopy
 import logging
+<<<<<<< HEAD
 from typing import Any, Tuple
+=======
+from typing import Mapping
+>>>>>>> prefer a single preference update endpoint
 
 from django.conf import settings
 from django.contrib.auth.backends import ModelBackend, RemoteUserBackend
 from django.contrib import messages
+from django.http import HttpRequest
 from django.utils.module_loading import import_string
 
 from social_core.backends.oauth import BaseOAuth2
 
-from argus.auth.models import SessionPreferences
+from argus.auth.models import Preferences, SessionPreferences
 
 
-_all__ = [
+__all__ = [
     "get_authentication_backend_classes",
     "has_model_backend",
     "has_remote_user_backend",
@@ -45,7 +50,7 @@ def get_psa_authentication_backends(backends=None):
     return [backend for backend in backends if issubclass(backend, BaseOAuth2)]
 
 
-def get_preference_obj(request, namespace):
+def get_preference_obj(request, namespace) -> Preferences:
     if request.user.is_authenticated:
         prefs = request.user.get_namespaced_preferences(namespace)
     else:
@@ -58,17 +63,32 @@ def get_preference(request, namespace, preference):
     return prefs.get_preference(preference)
 
 
-def get_or_update_preference(request, data, namespace, preference) -> Tuple[Any, bool]:
+def save_preferences(request, data, namespace):
+    prefs = get_preference_obj(request, namespace)
+    success = True
+    at_least_one = False
+    for key in prefs.FORMS:
+        if key in data:
+            at_least_one = True
+            success &= _save_preference(request, prefs, key, data)[1]
+    return at_least_one and success
+
+
+def save_preference(request, data, namespace, preference):
     """Save the single preference given in data to the given namespace
 
     Returns a tuple (value, success). Value is the value of the preference, and success a boolean
     indicating whether the preference was successfully updated
     """
     prefs = get_preference_obj(request, namespace)
+    return _save_preference(request, prefs, preference, data)
+
+
+def _save_preference(request: HttpRequest, prefs: Preferences, preference: str, data: Mapping):
     value = prefs.get_preference(preference)
     LOG.debug("Changing %s: currently %s", preference, value)
 
-    if not data.get(preference, None):
+    if data.get(preference, None) is None:
         LOG.debug("Failed to change %s, not in input: %s", preference, data)
         return value, False
 

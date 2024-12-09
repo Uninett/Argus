@@ -11,7 +11,7 @@
                value="{{ item }}"
                aria-label="{{ item }}"
                name="datetime_format_name"
-               hx-post="{% url 'htmx:change-dateformat' %}"
+               hx-post="{% url 'htmx:update-preferences' namespace='argus_htmx' %}"
                hx-trigger="change"
                hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' />
       </li>

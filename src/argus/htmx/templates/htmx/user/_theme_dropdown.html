@@ -11,7 +11,7 @@
                value="{{ item }}"
                aria-label="{{ item }}"
                name="theme"
-               hx-post="{% url 'htmx:change-theme' %}"
+               hx-post="{% url 'htmx:update-theme' %}"
                hx-trigger="change"
                hx-swap="outerHTML"
                hx-target="previous summary .badge"
