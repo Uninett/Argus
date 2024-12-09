@@ -11,7 +11,6 @@ from argus.incident.factories import (
 )
 from argus.incident.models import Event
 from argus.incident.factories import SourceSystemFactory, SourceUserFactory
-from argus.util.datetime_utils import INFINITY_REPR
 from argus.util.testing import disconnect_signals, connect_signals
 
 
