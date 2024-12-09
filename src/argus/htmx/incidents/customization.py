@@ -40,7 +40,7 @@ _BUILTIN_COLUMN_LIST = [
         "row_select",
         "Selected",
         "htmx/incidents/_incident_checkbox.html",
-        "htmx/incidents/_selected_incidents_header.html",
+        "htmx/incidents/_incident_list_select_all_checkbox.html",
     ),
     IncidentTableColumn("id", "ID", "htmx/incidents/_incident_pk.html"),
     IncidentTableColumn(
