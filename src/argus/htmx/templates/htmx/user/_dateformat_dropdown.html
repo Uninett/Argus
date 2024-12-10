@@ -4,7 +4,7 @@
     <span class="badge badge-primary">{{ preferences.argus_htmx.datetime_format_name }}</span>
   </summary>
   <ul class="max-h-64 overflow-y-scroll">
-    {% for item in preference_options.datetime_formats %}
+    {% for item in preferences_choices.argus_htmx.datetime_format_name %}
       <li>
         <input type="radio"
                class="btn btn-sm btn-block btn-ghost justify-start"

@@ -55,6 +55,10 @@ def preferences(cls: Optional[type] = None, namespace: Optional[str] = None):
     if namespace is None:
         raise ValueError("namespace may not be None")
 
+    FIELDS = getattr(cls, "FIELDS", None)
+    if FIELDS is None or not all(isinstance(k, str) and isinstance(v, PreferenceField) for k, v in FIELDS.items()):
+        raise TypeError(f"{cls.__name__}.FIELDS must be set to a Dict[str, PreferenceField]")
+
     class Meta:
         pass
 

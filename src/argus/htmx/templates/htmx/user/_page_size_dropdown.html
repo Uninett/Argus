@@ -4,7 +4,7 @@
     <span class="badge badge-primary">{{ preferences.argus_htmx.page_size }}</span>
   </summary>
   <ul class="max-h-64 overflow-y-scroll">
-    {% for item in preference_options.page_sizes %}
+    {% for item in preferences_choices.argus_htmx.page_size %}
       <li>
         <input type="radio"
                class="btn btn-sm btn-block btn-ghost justify-start"

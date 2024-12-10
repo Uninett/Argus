@@ -4,14 +4,14 @@
     {% include "./_current_theme.html" %}
   </summary>
   <ul class="max-h-64 overflow-y-scroll">
-    {% for item in preference_options.theme_list %}
+    {% for item in preferences_choices.argus_htmx.theme %}
       <li>
         <input type="radio"
                class="theme-controller btn btn-sm btn-block btn-ghost justify-start"
                value="{{ item }}"
                aria-label="{{ item }}"
                name="theme"
-               hx-post="{% url 'htmx:update-theme' %}"
+               hx-post="{% url 'htmx:update-preferences' namespace='argus_htmx' %}"
                hx-trigger="change"
                hx-swap="outerHTML"
                hx-target="previous summary .badge"

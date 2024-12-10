@@ -1,10 +1,6 @@
 from copy import deepcopy
 import logging
-<<<<<<< HEAD
-from typing import Any, Tuple
-=======
-from typing import Mapping
->>>>>>> prefer a single preference update endpoint
+from typing import Mapping, Union
 
 from django.conf import settings
 from django.contrib.auth.backends import ModelBackend, RemoteUserBackend
@@ -51,6 +47,8 @@ def get_psa_authentication_backends(backends=None):
 
 
 def get_preference_obj(request, namespace) -> Preferences:
+    if namespace not in Preferences.NAMESPACES:
+        raise ValueError(f"Unkown namespace '{namespace}'")
     if request.user.is_authenticated:
         prefs = request.user.get_namespaced_preferences(namespace)
     else:
@@ -63,15 +61,19 @@ def get_preference(request, namespace, preference):
     return prefs.get_preference(preference)
 
 
-def save_preferences(request, data, namespace):
-    prefs = get_preference_obj(request, namespace)
-    success = True
-    at_least_one = False
+def save_preferences(request, data, namespace_or_prefs: Union[str, Preferences]):
+    prefs = (
+        namespace_or_prefs
+        if isinstance(namespace_or_prefs, Preferences)
+        else get_preference_obj(request, namespace_or_prefs)
+    )
+    saved = []
+    failed = []
     for key in prefs.get_forms():
         if key in data:
-            at_least_one = True
-            success &= _save_preference(request, prefs, key, data)[1]
-    return at_least_one and success
+            sink = saved if _save_preference(request, prefs, key, data)[1] else failed
+            sink.append(key)
+    return saved, failed
 
 
 def save_preference(request, data, namespace, preference):
