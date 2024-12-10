@@ -37,10 +37,13 @@ def preferences(cls: Optional[type] = None, namespace: Optional[str] = None):
 
     Use like the following:
 
+    class MagicNumberForm(forms.Form):
+        magic_number = forms.IntegerField()
+
     @prefrences(namespace="my_namespace")
     class MyPreferences:
-        _FIELD_DEFAULTS = {
-          "example_pref": "some value"
+        FIELDS = {
+            "magic_number": PreferenceField(form=MagicNumberForm, default=42),
         }
 
     In order to get code/method completion, you can inherit from the ``PreferencesBase`` Protocol,
@@ -154,7 +157,6 @@ class SessionPreferences:
         self._namespace = namespace
         self.namespace = namespace
         self.prefclass = Preferences.NAMESPACES[namespace]
-        self._FIELD_DEFAULTS = self.prefclass._FIELD_DEFAULTS.copy()
         self.session.setdefault("preferences", dict())
         self.session["preferences"].setdefault(namespace, self.get_defaults())
         self.preferences = self.session["preferences"][namespace]
@@ -186,7 +188,6 @@ class SessionPreferences:
 
 class PreferencesBase(Protocol):
     FIELDS: dict[str, PreferenceField]
-    _FIELD_DEFAULTS: dict[str, Any]
 
     @classmethod
     def get_defaults(cls) -> dict[str, Any]:
