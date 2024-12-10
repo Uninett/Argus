@@ -9,5 +9,7 @@ class InconceivableException(Exception):
 
 
 class InconsistentDatabaseException(ValueError):
-    # Something is missing or doubled up in the database, or has neen accidentally deleted
+    # Something is missing or doubled up in the database,
+    # or has been accidentally deleted
+    # It cannot be fixed automatically so we must bail out
     pass
