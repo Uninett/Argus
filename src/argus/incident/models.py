@@ -463,14 +463,14 @@ class Incident(models.Model):
         return IncidentRelation.objects.filter(Q(incident1=self) | Q(incident2=self))
 
     def all_opening_events(self):
-        open_events = (Event.Type.INCIDENT_START, Event.Type.REOPEN)
+        open_events = Event.OPENING_TYPES
         return self.events.filter(type__in=open_events).order_by("timestamp")
 
     def all_reopen_events(self):
-        return self.events.filter(typen=Event.Type.REOPEN).order_by("timestamp")
+        return self.events.filter(type=Event.Type.REOPEN).order_by("timestamp")
 
     def all_closing_events(self):
-        close_events = (Event.Type.CLOSE, Event.Type.INCIDENT_END)
+        close_events = Event.CLOSING_TYPES
         return self.events.filter(type__in=close_events).order_by("timestamp")
 
     @property
