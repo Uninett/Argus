@@ -70,7 +70,9 @@ class UserIsUsedTests(TestCase):
 
 
 class UserMiscMethodTests(TestCase):
-    def test_get_preferences_context_returns_dict_of_all_properly_registered_preferences(self):
+    def test_get_preferences_context_returns_dict_of_all_properly_registered_preferences(
+        self,
+    ):
         user = PersonUserFactory()
 
         results = user.get_preferences_context()
@@ -137,6 +139,12 @@ class PreferencesTests(TestCase):
         self.assertEqual(instances.count(), 1)
         instance = instances[0]
         self.assertIsInstance(instance, MyPreferences)
+
+    def test_get_namespaced_preferences_creates_preferences_with_defaults(self):
+        user = PersonUserFactory()
+        pref_set = user.get_namespaced_preferences(namespace=MyPreferences._namespace)
+        self.assertIsInstance(pref_set, MyPreferences)
+        self.assertEqual(pref_set.preferences, {"magic_number": 42})
 
     def test_vanilla_get_context_dumps_preferences_field_including_defaults(self):
         user = PersonUserFactory()
@@ -236,18 +244,15 @@ class PreferencesManagerTests(TestCase):
         result = Preferences.objects.get_by_natural_key(user, MyPreferences._namespace)
         self.assertEqual(prefs, result)
 
-    def test_create_missing_preferences_creates_all_namespaces_for_all_users(self):
+    def test_get_or_create_preferences_creates_all_namespaces_for_user(self):
         user1 = PersonUserFactory()
-        user2 = PersonUserFactory()
 
         # no preferences yet
         self.assertFalse(Preferences.objects.filter(user=user1).exists())
-        self.assertFalse(Preferences.objects.filter(user=user2).exists())
 
-        Preferences.objects.create_missing_preferences()
+        user1.get_or_create_preferences()
         # three each (two from tests, one from app)
         self.assertEqual(Preferences.objects.filter(user=user1).count(), 3)
-        self.assertEqual(Preferences.objects.filter(user=user2).count(), 3)
 
     def test_get_all_defaults_returns_all_prefs_defaults(self):
         defaults = Preferences.objects.get_all_defaults()

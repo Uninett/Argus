@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import functools
-from typing import Any, Dict, Optional, Type, Union, Protocol
+from typing import Any, Dict, List, Optional, Type, Union, Protocol
 
 from django.contrib.auth.models import AbstractUser, Group
 from django.db import models
@@ -94,19 +94,23 @@ class User(AbstractUser):
         # user is not considered in use
         return False
 
-    def get_or_create_preferences(self):
-        Preferences.ensure_for_user(self)
-        return self.preferences.filter(namespace__in=Preferences.NAMESPACES)
+    def get_or_create_preferences(self) -> List[Preferences]:
+        return Preferences.ensure_for_user(self)
 
     def get_preferences_context(self):
         pref_sets = self.get_or_create_preferences()
         prefdict = {}
         for pref_set in pref_sets:
-            prefdict[pref_set._namespace] = pref_set.get_context()
+            prefdict[pref_set.namespace] = pref_set.get_context()
         return prefdict
 
     def get_namespaced_preferences(self, namespace):
-        return self.get_or_create_preferences().get(namespace=namespace)
+        print("here", namespace)
+        obj, _ = Preferences.objects.get_or_create(user=self, namespace=namespace)
+        if not obj.preferences and (defaults := obj.get_defaults()):
+            obj.preferences = defaults
+            obj.save()
+        return obj
 
 
 class PreferencesManager(models.Manager):
@@ -115,13 +119,6 @@ class PreferencesManager(models.Manager):
 
     def get_by_natural_key(self, user, namespace):
         return self.get(user=user, namespace=namespace)
-
-    def create_missing_preferences(self):
-        precount = Preferences.objects.count()
-        for namespace, subclass in Preferences.NAMESPACES.items():
-            for user in User.objects.all():
-                Preferences.ensure_for_user(user)
-        return (precount, Preferences.objects.count())
 
     def get_all_defaults(self):
         prefdict = {}
@@ -200,7 +197,7 @@ class PreferencesBase(Protocol):
         pass
 
 
-class Preferences(models.Model, PreferencesBase):
+class Preferences(models.Model):
     class Meta:
         verbose_name = "User Preferences"
         verbose_name_plural = "Users' Preferences"
@@ -216,6 +213,10 @@ class Preferences(models.Model, PreferencesBase):
 
     objects = PreferencesManager()
     unregistered = UnregisteredPreferencesManager()
+
+    # must be set by the subclasses
+    FORMS: dict[str, forms.Form]
+    _FIELD_DEFAULTS: dict[str, Any]
 
     # django methods
 
@@ -252,12 +253,20 @@ class Preferences(models.Model, PreferencesBase):
         return cls._FIELD_DEFAULTS.copy() if cls._FIELD_DEFAULTS else {}
 
     @classmethod
-    def ensure_for_user(cls, user):
+    def ensure_for_user(cls, user) -> List[Preferences]:
+        all_preferences = {p.namespace: p for p in user.preferences.all()}
+        valid_preferences = []
+
         for namespace, subclass in cls.NAMESPACES.items():
-            obj, _ = subclass.objects.get_or_create(user=user, namespace=namespace)
-            if not obj.preferences and (defaults := subclass.get_defaults()):
-                obj.preferences = defaults
-                obj.save()
+            if namespace in all_preferences:
+                valid_preferences.append(all_preferences[namespace])
+                continue
+            obj = subclass.objects.create(user=user, namespace=namespace)
+            obj.preferences = subclass.get_defaults()
+            obj.save()
+            valid_preferences.append(obj)
+
+        return valid_preferences
 
     def update_context(self, context):
         "Override this to change what is put in context"
