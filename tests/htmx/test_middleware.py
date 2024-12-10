@@ -1,18 +1,18 @@
 from unittest.mock import Mock
 
 from django import test
-from django.http import HttpResponse, HttpResponseRedirect
-from django.test.client import RequestFactory
-
-from argus.htmx.middleware import HtmxMessageMiddleware, LoginRequiredMiddleware
 from django.contrib import messages
 from django.contrib.messages.middleware import MessageMiddleware
 from django.contrib.sessions.middleware import SessionMiddleware
+from django.http import HttpResponse, HttpResponseRedirect
+from django.test.client import RequestFactory
 from django_htmx.http import (
+    HttpResponseClientRedirect,
     HttpResponseClientRefresh,
     HttpResponseLocation,
-    HttpResponseClientRedirect,
 )
+
+from argus.htmx.middleware import HtmxMessageMiddleware, LoginRequiredMiddleware
 
 
 class TestLoginRequiredMiddleware(test.TestCase):
