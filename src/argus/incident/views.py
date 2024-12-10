@@ -505,7 +505,7 @@ class EventViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, mixins.Retrie
                     repaired = incident.repair_end_time()
                     if repaired:
                         raise SuccessfulRepairException("end_time mismatch repaired, see logs")
-                    # should never happen, insufficent preceeding logic construct?
+                    # should never happen, here for completeness
                     LOG.error("Something weird happened, see other logs")
                     raise InconceivableException("Found end_time mismatch was in error, see logs")
             if event_type in Event.CLOSING_TYPES and not incident.open:
