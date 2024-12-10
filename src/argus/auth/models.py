@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+import dataclasses
 import functools
-from typing import Any, List, Optional, Type, Union, Protocol
+from typing import Any, Optional, Sequence, Union, Protocol
 
 from django.contrib.auth.models import AbstractUser, Group
 from django.db import models
@@ -18,6 +19,14 @@ def preferences_manager(namespace):
             return super().create(**kwargs)
 
     return Manager()
+
+
+@dataclasses.dataclass
+class PreferenceField:
+    form: forms.Form
+    choices: Optional[Sequence] = None
+    default: Optional[Any] = None
+    partial_response_template: Optional[str] = None
 
 
 def preferences(cls: Optional[type] = None, namespace: Optional[str] = None):
@@ -145,7 +154,6 @@ class SessionPreferences:
         self._namespace = namespace
         self.namespace = namespace
         self.prefclass = Preferences.NAMESPACES[namespace]
-        self.FORMS = self.prefclass.FORMS.copy()
         self._FIELD_DEFAULTS = self.prefclass._FIELD_DEFAULTS.copy()
         self.session.setdefault("preferences", dict())
         self.session["preferences"].setdefault(namespace, self.get_defaults())
@@ -164,17 +172,12 @@ class SessionPreferences:
     def get_instance(self):
         raise NotImplementedError
 
-    def get_defaults(self):
-        return self.prefclass.get_defaults()
+    _proxy_attrs = ("get_forms", "get_defaults", "update_context", "get_context", "get_preference")
 
-    def update_context(self, context):
-        return self.prefclass.update_context(context)
-
-    def get_context(self):
-        return self.prefclass.get_context()
-
-    def get_preference(self, name):
-        return self.prefclass.get_preference(name)
+    def __getattr__(self, name):
+        if name in self._proxy_attrs:
+            return getattr(self.prefclass, name)
+        return super().__getattr__(name)
 
     def save_preference(self, name, value):
         self.preferences[name] = value
@@ -182,7 +185,7 @@ class SessionPreferences:
 
 
 class PreferencesBase(Protocol):
-    FORMS: dict[str, forms.Form]
+    FIELDS: dict[str, PreferenceField]
     _FIELD_DEFAULTS: dict[str, Any]
 
     @classmethod
@@ -214,6 +217,8 @@ class Preferences(models.Model):
     FORMS: dict[str, forms.Form]
     _FIELD_DEFAULTS: dict[str, Any]
 
+    FIELDS: dict[str, PreferenceField]
+
     # django methods
 
     # called when subclass is constructing itself
@@ -244,9 +249,13 @@ class Preferences(models.Model):
             self.__class__ = subclass
 
     @classmethod
+    def get_forms(cls):
+        return {key: field.form for key, field in cls.FIELDS.items()}
+
+    @classmethod
     def get_defaults(cls):
         "Override to add magic"
-        return cls._FIELD_DEFAULTS.copy() if cls._FIELD_DEFAULTS else {}
+        return {key: field.default for key, field in cls.FIELDS.items()}
 
     @classmethod
     def ensure_for_user(cls, user) -> List[Preferences]:
