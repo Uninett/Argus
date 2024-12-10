@@ -23,6 +23,7 @@ from rest_framework.reverse import reverse
 from argus.drf.permissions import IsSuperuserOrReadOnly
 from argus.filter import get_filter_backend
 from argus.util.datetime_utils import INFINITY_REPR
+from argus.util.exceptions import InconceivableException, SuccessfulRepairException
 from argus.util.signals import bulk_changed
 
 from .forms import AddSourceSystemForm
@@ -465,7 +466,7 @@ class EventViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, mixins.Retrie
             # is sent after the incident has been manually closed
             if not user.is_source_system:
                 raise e
-        except AttributeError:
+        except (SuccessfulRepairException, InconceivableException):
             # Do not save new event, it was redundant
             return
         else:
@@ -503,10 +504,10 @@ class EventViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, mixins.Retrie
                     # Only ever 1, but might not have been saved correctly earlier
                     repaired = incident.repair_end_time()
                     if repaired:
-                        raise AttributeError("end_time mismatch repaired, see logs")
-                    # should never happen
+                        raise SuccessfulRepairException("end_time mismatch repaired, see logs")
+                    # should never happen, insufficent preceeding logic construct?
                     LOG.error("Something weird happened, see other logs")
-                    raise AttributeError("end_time mismatch was in error, see logs")
+                    raise InconceivableException("Found end_time mismatch was in error, see logs")
             if event_type in Event.CLOSING_TYPES and not incident.open:
                 self._abort_due_to_type_validation_error("The incident is already closed.")
             if event_type == Event.Type.REOPEN and incident.open:

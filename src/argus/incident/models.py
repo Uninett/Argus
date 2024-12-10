@@ -15,6 +15,7 @@ from django.db.models import F, Q
 from django.utils import timezone
 
 from argus.util.datetime_utils import INFINITY_REPR, get_infinity_repr
+from argus.util.exceptions import InconsistentDatabaseException
 from .constants import Level
 from .fields import DateTimeInfinityField
 from .validators import validate_lowercase, validate_key
@@ -557,7 +558,7 @@ class Incident(models.Model):
                 # missing close event. This is serious.
                 message = "Incident %s has been closed without adding an event"
                 LOG.error(message, self.pk)
-                raise ValueError(message)
+                raise InconsistentDatabaseException(message)
 
         # Only incidents with at least one close event from this point on
 
