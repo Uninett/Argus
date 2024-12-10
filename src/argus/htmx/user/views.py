@@ -27,7 +27,7 @@ def update_preferences(request: HtmxHttpRequest, namespace: str) -> HttpResponse
     saved, failed = save_preferences(request, request.POST, prefs)
 
     if not request.htmx:
-        # We're only expecting htmx requests, but let's make sure to behave decently in case we're not
+        # We're only expecting htmx requests, but let's make sure to behave decently in case of a regular request
         return HttpResponseRedirect(request.META.HTTP_REFERER or settings.LOGIN_REDIRECT_URL)
 
     # special case if we're only updating a single preference that has a partial template
