@@ -521,7 +521,21 @@ class Incident(models.Model):
         return self.events.filter(type=event_type).exists()
 
     def repair_end_time(self) -> Optional[bool]:
+        """Repairs end_time if there is a mismatch between events and end_time
+
+        This can happen under race-conditions and because we still cannot use
+        the ``atomic``-decorator everwhere.
+
+        Returns:
+        * True if a repair needed to be made
+        * False if it was stateful and ok
+        * None if it was stateless and ok
+        """
+        LOG.info("Incident %s: Detected potential mismatch of end_time and events", self.pk)
+
         if not self.stateful:
+            # the vital part for statelessness is set correctly
+            LOG.info("Incident %s: No mismatch, correctly stateless", self.pk)
             return
 
         if self.stateless_event:
@@ -531,21 +545,38 @@ class Incident(models.Model):
             LOG.warn("Mismatch between self %s end_time and event type: set stateless", self.pk)
             return True
 
+        # Only stateful incidents from this point on
+
         close_events = self.all_closing_events()
-        if not self.open and close_events.exists():
-            # end_time is already set closed (golden path)
+        if not close_events.exists():
+            if self.open:
+                # Golden path for open incidents
+                LOG.info("Incident %s: No mismatch, correctly stateful and open", self.pk)
+                return False
+            else:
+                # missing close event. This is serious.
+                message = "Incident %s has been closed without adding an event"
+                LOG.error(message, self.pk)
+                raise ValueError(message)
+
+        # Only incidents with at least one close event from this point on
+
+        if not self.open:
+            # Golden path for closed incidents
+            LOG.info("Incident %s: No mismatch, correctly stateful and closed", self.pk)
             return False
 
         reopen_event = self.reopen_event
         last_close_event = close_events.last()
         if not reopen_event or reopen_event.timestamp < last_close_event.timestamp:
             # end_time was not set when making closing event, fix
-            self.end_time = close_events.first().timestamp
+            self.end_time = last_close_event.timestamp
             self.save()
             LOG.warn("Mismatch between self %s end_time and event type: set end_time to less than infinity", self.pk)
             return True
 
         # a reopen event correctly exists and the incident is correctly open
+        LOG.info("Incident %s: No mismatch, correctly stateful and reopened", self.pk)
         return False
 
     def is_acked_by(self, group: str) -> bool:

@@ -465,6 +465,9 @@ class EventViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, mixins.Retrie
             # is sent after the incident has been manually closed
             if not user.is_source_system:
                 raise e
+        except AttributeError:
+            # Do not save new event, it was redundant
+            return
         else:
             # Only update incident if everything is valid; otherwise, just record the event
             self.update_incident(serializer.validated_data, incident)
@@ -494,10 +497,16 @@ class EventViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, mixins.Retrie
         if incident.stateful:
             if incident.event_already_exists(event_type):
                 if event_type == Event.Type.INCIDENT_START:
+                    # Only ever 1
                     abort_due_to_too_many_events(incident, event_type)
                 if event_type == Event.Type.INCIDENT_END:
-                    incident.repair_end_time()
-                    abort_due_to_too_many_events(incident, event_type)
+                    # Only ever 1, but might not have been saved correctly earlier
+                    repaired = incident.repair_end_time()
+                    if repaired:
+                        raise AttributeError("end_time mismatch repaired, see logs")
+                    # should never happen
+                    LOG.error("Something weird happened, see other logs")
+                    raise AttributeError("end_time mismatch was in error, see logs")
             if event_type in Event.CLOSING_TYPES and not incident.open:
                 self._abort_due_to_type_validation_error("The incident is already closed.")
             if event_type == Event.Type.REOPEN and incident.open:
