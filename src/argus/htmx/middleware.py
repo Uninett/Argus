@@ -70,7 +70,7 @@ class HtmxMessageMiddleware(MiddlewareMixin):
             return response
 
         # do not add messages to hx redirects/refreshes
-        if response.headers.get("HX-Refresh") == "true" or "HX-Redirect" in response.headers:
+        if response.headers.get("HX-Refresh") == "true" or {"HX-Redirect", "HX-Location"} & response.headers.keys():
             return response
 
         if not response.writable():

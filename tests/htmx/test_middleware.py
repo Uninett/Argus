@@ -1,10 +1,18 @@
 from unittest.mock import Mock
 
 from django import test
-from django.http import HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect
 from django.test.client import RequestFactory
 
-from argus.htmx.middleware import LoginRequiredMiddleware
+from argus.htmx.middleware import HtmxMessageMiddleware, LoginRequiredMiddleware
+from django.contrib import messages
+from django.contrib.messages.middleware import MessageMiddleware
+from django.contrib.sessions.middleware import SessionMiddleware
+from django_htmx.http import (
+    HttpResponseClientRefresh,
+    HttpResponseLocation,
+    HttpResponseClientRedirect,
+)
 
 
 class TestLoginRequiredMiddleware(test.TestCase):
@@ -48,3 +56,42 @@ class TestLoginRequiredMiddleware(test.TestCase):
         result = LoginRequiredMiddleware(lambda x: x).process_view(self.request, view_func, None, {})
         self.assertIsNotNone(result)
         self.assertIsInstance(result, HttpResponseRedirect)
+
+
+class TestHtmxMessageMiddleware(test.TestCase):
+    def setUp(self):
+        request = RequestFactory().get("/foo")
+        request.htmx = True
+        request.user = Mock()
+        self.request = request
+
+        SessionMiddleware(lambda x: x).process_request(self.request)
+        MessageMiddleware(lambda x: x).process_request(self.request)
+        messages.info(self.request, "a message")
+
+        self.middleware = HtmxMessageMiddleware(lambda x: x)
+
+    def process_response(self, response: HttpResponse):
+        return self.middleware.process_response(self.request, response).content.decode()
+
+    def tearDown(self):
+        # expire current messages
+        messages.get_messages(self.request)
+
+    def test_adds_message_to_response(self):
+        self.assertIn("a message", self.process_response(HttpResponse()))
+
+    def test_doesnt_add_message_if_not_htmx(self):
+        self.request.htmx = False
+        self.assertNotIn("a message", self.process_response(HttpResponse()))
+
+    def test_doesnt_add_message_on_redirect_response(self):
+        responses = [
+            ("redirect", HttpResponseRedirect("/")),
+            ("hx-redirect", HttpResponseClientRedirect("/")),
+            ("hx-location", HttpResponseLocation("/")),
+            ("hx-refresh", HttpResponseClientRefresh()),
+        ]
+        for name, response in responses:
+            with self.subTest(name):
+                self.assertNotIn("a message", self.process_response(response))
