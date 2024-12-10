@@ -67,7 +67,7 @@ class DestinationFormCreate(ModelForm):
                 self.cleaned_data["settings"] = settings
 
         if label := self.cleaned_data.get("label"):
-            destination_filter = DestinationConfig.objects.filter(label=label)
+            destination_filter = DestinationConfig.objects.filter(label=label, media=media)
             if self.instance:
                 destination_filter = destination_filter.exclude(pk=self.instance.pk)
             if destination_filter.exists():
