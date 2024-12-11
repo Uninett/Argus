@@ -1,16 +1,17 @@
-====================
-How to vendor a repo
-====================
+========================
+How to vendor a git repo
+========================
 
-By "vendoring a repo" we mean to include the source code of a repo into an
-existing repo. Following this how to will give you one repo with an extra root.
+By "vendoring a repo" we mean to include the source code and history of one git
+repo into another, already existing, git repo. Following this how to will give
+you one repo with an extra root.
 
 The TARGET repo is the the repo we want to end up with while the ORIGIN
 repo is the one we want to merge in (our terms). In this case, we wish to merge
 the "main" branch of ORIGIN into the "master" branch of TARGET. (It is easier
 to keep track if the branches have different names.)
 
-This how to assumes that ORIGIN and TARGET has no shared history, as is
+This how-to assumes that ORIGIN and TARGET has no shared history, as is
 the case if ORIGIN is a standalone library or django app.
 
 Prep the ORIGIN repo
@@ -21,15 +22,16 @@ Prep the ORIGIN repo
 
         git clone ORIGIN-clone path/to/ORIGIN
 
-3. cd into ORIGIN-clone
+3. ``cd`` into ORIGIN-clone
 4. Make sure you are on "main" branch of ORIGIN-clone
-5. Move every single file found by ``.gitignore`` in ORIGIN to a new directory that
-   does not exist on TARGET, we'll standardize on ``merge/`` here::
+5. Move every single file tracked by git (and not ignored by ``.gitignore``) in
+   ORIGIN to a new directory that does not exist on TARGET, we'll standardize
+   on ``merge/`` here::
 
         mkdir merge
         git mv -k * merge/
 
-   Without the "-k"-flag, ``git mv`` would error out with ``fatal: can not move
+   Without the ``-k``-flag, ``git mv`` would error out with ``fatal: can not move
    directory into itself, source=merge, destination=merge/merge`` and refuse to
    do anything.
 
@@ -57,7 +59,10 @@ Prep the ORIGIN repo
 
         git merge --allow-unrelated-histories TARGET/master
 
-10. Push the master/main of the ORIGIN-clone to a temporary branch on TARGET::
+   Note the ``--allow-unrelated-histories``-flag.
+
+10. Push the "master"/"main" of the ORIGIN-clone to a temporary branch on
+    TARGET::
 
         git push -u TARGET merge-ORIGIN
 
@@ -71,11 +76,11 @@ Fix up the TARGET repo
 
         git checkout -b merge-ORIGIN
         git pull
-3. You can either merge to master now (recommended) or start a new branch off
+3. You can either merge to "master" now (recommended) or start a new branch off
    merge-ORIGIN for the fixing-up. The goal is to have two different branches:
    one that is a clean copy of ORIGIN's history, one that does all the fixing.
    This makes the latter easy to review and safer to do in general.
-4. Whether you merged to master or not, start a new branch for the fixing::
+4. Whether you merged to "master" or not, start a new branch for the fixing::
 
         git switch -c move-ORIGIN-files-to-correct-location
 
@@ -93,40 +98,44 @@ Fix up the TARGET repo
 
         git push -u move-ORIGIN-files-to-correct-location
 
-7. When done and tests are green, merge/rebase/squash to master (you can do
+7. When done and tests are green, merge/rebase/squash to "master" (you can do
    this via github).
 
 Done!
 
-If ORIGIN is to cease to exist as a repo, move open issues to TARGET's repo.
+If ORIGIN is to cease to exist as a repo, move its open issues to TARGET's
+issue tracker.
 
-Moving issues
--------------
+Transferring Github issues
+--------------------------
 
-Github can move issues between Github repos just fine. There's a link to move
-issues in the right-hand menu on each issue page. If the TARGET repo has the
-labels of the ORIGIN repo, the labels will copy over just fine too.
+It is easy to transfer issues between Github repos, though only one at a time.
+There's a link to transfer issues in the right-hand menu on each issue page. If
+the TARGET repo has the labels of the ORIGIN repo, the labels will copy over
+just fine too.
 
+Notifications will be sent per issue moved so if many are moved at a time give
+a heads up to the team: they are about to be spammed.
+
+
+Move Github PR
+==============
+
+If you want to move a PR to the TARGET's official Github you first need to move
+the branch, then start a new PR with the same name at TARGET, then link back to
+the ORIGIN repo from the new PR. Now you can close the PR in ORIGIN.
 
 Move other branches from ORIGIN to TARGET
 =========================================
 
-Move PR
--------
-
-If you want to move a PR to the argus-server repo (TARGET) you first need to
-move the branch, then start a new PR with the same name at argus-server, then
-link back to any discussion in this repo from the new PR. Now you can close the
-PR in this repo.
-
 Prep code in ORIGIN
 -------------------
 
-In your local copy of ORIGIN (or a new clone) make a branch off main called rename::
+In your local copy of ORIGIN (or a new clone) make a branch off "main" called rename::
 
         git switch -c rename
 
-Move the code of main (just the code) to the paths that are correct for
+Move the code of "main" (just the code) to the paths that are correct for
 TARGET. Feel free to also update import paths and template paths in this
 code. Commit the changes to the ``rename`` branch.
 
@@ -144,7 +153,7 @@ Setup the remote in the ORIGIN repo
 
         git fetch TARGET
 
-3. Checkout master::
+3. Checkout "master"::
 
         git switch master
 
@@ -154,7 +163,7 @@ Move the actual branch
 First move your branch onto the ``rename`` branch.
 
 Do ``git mv old new`` or ``git rebase rename mybranch`` or use a graphical
-client to cherry-pick one by one onto main, or copy the files to the correct
+client to cherry-pick one by one onto "main", or copy the files to the correct
 place and add+commit them as new. It is enough to just move the files.
 Correcting import paths and file include paths can be done *after* the move, in
 the new repo, with a new commit.
@@ -170,7 +179,7 @@ Now you're ready for the move.
         git switch -c fvgyhj
 
 2. If it's only a single commit you can cherry-pick it. Move the real name to
-   the master then cherry-pick::
+   the "master" then cherry-pick::
 
         git branch -f mybranch master
         git switch mybranch
