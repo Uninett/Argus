@@ -13,10 +13,6 @@ repos:
         # Run the linter
     -   id: ruff
         name: "Ruff linting"
-        args: [
-          '--output-format=full',
-          '--statistics'
-        ]
         # Run the formatter
     -   id: ruff-format
         name: "Ruff formatting"
