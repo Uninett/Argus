@@ -4877,11 +4877,6 @@ details.collapse summary::-webkit-details-marker {
   color: var(--fallback-p,oklch(var(--p)/var(--tw-text-opacity)));
 }
 
-.text-primary-content {
-  --tw-text-opacity: 1;
-  color: var(--fallback-pc,oklch(var(--pc)/var(--tw-text-opacity)));
-}
-
 .text-warning {
   --tw-text-opacity: 1;
   color: var(--fallback-wa,oklch(var(--wa)/var(--tw-text-opacity)));
