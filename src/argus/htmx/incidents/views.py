@@ -9,13 +9,14 @@ from django.shortcuts import render, get_object_or_404
 
 from django.views.decorators.http import require_POST, require_GET
 from django.core.paginator import Paginator
-from django.http import HttpRequest, HttpResponse, HttpResponseBadRequest
-from django_htmx.middleware import HtmxDetails
+from django.http import HttpResponse, HttpResponseBadRequest
 from django_htmx.http import HttpResponseClientRefresh
 
 from argus.auth.utils import get_or_update_preference
 from argus.incident.models import Incident
 from argus.util.datetime_utils import make_aware
+
+from ..request import HtmxHttpRequest
 
 from .constants import ALLOWED_PAGE_SIZES
 from .customization import get_incident_table_columns
@@ -50,10 +51,6 @@ def prefetch_incident_daughters():
         "events",
         "events__ack",
     )
-
-
-class HtmxHttpRequest(HttpRequest):
-    htmx: HtmxDetails
 
 
 # fetch with htmx
