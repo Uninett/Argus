@@ -15,7 +15,7 @@ This how-to assumes that ORIGIN and TARGET has no shared history, as is
 the case if ORIGIN is a standalone library or django app.
 
 Prep the ORIGIN repo
---------------------
+====================
 
 1. Be placed somewhere there is no git repo
 2. Clone the ORIGIN repo locally::
@@ -69,7 +69,7 @@ Prep the ORIGIN repo
 You're finished with the ORIGIN-clone. You may remove it if you like.
 
 Fix up the TARGET repo
-----------------------
+======================
 
 1. Switch to a local clone of the TARGET repo
 2. Checkout and pull the temporary branch::
@@ -107,7 +107,7 @@ If ORIGIN is to cease to exist as a repo, move its open issues to TARGET's
 issue tracker.
 
 Transferring Github issues
---------------------------
+==========================
 
 It is easy to transfer issues between Github repos, though only one at a time.
 There's a link to transfer issues in the right-hand menu on each issue page. If
