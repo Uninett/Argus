@@ -1,0 +1,24 @@
+<details>
+  <summary>
+    Page size
+    <span class="badge badge-primary">{{ preferences.argus_htmx.page_size }}</span>
+  </summary>
+  <ul class="max-h-64 overflow-y-scroll">
+    {% for item in preferences_choices.argus_htmx.page_size %}
+      <li>
+        <input type="radio"
+               class="btn btn-sm btn-block btn-ghost justify-start"
+               value="{{ item }}"
+               aria-label="{{ item }}"
+               name="page_size"
+               hx-post="{% url 'htmx:update-preferences' namespace='argus_htmx' %}"
+               hx-trigger="change"
+               hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' />
+      </li>
+    {% empty %}
+      <li>
+        <p>No page sizes configured</p>
+      </li>
+    {% endfor %}
+  </ul>
+</details>
