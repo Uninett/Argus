@@ -20,7 +20,7 @@ __all__ = [
     "get_psa_authentication_backends",
     "get_preference_obj",
     "get_preference",
-    "save_preference",
+    "get_or_update_preference",
 ]
 
 
@@ -76,7 +76,7 @@ def save_preferences(request, data, namespace_or_prefs: Union[str, Preferences])
     return saved, failed
 
 
-def save_preference(request, data, namespace, preference):
+def get_or_update_preference(request, data, namespace, preference):
     """Save the single preference given in data to the given namespace
 
     Returns a tuple (value, success). Value is the value of the preference, and success a boolean

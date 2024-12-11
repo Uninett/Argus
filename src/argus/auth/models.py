@@ -55,10 +55,6 @@ def preferences(cls: Optional[type] = None, namespace: Optional[str] = None):
     if namespace is None:
         raise ValueError("namespace may not be None")
 
-    FIELDS = getattr(cls, "FIELDS", None)
-    if FIELDS is None or not all(isinstance(k, str) and isinstance(v, PreferenceField) for k, v in FIELDS.items()):
-        raise TypeError(f"{cls.__name__}.FIELDS must be set to a Dict[str, PreferenceField]")
-
     class Meta:
         pass
 
@@ -209,7 +205,7 @@ class Preferences(models.Model):
             models.UniqueConstraint(name="unique_preference", fields=["user", "namespace"]),
         ]
 
-    NAMESPACES: dict[str, Type[Preferences]] = {}
+    NAMESPACES: dict[str, type[Preferences]] = {}
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="preferences")
     namespace = models.CharField(blank=False, max_length=255)
@@ -219,19 +215,15 @@ class Preferences(models.Model):
     unregistered = UnregisteredPreferencesManager()
 
     # must be set by the subclasses
-    FORMS: dict[str, forms.Form]
-    _FIELD_DEFAULTS: dict[str, Any]
-
     FIELDS: dict[str, PreferenceField]
 
     # django methods
 
     # called when subclass is constructing itself
     def __init_subclass__(cls, **kwargs):
-        assert isinstance(getattr(cls, "FORMS", None), dict), f"{cls.__name__}.FORMS must be a dictionary"
-        assert isinstance(
-            getattr(cls, "_FIELD_DEFAULTS", None), dict
-        ), f"{cls.__name__}._FIELD_DEFAULTS must be a dictionary"
+        FIELDS = getattr(cls, "FIELDS", None)
+        if FIELDS is None or not all(isinstance(k, str) and isinstance(v, PreferenceField) for k, v in FIELDS.items()):
+            raise TypeError(f"{cls.__name__}.FIELDS must be set to a dict[str, PreferenceField]")
 
         super().__init_subclass__(**kwargs)
         cls.NAMESPACES[cls._namespace] = cls
@@ -263,7 +255,7 @@ class Preferences(models.Model):
         return {key: field.default for key, field in cls.FIELDS.items()}
 
     @classmethod
-    def ensure_for_user(cls, user) -> List[Preferences]:
+    def ensure_for_user(cls, user) -> list[Preferences]:
         all_preferences = {p.namespace: p for p in user.preferences.all()}
         valid_preferences = []
 
