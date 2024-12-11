@@ -81,7 +81,7 @@ class TestHtmxMessageMiddleware(test.TestCase):
     def test_adds_message_to_response(self):
         self.assertIn("a message", self.process_response(HttpResponse()))
 
-    def test_doesnt_add_message_if_not_htmx(self):
+    def test_doesnt_add_message_to_response_if_not_htmx(self):
         self.request.htmx = False
         self.assertNotIn("a message", self.process_response(HttpResponse()))
 
