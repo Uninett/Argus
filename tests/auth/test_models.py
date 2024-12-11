@@ -138,6 +138,12 @@ class PreferencesTests(TestCase):
         instance = instances[0]
         self.assertIsInstance(instance, MyPreferences)
 
+    def test_get_namespaced_preferences_creates_preferences_with_defaults(self):
+        user = PersonUserFactory()
+        pref_set = user.get_namespaced_preferences(namespace=MyPreferences._namespace)
+        self.assertIsInstance(pref_set, MyPreferences)
+        self.assertEqual(pref_set.preferences, {"magic_number": 42})
+
     def test_vanilla_get_context_dumps_preferences_field_including_defaults(self):
         user = PersonUserFactory()
 
@@ -235,19 +241,6 @@ class PreferencesManagerTests(TestCase):
         prefs = user.get_namespaced_preferences(MyPreferences._namespace)
         result = Preferences.objects.get_by_natural_key(user, MyPreferences._namespace)
         self.assertEqual(prefs, result)
-
-    def test_create_missing_preferences_creates_all_namespaces_for_all_users(self):
-        user1 = PersonUserFactory()
-        user2 = PersonUserFactory()
-
-        # no preferences yet
-        self.assertFalse(Preferences.objects.filter(user=user1).exists())
-        self.assertFalse(Preferences.objects.filter(user=user2).exists())
-
-        Preferences.objects.create_missing_preferences()
-        # three each (two from tests, one from app)
-        self.assertEqual(Preferences.objects.filter(user=user1).count(), 3)
-        self.assertEqual(Preferences.objects.filter(user=user2).count(), 3)
 
     def test_get_all_defaults_returns_all_prefs_defaults(self):
         defaults = Preferences.objects.get_all_defaults()
