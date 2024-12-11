@@ -7,9 +7,14 @@ Append the "context_processors" list for the TEMPLATES-backend
 See django settings for ``TEMPLATES``.
 """
 
+import functools
 from argus.auth.models import Preferences
 
 
+# When ``render`` is called multiple times during a request (such as by HtmxMessageMiddleware),
+# that also results in this function being called more than once for a request. That's unnecessary.
+# Luckily we can cache the result for a request.
+@functools.lru_cache(maxsize=10)
 def preferences(request):
     preferences_choices = {}
     for namespace, cls in Preferences.NAMESPACES.items():
