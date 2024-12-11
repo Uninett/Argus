@@ -27,19 +27,19 @@ Prep the ORIGIN repo
    does not exist on TARGET, we'll standardize on ``merge/`` here::
 
         mkdir merge
-        git mv [A-Za-ln-z]* merge/
+        git mv -k * merge/
 
-   We cannot move "merge/" itself, so any files and directories that start with
-   "m" needs to have their own ``git mv``-line, like ``manage.py``::
+   Without the "-k"-flag, ``git mv`` would error out with ``fatal: can not move
+   directory into itself, source=merge, destination=merge/merge`` and refuse to
+   do anything.
 
-        git mv manage.py merge/
+   Finally move the hidden files (filenames that start with ".")::
 
-   Trying to move ".git/" will also fail so we need multiple ``git mv`` for
-   hidden files as well::
+        git mv -k .* merge/
 
-        git mv .[A-Za-fh-z]* merge/
-        git mv .git[a-z]* merge/
-        git mv .git-[a-z]* merge/
+   Everything should now be in ``merge/`` except for the magic directory
+   ``.git/``, any files hidden by ``.gitignore``, and any untracked files. This
+   is as it should be.
 
 6. Commit::
 
