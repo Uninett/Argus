@@ -70,9 +70,7 @@ class UserIsUsedTests(TestCase):
 
 
 class UserMiscMethodTests(TestCase):
-    def test_get_preferences_context_returns_dict_of_all_properly_registered_preferences(
-        self,
-    ):
+    def test_get_preferences_context_returns_dict_of_all_properly_registered_preferences(self):
         user = PersonUserFactory()
 
         results = user.get_preferences_context()

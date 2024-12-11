@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import functools
-from typing import Any, Dict, List, Optional, Type, Union, Protocol
+from typing import Any, List, Optional, Type, Union, Protocol
 
 from django.contrib.auth.models import AbstractUser, Group
 from django.db import models
@@ -201,7 +201,7 @@ class Preferences(models.Model):
             models.UniqueConstraint(name="unique_preference", fields=["user", "namespace"]),
         ]
 
-    NAMESPACES: Dict[str, Type[Preferences]] = {}
+    NAMESPACES: dict[str, Type[Preferences]] = {}
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="preferences")
     namespace = models.CharField(blank=False, max_length=255)

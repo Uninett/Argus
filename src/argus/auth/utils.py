@@ -61,8 +61,8 @@ def get_preference(request, namespace, preference):
 def get_or_update_preference(request, data, namespace, preference) -> Tuple[Any, bool]:
     """Save the single preference given in data to the given namespace
 
-    Returns a tuple (value, success) with value the value of the preference and succces a boolean
-    indicating wether the preference was succesfully updated
+    Returns a tuple (value, success). Value is the value of the preference, and success a boolean
+    indicating whether the preference was successfully updated
     """
     prefs = get_preference_obj(request, namespace)
     value = prefs.get_preference(preference)
