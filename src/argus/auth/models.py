@@ -94,18 +94,14 @@ class User(AbstractUser):
         # user is not considered in use
         return False
 
-    def get_or_create_preferences(self) -> List[Preferences]:
-        return Preferences.ensure_for_user(self)
-
     def get_preferences_context(self):
-        pref_sets = self.get_or_create_preferences()
+        pref_sets = Preferences.ensure_for_user(self)
         prefdict = {}
         for pref_set in pref_sets:
             prefdict[pref_set.namespace] = pref_set.get_context()
         return prefdict
 
     def get_namespaced_preferences(self, namespace):
-        print("here", namespace)
         obj, _ = Preferences.objects.get_or_create(user=self, namespace=namespace)
         if not obj.preferences and (defaults := obj.get_defaults()):
             obj.preferences = defaults

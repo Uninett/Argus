@@ -13,7 +13,7 @@ from django.http import HttpRequest, HttpResponse, HttpResponseBadRequest
 from django_htmx.middleware import HtmxDetails
 from django_htmx.http import HttpResponseClientRefresh
 
-from argus.auth.utils import get_preference, save_preference
+from argus.auth.utils import get_or_update_preference
 from argus.incident.models import Incident
 from argus.util.datetime_utils import make_aware
 
@@ -117,10 +117,8 @@ def incident_list(request: HtmxHttpRequest) -> HttpResponse:
 
     # Standard Django pagination
 
-    page_size = get_preference(request, "argus_htmx", "page_size")
-    success = save_preference(request, request.GET, "argus_htmx", "page_size")
-    if success:
-        page_size = get_preference(request, "argus_htmx", "page_size")
+    page_size, _ = get_or_update_preference(request, request.GET, "argus_htmx", "page_size")
+
     paginator = Paginator(object_list=qs, per_page=page_size)
     page_num = params.pop("page", "1")
     page = paginator.get_page(page_num)

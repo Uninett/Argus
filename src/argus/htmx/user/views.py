@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.views.decorators.http import require_GET, require_POST
 from django_htmx.http import HttpResponseClientRefresh
 
-from argus.auth.utils import save_preference
+from argus.auth.utils import get_or_update_preference
 
 from argus.htmx.constants import ALLOWED_PAGE_SIZES
 from argus.htmx.incidents.views import HtmxHttpRequest
@@ -17,7 +17,7 @@ def page_size_names(request: HtmxHttpRequest) -> HttpResponse:
 
 @require_POST
 def change_page_size(request: HtmxHttpRequest) -> HttpResponse:
-    save_preference(request, request.POST, "argus_htmx", "page_size")
+    get_or_update_preference(request, request.POST, "argus_htmx", "page_size")
     return HttpResponseClientRefresh()
 
 

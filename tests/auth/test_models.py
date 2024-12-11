@@ -244,16 +244,6 @@ class PreferencesManagerTests(TestCase):
         result = Preferences.objects.get_by_natural_key(user, MyPreferences._namespace)
         self.assertEqual(prefs, result)
 
-    def test_get_or_create_preferences_creates_all_namespaces_for_user(self):
-        user1 = PersonUserFactory()
-
-        # no preferences yet
-        self.assertFalse(Preferences.objects.filter(user=user1).exists())
-
-        user1.get_or_create_preferences()
-        # three each (two from tests, one from app)
-        self.assertEqual(Preferences.objects.filter(user=user1).count(), 3)
-
     def test_get_all_defaults_returns_all_prefs_defaults(self):
         defaults = Preferences.objects.get_all_defaults()
         self.assertIsInstance(defaults, dict)

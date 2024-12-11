@@ -1,5 +1,6 @@
 from copy import deepcopy
 import logging
+from typing import Any, Tuple
 
 from django.conf import settings
 from django.contrib.auth.backends import ModelBackend, RemoteUserBackend
@@ -57,10 +58,11 @@ def get_preference(request, namespace, preference):
     return prefs.get_preference(preference)
 
 
-def save_preference(request, data, namespace, preference):
+def get_or_update_preference(request, data, namespace, preference) -> Tuple[Any, bool]:
     """Save the single preference given in data to the given namespace
 
-    Returns True on success, otherwise False
+    Returns a tuple (value, success) with value the value of the preference and succces a boolean
+    indicating wether the preference was succesfully updated
     """
     prefs = get_preference_obj(request, namespace)
     value = prefs.get_preference(preference)
@@ -68,21 +70,21 @@ def save_preference(request, data, namespace, preference):
 
     if not data.get(preference, None):
         LOG.debug("Failed to change %s, not in input: %s", preference, data)
-        return False
+        return value, False
 
     form = prefs.FORMS[preference](data)
     if not form.is_valid():
         messages.warning(request, f"Failed to change {preference}, invalid input")
         LOG.warning("Failed to change %s, invalid input: %s", preference, data)
-        return False
+        return value, False
 
     old_value = deepcopy(value)  # Just in case value is mutable..
     value = form.cleaned_data[preference]
     if value == old_value:
         LOG.debug("Did not change %s: no change", preference)
-        return False
+        return value, False
 
     prefs.save_preference(preference, value)
     messages.success(request, f"Changed {preference}: {old_value} → {value}")
     LOG.info("Changed %s: %s → %s", preference, old_value, value)
-    return True
+    return value, True
