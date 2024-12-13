@@ -1,15 +1,16 @@
 from django import forms
 
-from argus.auth.models import preferences
-
+from argus.auth.models import PreferenceField, preferences
 from argus.htmx.constants import (
-    DATETIME_FORMATS,
-    DATETIME_DEFAULT,
+    ALLOWED_PAGE_SIZES,
     DATETIME_CHOICES,
-    PAGE_SIZE_CHOICES,
+    DATETIME_DEFAULT,
+    DATETIME_FORMATS,
     DEFAULT_PAGE_SIZE,
+    PAGE_SIZE_CHOICES,
     THEME_CHOICES,
     THEME_DEFAULT,
+    THEME_NAMES,
 )
 
 
@@ -27,15 +28,17 @@ class ThemeForm(forms.Form):
 
 @preferences(namespace="argus_htmx")
 class ArgusHtmxPreferences:
-    FORMS = {
-        "datetime_format_name": DateTimeFormatForm,
-        "page_size": PageSizeForm,
-        "theme": ThemeForm,
-    }
-    _FIELD_DEFAULTS = {
-        "datetime_format_name": DATETIME_DEFAULT,
-        "page_size": DEFAULT_PAGE_SIZE,
-        "theme": THEME_DEFAULT,
+    FIELDS = {
+        "datetime_format_name": PreferenceField(
+            form=DateTimeFormatForm, default=DATETIME_DEFAULT, choices=DATETIME_FORMATS
+        ),
+        "page_size": PreferenceField(form=PageSizeForm, default=DEFAULT_PAGE_SIZE, choices=ALLOWED_PAGE_SIZES),
+        "theme": PreferenceField(
+            form=ThemeForm,
+            default=THEME_DEFAULT,
+            choices=THEME_NAMES,
+            partial_response_template="htmx/user/_current_theme.html",
+        ),
     }
 
     def update_context(self, context):
