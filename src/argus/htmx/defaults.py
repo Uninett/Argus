@@ -32,6 +32,7 @@ DEFAULT_THEMES = [
     "light",
     {
         "argus": {
+            "color-scheme": "light",
             "primary": "#006d91",
             "primary-content": "#d1e1e9",
             "secondary": "#f3b61f",

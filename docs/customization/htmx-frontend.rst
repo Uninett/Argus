@@ -70,6 +70,7 @@ How to customize the look:
         "dim",
         "autumn",
         { "mytheme": {
+            "color-scheme": "dark",
             "primary": "#009eb6",
             "primary-content": "#00090c",
             "secondary": "#00ac00",
