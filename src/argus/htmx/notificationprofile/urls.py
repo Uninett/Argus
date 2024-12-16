@@ -1,23 +1,13 @@
-from django.http import HttpResponse
-from django.template import Template, RequestContext
 from django.urls import path
-from django.views.decorators.http import require_GET
 
-
-@require_GET
-def placeholder(request):
-    template = Template(
-        """{% extends "htmx/base.html" %}
-        {% block main %}
-        <h1>NOTIFICATION PROFILES PLACEHOLDER</h1>
-        {% endblock main %}
-        """
-    )
-    context = RequestContext(request)
-    return HttpResponse(template.render(context))
+from . import views
 
 
 app_name = "htmx"
 urlpatterns = [
-    path("", placeholder, name="notificationprofile-placeholder"),
+    path("", views.NotificationProfileListView.as_view(), name="notificationprofile-list"),
+    path("create/", views.NotificationProfileCreateView.as_view(), name="notificationprofile-create"),
+    path("<pk>/", views.NotificationProfileDetailView.as_view(), name="notificationprofile-detail"),
+    path("<pk>/update/", views.NotificationProfileUpdateView.as_view(), name="notificationprofile-update"),
+    path("<pk>/delete/", views.NotificationProfileDeleteView.as_view(), name="notificationprofile-delete"),
 ]
