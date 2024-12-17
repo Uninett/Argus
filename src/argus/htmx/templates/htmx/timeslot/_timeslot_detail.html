@@ -1,0 +1,16 @@
+<section>
+  <h2>{{ object.name }}</h2>
+  <div>
+    {% for time_recurrence in object.time_recurrences.all %}<p>{{ time_recurrence }}</p>{% endfor %}
+    {% if show_buttons %}
+      <p>
+        <a class="btn btn-primary"
+           href="{% url "htmx:timeslot-update" pk=object.pk %}">Update</a>
+      </p>
+      <p>
+        <a class="btn btn-primary"
+           href="{% url "htmx:timeslot-delete" pk=object.pk %}">Delete</a>
+      </p>
+    {% endif %}
+  </div>
+</section>
