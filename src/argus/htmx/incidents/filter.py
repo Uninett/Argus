@@ -9,8 +9,20 @@ filter_backend = get_filter_backend()
 QuerySetFilter = filter_backend.QuerySetFilter
 
 
-class DropdownMultiSelect(forms.CheckboxSelectMultiple):
-    template_name = "htmx/incidents/_incident_source_select.html"
+class ExtraWidgetMixin:
+    def __init__(self, extra=None, **kwargs):
+        super().__init__(**kwargs)
+        self.extra = {} if extra is None else extra
+
+    def __deepcopy__(self, memo):
+        obj = super().__deepcopy__(memo)
+        obj.extra = self.extra.copy()
+        memo[id(self)] = obj
+        return obj
+
+
+class DropdownMultiSelect(ExtraWidgetMixin, forms.CheckboxSelectMultiple):
+    template_name = "htmx/forms/dropdown_select_multiple.html"
     option_template_name = "htmx/forms/checkbox_select_multiple.html"
 
 
@@ -20,7 +32,12 @@ class IncidentFilterForm(forms.Form):
     acked = forms.BooleanField(required=False)
     unacked = forms.BooleanField(required=False)
     source = forms.MultipleChoiceField(
-        widget=DropdownMultiSelect(attrs={"placeholder": "select sources..."}),
+        widget=DropdownMultiSelect(
+            attrs={"placeholder": "select sources..."},
+            extra={
+                "hx_get": "htmx:incidents-filter",
+            },
+        ),
         choices=tuple(SourceSystem.objects.values_list("id", "name")),
         required=False,
         label="Sources",
