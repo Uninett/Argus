@@ -3,27 +3,11 @@ from django import forms
 from argus.filter import get_filter_backend
 from argus.incident.models import SourceSystem
 from argus.incident.constants import Level
+from argus.htmx.widgets import DropdownMultiSelect
 
 
 filter_backend = get_filter_backend()
 QuerySetFilter = filter_backend.QuerySetFilter
-
-
-class ExtraWidgetMixin:
-    def __init__(self, extra=None, **kwargs):
-        super().__init__(**kwargs)
-        self.extra = {} if extra is None else extra
-
-    def __deepcopy__(self, memo):
-        obj = super().__deepcopy__(memo)
-        obj.extra = self.extra.copy()
-        memo[id(self)] = obj
-        return obj
-
-
-class DropdownMultiSelect(ExtraWidgetMixin, forms.CheckboxSelectMultiple):
-    template_name = "htmx/forms/dropdown_select_multiple.html"
-    option_template_name = "htmx/forms/checkbox_select_multiple.html"
 
 
 class IncidentFilterForm(forms.Form):
