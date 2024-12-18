@@ -1,3 +1,9 @@
+"""
+Everything needed python-wise to CRUD notificationprofiles
+
+See https://ccbv.co.uk/ to grok class-based views.
+"""
+
 from django import forms
 from django.urls import reverse
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
@@ -19,6 +25,8 @@ class NotificationProfileForm(forms.ModelForm):
 
 
 class NotificationProfileMixin:
+    "Common functionality for all views"
+
     model = NotificationProfile
 
     def get_queryset(self):
@@ -48,6 +56,8 @@ class NotificationProfileMixin:
 
 
 class ChangeMixin:
+    "Common functionality for create and update views"
+
     form_class = NotificationProfileForm
 
     def get_form_kwargs(self):
