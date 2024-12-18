@@ -12,6 +12,11 @@ class ExtraWidgetMixin:
         memo[id(self)] = obj
         return obj
 
+    def get_context(self, name, value, attrs):
+        context = super().get_context(name, value, attrs)
+        context["extra"] = self.extra
+        return context
+
 
 class DropdownMultiSelect(ExtraWidgetMixin, forms.CheckboxSelectMultiple):
     template_name = "htmx/forms/dropdown_select_multiple.html"
