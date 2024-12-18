@@ -472,7 +472,7 @@ class EventViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, mixins.Retrie
             return HttpResponseRedirect(reverse("incident:incident-detail", kwargs={"pk": incident.pk}))
         else:
             # Only update incident if everything is valid; otherwise, just record the event
-            self.update_incident(serializer.validated_data, incident)
+            self.update_incident_end_time(serializer.validated_data, incident)
 
         serializer.save(incident=incident, actor=user)
 
@@ -523,7 +523,7 @@ class EventViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, mixins.Retrie
         if event_type in Event.STATE_TYPES:
             self._abort_due_to_type_validation_error("Cannot change the state of a stateless incident.")
 
-    def update_incident(self, validated_data: dict, incident: Incident):
+    def update_incident_end_time(self, validated_data: dict, incident: Incident):
         timestamp = validated_data["timestamp"]
         event_type = validated_data["type"]
         if event_type in {Event.Type.INCIDENT_END, Event.Type.CLOSE}:
