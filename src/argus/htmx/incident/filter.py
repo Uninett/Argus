@@ -11,7 +11,7 @@ QuerySetFilter = filter_backend.QuerySetFilter
 
 
 class BadgeDropdownMultiSelect(DropdownMultiSelect):
-    template_name = "htmx/incidents/widgets/incident_source_select.html"
+    template_name = "htmx/incident/widgets/incident_source_select.html"
 
 
 class IncidentFilterForm(forms.Form):
