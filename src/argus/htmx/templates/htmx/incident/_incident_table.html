@@ -14,7 +14,7 @@
             {% if col.header_template %}
               {% include col.header_template with label=col.label %}
             {% elif col.filter_field %}
-              {% include "htmx/incident/_incident_filterable_column.html" with column=col %}
+              {% include "htmx/incident/cells/_incident_filterable_column_header.html" with column=col %}
             {% else %}
               {{ col.label }}
             {% endif %}
