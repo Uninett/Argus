@@ -14,7 +14,7 @@ class ExtraWidgetMixin:
 
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
-        context["extra"] = self.extra
+        context["widget"]["extra"] = self.extra
         return context
 
 
