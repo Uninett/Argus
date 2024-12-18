@@ -61,7 +61,7 @@ def incident_detail(request, pk: int):
         "incident": incident,
         "page_title": str(incident),
     }
-    return render(request, "htmx/incidents/incident_detail.html", context=context)
+    return render(request, "htmx/incident/incident_detail.html", context=context)
 
 
 def get_form_data(request, formclass: forms.Form):
@@ -77,7 +77,7 @@ def get_form_data(request, formclass: forms.Form):
 
 
 @require_POST
-def incidents_update(request: HtmxHttpRequest, action: str):
+def incident_update(request: HtmxHttpRequest, action: str):
     try:
         formclass, callback_func = INCIDENT_UPDATE_ACTIONS[action]
     except KeyError:
@@ -94,7 +94,7 @@ def filter_form(request: HtmxHttpRequest):
     incident_list_filter = get_filter_function()
     filter_form, _ = incident_list_filter(request, None)
     context = {"filter_form": filter_form}
-    return render(request, "htmx/incidents/_incident_filterbox.html", context=context)
+    return render(request, "htmx/incident/_incident_filterbox.html", context=context)
 
 
 @require_GET
@@ -124,9 +124,9 @@ def incident_list(request: HtmxHttpRequest) -> HttpResponse:
     # requests, allowing us to skip rendering the unchanging parts of the
     # template.
     if request.htmx:
-        base_template = "htmx/incidents/responses/_incident_list_refresh.html"
+        base_template = "htmx/incident/responses/_incident_list_refresh.html"
     else:
-        base_template = "htmx/incidents/_base.html"
+        base_template = "htmx/incident/_base.html"
     context = {
         "columns": columns,
         "filtered_count": filtered_count,
@@ -140,4 +140,4 @@ def incident_list(request: HtmxHttpRequest) -> HttpResponse:
         "all_page_sizes": ALLOWED_PAGE_SIZES,
     }
 
-    return render(request, "htmx/incidents/incident_list.html", context=context)
+    return render(request, "htmx/incident/incident_list.html", context=context)
