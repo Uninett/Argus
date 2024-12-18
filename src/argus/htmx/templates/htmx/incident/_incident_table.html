@@ -14,7 +14,7 @@
             {% if col.header_template %}
               {% include col.header_template with label=col.label %}
             {% elif col.filter_field %}
-              {% include "htmx/incidents/_incident_filterable_column.html" with column=col %}
+              {% include "htmx/incident/_incident_filterable_column.html" with column=col %}
             {% else %}
               {{ col.label }}
             {% endif %}
@@ -27,7 +27,7 @@
   </thead>
   <tbody id="table-body">
     {% block incident_rows %}
-      {% include "htmx/incidents/_incident_table_rows.html" with incident_list=page.object_list %}
+      {% include "htmx/incident/_incident_table_rows.html" with incident_list=page.object_list %}
     {% endblock incident_rows %}
   </tbody>
   <tfoot>
@@ -35,7 +35,7 @@
       <td colspan="{{ columns|length }}" class="border-t border-primary">
         <div class="flex justify-between items-center">
           {% block refresh_info %}
-            {% include "htmx/incidents/_incident_list_refresh_info.html" %}
+            {% include "htmx/incident/_incident_list_refresh_info.html" %}
           {% endblock refresh_info %}
           <!--
                 The htmx attributes set on the nav here are inherited by the child links.
