@@ -4,6 +4,7 @@ import secrets
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import IntegrityError
+from django.http import HttpResponseRedirect
 from django.utils import timezone
 
 from django_filters import rest_framework as filters
@@ -467,8 +468,8 @@ class EventViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, mixins.Retrie
             if not user.is_source_system:
                 raise e
         except (SuccessfulRepairException, InconceivableException):
-            # Do not save new event, it was redundant
-            return
+            # Do not save new event, it was redundant, redirect to incident
+            return HttpResponseRedirect(reverse("incident:incident-detail", kwargs={"pk": incident.pk}))
         else:
             # Only update incident if everything is valid; otherwise, just record the event
             self.update_incident(serializer.validated_data, incident)
