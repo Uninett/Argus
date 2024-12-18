@@ -555,10 +555,10 @@ class Incident(models.Model):
                 LOG.info("Incident %s: No mismatch, correctly stateful and open", self.pk)
                 return False
             else:
-                # missing close event. This is serious.
-                message = "Incident %s has been closed without adding an event"
+                # missing close event. This is serious. 500 Internal Server Error serious.
+                message = "Incident %s was previously closed without the creation of an appropriate event"
                 LOG.error(message, self.pk)
-                raise InconsistentDatabaseException(message)
+                raise InconsistentDatabaseException(message % self.pk)
 
         # Only incidents with at least one close event from this point on
 
