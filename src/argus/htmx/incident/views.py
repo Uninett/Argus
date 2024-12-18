@@ -77,7 +77,7 @@ def get_form_data(request, formclass: forms.Form):
 
 
 @require_POST
-def incidents_update(request: HtmxHttpRequest, action: str):
+def incident_update(request: HtmxHttpRequest, action: str):
     try:
         formclass, callback_func = INCIDENT_UPDATE_ACTIONS[action]
     except KeyError:
