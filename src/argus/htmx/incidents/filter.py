@@ -10,13 +10,17 @@ filter_backend = get_filter_backend()
 QuerySetFilter = filter_backend.QuerySetFilter
 
 
+class BadgeDropdownMultiSelect(DropdownMultiSelect):
+    template_name = "htmx/incidents/widgets/incident_source_select.html"
+
+
 class IncidentFilterForm(forms.Form):
     open = forms.BooleanField(required=False)
     closed = forms.BooleanField(required=False)
     acked = forms.BooleanField(required=False)
     unacked = forms.BooleanField(required=False)
     source = forms.MultipleChoiceField(
-        widget=DropdownMultiSelect(
+        widget=BadgeDropdownMultiSelect(
             attrs={"placeholder": "select sources..."},
             extra={
                 "hx_get": "htmx:incidents-filter",
