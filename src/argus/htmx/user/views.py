@@ -6,7 +6,7 @@ from django_htmx.http import HttpResponseClientRefresh
 from argus.auth.utils import get_or_update_preference
 
 from argus.htmx.constants import ALLOWED_PAGE_SIZES
-from argus.htmx.incidents.views import HtmxHttpRequest
+from argus.htmx.incident.views import HtmxHttpRequest
 
 
 @require_GET

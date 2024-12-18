@@ -12,7 +12,7 @@ def get_filter_function(arg=None):
     ARGUS_HTMX_FILTER_FUNCTION can be one of:
 
       * a callable that takes a Request and a QuerySet argument, and returns a Form and an updated
-        QuerySet (see ``argus.htmx.incidents.filter.incident_list_filter``)
+        QuerySet (see ``argus.htmx.incident.filter.incident_list_filter``)
       * a dotted path to an importable function that has the above signature
       * a dotted path to a module. This module should then contain a function named
         ``incident_list_filter`` with the above signature

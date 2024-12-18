@@ -1,6 +1,6 @@
 from django import test
 
-from argus.htmx.incidents.utils import get_filter_function
+from argus.htmx.incident.utils import get_filter_function
 
 
 class TestGetFilterFunction(test.TestCase):
