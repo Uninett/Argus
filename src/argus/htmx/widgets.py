@@ -21,3 +21,7 @@ class ExtraWidgetMixin:
 class DropdownMultiSelect(ExtraWidgetMixin, forms.CheckboxSelectMultiple):
     template_name = "htmx/forms/dropdown_select_multiple.html"
     option_template_name = "htmx/forms/checkbox_select_multiple.html"
+
+
+class BadgeDropdownMultiSelect(DropdownMultiSelect):
+    template_name = "htmx/forms/badge_dropdown_select_multiple.html"

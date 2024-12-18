@@ -3,15 +3,11 @@ from django import forms
 from argus.filter import get_filter_backend
 from argus.incident.models import SourceSystem
 from argus.incident.constants import Level
-from argus.htmx.widgets import DropdownMultiSelect
+from argus.htmx.widgets import BadgeDropdownMultiSelect
 
 
 filter_backend = get_filter_backend()
 QuerySetFilter = filter_backend.QuerySetFilter
-
-
-class BadgeDropdownMultiSelect(DropdownMultiSelect):
-    template_name = "htmx/incident/widgets/incident_source_select.html"
 
 
 class IncidentFilterForm(forms.Form):
