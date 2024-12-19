@@ -3,6 +3,19 @@
 This file documents changes to Argus that are relevant for operations and
 end-users.
 
+## [1.30.0] - 2024-12-19
+
+Final release of the year! This was again mostly changes to the alpha frontend.
+
+This release adds support for showing, adding, changing and deleting timeslots
+and notificaton profiles, though with no graphical polish whatsoever.
+
+The only functionality that is still to be finished is in the filter box on the
+incidents page:
+
+* filtering on tags
+* loading and saving filters
+
 ## [1.29.0] - 2024-12-06
 
 Mostly changes to the alpha frontend that will not be detailed here.
