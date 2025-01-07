@@ -67,7 +67,7 @@ class NotificationMedium(ABC):
     @classmethod
     def validate(
         cls, data: dict, user: User, instance: DestinationConfig = None, exception_class=ValidationError
-    ) -> dict:
+    ) -> CommonDestinationConfigForm:
         if instance:
             if data.get("media", "") != instance.media.slug:
                 raise exception_class(cls.error_messages["readonly_media"])
@@ -80,7 +80,7 @@ class NotificationMedium(ABC):
         if not form.is_valid():
             raise exception_class(form.errors)
 
-        settings_form = cls.validate_settings(data)
+        settings_form = cls.validate_settings(data, user)
         form.cleaned_data["settings"] = settings_form.cleaned_data
         form.cleaned_data["user"] = user
         return form
