@@ -8,3 +8,7 @@ src/argus/htmx/templates/htmx/incident(s).
   `htmx/incident/widgets/`.
 * Whenever there were plural view-names or url-names for incident-related views
   they were made singular.
+
+There will be empty directories left behind, `git` cannot do anything with
+these. Run `make clean` to delete cached files then find empty directories with
+`find . -type d -empty`. Delete them manually.
