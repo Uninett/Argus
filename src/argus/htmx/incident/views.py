@@ -15,6 +15,7 @@ from django_htmx.http import HttpResponseClientRefresh
 from argus.auth.utils import get_or_update_preference
 from argus.incident.models import Incident
 from argus.util.datetime_utils import make_aware
+from .filter import select_filter
 
 from ..request import HtmxHttpRequest
 
@@ -29,6 +30,7 @@ from ..utils import (
     bulk_reopen_queryset,
     bulk_change_ticket_url_queryset,
 )
+from ...notificationprofile.models import Filter
 
 User = get_user_model()
 LOG = logging.getLogger(__name__)
@@ -93,6 +95,15 @@ def incident_update(request: HtmxHttpRequest, action: str):
 def filter_form(request: HtmxHttpRequest):
     incident_list_filter = get_filter_function()
     filter_form, _ = incident_list_filter(request, None)
+    context = {"filter_form": filter_form}
+    return render(request, "htmx/incident/_incident_filterbox.html", context=context)
+
+
+@require_GET
+def filter_select(request: HtmxHttpRequest):
+    filter_id = request.GET.get("filter")
+    filter = get_object_or_404(Filter, id=filter_id)
+    filter_form, _ = select_filter(filter, None)
     context = {"filter_form": filter_form}
     return render(request, "htmx/incident/_incident_filterbox.html", context=context)
 

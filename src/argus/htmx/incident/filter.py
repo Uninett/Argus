@@ -105,3 +105,11 @@ def incident_list_filter(request, qs):
         filterblob = form.to_filterblob()
         qs = QuerySetFilter.filtered_incidents(filterblob, qs)
     return form, qs
+
+def select_filter(filter: Filter, qs):
+    form = IncidentFilterForm(filter.filter)
+
+    if form.is_valid():
+        filterblob = form.to_filterblob()
+        qs = QuerySetFilter.filtered_incidents(filterblob, qs)
+    return form, qs

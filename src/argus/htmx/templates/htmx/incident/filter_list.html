@@ -4,6 +4,11 @@
   </span>
 
   <select class="select select-ghost w-full max-w-xs"
+          id="incident-filter-select"
+          name="filter"
+          hx-get="{% url 'htmx:select-filter' %}"
+          hx-target="#incident-filter-box"
+          hx-swap="outerHTML"
   >
     <option disabled selected value="">---</option>
     {% for object in object_list %}
