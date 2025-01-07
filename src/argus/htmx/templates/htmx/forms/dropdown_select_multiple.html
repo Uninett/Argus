@@ -4,6 +4,7 @@
      hx-swap="outerHTML"
      hx-target="find .show-selected-box"
      hx-select=".show-selected-box"
+     {% if widget.extra.hx_get %}hx-get="{% url widget.extra.hx_get %}"{% endif %}
      {% endblock field_control %}>
   <div tabindex="0"
        role="button"

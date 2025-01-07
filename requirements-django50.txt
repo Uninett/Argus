@@ -72,6 +72,7 @@ django==5.0.9
     #   django-filter
     #   django-htmx
     #   django-phonenumber-field
+    #   django-rest-knox
     #   djangorestframework
     #   drf-rw-serializers
     #   drf-spectacular
@@ -84,11 +85,14 @@ django-htmx==1.21.0
     # via -r requirements/htmx.txt
 django-phonenumber-field[phonenumberslite]==7.3.0
     # via argus-server (pyproject.toml)
+django-rest-knox==5.0.2
+    # via argus-server (pyproject.toml)
 django-widget-tweaks==1.5.0
     # via -r requirements/htmx.txt
 djangorestframework==3.14.0
     # via
     #   argus-server (pyproject.toml)
+    #   django-rest-knox
     #   drf-spectacular
 drf-rw-serializers==1.1.1
     # via argus-server (pyproject.toml)

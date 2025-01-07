@@ -6,14 +6,22 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.exceptions import AuthenticationFailed
 
 
-class ExpiringTokenAuthentication(TokenAuthentication):
+class DeprecatedExpiringTokenAuthentication(TokenAuthentication):
     EXPIRATION_DURATION = timedelta(days=settings.AUTH_TOKEN_EXPIRES_AFTER_DAYS)
 
     def authenticate_credentials(self, key):
-        user, token = super().authenticate_credentials(key)
+        model = self.get_model()
+
+        try:
+            token = model.objects.select_related("user").get(key=key)
+        except model.DoesNotExist:
+            return None
+
+        if not token.user.is_active:
+            raise AuthenticationFailed("User inactive or deleted.")
 
         if token.created + self.EXPIRATION_DURATION < timezone.now():
             token.delete()
             raise AuthenticationFailed("Token has expired.")
 
-        return user, token
+        return token.user, token

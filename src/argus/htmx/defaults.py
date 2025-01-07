@@ -1,7 +1,7 @@
 # customize the displayed columns in the incident table
 # items in INCIDENT_TABLE_COLUMNS can be either a `str` referring to a key in
-# argus.htmx.incidents.customization.BUILTIN_COLUMNS or an instance of
-# argus.htmx.incidents.customization.IncidentTableColumn
+# argus.htmx.incident.customization.BUILTIN_COLUMNS or an instance of
+# argus.htmx.incident.customization.IncidentTableColumn
 from argus.site.settings import get_json_env, get_str_env
 
 INCIDENT_TABLE_COLUMNS = [
@@ -14,7 +14,7 @@ INCIDENT_TABLE_COLUMNS = [
     "description",
     "ticket",
 ]
-ARGUS_HTMX_FILTER_FUNCTION = "argus.htmx.incidents.filter.incident_list_filter"
+ARGUS_HTMX_FILTER_FUNCTION = "argus.htmx.incident.filter.incident_list_filter"
 
 # These templates are auto-discovered by the templating engine and are relative
 # to the argus.htmx's `templates/` directory
@@ -32,6 +32,7 @@ DEFAULT_THEMES = [
     "light",
     {
         "argus": {
+            "color-scheme": "light",
             "primary": "#006d91",
             "primary-content": "#d1e1e9",
             "secondary": "#f3b61f",
@@ -60,3 +61,8 @@ THEME_DEFAULT = get_str_env("ARGUS_THEME_DEFAULT", "argus")
 DEFAULT_THEME_OVERRIDE = {}
 TAILWIND_THEME_OVERRIDE = get_json_env("TAILWIND_THEME_OVERRIDE", DEFAULT_THEME_OVERRIDE, quiet=True)
 STYLESHEET_PATH = get_str_env("ARGUS_STYLESHEET_PATH", STYLESHEET_PATH_DEFAULT)
+
+NOTIFICATION_TOAST_AUTOCLOSE_SECONDS = {
+    "success": 10,
+    "autoclose": 10,
+}

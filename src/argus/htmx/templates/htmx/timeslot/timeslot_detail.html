@@ -1,0 +1,6 @@
+{% extends "htmx/base.html" %}
+{% block main %}
+  {% with show_buttons=True %}
+    {% include "./_timeslot_detail.html" %}
+  {% endwith %}
+{% endblock main %}

@@ -3,6 +3,35 @@
 This file documents changes to Argus that are relevant for operations and
 end-users.
 
+## [1.30.0] - 2024-12-19
+
+Final release of the year! This was again mostly changes to the alpha frontend.
+
+This release adds support for showing, adding, changing and deleting timeslots
+and notificaton profiles, though with no graphical polish whatsoever.
+
+The only functionality that is still to be finished is in the filter box on the
+incidents page:
+
+* filtering on tags
+* loading and saving filters
+
+## [1.29.0] - 2024-12-06
+
+Mostly changes to the alpha frontend that will not be detailed here.
+
+Support for multple API tokens per user has been added, via django-rest-knox.
+For that reason, the old API endpoints for dealing with token authentication
+has been deprecated, and new endpoints have been added to v2 of the API.
+
+We've copied the linting rules from argus-htmx, so anything that have not been
+merged yet might have to be updated to keep the linters happy.
+
+### Deprecated
+
+All v1 API endpoints for dealing with phone numbers have been deprecated.
+Please see the v2 endpoints dealing with destinations instead.
+
 ## [1.28.0] - 2024-11-29
 
 This version marks the inclusion of our new, alpha web frontend. It does not do

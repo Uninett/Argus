@@ -1,0 +1,9 @@
+{% extends "htmx/base.html" %}
+{% block main %}
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_div }}
+    {{ formset.as_div }}
+    <input class="btn btn-primary" type="submit" value="Save">
+  </form>
+{% endblock main %}

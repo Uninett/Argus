@@ -11,6 +11,11 @@ from argus.notificationprofile.serializers import RequestDestinationConfigSerial
 from .serializers import RequestPhoneNumberSerializerV1, ResponsePhoneNumberSerializerV1, UserSerializerV1
 
 
+PHONE_NUMBERS_DEPRECATED = (
+    "Phone numbers are now accessible through the destinations API. See /api/v2/notificationprofiles/destinations/."
+)
+
+
 class CurrentUserViewV1(APIView):
     permission_classes = [IsAuthenticated]
     serializer_class = UserSerializerV1
@@ -21,13 +26,32 @@ class CurrentUserViewV1(APIView):
 
 
 @extend_schema_view(
+    deprecated=True,
+    list=extend_schema(
+        deprecated=True,
+        description=PHONE_NUMBERS_DEPRECATED,
+    ),
+    retrieve=extend_schema(
+        deprecated=True,
+        description=PHONE_NUMBERS_DEPRECATED,
+    ),
+    destroy=extend_schema(
+        deprecated=True,
+        description=PHONE_NUMBERS_DEPRECATED,
+    ),
     create=extend_schema(
+        deprecated=True,
+        description=PHONE_NUMBERS_DEPRECATED,
         request=RequestPhoneNumberSerializerV1,
     ),
     update=extend_schema(
+        deprecated=True,
+        description=PHONE_NUMBERS_DEPRECATED,
         request=RequestPhoneNumberSerializerV1,
     ),
     partial_update=extend_schema(
+        deprecated=True,
+        description=PHONE_NUMBERS_DEPRECATED,
         request=RequestPhoneNumberSerializerV1,
     ),
 )

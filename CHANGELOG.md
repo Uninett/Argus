@@ -8,6 +8,92 @@ This project uses [*towncrier*](https://towncrier.readthedocs.io/) and the chang
 
 <!-- towncrier release notes start -->
 
+## [1.30.0] - 2024-12-19
+
+Mostly changes to the alpha frontend
+
+### Added
+
+- Added docs for how to vendor a repo (copy one repo into another, preserving
+  history).
+
+### HTMX app
+
+- Add HTMX version of the destinations page
+  ([#1001](https://github.com/Uninett/Argus/issues/1001))
+- Show user an error message in case a htmx partial request fails
+  ([#1023](https://github.com/Uninett/Argus/issues/1023))
+- Allow extending preferences page
+  ([#1070](https://github.com/Uninett/Argus/issues/1070))
+- Keep django messages in queue on htmx redirects or refreshes
+  ([#1071](https://github.com/Uninett/Argus/issues/1071))
+
+#### Added
+
+- Replaced the placeholder notification profile page with a very ugly but
+  functional one.
+- Replaced the placeholder time-slots page with a very ugly but functional one.
+- Added loading indicator to bulk action buttons
+
+#### Changed
+
+- Performance: Reduced the number of queries to preferences db table
+  ([#1082](https://github.com/Uninett/Argus/issues/1082))
+- Declared argus-theme as one with the light color scheme in order to always
+  have reasonable fallbacks.
+  ([#1088](https://github.com/Uninett/Argus/issues/1088))
+- Generalized the multiselect dropdown widget used for the source field in the
+  filterbox so that we can use it for other dropdowns on other pages.
+- Renamed some directories and templates to give them better, more
+  consistent names.
+
+#### Fixed
+
+- Fixed background color in input fields for argus-theme globally.
+  ([#1088](https://github.com/Uninett/Argus/issues/1088))
+
+
+## [1.29.0] - 2024-12-06
+
+Mostly changes to the alpha frontend
+
+### Added
+
+- Add support for multple API tokens per user via django-rest-knox. For that
+  reason, the old API endpoints for dealing with token authentication has been
+  deprecated, and new endpoints have been added to v2 of the API.
+
+### Changed
+
+- We've copied the linting rules from argus-htmx, so anything that have not
+  been merged yet might have to be updated to keep the linters happy.
+
+### Deprecated
+
+- All v1 API endpoints for dealing with phone numbers have been deprecated.
+  Please see the v2 endpoints dealing with destinations instead.
+
+### HTMx app
+
+#### Added
+
+- `ARGUS_HTMX_FILTER_FUNCTION` can take a callable or a dotted
+  function path ([#1029](https://github.com/Uninett/Argus/issues/1029))
+- Support incident filtering from incident list table columns
+
+#### Changed
+
+- Return user to login page on unauthenticated HTMx request
+- Automatically close certain notification toasts
+
+#### Fixed
+
+- Keep column filters when autoreloading incident list
+  ([#1033](https://github.com/Uninett/Argus/issues/1033))
+- Fix incorrect width specifier in column filter input
+  ([#1065](https://github.com/Uninett/Argus/issues/1065))
+
+
 ## [1.28.0] - 2024-11-29
 
 This version marks the inclusion of our new, alpha web frontend. It does not do

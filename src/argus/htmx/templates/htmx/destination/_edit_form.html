@@ -1,0 +1,27 @@
+<form hx-post="{% url 'htmx:htmx-update' form.instance.id %}"
+      hx-trigger="submit"
+      hx-target="#form-list"
+      class="flex flex-nowrap items-center gap-4">
+  {% csrf_token %}
+  <fieldset class="flex flex-nowrap items-center gap-4">
+    {% for hidden_field in form.hidden_fields %}{{ hidden_field }}{% endfor %}
+    {% for field in form.visible_fields %}
+      <label class="form-control max-w-xs mb-auto">
+        <div class="label">
+          <span class="label-text">{{ field.label }}</span>
+        </div>
+        <div class="input input-bordered flex items-center gap-2">{{ field }}</div>
+        <div class="label">
+          <span class="label-text-alt min-h-4">
+            {% if field.errors %}
+              {% for error in field.errors %}<p class="text-error">{{ error }}</p>{% endfor %}
+            {% endif %}
+          </span>
+        </div>
+      </label>
+    {% empty %}
+      <p>Something went wrong</p>
+    {% endfor %}
+  </fieldset>
+  <input type="submit" value="Update" class="btn btn-primary">
+</form>
