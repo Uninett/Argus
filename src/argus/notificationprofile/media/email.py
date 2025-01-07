@@ -155,7 +155,7 @@ class EmailNotification(BaseEmailNotification):
         """
         super().raise_if_not_deletable(destination=destination)
 
-        if destination.settings["synced"]:
+        if destination.settings.get("synced", None):
             raise cls.NotDeletableError(
                 "Cannot delete this email destination since it was defined by an outside source."
             )
@@ -184,6 +184,11 @@ class EmailNotification(BaseEmailNotification):
         )
         LOG.info("Cloning synced email-address on update: %s", old_address)
         return True
+
+    @classmethod
+    def clean(cls, form: forms.Form) -> forms.Form:
+        form.cleaned_data["synced"] = form.cleaned_data.get("synced", False)
+        return form
 
     @classmethod
     def update(cls, destination: DestinationConfig, validated_data: dict) -> DestinationConfig:
