@@ -8,7 +8,7 @@ class TestGetFilterFunction(test.TestCase):
         # importing incident_list_filter requires a fully migrated database. During tests,
         # especially in CI, this cannot be guaranteed if we import incident_list_filter at the
         # top of this file. So we postpone importing until the tests are run.
-        from argus.htmx.incidents.filter import incident_list_filter
+        from argus.htmx.incident.filter import incident_list_filter
 
         self.incident_list_filter = incident_list_filter
 
@@ -21,12 +21,12 @@ class TestGetFilterFunction(test.TestCase):
 
     def test_gets_incident_list_filter_from_dotted_path(self):
         self.assertIs(
-            get_filter_function("argus.htmx.incidents.filter.incident_list_filter"),
+            get_filter_function("argus.htmx.incident.filter.incident_list_filter"),
             self.incident_list_filter,
         )
 
     def test_gets_incident_list_filter_from_module(self):
         self.assertIs(
-            get_filter_function("argus.htmx.incidents.filter"),
+            get_filter_function("argus.htmx.incident.filter"),
             self.incident_list_filter,
         )
