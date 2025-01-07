@@ -50,3 +50,13 @@
     </ul>
   </fieldset>
 </form>
+
+<form
+      hx-get="{% url 'htmx:filter-list' %}"
+      hx-trigger="load"
+      hx-swap="innerHTML"
+>
+  <label>
+    Filter loading...
+  </label>
+</form>

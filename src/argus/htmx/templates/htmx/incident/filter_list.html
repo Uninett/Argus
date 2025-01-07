@@ -1,0 +1,17 @@
+<label class="form-control w-full max-w-xs">
+  <span class="block label">
+    <span class="label-text">Filter</span>
+  </span>
+
+  <select class="select select-ghost w-full max-w-xs"
+  >
+    <option disabled selected value="">---</option>
+    {% for object in object_list %}
+      <option value="{{ object.id }}">{{ object.name }}</option>
+    {% endfor %}
+  </select>
+
+  <span class="block label">
+    <span class="label-text-alt">Select from your filters</span>
+  </span>
+</label>

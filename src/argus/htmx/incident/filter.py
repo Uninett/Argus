@@ -1,13 +1,36 @@
 from django import forms
+from django.urls import reverse
+from django.views.generic import ListView
 
 from argus.filter import get_filter_backend
 from argus.incident.models import SourceSystem
 from argus.incident.constants import Level
 from argus.htmx.widgets import BadgeDropdownMultiSelect
-
+from argus.notificationprofile.models import Filter
 
 filter_backend = get_filter_backend()
 QuerySetFilter = filter_backend.QuerySetFilter
+
+class FilterMixin:
+    model = Filter
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        return qs.filter(user_id=self.request.user.id)
+
+    def get_template_names(self):
+        orig_app_label = self.model._meta.app_label
+        orig_model_name = self.model._meta.model_name
+        self.model._meta.app_label = "htmx/incident"
+        self.model._meta.model_name = "filter"
+        templates = super().get_template_names()
+        self.model._meta.app_label = orig_app_label
+        self.model._meta.model_name = orig_model_name
+        return templates
+
+    def get_success_url(self):
+        return reverse("htmx:filter-list")
+
 
 
 class IncidentFilterForm(forms.Form):
@@ -68,6 +91,10 @@ class IncidentFilterForm(forms.Form):
             filterblob["maxlevel"] = maxlevel
 
         return filterblob
+
+
+class FilterListView(FilterMixin, ListView):
+    pass
 
 
 def incident_list_filter(request, qs):
