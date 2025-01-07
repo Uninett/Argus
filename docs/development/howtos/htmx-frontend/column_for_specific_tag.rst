@@ -9,7 +9,7 @@ You only need to add the column to the column config::
         IncidentTableColumn(
             "mytag",
             "MYTAG",
-            "htmx/incidents/_incident_tag.html",
+            "htmx/incidents/cells/_incident_tag.html",
             context={"tag": "MYTAG"},
         )
         ..

@@ -2,8 +2,8 @@ from django import forms, test
 from django.test.client import RequestFactory
 from argus.auth.factories import PersonUserFactory
 from argus.filter.queryset_filters import QuerySetFilter
-from argus.htmx.incidents.customization import IncidentTableColumn
-from argus.htmx.incidents.views import incident_list
+from argus.htmx.incident.customization import IncidentTableColumn
+from argus.htmx.incident.views import incident_list
 
 
 class IncidentRegularFilterForm(forms.Form):
