@@ -162,7 +162,9 @@ class EmailNotification(BaseEmailNotification):
 
     @classmethod
     def _clone_if_changing_email_address(cls, destination: DestinationConfig, validated_data: dict):
-        if not destination.settings["synced"]:
+        "Clone synced destination"
+        if not destination.settings.get("synced", None):
+            LOG.warn('Email destination %s does not have "synced" flag in its settings', destination.id)
             return False
 
         new_address = validated_data["settings"][cls.MEDIA_SETTINGS_KEY]
