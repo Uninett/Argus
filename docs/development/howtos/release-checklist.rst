@@ -62,11 +62,18 @@ Checklist
         $ tox
 
 #. Check that :file:`CHANGELOG.md` and :file:`NOTES.md` are up to snuff. We use
-   :command:`towncrier` to add to the changelog from the files in
-   :file:`changelog.d/`.
+   `towncrier <https://towncrier.readthedocs.io>`_ to add to the changelog from the
+   files in :file:`changelog.d/`.
 
    Run :code:`towncrier build --version 1.5.1`. This will update
    :file:`CHANGELOG.md` and delete everything in :file:`changelog.d/`.
+
+   To preview what the addition to the changelog file would look like you can add the
+   flag ``--draft``. This will not delete the files or update :file:`CHANGELOG.md`.
+   It will only output the preview in the terminal.
+
+   If you want manually set the date that is added to the changelog you can use the
+   flag ``--date DATE``. Otherwise it will be today.
 
    Read the new entry in :file:`CHANGELOG.md` and adjust it as necessary for
    better language. Reorder as per the order the commits/pull-requests were
