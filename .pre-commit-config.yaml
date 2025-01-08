@@ -8,7 +8,7 @@ repos:
         exclude: &exclude_pattern '^changelog.d/'
     -   id: debug-statements
 -   repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.7.2
+    rev: v0.8.6
     hooks:
         # Run the linter
     -   id: ruff

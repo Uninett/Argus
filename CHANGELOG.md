@@ -8,6 +8,51 @@ This project uses [*towncrier*](https://towncrier.readthedocs.io/) and the chang
 
 <!-- towncrier release notes start -->
 
+## [1.30.0] - 2024-12-19
+
+Mostly changes to the alpha frontend
+
+### Added
+
+- Added docs for how to vendor a repo (copy one repo into another, preserving
+  history).
+
+### HTMX app
+
+- Add HTMX version of the destinations page
+  ([#1001](https://github.com/Uninett/Argus/issues/1001))
+- Show user an error message in case a htmx partial request fails
+  ([#1023](https://github.com/Uninett/Argus/issues/1023))
+- Allow extending preferences page
+  ([#1070](https://github.com/Uninett/Argus/issues/1070))
+- Keep django messages in queue on htmx redirects or refreshes
+  ([#1071](https://github.com/Uninett/Argus/issues/1071))
+
+#### Added
+
+- Replaced the placeholder notification profile page with a very ugly but
+  functional one.
+- Replaced the placeholder time-slots page with a very ugly but functional one.
+- Added loading indicator to bulk action buttons
+
+#### Changed
+
+- Performance: Reduced the number of queries to preferences db table
+  ([#1082](https://github.com/Uninett/Argus/issues/1082))
+- Declared argus-theme as one with the light color scheme in order to always
+  have reasonable fallbacks.
+  ([#1088](https://github.com/Uninett/Argus/issues/1088))
+- Generalized the multiselect dropdown widget used for the source field in the
+  filterbox so that we can use it for other dropdowns on other pages.
+- Renamed some directories and templates to give them better, more
+  consistent names.
+
+#### Fixed
+
+- Fixed background color in input fields for argus-theme globally.
+  ([#1088](https://github.com/Uninett/Argus/issues/1088))
+
+
 ## [1.29.0] - 2024-12-06
 
 Mostly changes to the alpha frontend

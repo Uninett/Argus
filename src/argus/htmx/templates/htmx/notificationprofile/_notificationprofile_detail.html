@@ -1,0 +1,25 @@
+<section>
+  <h2>{{ object.name|default:object.timeslot.name }}</h2>
+  <div>
+    <p>Active? {{ object.active }}</p>
+    <p>Timeslot: {{ object.timeslot }}</p>
+    <p>
+      Filters:
+      {% for filter_obj in object.filters.all %}{{ filter_obj }}{% endfor %}
+    </p>
+    <p>
+      Destinations:
+      {% for destination in object.destinations.all %}{{ destination }}{% endfor %}
+    </p>
+    {% if show_buttons %}
+      <p>
+        <a class="btn btn-primary"
+           href="{% url "htmx:notificationprofile-update" pk=object.pk %}">Update</a>
+      </p>
+      <p>
+        <a class="btn btn-primary"
+           href="{% url "htmx:notificationprofile-delete" pk=object.pk %}">Delete</a>
+      </p>
+    {% endif %}
+  </div>
+</section>

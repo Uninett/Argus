@@ -1,0 +1,23 @@
+{% extends "htmx/base.html" %}
+{% block main %}
+  <p>
+    <a class="btn btn-primary" href="{% url "htmx:timeslot-create" %}">Create</a>
+  </p>
+  {% for object in object_list %}
+    <div>
+      {% include "./_timeslot_detail.html" %}
+      <p>
+        <a class="btn btn-primary"
+           href="{% url "htmx:timeslot-detail" pk=object.pk %}">View</a>
+      </p>
+      <p>
+        <a class="btn btn-primary"
+           href="{% url "htmx:timeslot-update" pk=object.pk %}">Update</a>
+      </p>
+      <p>
+        <a class="btn btn-primary"
+           href="{% url "htmx:timeslot-delete" pk=object.pk %}">Delete</a>
+      </p>
+    </div>
+  {% endfor %}
+{% endblock main %}

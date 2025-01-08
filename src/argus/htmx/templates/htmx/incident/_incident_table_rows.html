@@ -1,0 +1,15 @@
+{% for incident in incident_list %}
+  {% block incident %}
+    {% include "htmx/incident/_incident_table_row.html" %}
+  {% endblock incident %}
+{% empty %}
+  <tr>
+    <td colspan="{{ columns|length }}">
+      {% if count %}
+        No incidents found that fit all the filter criteria
+      {% else %}
+        No incidents on record
+      {% endif %}
+    </td>
+  </tr>
+{% endfor %}

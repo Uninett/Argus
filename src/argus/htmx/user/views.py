@@ -5,7 +5,7 @@ from django.views.decorators.http import require_GET, require_POST
 from django_htmx.http import HttpResponseClientRefresh
 
 from argus.auth.utils import get_preference_obj, save_preferences
-from argus.htmx.incidents.views import HtmxHttpRequest
+from argus.htmx.incident.views import HtmxHttpRequest
 
 
 @require_GET
