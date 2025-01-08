@@ -157,7 +157,12 @@ class RequestDestinationConfigSerializer(serializers.ModelSerializer):
         if not isinstance(attrs["settings"], dict):
             raise serializers.ValidationError(medium.error_messages["settings_type"])
 
-        attrs["settings"] = medium.validate_settings(attrs, user, serializers.ValidationError)
+        attrs["settings"] = medium.validate_settings(
+            attrs,
+            user,
+            exception_class=serializers.ValidationError,
+            instance=self.instance,
+        )
 
         return attrs
 

@@ -93,15 +93,18 @@ With a little luck you might not need to override any of these.
 
 clean
    This method will do any additional cleaning beyond what is defined by the
-   defined ``Form``. Expects a valid form instance and returns the updated
-   valid form instance. If you have fields that shouldn't be set by a user, or
-   values that need extra conversion, you can do that in this method.
+   defined ``Form``. Expects a valid form instance and optional
+   DestinationConfig instance, and returns the updated valid form instance. If
+   you have fields that shouldn't be set by a user, or values that need extra
+   conversion, you can do that in this method. Use the passed in instance if
+   you need to fall back to defaults. This method should not be used to
+   validate anything and thus should never raise a validation Exception.
 
 get_label
    Your implementation of ``get_label`` should show a reasonable representation
    for a destination of that type that makes it easy to identify. For SMS that
    would simply be the phone number. By default it shows the label stored in
-   the destination. If no label have been set, it uses MEDIA_SETTINGS_KEY to
+   the destination. If no label has been set, it uses MEDIA_SETTINGS_KEY to
    look up the most important piece of information in the settings and uses
    that directly. The included plugins need not override ``get_label`` for this
    reason. If the label would be very long, for instance if the needed setting
@@ -136,14 +139,16 @@ update
 validate
    The function ``validate`` makes sure that a destination with the given
    settings can be updated or created. It uses the ``validate_settings`` method
-   to validate the settings-field, and a form (CommonDestinationConfigForm) to
-   validate the media and label-fields. The validated form is returned if ok,
-   otherwise a ``ValidationError`` should be raised. It is unlikely that you
-   will ever need to override this method.
+   to validate the settings-field, a form (CommonDestinationConfigForm) to
+   validate the media and label-fields, and an optional DestinationConfig
+   instance for the sake of the ``clean``-method. The validated form is
+   returned if ok, otherwise a ``ValidationError`` should be raised. It is
+   unlikely that you will ever need to override this method.
 
 validate_settings
    This method validates the actual contents of the settings-field using the
-   ``Form`` that is defined. The function ``has_duplicate`` can be used here to
-   ensure that not two destinations with the same settings will be created.
-   A ``ValidationError`` should be raised  if the given settings are invalid,
-   and the validated and cleaned data should be returned if not.
+   ``Form`` that is defined and an optional DestinationConfig instance for the
+   sake of the ``clean``-method. The function ``has_duplicate`` can be used
+   here to ensure that no two destinations with the same settings will be
+   created. A ``ValidationError`` should be raised  if the given settings are
+   invalid, and the validated and cleaned data should be returned if not.

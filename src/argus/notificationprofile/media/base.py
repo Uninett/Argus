@@ -56,6 +56,7 @@ class NotificationMedium(ABC):
         "readonly_medium": "Media cannot be updated, only settings.",
         "readonly_user": "User cannot be changed, only settings.",
         "settings_type": "Settings has to be a dictionary.",
+        "empty_settings": '"settings" cannot be empty',
     }
 
     class NotDeletableError(Exception):
@@ -80,30 +81,38 @@ class NotificationMedium(ABC):
         if not form.is_valid():
             raise exception_class(form.errors)
 
-        settings_form = cls.validate_settings(data, user)
+        settings_form = cls.validate_settings(data, user, instance=instance)
         form.cleaned_data["settings"] = settings_form.cleaned_data
         form.cleaned_data["user"] = user
         return form
 
     @classmethod
-    def validate_settings(cls, data: dict, user: User, exception_class=ValidationError) -> dict:
+    def validate_settings(
+        cls, data: dict, user: User, exception_class=ValidationError, instance: DestinationConfig = None
+    ) -> dict:
         """
         Validates the settings of destination and returns a dict with
         validated and cleaned data
         """
-        form = cls.Form(data["settings"])
+        settings = data["settings"]
+        if not isinstance(settings, dict):
+            raise exception_class(cls.error_messages["settings_type"])
+        if not settings:
+            raise exception_class(cls.error_messages["empty_settings"])
+
+        form = cls.Form(settings)
         if not form.is_valid():
             raise exception_class(form.errors)
 
-        form = cls.clean(form)
+        form = cls.clean(form, instance)
 
-        if cls.has_duplicate(user.destinations, data["settings"]):
+        if cls.has_duplicate(user.destinations, settings):
             raise exception_class(cls.MEDIA_SETTINGS_KEY, f"{cls.MEDIA_NAME} already exists")
 
         return form.cleaned_data
 
     @classmethod
-    def clean(cls, form: forms.Form) -> forms.Form:
+    def clean(cls, form: forms.Form, instance: DestinationConfig = None) -> forms.Form:
         """Can change the cleaned data of a valid form"""
         return form
 
