@@ -99,7 +99,7 @@ Reload site.
 Toggle
 ======
 
-Given that ``DEBUG`\ is set to ``True`` somewhere you could activate and
+Given that ``DEBUG`` is set to ``True`` somewhere you could activate and
 deactivate the config as detailed previously, but it is probably more elegant
 to toggle ``DEBUG``.
 
