@@ -15,7 +15,6 @@ from django_htmx.http import HttpResponseClientRefresh, reswap, retarget
 from argus.auth.utils import get_or_update_preference
 from argus.incident.models import Incident
 from argus.util.datetime_utils import make_aware
-from .filter import select_filter
 
 from ..request import HtmxHttpRequest
 
@@ -104,8 +103,9 @@ def filter_select(request: HtmxHttpRequest):
     filter_id = request.GET.get("filter", None)
     request.session["selected_filter"] = filter_id
     if filter_id:
+        incident_list_filter = get_filter_function()
         filter = get_object_or_404(Filter, id=filter_id)
-        filter_form, _ = select_filter(filter, None)
+        filter_form, _ = incident_list_filter(request, None, filter)
         context = {"filter_form": filter_form}
         return render(request, "htmx/incident/_incident_filterbox.html", context=context)
     else:
@@ -129,7 +129,10 @@ def incident_list(request: HtmxHttpRequest) -> HttpResponse:
     params = dict(request.GET.items())
 
     incident_list_filter = get_filter_function()
-    filter_form, qs = incident_list_filter(request, qs)
+    filter_pk, filter = request.session.get("selected_filter", None), None
+    if filter_pk:
+        filter = get_object_or_404(Filter, pk=filter_pk)
+    filter_form, qs = incident_list_filter(request, qs, filter)
     filtered_count = qs.count()
 
     # Standard Django pagination

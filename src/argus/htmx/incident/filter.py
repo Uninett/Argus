@@ -97,17 +97,11 @@ class FilterListView(FilterMixin, ListView):
     pass
 
 
-def incident_list_filter(request, qs):
-    # TODO: initialize with chosen Filter.filter if any
-    form = IncidentFilterForm(request.GET or None)
-
-    if form.is_valid():
-        filterblob = form.to_filterblob()
-        qs = QuerySetFilter.filtered_incidents(filterblob, qs)
-    return form, qs
-
-def select_filter(filter: Filter, qs):
-    form = IncidentFilterForm(filter.filter)
+def incident_list_filter(request, qs, filter: Filter = None):
+    if filter:
+        form = IncidentFilterForm(filter.filter)
+    else:
+        form = IncidentFilterForm(request.GET or None)
 
     if form.is_valid():
         filterblob = form.to_filterblob()
