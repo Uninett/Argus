@@ -10,9 +10,13 @@
           hx-target="#incident-filter-box"
           hx-swap="outerHTML"
   >
-    <option disabled selected value="">---</option>
+    <option
+            {% if not request.session.selected_filter %}selected{% endif %}
+            value="">---</option>
     {% for object in object_list %}
-      <option value="{{ object.id }}">{{ object.name }}</option>
+      <option value="{{ object.id }}"
+              {% if request.session.selected_filter == object.id|stringformat:"i" %}selected{% endif %}
+      >{{ object.name }}</option>
     {% endfor %}
   </select>
 
