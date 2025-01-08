@@ -162,7 +162,7 @@ class EmailNotification(BaseEmailNotification):
 
     @classmethod
     def _clone_if_changing_email_address(cls, destination: DestinationConfig, validated_data: dict):
-        "Clone synced destination"
+        """Clone synced destination"""
         if not destination.settings.get("synced", None):
             LOG.warn('Email destination %s does not have "synced" flag in its settings', destination.id)
             return False
@@ -186,8 +186,12 @@ class EmailNotification(BaseEmailNotification):
         return True
 
     @classmethod
-    def clean(cls, form: forms.Form) -> forms.Form:
-        form.cleaned_data["synced"] = form.cleaned_data.get("synced", False)
+    def clean(cls, form: forms.Form, instance: DestinationConfig = None) -> forms.Form:
+        synced = False
+        if instance:
+            # CYA. The admin currently do no validation of destinations created
+            synced = instance.settings.get("synced", False)
+        form.cleaned_data["synced"] = form.cleaned_data.get("synced", synced)
         return form
 
     @classmethod
