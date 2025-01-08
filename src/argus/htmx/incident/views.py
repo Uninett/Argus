@@ -10,7 +10,7 @@ from django.shortcuts import render, get_object_or_404
 from django.views.decorators.http import require_POST, require_GET
 from django.core.paginator import Paginator
 from django.http import HttpResponse, HttpResponseBadRequest
-from django_htmx.http import HttpResponseClientRefresh, reswap
+from django_htmx.http import HttpResponseClientRefresh, reswap, retarget
 
 from argus.auth.utils import get_or_update_preference
 from argus.incident.models import Incident
@@ -109,9 +109,12 @@ def filter_select(request: HtmxHttpRequest):
         context = {"filter_form": filter_form}
         return render(request, "htmx/incident/_incident_filterbox.html", context=context)
     else:
-        response = HttpResponse()
-        reswap(response, "none")
-        return response
+        if request.htmx.trigger:
+            return reswap(HttpResponse(), "none")
+        else:
+            response = HttpResponse()
+            retarget(response, "#incident-filter-select")
+            return response
 
 
 @require_GET
