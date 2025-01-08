@@ -54,10 +54,11 @@ MEDIA_JSON_SCHEMA
 MEDIA_SETTINGS_KEY
    The media settings key is the name of the most important key in the settings
    JSON field. It is used to cut down on the amount of code you need to write
-   if there is only one piece of data you need to send the notification. Among
-   other things, it is used to check for duplicate entries, so in a way it acts
-   as the primary key for your plugin. For that reason, it must be required in
-   the json schema.
+   if there is only one piece of config you need to send the notification.
+   Among other things, it is used to check for duplicate entries, so in a way
+   it acts as the primary key for your plugin. For that reason, it must be
+   required in the json schema. For example for an email plugin this would be
+   "email_address".
 
 Form
    The ``forms.Form`` used to validate the settings-field.
@@ -93,7 +94,8 @@ With a little luck you might not need to override any of these.
 clean
    This method will do any additional cleaning beyond what is defined by the
    defined ``Form``. Expects a valid form instance and returns the updated
-   valid form instance.
+   valid form instance. If you have fields that shouldn't be set by a user, or
+   values that need extra conversion, you can do that in this method.
 
 get_label
    Your implementation of ``get_label`` should show a reasonable representation
