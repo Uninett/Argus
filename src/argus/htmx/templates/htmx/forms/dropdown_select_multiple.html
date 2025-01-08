@@ -1,9 +1,10 @@
 <div class="dropdown dropdown-bottom "
      {% block field_control %}
      hx-trigger="change from:#{{ widget.attrs.id }}"
+     id="dropdown-{{ widget.attrs.id }}"
      hx-swap="outerHTML"
      hx-target="find .show-selected-box"
-     hx-select=".show-selected-box"
+     hx-select="#dropdown-{{ widget.attrs.id }} .show-selected-box"
      {% if widget.extra.hx_get %}hx-get="{% url widget.extra.hx_get %}"{% endif %}
      {% endblock field_control %}>
   <div tabindex="0"
