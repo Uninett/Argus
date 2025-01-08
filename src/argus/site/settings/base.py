@@ -24,7 +24,9 @@ from ..utils import update_settings
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = get_bool_env("DEBUG", False)
 
+# Explicit is better than implicit!
 ALLOWED_HOSTS = []
+INTERNAL_IPS = []
 
 # fmt: off
 # fsck off, black

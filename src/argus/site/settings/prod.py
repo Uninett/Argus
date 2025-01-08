@@ -1,3 +1,4 @@
 from argus.spa.settings import *
 
-INTERNAL_IPS = []
+# Beware: setting this to something else in production has security implications
+INTERNAL_IPS = []  # Don't alter me, please
