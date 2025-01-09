@@ -2,17 +2,17 @@
      class="card-actions justify-end"
 >
   {% if show_view %}
-    <p>
+    <button class="contents">
       <a class="btn btn-primary"
          href="{% url "htmx:notificationprofile-detail" pk=object.pk %}">View</a>
-    </p>
+    </button>
   {% endif %}
-  <p>
+  <button class="contents">
     <a class="btn btn-primary"
        href="{% url "htmx:notificationprofile-update" pk=object.pk %}">Update</a>
-  </p>
-  <p>
+  </button>
+  <button class="contents">
     <a class="btn btn-primary"
        href="{% url "htmx:notificationprofile-delete" pk=object.pk %}">Delete</a>
-  </p>
+  </button>
 </div>

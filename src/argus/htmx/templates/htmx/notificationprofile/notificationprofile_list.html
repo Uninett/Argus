@@ -1,10 +1,10 @@
 {% extends "./base.html" %}
 {% block profile_main %}
-  <div>
-    <p>
+  <div style="border: 2px solid black">
+    <button class="contents">
       <a class="btn btn-primary"
          href="{% url "htmx:notificationprofile-create" %}">Create</a>
-    </p>
+    </button>
     {% for object in object_list %}
       <div class="card">{% include "./_notificationprofile_detail.html" with show_view=True %}</div>
     {% endfor %}
