@@ -4160,12 +4160,13 @@ details.collapse summary::-webkit-details-marker {
   margin-bottom: 0.25rem;
 }
 
-.-ml-2 {
-  margin-left: -0.5rem;
+.my-4 {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
 }
 
-.mb-2 {
-  margin-bottom: 0.5rem;
+.-ml-2 {
+  margin-left: -0.5rem;
 }
 
 .mb-auto {
