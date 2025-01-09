@@ -4164,6 +4164,10 @@ details.collapse summary::-webkit-details-marker {
   margin-left: -0.5rem;
 }
 
+.mb-2 {
+  margin-bottom: 0.5rem;
+}
+
 .mb-auto {
   margin-bottom: auto;
 }
