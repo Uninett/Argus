@@ -11,15 +11,6 @@
       Destinations:
       {% for destination in object.destinations.all %}{{ destination }}{% endfor %}
     </p>
-    {% if show_buttons %}
-      <p>
-        <a class="btn btn-primary"
-           href="{% url "htmx:notificationprofile-update" pk=object.pk %}">Update</a>
-      </p>
-      <p>
-        <a class="btn btn-primary"
-           href="{% url "htmx:notificationprofile-delete" pk=object.pk %}">Delete</a>
-      </p>
-    {% endif %}
+    {% include "./_notificationprofile_buttons.html" %}
   </div>
 </section>

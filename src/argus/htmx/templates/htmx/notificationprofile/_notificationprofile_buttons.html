@@ -1,0 +1,16 @@
+<div>
+  {% if show_view %}
+    <p>
+      <a class="btn btn-primary"
+         href="{% url "htmx:notificationprofile-detail" pk=object.pk %}">View</a>
+    </p>
+  {% endif %}
+  <p>
+    <a class="btn btn-primary"
+       href="{% url "htmx:notificationprofile-update" pk=object.pk %}">Update</a>
+  </p>
+  <p>
+    <a class="btn btn-primary"
+       href="{% url "htmx:notificationprofile-delete" pk=object.pk %}">Delete</a>
+  </p>
+</div>
