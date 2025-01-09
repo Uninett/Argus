@@ -18,9 +18,7 @@ class IncidentFilterForm(forms.Form):
     source = forms.MultipleChoiceField(
         widget=BadgeDropdownMultiSelect(
             attrs={"placeholder": "select sources..."},
-            extra={
-                "hx_get": "htmx:incident-filter",
-            },
+            partial_get="htmx:incident-filter",
         ),
         choices=tuple(SourceSystem.objects.values_list("id", "name")),
         required=False,
