@@ -22,6 +22,7 @@ class NotificationProfileForm(forms.ModelForm):
         self.fields["timeslot"].queryset = Timeslot.objects.filter(user=user)
         self.fields["filters"].queryset = Filter.objects.filter(user=user)
         self.fields["destinations"].queryset = DestinationConfig.objects.filter(user=user)
+        self.fields["active"].widget.attrs["class"] = "checkbox checkbox-sm checkbox-accent border"
 
 
 class NotificationProfileMixin:
