@@ -3,7 +3,7 @@
   <div style="border: 2px solid black">
     <button class="contents">
       <a class="btn btn-primary"
-         href="{% url "htmx:notificationprofile-create" %}">Create</a>
+         href="{% url "htmx:notificationprofile-create" %}">Create new profile</a>
     </button>
     {% for object in object_list %}
       <div class="card mb-2 bg-base-100 glass shadow-2xl">{% include "./_notificationprofile_detail.html" with show_view=True %}</div>
