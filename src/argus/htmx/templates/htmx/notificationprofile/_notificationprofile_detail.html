@@ -1,5 +1,7 @@
-<section>
-  <h2>{{ object.name|default:object.timeslot.name }}</h2>
+<section style="border: 2px dotted blue"
+         class="card-body"
+>
+  <h2 class="card-title">{{ object.name|default:object.timeslot.name }}</h2>
   <div>
     <p>Active? {{ object.active }}</p>
     <p>Timeslot: {{ object.timeslot }}</p>

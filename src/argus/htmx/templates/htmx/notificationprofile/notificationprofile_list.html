@@ -6,7 +6,7 @@
          href="{% url "htmx:notificationprofile-create" %}">Create</a>
     </p>
     {% for object in object_list %}
-      <div>{% include "./_notificationprofile_detail.html" with show_view=True %}</div>
+      <div class="card">{% include "./_notificationprofile_detail.html" with show_view=True %}</div>
     {% endfor %}
   </div>
 {% endblock profile_main %}
