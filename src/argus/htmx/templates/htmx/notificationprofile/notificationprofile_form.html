@@ -1,8 +1,8 @@
-{% extends "htmx/base.html" %}
-{% block main %}
+{% extends "./base.html" %}
+{% block profile_main %}
   <form method="post">
     {% csrf_token %}
     {{ form.as_div }}
     <input class="btn btn-primary" type="submit" value="Save">
   </form>
-{% endblock main %}
+{% endblock profile_main %}
