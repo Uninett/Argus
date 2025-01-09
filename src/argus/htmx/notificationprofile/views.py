@@ -15,6 +15,9 @@ class NotificationProfileForm(forms.ModelForm):
     class Meta:
         model = NotificationProfile
         fields = ["name", "timeslot", "filters", "active", "destinations"]
+        widgets = {
+            "timeslot": forms.Select(attrs={"class": "select input-bordered w-full max-w-xs"}),
+        }
 
     def __init__(self, *args, **kwargs):
         user = kwargs.pop("user")
