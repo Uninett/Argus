@@ -26,6 +26,7 @@ class NotificationProfileForm(forms.ModelForm):
         self.fields["filters"].queryset = Filter.objects.filter(user=user)
         self.fields["destinations"].queryset = DestinationConfig.objects.filter(user=user)
         self.fields["active"].widget.attrs["class"] = "checkbox checkbox-sm checkbox-accent border"
+        self.fields["name"].widget.attrs["class"] = "input input-bordered"
 
 
 class NotificationProfileMixin:
