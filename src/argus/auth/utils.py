@@ -108,7 +108,7 @@ def _save_preference(request: HttpRequest, prefs: Preferences, preference: str, 
     value = form.cleaned_data[preference]
     if value == old_value:
         LOG.debug("Did not change %s: no change", preference)
-        return value, False
+        return value, True
 
     prefs.save_preference(preference, value)
     messages.success(request, f"Changed {preference}: {old_value} → {value}")
