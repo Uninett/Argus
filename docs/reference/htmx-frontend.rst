@@ -29,14 +29,14 @@ Install the dependencies::
 
     pip install argus-server[htmx]
 
-(The generated requirements-files includes the dependencies already.)
+(The generated requirements-files include the dependencies already.)
 
 Install and build Tailwind CSS and daisyUI
 ------------------------------------------
 
 If you want to be able to customize the frontend in any way, including changing
 or adding themes, you need to install the support for Tailwind CSS and daisyUI.
-This is not Python packages so cannot be streamlined much.
+They are not Python packages so it cannot be streamlined much.
 
 Recommended but open for tweaks and adaptations steps:
 
