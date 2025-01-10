@@ -48,17 +48,10 @@ def delete_htmx(request, pk: int) -> HttpResponse:
 def update_htmx(request, pk: int) -> HttpResponse:
     destination = DestinationConfig.objects.get(pk=pk)
     form = DestinationFormUpdate(request.POST or None, instance=destination, request=request)
-    template = "htmx/destination/_form_list.html"
     if form.is_valid():
         form.save()
-        return _render_destination_list(request, template=template)
-
-    update_forms = _get_update_forms(request.user)
-    for index, update_form in enumerate(update_forms):
-        if update_form.instance.pk == pk:
-            update_forms[index] = form
-            break
-    return _render_destination_list(request, update_forms=update_forms, template=template)
+    context = {"form": form, "update_error_msg": None}
+    return render(request, "htmx/destination/_update_and_delete_form.html", context=context)
 
 
 def _render_destination_list(
