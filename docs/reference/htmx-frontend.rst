@@ -22,7 +22,7 @@ Setup
 
 The app is included in the argus-server codebase, but it is optional to use.
 
-Install python dependencies
+Install Python dependencies
 ---------------------------
 
 Install the dependencies::
@@ -36,7 +36,7 @@ Install and build Tailwind CSS and daisyUI
 
 If you want to be able to customize the frontend in any way, including changing
 or adding themes, you need to install the support for Tailwind CSS and daisyUI.
-This is not python packages so cannot be streamlined much.
+This is not Python packages so cannot be streamlined much.
 
 Recommended but open for tweaks and adaptations steps:
 
@@ -182,7 +182,7 @@ See the :ref:`Authentication reference <authentication-reference>` and the
 OpenID Connect
 --------------
 
-Use the python social auth backend
+Use the Python social auth backend
 ``social_core.backends.open_id_connect.OpenIdConnectAuth``, see
 `PSA: OIDC (OpenID Connect) <https://python-social-auth.readthedocs.io/en/latest/backends/oidc.html>`_
 
