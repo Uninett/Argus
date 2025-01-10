@@ -29,16 +29,19 @@ def create_htmx(request) -> HttpResponse:
 @require_http_methods(["POST"])
 def delete_htmx(request, pk: int) -> HttpResponse:
     destination = get_object_or_404(request.user.destinations.all(), pk=pk)
-    template = "htmx/destination/_form_list.html"
     try:
         medium = api_safely_get_medium_object(destination.media.slug)
         medium.raise_if_not_deletable(destination)
     except NotificationMedium.NotDeletableError:
-        error_msg = "This destination cannot be deleted."
-        return _render_destination_list(request, errors=[error_msg], template=template)
+        form = DestinationFormUpdate(instance=destination)
+        context = {
+            "update_error_msg": "This destination cannot be deleted.",
+            "form": form,
+        }
+        return render(request, "htmx/destination/_update_and_delete_form.html", context=context)
     else:
         destination.delete()
-        return _render_destination_list(request, template=template)
+        return HttpResponse()
 
 
 @require_http_methods(["POST"])

@@ -1,0 +1,5 @@
+<div id="update-delete-forms" class="flex w-full h-fit items-center">
+  {% include "htmx/destination/_edit_form.html" %}
+  {% include "htmx/destination/_delete_form.html" %}
+  {% if update_error_msg %}<p class="text-error">{{ update_error_msg }}</p>{% endif %}
+</div>

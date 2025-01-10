@@ -4,10 +4,7 @@
       <summary class="collapse-title text-xl font-medium">{{ media.name }} ({{ forms|length }})</summary>
       <div class="collapse-content">
         {% for form in forms %}
-          <div class="flex w-full h-fit items-center">
-            {% include "htmx/destination/_edit_form.html" %}
-            {% include "htmx/destination/_delete_form.html" %}
-          </div>
+          {% include "htmx/destination/_update_and_delete_form.html" %}
         {% endfor %}
       </div>
     </details>
