@@ -70,7 +70,6 @@ def _render_destination_list(
     request,
     create_form: Optional[DestinationFormCreate] = None,
     update_forms: Optional[Sequence[DestinationFormUpdate]] = None,
-    errors: Optional[Sequence[str]] = None,
     template: str = "htmx/destination/destination_list.html",
 ) -> HttpResponse:
     """Function to render the destinations page.
@@ -79,21 +78,16 @@ def _render_destination_list(
     with errors while retaining the user input. If you want a blank form, pass None.
     :param update_forms: list of update forms to display. Useful for rendering forms
     with error messages while retaining the user input.
-    If this is None, the update forms will be generated from the user's destinations.
-    :param errors: a list of error messages to display on the page. Will not be tied to
-    any form fields."""
+    If this is None, the update forms will be generated from the user's destinations."""
 
     if create_form is None:
         create_form = DestinationFormCreate()
     if update_forms is None:
         update_forms = _get_update_forms(request.user)
-    if errors is None:
-        errors = []
     grouped_forms = _group_update_forms_by_media(update_forms)
     context = {
         "create_form": create_form,
         "grouped_forms": grouped_forms,
-        "errors": errors,
         "page_title": "Destinations",
     }
     return render(request, template, context=context)
