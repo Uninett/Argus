@@ -138,7 +138,7 @@ The ``argus.site.utils.update_settings`` function will add or change the setting
 
 See ``argus.htmx.appconfig._app_settings`` for what is being set.
 
-The management command ``printsettings`` (which depends on the app
+The management command ``print_settings`` (which depends on the app
 ``django-extensions``, a ``dev``-dependency) will print out the complete
 settings used.
 
