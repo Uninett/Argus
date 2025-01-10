@@ -82,7 +82,7 @@ Configure
 ---------
 
 If *all the settings you need to change* can be set via environment variables,
-use ``argus.htmx.settings`` as your settings-file. Othwerise, read on.
+use ``argus.htmx.settings`` as your settings-file. Otherwise, read on.
 
 Do this in your workdir, which could be the checked out `argus-server`_ repo.
 
@@ -239,7 +239,7 @@ overriding the :setting:`INCIDENT_TABLE_COLUMNS` setting. See
 Themes
 ------
 
-If you wish to change the available themes, first make sure the suport for
+If you wish to change the available themes, first make sure the support for
 Tailwind CSS and daisyUI has been installed, then see
 :ref:`customize-htmx-frontend`.
 
