@@ -1,8 +1,6 @@
 {% extends "./base.html" %}
 {% block profile_main %}
-  <form method="post" class="flex flex-row gap-4">
-    {% csrf_token %}
-    {{ form.as_div }}
-    <input class="btn btn-primary" type="submit" value="Save">
-  </form>
+  <section class="card my-4 bg-base-100 glass shadow-2xl">
+    {% include "./_notificationprofile_form.html" %}
+  </section>
 {% endblock profile_main %}

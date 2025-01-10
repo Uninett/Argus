@@ -5,6 +5,7 @@ See https://ccbv.co.uk/ to grok class-based views.
 """
 
 from django import forms
+from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
@@ -83,11 +84,20 @@ class ChangeMixin:
 
 
 class NotificationProfileListView(NotificationProfileMixin, ListView):
-    pass
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        forms = []
+        for obj in self.get_queryset():
+            form = NotificationProfileForm(None, user=self.request.user, instance=obj)
+            forms.append(form)
+        context["form_list"] = forms
+        return context
 
 
 class NotificationProfileDetailView(NotificationProfileMixin, DetailView):
-    pass
+    def dispatch(self, request, *args, **kwargs):
+        object = self.get_object()
+        return redirect("htmx:notificationprofile-update", pk=object.pk)
 
 
 class NotificationProfileCreateView(ChangeMixin, NotificationProfileMixin, CreateView):

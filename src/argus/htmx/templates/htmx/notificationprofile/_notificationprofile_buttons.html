@@ -1,16 +1,5 @@
-<div style="border: 2px solid pink"
-     class="card-actions justify-end"
->
-  {% if show_view %}
-    <button class="contents">
-      <a class="btn btn-primary"
-         href="{% url "htmx:notificationprofile-detail" pk=object.pk %}">View</a>
-    </button>
-  {% endif %}
-  <button class="contents">
-    <a class="btn btn-primary"
-       href="{% url "htmx:notificationprofile-update" pk=object.pk %}">Update</a>
-  </button>
+<div style="border: 2px solid pink" class="card-actions justify-end">
+  <input class="btn btn-primary" type="submit" value="Save">
   <button class="contents">
     <a class="btn btn-primary"
        href="{% url "htmx:notificationprofile-delete" pk=object.pk %}">Delete</a>
