@@ -71,8 +71,11 @@ def save_preferences(request, data, namespace_or_prefs: Union[str, Preferences])
     failed = []
     for key in prefs.get_forms():
         if key in data:
-            sink = saved if _save_preference(request, prefs, key, data)[1] else failed
-            sink.append(key)
+            success = _save_preference(request, prefs, key, data)[1]
+            if success:
+                saved.append(key)
+            else:
+                failed.append(key)
     return saved, failed
 
 
