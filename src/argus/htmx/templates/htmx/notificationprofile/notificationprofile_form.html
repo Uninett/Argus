@@ -1,6 +1,6 @@
 {% extends "./base.html" %}
 {% block profile_main %}
-  <form method="post">
+  <form method="post" class="flex flex-row gap-4">
     {% csrf_token %}
     {{ form.as_div }}
     <input class="btn btn-primary" type="submit" value="Save">
