@@ -29,16 +29,24 @@ def create_htmx(request) -> HttpResponse:
 @require_http_methods(["POST"])
 def delete_htmx(request, pk: int) -> HttpResponse:
     destination = get_object_or_404(request.user.destinations.all(), pk=pk)
-    template = "htmx/destination/_form_list.html"
+    media = destination.media
+    error_msg = None
     try:
         medium = api_safely_get_medium_object(destination.media.slug)
         medium.raise_if_not_deletable(destination)
     except NotificationMedium.NotDeletableError:
-        error_msg = "This destination cannot be deleted."
-        return _render_destination_list(request, errors=[error_msg], template=template)
+        error_msg = "That destination cannot be deleted."
     else:
         destination.delete()
-        return _render_destination_list(request, template=template)
+
+    forms = _get_update_forms(request.user, media=media)
+
+    context = {
+        "error_msg": error_msg,
+        "forms": forms,
+        "media": media,
+    }
+    return render(request, "htmx/destination/_collapse_with_forms.html", context=context)
 
 
 @require_http_methods(["POST"])
@@ -91,9 +99,16 @@ def _render_destination_list(
     return render(request, template, context=context)
 
 
-def _get_update_forms(user) -> list[DestinationFormUpdate]:
+def _get_update_forms(user, media: Media = None) -> list[DestinationFormUpdate]:
+    """Get a list of update forms for the user's destinations.
+    :param media: if provided, only return destinations for this media.
+    """
+    if media:
+        destinations = user.destinations.filter(media=media)
+    else:
+        destinations = user.destinations.all()
     # Sort by oldest first
-    destinations = user.destinations.all().order_by("pk")
+    destinations = destinations.order_by("pk")
     return [DestinationFormUpdate(instance=destination) for destination in destinations]
 
 
