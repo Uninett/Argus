@@ -46,7 +46,7 @@ Install
 1. Get Tailwind standalone CLI bundled with daisyUI from
    https://github.com/dobicinaitis/tailwind-cli-extra
 
-   Most linux::
+   Most Linux distributions::
 
         $ curl -sL https://github.com/dobicinaitis/tailwind-cli-extra/releases/latest/download/tailwindcss-extra-linux-x64 -o /tmp/tailwindcss
         $ chmod +x /tmp/tailwindcss
