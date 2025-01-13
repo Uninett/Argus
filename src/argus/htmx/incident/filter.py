@@ -11,6 +11,7 @@ from argus.notificationprofile.models import Filter
 filter_backend = get_filter_backend()
 QuerySetFilter = filter_backend.QuerySetFilter
 
+
 class FilterMixin:
     model = Filter
 
@@ -30,7 +31,6 @@ class FilterMixin:
 
     def get_success_url(self):
         return reverse("htmx:filter-list")
-
 
 
 class IncidentFilterForm(forms.Form):
@@ -123,5 +123,7 @@ def create_named_filter(request, filter_name: str, filterblob: dict):
     filter = None
 
     if form.is_valid():
-        filter = Filter.objects.create(user=request.user, name=form.cleaned_data["name"], filter=form.cleaned_data["filter"])
+        filter = Filter.objects.create(
+            user=request.user, name=form.cleaned_data["name"], filter=form.cleaned_data["filter"]
+        )
     return form, filter

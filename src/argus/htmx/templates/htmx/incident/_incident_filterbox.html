@@ -8,9 +8,7 @@
       hx-push-url="true"
       hx-indicator="#incident-list .htmx-indicator"
       onkeydown="if (event.keyCode === 13) event.preventDefault();">
-  <fieldset
-            hx-on:change="htmx.ajax('GET', '{% url 'htmx:select-filter' %}');"
-  >
+  <fieldset hx-on:change="htmx.ajax('GET', '{% url 'htmx:select-filter' %}');">
     <legend class="sr-only">Filter incidents</legend>
     <ul class="menu menu-horizontal menu-sm flex items-center gap-2 py-1.5">
       {% for field in filter_form %}
