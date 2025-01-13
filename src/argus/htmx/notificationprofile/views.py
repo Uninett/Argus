@@ -12,7 +12,13 @@ from django.views.generic import CreateView, DeleteView, DetailView, ListView, U
 from argus.notificationprofile.models import NotificationProfile, Timeslot, Filter, DestinationConfig
 
 
-class NotificationProfileForm(forms.ModelForm):
+class NoColonMixin:
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("label_suffix", "")
+        super().__init__(*args, **kwargs)
+
+
+class NotificationProfileForm(NoColonMixin, forms.ModelForm):
     class Meta:
         model = NotificationProfile
         fields = ["name", "timeslot", "filters", "active", "destinations"]
