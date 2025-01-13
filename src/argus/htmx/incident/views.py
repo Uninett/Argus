@@ -5,6 +5,7 @@ from datetime import datetime
 
 from django import forms
 from django.contrib.auth import get_user_model
+from django.contrib import messages
 from django.shortcuts import render, get_object_or_404
 
 from django.views.decorators.http import require_POST, require_GET
@@ -15,6 +16,7 @@ from django_htmx.http import HttpResponseClientRefresh, reswap, retarget
 from argus.auth.utils import get_or_update_preference
 from argus.incident.models import Incident
 from argus.util.datetime_utils import make_aware
+from .filter import create_named_filter
 
 from ..request import HtmxHttpRequest
 
@@ -96,6 +98,21 @@ def filter_form(request: HtmxHttpRequest):
     filter_form, _ = incident_list_filter(request, None)
     context = {"filter_form": filter_form}
     return render(request, "htmx/incident/_incident_filterbox.html", context=context)
+
+
+@require_POST
+def create_filter(request: HtmxHttpRequest):
+    filter_name = request.POST.get("filter_name", None)
+    incident_list_filter = get_filter_function()
+    filter_form, _ = incident_list_filter(request, None)
+    if filter_name and filter_form.is_valid():
+        filterblob = filter_form.to_filterblob()
+        form, filter = create_named_filter(request, filter_name, filterblob)
+        if filter:
+            request.session["selected_filter"] = str(filter.id)
+            return HttpResponseClientRefresh()
+    messages.error(request, "Failed to create filter")
+    return HttpResponseBadRequest()
 
 
 @require_GET
