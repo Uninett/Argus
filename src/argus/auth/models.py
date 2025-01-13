@@ -219,9 +219,9 @@ class Preferences(models.Model):
     # called when subclass is constructing itself
     def __init_subclass__(cls, **kwargs):
         assert isinstance(getattr(cls, "FORMS", None), dict), f"{cls.__name__}.FORMS must be a dictionary"
-        assert isinstance(
-            getattr(cls, "_FIELD_DEFAULTS", None), dict
-        ), f"{cls.__name__}._FIELD_DEFAULTS must be a dictionary"
+        assert isinstance(getattr(cls, "_FIELD_DEFAULTS", None), dict), (
+            f"{cls.__name__}._FIELD_DEFAULTS must be a dictionary"
+        )
 
         super().__init_subclass__(**kwargs)
         cls.NAMESPACES[cls._namespace] = cls
