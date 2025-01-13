@@ -143,8 +143,8 @@ example::
 
     ]
 
-For inbuilt support for other types of columns see the howtos in
-`the local docs <docs/development/howtos/htmx-frontend/>`_.
+For inbuilt support for other types of columns see the
+:ref:`HTMX HowTos`.
 
 
 .. _django-htmx: https://github.com/adamchainz/django-htmx
