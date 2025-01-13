@@ -22,21 +22,21 @@ Setup
 
 The app is included in the argus-server codebase, but it is optional to use.
 
-Install python dependencies
+Install Python dependencies
 ---------------------------
 
 Install the dependencies::
 
     pip install argus-server[htmx]
 
-(The generated requirements-files includes the dependencies already.)
+(The generated requirements-files include the dependencies already.)
 
 Install and build Tailwind CSS and daisyUI
 ------------------------------------------
 
 If you want to be able to customize the frontend in any way, including changing
 or adding themes, you need to install the support for Tailwind CSS and daisyUI.
-This is not python packages so cannot be streamlined much.
+They are not Python packages so it cannot be streamlined much.
 
 Recommended but open for tweaks and adaptations steps:
 
@@ -46,7 +46,7 @@ Install
 1. Get Tailwind standalone CLI bundled with daisyUI from
    https://github.com/dobicinaitis/tailwind-cli-extra
 
-   Most linux::
+   Most Linux distributions::
 
         $ curl -sL https://github.com/dobicinaitis/tailwind-cli-extra/releases/latest/download/tailwindcss-extra-linux-x64 -o /tmp/tailwindcss
         $ chmod +x /tmp/tailwindcss
@@ -82,7 +82,7 @@ Configure
 ---------
 
 If *all the settings you need to change* can be set via environment variables,
-use ``argus.htmx.settings`` as your settings-file. Othwerise, read on.
+use ``argus.htmx.settings`` as your settings-file. Otherwise, read on.
 
 Do this in your workdir, which could be the checked out `argus-server`_ repo.
 
@@ -138,7 +138,7 @@ The ``argus.site.utils.update_settings`` function will add or change the setting
 
 See ``argus.htmx.appconfig._app_settings`` for what is being set.
 
-The management command ``printsettings`` (which depends on the app
+The management command ``print_settings`` (which depends on the app
 ``django-extensions``, a ``dev``-dependency) will print out the complete
 settings used.
 
@@ -182,7 +182,7 @@ See the :ref:`Authentication reference <authentication-reference>` and the
 OpenID Connect
 --------------
 
-Use the python social auth backend
+Use the Python social auth backend
 ``social_core.backends.open_id_connect.OpenIdConnectAuth``, see
 `PSA: OIDC (OpenID Connect) <https://python-social-auth.readthedocs.io/en/latest/backends/oidc.html>`_
 
@@ -239,7 +239,7 @@ overriding the :setting:`INCIDENT_TABLE_COLUMNS` setting. See
 Themes
 ------
 
-If you wish to change the available themes, first make sure the suport for
+If you wish to change the available themes, first make sure the support for
 Tailwind CSS and daisyUI has been installed, then see
 :ref:`customize-htmx-frontend`.
 
