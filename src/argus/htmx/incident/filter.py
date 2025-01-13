@@ -38,7 +38,7 @@ class IncidentFilterForm(forms.Form):
     closed = forms.BooleanField(required=False)
     acked = forms.BooleanField(required=False)
     unacked = forms.BooleanField(required=False)
-    source = forms.MultipleChoiceField(
+    sourceSystemIds = forms.MultipleChoiceField(
         widget=BadgeDropdownMultiSelect(
             attrs={"placeholder": "select sources..."},
             extra={
@@ -82,9 +82,9 @@ class IncidentFilterForm(forms.Form):
         if acked is not None:
             filterblob["acked"] = acked
 
-        source = self.cleaned_data.get("source", [])
-        if source:
-            filterblob["sourceSystemIds"] = source
+        sources = self.cleaned_data.get("sourceSystemIds", [])
+        if sources:
+            filterblob["sourceSystemIds"] = sources
 
         maxlevel = self.cleaned_data.get("maxlevel", 0)
         if maxlevel:

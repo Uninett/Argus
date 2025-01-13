@@ -16,7 +16,7 @@
       {% for field in filter_form %}
         {% if not field.field.in_header %}
           <li class="form-control">
-            {% if field.name == "source" %}
+            {% if field.name == "sourceSystemIds" %}
               <div class="flex flex-nowrap">
                 <label class="label">
                   <span class="label-text">{{ field.label }}</span>
