@@ -1,8 +1,8 @@
 <label class="form-control w-full max-w-xs">
-  <span class="block label">
+  <span class="block label pt-1 pb-0.5">
     <span class="label-text">Filter</span>
   </span>
-  <select class="select select-ghost w-full max-w-xs"
+  <select class="select select-bordered select-sm join-item w-full max-w-xs"
           id="incident-filter-select"
           name="filter"
           hx-get="{% url 'htmx:select-filter' %}"
@@ -18,7 +18,7 @@
       </option>
     {% endfor %}
   </select>
-  <span class="block label">
+  <span class="block label pb-1 pt-0.5">
     <span class="label-text-alt">Select from your filters</span>
   </span>
 </label>
