@@ -1,8 +1,9 @@
 <form hx-post="{% url 'htmx:htmx-create' %}"
       hx-trigger="submit"
-      hx-target="#destination-content">
+      hx-target="#destination-content"
+      class="max-w-4xl w-full">
   {% csrf_token %}
-  <fieldset class="p-2 border rounded-box border-primary items-center gap-4 flex items-end">
+  <fieldset class="p-2 border rounded-box border-primary items-center gap-4 flex items-end justify-center">
     <legend class="menu-title">Create destination</legend>
     {% for field in create_form %}
       <label class="form-control max-w-xs mb-auto">
