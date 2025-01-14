@@ -1,9 +1,6 @@
-{% extends "htmx/base.html" %}
-{% block main %}
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_div }}
-    {{ formset.as_div }}
-    <input class="btn btn-primary" type="submit" value="Save">
-  </form>
-{% endblock main %}
+{% extends "./base.html" %}
+{% block timeslot_main %}
+  <section class="card my-4 bg-base-100 shadow-2xl">
+    {% include "./_timeslot_form.html" %}
+  </section>
+{% endblock timeslot_main %}
