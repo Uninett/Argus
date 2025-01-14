@@ -1,6 +1,7 @@
 from typing import Optional
 
 from django import forms
+from django.shortcuts import redirect
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
@@ -12,6 +13,12 @@ class TimeRecurrenceForm(forms.ModelForm):
     class Meta:
         model = TimeRecurrence
         exclude = ["timeslot"]
+
+
+class TimeslotForm(forms.ModelForm):
+    class Meta:
+        model = Timeslot
+        fields = ["name"]
 
 
 def make_timerecurrence_formset(data: Optional[dict] = None, timeslot: Optional[Timeslot] = None):
@@ -72,11 +79,21 @@ class FormsetMixin:
 
 
 class TimeslotListView(TimeslotMixin, ListView):
-    pass
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        forms = []
+        for obj in self.get_queryset():
+            form = TimeslotForm(None, instance=obj)
+            formset = make_timerecurrence_formset(timeslot=obj)
+            forms.append({"form": form, "formset": formset})
+        context["form_list"] = forms
+        return context
 
 
 class TimeslotDetailView(TimeslotMixin, DetailView):
-    pass
+    def dispatch(self, request, *args, **kwargs):
+        object = self.get_object()
+        return redirect("htmx:timeslot-update", pk=object.pk)
 
 
 class TimeslotCreateView(FormsetMixin, TimeslotMixin, CreateView):

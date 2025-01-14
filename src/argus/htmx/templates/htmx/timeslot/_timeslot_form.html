@@ -1,0 +1,21 @@
+<section class="card-body">
+  <form method="post"
+        action="{% if form.instance %}{% url "htmx:timeslot-create" %}{% url "htmx:timeslot-update" pk=form.instance.pk %}{% endif %}">
+    {% csrf_token %}
+    {{ form.as_div }}
+    {{ formset.as_div }}
+    <div class="card-actions justify-end">
+      {% if form.instance %}
+        <input type="submit" class="btn btn-primary" value="Save">
+      </input>
+      <button class="contents">
+        <a class="btn btn-primary"
+           href="{% url "htmx:timeslot-delete" pk=form.instance.pk %}">Delete</a>
+      </button>
+    {% else %}
+      <input type="submit" class="btn btn-primary" value="Create">
+    </input>
+  {% endif %}
+</div>
+</form>
+</section>
