@@ -11,6 +11,30 @@ os.environ.setdefault("ARGUS_SPA_COOKIE_DOMAIN", "localhost")
 from argus.spa.spa_settings import *  # noqa: E402, F403
 
 DEBUG = get_bool_env("DEBUG", True)
+
+# Disable using Redis in Channels and fall back to an InMemoryChannel
+# WARNING: This should only ever be used during development/testing and never
+# in production. To enforce this it is only ever activated when DEBUG is also set
+# fmt: off
+ARGUS_DISABLE_REDIS = get_bool_env("ARGUS_DISABLE_REDIS", False)
+if ARGUS_DISABLE_REDIS and DEBUG:
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels.layers.InMemoryChannelLayer",
+        },
+    }
+else:
+    _REDIS = urlsplit("//" + get_str_env("ARGUS_REDIS_SERVER", "127.0.0.1:6379"))
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels_redis.core.RedisChannelLayer",
+            "CONFIG": {
+                "hosts": [(_REDIS.hostname, _REDIS.port or 6379)],
+            },
+        },
+    }
+# fmt: on
+
 TEMPLATES[0]["OPTIONS"]["debug"] = get_bool_env("TEMPLATE_DEBUG", True)  # noqa: F405
 
 # SECURITY WARNING: keep the secret key used in production secret!

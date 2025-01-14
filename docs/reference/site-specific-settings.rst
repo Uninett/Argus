@@ -323,7 +323,7 @@ Ticket system settings
 ``TICKET_PLUGIN``, ``TICKET_ENDPOINT``, ``TICKET_AUTHENTICATION_SECRET``,
 ``TICKET_INFORMATION`` are all described in :ref:`ticket-systems-settings`.
 
-Debugging settings
+Development settings
 ------------------
 
 .. setting:: DEBUG
@@ -334,6 +334,14 @@ Debugging settings
 
 * :setting:`TEMPLATE_DEBUG` (optional) provides a convenient way to turn debugging on and off
   for templates. If undefined it will default to the value of :setting:`DEBUG`.
+
+.. setting:: ARGUS_DISABLE_REDIS
+
+* :setting:`ARGUS_DISABLE_REDIS` When given as an environment variable, this switches out the
+  depencendy of django channels on Redis with an InMemoryChannelLayer. This can only be done
+  in development (using the dev.py settings). Overriding this setting in a custom settings file has
+  no effect.
+
 
 Other settings
 --------------
