@@ -1,6 +1,6 @@
 <section class="card-body">
   <form method="post"
-        action="{% url "htmx:notificationprofile-update" pk=form.instance.pk %}"
+        action="{% if create %}{% url "htmx:notificationprofile-create" %}{% else %}{% url "htmx:notificationprofile-update" pk=form.instance.pk %}{% endif %}"
         class="flex flex-row gap-4">
     {% csrf_token %}
     {{ form.as_div }}
