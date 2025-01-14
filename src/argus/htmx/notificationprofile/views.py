@@ -54,6 +54,11 @@ class NotificationProfileMixin:
     def get_success_url(self):
         return reverse("htmx:notificationprofile-list")
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["page_title"] = "Profiles"
+        return context
+
 
 class ChangeMixin:
     "Common functionality for create and update views"
