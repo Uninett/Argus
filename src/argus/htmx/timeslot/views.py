@@ -42,6 +42,11 @@ class TimeslotMixin:
     def get_success_url(self):
         return reverse("htmx:timeslot-list")
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["page_title"] = "Timeslots"
+        return context
+
 
 class FormsetMixin:
     def post(self, request, *args, **kwargs):
