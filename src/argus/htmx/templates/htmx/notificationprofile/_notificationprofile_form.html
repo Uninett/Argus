@@ -1,9 +1,17 @@
 <section class="card-body">
-  <form method="post" action="{{ form.action }}" class="flex flex-row gap-4">
+  <form id="{{ form.prefix }}-form"
+        method="post"
+        action="{{ form.action }}"
+        class="flex flex-row gap-4">
     {% csrf_token %}
     <div class="flex items-end justify-between gap-2 w-full flex-nowrap">
-      {{ form.as_div }}
-      {% include "./_notificationprofile_buttons.html" with object=form.instance %}
+      <div class="flex items-start justify-start gap-2 w-full flex-wrap">{{ form.as_div }}</div>
+      <div class="card-actions justify-end flex-nowrap">
+        <input class="btn btn-primary" type="submit" value="Save">
+        {% if form.instance.pk %}
+          {% include form.modal.template_name with modal=form.modal %}
+        {% endif %}
+      </div>
     </div>
   </form>
 </section>

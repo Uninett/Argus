@@ -1,9 +1,0 @@
-<div class="card-actions justify-end flex-nowrap">
-  <input class="btn btn-primary" type="submit" value="Save">
-  {% if object.pk %}
-    <button class="contents">
-      <a class="btn btn-primary"
-         href="{% url "htmx:notificationprofile-delete" pk=object.pk %}">Delete</a>
-    </button>
-  {% endif %}
-</div>
