@@ -5,16 +5,26 @@ See https://ccbv.co.uk/ to grok class-based views.
 """
 
 from django import forms
+from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
 from argus.notificationprofile.models import NotificationProfile, Timeslot, Filter, DestinationConfig
 
 
-class NotificationProfileForm(forms.ModelForm):
+class NoColonMixin:
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("label_suffix", "")
+        super().__init__(*args, **kwargs)
+
+
+class NotificationProfileForm(NoColonMixin, forms.ModelForm):
     class Meta:
         model = NotificationProfile
         fields = ["name", "timeslot", "filters", "active", "destinations"]
+        widgets = {
+            "timeslot": forms.Select(attrs={"class": "select input-bordered w-full max-w-xs"}),
+        }
 
     def __init__(self, *args, **kwargs):
         user = kwargs.pop("user")
@@ -22,6 +32,8 @@ class NotificationProfileForm(forms.ModelForm):
         self.fields["timeslot"].queryset = Timeslot.objects.filter(user=user)
         self.fields["filters"].queryset = Filter.objects.filter(user=user)
         self.fields["destinations"].queryset = DestinationConfig.objects.filter(user=user)
+        self.fields["active"].widget.attrs["class"] = "checkbox checkbox-sm checkbox-accent border"
+        self.fields["name"].widget.attrs["class"] = "input input-bordered"
 
 
 class NotificationProfileMixin:
@@ -78,11 +90,20 @@ class ChangeMixin:
 
 
 class NotificationProfileListView(NotificationProfileMixin, ListView):
-    pass
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        forms = []
+        for obj in self.get_queryset():
+            form = NotificationProfileForm(None, user=self.request.user, instance=obj)
+            forms.append(form)
+        context["form_list"] = forms
+        return context
 
 
 class NotificationProfileDetailView(NotificationProfileMixin, DetailView):
-    pass
+    def dispatch(self, request, *args, **kwargs):
+        object = self.get_object()
+        return redirect("htmx:notificationprofile-update", pk=object.pk)
 
 
 class NotificationProfileCreateView(ChangeMixin, NotificationProfileMixin, CreateView):
