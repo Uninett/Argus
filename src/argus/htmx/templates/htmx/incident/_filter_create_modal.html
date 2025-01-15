@@ -1,0 +1,17 @@
+{% extends "htmx/_base_form_modal.html" %}
+{% block form_control %}
+  hx-post="{% url 'htmx:filter-create' %}"
+  hx-include="#incident-filter-box fieldset, [name='filter_name']"
+  hx-target="#incident-filter-box"
+  hx-swap="outerHTML"
+{% endblock form_control %}
+{% block dialogform %}
+  <label class="indicator input input-bordered flex items-center gap-2 w-full">
+    Filter name
+    <span class="indicator-item indicator-top indicator-start badge border-none mask mask-circle text-warning text-base">＊</span>
+    <input name="filter_name"
+           type="text"
+           required
+           class="appearance-none grow border-none" />
+  </label>
+{% endblock dialogform %}

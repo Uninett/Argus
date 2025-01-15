@@ -1,0 +1,6 @@
+<form id="filter-selector-form"
+      hx-get="{% url 'htmx:filter-list' %}"
+      hx-trigger="load, unselect"
+      hx-swap="innerHTML">
+  <p>Loading existing filters...</p>
+</form>
