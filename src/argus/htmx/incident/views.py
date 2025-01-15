@@ -107,9 +107,9 @@ def create_filter(request: HtmxHttpRequest):
     filter_form, _ = incident_list_filter(request, None)
     if filter_name and filter_form.is_valid():
         filterblob = filter_form.to_filterblob()
-        form, filter = create_named_filter(request, filter_name, filterblob)
-        if filter:
-            request.session["selected_filter"] = str(filter.id)
+        _, filter_obj = create_named_filter(request, filter_name, filterblob)
+        if filter_obj:
+            request.session["selected_filter"] = str(filter_obj.id)
             return HttpResponseClientRefresh()
     messages.error(request, "Failed to create filter")
     return HttpResponseBadRequest()
