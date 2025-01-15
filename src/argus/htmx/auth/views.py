@@ -50,4 +50,5 @@ class LoginView(DjangoLoginView):
         context = super().get_context_data(**kwargs)
         backends = get_htmx_authentication_backend_name_and_type()
         context["backends"] = backends
+        context["page_title"] = "Log in"
         return context

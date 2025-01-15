@@ -86,6 +86,7 @@ def _render_destination_list(
         "create_form": create_form,
         "grouped_forms": grouped_forms,
         "errors": errors,
+        "page_title": "Destinations",
     }
     return render(request, template, context=context)
 
