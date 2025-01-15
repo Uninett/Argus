@@ -9,6 +9,7 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
+from argus.htmx.forms import DeleteModalForm
 from argus.notificationprofile.models import NotificationProfile, Timeslot, Filter, DestinationConfig
 
 
@@ -95,6 +96,10 @@ class NotificationProfileListView(NotificationProfileMixin, ListView):
         forms = []
         for obj in self.get_queryset():
             form = NotificationProfileForm(None, user=self.request.user, instance=obj)
+            form.modal = DeleteModalForm(
+                dialog_id=f"delete-modal-{obj.pk}",
+                endpoint=reverse("htmx:notificationprofile-delete", pk=obj.pk),
+            )
             forms.append(form)
         context["form_list"] = forms
         return context
