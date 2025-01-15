@@ -5,7 +5,7 @@
      hx-swap="outerHTML"
      hx-target="find .show-selected-box"
      hx-select="#dropdown-{{ widget.attrs.id }} .show-selected-box"
-     hx-get="{% url widget.partial_get %}"
+     hx-get="{{ widget.partial_get }}"
      hx-include="find #{{ widget.attrs.id }}"
      {% endblock field_control %}>
   <div tabindex="0"

@@ -30,8 +30,43 @@ class DestinationFieldMixin:
             choices.append((dc.id, f"{dc.media.name}: {label}"))
         return choices
 
+    def _init_destinations(self, user):
+        qs = Filter.objects.filter(user=user)
+        self.fields["destinations"].queryset = qs
+        if self.instance:
+            partial_get = reverse(
+                "htmx:notificationprofile-destinations-field-update",
+                kwargs={"pk": self.instance.pk},
+            )
+        else:
+            partial_get = reverse("htmx:notificationprofile-destinations-field-create")
+        self.fields["destinations"].widget = DropdownMultiSelect(
+            partial_get=partial_get,
+            attrs={"placeholder": "select destination..."},
+        )
+        self.fields["destinations"].choices = self._get_destination_choices(user)
 
-class NotificationProfileForm(DestinationFieldMixin, NoColonMixin, forms.ModelForm):
+
+class FilterFieldMixin:
+    def _init_filters(self, user):
+        qs = Filter.objects.filter(user=user)
+        self.fields["filters"].queryset = qs
+
+        if self.instance:
+            partial_get = reverse(
+                "htmx:notificationprofile-filters-field-update",
+                kwargs={"pk": self.instance.pk},
+            )
+        else:
+            partial_get = reverse("htmx:notificationprofile-filters-field-create")
+        self.fields["filters"].widget = DropdownMultiSelect(
+            partial_get=partial_get,
+            attrs={"placeholder": "select filter..."},
+        )
+        self.fields["filters"].choices = tuple(qs.values_list("id", "name"))
+
+
+class NotificationProfileForm(DestinationFieldMixin, FilterFieldMixin, NoColonMixin, forms.ModelForm):
     class Meta:
         model = NotificationProfile
         fields = ["name", "timeslot", "filters", "active", "destinations"]
@@ -47,22 +82,11 @@ class NotificationProfileForm(DestinationFieldMixin, NoColonMixin, forms.ModelFo
         self.fields["active"].widget.attrs["class"] = "checkbox checkbox-sm checkbox-accent border"
         self.fields["name"].widget.attrs["class"] = "input input-bordered"
 
-        self.fields["filters"].queryset = Filter.objects.filter(user=user)
-        self.fields["filters"].widget = DropdownMultiSelect(
-            attrs={"placeholder": "select filter..."},
-            partial_get="htmx:notificationprofile-filters-field",
-        )
-        self.fields["filters"].choices = tuple(Filter.objects.filter(user=user).values_list("id", "name"))
-
-        self.fields["destinations"].queryset = DestinationConfig.objects.filter(user=user)
-        self.fields["destinations"].widget = DropdownMultiSelect(
-            attrs={"placeholder": "select destination..."},
-            partial_get="htmx:notificationprofile-destinations-field",
-        )
-        self.fields["destinations"].choices = self._get_destination_choices(user)
+        self._init_filters(user)
+        self._init_destinations(user)
 
 
-class NotificationProfileFilterForm(NoColonMixin, forms.ModelForm):
+class NotificationProfileFilterForm(FilterFieldMixin, NoColonMixin, forms.ModelForm):
     class Meta:
         model = NotificationProfile
         fields = ["filters"]
@@ -70,11 +94,7 @@ class NotificationProfileFilterForm(NoColonMixin, forms.ModelForm):
     def __init__(self, *args, **kwargs):
         user = kwargs.pop("user")
         super().__init__(*args, **kwargs)
-        self.fields["filters"].widget = DropdownMultiSelect(
-            partial_get="htmx:notificationprofile-filters-field",
-            attrs={"placeholder": "select filter..."},
-        )
-        self.fields["filters"].choices = tuple(Filter.objects.filter(user=user).values_list("id", "name"))
+        self._init_filters(user)
 
 
 class NotificationProfileDestinationForm(DestinationFieldMixin, NoColonMixin, forms.ModelForm):
@@ -85,29 +105,33 @@ class NotificationProfileDestinationForm(DestinationFieldMixin, NoColonMixin, fo
     def __init__(self, *args, **kwargs):
         user = kwargs.pop("user")
         super().__init__(*args, **kwargs)
-        self.fields["destinations"].widget = DropdownMultiSelect(
-            partial_get="htmx:notificationprofile-destinations-field",
-            attrs={"placeholder": "select destination..."},
-        )
-        self.fields["destinations"].choices = self._get_destination_choices(user)
+        self._init_destinations(user)
 
 
-def _render_form_field(request: HtmxHttpRequest, form, partial_template_name):
+def _render_form_field(request: HtmxHttpRequest, form, partial_template_name, prefix=None):
     # Not a view!
-    form = form(request.GET or None, user=request.user)
+    form = form(request.GET or None, user=request.user, prefix=prefix)
     context = {"form": form}
     return render(request, partial_template_name, context=context)
 
 
-def filters_form_view(request: HtmxHttpRequest):
+def filters_form_view(request: HtmxHttpRequest, pk: int = None):
+    prefix = f"npf{pk}" if pk else None
     return _render_form_field(
-        request, NotificationProfileFilterForm, "htmx/notificationprofile/_notificationprofile_form.html"
+        request,
+        NotificationProfileFilterForm,
+        "htmx/notificationprofile/_notificationprofile_form.html",
+        prefix=prefix,
     )
 
 
-def destinations_form_view(request: HtmxHttpRequest):
+def destinations_form_view(request: HtmxHttpRequest, pk: int = None):
+    prefix = f"npf{pk}" if pk else None
     return _render_form_field(
-        request, NotificationProfileDestinationForm, "htmx/notificationprofile/_notificationprofile_form.html"
+        request,
+        NotificationProfileDestinationForm,
+        "htmx/notificationprofile/_notificationprofile_form.html",
+        prefix=prefix,
     )
 
 
@@ -165,6 +189,24 @@ class ChangeMixin:
         self.object.user = self.request.user
         self.object.save()
         return super().form_valid(form)
+
+    def get_prefix(self):
+        if self.object:
+            prefix = f"npf{self.object.pk}"
+            return prefix
+        return self.prefix
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.object:
+            action = reverse(
+                "htmx:notificationprofile-update",
+                kwargs={"pk": self.object.pk},
+            )
+        else:
+            action = reverse("htmx:notificationprofile-create")
+        context["action"] = action
+        return context
 
 
 class NotificationProfileListView(NotificationProfileMixin, ListView):
