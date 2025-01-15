@@ -15,8 +15,9 @@ from django_htmx.http import HttpResponseClientRefresh, reswap, retarget
 
 from argus.auth.utils import get_or_update_preference
 from argus.incident.models import Incident
+from argus.notificationprofile.models import Filter
 from argus.util.datetime_utils import make_aware
-from .filter import create_named_filter
+from argus.htmx.incident.filter import create_named_filter
 
 from ..request import HtmxHttpRequest
 
@@ -31,7 +32,6 @@ from ..utils import (
     bulk_reopen_queryset,
     bulk_change_ticket_url_queryset,
 )
-from ...notificationprofile.models import Filter
 
 User = get_user_model()
 LOG = logging.getLogger(__name__)
