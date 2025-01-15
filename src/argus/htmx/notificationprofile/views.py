@@ -172,7 +172,7 @@ class NotificationProfileListView(NotificationProfileMixin, ListView):
         context = super().get_context_data(**kwargs)
         forms = []
         for obj in self.get_queryset():
-            form = NotificationProfileForm(None, user=self.request.user, instance=obj)
+            form = NotificationProfileForm(None, prefix=f"npf{obj.pk}", user=self.request.user, instance=obj)
             forms.append(form)
         context["form_list"] = forms
         return context
