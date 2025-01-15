@@ -1,6 +1,7 @@
 <form hx-post="{% url 'htmx:htmx-create' %}"
       hx-trigger="submit"
       hx-target="#destination-content"
+      hx-swap="outerHTML"
       class="max-w-4xl w-full">
   {% csrf_token %}
   <fieldset class="p-2 border rounded-box border-primary items-center gap-4 flex items-end justify-center">

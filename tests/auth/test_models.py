@@ -199,7 +199,7 @@ class PreferencesTests(TestCase):
         user = PersonUserFactory()
 
         pref_set1 = user.get_namespaced_preferences(namespace=MyPreferences._namespace)
-        Form1 = pref_set1.FORMS["magic_number"]
+        Form1 = pref_set1.get_forms()["magic_number"]
         pref_dict1 = {"foo": "bar", "magic_number": 2}
         query_dict1 = QueryDict("", mutable=True)
         query_dict1.update(pref_dict1)
@@ -209,7 +209,7 @@ class PreferencesTests(TestCase):
         self.assertEqual(form1.cleaned_data["magic_number"], pref_dict1["magic_number"])
 
         pref_set2 = user.get_namespaced_preferences(namespace=MyOtherPreferences._namespace)
-        Form2 = pref_set2.FORMS["magic_number"]
+        Form2 = pref_set2.get_forms()["magic_number"]
         pref_dict2 = {"foo": "bar", "magic_number": 3}
         query_dict2 = QueryDict("", mutable=True)
         query_dict2.update(pref_dict2)
