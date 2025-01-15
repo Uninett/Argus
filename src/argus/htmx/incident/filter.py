@@ -103,7 +103,10 @@ class FilterListView(FilterMixin, ListView):
     pass
 
 
-def incident_list_filter(request, qs, filter_obj: Filter = None):
+def incident_list_filter(request, qs):
+    filter_pk, filter_obj = request.session.get("selected_filter", None), None
+    if filter_pk:
+        filter_obj = Filter.objects.get(pk=filter_pk)
     if filter_obj:
         form = IncidentFilterForm(filter_obj.filter)
     else:

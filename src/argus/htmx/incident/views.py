@@ -93,6 +93,7 @@ def incident_update(request: HtmxHttpRequest, action: str):
 
 @require_GET
 def filter_form(request: HtmxHttpRequest):
+    request.session["selected_filter"] = None
     incident_list_filter = get_filter_function()
     filter_form, _ = incident_list_filter(request, None)
     context = {"filter_form": filter_form}
@@ -120,19 +121,16 @@ def create_filter(request: HtmxHttpRequest):
 def filter_select(request: HtmxHttpRequest):
     filter_id = request.GET.get("filter", None)
     request.session["selected_filter"] = filter_id
-    if filter_id:
+    if filter_id and get_object_or_404(Filter, id=filter_id):
         incident_list_filter = get_filter_function()
-        filter_obj = get_object_or_404(Filter, id=filter_id)
-        filter_form, _ = incident_list_filter(request, None, filter_obj)
+        filter_form, _ = incident_list_filter(request, None)
         context = {"filter_form": filter_form}
         return render(request, "htmx/incident/_incident_filterbox.html", context=context)
     else:
         if request.htmx.trigger:
             return reswap(HttpResponse(), "none")
         else:
-            response = HttpResponse()
-            retarget(response, "#incident-filter-select")
-            return response
+            return retarget(HttpResponse(), "#incident-filter-select")
 
 
 @require_GET
@@ -147,10 +145,7 @@ def incident_list(request: HtmxHttpRequest) -> HttpResponse:
     params = dict(request.GET.items())
 
     incident_list_filter = get_filter_function()
-    filter_pk, filter_obj = request.session.get("selected_filter", None), None
-    if filter_pk:
-        filter_obj = get_object_or_404(Filter, pk=filter_pk)
-    filter_form, qs = incident_list_filter(request, qs, filter_obj)
+    filter_form, qs = incident_list_filter(request, qs)
     filtered_count = qs.count()
 
     # Standard Django pagination
