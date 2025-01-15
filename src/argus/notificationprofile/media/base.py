@@ -3,18 +3,21 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
+from django import forms
+from django.core.exceptions import ValidationError
+
+from ..models import DestinationConfig
+
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
     from types import NoneType
-    from typing import Union
+    from typing import Union, Generator
 
     from django.contrib.auth import get_user_model
     from django.db.models.query import QuerySet
 
     from argus.incident.models import Event
-    from ..models import DestinationConfig
-    from ..serializers import RequestDestinationConfigSerializer
 
     User = get_user_model()
 
@@ -22,7 +25,40 @@ if TYPE_CHECKING:
 __all__ = ["NotificationMedium"]
 
 
+class CommonDestinationConfigForm(forms.ModelForm):
+    class Meta:
+        model = DestinationConfig
+        fields = ["media", "label"]
+
+
 class NotificationMedium(ABC):
+    """
+    Must be defined by subclasses:
+
+    Class attributes:
+
+    - MEDIA_SLUG: short string id for the medium, lowercase
+    - MEDIA_NAME: human friendly id for the medium
+    - MEDIA_SETTINGS_KEY: the field in settings that is specific for this medium
+    - MEDIA_JSON_SCHEMA: A json-schema to describe the settings field to
+      javascript, used by the API
+    - Form: a django.forms.Form that validates the contents of the
+      settings-field. MEDIA_SETTINGS_KEY must be the field-name of a required
+      field in the form.
+
+    Class methods:
+
+    - send(event, destinations): How to send the given event to the given
+      destinations of type MEDIA_SLUG.
+    """
+
+    error_messages = {
+        "readonly_medium": "Media cannot be updated, only settings.",
+        "readonly_user": "User cannot be changed, only settings.",
+        "settings_type": "Settings has to be a dictionary.",
+        "empty_settings": '"settings" cannot be empty',
+    }
+
     class NotDeletableError(Exception):
         """
         Custom exception class that is raised when a destination cannot be
@@ -30,35 +66,88 @@ class NotificationMedium(ABC):
         """
 
     @classmethod
-    @abstractmethod
-    def validate(cls, instance: RequestDestinationConfigSerializer, dict: dict, user: User) -> dict:
+    def validate(
+        cls, data: dict, user: User, instance: DestinationConfig = None, exception_class=ValidationError
+    ) -> CommonDestinationConfigForm:
+        if instance:
+            if data.get("media", "") != instance.media.slug:
+                raise exception_class(cls.error_messages["readonly_media"])
+            form = CommonDestinationConfigForm(data, instance=instance)
+            if instance.user != user:
+                raise exception_class(cls.error_messages["readonly_user"])
+        else:
+            form = CommonDestinationConfigForm(data)
+
+        if not form.is_valid():
+            raise exception_class(form.errors)
+
+        settings_form = cls.validate_settings(data, user, instance=instance)
+        form.cleaned_data["settings"] = settings_form.cleaned_data
+        form.cleaned_data["user"] = user
+        return form
+
+    @classmethod
+    def validate_settings(
+        cls, data: dict, user: User, exception_class=ValidationError, instance: DestinationConfig = None
+    ) -> dict:
         """
         Validates the settings of destination and returns a dict with
         validated and cleaned data
         """
-        pass
+        settings = data["settings"]
+        if not isinstance(settings, dict):
+            raise exception_class(cls.error_messages["settings_type"])
+        if not settings:
+            raise exception_class(cls.error_messages["empty_settings"])
+
+        form = cls.Form(settings)
+        if not form.is_valid():
+            raise exception_class(form.errors)
+
+        form = cls.clean(form, instance)
+
+        if cls.has_duplicate(user.destinations, settings):
+            raise exception_class(cls.MEDIA_SETTINGS_KEY, f"{cls.MEDIA_NAME} already exists")
+
+        return form.cleaned_data
 
     @classmethod
-    @abstractmethod
+    def clean(cls, form: forms.Form, instance: DestinationConfig = None) -> forms.Form:
+        """Can change the cleaned data of a valid form"""
+        return form
+
+    @classmethod
     def has_duplicate(cls, queryset: QuerySet, settings: dict) -> bool:
         """
         Returns True if a destination with the given settings already exists
         in the given queryset
         """
-        pass
-
-    @staticmethod
-    @abstractmethod
-    def get_label(destination: DestinationConfig) -> str:
-        """
-        Returns a descriptive label for this destination.
-        """
-        pass
+        key = f"settings__{cls.MEDIA_SETTINGS_KEY}"
+        value = settings[cls.MEDIA_SETTINGS_KEY]
+        return queryset.filter(media_id=cls.MEDIA_SLUG, **{key: value}).exists()
 
     @classmethod
-    def get_relevant_addresses(cls, destinations: Iterable[DestinationConfig]) -> set[DestinationConfig]:
+    def get_label(cls, destination: DestinationConfig) -> str:
+        """
+        Returns a descriptive label for this destination if none is stored
+        """
+        return destination.label if destination.label else destination.settings.get(cls.MEDIA_SETTINGS_KEY)
+
+    # No querysets beyond this point!
+
+    @classmethod
+    def _get_relevant_destinations(cls, destinations: Iterable[DestinationConfig]) -> Generator[DestinationConfig]:
+        return (destination for destination in destinations if destination.media_id == cls.MEDIA_SLUG)
+
+    @classmethod
+    def get_relevant_destination_settings(cls, destinations: Iterable[DestinationConfig]) -> set[str]:
         """Returns a set of addresses the message should be sent to"""
-        pass
+        destinations = [
+            destination.settings[cls.MEDIA_SETTINGS_KEY] for destination in cls._get_relevant_destinations(destinations)
+        ]
+        return set(destinations)
+
+    get_relevant_addresses = get_relevant_destination_settings
 
     @classmethod
     @abstractmethod
@@ -79,11 +168,23 @@ class NotificationMedium(ABC):
                 f"Cannot delete this destination since it is in use in the notification profile(s): {profiles}."
             )
 
-    @staticmethod
-    def update(destination: DestinationConfig, validated_data: dict) -> Union[DestinationConfig, NoneType]:
+    @classmethod
+    def _update_destination(cls, destination: DestinationConfig, validated_data: dict) -> DestinationConfig:
+        # adapted from rest_framework.serializers.ModelSerializer.update
+        # DestinationConfig MUST NOT have any m2m-relations so this is safe
+
+        for attr, value in validated_data.items():
+            setattr(destination, attr, value)
+
+        return destination
+
+    @classmethod
+    def update(cls, destination: DestinationConfig, validated_data: dict) -> Union[DestinationConfig, NoneType]:
         """
-        Updates a destination in case the normal update function is not
-        sufficient and returns the updated destination in that case,
-        returns None otherwise
+        Updates a destination
+
+        Override in case the normal update function is not sufficient
         """
-        return None
+        instance = cls._update_destination(destination, validated_data)
+        instance.save()
+        return instance
