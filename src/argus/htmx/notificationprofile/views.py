@@ -97,6 +97,7 @@ class NotificationProfileListView(NotificationProfileMixin, ListView):
             form = NotificationProfileForm(None, user=self.request.user, instance=obj)
             forms.append(form)
         context["form_list"] = forms
+        context["create_form"] = NotificationProfileForm(None, user=self.request.user)
         return context
 
 
@@ -107,7 +108,10 @@ class NotificationProfileDetailView(NotificationProfileMixin, DetailView):
 
 
 class NotificationProfileCreateView(ChangeMixin, NotificationProfileMixin, CreateView):
-    pass
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["create"] = True
+        return context
 
 
 class NotificationProfileUpdateView(ChangeMixin, NotificationProfileMixin, UpdateView):
