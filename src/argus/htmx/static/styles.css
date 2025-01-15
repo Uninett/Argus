@@ -4377,6 +4377,10 @@ details.collapse summary::-webkit-details-marker {
   min-width: fit-content;
 }
 
+.max-w-4xl {
+  max-width: 56rem;
+}
+
 .max-w-xs {
   max-width: 20rem;
 }
@@ -4443,6 +4447,10 @@ details.collapse summary::-webkit-details-marker {
 
 .justify-start {
   justify-content: flex-start;
+}
+
+.justify-center {
+  justify-content: center;
 }
 
 .justify-between {

@@ -174,7 +174,13 @@ class SessionPreferences:
     def get_instance(self):
         raise NotImplementedError
 
-    _proxy_attrs = ("get_forms", "get_defaults", "update_context", "get_context", "get_preference")
+    _proxy_attrs = (
+        "get_forms",
+        "get_defaults",
+        "update_context",
+        "get_context",
+        "get_preference",
+    )
 
     def __getattr__(self, name):
         if name in self._proxy_attrs:

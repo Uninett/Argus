@@ -22,3 +22,6 @@ c7b7fa04e832df023f5cbb2f755fb81d172b3200
 bc456a556e0df11b0f25420c5c6933c068adef10
 # Reformat HTML templates using djLint @johannaengland 03/12/2024
 bf5fac0b04d6a1e9b8710199404f6179956e9ae0
+# Reformat code using ruff v0.9.1 @johannaengland 13/01/2025
+11dec46060f17c5e3491639f188d459c8c8cde08
+
