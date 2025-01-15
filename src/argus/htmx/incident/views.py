@@ -17,7 +17,6 @@ from argus.auth.utils import get_or_update_preference
 from argus.incident.models import Incident
 from argus.notificationprofile.models import Filter
 from argus.util.datetime_utils import make_aware
-from argus.htmx.incident.filter import create_named_filter
 
 from ..request import HtmxHttpRequest
 
@@ -107,6 +106,8 @@ def create_filter(request: HtmxHttpRequest):
     filter_form, _ = incident_list_filter(request, None)
     if filter_name and filter_form.is_valid():
         filterblob = filter_form.to_filterblob()
+        from argus.htmx.incident.filter import create_named_filter
+
         _, filter_obj = create_named_filter(request, filter_name, filterblob)
         if filter_obj:
             request.session["selected_filter"] = str(filter_obj.id)
