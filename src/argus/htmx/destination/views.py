@@ -18,7 +18,7 @@ def destination_list(request):
 
 @require_http_methods(["POST"])
 def create_htmx(request) -> HttpResponse:
-    form = DestinationFormCreate(request.POST or None, request=request)
+    form = DestinationFormCreate(request.POST or None, user=request.user)
     template = "htmx/destination/_content.html"
     if form.is_valid():
         form.save()
@@ -52,22 +52,17 @@ def delete_htmx(request, pk: int) -> HttpResponse:
 @require_http_methods(["POST"])
 def update_htmx(request, pk: int) -> HttpResponse:
     destination = DestinationConfig.objects.get(pk=pk)
-    media = destination.media
-    form = DestinationFormUpdate(request.POST or None, instance=destination, request=request)
-    if is_valid := form.is_valid():
+    form = DestinationFormUpdate(request.POST or None, instance=destination, request=request.user)
+    template = "htmx/destination/_form_list.html"
+    if form.is_valid():
         form.save()
-
-    update_forms = _get_update_forms(request.user, media=media)
-
-    if not is_valid:
-        update_forms = _replace_form_in_list(update_forms, form)
-
-    context = {
-        "error_msg": None,
-        "forms": update_forms,
-        "media": media,
-    }
-    return render(request, "htmx/destination/_collapse_with_forms.html", context=context)
+        return _render_destination_list(request, template=template)
+    update_forms = _get_update_forms(request.user)
+    for index, update_form in enumerate(update_forms):
+        if update_form.instance.pk == pk:
+            update_forms[index] = form
+            break
+    return _render_destination_list(request, update_forms=update_forms, template=template)
 
 
 def _render_destination_list(

@@ -2,7 +2,6 @@ from django import forms
 from django.forms import ModelForm
 
 from argus.notificationprofile.models import DestinationConfig, Media
-from argus.notificationprofile.serializers import RequestDestinationConfigSerializer
 from argus.notificationprofile.media import api_safely_get_medium_object
 
 
@@ -10,8 +9,8 @@ class DestinationFormCreate(ModelForm):
     settings = forms.CharField(required=True)
 
     def __init__(self, *args, **kwargs):
-        # Serializer request the request object
-        self.request = kwargs.pop("request", None)
+        # Serializer needs the request object
+        self.user = kwargs.pop("user", None)
         super().__init__(*args, **kwargs)
 
     class Meta:
@@ -26,54 +25,29 @@ class DestinationFormCreate(ModelForm):
 
     def clean(self):
         super().clean()
+        media = self.cleaned_data["media"]
+        medium = api_safely_get_medium_object(media.slug)()
         settings_key = _get_settings_key_for_media(self.cleaned_data["media"])
         # Convert settings value (e.g. email address) to be compatible with JSONField
         self.cleaned_data["settings"] = {settings_key: self.cleaned_data["settings"]}
-        self._init_serializer()
-        return self._validate_serializer()
+
+        # Update form needs to set instance.settings back to the json dict form before validating
+
+        form = self._validate(medium)
+        return form.cleaned_data
 
     def save(self):
-        # self.serializer should be initiated and validated in clean() before save() is called
-        self.serializer.save(user=self.request.user)
-
-    def _init_serializer(self):
-        serializer = RequestDestinationConfigSerializer(
-            data={
-                "media": self.cleaned_data["media"],
-                "label": self.cleaned_data.get("label", ""),
-                "settings": self.cleaned_data["settings"],
-            },
-            context={"request": self.request},
+        # Manual save to include user since the form itself does not have a user field
+        new_destination = DestinationConfig(
+            user=self.cleaned_data["user"],
+            media=self.cleaned_data["media"],
+            label=self.cleaned_data.get("label", ""),
+            settings=self.cleaned_data["settings"],
         )
-        self.serializer = serializer
+        new_destination.save()
 
-    def _validate_serializer(self):
-        media = self.cleaned_data["media"]
-        settings_key = _get_settings_key_for_media(media)
-
-        # Add error messages from serializer to form
-        if not self.serializer.is_valid():
-            for error_name, error_detail in self.serializer.errors.items():
-                if error_name in ["media", "label", settings_key]:
-                    if error_name == settings_key:
-                        error_name = "settings"
-                    self.add_error(error_name, error_detail)
-                    # Serializer might add more data to the JSON dict
-                    if settings := self.serializer.data.get("settings"):
-                        self.cleaned_data["settings"] = settings
-        else:
-            # Serializer might add more data to the JSON dict
-            if settings := self.serializer.validated_data.get("settings"):
-                self.cleaned_data["settings"] = settings
-
-        if label := self.cleaned_data.get("label"):
-            destination_filter = DestinationConfig.objects.filter(label=label, media=media)
-            if self.instance:
-                destination_filter = destination_filter.exclude(pk=self.instance.pk)
-            if destination_filter.exists():
-                self.add_error("label", "Name must be unique per media")
-
-        return self.cleaned_data
+    def _validate(self, medium):
+        return medium.validate(data=self.cleaned_data, user=self.user)
 
 
 class DestinationFormUpdate(DestinationFormCreate):
@@ -94,28 +68,14 @@ class DestinationFormUpdate(DestinationFormCreate):
             "media": forms.HiddenInput(),
         }
 
-    def _init_serializer(self):
-        # self.instance is modified in __init__,
-        # so get unmodified version here for the serializer
-        destination = DestinationConfig.objects.get(pk=self.instance.pk)
-        settings_key = _get_settings_key_for_media(destination.media)
-        data = {}
+    def save(self):
+        self.instance.settings = self.cleaned_data["settings"]
+        self.instance.label = self.cleaned_data.get("label", "")
+        self.instance.save()
 
-        if "label" in self.cleaned_data:
-            label = self.cleaned_data["label"]
-            if label != destination.label:
-                data["label"] = label
-
-        settings = self.cleaned_data["settings"]
-        if settings.get(settings_key) != destination.settings.get(settings_key):
-            data["settings"] = settings
-
-        self.serializer = RequestDestinationConfigSerializer(
-            destination,
-            data=data,
-            context={"request": self.request},
-            partial=True,
-        )
+    def _validate(self, medium):
+        # raise ValueError(str(self.cleaned_data["media"]) == self.instance.media.slug)
+        return medium.validate(data=self.cleaned_data, user=self.user, instance=self.instance)
 
 
 def _get_settings_key_for_media(media: Media) -> str:
