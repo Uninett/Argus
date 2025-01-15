@@ -16,8 +16,11 @@ class IncidentColumnFilterForm(forms.Form):
 
 
 def incident_list_filter_factory(form_cls):
-    def incident_list_filter(request, qs):
-        form = form_cls(request.GET or None)
+    def incident_list_filter(request, qs, filter_obj=None):
+        if filter_obj:
+            form = form_cls(filter_obj.filter)
+        else:
+            form = form_cls(request.GET or None)
 
         if form.is_valid():
             filterblob = form.to_filterblob()
@@ -41,6 +44,7 @@ def incident_list_filter_factory(form_cls):
 class TestRegularColumn(test.TestCase):
     def setUp(self):
         request = RequestFactory().get("/incidents")
+        request.session = {}
         request.user = PersonUserFactory()
         request.htmx = False
         self.response = incident_list(request)
@@ -67,6 +71,7 @@ class TestRegularColumn(test.TestCase):
 class TestFilterableColumn(test.TestCase):
     def setUp(self):
         request = RequestFactory().get("/incidents")
+        request.session = {}
         request.user = PersonUserFactory()
         request.htmx = False
         self.response = incident_list(request)
