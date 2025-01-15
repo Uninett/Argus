@@ -1,4 +1,5 @@
 from django import forms
+from django.urls import reverse
 
 from argus.filter import get_filter_backend
 from argus.incident.models import SourceSystem
@@ -18,9 +19,7 @@ class IncidentFilterForm(forms.Form):
     source = forms.MultipleChoiceField(
         widget=BadgeDropdownMultiSelect(
             attrs={"placeholder": "select sources..."},
-            extra={
-                "hx_get": "htmx:incident-filter",
-            },
+            partial_get=reverse("htmx:incident-filter"),
         ),
         choices=tuple(SourceSystem.objects.values_list("id", "name")),
         required=False,
