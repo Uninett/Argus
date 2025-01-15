@@ -103,9 +103,9 @@ class FilterListView(FilterMixin, ListView):
     pass
 
 
-def incident_list_filter(request, qs, filter: Filter = None):
-    if filter:
-        form = IncidentFilterForm(filter.filter)
+def incident_list_filter(request, qs, filter_obj: Filter = None):
+    if filter_obj:
+        form = IncidentFilterForm(filter_obj.filter)
     else:
         if request.method == "POST":
             form = IncidentFilterForm(request.POST)
@@ -120,10 +120,10 @@ def incident_list_filter(request, qs, filter: Filter = None):
 
 def create_named_filter(request, filter_name: str, filterblob: dict):
     form = NamedFilterForm({"name": filter_name, "filter": filterblob})
-    filter = None
+    filter_obj = None
 
     if form.is_valid():
-        filter = Filter.objects.create(
+        filter_obj = Filter.objects.create(
             user=request.user, name=form.cleaned_data["name"], filter=form.cleaned_data["filter"]
         )
-    return form, filter
+    return form, filter_obj
