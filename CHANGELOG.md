@@ -8,6 +8,59 @@ This project uses [*towncrier*](https://towncrier.readthedocs.io/) and the chang
 
 <!-- towncrier release notes start -->
 
+## [1.31.0] - 2025-01-17
+
+Mostly changes to the new frontend this time around.
+
+Two development-relevant changes:
+
+- Refactor of incident-specific frontend pages, many files have new names
+- How to define a preference has changed
+
+There are visible changes to the destinations-page and profiles page as well.
+
+### Added
+
+- Added howto for how to easily toggle the use of django-debug-toolbar with the
+  help of the extra/overriding-apps machinery and an environment variable.
+
+### HTMx app
+
+#### Added
+
+- Centre destination page content.
+  ([#1079](https://github.com/Uninett/Argus/issues/1079))
+- Add vertical gap between collapse element and create form on HTMX
+  destinations page. ([#1080](https://github.com/Uninett/Argus/issues/1080))
+
+#### Changed
+
+- Streamline definition and usage of preferences
+  ([#1072](https://github.com/Uninett/Argus/issues/1072))
+- Only update the related media list when deleting a destination.
+  ([#1128](https://github.com/Uninett/Argus/issues/1128))
+- Customizers beware: Major refactor in src/argus/htmx/incident(s) and
+  src/argus/htmx/templates/htmx/incident(s).
+
+  * All directories named "incidents" was changed to "incident".
+  * The templates that defines columns in the incident list was moved to
+    `htmx/incident/cells/`.
+  * The template for selecting sources in the filterbox was moved to
+    `htmx/incident/widgets/`.
+  * Whenever there were plural view-names or url-names for incident-related
+    views they were made singular.
+
+  There will be empty directories left behind, `git` cannot do anything with
+  these. Run `make clean` to delete cached files then find empty directories
+  with `find . -type d -empty`. Delete them manually.
+- Polished the looks of the profiles page. More to come!
+
+#### Fixed
+
+- Fix create destination form generating extra div when submitting.
+  ([#1129](https://github.com/Uninett/Argus/issues/1129))
+
+
 ## [1.30.0] - 2024-12-19
 
 Mostly changes to the alpha frontend
