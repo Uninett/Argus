@@ -1,7 +1,7 @@
 from django import forms
 
 from argus.filter import get_filter_backend
-from argus.incident.models import SourceSystem
+from argus.incident.models import SourceSystem, Tag
 from argus.incident.constants import Level
 from argus.htmx.widgets import BadgeDropdownMultiSelect
 
@@ -25,6 +25,17 @@ class IncidentFilterForm(forms.Form):
         choices=tuple(SourceSystem.objects.values_list("id", "name")),
         required=False,
         label="Sources",
+    )
+    tags = forms.MultipleChoiceField(
+        widget=BadgeDropdownMultiSelect(
+            attrs={"placeholder": "select tags..."},
+            extra={
+                "hx_get": "htmx:incident-filter",
+            },
+        ),
+        choices=[(tag.id, tag.representation) for tag in Tag.objects.all()],
+        required=False,
+        label="Tags",
     )
     maxlevel = forms.IntegerField(
         widget=forms.NumberInput(
@@ -62,6 +73,10 @@ class IncidentFilterForm(forms.Form):
         source = self.cleaned_data.get("source", [])
         if source:
             filterblob["sourceSystemIds"] = source
+
+        tags = self.cleaned_data.get("tags", [])
+        if tags:
+            filterblob["tags"] = [tag.representation for tag in Tag.objects.filter(id__in=tags)]
 
         maxlevel = self.cleaned_data.get("maxlevel", 0)
         if maxlevel:
