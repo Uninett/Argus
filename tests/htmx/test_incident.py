@@ -41,6 +41,7 @@ def incident_list_filter_factory(form_cls):
 class TestRegularColumn(test.TestCase):
     def setUp(self):
         request = RequestFactory().get("/incidents")
+        request.session = {}
         request.user = PersonUserFactory()
         request.htmx = False
         self.response = incident_list(request)
@@ -67,6 +68,7 @@ class TestRegularColumn(test.TestCase):
 class TestFilterableColumn(test.TestCase):
     def setUp(self):
         request = RequestFactory().get("/incidents")
+        request.session = {}
         request.user = PersonUserFactory()
         request.htmx = False
         self.response = incident_list(request)
