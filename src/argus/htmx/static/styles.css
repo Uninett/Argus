@@ -4483,6 +4483,14 @@ details.collapse summary::-webkit-details-marker {
   border-radius: 0.5rem;
 }
 
+.\!rounded-ee-\[inherit\] {
+  border-end-end-radius: inherit !important;
+}
+
+.\!rounded-se-\[inherit\] {
+  border-start-end-radius: inherit !important;
+}
+
 .border {
   border-width: 2px;
 }
