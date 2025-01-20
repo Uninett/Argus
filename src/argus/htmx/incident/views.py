@@ -102,13 +102,13 @@ def filter_form(request: HtmxHttpRequest):
 
 @require_POST
 def create_filter(request: HtmxHttpRequest):
+    from argus.htmx.incident.filter import create_named_filter
+
     filter_name = request.POST.get("filter_name", None)
     incident_list_filter = get_filter_function()
     filter_form, _ = incident_list_filter(request, None)
     if filter_name and filter_form.is_valid():
         filterblob = filter_form.to_filterblob()
-        from argus.htmx.incident.filter import create_named_filter
-
         _, filter_obj = create_named_filter(request, filter_name, filterblob)
         if filter_obj:
             request.session["selected_filter"] = str(filter_obj.id)
