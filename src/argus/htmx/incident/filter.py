@@ -82,9 +82,9 @@ class IncidentFilterForm(forms.Form):
         filterblob["acked"] = acked
         filterblob["unacked"] = unacked
 
-        sources = self.cleaned_data.get("sourceSystemIds", [])
-        if sources:
-            filterblob["sourceSystemIds"] = sources
+        sourceSystemIds = self.cleaned_data.get("sourceSystemIds", [])
+        if sourceSystemIds:
+            filterblob["sourceSystemIds"] = sourceSystemIds
 
         maxlevel = self.cleaned_data.get("maxlevel", 0)
         if maxlevel:
