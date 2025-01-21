@@ -1,8 +1,13 @@
 <details class="collapse bg-base-200 collapse-arrow" open="">
-  <summary class="collapse-title text-xl font-medium">{{ media.name }} ({{ forms|length }})</summary>
-  <div class="collapse-content">
+  <summary class="collapse-title text-xl font-medium">{{ media.name }} ({{ forms.update_forms|length }})</summary>
+  <div class="collapse-content flex flex-col gap-4">
     {% if error_msg %}<p class="text-error">{{ error_msg }}</p>{% endif %}
-    {% for form in forms %}
+    <div class="flex w-full h-fit items-center justify-center">
+      {% with forms=forms.create_form %}
+        {% include "htmx/destination/_create_form.html" %}
+      {% endwith %}
+    </div>
+    {% for forms in forms.update_forms %}
       <div class="flex w-full h-fit items-center justify-center">
         {% include "htmx/destination/_edit_form.html" %}
         {% include "htmx/destination/_delete_form.html" %}

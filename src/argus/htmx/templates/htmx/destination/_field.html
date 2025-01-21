@@ -1,0 +1,13 @@
+<label class="form-control max-w-xs mb-auto">
+  <div class="label">
+    <span class="label-text">{{ field.label }}</span>
+  </div>
+  <div class="input input-bordered flex items-center gap-2">{{ field }}</div>
+  <div class="label">
+    <span class="label-text-alt min-h-4">
+      {% if field.errors %}
+        {% for error in field.errors %}<p class="text-error">{{ error }}</p>{% endfor %}
+      {% endif %}
+    </span>
+  </div>
+</label>

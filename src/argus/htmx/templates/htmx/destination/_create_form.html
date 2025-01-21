@@ -1,32 +1,11 @@
-<form hx-post="{% url 'htmx:htmx-create' %}"
-      hx-trigger="submit"
-      hx-target="#destination-content"
-      hx-swap="outerHTML"
-      class="max-w-4xl w-full">
-  {% csrf_token %}
-  <fieldset class="p-2 border rounded-box border-primary items-center gap-4 flex items-end justify-center">
-    <legend class="menu-title">Create destination</legend>
-    {% for field in create_form %}
-      <label class="form-control max-w-xs mb-auto">
-        <div class="label">
-          <span class="label-text">{{ field.label }}</span>
-        </div>
-        {% if field.name == "media" %}
-          {{ field }}
-        {% else %}
-          <div class="input input-bordered flex items-center gap-2">{{ field }}</div>
-        {% endif %}
-        <div class="label">
-          <span class="label-text-alt min-h-4">
-            {% if field.errors %}
-              {% for error in field.errors %}<p class="text-error">{{ error }}</p>{% endfor %}
-            {% endif %}
-          </span>
-        </div>
-      </label>
-    {% empty %}
-      <p>Something went wrong</p>
-    {% endfor %}
-    <input type="submit" value="Create" class="btn btn-primary">
-  </fieldset>
-</form>
+{% with label_form=forms.label_form settings_form=forms.settings_form %}
+  <form {% if label_form.prefix %}id="{{ label_form.prefix }}"{% endif %}
+        action="{% url 'htmx:destination-create' media=media %}"
+        hx-post="{% url 'htmx:destination-create' media=media %}"
+        hx-trigger="submit"
+        hx-target="#destination-content"
+        hx-swap="outerHTML"
+        class="max-w-4xl w-full">
+    {% include "./_destination_form.html" %}
+  </form>
+{% endwith %}
