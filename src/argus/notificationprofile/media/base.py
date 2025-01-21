@@ -23,7 +23,21 @@ if TYPE_CHECKING:
     User = get_user_model()
 
 
-__all__ = ["NotificationMedium"]
+__all__ = [
+    "LabelForm",
+    "CommonDestinationConfigForm",
+    "NotificationMedium",
+]
+
+
+class LabelForm(forms.ModelForm):
+    class Meta:
+        model = DestinationConfig
+        fields = ["label"]
+
+    def __init__(self, user, **kwargs):
+        self.user = user
+        super().__init__(**kwargs)
 
 
 class CommonDestinationConfigForm(forms.ModelForm):

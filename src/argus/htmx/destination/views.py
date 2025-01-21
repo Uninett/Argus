@@ -1,14 +1,66 @@
-from typing import Optional, Sequence
-from django.shortcuts import render, get_object_or_404
+from __future__ import annotations
 
-from django.views.decorators.http import require_http_methods
+from collections import namedtuple
+import logging
+from typing import Optional, TYPE_CHECKING
+
+from django.http import QueryDict
+from django.contrib import messages
 from django.http import HttpResponse
+from django.shortcuts import redirect, render, get_object_or_404
+from django.views.decorators.http import require_http_methods
 
 from argus.notificationprofile.models import DestinationConfig, Media
-from argus.notificationprofile.media import api_safely_get_medium_object
-from argus.notificationprofile.media.base import NotificationMedium
+from argus.notificationprofile.media import get_medium_object
+from argus.notificationprofile.media.base import NotificationMedium, LabelForm
 
-from .forms import DestinationFormCreate, DestinationFormUpdate
+if TYPE_CHECKING:
+    from django.forms import Form
+
+
+LOG = logging.getLogger(__name__)
+Forms = namedtuple("Forms", ["label_form", "settings_form"])
+
+
+# not a view
+def get_forms(request, media: str, instance: DestinationConfig = None):
+    prefix = "destinationform"
+    medium = get_medium_object(media)
+
+    if instance and instance.pk:
+        prefix += f"-{instance.pk}-{media}"
+        label_name = medium.get_label(instance)
+        if label_name:
+            label_initial = {"label": label_name}
+    else:
+        prefix += f"-{media}"
+        label_initial = {}
+
+    data = None
+    for key in request.POST:
+        if key.startswith(prefix):
+            data = request.POST
+            break
+    label_form = LabelForm(data=data, user=request.user, initial=label_initial, instance=instance, prefix=prefix)
+    settings_form = medium.validate_settings(data, request.user, instance=instance, prefix=prefix)
+
+    if data:
+        label_form.is_valid()
+    return Forms(label_form, settings_form)
+
+
+# not a view
+def save_forms(user, media: str, label_form: LabelForm, settings_form: Form):
+    if label_form.instance.pk:
+        media = label_form.instance.media_id
+    if label_form.is_valid() and settings_form.is_valid():
+        obj = label_form.save(commit=False)
+        obj.user = user
+        obj.media_id = media
+        obj.settings = settings_form.cleaned_data
+        obj.save()
+        return obj
+    return None
 
 
 @require_http_methods(["GET"])
@@ -17,113 +69,119 @@ def destination_list(request):
 
 
 @require_http_methods(["POST"])
-def create_htmx(request) -> HttpResponse:
-    form = DestinationFormCreate(request.POST or None, user=request.user)
+def create_destination(request, media: str) -> HttpResponse:
+    medium = get_medium_object(media)
+    label_form, settings_form = get_forms(request, media)
     template = "htmx/destination/_content.html"
-    if form.is_valid():
-        form.save()
-        return _render_destination_list(request, template=template)
-    return _render_destination_list(request, create_form=form, template=template)
+    context = {
+        "label_form": label_form,
+        "settings_form": settings_form,
+        "media": media,
+    }
+    obj = save_forms(request.user, media, label_form, settings_form)
+    if obj:
+        label = medium.get_label(obj)
+        message = f'Created new {media} destination "{label}"'
+        messages.success(request, message)
+        LOG.info(message)
+        request.POST = QueryDict("")
+        return _render_destination_list(request, context=context, template=template)
+        # return redirect("htmx:destination-list")
+    error_msg = f"Could not create new {media} destination"
+    messages.warning(request, error_msg)
+    LOG.warn(error_msg)
+    return _render_destination_list(request, context=context, template=template)
 
 
 @require_http_methods(["POST"])
-def delete_htmx(request, pk: int) -> HttpResponse:
+def delete_destination(request, pk: int) -> HttpResponse:
     destination = get_object_or_404(request.user.destinations.all(), pk=pk)
     media = destination.media
     error_msg = None
+    medium = get_medium_object(media.slug)
+    destination_label = medium.get_label(destination)
     try:
-        medium = api_safely_get_medium_object(destination.media.slug)
         medium.raise_if_not_deletable(destination)
     except NotificationMedium.NotDeletableError as e:
-        error_msg = " ".join(e.args)
+        # template?
+        error_msg = ", ".join(e.args)
+        message = f'Failed to delete {media} destination "{destination}": {error_msg}'
+        messages.warning(request, message)
+        LOG.warn(message)
     else:
         destination.delete()
+        message = f'Deleted {media} destination "{destination_label}"'
+        messages.success(request, message)
+        LOG.info(message)
 
-    forms = _get_update_forms(request.user, media=media)
-
-    context = {
-        "error_msg": error_msg,
-        "forms": forms,
-        "media": media,
-    }
-    return render(request, "htmx/destination/_collapse_with_forms.html", context=context)
+    return redirect("htmx:destination-list")
 
 
 @require_http_methods(["POST"])
-def update_htmx(request, pk: int) -> HttpResponse:
-    destination = DestinationConfig.objects.get(pk=pk)
-    form = DestinationFormUpdate(request.POST or None, instance=destination, request=request.user)
+def update_destination(request, pk: int, media: str) -> HttpResponse:
+    medium = get_medium_object(media)
     template = "htmx/destination/_form_list.html"
-    if form.is_valid():
-        form.save()
+    destination = get_object_or_404(request.user.destinations.all(), pk=pk)
+    label = medium.get_label(destination)
+    forms = get_forms(request, media, instance=destination)
+    obj = save_forms(request.user, media, *forms)
+    if obj:
+        label = medium.get_label(obj)
+        message = f'Updated {media} destination "{label}"'
+        messages.success(request, message)
+        LOG.info(message)
+        request.POST = QueryDict("")
         return _render_destination_list(request, template=template)
-    update_forms = _get_update_forms(request.user)
-    for index, update_form in enumerate(update_forms):
-        if update_form.instance.pk == pk:
-            update_forms[index] = form
+    error_msg = f'Could not update {media} destination "{label}"'
+    messages.warning(request, error_msg)
+    LOG.warn(request, error_msg)
+    all_forms = get_all_forms_grouped_by_media(request)
+    update_forms = get_all_update_forms_for_media(request, media)
+    for index, forms in enumerate(update_forms):
+        if forms.label_form.instance.pk == pk:
+            update_forms[index] = forms
             break
-    return _render_destination_list(request, update_forms=update_forms, template=template)
+    all_forms[media] = update_forms
+    context = {
+        "forms": all_forms,
+        "label_form": forms.label_form,
+        "settings_form": forms.settings_form,
+        "media": media,
+    }
+    return _render_destination_list(request, context=context, template=template)
 
 
 def _render_destination_list(
     request,
-    create_form: Optional[DestinationFormCreate] = None,
-    update_forms: Optional[Sequence[DestinationFormUpdate]] = None,
+    context: Optional[dict] = None,
     template: str = "htmx/destination/destination_list.html",
 ) -> HttpResponse:
-    """Function to render the destinations page.
+    """Function to render the destinations page"""
 
-    :param create_form: this is used to display the form for creating a new destination
-    with errors while retaining the user input. If you want a blank form, pass None.
-    :param update_forms: list of update forms to display. Useful for rendering forms
-    with error messages while retaining the user input.
-    If this is None, the update forms will be generated from the user's destinations."""
-
-    if create_form is None:
-        create_form = DestinationFormCreate()
-    if update_forms is None:
-        update_forms = _get_update_forms(request.user)
-    grouped_forms = _group_update_forms_by_media(update_forms)
-    context = {
-        "create_form": create_form,
-        "grouped_forms": grouped_forms,
-        "page_title": "Destinations",
-    }
+    if not context:
+        context = {}
+    if "forms" not in context:
+        context["forms"] = get_all_forms_grouped_by_media(request)
+    context["page_title"] = "Destinations"
     return render(request, template, context=context)
 
 
-def _get_update_forms(user, media: Media = None) -> list[DestinationFormUpdate]:
+def get_all_update_forms_for_media(request, media: str) -> list[Forms]:
     """Get a list of update forms for the user's destinations.
-    :param media: if provided, only return destinations for this media.
+    :param media: Only return destinations for this media.
     """
-    if media:
-        destinations = user.destinations.filter(media=media)
-    else:
-        destinations = user.destinations.all()
-    # Sort by oldest first
-    destinations = destinations.order_by("pk")
-    return [DestinationFormUpdate(instance=destination) for destination in destinations]
+    destinations = request.user.destinations.filter(media_id=media).order_by("pk")
+
+    return [get_forms(request, media, instance=destination) for destination in destinations]
 
 
-def _group_update_forms_by_media(
-    destination_forms: Sequence[DestinationFormUpdate],
-) -> dict[Media, list[DestinationFormUpdate]]:
-    grouped_destinations = {}
-
-    # Adding a media to the dict even if there are no destinations for it
-    # is useful so that the template can render a section for that media
+def get_all_forms_grouped_by_media(request):
+    forms = {}
     for media in Media.objects.all():
-        grouped_destinations[media] = []
-
-    for form in destination_forms:
-        grouped_destinations[form.instance.media].append(form)
-
-    return grouped_destinations
-
-
-def _replace_form_in_list(forms: list[DestinationFormUpdate], form: DestinationFormUpdate):
-    for index, f in enumerate(forms):
-        if f.instance.pk == form.instance.pk:
-            forms[index] = form
-            break
+        create_form = get_forms(request, media.slug)
+        update_forms = get_all_update_forms_for_media(request, media.slug)
+        forms[media] = {
+            "create_form": create_form,
+            "update_forms": update_forms,
+        }
     return forms
