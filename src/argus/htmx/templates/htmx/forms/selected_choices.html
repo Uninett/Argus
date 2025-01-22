@@ -1,0 +1,19 @@
+{% with id=widget.attrs.id %}
+  <div {% if id %}id="{{ id }}"{% endif %}
+       {% if widget.attrs.class %}class="{{ widget.attrs.class }}"{% endif %}>
+    {% for group, options, index in widget.optgroups %}
+      {% if group %}
+        <div>
+          <label>{{ group }}</label>
+        {% endif %}
+        {% for option in options %}
+          {% if option.selected %}
+            <div>{% include option.template_name with widget=option %}</div>
+          {% endif %}
+        {% endfor %}
+        {% if group %}</div>{% endif %}
+    {% empty %}
+      <div>No search results. Please type at least one letter.</div>
+    {% endfor %}
+  </div>
+{% endwith %}

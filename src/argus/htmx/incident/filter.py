@@ -3,10 +3,11 @@ from django.urls import reverse
 from django.views.generic import ListView
 
 from argus.filter import get_filter_backend
-from argus.incident.models import SourceSystem
+from argus.incident.models import SourceSystem, Tag
 from argus.incident.constants import Level
-from argus.htmx.widgets import BadgeDropdownMultiSelect
 from argus.notificationprofile.models import Filter
+from argus.htmx.widgets import BadgeDropdownMultiSelect, SearchDropdownMultiSelect
+
 
 filter_backend = get_filter_backend()
 QuerySetFilter = filter_backend.QuerySetFilter
@@ -33,6 +34,38 @@ class FilterMixin:
         return reverse("htmx:filter-list")
 
 
+class TagFilterForm(forms.Form):
+    tags = forms.MultipleChoiceField(
+        widget=SearchDropdownMultiSelect(
+            attrs={
+                "placeholder": "search tags...",
+            },
+            partial_get=None,
+        ),
+        choices=((tag.id, str(tag)) for tag in Tag.objects.none()),
+        required=False,
+        label="Tags",
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # mollify tests
+        self.fields["tags"].widget.partial_get = reverse("htmx:search-tags")
+
+        query = kwargs.pop("search", None)
+        if not query:
+            self.fields["tags"].choices = ((tag.id, str(tag)) for tag in Tag.objects.all())
+            return
+
+        if Tag.TAG_DELIMITER in query:
+            key, value = Tag.split(query)
+            tags = Tag.objects.filter(key=key, value__icontains=value)[:20]
+        else:
+            tags = Tag.objects.filter(key__icontains=query)[:20]
+
+        self.fields["tags"].choices = ((tag.id, str(tag)) for tag in tags)
+
+
 class IncidentFilterForm(forms.Form):
     open = forms.BooleanField(required=False)
     closed = forms.BooleanField(required=False)
@@ -47,13 +80,14 @@ class IncidentFilterForm(forms.Form):
         required=False,
         label="Sources",
     )
-    tags = forms.CharField(
-        widget=forms.TextInput(
+    tags = forms.MultipleChoiceField(
+        widget=SearchDropdownMultiSelect(
             attrs={
-                "placeholder": "enter tags...",
-                "class": "show-selected-box input input-accent input-bordered input-md border overflow-y-auto min-h-8 h-auto max-h-16 max-w-xs leading-tight",
-            }
+                "placeholder": "search tags...",
+            },
+            partial_get=None,
         ),
+        choices=((tag.id, str(tag)) for tag in Tag.objects.all()),
         required=False,
         label="Tags",
     )
@@ -70,6 +104,7 @@ class IncidentFilterForm(forms.Form):
         super().__init__(*args, **kwargs)
         # mollify tests
         self.fields["sourceSystemIds"].widget.partial_get = reverse("htmx:incident-filter")
+        self.fields["tags"].widget.partial_get = reverse("htmx:search-tags")
 
     def _tristate(self, onkey, offkey):
         on = self.cleaned_data.get(onkey, None)

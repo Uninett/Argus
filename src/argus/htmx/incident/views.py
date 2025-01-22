@@ -135,6 +135,28 @@ def filter_select(request: HtmxHttpRequest):
 
 
 @require_GET
+def search_tags(request: HtmxHttpRequest):
+    from .filter import TagFilterForm
+
+    query = request.GET.get("search", None)
+    form = TagFilterForm(request.GET or None)
+    form.is_valid()
+
+    if not query:
+        return render(
+            request,
+            "htmx/forms/selected_choices.html",
+            {"widget": form.fields["tags"].widget},
+        )
+
+    return render(
+        request,
+        "htmx/forms/search_results.html",
+        {"widget": form.fields["tags"].widget},
+    )
+
+
+@require_GET
 def incident_list(request: HtmxHttpRequest) -> HttpResponse:
     columns = get_incident_table_columns()
 

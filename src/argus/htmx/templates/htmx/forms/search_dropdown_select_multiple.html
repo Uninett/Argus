@@ -1,0 +1,30 @@
+<div class="dropdown dropdown-bottom">
+  <div tabindex="0"
+       role="button"
+       class="show-selected-box input input-accent input-bordered input-md border overflow-y-auto min-h-8 h-auto max-h-16 max-w-xs leading-tight flex flex-wrap items-center gap-0.5">
+    {% if not widget.has_selected %}
+      <input class="form-control"
+             type="search"
+             name="search"
+             placeholder="{{ widget.attrs.placeholder }}"
+             hx-get="{{ widget.partial_get }}"
+             hx-trigger="input changed delay:500ms, keyup[key=='Enter']"
+             hx-target="#search-results"
+             hx-swap="innerHTML">
+    {% endif %}
+    {% for _, options, _ in widget.optgroups %}
+      {% for option in options %}
+        {% if option.selected %}
+          {% block show_selected %}
+            <p class="text-primary italic font-medium">{{ option.label }},</p>
+          {% endblock show_selected %}
+        {% endif %}
+      {% endfor %}
+    {% endfor %}
+  </div>
+  <div id="search-results"
+       tabindex="0"
+       class="dropdown-content bg-base-100 rounded-box z-[1] min-w-fit w-full max-h-80 overflow-y-auto p-2 mt-0.5 shadow">
+    {% include "htmx/forms/selected_choices.html" %}
+  </div>
+</div>
