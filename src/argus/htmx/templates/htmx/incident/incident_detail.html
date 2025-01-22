@@ -83,10 +83,10 @@
           </section>
         </section>
         <section id="acknowledgements" class="card">
-          <h2 class="card-title">Acknowledgements</h2>
-          <div class="divide-y divide-solid">
+          <h2 class="card-title pl-8">Acknowledgements</h2>
+          <div class="card-body gap-4 grow-0">
             {% for ack in incident.acks %}
-              <div class="card-body flex-none">
+              <div class="px-2">
                 <p>{{ ack.event.description }}</p>
                 <p>
                   {{ ack.event.actor }}
@@ -94,18 +94,19 @@
                 </p>
                 {% if ack.expiration %}<p>Expires: {{ ack.expiration|date:preferences.argus_htmx.datetime_format }}</p>{% endif %}
               </div>
+              {% if not forloop.last %}<hr />{% endif %}
             {% endfor %}
-            <div class="card-actions divide-none">
+            <div class="card-actions grow-0">
               {% include "htmx/incident/_incident_acknowledge_modal.html" with action="ack" dialog_id="create-acknowledgment-dialog" button_title="Create acknowledgment" header="Submit acknowledgment" explanation="Write a message describing why this incident was acknowledged" cancel_text="Cancel" submit_text="Submit" %}
             </div>
           </div>
         </section>
         <section id="events" class="card">
-          <h2 class="card-title">Related events</h2>
-          <div class="divide-y divide-solid">
+          <h2 class="card-title pl-8">Related events</h2>
+          <div class="gap-4 card-body flex-none">
             {% for event in incident.events.all %}
               {% if not event.ack %}
-                <div class="card-body flex-none">
+                <div class="px-2">
                   <p>{{ event.get_type_display }}</p>
                   <p>{{ event.description }}</p>
                   <p>
@@ -113,6 +114,7 @@
                     {{ event.timestamp|date:preferences.argus_htmx.datetime_format }}
                   </p>
                 </div>
+                {% if not forloop.last %}<hr />{% endif %}
               {% endif %}
             {% endfor %}
           </div>
