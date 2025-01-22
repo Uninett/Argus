@@ -11,7 +11,7 @@
           </section>
           <section id="status" class="card">
             <h2 class="card-title">Status</h2>
-            <p class="card-body">
+            <p class="card-body flex-row flex-wrap gap-0.5">
               {% if incident.open %}
                 <span class="badge badge-primary">Open</span>
               {% else %}
@@ -31,7 +31,7 @@
           </section>
           <section id="tags" class="card">
             <h2 class="card-title">Tags</h2>
-            <p class="card-body">
+            <p class="card-body flex-row flex-wrap gap-0.5">
               {% for tag in incident.deprecated_tags %}<span class="badge badge-neutral">{{ tag }}</span>{% endfor %}
             </p>
           </section>
