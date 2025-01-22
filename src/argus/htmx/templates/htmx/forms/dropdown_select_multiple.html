@@ -1,15 +1,17 @@
-<div class="dropdown dropdown-bottom "
+<div class="dropdown dropdown-bottom"
      {% block field_control %}
-     hx-trigger="change from:#{{ widget.attrs.id }}"
+     id="dropdown-{{ widget.attrs.id }}"
+     hx-trigger="change from:(find #{{ widget.attrs.id }})"
      hx-swap="outerHTML"
      hx-target="find .show-selected-box"
-     hx-select=".show-selected-box"
-     {% if widget.extra.hx_get %}hx-get="{% url widget.extra.hx_get %}"{% endif %}
+     hx-select="#dropdown-{{ widget.attrs.id }} .show-selected-box"
+     hx-get="{{ widget.partial_get }}"
+     hx-include="find #{{ widget.attrs.id }}"
      {% endblock field_control %}>
   <div tabindex="0"
        role="button"
        class="show-selected-box input input-accent input-bordered input-md border overflow-y-auto min-h-8 h-auto max-h-16 max-w-xs leading-tight flex flex-wrap items-center gap-0.5">
-    <p class="text-base-content/50">{{ widget.attrs.placeholder }}</p>
+    {% if not widget.has_selected %}<p class="text-base-content/50">{{ widget.attrs.placeholder }}</p>{% endif %}
     {% for _, options, _ in widget.optgroups %}
       {% for option in options %}
         {% if option.selected %}
