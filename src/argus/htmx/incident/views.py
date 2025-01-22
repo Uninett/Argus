@@ -5,15 +5,17 @@ from datetime import datetime
 
 from django import forms
 from django.contrib.auth import get_user_model
+from django.contrib import messages
 from django.shortcuts import render, get_object_or_404
 
 from django.views.decorators.http import require_POST, require_GET
 from django.core.paginator import Paginator
 from django.http import HttpResponse, HttpResponseBadRequest
-from django_htmx.http import HttpResponseClientRefresh
+from django_htmx.http import HttpResponseClientRefresh, reswap, retarget
 
 from argus.auth.utils import get_or_update_preference
 from argus.incident.models import Incident
+from argus.notificationprofile.models import Filter
 from argus.util.datetime_utils import make_aware
 
 from ..request import HtmxHttpRequest
@@ -91,10 +93,45 @@ def incident_update(request: HtmxHttpRequest, action: str):
 
 @require_GET
 def filter_form(request: HtmxHttpRequest):
+    request.session["selected_filter"] = None
     incident_list_filter = get_filter_function()
     filter_form, _ = incident_list_filter(request, None)
     context = {"filter_form": filter_form}
     return render(request, "htmx/incident/_incident_filterbox.html", context=context)
+
+
+@require_POST
+def create_filter(request: HtmxHttpRequest):
+    from argus.htmx.incident.filter import create_named_filter
+
+    filter_name = request.POST.get("filter_name", None)
+    incident_list_filter = get_filter_function()
+    filter_form, _ = incident_list_filter(request, None)
+    if filter_name and filter_form.is_valid():
+        filterblob = filter_form.to_filterblob()
+        _, filter_obj = create_named_filter(request, filter_name, filterblob)
+        if filter_obj:
+            request.session["selected_filter"] = str(filter_obj.id)
+            return HttpResponseClientRefresh()
+    messages.error(request, "Failed to create filter")
+    return HttpResponseBadRequest()
+
+
+@require_GET
+def filter_select(request: HtmxHttpRequest):
+    filter_id = request.GET.get("filter", None)
+    if filter_id and get_object_or_404(Filter, id=filter_id):
+        request.session["selected_filter"] = filter_id
+        incident_list_filter = get_filter_function()
+        filter_form, _ = incident_list_filter(request, None)
+        context = {"filter_form": filter_form}
+        return render(request, "htmx/incident/_incident_filterbox.html", context=context)
+    else:
+        request.session["selected_filter"] = None
+        if request.htmx.trigger:
+            return reswap(HttpResponse(), "none")
+        else:
+            return retarget(HttpResponse(), "#incident-filter-select")
 
 
 @require_GET

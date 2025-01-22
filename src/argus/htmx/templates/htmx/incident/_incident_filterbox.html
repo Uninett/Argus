@@ -2,19 +2,19 @@
 <form id="incident-filter-box"
       hx-get="{% url 'htmx:incident-list' %}"
       hx-include="#table-refresh-info, #incident-filter-box, .column-filter"
-      hx-trigger="keydown[keyCode==13], change delay:100ms"
+      hx-trigger="keydown[keyCode==13], change delay:100ms, load"
       hx-target="#table"
       hx-swap="outerHTML"
       hx-push-url="true"
       hx-indicator="#incident-list .htmx-indicator"
       onkeydown="if (event.keyCode === 13) event.preventDefault();">
-  <fieldset>
+  <fieldset hx-on:change="htmx.ajax('GET', '{% url 'htmx:select-filter' %}');">
     <legend class="sr-only">Filter incidents</legend>
     <ul class="menu menu-horizontal menu-sm flex items-center gap-2 py-1.5">
       {% for field in filter_form %}
         {% if not field.field.in_header %}
           <li class="form-control">
-            {% if field.name == "source" %}
+            {% if field.name == "sourceSystemIds" %}
               <div class="flex flex-nowrap">
                 <label class="label">
                   <span class="label-text">{{ field.label }}</span>
