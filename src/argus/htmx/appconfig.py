@@ -42,6 +42,10 @@ _app_settings = [
             "argus.htmx.middleware.HtmxMessageMiddleware": "end",
         },
     },
+    {
+        "app_name": "django.forms",
+        "settings": {"FORM_RENDERER": "django.forms.renderers.TemplatesSetting"},
+    },
 ]
 
 APP_SETTINGS = ListAppSetting(_app_settings).root

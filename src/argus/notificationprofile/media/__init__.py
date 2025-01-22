@@ -38,8 +38,8 @@ __all__ = [
 
 # TODO: Raise Incident if media_class not importable?
 MEDIA_PLUGINS = getattr(settings, "MEDIA_PLUGINS")
-MEDIA_CLASSES = [import_class_from_dotted_path(media_plugin) for media_plugin in MEDIA_PLUGINS]
-MEDIA_CLASSES_DICT = {media_class.MEDIA_SLUG: media_class for media_class in MEDIA_CLASSES}
+_media_classes = [import_class_from_dotted_path(media_plugin) for media_plugin in MEDIA_PLUGINS]
+MEDIA_CLASSES_DICT = {media_class.MEDIA_SLUG: media_class for media_class in _media_classes}
 
 
 def api_safely_get_medium_object(media_slug):

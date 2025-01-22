@@ -1,7 +1,5 @@
 <section class="card-body">
-  <form method="post"
-        action="{% url "htmx:notificationprofile-update" pk=form.instance.pk %}"
-        class="flex flex-row gap-4">
+  <form method="post" action="{{ form.action }}" class="flex flex-row gap-4">
     {% csrf_token %}
     {{ form.as_div }}
     {% include "./_notificationprofile_buttons.html" with object=form.instance %}

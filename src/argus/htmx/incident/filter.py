@@ -41,9 +41,7 @@ class IncidentFilterForm(forms.Form):
     sourceSystemIds = forms.MultipleChoiceField(
         widget=BadgeDropdownMultiSelect(
             attrs={"placeholder": "select sources..."},
-            extra={
-                "hx_get": "htmx:incident-filter",
-            },
+            partial_get=None,
         ),
         choices=tuple(SourceSystem.objects.values_list("id", "name")),
         required=False,
@@ -57,6 +55,11 @@ class IncidentFilterForm(forms.Form):
         initial=max(Level).value,
         required=False,
     )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # mollify tests
+        self.fields["sourceSystemIds"].widget.partial_get = reverse("htmx:incident-filter")
 
     def _tristate(self, onkey, offkey):
         on = self.cleaned_data.get(onkey, None)

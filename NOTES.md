@@ -1,7 +1,21 @@
 # Release Notes
 
-This file documents changes to Argus that are relevant for operations and
-end-users.
+This file documents changes to Argus that are relevant for operations,
+customizers and end-users.
+
+## [1.31.0] - 2025-01-17
+
+Mostly changes to the new frontend this time around.
+
+Two development-relevant changes that affect customization:
+
+- Refactor of incident-specific frontend pages, many files have new names
+- How to define a preference has changed
+
+There are visible changes to the destinations-page and profiles page as well.
+
+This release is the first round of polish for the profiles page. More is to
+come.
 
 ## [1.30.0] - 2024-12-19
 
