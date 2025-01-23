@@ -1,3 +1,5 @@
+import logging
+
 from django.conf import settings
 from django.contrib.auth.views import redirect_to_login
 from django.http import HttpResponse
@@ -6,7 +8,10 @@ from django.utils.deprecation import MiddlewareMixin
 from django.utils.encoding import force_str
 from django_htmx.http import HttpResponseClientRedirect
 from django.contrib import messages
+
 from .request import HtmxHttpRequest
+
+LOG = logging.getLogger(__name__)
 
 
 class LoginRequiredMiddleware:
@@ -61,6 +66,12 @@ class HtmxMessageMiddleware(MiddlewareMixin):
 
     TEMPLATE = "messages/_notification_messages_htmx_append.html"
 
+    def process_exception(self, request, exception):
+        error_msg = f"500 Internal Server Error: {exception}"
+        messages.error(request, error_msg)
+        LOG.error(error_msg)
+        return None
+
     def process_response(self, request: HtmxHttpRequest, response: HttpResponse) -> HttpResponse:
         if not request.htmx:
             return response
@@ -84,7 +95,11 @@ class HtmxMessageMiddleware(MiddlewareMixin):
             has_error_message = any("error" in message.tags for message in storage)
             storage.used = False
             if not has_error_message:
-                messages.error(request, "An error occured while processing your request, please try again")
+                error_msg = f"{response.status_code} {response.reason_phrase}"
+                messages.error(
+                    request, f"An error occured while processing your request, please try again: {error_msg}"
+                )
+                LOG.error("Unhandled exception: %s", error_msg)
             # HTMX doesn't swap content for response codes >=400. However, we do want to show
             # the new messages, so we need to rewrite the response to 200, and make sure it only
             # swaps the oob notification content
