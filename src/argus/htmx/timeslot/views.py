@@ -34,10 +34,13 @@ class TimeslotMixin:
     model = Timeslot
     prefix = "timeslot"
 
-    def get_prefix(self):
-        if self.object and self.object.pk:
-            return self.prefix + f"-{self.object.pk}"
+    def _get_prefix(self, pk):
+        if pk:
+            return self.prefix + f"-{pk}"
         return self.prefix
+
+    def get_prefix(self):
+        return self._get_prefix(getattr(self.object, "pk", None))
 
     def get_queryset(self):
         qs = super().get_queryset().prefetch_related("time_recurrences")
@@ -90,7 +93,7 @@ class TimeslotListView(TimeslotMixin, ListView):
         context = super().get_context_data(**kwargs)
         forms = []
         for obj in self.get_queryset():
-            form = TimeslotForm(None, instance=obj)
+            form = TimeslotForm(None, instance=obj, prefix=self._get_prefix(obj.pk))
             formset = make_timerecurrence_formset(timeslot=obj)
             forms.append({"form": form, "formset": formset})
         context["form_list"] = forms
