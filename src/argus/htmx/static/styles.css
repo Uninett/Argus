@@ -4079,7 +4079,7 @@ details.collapse summary::-webkit-details-marker {
 /* Adds overlay */
 
 .loading-box:has(> .htmx-indicator.htmx-request) > *:not(.htmx-indicator) {
-  opacity: 0.3;
+  opacity: var(--loading-overlay-opacity, 0.3);
 }
 
 /* Disables mouse interactions */
@@ -4726,6 +4726,10 @@ details.collapse summary::-webkit-details-marker {
 
 .filter {
   filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
+}
+
+.\[--loading-overlay-opacity\:0\.5\] {
+  --loading-overlay-opacity: 0.5;
 }
 
 .\[--tab-border-color\:theme\(colors\.primary\)\] {
