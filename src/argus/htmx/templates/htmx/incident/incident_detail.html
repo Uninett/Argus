@@ -4,7 +4,7 @@
     {% block incident_detail %}
       <h1 class="text-xl font-bold">{{ incident.pk }}: {{ incident.description }}</h1>
       <div class="flex gap-4">
-        <section id="incident-detail" class="flex-none">
+        <section id="incident-detail" class="basis-1/4 shrink-0 max-w-[30%]">
           <section id="level" class="card">
             <h2 class="card-title">Level</h2>
             <p class="card-body">{{ incident.level }}</p>
@@ -82,7 +82,7 @@
             </div>
           </section>
         </section>
-        <section id="acknowledgements" class="card">
+        <section id="acknowledgements" class="basis-1/4 max-w-[30%] card">
           <h2 class="card-title">Acknowledgements</h2>
           <div class="divide-y divide-solid">
             {% for ack in incident.acks %}
@@ -100,7 +100,7 @@
             </div>
           </div>
         </section>
-        <section id="events" class="card">
+        <section id="events" class="basis-1/4 max-w-[30%] card">
           <h2 class="card-title">Related events</h2>
           <div class="divide-y divide-solid">
             {% for event in incident.events.all %}
