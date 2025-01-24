@@ -4328,6 +4328,10 @@ details.collapse summary::-webkit-details-marker {
   flex-grow: 1;
 }
 
+.grow-0 {
+  flex-grow: 0;
+}
+
 .basis-1\/4 {
   flex-basis: 25%;
 }
@@ -4412,20 +4416,6 @@ details.collapse summary::-webkit-details-marker {
   --tw-space-y-reverse: 0;
   margin-top: calc(0.5rem * calc(1 - var(--tw-space-y-reverse)));
   margin-bottom: calc(0.5rem * var(--tw-space-y-reverse));
-}
-
-.divide-y > :not([hidden]) ~ :not([hidden]) {
-  --tw-divide-y-reverse: 0;
-  border-top-width: calc(2px * calc(1 - var(--tw-divide-y-reverse)));
-  border-bottom-width: calc(2px * var(--tw-divide-y-reverse));
-}
-
-.divide-solid > :not([hidden]) ~ :not([hidden]) {
-  border-style: solid;
-}
-
-.divide-none > :not([hidden]) ~ :not([hidden]) {
-  border-style: none;
 }
 
 .overflow-x-auto {
@@ -4574,6 +4564,10 @@ details.collapse summary::-webkit-details-marker {
 
 .pb-1 {
   padding-bottom: 0.25rem;
+}
+
+.pl-8 {
+  padding-left: 2rem;
 }
 
 .pt-0\.5 {
