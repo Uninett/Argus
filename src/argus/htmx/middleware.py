@@ -97,7 +97,9 @@ class HtmxMessageMiddleware(MiddlewareMixin):
             has_error_message = any("error" in message.tags for message in storage)
             storage.used = False
             if not has_error_message:
-                error_msg = f"{response.status_code} {response.reason_phrase}"
+                error_msg = str(getattr(response, "content", b""))
+                if not error_msg:
+                    error_msg = f"{response.status_code} {response.reason_phrase}"
                 messages.error(
                     request, f"An error occured while processing your request, please try again: {error_msg}"
                 )
