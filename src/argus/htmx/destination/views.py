@@ -34,8 +34,8 @@ def delete_htmx(request, pk: int) -> HttpResponse:
     try:
         medium = api_safely_get_medium_object(destination.media.slug)
         medium.raise_if_not_deletable(destination)
-    except NotificationMedium.NotDeletableError:
-        error_msg = "That destination cannot be deleted."
+    except NotificationMedium.NotDeletableError as e:
+        error_msg = " ".join(e.args)
     else:
         destination.delete()
 
