@@ -26,11 +26,18 @@ def make_timerecurrence_formset(data: Optional[dict] = None, timeslot: Optional[
     TimeRecurrenceFormSet = forms.inlineformset_factory(
         Timeslot, TimeRecurrence, fields="__all__", extra=extra, can_delete=False, min_num=1
     )
-    return TimeRecurrenceFormSet(data=data, instance=timeslot)
+    prefix = f"timerecurrenceform-{timeslot.pk}" if timeslot else ""
+    return TimeRecurrenceFormSet(data=data, instance=timeslot, prefix=prefix)
 
 
 class TimeslotMixin:
     model = Timeslot
+    prefix = "timeslot"
+
+    def get_prefix(self):
+        if self.object and self.object.pk:
+            return self.prefix + f"-{self.object.pk}"
+        return self.prefix
 
     def get_queryset(self):
         qs = super().get_queryset().prefetch_related("time_recurrences")
