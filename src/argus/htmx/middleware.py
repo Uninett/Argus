@@ -67,7 +67,9 @@ class HtmxMessageMiddleware(MiddlewareMixin):
     TEMPLATE = "messages/_notification_messages_htmx_append.html"
 
     def process_exception(self, request, exception):
-        error_msg = f"500 Internal Server Error: {exception}"
+        error_msg = "500 Internal Server Error"
+        if str(exception):
+            error_msg += f": {exception}"
         messages.error(request, error_msg)
         LOG.error(error_msg)
         return None
