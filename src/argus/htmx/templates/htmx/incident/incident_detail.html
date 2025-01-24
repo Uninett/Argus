@@ -3,15 +3,15 @@
   <div class="flex flex-col items-center gap-4 m-4">
     {% block incident_detail %}
       <h1 class="text-xl font-bold">{{ incident.pk }}: {{ incident.description }}</h1>
-      <div class="flex gap-4">
-        <section id="incident-detail" class="flex-none">
+      <div class="flex gap-4 justify-center">
+        <section id="incident-detail" class="basis-1/4 shrink-0 max-w-[30%]">
           <section id="level" class="card">
             <h2 class="card-title">Level</h2>
             <p class="card-body">{{ incident.level }}</p>
           </section>
           <section id="status" class="card">
             <h2 class="card-title">Status</h2>
-            <p class="card-body">
+            <p class="card-body flex-row flex-wrap gap-0.5">
               {% if incident.open %}
                 <span class="badge badge-primary">Open</span>
               {% else %}
@@ -31,7 +31,7 @@
           </section>
           <section id="tags" class="card">
             <h2 class="card-title">Tags</h2>
-            <p class="card-body">
+            <p class="card-body flex-row flex-wrap gap-0.5">
               {% for tag in incident.deprecated_tags %}<span class="badge badge-neutral">{{ tag }}</span>{% endfor %}
             </p>
           </section>
@@ -82,7 +82,7 @@
             </div>
           </section>
         </section>
-        <section id="acknowledgements" class="card">
+        <section id="acknowledgements" class="basis-1/4 max-w-[30%] card">
           <h2 class="card-title pl-8">Acknowledgements</h2>
           <div class="card-body gap-4 grow-0">
             {% for ack in incident.acks %}
@@ -101,7 +101,7 @@
             </div>
           </div>
         </section>
-        <section id="events" class="card">
+        <section id="events" class="basis-1/4 max-w-[30%] card">
           <h2 class="card-title pl-8">Related events</h2>
           <div class="gap-4 card-body flex-none">
             {% for event in incident.events.all %}

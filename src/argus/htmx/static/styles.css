@@ -4304,6 +4304,10 @@ details.collapse summary::-webkit-details-marker {
   max-width: 56rem;
 }
 
+.max-w-\[30\%\] {
+  max-width: 30%;
+}
+
 .max-w-xs {
   max-width: 20rem;
 }
@@ -4316,12 +4320,20 @@ details.collapse summary::-webkit-details-marker {
   flex: none;
 }
 
+.shrink-0 {
+  flex-shrink: 0;
+}
+
 .grow {
   flex-grow: 1;
 }
 
 .grow-0 {
   flex-grow: 0;
+}
+
+.basis-1\/4 {
+  flex-basis: 25%;
 }
 
 .border-separate {
