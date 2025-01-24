@@ -96,7 +96,7 @@
               </div>
               {% if not forloop.last %}<hr />{% endif %}
             {% endfor %}
-            <div class="card-actions grow-0">
+            <div class="card-actions grow-0 order-first">
               {% include "htmx/incident/_incident_acknowledge_modal.html" with action="ack" dialog_id="create-acknowledgment-dialog" button_title="Create acknowledgment" header="Submit acknowledgment" explanation="Write a message describing why this incident was acknowledged" cancel_text="Cancel" submit_text="Submit" %}
             </div>
           </div>
