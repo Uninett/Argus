@@ -1,11 +1,11 @@
 <section class="card-body">
   <form method="post"
-        action="{% if form.instance %}{% url "htmx:timeslot-create" %}{% url "htmx:timeslot-update" pk=form.instance.pk %}{% endif %}">
+        action="{% if form.instance.pk %}{% url "htmx:timeslot-update" pk=form.instance.pk %}{% else %}{% url "htmx:timeslot-create" %}{% endif %}">
     {% csrf_token %}
     {{ form.as_div }}
     {{ formset.as_div }}
     <div class="card-actions justify-end">
-      {% if form.instance %}
+      {% if form.instance.pk %}
         <input type="submit" class="btn btn-primary" value="Save">
       </input>
       <button class="contents">
