@@ -97,12 +97,12 @@ class HtmxMessageMiddleware(MiddlewareMixin):
             has_error_message = any("error" in message.tags for message in storage)
             storage.used = False
             if not has_error_message:
-                error_msg = str(getattr(response, "content", b""))
+                error_msg = getattr(response, "content", b"")
+                if isinstance(error_msg, bytes):
+                    error_msg = error_msg.decode("utf-8")
                 if not error_msg:
                     error_msg = f"{response.status_code} {response.reason_phrase}"
-                messages.error(
-                    request, f"An error occured while processing your request, please try again: {error_msg}"
-                )
+                messages.error(request, f"An unexpected error occured: {error_msg}. Please try again")
                 LOG.error("Unhandled exception: %s", error_msg)
             # HTMX doesn't swap content for response codes >=400. However, we do want to show
             # the new messages, so we need to rewrite the response to 200, and make sure it only
