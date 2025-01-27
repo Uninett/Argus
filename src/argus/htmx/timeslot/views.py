@@ -1,6 +1,7 @@
 from typing import Optional
 
 from django import forms
+from django.contrib import messages
 from django.shortcuts import redirect
 from django.http import HttpResponseRedirect
 from django.urls import reverse
@@ -75,6 +76,11 @@ class FormsetMixin:
             return self.form_invalid(form, formset)
 
     def form_invalid(self, form, formset):
+        errors = []
+        for error in [form.errors] + formset.errors:
+            if error:
+                errors.append(error.as_text())
+        messages.warning(self.request, f"Couldn't save timeslot: {errors}")
         return self.render_to_response(self.get_context_data(form=form, formset=formset))
 
     def form_valid(self, form, formset):
@@ -85,6 +91,7 @@ class FormsetMixin:
         for tr in trs:
             tr.timeslot = self.object
             tr.save()
+        messages.success(self.request, f"Saved timeslot {self.object}")
         return HttpResponseRedirect(self.get_success_url())
 
 
@@ -133,4 +140,9 @@ class TimeslotUpdateView(FormsetMixin, TimeslotMixin, UpdateView):
 
 
 class TimeslotDeleteView(TimeslotMixin, DeleteView):
-    pass
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        success_url = self.get_success_url()
+        self.object.delete()
+        messages.success(request, f'Successfully deleted timeslot "{self.object}"')
+        return HttpResponseRedirect(success_url)
