@@ -134,11 +134,16 @@ def filter_select(request: HtmxHttpRequest):
             return retarget(HttpResponse(), "#incident-filter-select")
 
 
+class SearchForm(forms.Form):
+    search = forms.CharField(required=False)
+
+
 @require_GET
 def search_tags(request: HtmxHttpRequest):
-    from .filter import TagFilterForm
+    search_form = SearchForm(request.GET or None)
+    search_form.is_valid()
+    query = search_form.cleaned_data["search"]
 
-    query = request.GET.get("search", None)
     form = TagFilterForm(request.GET or None)
     form.is_valid()
 

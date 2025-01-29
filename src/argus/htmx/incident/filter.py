@@ -34,27 +34,23 @@ class FilterMixin:
         return reverse("htmx:filter-list")
 
 
-class TagFilterForm(forms.Form):
-    tags = forms.MultipleChoiceField(
-        widget=SearchDropdownMultiSelect(
-            attrs={
-                "placeholder": "search tags...",
-            },
-            partial_get=None,
-        ),
-        choices=((tag.id, str(tag)) for tag in Tag.objects.none()),
-        required=False,
-        label="Tags",
-    )
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+class TagFieldMixin:
+    def _init_tag_field(self, *args, **kwargs):
         # mollify tests
+        initial = kwargs.get("initial", None)
+        if not initial:
+            initial = {
+                "tags": [(801, "location=argus")],
+            }
         self.fields["tags"].widget.partial_get = reverse("htmx:search-tags")
-
         query = kwargs.pop("search", None)
+        self.get_choices(query)
+
+    def get_choices(self, query):
+        # breakpoint()
         if not query:
-            self.fields["tags"].choices = ((tag.id, str(tag)) for tag in Tag.objects.all())
+            # all_tags = Tag.objects.all()
+            self.fields["tags"].choices = ()  # (tag.id, str(tag)) for tag in all_tags[:20])
             return
 
         if Tag.TAG_DELIMITER in query:
@@ -66,7 +62,25 @@ class TagFilterForm(forms.Form):
         self.fields["tags"].choices = ((tag.id, str(tag)) for tag in tags)
 
 
-class IncidentFilterForm(forms.Form):
+class TagFilterForm(TagFieldMixin, forms.Form):
+    tags = forms.MultipleChoiceField(
+        widget=SearchDropdownMultiSelect(
+            attrs={
+                "placeholder": "search tags...",
+            },
+            partial_get=None,
+        ),
+        choices=(),  # (tag.id, str(tag)) for tag in Tag.objects.none()),
+        required=False,
+        label="Tags",
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._init_tag_field(*args, **kwargs)
+
+
+class IncidentFilterForm(TagFieldMixin, forms.Form):
     open = forms.BooleanField(required=False)
     closed = forms.BooleanField(required=False)
     acked = forms.BooleanField(required=False)
@@ -87,7 +101,7 @@ class IncidentFilterForm(forms.Form):
             },
             partial_get=None,
         ),
-        choices=((tag.id, str(tag)) for tag in Tag.objects.all()),
+        choices=(),  # (tag.id, str(tag)) for tag in Tag.objects.all()),
         required=False,
         label="Tags",
     )
@@ -104,7 +118,7 @@ class IncidentFilterForm(forms.Form):
         super().__init__(*args, **kwargs)
         # mollify tests
         self.fields["sourceSystemIds"].widget.partial_get = reverse("htmx:incident-filter")
-        self.fields["tags"].widget.partial_get = reverse("htmx:search-tags")
+        self._init_tag_field(*args, **kwargs)
 
     def _tristate(self, onkey, offkey):
         on = self.cleaned_data.get(onkey, None)
