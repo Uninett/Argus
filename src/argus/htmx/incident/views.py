@@ -134,6 +134,33 @@ def filter_select(request: HtmxHttpRequest):
             return retarget(HttpResponse(), "#incident-filter-select")
 
 
+class SearchForm(forms.Form):
+    search = forms.CharField(required=False)
+
+
+@require_GET
+def search_tags(request: HtmxHttpRequest):
+    search_form = SearchForm(request.GET or None)
+    search_form.is_valid()
+    query = search_form.cleaned_data["search"]
+
+    form = TagFilterForm(request.GET or None)
+    form.is_valid()
+
+    if not query:
+        return render(
+            request,
+            "htmx/forms/selected_choices.html",
+            {"widget": form.fields["tags"].widget},
+        )
+
+    return render(
+        request,
+        "htmx/forms/search_results.html",
+        {"widget": form.fields["tags"].widget},
+    )
+
+
 @require_GET
 def incident_list(request: HtmxHttpRequest) -> HttpResponse:
     columns = get_incident_table_columns()
