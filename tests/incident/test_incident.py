@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 from django.test import TestCase
 from django.utils import timezone
@@ -89,3 +89,34 @@ class IncidentLevelTests(TestCase):
     def test_level_str_returns_name_of_level(self):
         incident = StatefulIncidentFactory(level=1)
         self.assertEqual(incident.pp_level(), "Critical")
+
+
+class IncidentRepairEndTimeTests(TestCase):
+    def setup(self):
+        disconnect_signals()
+
+    def tearDown(self):
+        connect_signals()
+
+    def test_golden_path(self):
+        incident = StatefulIncidentFactory(level=1)
+        end_time = incident.end_time
+        self.assertFalse(incident.repair_end_time())
+        self.assertEqual(end_time, incident.end_time)
+
+    def test_stateless_event_on_stateful_incident_should_fix_end_time(self):
+        incident = StatefulIncidentFactory(level=1)
+        end_time = incident.end_time
+        EventFactory(incident=incident, type=Event.Type.STATELESS)
+        self.asserTrue(incident.repair_end_time())
+        self.assertNotEqual(end_time, incident.end_time)
+        self.assertEqual(incident.end_time, None)
+
+    def test_closing_event_without_finite_end_time_and_reopen_event_should_fix_endt_time(self):
+        incident = StatefulIncidentFactory(level=1)
+        end_time = incident.end_time
+        self.assertEqual(incident.end_time, datetime.max)
+        EventFactory(incident=incident, type=Event.Type.INCIDENT_END)
+        self.asserTrue(incident.repair_end_time())
+        self.assertNotEqual(end_time, incident.end_time)
+        self.assertLessThan(incident.end_time, datetime.max)
