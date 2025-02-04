@@ -1,0 +1,8 @@
+{% for hidden_field in label_form.hidden_fields %}{{ hidden_field }}{% endfor %}
+{% include "./_field.html" with field=label_form.label %}
+{% for hidden_field in settings_form.hidden_fields %}{{ hidden_field }}{% endfor %}
+{% for field in settings_form %}
+  {% include "./_field.html" %}
+{% empty %}
+  <p>Could not fetch settings form</p>
+{% endfor %}
