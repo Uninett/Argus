@@ -10,8 +10,6 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
-from urllib.parse import urlsplit
-
 import dj_database_url
 
 # Import some helpers
@@ -53,7 +51,6 @@ INSTALLED_APPS = [
     "argus.auth",
     "argus.base",
     "argus.incident",
-    "argus.ws",
     "argus.filter",
     "argus.notificationprofile",
     "argus.dev",
@@ -223,23 +220,6 @@ REST_FRAMEWORK = {
 # fmt: on
 
 AUTH_TOKEN_EXPIRES_AFTER_DAYS = 14
-
-
-# django-channels
-
-ASGI_APPLICATION = "argus.ws.asgi.application"
-
-# fmt: off
-_REDIS = urlsplit("//" + get_str_env("ARGUS_REDIS_SERVER", "127.0.0.1:6379"))
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [(_REDIS.hostname, _REDIS.port or 6379)],
-        },
-    },
-}
-# fmt: on
 
 # Project specific settings
 
