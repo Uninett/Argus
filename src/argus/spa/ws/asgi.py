@@ -28,7 +28,7 @@ application = ProtocolTypeRouter({
     "http": django_http,
     "websocket": AuthMiddlewareStack(
         URLRouter([
-            path("ws/open/", OpenIncidentConsumer.as_asgi()),
+            path("/ws/open/", OpenIncidentConsumer.as_asgi()),
         ])
     ),
 })
