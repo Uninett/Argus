@@ -38,6 +38,14 @@ class IncidentFilterForm(forms.Form):
     closed = forms.BooleanField(required=False)
     acked = forms.BooleanField(required=False)
     unacked = forms.BooleanField(required=False)
+    sourceSystemIds = forms.MultipleChoiceField(
+        widget=BadgeDropdownMultiSelect(
+            attrs={"placeholder": "select sources..."},
+            partial_get=None,
+        ),
+        required=False,
+        label="Sources",
+    )
     maxlevel = forms.IntegerField(
         widget=forms.NumberInput(
             attrs={"type": "range", "step": "1", "min": min(Level).value, "max": max(Level).value}
@@ -46,21 +54,12 @@ class IncidentFilterForm(forms.Form):
         initial=max(Level).value,
         required=False,
     )
-    field_order = ["open", "closed", "acked", "unacked", "sourceSystemIds", "maxlevel"]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # mollify tests
-        self.fields["sourceSystemIds"] = forms.MultipleChoiceField(
-            widget=BadgeDropdownMultiSelect(
-                attrs={"placeholder": "select sources..."},
-                partial_get=reverse("htmx:incident-filter"),
-            ),
-            choices=tuple(SourceSystem.objects.values_list("id", "name")),
-            required=False,
-            label="Sources",
-        )
-        self.order_fields(self.field_order)
+        self.fields["sourceSystemIds"].widget.partial_get = reverse("htmx:incident-filter")
+        self.fields["sourceSystemIds"].choices = tuple(SourceSystem.objects.values_list("id", "name"))
 
     def _tristate(self, onkey, offkey):
         on = self.cleaned_data.get(onkey, None)
