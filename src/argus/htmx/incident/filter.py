@@ -43,7 +43,6 @@ class IncidentFilterForm(forms.Form):
             attrs={"placeholder": "select sources..."},
             partial_get=None,
         ),
-        choices=tuple(SourceSystem.objects.values_list("id", "name")),
         required=False,
         label="Sources",
     )
@@ -60,6 +59,7 @@ class IncidentFilterForm(forms.Form):
         super().__init__(*args, **kwargs)
         # mollify tests
         self.fields["sourceSystemIds"].widget.partial_get = reverse("htmx:incident-filter")
+        self.fields["sourceSystemIds"].choices = tuple(SourceSystem.objects.values_list("id", "name"))
 
     def _tristate(self, onkey, offkey):
         on = self.cleaned_data.get(onkey, None)
