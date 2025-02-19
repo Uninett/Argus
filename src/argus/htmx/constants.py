@@ -1,7 +1,13 @@
-from argus.htmx.dateformat.constants import DATETIME_DEFAULT, DATETIME_FORMATS, DATETIME_CHOICES
-from argus.htmx.incident.constants import DEFAULT_PAGE_SIZE, ALLOWED_PAGE_SIZES, PAGE_SIZE_CHOICES
-from argus.htmx.themes.constants import THEME_CHOICES, THEME_NAMES, THEME_DEFAULT
-
+from argus.htmx.dateformat.constants import DATETIME_CHOICES, DATETIME_DEFAULT, DATETIME_FORMATS
+from argus.htmx.incident.constants import (
+    ALLOWED_PAGE_SIZES,
+    DEFAULT_PAGE_SIZE,
+    PAGE_SIZE_CHOICES,
+    UPDATE_INTERVAL_ALLOWED,
+    UPDATE_INTERVAL_CHOICES,
+    UPDATE_INTERVAL_DEFAULT,
+)
+from argus.htmx.themes.constants import THEME_CHOICES, THEME_DEFAULT, THEME_NAMES
 
 __all__ = [
     "ALLOWED_PAGE_SIZES",
@@ -13,4 +19,7 @@ __all__ = [
     "THEME_CHOICES",
     "THEME_DEFAULT",
     "THEME_NAMES",
+    "UPDATE_INTERVAL_ALLOWED",
+    "UPDATE_INTERVAL_CHOICES",
+    "UPDATE_INTERVAL_DEFAULT",
 ]

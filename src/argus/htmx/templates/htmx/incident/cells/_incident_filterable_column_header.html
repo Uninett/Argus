@@ -13,14 +13,14 @@
          _="on keyup[key is 'Escape'] from body add .hidden to me">
       <input name="{{ column.filter_field }}"
              autocomplete="off"
-             class="input input-xs grow input-accent"
+             class="input input-xs grow input-accent incident-list-param"
              value="{{ filter_form|fieldvalue:column.filter_field }}">
       <button type="button"
               class="btn btn-xs btn-primary"
               _="on click add .hidden to closest .column-filter"
               hx-get="{% url 'htmx:incident-list' %}"
               hx-trigger="click"
-              hx-include="#table-refresh-info, #incident-filter-box, .column-filter"
+              hx-include=".incident-list-param"
               hx-target="#table"
               hx-swap="outerHTML"
               hx-push-url="true"

@@ -21,6 +21,7 @@ __all__ = [
     "get_preference_obj",
     "get_preference",
     "get_or_update_preference",
+    "save_preferences",
 ]
 
 
