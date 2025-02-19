@@ -18,6 +18,8 @@ import dj_database_url
 from . import get_bool_env, get_str_env, get_int_env, setup_logging, normalize_url, get_json_env, validate_app_setting
 from ..utils import update_settings
 
+SETTINGS_MODULE = get_str_env("DJANGO_SETTINGS_MODULE", None)
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
