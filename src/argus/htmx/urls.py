@@ -7,6 +7,7 @@ from .timeslot.urls import urlpatterns as timeslot_urls
 from .notificationprofile.urls import urlpatterns as notificationprofile_urls
 from .destination.urls import urlpatterns as destination_urls
 from .user.urls import urlpatterns as user_urls
+from .views import IncidentListRedirectView
 
 app_name = "htmx"
 urlpatterns = [
@@ -18,4 +19,5 @@ urlpatterns = [
     path("notificationprofiles/", include(notificationprofile_urls)),
     path("destinations/", include(destination_urls)),
     path("user/", include(user_urls)),
+    path("", IncidentListRedirectView.as_view(), name="root"),
 ]
