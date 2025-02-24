@@ -20,7 +20,6 @@ from argus.util.datetime_utils import make_aware
 
 from ..request import HtmxHttpRequest
 
-from .constants import ALLOWED_PAGE_SIZES
 from .customization import get_incident_table_columns
 from .utils import get_filter_function
 from .forms import AckForm, DescriptionOptionalForm, EditTicketUrlForm, AddTicketUrlForm
@@ -173,8 +172,6 @@ def incident_list(request: HtmxHttpRequest) -> HttpResponse:
         "base": base_template,
         "page": page,
         "last_refreshed": last_refreshed,
-        "update_interval": 30,
-        "all_page_sizes": ALLOWED_PAGE_SIZES,
     }
 
     return render(request, "htmx/incident/incident_list.html", context=context)

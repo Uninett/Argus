@@ -1,3 +1,4 @@
+from typing import Literal, Union
 from django import template
 from django.contrib.messages.storage.base import Message
 from django.conf import settings
@@ -52,3 +53,10 @@ def autoclose_time(message: Message):
     if not tags:
         return -1
     return min(candidates[tag] for tag in tags)
+
+
+@register.filter
+def update_interval_string(value: Union[int, Literal["never"]]):
+    if value == "never":
+        return "Never"
+    return f"{value}s"

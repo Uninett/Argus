@@ -1,9 +1,5 @@
-<form hx-get="{% url 'htmx:incident-list' %}"
-      id="table-refresh-info"
-      hx-trigger="change"
-      hx-target="#table"
-      hx-swap="outerHTML"
-      hx-indicator="#incident-list .htmx-indicator">
+{% load argus_htmx %}
+<div id="table-refresh-info">
   <dl class="stats stats-horizontal shadow leading-none overflow-x-auto font-medium bg-neutral text-neutral-content">
     <div class="stat py-2">
       <dt class="stat-title text-neutral-content/80">Total, all time</dt>
@@ -20,9 +16,16 @@
     <div class="stat py-2">
       <dt class="stat-title text-neutral-content/80">Per page</dt>
       <dd class="stat-value text-base">
-        <select class="select select-xs bg-transparent text-base border-none -ml-2"
-                name="page_size">
-          {% for ps in all_page_sizes %}
+        <select class="select select-xs bg-transparent text-base border-none -ml-2 incident-list-param"
+                name="page_size"
+                hx-get="{% url 'htmx:incident-list' %}"
+                hx-trigger="change"
+                hx-target="#table"
+                hx-swap="outerHTML"
+                hx-push-url="true"
+                hx-include=".incident-list-param"
+                hx-indicator="#incident-list .htmx-indicator">
+          {% for ps in preferences_choices.argus_htmx.page_size %}
             <option class="bg-neutral"
                     value="{{ ps }}"
                     {% if ps == preferences.argus_htmx.page_size %}selected{% endif %}>{{ ps }}</option>
@@ -39,8 +42,21 @@
     <div class="stat py-2">
       <dt class="stat-title text-neutral-content/80">Updating every</dt>
       <dd class="stat-value text-base">
-        {{ update_interval|default:"?" }}s
+        <select class="select select-xs bg-transparent text-base border-none -ml-2"
+                name="update_interval"
+                hx-post="{% url 'htmx:update-preferences' namespace='argus_htmx' %}"
+                hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                hx-indicator="#incident-list .htmx-indicator"
+                autocomplete="off">
+          {% for interval in preferences_choices.argus_htmx.update_interval %}
+            <option class="bg-neutral"
+                    value="{{ interval|default:'never' }}"
+                    {% if interval == preferences.argus_htmx.update_interval %}selected{% endif %}>
+              {{ interval|update_interval_string }}
+            </option>
+          {% endfor %}
+        </select>
       </dd>
     </div>
   </dl>
-</form>
+</div>

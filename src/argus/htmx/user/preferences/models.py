@@ -11,6 +11,9 @@ from argus.htmx.constants import (
     THEME_CHOICES,
     THEME_DEFAULT,
     THEME_NAMES,
+    UPDATE_INTERVAL_ALLOWED,
+    UPDATE_INTERVAL_DEFAULT,
+    UPDATE_INTERVAL_CHOICES,
 )
 
 
@@ -20,6 +23,12 @@ class DateTimeFormatForm(forms.Form):
 
 class PageSizeForm(forms.Form):
     page_size = forms.TypedChoiceField(required=False, choices=PAGE_SIZE_CHOICES, coerce=int)
+
+
+class UpdateIntervalForm(forms.Form):
+    update_interval = forms.TypedChoiceField(
+        required=False, choices=UPDATE_INTERVAL_CHOICES, coerce=lambda v: "never" if v.lower() == "never" else int(v)
+    )
 
 
 class ThemeForm(forms.Form):
@@ -38,6 +47,9 @@ class ArgusHtmxPreferences:
             default=THEME_DEFAULT,
             choices=THEME_NAMES,
             partial_response_template="htmx/user/_current_theme.html",
+        ),
+        "update_interval": PreferenceField(
+            form=UpdateIntervalForm, default=UPDATE_INTERVAL_DEFAULT, choices=UPDATE_INTERVAL_ALLOWED
         ),
     }
 
