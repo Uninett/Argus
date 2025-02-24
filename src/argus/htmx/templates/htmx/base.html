@@ -38,26 +38,7 @@
                   {{ request.user|make_list|first }}
                 </span>
               </summary>
-              <ul class="menu menu-md dropdown-content bg-base-200 text-base-content rounded-box z-[1] mt-3 w-52 p-2 shadow max-h-svh">
-                <li class="menu-title">
-                  Logged in as: <span class="text-info">{{ request.user }}</span>
-                  <div class="divider divider-secondary my-0"></div>
-                </li>
-                <li>{% include "htmx/user/_theme_dropdown.html" %}</li>
-                <li>{% include "htmx/user/_dateformat_dropdown.html" %}</li>
-                <li>
-                  <a href="{% url 'htmx:user-preferences' %}">Preferences…</a>
-                </li>
-                <li>
-                  <a href="{% url 'htmx:destination-list' %}">Destinations</a>
-                </li>
-                <li>
-                  <form class="flex" action="{% url "htmx:logout" %}" method="post">
-                    {% csrf_token %}
-                    <button class="flex-1 text-start" type="submit">Log out</button>
-                  </form>
-                </li>
-              </ul>
+              {% include "htmx/user/_user_menu.html" %}
             </details>
           {% else %}
             <a class="btn" href="{% url 'htmx:login' %}">Log in</a>
