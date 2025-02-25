@@ -5,5 +5,3 @@ https://github.com/uninett/Argus-frontend
 
 See docs/reference/react-frontend.rst
 """
-
-default_app_config = "argus.spa.ws.apps.WSConfig"
