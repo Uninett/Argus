@@ -25,40 +25,45 @@ There are several ways to install Argus.
 * Python 3.8+
 * Django 4.2 or 5.0
 * pip
+* PostgreSQL
 
 #### Optional requirements
 
-* **Redis**
-  is recommended if you are going to run the frontend.
-  Redis backs the websockets, in order to push realtime updates to the frontend.
-* [Argus-frontend](https://github.com/Uninett/Argus-frontend/)
-* PostgreSQL
-* Docker and Docker Compose to run Argus in Docker
-
-#### Optional: Dataporten registration
-
-Dataporten authentication is supported by Argus and can be used to log into
-Argus-frontend.
-Refer to the [Dataporten](https://argus-server.rtfd.io/en/latest/authentication.html#dataporten) section of the documentation to learn
-about Dataporten registration, and how to set it up with Argus.
+* Docker and Docker Compose to run Argus in Docker. This will also run
+  a PostgreSQL server for you.
 
 #### Optional: New frontend
 
-You need to have the frontend dependencies installed.
-
-Either of
+You need to have the new frontend dependencies installed.
 
 ```
 pip install argus-server[htmx]
 ```
 
-or
-
-```
-pip install -r requirements/htmx.txt
-```
-
 will do it.
+
+#### Optional: Old frontend
+
+The old frontend needs:
+
+* **Redis**. Redis backs the websockets, in order to push realtime updates to
+  the frontend. See the included `docker compose` file for the quickest way.
+* [Argus-frontend](https://github.com/Uninett/Argus-frontend/), javascript that
+  uses the API.
+
+Get the python dependencies via:
+
+```
+pip install argus-server[spa]
+```
+
+#### Optional: Dataporten registration
+
+Dataporten authentication is supported by Argus and can be used to log into
+Argus-frontend. Refer to the
+[Dataporten](https://argus-server.rtfd.io/en/latest/authentication.html#dataporten)
+section of the documentation to learn about Dataporten registration, and how to
+set it up with Argus.
 
 ### Install Argus using pip
 

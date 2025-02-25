@@ -7,8 +7,18 @@ REACT Frontend
 The classic frontend is a single page application (SPA) written in REACT. See
 the `Github repo of Argus-frontend <https://github.com/uninett/Argus-frontend>`_
 
-It needs its own specific settings and has a handful of API endpoints that are
-not needed if running headless.
+It depends on `redis <https://redis.io/>`_, needs its own specific settings and
+has a handful of API endpoints that are not needed if running headless.
+
+Dependencies
+============
+
+Install the python dependencies to talk to redis via ``pip install
+argus-server[spa]``.
+
+The docker-compose config included will run up a server for you during
+development and testing. How to deploy redis in production will not be detailed
+here.
 
 Settings
 ========
@@ -41,6 +51,21 @@ deployed on the same domain, or the frontend to be on a subdomain of the
 development and testing using the `dev`, `dockerdev` or `test_CI` settings-file
 as a base, :setting:`ARGUS_SPA_COOKIE_DOMAIN` can be empty (and will default to
 localhost).
+
+Realtime updates
+----------------
+
+.. setting:: ARGUS_REDIS_SERVER
+
+The Argus API can notify the frontend about changes in the list of open
+incidents in realtime using a websocket (implemented using Django
+Channels). The realtime interface requires access to a Redis server for message
+passing.
+
+By default, Argus will look for a Redis server on ``localhost:6379``. To use a
+different server, set the :setting:`ARGUS_REDIS_SERVER` environment variable, e.g::
+
+  ARGUS_REDIS_SERVER=my-redis-server.example.org:6379
 
 Dataporten via OAuth2
 ---------------------
