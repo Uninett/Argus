@@ -4,7 +4,7 @@ Upgrading HTMX to a new version
 To upgrade the HTMX to a new version, follow these steps:
 
 1. **Backup Current File**:
-   Ensure you have a backup of the current ``htmx-*.min.js`` file located in the ``static`` directory.
+   Ensure you have a backup of the current ``htmx-*.min.js`` file located directly in the ``src/argus/htmx/static`` directory.
 
 2. **Download the Latest Version**:
    Obtain the latest version of minified HTMX from the `UNPKG`_, for example:
