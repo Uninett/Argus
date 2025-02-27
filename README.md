@@ -257,3 +257,8 @@ $ tox
 ```
 An [HTML coverage report](htmlcov/index.html) will be generated.
 Refer to the [tox.ini](tox.ini) file for further options.
+
+
+## How to do maintenance
+
+See [MAINTAINING.rst](MAINTAINING.rst).
