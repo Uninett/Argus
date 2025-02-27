@@ -17,7 +17,7 @@ Making new releases
 ===================
 
 * `Argus release checklist (local copy) <./docs/development/howtos/release-checklist.rst>`_
-* `Argus release checklist on rtd <https://argus-server.readthedocs.io/en/latest/development/howtos/release-checklist.html`_
+* `Argus release checklist on rtd <https://argus-server.readthedocs.io/en/latest/development/howtos/release-checklist.html>`_
 
 Note that the final step (making a GitHub release) is needed for the automation
 to work correctly in some other repos, notably `argus-docker
