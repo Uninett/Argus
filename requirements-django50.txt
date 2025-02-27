@@ -47,7 +47,7 @@ charset-normalizer==3.3.2
     # via requests
 constantly==23.10.4
     # via twisted
-cryptography==43.0.1
+cryptography==44.0.1
     # via
     #   -r constraints.txt
     #   autobahn
@@ -153,7 +153,7 @@ pydantic-core==2.18.2
     # via pydantic
 pyjwt==2.8.0
     # via social-auth-core
-pyopenssl==24.2.1
+pyopenssl==25.0.0
     # via
     #   -r constraints.txt
     #   twisted
@@ -217,6 +217,7 @@ typing-extensions==4.9.0
     #   dj-database-url
     #   pydantic
     #   pydantic-core
+    #   pyopenssl
     #   twisted
 uritemplate==4.1.1
     # via drf-spectacular
