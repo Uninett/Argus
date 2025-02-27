@@ -2,6 +2,7 @@
 [![test badge](https://github.com/Uninett/Argus/actions/workflows/python.yml/badge.svg)](https://github.com/Uninett/Argus/actions)
 [![codecov badge](https://codecov.io/gh/Uninett/Argus/branch/master/graph/badge.svg)](https://codecov.io/gh/Uninett/Argus)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
+[![djLint](https://img.shields.io/badge/html%20style-djlint-blue.svg)](https://www.djlint.com)
 [![docs badge](https://readthedocs.org/projects/argus-server/badge/?version=latest&style=flat)](http://argus-server.rtfd.io/en/latest/)
 
 Argus is a platform for aggregating incidents across network management systems, and
@@ -230,8 +231,10 @@ You will find Argus running at http://localhost:8000/.
 
 ### Code style
 
-Argus uses ruff as a source code formatter. Ruff will automatically install
-with the [dev requirements](requirements/dev.txt).
+Argus uses [ruff](https://docs.astral.sh/ruff/) as a Python source code
+formatter and linter and [djLint](https://djlint.com/) as an HTML formatter and
+linter. Ruff and djLint will automatically install with the
+[dev requirements](requirements/dev.txt).
 
 A pre-commit hook will format new code automatically before committing.
 To enable this pre-commit hook, run
