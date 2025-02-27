@@ -11,7 +11,8 @@ documentation (online) <https://argus-server.readthedocs.io/en/latest/>`_. This
 is automatically handled by GitHub actions.
 
 Occasionally it might be necessary to update the config file, which is
-`.readthedocs.yaml <./.readthedocs.yaml>`_.
+`.readthedocs.yaml <./.readthedocs.yaml>`_. See configuration file options at
+`Read the Docs <https://docs.readthedocs.com/platform/stable/config-file/v2.html>`_.
 
 Making new releases
 ===================
