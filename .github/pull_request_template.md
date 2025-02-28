@@ -19,7 +19,8 @@ More information about contributing to Argus can be found in the
 [Development docs](https://argus-server.readthedocs.io/en/latest/development.html).
 
 <!-- Add an "X" inside the brackets to confirm -->
-<!-- If not checking one or more of the boxes, please explain why below each. -->
+<!-- Remove checks that do not apply -->
+<!-- Of the checks that do apply: If not checking one or more of the boxes, please explain why below each. -->
 
 * [ ] Added a changelog fragment for [towncrier](https://argus-server.readthedocs.io/en/latest/development/howtos/changelog-entry.html)
 * [ ] Added/amended tests for new/changed code
