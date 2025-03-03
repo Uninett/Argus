@@ -3,6 +3,19 @@
 This file documents changes to Argus that are relevant for operations,
 customizers and end-users.
 
+## [1.32.0] - 2025-03-03
+
+Mostly changes to the new frontend again, as well as some new and improved
+docs.
+
+If you use the old frontend and have a heavily customized settings-file, make
+sure it is compatible with the settings in `argus.spa.settings`, as the spa-app
+is no longer included by default in `INSTALLED_APPS`. For the same reason,
+running `redis` is only necessary if using the spa settings.
+
+With the new frontend, visiting the root of the site will now redirect to the
+incidents list and therefore possibly triggering a log in.
+
 ## [1.31.0] - 2025-01-17
 
 Mostly changes to the new frontend this time around.

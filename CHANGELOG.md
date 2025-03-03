@@ -8,6 +8,53 @@ This project uses [*towncrier*](https://towncrier.readthedocs.io/) and the chang
 
 <!-- towncrier release notes start -->
 
+## [1.32.0] - 2025-03-03
+
+### Added
+
+- There's a new how to for customzing templates.
+- Added MAINTAINING.rst so that maintenance tasks do not reside in only
+  a single head.
+
+### Changed
+
+- The commit messages howto has been updated.
+- Move the websockets stuff into the argus.spa directory and turn `argus.spa`
+  into an app instead of `argus.ws`. This will make it easier to remove spa
+  support.
+
+### HTMx app
+
+#### Added
+
+- Implemented functionality that allows users to create new incident filters,
+  and to select from existing ones via HTMX UI.
+  ([#1045](https://github.com/Uninett/Argus/issues/1045))
+- Add incident update interval as a preference
+  ([#1174](https://github.com/Uninett/Argus/issues/1174))
+- Add `HTMX_PATH` and `HYPERSCRIPT_PATH` setting
+  ([#1183](https://github.com/Uninett/Argus/issues/1183))
+
+### Changed
+
+- Update only the related media list when updating a destination.
+  ([#1136](https://github.com/Uninett/Argus/issues/1136))
+- Visiting the root page will now lead to be redirected to the
+  /incidents/-page, triggering a login if necessary.
+- Django's own templates for form widgets are now overridable
+- Profiles page was updated and hopefullt improved thereby.
+- There are lots of visual improvements
+- More templates can be more easily customized
+
+### Fixed
+
+- Show relevant error message on destination delete by passing the original
+  exception message to the UI.
+  ([#1147](https://github.com/Uninett/Argus/issues/1147))
+- Do not run database query when importing IncidentFormFilter
+  ([#1176](https://github.com/Uninett/Argus/issues/1176))
+
+
 ## [1.31.0] - 2025-01-17
 
 Mostly changes to the new frontend this time around.
