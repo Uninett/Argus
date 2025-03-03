@@ -35,7 +35,7 @@ This project uses [*towncrier*](https://towncrier.readthedocs.io/) and the chang
 - Add `HTMX_PATH` and `HYPERSCRIPT_PATH` setting
   ([#1183](https://github.com/Uninett/Argus/issues/1183))
 
-### Changed
+#### Changed
 
 - Update only the related media list when updating a destination.
   ([#1136](https://github.com/Uninett/Argus/issues/1136))
@@ -46,7 +46,7 @@ This project uses [*towncrier*](https://towncrier.readthedocs.io/) and the chang
 - There are lots of visual improvements
 - More templates can be more easily customized
 
-### Fixed
+#### Fixed
 
 - Show relevant error message on destination delete by passing the original
   exception message to the UI.
