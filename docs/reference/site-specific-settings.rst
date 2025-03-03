@@ -38,6 +38,8 @@ Django-specific settings
   .. warning:: Keep the :setting:`SECRET_KEY` secret, as it is relevant to the
     security and integrity of your Argus instance.
 
+.. _site-specific-settings-additional-apps:
+
 Settings for adding additional Django apps
 ------------------------------------------
 
