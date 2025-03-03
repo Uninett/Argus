@@ -46,6 +46,16 @@ class IncidentFilterForm(forms.Form):
         required=False,
         label="Sources",
     )
+    tags = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                "placeholder": "enter tags...",
+                "class": "show-selected-box input input-accent input-bordered input-md border overflow-y-auto min-h-8 h-auto max-h-16 max-w-xs leading-tight",
+            }
+        ),
+        required=False,
+        label="Tags",
+    )
     maxlevel = forms.IntegerField(
         widget=forms.NumberInput(
             attrs={"type": "range", "step": "1", "min": min(Level).value, "max": max(Level).value}
@@ -88,6 +98,10 @@ class IncidentFilterForm(forms.Form):
         sourceSystemIds = self.cleaned_data.get("sourceSystemIds", [])
         if sourceSystemIds:
             filterblob["sourceSystemIds"] = sourceSystemIds
+
+        tags = self.cleaned_data.get("tags", [])
+        if tags:
+            filterblob["tags"] = tags.split(", ")
 
         maxlevel = self.cleaned_data.get("maxlevel", 0)
         if maxlevel:
