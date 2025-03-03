@@ -52,16 +52,24 @@ Feel free to use a thesaurus to find a good verb.
 If the "Fix typo" fixes a typo introduced in the same PR, please do a fixup,
 see "Temporary commit messages" above.
 
-More info
----------
+Context and more info
+---------------------
 
 If there is more to add, have a blank line after the first line then describe
 away. Issue numbers, pull request numbers, links to more info can all go here.
 
-Explanations as to what is actually going on are especially welcome.
+This is also the place for context, by that we mean *what is affected*. API,
+frontend-only things, backend only things, subsystems like autocreating tickets
+or sending notifications. This is especially important for new features.
+
+Explanations as to what is actually going on or why a specific solution was chosen
+when there are several available are especially welcome.
 
 If this a pull request with a good and beefy explanation, copy the explanation
 to the body of the commit so that the explanation stays with the code.
+
+Commit messages cannot contain screenshots! If there is a visual change, try
+describing it.
 
 Collaborators
 -------------
