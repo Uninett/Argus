@@ -49,7 +49,7 @@ class IncidentFilterForm(forms.Form):
     tags = forms.CharField(
         widget=forms.TextInput(
             attrs={
-                "placeholder": "enter tags...",
+                "placeholder": "key=value, ...",
                 "class": "show-selected-box input input-accent input-bordered input-md border overflow-y-auto min-h-8 h-auto max-h-16 max-w-xs leading-tight",
             }
         ),
