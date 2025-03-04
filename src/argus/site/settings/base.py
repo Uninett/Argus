@@ -13,7 +13,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 import dj_database_url
 
 # Import some helpers
-from . import get_bool_env, get_str_env, get_int_env, setup_logging, normalize_url, get_json_env, validate_app_setting
+from . import get_bool_env, get_str_env, get_int_env, setup_logging, get_json_env, validate_app_setting
 from ..utils import update_settings
 
 # Quick-start development settings - unsuitable for production
@@ -29,7 +29,6 @@ INTERNAL_IPS = []
 # fmt: off
 # fsck off, black
 INSTALLED_APPS = [
-    "channels",  # Must be early
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -45,7 +44,7 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "django_filters",
     "phonenumber_field",
-    "knox",
+    "knox",  # token auth
 
     # Argus apps
     "argus.auth",
@@ -183,11 +182,6 @@ if LOGGING_MODULE:
 
 # For permalinks to incidents in argus dashboard
 FRONTEND_URL = get_str_env("ARGUS_FRONTEND_URL")
-
-# django-cors-headers
-CORS_ALLOWED_ORIGINS = []
-if FRONTEND_URL:
-    CORS_ALLOWED_ORIGINS.append(normalize_url(FRONTEND_URL))
 
 # django-rest-framework
 
