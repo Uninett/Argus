@@ -50,7 +50,7 @@ class IncidentFilterForm(forms.Form):
         widget=forms.TextInput(
             attrs={
                 "placeholder": "key=value, ...",
-                "class": "show-selected-box input input-accent input-bordered input-md border overflow-y-auto min-h-8 h-auto max-h-16 max-w-xs leading-tight",
+                "class": "input input-accent input-bordered input-md border overflow-y-auto min-h-8 h-auto max-h-16 max-w-xs leading-tight",
             }
         ),
         required=False,
@@ -75,8 +75,8 @@ class IncidentFilterForm(forms.Form):
         tags = self.cleaned_data["tags"]
         if tags:
             try:
-                tags = tags.split(", ")
-                [Tag.split(tag) for tag in tags]
+                tags_list = [tag.strip() for tag in tags.split(",")]
+                [Tag.split(tag) for tag in tags_list]
             except ValueError:
                 raise forms.ValidationError("Tags need to have the format key=value, key2=value2")
 
