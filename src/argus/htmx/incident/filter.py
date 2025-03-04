@@ -125,6 +125,9 @@ def incident_list_filter(request, qs):
     if filter_pk:
         filter_obj = Filter.objects.get(pk=filter_pk)
     if filter_obj:
+        filterblob = filter_obj.filter
+        if "tags" in filterblob.keys():
+            filterblob["tags"] = ", ".join(filterblob["tags"])
         form = IncidentFilterForm(filter_obj.filter)
     else:
         if request.method == "POST":
