@@ -3,7 +3,7 @@ from django.urls import reverse
 from django.views.generic import ListView
 
 from argus.filter import get_filter_backend
-from argus.incident.models import SourceSystem
+from argus.incident.models import SourceSystem, Tag
 from argus.incident.constants import Level
 from argus.htmx.widgets import BadgeDropdownMultiSelect
 from argus.notificationprofile.models import Filter
@@ -70,6 +70,17 @@ class IncidentFilterForm(forms.Form):
         # mollify tests
         self.fields["sourceSystemIds"].widget.partial_get = reverse("htmx:incident-filter")
         self.fields["sourceSystemIds"].choices = tuple(SourceSystem.objects.values_list("id", "name"))
+
+    def clean_tags(self):
+        tags = self.cleaned_data["tags"]
+        if tags:
+            try:
+                tags = tags.split(", ")
+                [Tag.split(tag) for tag in tags]
+            except ValueError:
+                raise forms.ValidationError("Tags need to have the format key=value, key2=value2")
+
+        return tags
 
     def _tristate(self, onkey, offkey):
         on = self.cleaned_data.get(onkey, None)
