@@ -101,7 +101,7 @@ class IncidentFilterForm(forms.Form):
 
         tags = self.cleaned_data.get("tags", [])
         if tags:
-            filterblob["tags"] = tags.split(", ")
+            filterblob["tags"] = [tag.strip() for tag in tags.split(",")]
 
         maxlevel = self.cleaned_data.get("maxlevel", 0)
         if maxlevel:
