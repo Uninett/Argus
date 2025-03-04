@@ -1,6 +1,6 @@
 from urllib.parse import urlsplit
 
-from argus.site.settings.backend import *
+from argus.site.settings.base import *
 from argus.site.settings import get_str_env, normalize_url
 
 
