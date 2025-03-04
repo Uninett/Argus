@@ -70,6 +70,7 @@ def incident_detail(request, pk: int):
     context = {
         "incident": incident,
         "page_title": str(incident),
+        "autocreate_ticket": True,
     }
     return render(request, "htmx/incident/incident_detail.html", context=context)
 
