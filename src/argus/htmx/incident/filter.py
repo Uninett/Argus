@@ -55,6 +55,7 @@ class IncidentFilterForm(forms.Form):
         ),
         required=False,
         label="Tags",
+        help_text='Press "Enter" after each completed tag',
     )
     maxlevel = forms.IntegerField(
         widget=forms.NumberInput(
