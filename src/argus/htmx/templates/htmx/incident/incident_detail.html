@@ -40,14 +40,34 @@
             <div class="card-body">
               <h3 class="font-bold">Description</h3>
               <p>{{ incident.description }}</p>
-              <h3 class="font-bold">Start time</h3>
-              <p>{{ incident.start_time|date:preferences.argus_htmx.datetime_format }}</p>
-              <h3 class="font-bold">Duration</h3>
-              <p>{{ incident.end_time|date:preferences.argus_htmx.datetime_format }}</p>
+              {% if incident.stateful %}
+                <h3 class="font-bold">Start time</h3>
+                <p>
+                  <time datetime="{{ incident.start_time|date:"c" }}">{{ incident.start_time|date:preferences.argus_htmx.datetime_format }}</time>
+                </p>
+                {% if incident.open %}
+                  <h3 class="font-bold">End time</h3>
+                  <p>—</p>
+                  <h3 class="font-bold">Current duration</h3>
+                  <p>{{ incident.duration }}</p>
+                {% else %}
+                  <h3 class="font-bold">End time</h3>
+                  <p>
+                    <time datetime="{{ incident.end_time|date:"c" }}">{{ incident.end_time|date:preferences.argus_htmx.datetime_format }}</time>
+                  </p>
+                  <h3 class="font-bold">Total duration</h3>
+                  <p>{{ incident.duration }}</p>
+                {% endif %}
+              {% else %}
+                <h3 class="font-bold">Timestamp</h3>
+                <p>
+                  <time datetime="{{ incident.start_time }}">{{ incident.start_time|date:preferences.argus_htmx.datetime_format }}</time>
+                </p>
+              {% endif %}
               <h3 class="font-bold">Source</h3>
               <p>{{ incident.source.name }}</p>
               <h3 class="font-bold">Incident id in {{ incident.source.name }}</h3>
-              <p>{{ incident.source_incident_id }}</p>
+              <p>{{ incident.source_incident_id|default:"—" }}</p>
               <h3 class="font-bold">More details at</h3>
               <p>
                 {% if incident.details_url %}
