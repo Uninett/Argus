@@ -8,6 +8,30 @@ This project uses [*towncrier*](https://towncrier.readthedocs.io/) and the chang
 
 <!-- towncrier release notes start -->
 
+## [1.33.0] - 2025-03-05
+
+### Fixed
+
+- Moved channels app from base settings to spa settings, where it belongs. The
+  dependency had already been moved, so this avoids an ImportError on new
+  installs. The spa frontend also needs CORS, but due to the complexity of when
+  the middleware needs to be called, the cors app and middleware have not been
+  moved, only the spa-specific setting.
+
+### HTMx app
+
+#### Added
+
+- Add text field to filter incident list by tags
+  ([#1044](https://github.com/Uninett/Argus/issues/1044))
+
+#### Changed
+
+- Improved formatting of incident datetimes on the details page by using
+  `<time>`-tags, showing duration and end time only for stateful incidents, and
+  showing duration for closed and still open incidents differently.
+
+
 ## [1.32.0] - 2025-03-03
 
 ### Added

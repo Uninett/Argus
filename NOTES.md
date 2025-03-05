@@ -3,6 +3,13 @@
 This file documents changes to Argus that are relevant for operations,
 customizers and end-users.
 
+## [1.33.0] - 2025-03-05
+
+Moved channels app from base settings to spa settings, where it belongs. This
+avoids an ImportError on new installs.
+
+Filtering by tags now possible in the new frontend.
+
 ## [1.32.0] - 2025-03-03
 
 Mostly changes to the new frontend again, as well as some new and improved
