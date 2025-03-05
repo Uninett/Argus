@@ -1,4 +1,5 @@
 from django import forms
+from django.contrib import messages
 from django.urls import reverse
 from django.views.generic import ListView
 
@@ -77,11 +78,18 @@ class IncidentFilterForm(forms.Form):
         if tags:
             try:
                 tags_list = [tag.strip() for tag in tags.split(",")]
-                [Tag.split(tag) for tag in tags_list]
+                tags_qss = Tag.objects.parse(*tags_list)
             except ValueError:
                 raise forms.ValidationError("Tags need to have the format key=value, key2=value2")
 
-        return tags
+        existing_tags = []
+        for tags_qs in tags_qss:
+            existing_tags.extend([str(tag) for tag in tags_qs])
+        if len(existing_tags) < len(tags_list):
+            # TODO add message here that invalid tags were cleaned
+            None
+
+        return ", ".join(existing_tags)
 
     def _tristate(self, onkey, offkey):
         on = self.cleaned_data.get(onkey, None)
