@@ -75,21 +75,23 @@ class IncidentFilterForm(forms.Form):
 
     def clean_tags(self):
         tags = self.cleaned_data["tags"]
-        if tags:
-            try:
-                tags_list = [tag.strip() for tag in tags.split(",")]
-                tags_qss = Tag.objects.parse(*tags_list)
-            except ValueError:
-                raise forms.ValidationError("Tags need to have the format key=value, key2=value2")
+        if not tags:
+            return None
 
-        existing_tags = []
+        try:
+            tags_list = set(tag.strip() for tag in tags.split(","))
+            tags_qss = Tag.objects.parse(*tags_list)
+        except ValueError:
+            raise forms.ValidationError("Tags need to have the format key=value, key2=value2")
+
+        existing_tags = set()
         for tags_qs in tags_qss:
-            existing_tags.extend([str(tag) for tag in tags_qs])
-        if len(existing_tags) < len(tags_list):
-            # TODO add message here that invalid tags were cleaned
-            None
+            existing_tags.update(set(str(tag) for tag in tags_qs))
+        missing_tags = tags_list - existing_tags
+        if missing_tags:
+            raise forms.ValidationError(f"The following tags could not be found: {', '.join(missing_tags)}")
 
-        return ", ".join(existing_tags)
+        return tags
 
     def _tristate(self, onkey, offkey):
         on = self.cleaned_data.get(onkey, None)
@@ -158,6 +160,9 @@ def incident_list_filter(request, qs):
     if form.is_valid():
         filterblob = form.to_filterblob()
         qs = QuerySetFilter.filtered_incidents(filterblob, qs)
+    else:
+        for field, error_messages in form.errors.items():
+            messages.error(request, f"{field}: {','.join(error_messages)}")
     return form, qs
 
 
