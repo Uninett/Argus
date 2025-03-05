@@ -7,8 +7,9 @@ REACT Frontend
 The classic frontend is a single page application (SPA) written in REACT. See
 the `Github repo of Argus-frontend <https://github.com/uninett/Argus-frontend>`_
 
-It depends on `redis <https://redis.io/>`_, needs its own specific settings and
-has a handful of API endpoints that are not needed if running headless.
+It depends on `redis <https://redis.io/>`_, some additional 3rd party django
+apps, needs its own specific settings and has a handful of API endpoints that
+are not needed if running headless.
 
 Dependencies
 ============
@@ -23,13 +24,15 @@ here.
 Settings
 ========
 
-Base the settings file on ``argus.spa.settings``. Note that the app
-``argus.spa`` is added to :setting:`INSTALLED_APPS`.
+Base the settings file on ``argus.spa.settings``.
 
-The individual settings are in ``argus.spa.spa_settings``, note especially that
-:setting:`ROOT_URLCONF` is set to ``argus.spa.root_urls``. If you prefer to
+The individual settings are in ``argus.spa.spa_settings``, but note:
+
+* :setting:`ROOT_URLCONF` is set to ``argus.spa.root_urls``. If you prefer to
 make your own root ``urls.py``, the frontend-specific urls can be imported from
 ``argus.spa.spa_urls``.
+* :setting:`INSTALLED_APPS` is rewritten to add the apps ``channels`` and
+``argus.spa``. The order matters,``channels`` must be early.
 
 Domain settings
 ---------------
@@ -66,6 +69,20 @@ By default, Argus will look for a Redis server on ``localhost:6379``. To use a
 different server, set the :setting:`ARGUS_REDIS_SERVER` environment variable, e.g::
 
   ARGUS_REDIS_SERVER=my-redis-server.example.org:6379
+
+.. setting:: CHANNEL_LAYERS
+
+The realtime updates uses the app ``channels``. This setting by default depends
+on :seting:`ARGUS_REDIS_SERVER`, itshould normally not be necessary to change
+it.
+
+CORS handling
+-------------
+
+For the react frontend to have permissions to talk to the backend in
+production, CORS headers must be set correctly. See the documentation at
+`django-cors-headers <https://pypi.org/project/django-cors-headers/>`_ for what
+is possible.
 
 Dataporten via OAuth2
 ---------------------

@@ -1,9 +1,12 @@
 from urllib.parse import urlsplit
 
-from argus.site.settings import get_str_env
+from argus.site.settings.base import *
+from argus.site.settings import get_str_env, normalize_url
 
 
 FRONTEND = "spa"
+
+INSTALLED_APPS = ["channels"] + INSTALLED_APPS + ["argus.spa"]
 
 LOGIN_URL = "/login/"
 LOGOUT_URL = "/logout/"
@@ -31,6 +34,11 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 ROOT_URLCONF = "argus.spa.root_urls"
+
+# django-cors-headers
+CORS_ALLOWED_ORIGINS = []
+if FRONTEND_URL:
+    CORS_ALLOWED_ORIGINS.append(normalize_url(FRONTEND_URL))
 
 # django-channels
 
