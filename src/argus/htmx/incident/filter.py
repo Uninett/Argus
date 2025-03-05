@@ -1,9 +1,10 @@
 from django import forms
+from django.contrib import messages
 from django.urls import reverse
 from django.views.generic import ListView
 
 from argus.filter import get_filter_backend
-from argus.incident.models import SourceSystem
+from argus.incident.models import SourceSystem, Tag
 from argus.incident.constants import Level
 from argus.htmx.widgets import BadgeDropdownMultiSelect
 from argus.notificationprofile.models import Filter
@@ -46,6 +47,17 @@ class IncidentFilterForm(forms.Form):
         required=False,
         label="Sources",
     )
+    tags = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                "placeholder": "key=value, ...",
+                "class": "input input-accent input-bordered input-md border overflow-y-auto min-h-8 h-auto max-h-16 max-w-xs leading-tight",
+            }
+        ),
+        required=False,
+        label="Tags",
+        help_text='Press "Enter" after each completed tag',
+    )
     maxlevel = forms.IntegerField(
         widget=forms.NumberInput(
             attrs={"type": "range", "step": "1", "min": min(Level).value, "max": max(Level).value}
@@ -60,6 +72,26 @@ class IncidentFilterForm(forms.Form):
         # mollify tests
         self.fields["sourceSystemIds"].widget.partial_get = reverse("htmx:incident-filter")
         self.fields["sourceSystemIds"].choices = tuple(SourceSystem.objects.values_list("id", "name"))
+
+    def clean_tags(self):
+        tags = self.cleaned_data["tags"]
+        if not tags:
+            return None
+
+        try:
+            tags_list = set(tag.strip() for tag in tags.split(","))
+            tags_qss = Tag.objects.parse(*tags_list)
+        except ValueError:
+            raise forms.ValidationError("Tags need to have the format key=value, key2=value2")
+
+        existing_tags = set()
+        for tags_qs in tags_qss:
+            existing_tags.update(set(str(tag) for tag in tags_qs))
+        missing_tags = tags_list - existing_tags
+        if missing_tags:
+            raise forms.ValidationError(f"The following tags could not be found: {', '.join(missing_tags)}")
+
+        return tags
 
     def _tristate(self, onkey, offkey):
         on = self.cleaned_data.get(onkey, None)
@@ -89,6 +121,10 @@ class IncidentFilterForm(forms.Form):
         if sourceSystemIds:
             filterblob["sourceSystemIds"] = sourceSystemIds
 
+        tags = self.cleaned_data.get("tags", [])
+        if tags:
+            filterblob["tags"] = [tag.strip() for tag in tags.split(",")]
+
         maxlevel = self.cleaned_data.get("maxlevel", 0)
         if maxlevel:
             filterblob["maxlevel"] = maxlevel
@@ -111,6 +147,9 @@ def incident_list_filter(request, qs):
     if filter_pk:
         filter_obj = Filter.objects.get(pk=filter_pk)
     if filter_obj:
+        filterblob = filter_obj.filter
+        if "tags" in filterblob.keys():
+            filterblob["tags"] = ", ".join(filterblob["tags"])
         form = IncidentFilterForm(filter_obj.filter)
     else:
         if request.method == "POST":
@@ -121,6 +160,9 @@ def incident_list_filter(request, qs):
     if form.is_valid():
         filterblob = form.to_filterblob()
         qs = QuerySetFilter.filtered_incidents(filterblob, qs)
+    else:
+        for field, error_messages in form.errors.items():
+            messages.error(request, f"{field}: {','.join(error_messages)}")
     return form, qs
 
 
