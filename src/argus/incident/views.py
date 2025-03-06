@@ -60,10 +60,7 @@ from .ticket.base import (
     TicketPluginImportException,
     TicketSettingsException,
 )
-from .ticket.utils import (
-    get_autocreate_ticket_plugin,
-    serialize_incident_for_ticket_autocreation,
-)
+from .ticket.utils import autocreate_ticket
 
 filter_backend = get_filter_backend()
 IncidentFilter = filter_backend.IncidentFilter
@@ -313,22 +310,12 @@ class TicketPluginViewSet(viewsets.ViewSet):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            ticket_plugin = get_autocreate_ticket_plugin()
+            url = autocreate_ticket(incident, request.user)
         except TicketSettingsException as e:
             # shouldn't this be a 500 Server Error?
             return Response(data=str(e), status=status.HTTP_400_BAD_REQUEST)
         except TicketPluginImportException as e:
             return Response(data=str(e), status=status.HTTP_500_BAD_REQUEST)
-
-        serialized_incident = serialize_incident_for_ticket_autocreation(incident, request.user)
-
-        try:
-            url = ticket_plugin.create_ticket(serialized_incident)
-        except TicketSettingsException as e:
-            return Response(
-                data=str(e),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
         except TicketClientException as e:
             return Response(
                 data=str(e),
@@ -346,8 +333,7 @@ class TicketPluginViewSet(viewsets.ViewSet):
             )
 
         if url:
-            incident.change_ticket_url(request.user, url, timezone.now())
-            serializer = self.serializer_class(data={"ticket_url": incident.ticket_url})
+            serializer = self.serializer_class(data={"ticket_url": url})
             if serializer.is_valid():
                 return Response(serializer.data, status=status.HTTP_200_OK)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

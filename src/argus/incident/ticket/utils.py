@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 from urllib.parse import urljoin
 
 from django.conf import settings
+from django.utils.timezone import now as tznow
 
 from argus.incident.ticket.base import (
     TicketPluginImportException,
@@ -30,6 +31,7 @@ __all__ = [
     "get_ticket_plugin_path",
     "get_autocreate_ticket_plugin",
     "serialize_incident_for_ticket_autocreation",
+    "autocreate_ticket",
 ]
 
 
@@ -68,3 +70,22 @@ def serialize_incident_for_ticket_autocreation(incident: Incident, actor: User):
     )
     serialized_incident["user"] = actor.get_full_name()
     return serialized_incident
+
+
+def autocreate_ticket(incident: Incident, user: User, plugin=None, timestamp=None):
+    # never overwrite existing url
+    if incident.ticket_url:
+        return None
+
+    if not plugin:
+        plugin = get_autocreate_ticket_plugin()
+    if not timestamp:
+        timestamp = tznow()
+
+    serialized_incident = serialize_incident_for_ticket_autocreation(incident, user)
+
+    url = plugin.create_ticket(serialized_incident)
+
+    incident.change_ticket_url(user, url, timestamp)
+
+    return incident.ticket_url
