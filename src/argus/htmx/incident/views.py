@@ -16,6 +16,7 @@ from django_htmx.http import HttpResponseClientRefresh, reswap, retarget
 
 from argus.auth.utils import get_or_update_preference
 from argus.incident.models import Incident
+from argus.incident.ticket.utils import get_ticket_plugin_path
 from argus.notificationprofile.models import Filter
 from argus.util.datetime_utils import make_aware
 
@@ -70,7 +71,7 @@ def incident_detail(request, pk: int):
     context = {
         "incident": incident,
         "page_title": str(incident),
-        "autocreate_ticket": True,
+        "autocreate_ticket": bool(get_ticket_plugin_path()),
     }
     return render(request, "htmx/incident/incident_detail.html", context=context)
 

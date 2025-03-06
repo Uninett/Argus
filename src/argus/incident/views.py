@@ -57,6 +57,7 @@ from .ticket.base import (
     TicketClientException,
     TicketCreationException,
     TicketPluginException,
+    TicketPluginImportException,
     TicketSettingsException,
 )
 from .ticket.utils import (
@@ -316,6 +317,8 @@ class TicketPluginViewSet(viewsets.ViewSet):
         except TicketSettingsException as e:
             # shouldn't this be a 500 Server Error?
             return Response(data=str(e), status=status.HTTP_400_BAD_REQUEST)
+        except TicketPluginImportException as e:
+            return Response(data=str(e), status=status.HTTP_500_BAD_REQUEST)
 
         serialized_incident = serialize_incident_for_ticket_autocreation(incident, request.user)
 
