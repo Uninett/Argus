@@ -381,7 +381,7 @@ With this version, the API for bulk changes of incidents and sending of
 notifications to new and interesting destinations via destination plugins has
 been frozen, and should be ready for use, completing what was started in 1.10.
 
-## Added
+### Added
 - Also include frontend-url to incident in incident-serializer
 - Show installed plugins in the metadata view
 
