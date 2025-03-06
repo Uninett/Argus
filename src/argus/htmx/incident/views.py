@@ -26,11 +26,13 @@ from .customization import get_incident_table_columns
 from .utils import get_filter_function
 from .forms import AckForm, DescriptionOptionalForm, EditTicketUrlForm, AddTicketUrlForm
 from ..utils import (
+    autocreate_ticket_url_queryset,
     bulk_change_incidents,
     bulk_ack_queryset,
     bulk_close_queryset,
     bulk_reopen_queryset,
     bulk_change_ticket_url_queryset,
+    change_incident,
 )
 
 User = get_user_model()
@@ -38,12 +40,15 @@ LOG = logging.getLogger(__name__)
 
 
 # Map request trigger to parameters for incidents update
-INCIDENT_UPDATE_ACTIONS = {
+INCIDENT_UPDATE_BULK_ACTIONS = {
     "ack": (AckForm, bulk_ack_queryset),
     "close": (DescriptionOptionalForm, bulk_close_queryset),
     "reopen": (DescriptionOptionalForm, bulk_reopen_queryset),
     "update-ticket": (EditTicketUrlForm, bulk_change_ticket_url_queryset),
     "add-ticket": (AddTicketUrlForm, bulk_change_ticket_url_queryset),
+}
+INCIDENT_UPDATE_SINGLE_ACTIONS = {
+    "autocreate-ticket": (None, autocreate_ticket_url_queryset),
 }
 
 
@@ -76,28 +81,40 @@ def incident_detail(request, pk: int):
     return render(request, "htmx/incident/incident_detail.html", context=context)
 
 
+def get_incident_ids_to_update(request):
+    return request.POST.getlist("incident_ids", [])
+
+
 def get_form_data(request, formclass: forms.Form):
     formdata = request.POST or None
-    incident_ids = []
     cleaned_form = None
-    if formdata:
-        incident_ids = request.POST.getlist("incident_ids", [])
+    if formclass and formdata:
         form = formclass(formdata)
         if form.is_valid():
             cleaned_form = form.cleaned_data
-    return cleaned_form, incident_ids
+    return cleaned_form
 
 
 @require_POST
 def incident_update(request: HtmxHttpRequest, action: str):
     try:
-        formclass, callback_func = INCIDENT_UPDATE_ACTIONS[action]
+        formclass, callback_func = INCIDENT_UPDATE_BULK_ACTIONS[action]
+        bulk = True
     except KeyError:
-        LOG.error("Unrecognized action name %s when updating incidents.", action)
-        return HttpResponseBadRequest("Invalid update action")
-    formdata, incident_ids = get_form_data(request, formclass)
-    if formdata:
-        bulk_change_incidents(request.user, incident_ids, formdata, callback_func)
+        bulk = False
+        try:
+            formclass, callback_func = INCIDENT_UPDATE_SINGLE_ACTIONS[action]
+        except KeyError:
+            LOG.error("Unrecognized action name %s when updating incidents.", action)
+            return HttpResponseBadRequest("Invalid update action")
+    incident_ids = get_incident_ids_to_update(request)
+    formdata = get_form_data(request, formclass)
+    if incident_ids:
+        if bulk:
+            bulk_change_incidents(request.user, incident_ids, formdata, callback_func)
+        else:
+            incident_id = incident_ids.pop()
+            change_incident(request.user, incident_id, formdata, callback_func)
     return HttpResponseClientRefresh()
 
 
