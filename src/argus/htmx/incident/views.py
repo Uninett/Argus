@@ -126,6 +126,12 @@ def create_filter(request: HtmxHttpRequest):
 
 
 @require_GET
+def get_existing_filters(request: HtmxHttpRequest):
+    context = {"filters": Filter.objects.all().filter(user=request.user)}
+    return render(request, "htmx/incident/_existing_filters.html", context=context)
+
+
+@require_GET
 def filter_select(request: HtmxHttpRequest):
     filter_id = request.GET.get("filter", None)
     if filter_id and get_object_or_404(Filter, id=filter_id):
