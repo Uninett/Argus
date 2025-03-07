@@ -4626,6 +4626,10 @@ details.collapse summary::-webkit-details-marker {
   font-weight: 600;
 }
 
+.font-normal {
+  font-weight: 400;
+}
+
 .capitalize {
   text-transform: capitalize;
 }

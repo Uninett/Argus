@@ -1,7 +1,16 @@
 <div class="dropdown">
-  <div tabindex="0" role="button" class="btn btn-sm join-item m-1">Delete filters</div>
-  <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-10 w-52 p-2 shadow-sm">
-    <li><a>Filter 1</a></li>
-    <li><a>Filter 2</a></li>
+  <div tabindex="0" role="button" class="btn btn-sm join-item m-1">Delete filter</div>
+  <ul tabindex="0"
+      class="dropdown-content menu bg-base-100 rounded-box z-10 w-52 p-2 shadow-sm">
+    <li>
+      <a class="flex">
+        {% include "htmx/_base_confirm_dialog.html" with item_class="w-full text-start" dialog_id="filter-1-delete-confirm" item_title="Filter 1" header="Delete filter" confirmation_message="Are you sure you want to delete this filter?" %}
+      </a>
+    </li>
+    <li>
+      <a class="flex">
+        {% include "htmx/_base_confirm_dialog.html" with item_class="w-full text-start" dialog_id="filter-2-delete-confirm" item_title="Filter 2" header="Delete filter" confirmation_message="Are you sure you want to delete this filter?" %}
+      </a>
+    </li>
   </ul>
 </div>
