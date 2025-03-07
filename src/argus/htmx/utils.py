@@ -67,7 +67,7 @@ def bulk_change_ticket_url_queryset(actor, qs, data: dict[str, Any]):
 
 
 def single_autocreate_ticket_url_queryset(actor, qs, data: dict[str, Any]):
-    incident = qs.pop()
+    incident = qs.get()
     autocreate_ticket(incident, actor, timestamp=data["timestamp"])
     incident.refresh_from_db()
     return incident
