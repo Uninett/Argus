@@ -12,4 +12,5 @@ urlpatterns = [
     path("filter-list/", filter.FilterListView.as_view(), name="filter-list"),
     path("select-filter/", views.filter_select, name="select-filter"),
     path("filter-create/", views.create_filter, name="filter-create"),
+    path("existing-filters/", views.get_existing_filters, name="existing-filters"),
 ]

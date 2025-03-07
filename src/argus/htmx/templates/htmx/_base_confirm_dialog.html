@@ -4,7 +4,10 @@
   <div class="modal-box card card-compact shadow-xl loading-box">
     <div class="w-full">
       <div class="divider divider-start">
-        <h3 class="card-title">{{ header }}</h3>
+        <h3 class="card-title">
+          {{ action }}
+          <p class="italic">{{ item_id|default:"" }}</p>
+        </h3>
       </div>
       <p class="antialiased text-base font-normal">{{ confirmation_message }}</p>
       <div class="modal-action card-actions">
