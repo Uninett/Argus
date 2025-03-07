@@ -66,7 +66,8 @@ def bulk_change_ticket_url_queryset(actor, qs, data: dict[str, Any]):
     return qs.update_ticket_url(actor, ticket_url, timestamp=timestamp)
 
 
-def autocreate_ticket_url_queryset(actor, incident, data: dict[str, Any]):
+def single_autocreate_ticket_url_queryset(actor, qs, data: dict[str, Any]):
+    incident = qs.pop()
     autocreate_ticket(incident, actor, timestamp=data["timestamp"])
     incident.refresh_from_db()
     return incident
@@ -95,25 +96,3 @@ def bulk_change_incidents(actor, incident_ids: list[int], data: dict[str, Any], 
     incidents = func(actor, qs, data)
     send_changed_incidents(incidents)
     return incidents, missing_ids
-
-
-def change_incident(actor, incident_id: int, data: dict[str, Any], func):
-    """
-    Update single incident
-
-    Applies ``func`` to the incident having ``incident_id`` with the
-    pre-validated type dependent key-value pairs in ``data``. Blames it on the
-    user ``actor``. Adds ``timestamp`` to ``data`` if it is not already
-    present.
-
-    Returns the updated incident.
-    """
-    if not data:
-        data = {}
-
-    incident = Incident.objects.get(id=incident_id)
-    if not data.get("timestamp"):
-        data["timestamp"] = timezone.now()
-    incident = func(actor, incident, data)
-    # should send signal here
-    return incident
