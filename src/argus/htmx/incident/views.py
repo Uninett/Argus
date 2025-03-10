@@ -128,10 +128,12 @@ def create_filter(request: HtmxHttpRequest):
 @require_POST
 def delete_filter(request: HtmxHttpRequest, pk: int):
     filter_obj = get_object_or_404(Filter, id=pk)
-    filter_obj.delete()
-    if request.session.get("selected_filter") == str(pk):
-        request.session["selected_filter"] = None
-    return HttpResponseClientRefresh()
+    deleted_id = filter_obj.delete()
+    if deleted_id:
+        messages.success(request, f"Deleted filter {filter_obj.name}.")
+        if request.session.get("selected_filter") == str(pk):
+            request.session["selected_filter"] = None
+            return HttpResponseClientRefresh()
 
 
 @require_GET
