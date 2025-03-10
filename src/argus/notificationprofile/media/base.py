@@ -133,9 +133,12 @@ class NotificationMedium(ABC):
             form.add_error(
                 None,
                 DjangoValidationError(
-                    "This %(media)s destination already exists",
+                    "A %(media)s destination with this %(key) already exists",
                     code="duplicate",
-                    params={"media": cls.MEDIA_SLUG},
+                    params={
+                        "media": cls.MEDIA_SLUG,
+                        "key": cls.MEDIA_SETTINGS_KEY,
+                    },
                 ),
             )
         return form
