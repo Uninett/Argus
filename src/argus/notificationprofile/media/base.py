@@ -160,7 +160,7 @@ class NotificationMedium(ABC):
     @classmethod
     def get_label(cls, destination: DestinationConfig) -> str:
         """
-        Returns a descriptive label for this destination if none is stored
+        Returns the stored label or a descriptive label for this destination otherwise
         """
         return destination.label if destination.label else destination.settings.get(cls.MEDIA_SETTINGS_KEY)
 
