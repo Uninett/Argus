@@ -77,11 +77,11 @@ class NotificationMedium(ABC):
                 code = "readonly_media"
                 message = cls.error_messages["readonly_media"]
                 raise DRFValidationError(detail={"media": message}, code=code)
-            form = CommonDestinationConfigForm(data, instance=instance)
             if instance.user != user:
                 code = "readonly_user"
                 message = cls.error_messages["readonly_user"]
                 raise DRFValidationError(detail={"user": message}, code=code)
+            form = CommonDestinationConfigForm(data, instance=instance)
         else:
             form = CommonDestinationConfigForm(data)
 
