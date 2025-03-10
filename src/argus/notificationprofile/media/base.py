@@ -117,8 +117,7 @@ class NotificationMedium(ABC):
         prefix: str = "",
     ) -> forms.Form:
         """
-        Validates the settings of destination and returns a dict with
-        validated and cleaned data
+        Validates the settings of destination and returns a bound, cleaned form
         """
         initial = {}
         if instance:
