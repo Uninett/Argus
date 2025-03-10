@@ -1,3 +1,5 @@
+.. _howto-override-templates:
+
 ====================
 Override templates
 ====================
@@ -63,7 +65,7 @@ For more information, see `Django template tags`_.
 
 
 Use cases for overriding templates
-=================================
+==================================
 
 Below is a list of templates that you may want to override for your use cases. This is by no means
 an extensive list, but can provide entry points or inspiration:
