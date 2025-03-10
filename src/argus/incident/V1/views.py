@@ -13,14 +13,73 @@ from argus.filter.filters import SOURCE_LOCKED_INCIDENT_OPENAPI_PARAMETER_DESCRI
 
 from ..constants import Level
 from ..models import Incident, SourceSystem
-from ..serializers import IncidentPureDeserializer, SourceSystemSerializer
-from ..views import IncidentViewSet
+from ..serializers import IncidentPureDeserializer, SourceSystemSerializer, IncidentTicketUrlSerializer
+from ..views import (
+    EventViewSet,
+    IncidentTagViewSet,
+    IncidentViewSet,
+    SourceSystemTypeViewSet,
+    SourceSystemViewSet,
+)
 from .serializers import (
     AcknowledgementSerializerV1,
     IncidentSerializerV1,
     MetadataSerializerV1,
     UpdateAcknowledgementSerializerV1,
 )
+
+# deprecate views unchanged from V2
+
+
+@extend_schema_view(
+    retrieve=extend_schema(deprecated=True),
+    destroy=extend_schema(deprecated=True),
+    update=extend_schema(deprecated=True),
+    partial_update=extend_schema(deprecated=True),
+    create=extend_schema(deprecated=True),
+    list=extend_schema(deprecated=True),
+)
+class EventViewSetV1(EventViewSet):
+    pass
+
+
+@extend_schema_view(
+    retrieve=extend_schema(deprecated=True),
+    destroy=extend_schema(deprecated=True),
+    update=extend_schema(deprecated=True),
+    partial_update=extend_schema(deprecated=True),
+    create=extend_schema(deprecated=True),
+    list=extend_schema(deprecated=True),
+)
+class IncidentTagViewSetV1(IncidentTagViewSet):
+    pass
+
+
+@extend_schema_view(
+    retrieve=extend_schema(deprecated=True),
+    destroy=extend_schema(deprecated=True),
+    update=extend_schema(deprecated=True),
+    partial_update=extend_schema(deprecated=True),
+    create=extend_schema(deprecated=True),
+    list=extend_schema(deprecated=True),
+)
+class SourceSystemViewSetV1(SourceSystemViewSet):
+    pass
+
+
+@extend_schema_view(
+    retrieve=extend_schema(deprecated=True),
+    destroy=extend_schema(deprecated=True),
+    update=extend_schema(deprecated=True),
+    partial_update=extend_schema(deprecated=True),
+    create=extend_schema(deprecated=True),
+    list=extend_schema(deprecated=True),
+)
+class SourceSystemTypeViewSetV1(SourceSystemTypeViewSet):
+    pass
+
+
+# overridden views
 
 
 @extend_schema_view(
@@ -125,6 +184,15 @@ class IncidentViewSetV1(IncidentViewSet):
             "sourceSystems": source_systems.data,
         }
         return Response(data)
+
+    @extend_schema(
+        deprecated=True,
+        request=IncidentTicketUrlSerializer,
+        responses=IncidentTicketUrlSerializer,
+    )
+    @action(detail=True, methods=["put"])
+    def ticket_url(self, request, pk=None):
+        return super().ticket_url(request, pk)
 
 
 @extend_schema_view(
