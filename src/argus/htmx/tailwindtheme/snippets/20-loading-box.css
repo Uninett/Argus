@@ -19,7 +19,7 @@
   }
   /* Adds overlay */
   .loading-box:has(> .htmx-indicator.htmx-request) > *:not(.htmx-indicator) {
-    opacity: 0.3;
+    opacity: 0.5;
   }
   /* Disables mouse interactions */
   .loading-box:has(> .htmx-indicator.htmx-request) * {
