@@ -172,7 +172,7 @@ class NotificationMedium(ABC):
 
     @classmethod
     def get_relevant_destination_settings(cls, destinations: Iterable[DestinationConfig]) -> set[str]:
-        """Returns a set of addresses the message should be sent to"""
+        """Returns a set of type specific destination values the message should be sent to"""
         destinations = [
             destination.settings[cls.MEDIA_SETTINGS_KEY] for destination in cls._get_relevant_destinations(destinations)
         ]
