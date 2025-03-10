@@ -20,13 +20,13 @@ class CurrentUserViewV1(APIView):
     permission_classes = [IsAuthenticated]
     serializer_class = UserSerializerV1
 
+    @extend_schema(deprecated=True)
     def get(self, request, *args, **kwargs):
         serializer = self.serializer_class(request.user)
         return Response(serializer.data)
 
 
 @extend_schema_view(
-    deprecated=True,
     list=extend_schema(
         deprecated=True,
         description=PHONE_NUMBERS_DEPRECATED,
