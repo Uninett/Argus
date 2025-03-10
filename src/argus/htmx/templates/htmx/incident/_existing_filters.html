@@ -1,9 +1,9 @@
 {% for filter in filters %}
   <li>
     <a class="flex">
-      {% include "htmx/_base_confirm_dialog.html" with item_class="w-full text-start" dialog_id="filter-delete-confirm" item_title=filter.name action="Delete filter" item_id=filter.name confirmation_message="Are you sure you want to delete this filter?" %}
+      {% include "htmx/incident/_delete_filter_confirm_dialog.html" with item_class="w-full text-start" dialog_id="filter-delete-confirm" item_title=filter.name action="Delete filter" item_id=filter.id confirmation_message="Are you sure you want to delete this filter?" %}
     </a>
   </li>
-  {% empty %}
+{% empty %}
   <p>loading filters...</p>
 {% endfor %}

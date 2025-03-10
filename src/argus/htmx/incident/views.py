@@ -125,6 +125,15 @@ def create_filter(request: HtmxHttpRequest):
     return HttpResponseBadRequest()
 
 
+@require_POST
+def delete_filter(request: HtmxHttpRequest, pk: int):
+    filter_obj = get_object_or_404(Filter, id=pk)
+    filter_obj.delete()
+    if request.session.get("selected_filter") == str(pk):
+        request.session["selected_filter"] = None
+    return HttpResponseClientRefresh()
+
+
 @require_GET
 def get_existing_filters(request: HtmxHttpRequest):
     context = {"filters": Filter.objects.all().filter(user=request.user)}

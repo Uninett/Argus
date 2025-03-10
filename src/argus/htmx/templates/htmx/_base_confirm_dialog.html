@@ -1,19 +1,22 @@
 <button class="{{ item_class|default:"" }}"
-        onclick="htmx.find('#{{ dialog_id }}').showModal()">{{ item_title }}</button>
-<dialog id="{{ dialog_id }}" class="modal">
+        onclick="htmx.find('#{{ dialog_id }}-{{ item_id|default:"" }}').showModal()">{{ item_title }}</button>
+<dialog id="{{ dialog_id }}-{{ item_id|default:'' }}" class="modal">
   <div class="modal-box card card-compact shadow-xl loading-box">
     <div class="w-full">
       <div class="divider divider-start">
         <h3 class="card-title">
           {{ action }}
-          <p class="italic">{{ item_id|default:"" }}</p>
+          <p class="italic">{{ item_title|default:"" }}</p>
         </h3>
       </div>
       <p class="antialiased text-base font-normal">{{ confirmation_message }}</p>
       <div class="modal-action card-actions">
         <form method="dialog" class="w-full">
+          {% csrf_token %}
           <div class="divider divider-end">
-            <button class="btn btn-ghost">
+            <button class="btn btn-ghost"
+                    {% block confirm_action_control %}
+                    {% endblock confirm_action_control %}>
               <span>YES</span>
             </button>
             <button class="btn btn-ghost">NO</button>
