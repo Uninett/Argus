@@ -15,10 +15,39 @@ from argus.filter.V1.serializers import (
 )
 from argus.incident.serializers import IncidentSerializer
 from ..models import Filter, NotificationProfile
+from ..views import TimeslotViewSet, FilterPreviewView
 from .serializers import (
     ResponseNotificationProfileSerializerV1,
     RequestNotificationProfileSerializerV1,
 )
+
+
+# deprecate views unchanged from V2
+
+
+@extend_schema_view(
+    list=extend_schema(deprecated=True),
+    retrieve=extend_schema(deprecated=True),
+    create=extend_schema(deprecated=True),
+    update=extend_schema(deprecated=True),
+    partial_update=extend_schema(deprecated=True),
+    destroy=extend_schema(deprecated=True),
+)
+class TimeslotViewSetV1(TimeslotViewSet):
+    pass
+
+
+@extend_schema_view(
+    post=extend_schema(deprecated=True),
+)
+class FilterPreviewViewV1(FilterPreviewView):
+    pass
+
+
+filter_preview_view = FilterPreviewViewV1.as_view()
+
+
+# overridden views
 
 
 @extend_schema_view(
