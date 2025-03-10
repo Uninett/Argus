@@ -214,7 +214,7 @@ class NotificationMedium(ABC):
         errors = cls.is_not_deletable(destination)
         if errors:
             message = " ".join(errors.values())
-            raise cls.NotDeletableError(f"Cannot delete this destination: {message}.")
+            raise cls.NotDeletableError(f"Cannot delete this destination: {message}")
 
     @classmethod
     def _update_destination(cls, destination: DestinationConfig, validated_data: dict) -> DestinationConfig:
