@@ -82,7 +82,7 @@ def get_incident_ids_to_update(request):
     return request.POST.getlist("incident_ids", [])
 
 
-def get_form_data(request, formclass: forms.Form):
+def get_form_data(request, formclass: Optional[forms.Form]):
     formdata = request.POST or None
     cleaned_form = None
     if formclass and formdata:
