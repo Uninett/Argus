@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 from datetime import datetime
+from typing import Optional
 
 from django import forms
 from django.contrib.auth import get_user_model
