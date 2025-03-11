@@ -79,7 +79,7 @@
               <h3 class="font-bold">Ticket</h3>
               <div>
                 {% if incident.ticket_url %}
-                  <a href="{{ incident.ticket_url }}" target="_blank">{{ incident.ticket_url }}</a>
+                  <a class="link" href="{{ incident.ticket_url }}" target="_blank">{{ incident.ticket_url }}</a>
                   {% include "htmx/incident/_incident_ticket_edit_modal.html" with action="update-ticket" dialog_id="edit-ticket-dialog" button_title="Edit ticket URL" header="Edit ticket" explanation="" cancel_text="Cancel" submit_text="Edit ticket" %}
                 {% else %}
                   —
