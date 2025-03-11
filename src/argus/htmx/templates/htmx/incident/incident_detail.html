@@ -83,7 +83,7 @@
                   {% include "htmx/incident/_incident_ticket_edit_modal.html" with action="update-ticket" dialog_id="edit-ticket-dialog" button_title="Edit ticket URL" header="Edit ticket" explanation="" cancel_text="Cancel" submit_text="Edit ticket" %}
                 {% else %}
                   —
-                  {% include "htmx/incident/_incident_ticket_manual_create_modal.html" with action="add-ticket" dialog_id="manual-create-ticket-dialog" button_title="Add ticket url" header="Manually add ticket URL" explanation="" cancel_text="Cancel" submit_text="Add ticket" %}
+                  {% include "htmx/incident/_incident_ticket_manual_create_modal.html" with action="add-ticket" dialog_id="manual-create-ticket-dialog" button_title="Add ticket URL" header="Manually add ticket URL" explanation="" cancel_text="Cancel" submit_text="Add ticket" %}
                   {% if autocreate_ticket %}
                     {% include "htmx/incident/_incident_ticket_autocreate_modal.html" with action="autocreate-ticket" dialog_id="auto-create-ticket-dialog" button_title="Create ticket" header="Automatically create ticket" explanation="Are you sure you want to automatically generate a ticket from this incident?" cancel_text="Cancel" submit_text="Create ticket" %}
                   {% endif %}
