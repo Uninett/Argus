@@ -46,7 +46,12 @@ Domain settings
 
 * :setting:`ARGUS_FRONTEND_URL` is used for redirecting back to frontend after logging in
   through Feide and CORS. Must either be a subdomain of or the same as
-  :setting:`ARGUS_SPA_COOKIE_DOMAIN`.
+  :setting:`ARGUS_SPA_COOKIE_DOMAIN`. It is also used for building permalinks
+  to point back to incidents in the dashboard, or whenever else an absolute url
+  is needed.
+
+Depending on how argus is deployed this is the only sure fire way to get hold
+of the hostname.
 
 In production, Argus requires the frontend and the backend to either be
 deployed on the same domain, or the frontend to be on a subdomain of the
