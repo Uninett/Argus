@@ -80,12 +80,12 @@
               <div>
                 {% if incident.ticket_url %}
                   <a href="{{ incident.ticket_url }}" target="_blank">{{ incident.ticket_url }}</a>
-                  {% include "htmx/incident/_incident_ticket_edit_modal.html" with action="update-ticket" dialog_id="edit-ticket-dialog" button_title="Edit ticket url" header="Edit ticket" explanation="" cancel_text="Cancel" submit_text="Update" %}
+                  {% include "htmx/incident/_incident_ticket_edit_modal.html" with action="update-ticket" dialog_id="edit-ticket-dialog" button_title="Edit ticket URL" header="Edit ticket" explanation="" cancel_text="Cancel" submit_text="Edit ticket" %}
                 {% else %}
                   —
-                  {% include "htmx/incident/_incident_ticket_manual_create_modal.html" with action="add-ticket" dialog_id="manual-create-ticket-dialog" button_title="Add ticket url" header="Add url to existing ticket" explanation="Are you sure you want to store this url to an existing ticket on this incident?" cancel_text="Cancel" submit_text="Add ticket" %}
+                  {% include "htmx/incident/_incident_ticket_manual_create_modal.html" with action="add-ticket" dialog_id="manual-create-ticket-dialog" button_title="Add ticket url" header="Manually add ticket URL" explanation="" cancel_text="Cancel" submit_text="Add ticket" %}
                   {% if autocreate_ticket %}
-                    {% include "htmx/incident/_incident_ticket_autocreate_modal.html" with action="autocreate-ticket" dialog_id="auto-create-ticket-dialog" button_title="Create ticket" header="Create ticket and store the generated url" explanation="Are you sure you want to create a ticket for this incident?" cancel_text="Cancel" submit_text="Create ticket" %}
+                    {% include "htmx/incident/_incident_ticket_autocreate_modal.html" with action="autocreate-ticket" dialog_id="auto-create-ticket-dialog" button_title="Create ticket" header="Automatically create ticket" explanation="Are you sure you want to automatically generate a ticket from this incident?" cancel_text="Cancel" submit_text="Create ticket" %}
                   {% endif %}
                 {% endif %}
               </div>
