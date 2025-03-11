@@ -76,24 +76,34 @@ class NotificationProfileForm(DestinationFieldMixin, FilterFieldMixin, NoColonMi
         }
 
     def __init__(self, *args, **kwargs):
-        user = kwargs.pop("user")
+        self.user = kwargs.pop("user")
         super().__init__(*args, **kwargs)
 
-        self.fields["timeslot"].queryset = Timeslot.objects.filter(user=user)
+        self.fields["timeslot"].queryset = Timeslot.objects.filter(user=self.user)
         self.fields["active"].widget.attrs["class"] = "checkbox checkbox-sm checkbox-accent border"
         self.fields["active"].widget.attrs["autocomplete"] = "off"
         self.fields["name"].widget.attrs["class"] = "input input-bordered"
 
         self.action = self.get_action()
 
-        self._init_filters(user)
-        self._init_destinations(user)
+        self._init_filters(self.user)
+        self._init_destinations(self.user)
 
     def get_action(self):
         if self.instance and self.instance.pk:
             return reverse("htmx:notificationprofile-update", kwargs={"pk": self.instance.pk})
         else:
             return reverse("htmx:notificationprofile-create")
+
+    def clean_name(self):
+        name = self.cleaned_data["name"]
+        # Making sure to check for duplicate names, but allow updating of profiles
+        profiles_with_same_name = NotificationProfile.objects.filter(user=self.user, name=name).exclude(
+            pk=getattr(self.instance, "pk", None)
+        )
+        if profiles_with_same_name.exists():
+            raise forms.ValidationError(f"A profile by this user with the name '{name}' already exists.")
+        return name
 
 
 class NotificationProfileFilterForm(FilterFieldMixin, NoColonMixin, forms.ModelForm):
