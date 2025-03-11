@@ -160,8 +160,8 @@ Domain settings
 The setting must point to the publicly visible domain where the frontend is
 running. This might be different from where the backend is running.
 
-Depending on how argus is deployed this is the only sure fire way to get hold
-of the hostname.
+Depending on how Argus is deployed this is the only sure fire way to get hold
+of the externally visible hostname in the code in all cases.
 
 OAuth2
 ------
