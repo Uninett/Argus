@@ -127,7 +127,7 @@ Removing an existing action
 ---------------------------
 
 Removing an existing action involves removing the handler from the ``INCIDENT_UPDATE_ACTIONS``
-registry and removing the button from the. For example, to remove the ``reopen`` action, place the
+registry and removing the button from the UI. For example, to remove the ``reopen`` action, place the
 following in your ``apps.py``::
 
   class MyApp(AppConfig):
