@@ -3,6 +3,7 @@
   <label>
     Change ticket
     <input name="ticket_url"
+           type="url"
            value="{{ incident.ticket_url|default:"" }}"
            placeholder="valid url or nothing"
            class="input input-bordered w-full max-w-xs" />
