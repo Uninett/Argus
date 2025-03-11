@@ -38,66 +38,97 @@
           <section id="primary-details" class="card">
             <h2 class="card-title">Primary details (#{{ incident.pk }})</h2>
             <div class="card-body">
-              <h3 class="font-bold">Description</h3>
-              <p>{{ incident.description }}</p>
+              <section>
+                <h3 class="font-bold">Description</h3>
+                <p>{{ incident.description }}</p>
+              </section>
               {% if incident.stateful %}
-                <h3 class="font-bold">Start time</h3>
-                <p>
-                  <time datetime="{{ incident.start_time|date:"c" }}">{{ incident.start_time|date:preferences.argus_htmx.datetime_format }}</time>
-                </p>
-                {% if incident.open %}
-                  <h3 class="font-bold">End time</h3>
-                  <p>—</p>
-                  <h3 class="font-bold">Current duration</h3>
-                  <p>{{ incident.duration }}</p>
-                {% else %}
-                  <h3 class="font-bold">End time</h3>
+                <section>
+                  <h3 class="font-bold">Start time</h3>
                   <p>
-                    <time datetime="{{ incident.end_time|date:"c" }}">{{ incident.end_time|date:preferences.argus_htmx.datetime_format }}</time>
+                    <time datetime="{{ incident.start_time|date:"c" }}">{{ incident.start_time|date:preferences.argus_htmx.datetime_format }}</time>
                   </p>
-                  <h3 class="font-bold">Total duration</h3>
-                  <p>{{ incident.duration }}</p>
+                </section>
+                {% if incident.open %}
+                  <section>
+                    <h3 class="font-bold">End time</h3>
+                    <p>—</p>
+                  </section>
+                  <section>
+                    <h3 class="font-bold">Current duration</h3>
+                    <p>{{ incident.duration }}</p>
+                  </section>
+                {% else %}
+                  <section>
+                    <h3 class="font-bold">End time</h3>
+                    <p>
+                      <time datetime="{{ incident.end_time|date:"c" }}">{{ incident.end_time|date:preferences.argus_htmx.datetime_format }}</time>
+                    </p>
+                  </section>
+                  <section>
+                    <h3 class="font-bold">Total duration</h3>
+                    <p>{{ incident.duration }}</p>
+                  </section>
                 {% endif %}
               {% else %}
-                <h3 class="font-bold">Timestamp</h3>
-                <p>
-                  <time datetime="{{ incident.start_time }}">{{ incident.start_time|date:preferences.argus_htmx.datetime_format }}</time>
-                </p>
+                <section>
+                  <h3 class="font-bold">Timestamp</h3>
+                  <p>
+                    <time datetime="{{ incident.start_time }}">{{ incident.start_time|date:preferences.argus_htmx.datetime_format }}</time>
+                  </p>
+                </section>
               {% endif %}
-              <h3 class="font-bold">Source</h3>
-              <p>{{ incident.source.name }}</p>
-              <h3 class="font-bold">Incident id in {{ incident.source.name }}</h3>
-              <p>{{ incident.source_incident_id|default:"—" }}</p>
-              <h3 class="font-bold">More details at</h3>
-              <p>
-                {% if incident.details_url %}
-                  <a href="{{ incident.details_url }}">{{ incident.details_url }}</a>
-                {% else %}
-                  —
-                {% endif %}
-              </p>
-              <h3 class="font-bold">Ticket</h3>
-              <div>
-                {% if incident.ticket_url %}
-                  <a class="link" href="{{ incident.ticket_url }}" target="_blank">{{ incident.ticket_url }}</a>
-                  {% include "htmx/incident/_incident_ticket_edit_modal.html" with action="update-ticket" dialog_id="edit-ticket-dialog" button_title="Edit ticket URL" header="Edit ticket" explanation="" cancel_text="Cancel" submit_text="Edit ticket" %}
-                {% else %}
-                  —
-                  {% include "htmx/incident/_incident_ticket_manual_create_modal.html" with action="add-ticket" dialog_id="manual-create-ticket-dialog" button_title="Add ticket URL" header="Manually add ticket URL" explanation="" cancel_text="Cancel" submit_text="Add ticket" %}
-                  {% if autocreate_ticket %}
-                    {% include "htmx/incident/_incident_ticket_autocreate_modal.html" with action="autocreate-ticket" dialog_id="auto-create-ticket-dialog" button_title="Create ticket" header="Automatically create ticket" explanation="Are you sure you want to automatically generate a ticket from this incident?" cancel_text="Cancel" submit_text="Create ticket" %}
-                  {% endif %}
-                {% endif %}
-              </div>
-              <div class="card-actions">
-                {% if incident.stateful %}
-                  {% if incident.open %}
-                    {% include "htmx/incident/_incident_close_modal.html" with action="close" dialog_id="close-incident-dialog" button_title="Close" header="Manually close incident" explanation="Write a message describing why the incident was manually closed" cancel_text="Cancel" submit_text="Close now" %}
+              <section>
+                <h3 class="font-bold">Source</h3>
+                <p>{{ incident.source.name }}</p>
+              </section>
+              <section>
+                <h3 class="font-bold">Incident id in {{ incident.source.name }}</h3>
+                <p>{{ incident.source_incident_id|default:"—" }}</p>
+              </section>
+              <section>
+                <h3 class="font-bold">More details at</h3>
+                <p>
+                  {% if incident.details_url %}
+                    <a href="{{ incident.details_url }}">{{ incident.details_url }}</a>
                   {% else %}
-                    {% include "htmx/incident/_incident_reopen_modal.html" with action="reopen" dialog_id="reopen-incident-dialog" button_title="Reopen" header="Manually reopen incident" explanation="Write a message describing why the incident was manually reopend" cancel_text="Cancel" submit_text="Reopen now" %}
+                    —
                   {% endif %}
+                </p>
+              </section>
+              <section>
+                <h3 class="font-bold">Ticket</h3>
+                <div class="flex flex-col gap-2">
+                  <div>
+                    {% if incident.ticket_url %}
+                      <a class="link" href="{{ incident.ticket_url }}" target="_blank">{{ incident.ticket_url }}</a>
+                    {% else %}
+                      —
+                    {% endif %}
+                  </div>
+                  <div class="flex flex-row gap-2">
+                    {% if incident.ticket_url %}
+                      {% include "htmx/incident/_incident_ticket_edit_modal.html" with action="update-ticket" dialog_id="edit-ticket-dialog" button_title="Edit ticket URL" header="Edit ticket" explanation="" cancel_text="Cancel" submit_text="Edit ticket" %}
+                    {% else %}
+                      {% include "htmx/incident/_incident_ticket_manual_create_modal.html" with action="add-ticket" dialog_id="manual-create-ticket-dialog" button_title="Add ticket URL" header="Manually add ticket URL" explanation="" cancel_text="Cancel" submit_text="Add ticket" %}
+                      {% if autocreate_ticket %}
+                        {% include "htmx/incident/_incident_ticket_autocreate_modal.html" with action="autocreate-ticket" dialog_id="auto-create-ticket-dialog" button_title="Create ticket" header="Automatically create ticket" explanation="Are you sure you want to automatically generate a ticket from this incident?" cancel_text="Cancel" submit_text="Create ticket" %}
+                      {% endif %}
+                    {% endif %}
+                  </div>
+                </div>
+              </section>
+            </div>
+          </section>
+          <section>
+            <div class="card-actions">
+              {% if incident.stateful %}
+                {% if incident.open %}
+                  {% include "htmx/incident/_incident_close_modal.html" with action="close" dialog_id="close-incident-dialog" button_title="Close" header="Manually close incident" explanation="Write a message describing why the incident was manually closed" cancel_text="Cancel" submit_text="Close now" %}
+                {% else %}
+                  {% include "htmx/incident/_incident_reopen_modal.html" with action="reopen" dialog_id="reopen-incident-dialog" button_title="Reopen" header="Manually reopen incident" explanation="Write a message describing why the incident was manually reopend" cancel_text="Cancel" submit_text="Reopen now" %}
                 {% endif %}
-              </div>
+              {% endif %}
             </div>
           </section>
         </section>

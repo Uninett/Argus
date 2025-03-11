@@ -4340,6 +4340,10 @@ details.collapse summary::-webkit-details-marker {
   flex-basis: 25%;
 }
 
+.border-collapse {
+  border-collapse: collapse;
+}
+
 .border-separate {
   border-collapse: separate;
 }
