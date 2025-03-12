@@ -14,12 +14,12 @@
         <form method="dialog" class="w-full">
           {% csrf_token %}
           <div class="divider divider-end">
-            <button class="btn btn-ghost text-primary"
+            <button class="btn btn-primary"
                     {% block confirm_action_control %}
                     {% endblock confirm_action_control %}>
-              <span>YES</span>
+              <span>Yes</span>
             </button>
-            <button class="btn btn-ghost text-primary">NO</button>
+            <button class="btn">No</button>
           </div>
         </form>
       </div>
