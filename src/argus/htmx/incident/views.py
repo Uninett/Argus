@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 from datetime import datetime
+from typing import Optional
 
 from django import forms
 from django.contrib.auth import get_user_model
@@ -16,6 +17,7 @@ from django_htmx.http import HttpResponseClientRefresh, reswap, retarget
 
 from argus.auth.utils import get_or_update_preference
 from argus.incident.models import Incident
+from argus.incident.ticket.utils import get_ticket_plugin_path
 from argus.notificationprofile.models import Filter
 from argus.util.datetime_utils import make_aware
 
@@ -25,6 +27,7 @@ from .customization import get_incident_table_columns
 from .utils import get_filter_function
 from .forms import AckForm, DescriptionOptionalForm, EditTicketUrlForm, AddTicketUrlForm
 from ..utils import (
+    single_autocreate_ticket_url_queryset,
     bulk_change_incidents,
     bulk_ack_queryset,
     bulk_close_queryset,
@@ -43,6 +46,7 @@ INCIDENT_UPDATE_ACTIONS = {
     "reopen": (DescriptionOptionalForm, bulk_reopen_queryset),
     "update-ticket": (EditTicketUrlForm, bulk_change_ticket_url_queryset),
     "add-ticket": (AddTicketUrlForm, bulk_change_ticket_url_queryset),
+    "autocreate-ticket": (None, single_autocreate_ticket_url_queryset),
 }
 
 
@@ -70,20 +74,23 @@ def incident_detail(request, pk: int):
     context = {
         "incident": incident,
         "page_title": str(incident),
+        "autocreate_ticket": bool(get_ticket_plugin_path()),
     }
     return render(request, "htmx/incident/incident_detail.html", context=context)
 
 
-def get_form_data(request, formclass: forms.Form):
+def get_incident_ids_to_update(request):
+    return request.POST.getlist("incident_ids", [])
+
+
+def get_form_data(request, formclass: Optional[forms.Form]):
     formdata = request.POST or None
-    incident_ids = []
     cleaned_form = None
-    if formdata:
-        incident_ids = request.POST.getlist("incident_ids", [])
+    if formclass and formdata:
         form = formclass(formdata)
         if form.is_valid():
             cleaned_form = form.cleaned_data
-    return cleaned_form, incident_ids
+    return cleaned_form
 
 
 @require_POST
@@ -93,8 +100,9 @@ def incident_update(request: HtmxHttpRequest, action: str):
     except KeyError:
         LOG.error("Unrecognized action name %s when updating incidents.", action)
         return HttpResponseBadRequest("Invalid update action")
-    formdata, incident_ids = get_form_data(request, formclass)
-    if formdata:
+    incident_ids = get_incident_ids_to_update(request)
+    formdata = get_form_data(request, formclass)
+    if incident_ids:
         bulk_change_incidents(request.user, incident_ids, formdata, callback_func)
     return HttpResponseClientRefresh()
 
