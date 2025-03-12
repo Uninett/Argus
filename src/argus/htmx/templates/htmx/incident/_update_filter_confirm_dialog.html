@@ -1,0 +1,5 @@
+{% extends "htmx/_base_confirm_dialog.html" %}
+{% block confirm_action_control %}
+  hx-post="{% url 'htmx:filter-update' pk=filter.id %}"
+  hx-include="#incident-filter-box fieldset"
+{% endblock confirm_action_control %}
