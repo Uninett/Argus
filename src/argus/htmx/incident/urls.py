@@ -13,5 +13,6 @@ urlpatterns = [
     path("select-filter/", views.filter_select, name="select-filter"),
     path("filter-create/", views.create_filter, name="filter-create"),
     path("filter/delete/<int:pk>/", views.delete_filter, name="filter-delete"),
+    path("filter/update/<int:pk>/", views.update_filter, name="filter-update"),
     path("filter/existing/", views.get_existing_filters, name="existing-filters"),
 ]
