@@ -133,7 +133,7 @@ def delete_filter(request: HtmxHttpRequest, pk: int):
         messages.success(request, f"Deleted filter {filter_obj.name}.")
         if request.session.get("selected_filter") == str(pk):
             request.session["selected_filter"] = None
-            return HttpResponseClientRefresh()
+        return HttpResponseClientRefresh()
 
 
 @require_GET
