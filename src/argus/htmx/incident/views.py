@@ -138,8 +138,12 @@ def delete_filter(request: HtmxHttpRequest, pk: int):
 
 @require_GET
 def get_existing_filters(request: HtmxHttpRequest):
-    context = {"filters": Filter.objects.all().filter(user=request.user)}
-    return render(request, "htmx/incident/_existing_filters.html", context=context)
+    existing_filters = Filter.objects.all().filter(user=request.user)
+    if existing_filters:
+        context = {"filters": existing_filters}
+        return render(request, "htmx/incident/_existing_filters.html", context=context)
+    else:
+        return render(request, "htmx/incident/responses/empty_list_item.html", context={"message": "No filters found."})
 
 
 @require_GET
