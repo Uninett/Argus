@@ -1,8 +1,8 @@
-{# This confirmation dialog is a special case of the base form modal that needs its own template.
+<!-- This confirmation dialog is a special case of the base form modal that needs its own template.
 It can be used as one of several confirm dialogs in DOM, for example as an item in HTML list.
 In this case the item_id attribute must be provided when extending from this template.
 Or it can be used as an existing base modal - not more than one with the matching ID per DOM.
-In this case the item_id attribute can be omitted when extending from this template.#}
+In this case the item_id attribute can be omitted when extending from this template. -->
 <button class="{{ item_class|default:"" }}"
         onclick="htmx.find('#{{ dialog_id }}-{{ item_id|default:"" }}').showModal()">{{ item_title }}</button>
 <dialog id="{{ dialog_id }}-{{ item_id|default:'' }}" class="modal">

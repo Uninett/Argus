@@ -134,6 +134,25 @@ def create_filter(request: HtmxHttpRequest):
 
 
 @require_POST
+def update_filter(request: HtmxHttpRequest, pk: int):
+    filter_obj = get_object_or_404(Filter, id=pk)
+    incident_list_filter = get_filter_function()
+    filter_form, _ = incident_list_filter(request, None)
+    if filter_form.is_valid():
+        filterblob = filter_form.to_filterblob()
+        filter_obj.filter = filterblob
+        filter_obj.save()
+
+        # Immediately select the newly updated filter - keep or not?
+        # request.session["selected_filter"] = str(filter_obj.id)
+
+        messages.success(request, f"Updated filter '{filter_obj.name}'.")
+        return HttpResponseClientRefresh()
+    messages.error(request, f"Failed to update filter '{filter_obj.name}'.")
+    return HttpResponseBadRequest()
+
+
+@require_POST
 def delete_filter(request: HtmxHttpRequest, pk: int):
     filter_obj = get_object_or_404(Filter, id=pk)
     deleted_id = filter_obj.delete()
