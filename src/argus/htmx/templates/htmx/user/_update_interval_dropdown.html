@@ -11,6 +11,7 @@
                value="{{ item }}"
                aria-label="{{ item }}"
                name="update_interval"
+               autocomplete="off"
                hx-post="{% url 'htmx:update-preferences' namespace='argus_htmx' %}"
                hx-trigger="change"
                hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' />
