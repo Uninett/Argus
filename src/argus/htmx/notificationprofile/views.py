@@ -218,6 +218,7 @@ class NotificationProfileListView(NotificationProfileMixin, ListView):
             form.modal = DeleteModalForm(
                 dialog_id=f"delete-modal-{obj.pk}",
                 endpoint=reverse("htmx:notificationprofile-delete", pk=obj.pk),
+            )
             forms.append(form)
         context["form_list"] = forms
         return context
