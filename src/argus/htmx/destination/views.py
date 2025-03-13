@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections import namedtuple
 import logging
-from typing import Optional, TYPE_CHECKING
+from typing import Optional, TYPE_CHECKING, Tuple
 
 from django.http import QueryDict
 from django.contrib import messages
@@ -56,7 +56,7 @@ def get_forms(request, media: str, instance: Optional[DestinationConfig] = None)
 
 
 # not a view
-def save_forms(user, media: str, label_form: LabelForm, settings_form: Form) -> DestinationConfig:
+def save_forms(user, media: str, label_form: LabelForm, settings_form: Form) -> Tuple[DestinationConfig, bool]:
     """Save the contents of the two forms necessary to change a destination
 
     The two forms should first have been instanciated via ``get_forms``.
@@ -64,18 +64,29 @@ def save_forms(user, media: str, label_form: LabelForm, settings_form: Form) -> 
     - media is for linking up the right plugin on create
     - label_form is for all the common fields of a destination
     - settings_form is fetched from the destination plugin found via "media"
+
+    if the forms are valid, return the (updated) DestinationConfig and a bool
+    of whether the object was changed or not. If the forms were not valid,
+    return (None, false)
     """
-    if label_form.instance.pk:
+    changed = False
+    obj = label_form.instance
+    if obj.pk:
         # ensure that media type cannot be changed when updating a destination
-        media = label_form.instance.media_id
-    if label_form.is_valid() and settings_form.is_valid():
-        obj = label_form.save(commit=False)
-        obj.user = user
-        obj.media_id = media
-        obj.settings = settings_form.cleaned_data
-        obj.save()
-        return obj
-    return None
+        media = obj.media_id
+    if label_form.has_changed() or settings_form.has_changed():
+        changed = True
+    else:
+        return obj, changed
+    if not (label_form.is_valid() and settings_form.is_valid()):
+        obj = obj or None
+        return obj, changed
+    obj = label_form.save(commit=False)
+    obj.user = user
+    obj.media_id = media
+    obj.settings = settings_form.cleaned_data
+    obj.save()
+    return obj, changed
 
 
 @require_http_methods(["GET"])
@@ -93,15 +104,15 @@ def create_destination(request, media: str) -> HttpResponse:
         "settings_form": settings_form,
         "media": media,
     }
-    obj = save_forms(request.user, media, label_form, settings_form)
-    if obj:
-        label = medium.get_label(obj)
-        message = f'Created new {medium.MEDIA_NAME} destination "{label}"'
-        messages.success(request, message)
-        LOG.info(message)
+    obj, changed = save_forms(request.user, media, label_form, settings_form)
+    if changed:
+        if obj:
+            label = medium.get_label(obj)
+            message = f'Created new {medium.MEDIA_NAME} destination "{label}"'
+            messages.success(request, message)
+            LOG.info(message)
         request.POST = QueryDict("")
         return _render_destination_list(request, context=context, template=template)
-        # return redirect("htmx:destination-list")
     error_msg = f"Could not create new {medium.MEDIA_NAME} destination"
     messages.warning(request, error_msg)
     LOG.warn(error_msg)
@@ -139,13 +150,16 @@ def update_destination(request, pk: int, media: str) -> HttpResponse:
     destination = get_object_or_404(request.user.destinations.all(), pk=pk)
     label = medium.get_label(destination)
     forms = get_forms(request, media, instance=destination)
-    obj = save_forms(request.user, media, *forms)
-    if obj:
-        label = medium.get_label(obj)
-        message = f'Updated {medium.MEDIA_NAME} destination "{label}"'
-        messages.success(request, message)
-        LOG.info(message)
+    obj, changed = save_forms(request.user, media, *forms)
+    if changed:
+        if obj:
+            label = medium.get_label(obj)
+            message = f'Updated {medium.MEDIA_NAME} destination "{label}"'
+            messages.success(request, message)
+            LOG.info(message)
         request.POST = QueryDict("")
+        return _render_destination_list(request, template=template)
+    else:
         return _render_destination_list(request, template=template)
     error_msg = f'Could not update {medium.MEDIA_NAME} destination "{label}"'
     messages.warning(request, error_msg)
