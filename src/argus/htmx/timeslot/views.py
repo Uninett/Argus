@@ -1,6 +1,8 @@
 from typing import Optional
 
 from django import forms
+from django.contrib import messages
+from django.shortcuts import redirect
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
@@ -12,18 +14,50 @@ class TimeRecurrenceForm(forms.ModelForm):
     class Meta:
         model = TimeRecurrence
         exclude = ["timeslot"]
+        widgets = {
+            "start": forms.TimeInput(
+                attrs={
+                    "type": "text",
+                    "pattern": "[0-2][0-9]:[0-5][0-9]",
+                    "class": "input-bordered",
+                }
+            ),
+            "end": forms.TimeInput(
+                attrs={
+                    "type": "time",
+                    "step": 60,
+                    "class": "input-bordered",
+                }
+            ),
+        }
+
+
+class TimeslotForm(forms.ModelForm):
+    class Meta:
+        model = Timeslot
+        fields = ["name"]
 
 
 def make_timerecurrence_formset(data: Optional[dict] = None, timeslot: Optional[Timeslot] = None):
     extra = 0 if not timeslot else 1
     TimeRecurrenceFormSet = forms.inlineformset_factory(
-        Timeslot, TimeRecurrence, fields="__all__", extra=extra, can_delete=False, min_num=1
+        Timeslot, TimeRecurrence, form=TimeRecurrenceForm, fields="__all__", extra=extra, can_delete=False, min_num=1
     )
-    return TimeRecurrenceFormSet(data=data, instance=timeslot)
+    prefix = f"timerecurrenceform-{timeslot.pk}" if timeslot else ""
+    return TimeRecurrenceFormSet(data=data, instance=timeslot, prefix=prefix)
 
 
 class TimeslotMixin:
     model = Timeslot
+    prefix = "timeslot"
+
+    def _get_prefix(self, pk):
+        if pk:
+            return self.prefix + f"-{pk}"
+        return self.prefix
+
+    def get_prefix(self):
+        return self._get_prefix(getattr(self.object, "pk", None))
 
     def get_queryset(self):
         qs = super().get_queryset().prefetch_related("time_recurrences")
@@ -58,6 +92,11 @@ class FormsetMixin:
             return self.form_invalid(form, formset)
 
     def form_invalid(self, form, formset):
+        errors = []
+        for error in [form.errors] + formset.errors:
+            if error:
+                errors.append(error.as_text())
+        messages.warning(self.request, f"Couldn't save timeslot: {errors}")
         return self.render_to_response(self.get_context_data(form=form, formset=formset))
 
     def form_valid(self, form, formset):
@@ -68,15 +107,26 @@ class FormsetMixin:
         for tr in trs:
             tr.timeslot = self.object
             tr.save()
+        messages.success(self.request, f"Saved timeslot {self.object}")
         return HttpResponseRedirect(self.get_success_url())
 
 
 class TimeslotListView(TimeslotMixin, ListView):
-    pass
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        forms = []
+        for obj in self.get_queryset():
+            form = TimeslotForm(None, instance=obj, prefix=self._get_prefix(obj.pk))
+            formset = make_timerecurrence_formset(timeslot=obj)
+            forms.append({"form": form, "formset": formset})
+        context["form_list"] = forms
+        return context
 
 
 class TimeslotDetailView(TimeslotMixin, DetailView):
-    pass
+    def dispatch(self, request, *args, **kwargs):
+        object = self.get_object()
+        return redirect("htmx:timeslot-update", pk=object.pk)
 
 
 class TimeslotCreateView(FormsetMixin, TimeslotMixin, CreateView):
@@ -106,4 +156,9 @@ class TimeslotUpdateView(FormsetMixin, TimeslotMixin, UpdateView):
 
 
 class TimeslotDeleteView(TimeslotMixin, DeleteView):
-    pass
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        success_url = self.get_success_url()
+        self.object.delete()
+        messages.success(request, f'Successfully deleted timeslot "{self.object}"')
+        return HttpResponseRedirect(success_url)

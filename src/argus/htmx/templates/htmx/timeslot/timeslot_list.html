@@ -1,23 +1,13 @@
-{% extends "htmx/base.html" %}
-{% block main %}
-  <p>
-    <a class="btn btn-primary" href="{% url "htmx:timeslot-create" %}">Create</a>
-  </p>
-  {% for object in object_list %}
-    <div>
-      {% include "./_timeslot_detail.html" %}
-      <p>
-        <a class="btn btn-primary"
-           href="{% url "htmx:timeslot-detail" pk=object.pk %}">View</a>
-      </p>
-      <p>
-        <a class="btn btn-primary"
-           href="{% url "htmx:timeslot-update" pk=object.pk %}">Update</a>
-      </p>
-      <p>
-        <a class="btn btn-primary"
-           href="{% url "htmx:timeslot-delete" pk=object.pk %}">Delete</a>
-      </p>
-    </div>
-  {% endfor %}
-{% endblock main %}
+{% extends "./base.html" %}
+{% block timeslot_main %}
+  <div>
+    <button>
+      <a class="btn btn-primary" href="{% url "htmx:timeslot-create" %}">Create</a>
+    </button>
+    {% for entry in form_list %}
+      <div class="card my-4 bg-base-100 shadow-2xl">
+        {% include "./_timeslot_form.html" with form=entry.form formset=entry.formset %}
+      </div>
+    {% endfor %}
+  </div>
+{% endblock timeslot_main %}
