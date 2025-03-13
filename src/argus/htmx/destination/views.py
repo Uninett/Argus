@@ -96,13 +96,13 @@ def create_destination(request, media: str) -> HttpResponse:
     obj = save_forms(request.user, media, label_form, settings_form)
     if obj:
         label = medium.get_label(obj)
-        message = f'Created new {medium.name} destination "{label}"'
+        message = f'Created new {medium.MEDIA_NAME} destination "{label}"'
         messages.success(request, message)
         LOG.info(message)
         request.POST = QueryDict("")
         return _render_destination_list(request, context=context, template=template)
         # return redirect("htmx:destination-list")
-    error_msg = f"Could not create new {medium.name} destination"
+    error_msg = f"Could not create new {medium.MEDIA_NAME} destination"
     messages.warning(request, error_msg)
     LOG.warn(error_msg)
     return _render_destination_list(request, context=context, template=template)
@@ -120,12 +120,12 @@ def delete_destination(request, pk: int) -> HttpResponse:
     except NotificationMedium.NotDeletableError as e:
         # template?
         error_msg = ", ".join(e.args)
-        message = f'Failed to delete {medium.name} destination "{destination}": {error_msg}'
+        message = f'Failed to delete {medium.MEDIA_NAME} destination "{destination}": {error_msg}'
         messages.warning(request, message)
         LOG.warn(message)
     else:
         destination.delete()
-        message = f'Deleted {medium.name} destination "{destination_label}"'
+        message = f'Deleted {medium.MEDIA_NAME} destination "{destination_label}"'
         messages.success(request, message)
         LOG.info(message)
 
@@ -142,12 +142,12 @@ def update_destination(request, pk: int, media: str) -> HttpResponse:
     obj = save_forms(request.user, media, *forms)
     if obj:
         label = medium.get_label(obj)
-        message = f'Updated {medium.name} destination "{label}"'
+        message = f'Updated {medium.MEDIA_NAME} destination "{label}"'
         messages.success(request, message)
         LOG.info(message)
         request.POST = QueryDict("")
         return _render_destination_list(request, template=template)
-    error_msg = f'Could not update {medium.name} destination "{label}"'
+    error_msg = f'Could not update {medium.MEDIA_NAME} destination "{label}"'
     messages.warning(request, error_msg)
     LOG.warn(request, error_msg)
     all_forms = get_all_forms_grouped_by_media(request)
