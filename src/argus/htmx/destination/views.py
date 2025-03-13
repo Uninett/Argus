@@ -23,15 +23,21 @@ Forms = namedtuple("Forms", ["label_form", "settings_form"])
 
 
 # not a view
-def get_forms(request, media: str, instance: DestinationConfig = None):
+def get_forms(request, media: str, instance: Optional[DestinationConfig] = None) -> Forms:
+    """Get and bind the two forms necessary to change a destination
+
+    - media is for selecting the right plugin
+    - label_form is for all the common fields of a destination
+    - settings_form is fetched from the destination plugin found via "media"
+    - instance holds the pre-existing values if updating
+    """
     prefix = "destinationform"
     medium = get_medium_object(media)
 
     if instance and instance.pk:
         prefix += f"-{instance.pk}-{media}"
         label_name = medium.get_label(instance)
-        if label_name:
-            label_initial = {"label": label_name}
+        label_initial = {"label": label_name}
     else:
         prefix += f"-{media}"
         label_initial = {}
@@ -50,8 +56,17 @@ def get_forms(request, media: str, instance: DestinationConfig = None):
 
 
 # not a view
-def save_forms(user, media: str, label_form: LabelForm, settings_form: Form):
+def save_forms(user, media: str, label_form: LabelForm, settings_form: Form) -> DestinationConfig:
+    """Save the contents of the two forms necessary to change a destination
+
+    The two forms should first have been instanciated via ``get_forms``.
+
+    - media is for linking up the right plugin on create
+    - label_form is for all the common fields of a destination
+    - settings_form is fetched from the destination plugin found via "media"
+    """
     if label_form.instance.pk:
+        # ensure that media type cannot be changed when updating a destination
         media = label_form.instance.media_id
     if label_form.is_valid() and settings_form.is_valid():
         obj = label_form.save(commit=False)
@@ -81,7 +96,7 @@ def create_destination(request, media: str) -> HttpResponse:
     obj = save_forms(request.user, media, label_form, settings_form)
     if obj:
         label = medium.get_label(obj)
-        message = f'Created new {media} destination "{label}"'
+        message = f'Created new {medium.name} destination "{label}"'
         messages.success(request, message)
         LOG.info(message)
         request.POST = QueryDict("")
@@ -105,12 +120,12 @@ def delete_destination(request, pk: int) -> HttpResponse:
     except NotificationMedium.NotDeletableError as e:
         # template?
         error_msg = ", ".join(e.args)
-        message = f'Failed to delete {media} destination "{destination}": {error_msg}'
+        message = f'Failed to delete {medium.name} destination "{destination}": {error_msg}'
         messages.warning(request, message)
         LOG.warn(message)
     else:
         destination.delete()
-        message = f'Deleted {media} destination "{destination_label}"'
+        message = f'Deleted {medium.name} destination "{destination_label}"'
         messages.success(request, message)
         LOG.info(message)
 
@@ -127,12 +142,12 @@ def update_destination(request, pk: int, media: str) -> HttpResponse:
     obj = save_forms(request.user, media, *forms)
     if obj:
         label = medium.get_label(obj)
-        message = f'Updated {media} destination "{label}"'
+        message = f'Updated {medium.name} destination "{label}"'
         messages.success(request, message)
         LOG.info(message)
         request.POST = QueryDict("")
         return _render_destination_list(request, template=template)
-    error_msg = f'Could not update {media} destination "{label}"'
+    error_msg = f'Could not update {medium.name} destination "{label}"'
     messages.warning(request, error_msg)
     LOG.warn(request, error_msg)
     all_forms = get_all_forms_grouped_by_media(request)
