@@ -148,6 +148,8 @@ def update_filter(request: HtmxHttpRequest, pk: int):
 
         messages.success(request, f"Updated filter '{filter_obj.name}'.")
         return HttpResponseClientRefresh()
+    messages.error(request, f"Failed to update filter '{filter_obj.name}'.")
+    return HttpResponseBadRequest()
 
 
 @require_POST
