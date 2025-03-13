@@ -123,7 +123,7 @@ class NotificationMedium(ABC):
         if instance:
             initial = instance.settings
         form = cls.Form(data=data, initial=initial, prefix=prefix)
-        if not form.is_valid():
+        if not (form.has_changed() and form.is_valid()):
             return form
 
         form = cls.clean(form, instance)
