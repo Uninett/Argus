@@ -102,7 +102,7 @@ def create_destination(request, media: str) -> HttpResponse:
         request.POST = QueryDict("")
         return _render_destination_list(request, context=context, template=template)
         # return redirect("htmx:destination-list")
-    error_msg = f"Could not create new {media} destination"
+    error_msg = f"Could not create new {medium.name} destination"
     messages.warning(request, error_msg)
     LOG.warn(error_msg)
     return _render_destination_list(request, context=context, template=template)
