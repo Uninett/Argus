@@ -50,7 +50,7 @@ Domain settings
   to point back to incidents in the dashboard, or whenever else an absolute url
   is needed.
 
-Depending on how Argus is deployed this is the only sure fire way to get hold
+Depending on how Argus is deployed this is the only surefire way to get hold
 of the externally visible hostname in the code in all cases.
 
 In production, Argus requires the frontend and the backend to either be
