@@ -13,7 +13,7 @@ from django.views.generic import CreateView, DeleteView, DetailView, ListView, U
 from argus.htmx.request import HtmxHttpRequest
 from argus.htmx.widgets import DropdownMultiSelect
 from argus.notificationprofile.media import MEDIA_CLASSES_DICT
-from argus.htmx.modals import Modal
+from argus.htmx.modals import ConfirmationModal
 from argus.notificationprofile.models import NotificationProfile, Timeslot, Filter, DestinationConfig
 
 
@@ -23,7 +23,7 @@ class NoColonMixin:
         super().__init__(*args, **kwargs)
 
 
-class DeleteModal(Modal):
+class DeleteModal(ConfirmationModal):
     button_title: str = "Delete"
     header: str = "Delete notificatipnprofile"
     submit_text: str = "Delete"

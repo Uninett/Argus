@@ -6,7 +6,6 @@ from pydantic import BaseModel
 class Modal(BaseModel):
     model_config = {"arbitrary_types_allowed": True}
 
-    form: Form = None
     instance_id: int = None
     template_name: str = "htmx/_base_form_modal2.html"
     bulk: bool = None
@@ -26,3 +25,11 @@ class Modal(BaseModel):
         if self.instance_id:
             return self.endpoint.format(self.instance_id)
         return self.endpoint
+
+
+class ConfirmationModal(Modal):
+    pass
+
+
+class FormModal(Modal):
+    form: Form
