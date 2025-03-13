@@ -1,33 +1,29 @@
-<button class="btn {{ form.button_class }}"
-        onclick="htmx.find('#{{ form.dialog_id }}').showModal()">{{ button_title }}</button>
-<dialog id="{{ form.dialog_id }}" class="modal">
+<button class="btn {{ modal.button_class }}"
+        onclick="htmx.find('#{{ modal.dialog_id }}').showModal()">{{ modal.button_title }}</button>
+<dialog id="{{ modal.dialog_id }}" class="form">
   <div class="modal-box card card-compact shadow-xl loading-box">
     <div class="w-full">
       <div class="divider divider-start">
-        <h3 class="card-title">{{ form.header }}</h3>
+        <h3 class="card-title">{{ modal.header }}</h3>
       </div>
-      <form id="{{ form.dialog_id }}-form"
+      <form id="{{ modal.dialog_id }}-form"
             class="card-body"
-            {% block form_control %}
             method="post"
-            action="{{ endpoint }}"
-            {% endblock form_control %}>
+            action="{{ modal.endpoint }}">
         {% csrf_token %}
         <fieldset class="menu menu-vertical gap-4">
-          <legend class="antialiased text-base font-bold py-2">{{ form.explanation }}</legend>
-          {% block dialogform %}
-          {% endblock dialogform %}
+          <legend class="antialiased text-base font-bold py-2">{{ modal.explanation }}</legend>
         </fieldset>
       </form>
       <div class="modal-action card-actions">
         <form method="dialog" class="w-full">
           <div class="divider divider-end">
             <button type="submit"
-                    form="{{ form.dialog_id }}-form"
-                    class="btn {{ form.button_class }}">
-              <span>{{ form.submit_text }}</span>
+                    form="{{ modal.dialog_id }}-form"
+                    class="btn {{ modal.button_class }}">
+              <span>{{ modal.submit_text }}</span>
             </button>
-            <button class="btn">{{ form.cancel_text }}</button>
+            <button class="btn">{{ modal.cancel_text }}</button>
           </div>
         </form>
       </div>

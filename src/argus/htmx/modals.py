@@ -1,11 +1,16 @@
-from dataclasses import dataclass
+from django.forms import Form
+
+from pydantic import BaseModel
 
 
-@dataclass
-class ModalForm:
-    form: int = None
+class Modal(BaseModel):
+    model_config = {"arbitrary_types_allowed": True}
+
+    form: Form = None
     instance_id: int = None
     template_name: str = "htmx/_base_form_modal2.html"
+    bulk: bool = None
+    single: bool = None
 
     # needed by template
     button_class: str = "btn-primary"
@@ -21,10 +26,3 @@ class ModalForm:
         if self.instance_id:
             return self.endpoint.format(self.instance_id)
         return self.endpoint
-
-
-class DeleteModalForm(ModalForm):
-    button_title = "Delete title"
-    header = "Delete header"
-    submit_text = "Delete nao"
-    explanation = "Delete explanation"
