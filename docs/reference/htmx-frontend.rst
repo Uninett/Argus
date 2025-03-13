@@ -155,10 +155,13 @@ Domain settings
 .. setting:: ARGUS_FRONTEND_URL
 
 * :setting:`ARGUS_FRONTEND_URL` is used for building permalinks to point back
-  to incidents in the dashboard.
+  to incidents in the dashboard, or whenever else an absolute url is needed.
 
 The setting must point to the publicly visible domain where the frontend is
 running. This might be different from where the backend is running.
+
+Depending on how Argus is deployed this is the only surefire way to get hold
+of the externally visible hostname in the code in all cases.
 
 OAuth2
 ------
