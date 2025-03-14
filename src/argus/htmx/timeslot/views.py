@@ -59,7 +59,7 @@ class TimeslotForm(forms.ModelForm):
 def make_timerecurrence_formset(data: Optional[dict] = None, timeslot: Optional[Timeslot] = None):
     extra = 0 if not timeslot else 1
     TimeRecurrenceFormSet = forms.inlineformset_factory(
-        Timeslot, TimeRecurrence, form=TimeRecurrenceForm, fields="__all__", extra=extra, can_delete=False, min_num=1
+        Timeslot, TimeRecurrence, form=TimeRecurrenceForm, fields="__all__", extra=extra, can_delete=True, min_num=1
     )
     prefix = f"timerecurrenceform-{timeslot.pk}" if timeslot else ""
     return TimeRecurrenceFormSet(data=data, instance=timeslot, prefix=prefix)
@@ -122,6 +122,8 @@ class FormsetMixin:
         self.object.user = self.request.user
         self.object.save()
         trs = formset.save(commit=False)
+        for tr in formset.deleted_objects:
+            tr.delete()
         for tr in trs:
             tr.timeslot = self.object
             tr.save()
