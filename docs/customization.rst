@@ -32,3 +32,8 @@ HTMx frontend
 The HTMx frontend is designed to be very customizable.
 
 See :ref:`customize-htmx-frontend`
+
+.. toctree::
+   :glob:
+
+   customization/*

@@ -29,10 +29,10 @@ Base the settings file on ``argus.spa.settings``.
 The individual settings are in ``argus.spa.spa_settings``, but note:
 
 * :setting:`ROOT_URLCONF` is set to ``argus.spa.root_urls``. If you prefer to
-make your own root ``urls.py``, the frontend-specific urls can be imported from
-``argus.spa.spa_urls``.
+  make your own root ``urls.py``, the frontend-specific urls can be imported
+  from ``argus.spa.spa_urls``.
 * :setting:`INSTALLED_APPS` is rewritten to add the apps ``channels`` and
-``argus.spa``. The order matters,``channels`` must be early.
+  ``argus.spa``. The order matters,``channels`` must be early.
 
 Domain settings
 ---------------
@@ -78,7 +78,7 @@ different server, set the :setting:`ARGUS_REDIS_SERVER` environment variable, e.
 .. setting:: CHANNEL_LAYERS
 
 The realtime updates uses the app ``channels``. This setting by default depends
-on :seting:`ARGUS_REDIS_SERVER`, itshould normally not be necessary to change
+on :setting:`ARGUS_REDIS_SERVER`, itshould normally not be necessary to change
 it.
 
 CORS handling
