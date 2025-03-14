@@ -12,7 +12,7 @@ Welcome to Argus' documentation!
    about-argus
    reference
    integrations/index
-   customization/index
+   customization
    development
    :maxdepth: 2
    :caption: Contents:
