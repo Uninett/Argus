@@ -1,7 +1,7 @@
 {% with update=label_form.instance.pk %}
   {% csrf_token %}
   <fieldset class="p-2 border rounded-box border{% if not update %}-primary{% endif %} items-center gap-4 flex flex-col items-end justify-center">
-    {% if not label_form.instance.pk %}<legend class="menu-title">Create destination</legend>{% endif %}
+    {% if not update %}<legend class="menu-title">Create destination</legend>{% endif %}
     {% include "./_non_field_form_errors.html" %}
     <div class="items-center gap-4 flex flex-row items-end justify-center">
       {% include "./_form_fields.html" %}
