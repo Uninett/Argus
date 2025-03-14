@@ -59,7 +59,7 @@ def get_forms(request, media: str, instance: Optional[DestinationConfig] = None)
 def save_forms(user, media: str, label_form: LabelForm, settings_form: Form) -> Tuple[DestinationConfig, bool]:
     """Save the contents of the two forms necessary to change a destination
 
-    The two forms should first have been instanciated via ``get_forms``.
+    The two forms should first have been instantiated via ``get_forms``.
 
     - media is for linking up the right plugin on create
     - label_form is for all the common fields of a destination
