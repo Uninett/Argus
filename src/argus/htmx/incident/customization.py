@@ -42,6 +42,7 @@ _BUILTIN_COLUMN_LIST = [
         "",
         "htmx/incident/cells/_incident_color_status.html",
         cell_wrapper_template="htmx/incident/cells/_incident_color_status.html",
+        context={"column_classes": "w-4 p-0"},
     ),
     IncidentTableColumn(
         "row_select",

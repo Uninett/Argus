@@ -4282,6 +4282,10 @@ details.collapse summary::-webkit-details-marker {
   width: 6rem;
 }
 
+.w-4 {
+  width: 1rem;
+}
+
 .w-52 {
   width: 13rem;
 }
@@ -4553,6 +4557,10 @@ details.collapse summary::-webkit-details-marker {
      object-fit: scale-down;
 }
 
+.p-0 {
+  padding: 0px;
+}
+
 .p-1 {
   padding: 0.25rem;
 }
@@ -4700,11 +4708,6 @@ details.collapse summary::-webkit-details-marker {
 .text-primary {
   --tw-text-opacity: 1;
   color: var(--fallback-p,oklch(var(--p)/var(--tw-text-opacity, 1)));
-}
-
-.text-primary-content {
-  --tw-text-opacity: 1;
-  color: var(--fallback-pc,oklch(var(--pc)/var(--tw-text-opacity, 1)));
 }
 
 .text-warning {
