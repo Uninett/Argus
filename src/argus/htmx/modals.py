@@ -1,5 +1,7 @@
 from django.forms import Form
 
+# pydantic instead of dataclasses because the former has
+# less surprises when subclassing
 from pydantic import BaseModel
 
 
