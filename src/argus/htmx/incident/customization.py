@@ -31,7 +31,6 @@ class IncidentTableColumn:
     label: str  # display value
     cell_template: str
     header_template: Optional[str] = None
-    cell_wrapper_template: Optional[str] = None
     context: Optional[dict] = None
     filter_field: Optional[str] = None
     cell_wrapper_template: str = "htmx/incident/_incident_table_cell.html"
