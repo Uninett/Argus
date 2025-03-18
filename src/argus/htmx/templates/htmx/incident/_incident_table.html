@@ -16,7 +16,7 @@
     <tr class="border-b border-primary">
       {% block columns %}
         {% for col in columns %}
-          <th class="border-b border-primary {{ col.context.column_classes }}">
+          <th class="border-b border-primary {{ col.column_classes }}">
             {% if col.header_template %}
               {% include col.header_template with label=col.label %}
             {% elif col.filter_field %}

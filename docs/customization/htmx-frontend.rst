@@ -146,7 +146,10 @@ There are several optional attributes to ``IncidentTableColumn``:
   ``cell_template`` and wraps it in a ``<td>``-tag. This makes it possible to
   add attributes to the ``<td>``-tag or skip including the ``cell_template``
   altogether.
-* ``context``: Additional hardcoded context for every cell of its type, as a dictionary.
+* ``column_classes``: Additional classes to set on ``<th>``, handy for
+  controlling width.
+* ``context``: Additional hardcoded context for every cell of its type, as
+  a dictionary.
 * ``header_template``: A template overriding the default ``<th>`` for the column.
 
 For inbuilt support for other types of columns see the
