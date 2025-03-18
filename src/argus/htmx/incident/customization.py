@@ -31,23 +31,31 @@ class IncidentTableColumn:
     label: str  # display value
     cell_template: str
     header_template: Optional[str] = None
+    cell_wrapper_template: Optional[str] = None
     context: Optional[dict] = None
     filter_field: Optional[str] = None
+    cell_wrapper_template: str = "htmx/incident/_incident_table_cell.html"
 
 
 _BUILTIN_COLUMN_LIST = [
     IncidentTableColumn(
+        "color_status",
+        "",
+        "htmx/incident/cells/_incident_color_status.html",
+        cell_wrapper_template="htmx/incident/cells/_incident_color_status.html",
+    ),
+    IncidentTableColumn(
         "row_select",
         "Selected",
         "htmx/incident/cells/_incident_checkbox.html",
-        "htmx/incident/cells/_incident_list_select_all_checkbox_header.html",
+        header_template="htmx/incident/cells/_incident_list_select_all_checkbox_header.html",
     ),
     IncidentTableColumn("id", "ID", "htmx/incident/cells/_incident_pk.html"),
     IncidentTableColumn(
         "start_time",
         "Timestamp",
         "htmx/incident/cells/_incident_start_time.html",
-        "htmx/incident/cells/_incident_start_time_header.html",
+        header_template="htmx/incident/cells/_incident_start_time_header.html",
     ),
     IncidentTableColumn("status", "Status", "htmx/incident/cells/_incident_status.html"),
     IncidentTableColumn("level", "Severity level", "htmx/incident/cells/_incident_level.html"),
