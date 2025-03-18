@@ -7,7 +7,7 @@ class Modal(BaseModel):
     model_config = {"arbitrary_types_allowed": True}
 
     instance_id: int = None
-    template_name: str = "htmx/_base_form_modal2.html"
+    template_name: str = "htmx/_base_form_modal_experimental.html"
     bulk: bool = None
     single: bool = None
 
