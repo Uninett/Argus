@@ -1,4 +1,5 @@
 from typing import Optional
+from datetime import time
 
 from django import forms
 from django.contrib import messages
@@ -16,20 +17,37 @@ class TimeRecurrenceForm(forms.ModelForm):
         exclude = ["timeslot"]
         widgets = {
             "start": forms.TimeInput(
+                format="%H:%M",
                 attrs={
                     "type": "text",
-                    "pattern": "[0-2][0-9]:[0-5][0-9]",
+                    "pattern": "[012]\d:[0-5]\d",
                     "class": "input-bordered",
-                }
+                    "placeholder": "HH:MM",
+                },
             ),
             "end": forms.TimeInput(
+                format="%H:%M",
                 attrs={
                     "type": "time",
                     "step": 60,
                     "class": "input-bordered",
-                }
+                },
             ),
         }
+
+    def clean_start(self):
+        timeobj = self.cleaned_data["start"]
+        timeobj = timeobj.replace(second=0, microsecond=0)
+        return timeobj
+
+    def clean_end(self):
+        timeobj = self.cleaned_data["end"]
+        max = time.max
+        if timeobj.minute == max.minute:
+            timeobj = timeobj.replace(second=max.second, microsecond=max.microsecond)
+        else:
+            timeobj = timeobj.replace(second=0, microsecond=0)
+        return timeobj
 
 
 class TimeslotForm(forms.ModelForm):
