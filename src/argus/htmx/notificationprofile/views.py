@@ -25,9 +25,9 @@ class NoColonMixin:
 
 class DeleteModal(ConfirmationModal):
     button_title: str = "Delete"
-    header: str = "Delete notificatipnprofile"
+    header: str = "Delete notification profile"
     submit_text: str = "Delete"
-    explanation: str = "Delete this notificatipnprofile?"
+    explanation: str = "Delete this notification profile?"
 
 
 class DestinationFieldMixin:
