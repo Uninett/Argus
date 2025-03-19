@@ -72,7 +72,7 @@ an extensive list, but can provide entry points or inspiration:
 
 * ``htmx/base.html``: add or remove nav links
 * ``htmx/incident/_incident_list_menubar.html``: remove the ``_filter_controls`` widget from the
-  filter box. This requires full template override by copy/pasting the original template and modifying its content
+  filter box. This requires a full template override by copy/pasting the original template and modifying its content
 * ``htmx/incident/_incident_list_update_menu.html``: add custom action buttons to the "Update
   Incidents" tab in this incident list
 * ``htmx/incident/cells/*.html``: customize how incident list column cells are rendered
