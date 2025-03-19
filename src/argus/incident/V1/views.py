@@ -13,7 +13,7 @@ from argus.filter.filters import SOURCE_LOCKED_INCIDENT_OPENAPI_PARAMETER_DESCRI
 
 from ..constants import Level
 from ..models import Incident, SourceSystem
-from ..serializers import IncidentPureDeserializer, SourceSystemSerializer, IncidentTicketUrlSerializer
+from ..serializers import IncidentPureDeserializer, IncidentTicketUrlSerializer, SourceSystemSerializer
 from ..views import (
     EventViewSet,
     IncidentTagViewSet,
