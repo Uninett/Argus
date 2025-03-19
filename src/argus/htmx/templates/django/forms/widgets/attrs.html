@@ -1,4 +1,6 @@
-autocomplete="off"
+{% if not "autocomplete" in widget.attrs.keys %}
+  autocomplete="off"
+{% endif %±
 {% for name, value in widget.attrs.items %}
   {% if value is not False %}
     {{ name }}
