@@ -17,7 +17,7 @@ PHONE_NUMBERS_DEPRECATED = (
     "Phone numbers are now accessible through the destinations API. See /api/v2/notificationprofiles/destinations/."
 )
 
-# deprecate views unchanged from V2
+# deprecated views unchanged from V2
 
 
 @extend_schema_view(get=extend_schema(deprecated=True))
