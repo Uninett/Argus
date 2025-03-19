@@ -134,14 +134,23 @@ example::
         BUILTIN_COLUMNS["description"], # equivalent to just "description"
         IncidentTableColumn( # a new column definition
             name="name",
-            label="Custom"
-            cell_template="/path/to/template.html"
-            context={
-                "additional": "value"
-            }
+            label="Custom",
+            cell_template="/path/to/template.html",  # contents of cell
         ),
 
     ]
+
+There are several optional attributes to ``IncidentTableColumn``:
+
+* ``cell_wrapper_template``: A template that by default includes the
+  ``cell_template`` and wraps it in a ``<td>``-tag. This makes it possible to
+  add attributes to the ``<td>``-tag or skip including the ``cell_template``
+  altogether.
+* ``column_classes``: Additional classes to set on ``<th>``, handy for
+  controlling width.
+* ``context``: Additional hardcoded context for every cell of its type, as
+  a dictionary.
+* ``header_template``: A template overriding the default ``<th>`` for the column.
 
 For inbuilt support for other types of columns see the
 :ref:`HTMX HowTos`.
