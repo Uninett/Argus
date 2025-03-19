@@ -13,9 +13,9 @@
             <h2 class="card-title">Status</h2>
             <p class="card-body flex-row flex-wrap gap-0.5">
               {% if incident.open %}
-                <span class="badge badge-primary">Open</span>
+                <span class="badge badge-accent">Open</span>
               {% else %}
-                <span class="badge badge-accent">Closed</span>
+                <span class="badge badge-primary">Closed</span>
               {% endif %}
               {% if incident.acked %}
                 <span class="badge badge-primary">Acknowledged</span>
