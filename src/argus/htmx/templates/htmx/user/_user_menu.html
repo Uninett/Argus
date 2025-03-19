@@ -7,7 +7,9 @@
     <li>{% include "htmx/user/_theme_dropdown.html" %}</li>
     <li>{% include "htmx/user/_dateformat_dropdown.html" %}</li>
     <li>{% include "htmx/user/_user_menu_preferences.html" %}</li>
-    <li>{% include "htmx/user/_user_menu_destinations.html" %}</li>
+    {% block notification_links %}
+      {% include "htmx/user/_user_menu_notification_config.html" %}
+    {% endblock notification_links %}
     <li>{% include "htmx/user/_user_menu_logout.html" %}</li>
   {% endblock items %}
 </ul>
