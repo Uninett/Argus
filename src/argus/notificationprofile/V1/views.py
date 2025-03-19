@@ -22,7 +22,7 @@ from .serializers import (
 )
 
 
-# deprecate views unchanged from V2
+# deprecated views unchanged from V2
 
 
 @extend_schema_view(
