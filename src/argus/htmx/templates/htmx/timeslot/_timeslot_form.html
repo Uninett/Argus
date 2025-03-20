@@ -1,3 +1,4 @@
+{% load widget_tweaks %}
 <section class="card-body">
   <form method="post"
         action="{% if form.instance.pk %}{% url "htmx:timeslot-update" pk=form.instance.pk %}{% else %}{% url "htmx:timeslot-create" %}{% endif %}">
