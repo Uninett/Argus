@@ -74,6 +74,7 @@ def make_timerecurrence_formset(data: Optional[dict] = None, timeslot: Optional[
         min_num=1,
     )
     prefix = f"timerecurrenceform-{timeslot.pk}" if timeslot else ""
+    TimeRecurrenceFormSet.template_name_div = "htmx/timeslot/timerecurrence_div.html"
     return TimeRecurrenceFormSet(data=data, instance=timeslot, prefix=prefix)
 
 
