@@ -32,6 +32,10 @@ class Timeslot(models.Model):
     def __str__(self):
         return self.name
 
+    def time_recurrence_as_prose(self):
+        time_recurrence_prose = [collection_to_prose(tr) for tr in self.time_recurrences.all()]
+        return " ".join(time_recurrence_prose)
+
     def timestamp_is_within_time_recurrences(self, timestamp: datetime):
         for time_recurrence in self.time_recurrences.all():
             if time_recurrence.timestamp_is_within(timestamp):
@@ -73,8 +77,32 @@ class TimeRecurrence(models.Model):
     """
 
     def __str__(self):
-        days = collection_to_prose(self.get_days_list())
-        return f"{self.start}-{self.end} on {days}"
+        if self.is_all_the_time:
+            return "24/7"
+        all_hours = self.is_around_the_clock
+        if all_hours:
+            hour_range = "around the clock"
+        else:
+            hour_range = f"{self.start}-{self.end}"
+        all_days = self.is_every_day
+        if all_days:
+            days = ", every day"
+        else:
+            days = " on " + collection_to_prose(self.get_days_list())
+        return f"{hour_range}{days}"
+
+    @property
+    def is_around_the_clock(self):
+        return self.start <= time(hour=0, minute=0, second=59) and self.end >= time(hour=23, minute=59, second=0)
+
+    @property
+    def is_every_day(self):
+        # more than 7 should never happen but let's be paranoid
+        return len(self.days) >= 7
+
+    @property
+    def is_all_the_time(self):
+        return self.is_around_the_clock and self.is_every_day
 
     @property
     def isoweekdays(self):
