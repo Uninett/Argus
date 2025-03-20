@@ -61,7 +61,9 @@ class TimeslotForm(forms.ModelForm):
 
 
 def make_timerecurrence_formset(data: Optional[dict] = None, timeslot: Optional[Timeslot] = None):
-    extra = 0 if not timeslot else 1
+    extra = 1
+    if not timeslot or not timeslot.time_recurrences.exists():
+        extra = 0
     TimeRecurrenceFormSet = forms.inlineformset_factory(
         Timeslot, TimeRecurrence, form=TimeRecurrenceForm, fields="__all__", extra=extra, can_delete=True, min_num=1
     )
@@ -118,7 +120,8 @@ class FormsetMixin:
         for error in [form.errors] + formset.errors:
             if error:
                 errors.append(error.as_text())
-        messages.warning(self.request, f"Couldn't save timeslot: {errors}")
+        if errors:
+            messages.warning(self.request, f"Couldn't save timeslot: {errors}")
         return self.render_to_response(self.get_context_data(form=form, formset=formset))
 
     def form_valid(self, form, formset):
