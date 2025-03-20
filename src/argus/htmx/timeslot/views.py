@@ -162,7 +162,7 @@ class FormsetMixin:
         formset.save(commit=False)
 
         message_list = []
-        timeslot_message = "Saved timeslot name"
+        timeslot_message = f"Saved timeslot {form.cleaned_data['name']}"
         changed_message = f"Saved timeslot {self.object}"
 
         if form.has_changed():
