@@ -15,3 +15,10 @@ tests see by
 ``@override_settings(ROOT_URLCONF="i.want.to.test.these.urls.py")``, replacing
 "i.want.to.test.these.urls.py" with whatever urls.py defines the namespace in
 question.
+
+When I test a form, my browser autofills with data from the previous test
+=========================================================================
+
+Firefox does this by default. You can control it by altering the template for
+the form input in question. Set ``autocomplete="off"`` as an attribute on the
+input tag.
