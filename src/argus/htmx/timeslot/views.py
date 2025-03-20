@@ -26,25 +26,24 @@ class TimeRecurrenceForm(forms.ModelForm):
     days = DaysMultipleChoiceField()
 
     class Meta:
+        TIMEINPUT_FORMAT = "%H:%M"
+        TIMEINPUT_ATTRS = {
+            "type": "text",
+            "pattern": "[012]\d:[0-5]\d",
+            "class": "input-bordered",
+            "placeholder": "HH:MM",
+        }
+
         model = TimeRecurrence
         exclude = ["timeslot"]
         widgets = {
             "start": forms.TimeInput(
-                format="%H:%M",
-                attrs={
-                    "type": "text",
-                    "pattern": "[012]\d:[0-5]\d",
-                    "class": "input-bordered",
-                    "placeholder": "HH:MM",
-                },
+                format=TIMEINPUT_FORMAT,
+                attrs=TIMEINPUT_ATTRS,
             ),
             "end": forms.TimeInput(
-                format="%H:%M",
-                attrs={
-                    "type": "time",
-                    "step": 60,
-                    "class": "input-bordered",
-                },
+                format=TIMEINPUT_FORMAT,
+                attrs=TIMEINPUT_ATTRS,
             ),
         }
 
