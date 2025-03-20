@@ -9,7 +9,7 @@
           <div class="label">
             <span class="label-text">{{ field.label }}</span>
           </div>
-          {{ field|add_class:"input input-ghost input-primary border-b" }}
+          {{ field|add_class:"input input-bordered border-b" }}
         </label>
       {% endfor %}
       <div class="flex flex-col gap-4">{{ formset.as_div }}</div>
