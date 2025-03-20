@@ -1,5 +1,6 @@
-from typing import Optional
 from datetime import time
+import logging
+from typing import Optional
 
 from django import forms
 from django.contrib import messages
@@ -9,6 +10,9 @@ from django.urls import reverse
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
 from argus.notificationprofile.models import Timeslot, TimeRecurrence
+
+
+LOG = logging.getLogger(__name__)
 
 
 class TimeRecurrenceForm(forms.ModelForm):
@@ -121,13 +125,39 @@ class FormsetMixin:
         self.object = form.save(commit=False)
         self.object.user = self.request.user
         self.object.save()
-        trs = formset.save(commit=False)
+        formset.save(commit=False)
+
+        deleted = []
+        message_list = []
         for tr in formset.deleted_objects:
+            deleted.append(str(tr))
+            LOG.debug("Delete %s (%s)", tr, tr.id)
             tr.delete()
-        for tr in trs:
-            tr.timeslot = self.object
-            tr.save()
-        messages.success(self.request, f"Saved timeslot {self.object}")
+        if deleted:
+            delete_message = "Deleted " + ", ".join(deleted) + f" from {self.object}"
+            message_list.append(delete_message)
+
+        if formset.new_objects:
+            new_message = f"Added timerecurrene to timeslot {self.object}"
+            message_list.append(new_message)
+            for tr in formset.new_objects:
+                LOG.debug("Add %s", tr)
+                tr.timeslot = self.object
+                tr.save()
+
+        if form.has_changed() or formset.changed_objects:
+            changed_message = f"Saved timeslot {self.object}"
+            message_list.append(changed_message)
+            for tr, changed in formset.changed_objects:
+                # For some reason this is *always* run
+                LOG.debug("Update %s (%s), %s", tr, tr.id, changed)
+                tr.timeslot = self.object
+                tr.save()
+
+        if message_list:
+            message = ". ".join(message_list)
+            LOG.info(message)
+            messages.success(self.request, message)
         return HttpResponseRedirect(self.get_success_url())
 
 
