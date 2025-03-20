@@ -190,18 +190,17 @@ class FormsetMixin:
         if formset.new_objects:
             new_message = f"Added time recurrence to timeslot {self.object}."
             message_list.append(new_message)
-            for tr in formset.new_objects:
-                LOG.debug("Add %s", tr)
-                tr.timeslot = self.object
-                tr.save()
+            for new_tr in formset.new_objects:
+                LOG.debug("Add %s", new_tr)
+                new_tr.timeslot = self.object
+                new_tr.save()
 
         if form.has_changed() or formset.changed_objects:
             message_list.append(changed_message)
-            for tr, changed in formset.changed_objects:
-                # For some reason this is *always* run
-                LOG.debug("Update %s (%s), %s", tr, tr.id, changed)
-                tr.timeslot = self.object
-                tr.save()
+            for changed_tr, changed in formset.changed_objects:
+                LOG.debug("Update %s (%s), %s", changed_tr, changed_tr.id, changed)
+                changed_tr.timeslot = self.object
+                changed_tr.save()
 
         if message_list:
             message = " ".join(message_list)
