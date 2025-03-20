@@ -18,10 +18,7 @@
         <div class="card-actions flex items-end">
           {% if form.instance.pk %}
             <input type="submit" class="btn btn-primary" value="Save">
-            <button class="contents">
-              <a class="btn btn-primary"
-                 href="{% url "htmx:timeslot-delete" pk=form.instance.pk %}">Delete</a>
-            </button>
+            {% include "htmx/timeslot/_delete_timeslot_confirm_dialog.html" with item_class="btn btn-primary text-start" dialog_id="timeslot-delete-confirm" item_title=form.instance.name modal_button_name="Delete timeslot" action="Delete timeslot" item_id=form.instance.pk confirmation_message="Are you sure you want to delete this timeslot?" %}
           {% else %}
             <input type="submit" class="btn btn-primary" value="Create">
           {% endif %}
