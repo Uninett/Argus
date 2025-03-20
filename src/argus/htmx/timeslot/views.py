@@ -173,7 +173,7 @@ class FormsetMixin:
                 messages.success(self.request, timeslot_message)
                 return HttpResponseRedirect(self.get_success_url())
 
-        if not formset.changed_objects:
+        if not (formset.changed_objects or formset.new_objects):
             no_forms_msg = f'There are no time recurrences in timeslot "{self.object}". Click the "Delete"-button to delete the entire timeslot.'
             messages.warning(self.request, no_forms_msg)
             return HttpResponseRedirect(self.get_success_url())
