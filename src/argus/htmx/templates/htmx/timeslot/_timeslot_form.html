@@ -1,9 +1,17 @@
+{% load widget_tweaks %}
 <section class="card-body">
   <form method="post"
         action="{% if form.instance.pk %}{% url "htmx:timeslot-update" pk=form.instance.pk %}{% else %}{% url "htmx:timeslot-create" %}{% endif %}">
     {% csrf_token %}
     <div class="flex flex-col gap-4">
-      {{ form.as_div }}
+      {% for field in form %}
+        <label class="form-control w-full max-w-md">
+          <div class="label">
+            <span class="label-text">{{ field.label }}</span>
+          </div>
+          {{ field|add_class:"input input-ghost input-primary border-b" }}
+        </label>
+      {% endfor %}
       <div class="flex flex-col gap-4">{{ formset.as_div }}</div>
       <div class="card-actions justify-end">
         {% if form.instance.pk %}
