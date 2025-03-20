@@ -59,7 +59,10 @@ class TimeRecurrenceForm(forms.ModelForm):
 
         self.fields["days"].widget = BadgeDropdownMultiSelect(
             partial_get=partial_get,
-            attrs={"placeholder": "select days...", "field_styles": "input input-bordered border-b max-w-md"},
+            attrs={
+                "placeholder": "select days...",
+                "field_styles": "input input-bordered border-b max-w-full justify-center",
+            },
         )
         self.fields["days"].choices = TimeRecurrence.Day.choices
 
