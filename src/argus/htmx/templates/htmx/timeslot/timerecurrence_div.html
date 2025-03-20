@@ -1,4 +1,28 @@
+{% load widget_tweaks %}
 {{ formset.management_form }}
 {% for form in formset %}
-  <div class="flex flex-col gap-4 p-4 border rounded-box border-primary">{{ form.as_div }}</div>
+  <div class="flex flex-col gap-4 p-4 border rounded-box border-primary">
+    {% for field in form %}
+      {% if not field.is_hidden %}
+        {% if field|field_type == "timefield" %}
+          <label class="form-control w-full max-w-md">
+            <div class="label">
+              <span class="label-text">{{ field.label }}</span>
+            </div>
+            {{ field|add_class:"input input-bordered border-b" }}
+          </label>
+        {% elif field|field_type == "booleanfield" %}
+          <div class="form-control items-start">
+            <label class="label cursor-pointer">
+              <span class="label-text mr-2">{{ field.label }}:</span>
+              {{ field|add_class:"checkbox checkbox-sm checkbox-primary" }}
+            </label>
+          </div>
+        {% else %}
+          {{ field.label_tag }}
+          {{ field }}
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+  </div>
 {% endfor %}
