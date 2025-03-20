@@ -162,12 +162,12 @@ class FormsetMixin:
         formset.save(commit=False)
 
         message_list = []
-        timeslot_message = f"Saved timeslot {form.cleaned_data['name']}"
+        timeslot_message = f"Set timeslot name to {self.object.name}"
         changed_message = f"Saved timeslot {self.object}"
 
         if form.has_changed():
             message_list.append(timeslot_message)
-            if not formset.changed_objects:
+            if not (formset.changed_objects or formset.new_objects or formset.deleted_objects):
                 messages.success(self.request, timeslot_message)
                 return HttpResponseRedirect(self.get_success_url())
 
@@ -186,7 +186,7 @@ class FormsetMixin:
             message_list.append(delete_message)
 
         if formset.new_objects:
-            new_message = f"Added timerecurrene to timeslot {self.object}"
+            new_message = f"Added time recurrence to timeslot {self.object}"
             message_list.append(new_message)
             for tr in formset.new_objects:
                 LOG.debug("Add %s", tr)
