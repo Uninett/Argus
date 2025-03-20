@@ -1,4 +1,5 @@
 import importlib
+from typing import Collection
 
 
 class AttrGetter:
@@ -35,3 +36,14 @@ def import_class_from_dotted_path(dotted_path: str):
     module = importlib.import_module(module_name)
     class_ = getattr(module, class_name)
     return class_
+
+
+def collection_to_prose(collection: Collection):
+    if not collection:
+        return ""
+    if len(collection) == 1:
+        return str(collection[0])
+    last = collection[-1]
+    preceding = collection[:-1]
+    prose = ", ".join(map(str, preceding)) + " and " + str(last)
+    return prose
