@@ -10,6 +10,8 @@ from django.db import models
 from django.utils import timezone
 from django.utils.text import slugify
 
+from argus.util.utils import collection_to_prose
+
 if TYPE_CHECKING:
     from argus.incident.models import Event, Incident  # noqa: F401
 
@@ -71,7 +73,7 @@ class TimeRecurrence(models.Model):
     """
 
     def __str__(self):
-        days = self.get_days_list()
+        days = collection_to_prose(self.get_days_list())
         return f"{self.start}-{self.end} on {days}"
 
     @property
