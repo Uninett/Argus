@@ -1,5 +1,6 @@
-from typing import Optional
 from datetime import time
+import logging
+from typing import Optional
 
 from django import forms
 from django.contrib import messages
@@ -9,6 +10,9 @@ from django.urls import reverse
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
 from argus.notificationprofile.models import Timeslot, TimeRecurrence
+
+
+LOG = logging.getLogger(__name__)
 
 
 class TimeRecurrenceForm(forms.ModelForm):
@@ -57,9 +61,17 @@ class TimeslotForm(forms.ModelForm):
 
 
 def make_timerecurrence_formset(data: Optional[dict] = None, timeslot: Optional[Timeslot] = None):
-    extra = 0 if not timeslot else 1
+    extra = 1
+    if not timeslot or not timeslot.time_recurrences.exists():
+        extra = 0
     TimeRecurrenceFormSet = forms.inlineformset_factory(
-        Timeslot, TimeRecurrence, form=TimeRecurrenceForm, fields="__all__", extra=extra, can_delete=False, min_num=1
+        Timeslot,
+        TimeRecurrence,
+        form=TimeRecurrenceForm,
+        fields="__all__",
+        extra=extra,
+        can_delete=True,
+        min_num=1,
     )
     prefix = f"timerecurrenceform-{timeslot.pk}" if timeslot else ""
     return TimeRecurrenceFormSet(data=data, instance=timeslot, prefix=prefix)
@@ -114,18 +126,60 @@ class FormsetMixin:
         for error in [form.errors] + formset.errors:
             if error:
                 errors.append(error.as_text())
-        messages.warning(self.request, f"Couldn't save timeslot: {errors}")
+        if errors:
+            messages.warning(self.request, f"Couldn't save timeslot: {errors}")
         return self.render_to_response(self.get_context_data(form=form, formset=formset))
 
     def form_valid(self, form, formset):
         self.object = form.save(commit=False)
         self.object.user = self.request.user
         self.object.save()
-        trs = formset.save(commit=False)
-        for tr in trs:
-            tr.timeslot = self.object
-            tr.save()
-        messages.success(self.request, f"Saved timeslot {self.object}")
+        formset.save(commit=False)
+
+        message_list = []
+        timeslot_message = "Saved timeslot name"
+        changed_message = f"Saved timeslot {self.object}"
+
+        if form.has_changed():
+            message_list.append(timeslot_message)
+            if not formset.changed_objects:
+                messages.success(self.request, timeslot_message)
+                return HttpResponseRedirect(self.get_success_url())
+
+        if not formset.changed_objects:
+            no_forms_msg = f'There are no time recurrences in timeslot "{self.object}". Click the "Delete"-button to delete the entire timeslot.'
+            messages.warning(self.request, no_forms_msg)
+            return HttpResponseRedirect(self.get_success_url())
+
+        deleted = []
+        for tr in formset.deleted_objects:
+            deleted.append(str(tr))
+            LOG.debug("Delete %s (%s)", tr, tr.id)
+            tr.delete()
+        if deleted:
+            delete_message = "Deleted " + ", ".join(deleted) + f" from {self.object}"
+            message_list.append(delete_message)
+
+        if formset.new_objects:
+            new_message = f"Added timerecurrene to timeslot {self.object}"
+            message_list.append(new_message)
+            for tr in formset.new_objects:
+                LOG.debug("Add %s", tr)
+                tr.timeslot = self.object
+                tr.save()
+
+        if form.has_changed() or formset.changed_objects:
+            message_list.append(changed_message)
+            for tr, changed in formset.changed_objects:
+                # For some reason this is *always* run
+                LOG.debug("Update %s (%s), %s", tr, tr.id, changed)
+                tr.timeslot = self.object
+                tr.save()
+
+        if message_list:
+            message = ". ".join(message_list)
+            LOG.info(message)
+            messages.success(self.request, message)
         return HttpResponseRedirect(self.get_success_url())
 
 
