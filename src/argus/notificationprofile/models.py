@@ -32,7 +32,16 @@ class Timeslot(models.Model):
     def __str__(self):
         return self.name
 
+    @property
+    def is_all_the_time(self):
+        for tr in self.time_recurrences.all():
+            if tr.is_all_the_time:
+                return True
+        return False
+
     def time_recurrence_as_prose(self):
+        if self.is_all_the_time:
+            return "24/7"
         time_recurrence_prose = [collection_to_prose(tr) for tr in self.time_recurrences.all()]
         return " ".join(time_recurrence_prose)
 
