@@ -1,3 +1,4 @@
+{% load widget_tweaks %}
 {{ formset.management_form }}
 {% for form in formset %}
   <div class="flex flex-col gap-4 p-4 border rounded-box border-primary">{{ form.as_div }}</div>
