@@ -8,6 +8,8 @@ from rest_framework.views import APIView
 from argus.drf.permissions import IsOwner
 from argus.notificationprofile.models import DestinationConfig
 from argus.notificationprofile.serializers import RequestDestinationConfigSerializer
+
+from ..views import BasicUserDetail
 from .serializers import RequestPhoneNumberSerializerV1, ResponsePhoneNumberSerializerV1, UserSerializerV1
 
 
@@ -15,18 +17,28 @@ PHONE_NUMBERS_DEPRECATED = (
     "Phone numbers are now accessible through the destinations API. See /api/v2/notificationprofiles/destinations/."
 )
 
+# deprecated views unchanged from V2
+
+
+@extend_schema_view(get=extend_schema(deprecated=True))
+class BasicUserDetailV1(BasicUserDetail):
+    pass
+
+
+# overridden views
+
 
 class CurrentUserViewV1(APIView):
     permission_classes = [IsAuthenticated]
     serializer_class = UserSerializerV1
 
+    @extend_schema(deprecated=True)
     def get(self, request, *args, **kwargs):
         serializer = self.serializer_class(request.user)
         return Response(serializer.data)
 
 
 @extend_schema_view(
-    deprecated=True,
     list=extend_schema(
         deprecated=True,
         description=PHONE_NUMBERS_DEPRECATED,

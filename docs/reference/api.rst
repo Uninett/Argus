@@ -5,6 +5,12 @@ API Endpoints
 Endpoints, API v1
 =================
 
+.. warning::
+
+     v1 of the API is deprecated and will be removed.
+
+
+
 Authorization
 -------------
 
@@ -881,11 +887,6 @@ Notification profile endpoints
 
 Endpoints, API v2
 =================
-
-.. note::
-
-     v2 of the API is not stable yet.
-
 
 Authorization
 -------------
