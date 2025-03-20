@@ -1,29 +1,33 @@
 {% load widget_tweaks %}
-<section class="card-body">
+<section class="card-body max-w-4xl w-full">
   <form method="post"
         action="{% if form.instance.pk %}{% url "htmx:timeslot-update" pk=form.instance.pk %}{% else %}{% url "htmx:timeslot-create" %}{% endif %}">
     {% csrf_token %}
-    <div class="flex flex-col gap-4">
-      {% for field in form %}
-        <label class="form-control w-full max-w-md">
-          <div class="label">
-            <span class="label-text">{{ field.label }}</span>
-          </div>
-          {{ field|add_class:"input input-bordered border-b" }}
-        </label>
-      {% endfor %}
-      <div class="flex flex-col gap-4">{{ formset.as_div }}</div>
-      <div class="card-actions justify-end">
-        {% if form.instance.pk %}
-          <input type="submit" class="btn btn-primary" value="Save">
-          <button class="contents">
-            <a class="btn btn-primary"
-               href="{% url "htmx:timeslot-delete" pk=form.instance.pk %}">Delete</a>
-          </button>
-        {% else %}
-          <input type="submit" class="btn btn-primary" value="Create">
-        {% endif %}
+    <div class="flex flex-col gap-4 w-full">
+      <div class="flex gap-16 justify-between">
+        <div>
+          {% for field in form %}
+            <label class="form-control w-full max-w-md">
+              <div class="label">
+                <span class="label-text">{{ field.label }}</span>
+              </div>
+              {{ field|add_class:"input input-bordered border-b" }}
+            </label>
+          {% endfor %}
+        </div>
+        <div class="card-actions flex items-end">
+          {% if form.instance.pk %}
+            <input type="submit" class="btn btn-primary" value="Save">
+            <button class="contents">
+              <a class="btn btn-primary"
+                 href="{% url "htmx:timeslot-delete" pk=form.instance.pk %}">Delete</a>
+            </button>
+          {% else %}
+            <input type="submit" class="btn btn-primary" value="Create">
+          {% endif %}
+        </div>
       </div>
+      <div class="flex flex-col gap-4">{{ formset.as_div }}</div>
     </div>
   </form>
 </section>
