@@ -65,7 +65,13 @@ def make_timerecurrence_formset(data: Optional[dict] = None, timeslot: Optional[
     if not timeslot or not timeslot.time_recurrences.exists():
         extra = 0
     TimeRecurrenceFormSet = forms.inlineformset_factory(
-        Timeslot, TimeRecurrence, form=TimeRecurrenceForm, fields="__all__", extra=extra, can_delete=True, min_num=1
+        Timeslot,
+        TimeRecurrence,
+        form=TimeRecurrenceForm,
+        fields="__all__",
+        extra=extra,
+        can_delete=True,
+        min_num=1,
     )
     prefix = f"timerecurrenceform-{timeslot.pk}" if timeslot else ""
     return TimeRecurrenceFormSet(data=data, instance=timeslot, prefix=prefix)
@@ -130,8 +136,22 @@ class FormsetMixin:
         self.object.save()
         formset.save(commit=False)
 
-        deleted = []
         message_list = []
+        timeslot_message = "Saved timeslot name"
+        changed_message = f"Saved timeslot {self.object}"
+
+        if form.has_changed():
+            message_list.append(timeslot_message)
+            if not formset.changed_objects:
+                messages.success(self.request, timeslot_message)
+                return HttpResponseRedirect(self.get_success_url())
+
+        if not formset.changed_objects:
+            no_forms_msg = f'There are no time recurrences in timeslot "{self.object}". Click the "Delete"-button to delete the entire timeslot.'
+            messages.warning(self.request, no_forms_msg)
+            return HttpResponseRedirect(self.get_success_url())
+
+        deleted = []
         for tr in formset.deleted_objects:
             deleted.append(str(tr))
             LOG.debug("Delete %s (%s)", tr, tr.id)
@@ -149,7 +169,6 @@ class FormsetMixin:
                 tr.save()
 
         if form.has_changed() or formset.changed_objects:
-            changed_message = f"Saved timeslot {self.object}"
             message_list.append(changed_message)
             for tr, changed in formset.changed_objects:
                 # For some reason this is *always* run
