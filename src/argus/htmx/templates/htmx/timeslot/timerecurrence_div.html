@@ -1,9 +1,10 @@
 {% load widget_tweaks %}
 {{ formset.management_form }}
 {% for form in formset %}
-  <div class="flex flex-col gap-2 p-4 border rounded-box border-primary">
+  <fieldset class="flex flex-col gap-2 p-4 border rounded-box {% if form.instance.pk %}border-primary{% endif %}">
     {{ form.id }}
     {{ form.timeslot }}
+    {% if not form.instance.pk %}<legend class="px-2">Unsaved</legend>{% endif %}
     <div class="form-control items-start self-end">
       <label class="label cursor-pointer">
         <span class="label-text mr-2">{{ form.DELETE.label }}:</span>
@@ -30,5 +31,5 @@
       </div>
       {% render_field form.days %}
     </label>
-  </div>
+  </fieldset>
 {% endfor %}
