@@ -4,7 +4,10 @@ In this case the item_id attribute must be provided when extending from this tem
 Or it can be used as an existing base modal - not more than one with the matching ID per DOM.
 In this case the item_id attribute can be omitted when extending from this template. -->
 <button class="{{ item_class|default:"" }}"
-        onclick="htmx.find('#{{ dialog_id }}-{{ item_id|default:"" }}').showModal()">{{ item_title }}</button>
+        type="button"
+        onclick="htmx.find('#{{ dialog_id }}-{{ item_id|default:"" }}').showModal()">
+  {{ modal_button_name|default:item_title }}
+</button>
 <dialog id="{{ dialog_id }}-{{ item_id|default:'' }}" class="modal">
   <div class="modal-box card card-compact shadow-xl loading-box">
     <div class="w-full">
@@ -20,11 +23,18 @@ In this case the item_id attribute can be omitted when extending from this templ
           {% csrf_token %}
           <div class="divider divider-end">
             <button class="btn btn-primary"
+                    type="button"
                     {% block confirm_action_control %}
                     {% endblock confirm_action_control %}>
               <span>Yes</span>
             </button>
-            <button class="btn">No</button>
+            <button class="btn"
+                    type="button"
+                    {% block cancel_action_control %}
+                    onclick="htmx.find('#{{ dialog_id }}-{{ item_id|default:"" }}').close()"
+                    {% endblock cancel_action_control %}>
+              <span>No</span>
+            </button>
           </div>
         </form>
       </div>

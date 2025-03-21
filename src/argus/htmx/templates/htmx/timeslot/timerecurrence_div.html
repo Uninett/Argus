@@ -1,0 +1,35 @@
+{% load widget_tweaks %}
+{{ formset.management_form }}
+{% for form in formset %}
+  <fieldset class="flex flex-col gap-2 p-4 border rounded-box {% if form.instance.pk %}border-primary{% endif %}">
+    {{ form.id }}
+    {{ form.timeslot }}
+    {% if not form.instance.pk %}<legend class="px-2">Unsaved</legend>{% endif %}
+    <div class="form-control items-start self-end">
+      <label class="label cursor-pointer">
+        <span class="label-text mr-2">{{ form.DELETE.label }}:</span>
+        {% render_field form.DELETE class+="checkbox checkbox-sm checkbox-primary" %}
+      </label>
+    </div>
+    <div class="flex gap-2 w-full flex-nowrap max-sm:flex-wrap">
+      <label class="form-control w-full max-w-md">
+        <div class="label">
+          <span class="label-text">{{ form.start.label }}</span>
+        </div>
+        {% render_field form.start class+="input input-bordered border-b" %}
+      </label>
+      <label class="form-control w-full max-w-lg">
+        <div class="label">
+          <span class="label-text">{{ form.end.label }}</span>
+        </div>
+        {% render_field form.end class+="input input-bordered border-b" %}
+      </label>
+    </div>
+    <label class="form-control w-full self-center">
+      <div class="label">
+        <span class="label-text">{{ form.days.label }}</span>
+      </div>
+      {% render_field form.days %}
+    </label>
+  </fieldset>
+{% endfor %}

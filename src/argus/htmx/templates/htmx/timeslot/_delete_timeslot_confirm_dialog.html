@@ -1,0 +1,6 @@
+{% extends "htmx/_base_confirm_dialog.html" %}
+{% block confirm_action_control %}
+  hx-post="{% url 'htmx:timeslot-delete' pk=item_id %}"
+  hx-target="body"
+  hx-swap="outerHTML"
+{% endblock confirm_action_control %}
