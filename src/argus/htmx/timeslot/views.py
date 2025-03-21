@@ -1,9 +1,12 @@
+from __future__ import annotations
+
 from datetime import time
 import logging
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
 
 from django import forms
 from django.contrib import messages
+from django.forms.formsets import TOTAL_FORM_COUNT, INITIAL_FORM_COUNT
 from django.shortcuts import redirect
 from django.http import HttpResponseRedirect
 from django.urls import reverse
@@ -12,8 +15,12 @@ from django.views.generic import CreateView, DeleteView, DetailView, ListView, U
 from argus.htmx.widgets import BadgeDropdownMultiSelect
 from argus.notificationprofile.models import Timeslot, TimeRecurrence
 
+if TYPE_CHECKING:
+    from django.http import QueryDict
+
 
 LOG = logging.getLogger(__name__)
+ADD_RECURRENCE = "add_recurrence"  # button name
 
 
 class DaysMultipleChoiceField(forms.MultipleChoiceField):
@@ -87,22 +94,39 @@ class TimeslotForm(forms.ModelForm):
         fields = ["name"]
 
 
-def make_timerecurrence_formset(data: Optional[dict] = None, timeslot: Optional[Timeslot] = None):
-    extra = 1
-    if not timeslot or not timeslot.time_recurrences.exists():
-        extra = 0
+class InlineFormSet(forms.BaseInlineFormSet):
+    template_name_div = "htmx/timeslot/timerecurrence_div.html"
+
+    def _stored_total_form_count(self):
+        return self.management_form.cleaned_data.get(TOTAL_FORM_COUNT, None)
+
+    def _stored_initial_form_count(self):
+        return self.management_form.cleaned_data.get(INITIAL_FORM_COUNT, None)
+
+    def current_extra_form_count(self):
+        return max(self._stored_total_form_count() - self._stored_initial_form_count(), 0)
+
+
+def make_timerecurrence_formset(data: Optional[dict] = None, instance: Optional[Timeslot] = None, add: int = 0, **_):
+    # we catch ``**_`` because get_form_kwargs may send in unused kwargs
+    # e.g. "prefix", "initial"
+    extra = 0 + max(add, 0)
     TimeRecurrenceFormSet = forms.inlineformset_factory(
         Timeslot,
         TimeRecurrence,
         form=TimeRecurrenceForm,
+        formset=InlineFormSet,
         fields="__all__",
         extra=extra,
         can_delete=True,
         min_num=1,
     )
-    prefix = f"timerecurrenceform-{timeslot.pk}" if timeslot else ""
-    TimeRecurrenceFormSet.template_name_div = "htmx/timeslot/timerecurrence_div.html"
-    return TimeRecurrenceFormSet(data=data, instance=timeslot, prefix=prefix)
+    prefix = f"timerecurrenceform-{instance.pk}" if instance else ""
+    # keep in a variable for debugging purposes
+    formset = TimeRecurrenceFormSet(data=data, instance=instance, prefix=prefix)
+    print("Make: is bound:", formset.is_bound)
+    print("Make: add", add, TimeRecurrenceFormSet.extra, formset.total_form_count(), len(formset.extra_forms))
+    return formset
 
 
 class TimeslotMixin:
@@ -137,13 +161,41 @@ class TimeslotMixin:
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["page_title"] = "Timeslots"
+        context["add_recurrence_button_name"] = ADD_RECURRENCE
         return context
 
 
 class FormsetMixin:
+    def _must_add_form(self, data: Optional[QueryDict] = None):
+        if not data:
+            return False
+        return bool(data.get(ADD_RECURRENCE, False))
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()  # sets "data", "instance"
+        if "data" in kwargs and self._must_add_form(kwargs["data"]):
+            pass
+
+        return kwargs
+
+    def get_formset(self, must_add: bool = False):
+        add = 0
+        if must_add:
+            # We need a formset instance in order to count the number of forms available
+            formset = make_timerecurrence_formset(**self.get_form_kwargs())
+            num_forms = formset.current_extra_form_count()
+            add = num_forms + 1
+        formset = make_timerecurrence_formset(**self.get_form_kwargs(), add=add)
+        return formset
+
     def post(self, request, *args, **kwargs):
         form = self.get_form()
-        formset = make_timerecurrence_formset(data=request.POST, timeslot=self.object)
+        must_add = self._must_add_form(request.POST)
+        formset = self.get_formset(must_add)
+        if must_add:
+            LOG.debug("Increment number of time recurrence forms and show them")
+            return self.render_to_response(self.get_context_data(form=form, formset=formset))
+        LOG.debug("Validating timeslot...")
         if form.is_valid() and formset.is_valid():
             return self.form_valid(form, formset)
         else:
@@ -216,7 +268,7 @@ class TimeslotListView(TimeslotMixin, ListView):
         forms = []
         for obj in self.get_queryset():
             form = TimeslotForm(None, instance=obj, prefix=self._get_prefix(obj.pk))
-            formset = make_timerecurrence_formset(timeslot=obj)
+            formset = make_timerecurrence_formset(instance=obj)
             forms.append({"form": form, "formset": formset})
         context["form_list"] = forms
         return context
@@ -233,7 +285,10 @@ class TimeslotCreateView(FormsetMixin, TimeslotMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["formset"] = make_timerecurrence_formset()
+        data = self.get_form_kwargs().get("data", None)
+        must_add = self._must_add_form(data)
+        formset = self.get_formset(must_add)
+        context["formset"] = formset
         return context
 
     def post(self, request, *args, **kwargs):
@@ -246,7 +301,10 @@ class TimeslotUpdateView(FormsetMixin, TimeslotMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["formset"] = make_timerecurrence_formset(timeslot=self.object)
+        data = self.get_form_kwargs().get("data", None)
+        must_add = self._must_add_form(data)
+        formset = self.get_formset(must_add)
+        context["formset"] = formset
         return context
 
     def post(self, request, *args, **kwargs):

@@ -102,12 +102,16 @@ class TimeRecurrence(models.Model):
 
     @property
     def is_around_the_clock(self):
-        return self.start <= time(hour=0, minute=0, second=59) and self.end >= time(hour=23, minute=59, second=0)
+        if self.start and self.end:
+            return self.start <= time(hour=0, minute=0, second=59) and self.end >= time(hour=23, minute=59, second=0)
+        return False
 
     @property
     def is_every_day(self):
         # more than 7 should never happen but let's be paranoid
-        return len(self.days) >= 7
+        if self.days:
+            return len(self.days) >= 7
+        return False
 
     @property
     def is_all_the_time(self):
@@ -116,14 +120,20 @@ class TimeRecurrence(models.Model):
     @property
     def isoweekdays(self):
         # `days` are stored as strings in the db
-        return {int(day) for day in self.days}
+        if self.days:
+            return {int(day) for day in self.days}
+        return set()
 
     def get_days_list(self):
-        return [self.Day(day).label for day in self.days]
+        if self.days:
+            return [self.Day(day).label for day in self.days]
+        return []
 
     def timestamp_is_within(self, timestamp: datetime):
         # FIXME: Might affect performance negatively if calling this method frequently
         timestamp = timestamp.astimezone(timezone.get_current_timezone())
+        if not (self.start and self.end):
+            return False
         return timestamp.isoweekday() in self.isoweekdays and self.start <= timestamp.time() <= self.end
 
     def save(self, *args, **kwargs):
