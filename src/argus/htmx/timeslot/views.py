@@ -162,19 +162,25 @@ class FormsetMixin:
         self.object = form.save(commit=False)
         self.object.user = self.request.user
         self.object.save()
-        formset.save(commit=False)
+        old_trs = self.object.time_recurrences.all()
+        trs = formset.save(commit=False)
+        for tr in trs:
+            tr.timeslot = self.object
+            tr.save()
+        new_recurrences = self.object.time_recurrences.all()
 
         message_list = []
         timeslot_message = f"Set timeslot name to {self.object.name}."
         changed_message = f"Saved timeslot {self.object}."
 
+        # bail out early if the only change is timeslot name
         if form.has_changed():
             if not (formset.changed_objects or formset.new_objects or formset.deleted_objects):
                 messages.success(self.request, timeslot_message)
                 return HttpResponseRedirect(self.get_success_url())
 
-        if not (formset.changed_objects or formset.new_objects):
-            no_forms_msg = f'There are no time recurrences in timeslot "{self.object}". Click the "Delete"-button to delete the entire timeslot.'
+        if not old_trs.exists() and not new_recurrences.exists():
+            no_forms_msg = f'There are no time recurrences in timeslot "{self.object}". Click the "Delete"-button if you wish to delete the entire timeslot.'
             messages.warning(self.request, no_forms_msg)
             return HttpResponseRedirect(self.get_success_url())
 
@@ -192,15 +198,11 @@ class FormsetMixin:
             message_list.append(new_message)
             for new_tr in formset.new_objects:
                 LOG.debug("Add %s", new_tr)
-                new_tr.timeslot = self.object
-                new_tr.save()
 
         if form.has_changed() or formset.changed_objects:
             message_list.append(changed_message)
             for changed_tr, changed in formset.changed_objects:
                 LOG.debug("Update %s (%s), %s", changed_tr, changed_tr.id, changed)
-                changed_tr.timeslot = self.object
-                changed_tr.save()
 
         if message_list:
             message = " ".join(message_list)
