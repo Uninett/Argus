@@ -6,14 +6,14 @@
     <div class="flex flex-col gap-4 w-full">
       <div class="flex gap-16 justify-between">
         <div>
-          {% for field in form %}
+          {% with form.name as field %}
             <label class="form-control w-full max-w-md">
               <div class="label">
                 <span class="label-text">{{ field.label }}</span>
               </div>
               {{ field|add_class:"input input-bordered border-b" }}
             </label>
-          {% endfor %}
+          {% endwith %}
         </div>
         <div class="card-actions flex items-end">
           {% if form.instance.pk %}
