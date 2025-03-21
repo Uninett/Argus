@@ -52,7 +52,7 @@ class TimeRecurrenceForm(forms.ModelForm):
         if self.instance.id:
             partial_get = reverse(
                 "htmx:timeslot-update",
-                kwargs={"pk": self.instance.pk},
+                kwargs={"pk": self.instance.timeslot.id},
             )
         else:
             partial_get = reverse("htmx:timeslot-create")
