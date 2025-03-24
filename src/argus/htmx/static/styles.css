@@ -4782,6 +4782,10 @@ details.collapse summary::-webkit-details-marker {
   border-bottom-width: 2px;
 }
 
+.border-b-1 {
+  border-bottom-width: 1px;
+}
+
 .border-t {
   border-top-width: 2px;
 }
@@ -4793,6 +4797,11 @@ details.collapse summary::-webkit-details-marker {
 .border-accent {
   --tw-border-opacity: 1;
   border-color: var(--fallback-a,oklch(var(--a)/var(--tw-border-opacity)));
+}
+
+.border-base-200 {
+  --tw-border-opacity: 1;
+  border-color: var(--fallback-b2,oklch(var(--b2)/var(--tw-border-opacity)));
 }
 
 .border-primary {
