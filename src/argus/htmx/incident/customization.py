@@ -25,6 +25,7 @@ class IncidentTableColumn:
     :param filter_field: when given, this column is considered filterable and a filter
         input is attached to the column header that can provide a query param with `filter_field`
         as the key
+    :param is_clickable: when True, clicking on column's cells will navigate to the incident detail page
     """
 
     name: str  # identifier
@@ -35,6 +36,7 @@ class IncidentTableColumn:
     filter_field: Optional[str] = None
     cell_wrapper_template: str = "htmx/incident/_incident_table_cell.html"
     column_classes: str = ""
+    is_clickable: bool = False
 
 
 _BUILTIN_COLUMN_LIST = [

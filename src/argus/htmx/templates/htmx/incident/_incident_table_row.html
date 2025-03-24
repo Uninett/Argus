@@ -1,4 +1,10 @@
-<tr id="incident-{{ incident.pk }}-row" class="hover">
+<tr id="incident-{{ incident.pk }}-row"
+    class="hover"
+    hx-get="{% url 'htmx:incident-detail' pk=incident.pk %}"
+    hx-trigger="click from:#incident-{{ incident.pk }}-row>td.clickable"
+    hx-params="none"
+    hx-target="closest body"
+    hx-swap="outerHTML">
   {% block columns %}
     {% for column in columns %}
       {% include column.cell_wrapper_template %}

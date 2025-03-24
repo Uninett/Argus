@@ -1,4 +1,4 @@
-<td>
+<td {% if column.is_clickable %}class="cursor-pointer clickable"{% endif %}>
   {% if column.cell_template %}
     {% include column.cell_template %}
   {% else %}
