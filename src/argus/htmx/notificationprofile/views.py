@@ -80,7 +80,7 @@ class NotificationProfileForm(DestinationFieldMixin, FilterFieldMixin, NoColonMi
         super().__init__(*args, **kwargs)
 
         self.fields["timeslot"].queryset = Timeslot.objects.filter(user=self.user)
-        self.fields["active"].widget.attrs["class"] = "checkbox checkbox-sm checkbox-accent border"
+        self.fields["active"].widget.attrs["class"] = "checkbox checkbox-sm border"
         self.fields["active"].widget.attrs["autocomplete"] = "off"
         self.fields["name"].widget.attrs["class"] = "input input-bordered"
 
