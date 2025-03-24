@@ -33,7 +33,7 @@ class IncidentTableColumn:
     header_template: Optional[str] = None
     context: Optional[dict] = None
     filter_field: Optional[str] = None
-    cell_wrapper_template: str = "htmx/incident/_incident_table_cell_default.html"
+    cell_wrapper_template: str = "htmx/incident/_incident_table_cell_clickable.html"
     column_classes: str = ""
 
 
@@ -50,12 +50,12 @@ _BUILTIN_COLUMN_LIST = [
         "Selected",
         "htmx/incident/cells/_incident_checkbox.html",
         header_template="htmx/incident/cells/_incident_list_select_all_checkbox_header.html",
+        cell_wrapper_template="htmx/incident/_incident_table_cell_default.html",
     ),
     IncidentTableColumn(
         "id",
         "ID",
         "htmx/incident/cells/_incident_pk.html",
-        cell_wrapper_template="htmx/incident/_incident_table_cell_clickable.html",
     ),
     IncidentTableColumn(
         "start_time",
@@ -70,12 +70,21 @@ _BUILTIN_COLUMN_LIST = [
         "description",
         "Description",
         "htmx/incident/cells/_incident_description.html",
-        cell_wrapper_template="htmx/incident/_incident_table_cell_clickable.html",
     ),
     IncidentTableColumn("ack", "Ack", "htmx/incident/cells/_incident_ack.html"),
     IncidentTableColumn("combined_status", "Status", "htmx/incident/cells/_incident_combined_status.html"),
-    IncidentTableColumn("ticket", "Ticket", "htmx/incident/cells/_incident_ticket.html"),
-    IncidentTableColumn("links", "Actions", "htmx/incident/cells/_incident_actions.html"),
+    IncidentTableColumn(
+        "ticket",
+        "Ticket",
+        "htmx/incident/cells/_incident_ticket.html",
+        cell_wrapper_template="htmx/incident/_incident_table_cell_default.html",
+    ),
+    IncidentTableColumn(
+        "links",
+        "Actions",
+        "htmx/incident/cells/_incident_actions.html",
+        cell_wrapper_template="htmx/incident/_incident_table_cell_default.html",
+    ),
 ]
 BUILTIN_COLUMNS = {col.name: col for col in _BUILTIN_COLUMN_LIST}
 
