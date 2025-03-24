@@ -5189,6 +5189,10 @@ details.collapse summary::-webkit-details-marker {
   box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
 }
 
+.group:last-child .group-last\:border-b-0 {
+  border-bottom-width: 0;
+}
+
 @media (min-width: 640px) {
   .sm\:w-96 {
     width: 24rem;
