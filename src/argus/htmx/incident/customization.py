@@ -59,13 +59,18 @@ _BUILTIN_COLUMN_LIST = [
         "Timestamp",
         "htmx/incident/cells/_incident_start_time.html",
         header_template="htmx/incident/cells/_incident_start_time_header.html",
+        is_clickable=True,
     ),
     IncidentTableColumn("status", "Status", "htmx/incident/cells/_incident_status.html"),
-    IncidentTableColumn("level", "Severity level", "htmx/incident/cells/_incident_level.html"),
-    IncidentTableColumn("source", "Source", "htmx/incident/cells/_incident_source.html"),
-    IncidentTableColumn("description", "Description", "htmx/incident/cells/_incident_description.html"),
+    IncidentTableColumn("level", "Severity level", "htmx/incident/cells/_incident_level.html", is_clickable=True),
+    IncidentTableColumn("source", "Source", "htmx/incident/cells/_incident_source.html", is_clickable=True),
+    IncidentTableColumn(
+        "description", "Description", "htmx/incident/cells/_incident_description.html", is_clickable=True
+    ),
     IncidentTableColumn("ack", "Ack", "htmx/incident/cells/_incident_ack.html"),
-    IncidentTableColumn("combined_status", "Status", "htmx/incident/cells/_incident_combined_status.html"),
+    IncidentTableColumn(
+        "combined_status", "Status", "htmx/incident/cells/_incident_combined_status.html", is_clickable=True
+    ),
     IncidentTableColumn("ticket", "Ticket", "htmx/incident/cells/_incident_ticket.html"),
     IncidentTableColumn("links", "Actions", "htmx/incident/cells/_incident_actions.html"),
 ]
