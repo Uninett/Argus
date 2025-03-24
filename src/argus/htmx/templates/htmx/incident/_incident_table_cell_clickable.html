@@ -1,6 +1,5 @@
 <td>
-  <a class="block link"
-     href="{% url 'htmx:incident-detail' pk=incident.pk %}">
+  <a class="block" href="{% url 'htmx:incident-detail' pk=incident.pk %}">
     {% if column.cell_template %}
       {% include column.cell_template %}
     {% else %}
