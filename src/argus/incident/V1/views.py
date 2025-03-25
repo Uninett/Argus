@@ -13,8 +13,14 @@ from argus.filter.filters import SOURCE_LOCKED_INCIDENT_OPENAPI_PARAMETER_DESCRI
 
 from ..constants import Level
 from ..models import Incident, SourceSystem
-from ..serializers import IncidentPureDeserializer, SourceSystemSerializer
-from ..views import IncidentViewSet
+from ..serializers import IncidentPureDeserializer, IncidentTicketUrlSerializer, SourceSystemSerializer
+from ..views import (
+    EventViewSet,
+    IncidentTagViewSet,
+    IncidentViewSet,
+    SourceSystemTypeViewSet,
+    SourceSystemViewSet,
+)
 from .serializers import (
     AcknowledgementSerializerV1,
     IncidentSerializerV1,
@@ -22,9 +28,68 @@ from .serializers import (
     UpdateAcknowledgementSerializerV1,
 )
 
+# deprecated views unchanged from V2
+
 
 @extend_schema_view(
+    retrieve=extend_schema(deprecated=True),
+    destroy=extend_schema(deprecated=True),
+    update=extend_schema(deprecated=True),
+    partial_update=extend_schema(deprecated=True),
+    create=extend_schema(deprecated=True),
+    list=extend_schema(deprecated=True),
+)
+class EventViewSetV1(EventViewSet):
+    pass
+
+
+@extend_schema_view(
+    retrieve=extend_schema(deprecated=True),
+    destroy=extend_schema(deprecated=True),
+    update=extend_schema(deprecated=True),
+    partial_update=extend_schema(deprecated=True),
+    create=extend_schema(deprecated=True),
+    list=extend_schema(deprecated=True),
+)
+class IncidentTagViewSetV1(IncidentTagViewSet):
+    pass
+
+
+@extend_schema_view(
+    retrieve=extend_schema(deprecated=True),
+    destroy=extend_schema(deprecated=True),
+    update=extend_schema(deprecated=True),
+    partial_update=extend_schema(deprecated=True),
+    create=extend_schema(deprecated=True),
+    list=extend_schema(deprecated=True),
+)
+class SourceSystemViewSetV1(SourceSystemViewSet):
+    pass
+
+
+@extend_schema_view(
+    retrieve=extend_schema(deprecated=True),
+    destroy=extend_schema(deprecated=True),
+    update=extend_schema(deprecated=True),
+    partial_update=extend_schema(deprecated=True),
+    create=extend_schema(deprecated=True),
+    list=extend_schema(deprecated=True),
+)
+class SourceSystemTypeViewSetV1(SourceSystemTypeViewSet):
+    pass
+
+
+# overridden views
+
+
+@extend_schema_view(
+    retrieve=extend_schema(deprecated=True),
+    destroy=extend_schema(deprecated=True),
+    update=extend_schema(deprecated=True),
+    partial_update=extend_schema(deprecated=True),
+    create=extend_schema(deprecated=True),
     list=extend_schema(
+        deprecated=True,
         parameters=[
             OpenApiParameter(
                 name="acked",
@@ -97,8 +162,8 @@ from .serializers import (
                 description="Fetch stateful (`true`) or stateless (`false`) incidents.",
                 enum=BooleanStringOAEnum,
             ),
-        ]
-    )
+        ],
+    ),
 )
 class IncidentViewSetV1(IncidentViewSet):
     def get_serializer_class(self):
@@ -120,11 +185,26 @@ class IncidentViewSetV1(IncidentViewSet):
         }
         return Response(data)
 
+    @extend_schema(
+        deprecated=True,
+        request=IncidentTicketUrlSerializer,
+        responses=IncidentTicketUrlSerializer,
+    )
+    @action(detail=True, methods=["put"])
+    def ticket_url(self, request, pk=None):
+        return super().ticket_url(request, pk)
+
 
 @extend_schema_view(
+    retrieve=extend_schema(deprecated=True),
+    create=extend_schema(deprecated=True),
+    update=extend_schema(deprecated=True),
+    partial_update=extend_schema(deprecated=True),
+    destroy=extend_schema(deprecated=True),
     list=extend_schema(
+        deprecated=True,
         parameters=SOURCE_LOCKED_INCIDENT_OPENAPI_PARAMETER_DESCRIPTIONS,
-    )
+    ),
 )
 class SourceLockedIncidentViewSetV1(IncidentViewSetV1):
     """All incidents added by the currently logged in user
@@ -139,15 +219,20 @@ class SourceLockedIncidentViewSetV1(IncidentViewSetV1):
 
 
 @extend_schema_view(
+    list=extend_schema(deprecated=True),
+    retrieve=extend_schema(deprecated=True),
     create=extend_schema(
+        deprecated=True,
         request=AcknowledgementSerializerV1,
         responses={"201": AcknowledgementSerializerV1},
     ),
     update=extend_schema(
+        deprecated=True,
         request=UpdateAcknowledgementSerializerV1,
         responses={"200": AcknowledgementSerializerV1},
     ),
     partial_update=extend_schema(
+        deprecated=True,
         request=UpdateAcknowledgementSerializerV1,
         responses={"200": AcknowledgementSerializerV1},
     ),

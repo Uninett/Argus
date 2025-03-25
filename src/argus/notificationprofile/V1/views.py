@@ -15,12 +15,49 @@ from argus.filter.V1.serializers import (
 )
 from argus.incident.serializers import IncidentSerializer
 from ..models import Filter, NotificationProfile
+from ..views import TimeslotViewSet, FilterPreviewView
 from .serializers import (
     ResponseNotificationProfileSerializerV1,
     RequestNotificationProfileSerializerV1,
 )
 
 
+# deprecated views unchanged from V2
+
+
+@extend_schema_view(
+    list=extend_schema(deprecated=True),
+    retrieve=extend_schema(deprecated=True),
+    create=extend_schema(deprecated=True),
+    update=extend_schema(deprecated=True),
+    partial_update=extend_schema(deprecated=True),
+    destroy=extend_schema(deprecated=True),
+)
+class TimeslotViewSetV1(TimeslotViewSet):
+    pass
+
+
+@extend_schema_view(
+    post=extend_schema(deprecated=True),
+)
+class FilterPreviewViewV1(FilterPreviewView):
+    pass
+
+
+filter_preview_view = FilterPreviewViewV1.as_view()
+
+
+# overridden views
+
+
+@extend_schema_view(
+    list=extend_schema(deprecated=True),
+    retrieve=extend_schema(deprecated=True),
+    create=extend_schema(deprecated=True),
+    update=extend_schema(deprecated=True),
+    partial_update=extend_schema(deprecated=True),
+    destroy=extend_schema(deprecated=True),
+)
 class FilterViewSetV1(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated, IsOwner]
     serializer_class = FilterSerializerV1
@@ -53,15 +90,21 @@ class FilterViewSetV1(viewsets.ModelViewSet):
 
 @extend_schema_view(
     create=extend_schema(
+        deprecated=True,
         request=RequestNotificationProfileSerializerV1,
         responses={201: ResponseNotificationProfileSerializerV1},
     ),
     update=extend_schema(
+        deprecated=True,
         request=RequestNotificationProfileSerializerV1,
     ),
     partial_update=extend_schema(
+        deprecated=True,
         request=RequestNotificationProfileSerializerV1,
     ),
+    destroy=extend_schema(deprecated=True),
+    retrieve=extend_schema(deprecated=True),
+    list=extend_schema(deprecated=True),
 )
 class NotificationProfileViewSetV1(rw_viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated, IsOwner]
@@ -78,6 +121,7 @@ class NotificationProfileViewSetV1(rw_viewsets.ModelViewSet):
 
     @extend_schema(
         responses={200: IncidentSerializer(many=True)},
+        deprecated=True,
     )
     @action(methods=["get"], detail=True)
     def incidents(self, request, pk, *args, **kwargs):
@@ -97,6 +141,7 @@ class NotificationProfileViewSetV1(rw_viewsets.ModelViewSet):
     @extend_schema(
         request=FilterPreviewSerializer,
         responses=IncidentSerializer(many=True),
+        deprecated=True,
     )
     @action(methods=["post"], detail=False)
     def preview(self, request, **_):
