@@ -140,17 +140,72 @@ example::
 
     ]
 
-There are several optional attributes to ``IncidentTableColumn``:
 
-* ``cell_wrapper_template``: A template that by default includes the
-  ``cell_template`` and wraps it in a ``<td>``-tag. This makes it possible to
-  add attributes to the ``<td>``-tag or skip including the ``cell_template``
-  altogether.
-* ``column_classes``: Additional classes to set on ``<th>``, handy for
-  controlling width.
-* ``context``: Additional hardcoded context for every cell of its type, as
-  a dictionary.
-* ``header_template``: A template overriding the default ``<th>`` for the column.
+.. py:class:: IncidentTableColumn
+
+   .. py:attribute:: name
+
+      :type: str
+
+      The identifier for the column
+
+   .. py:attribute:: label
+
+      :type: str
+
+      The column header, put inside ``<th></th>``
+
+   .. py:attribute:: cell_template
+
+      :type: str
+
+      Template to use when rendering a cell for this column.
+
+      For the contents of a cell, put inside ``<td></td>``
+
+   .. py:attribute:: cell_wrapper_template
+
+      :type: str
+      :value: htmx/incident/_incident_table_cell_default.html
+
+      A template that by default includes the ``cell_template`` and wraps it in
+      a ``<td>``-tag. This makes it possible to add attributes to the
+      ``<td>``-tag or skip including the ``cell_template`` altogether.
+
+      Replacing the default with
+      ``htmx/incident/_incident_table_cell_clickable.html`` will result in the
+      ``cell_template`` being wrapped in a link (``<a>``) to the details page.
+
+   .. py:attribute:: column_classes
+
+      :type: str
+      :value: ""
+
+      Additional classes to set on ``<th>``, handy for controlling width.
+
+   .. py:attribute:: context
+
+      :type: Optional[dict]
+      :value: None
+
+      Additional context to pass to the rendering cell.
+
+   .. py:attribute:: filter_field
+
+      :type: Optional[str]
+
+      When given, this column is considered filterable and a filter input is
+      attached to the column header that can provide a query param with
+      ``filter_field`` as the key. The key must ..
+
+      Adds a pop-up-able free text search field for that column, in the ``<th>``.
+
+   .. py:attribute:: header_template
+
+      :type: Optional[str]
+      :value: None
+
+      A template overriding the default ``<th>`` for the column.
 
 For inbuilt support for other types of columns see the
 :ref:`HTMX HowTos`.
