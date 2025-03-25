@@ -166,15 +166,16 @@ example::
    .. py:attribute:: cell_wrapper_template
 
       :type: str
-      :value: htmx/incident/_incident_table_cell_default.html
+      :value: htmx/incident/_incident_table_cell_wrapper_default.html
 
       A template that by default includes the ``cell_template`` and wraps it in
       a ``<td>``-tag. This makes it possible to add attributes to the
       ``<td>``-tag or skip including the ``cell_template`` altogether.
 
       Replacing the default with
-      ``htmx/incident/_incident_table_cell_clickable.html`` will result in the
-      ``cell_template`` being wrapped in a link (``<a>``) to the details page.
+      ``htmx/incident/_incident_table_cell_wrapper_link_to_details.html`` will
+      result in the ``cell_template`` being wrapped in a link (``<a>``) to the
+      details page.
 
    .. py:attribute:: column_classes
 
