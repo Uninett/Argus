@@ -13,19 +13,19 @@
             <h2 class="card-title">Status</h2>
             <p class="card-body flex-row flex-wrap gap-0.5">
               {% if incident.open %}
-                <span class="badge badge-accent">Open</span>
+                <span class="badge badge-error">Open</span>
               {% else %}
-                <span class="badge badge-primary">Closed</span>
+                <span class="badge badge-success">Closed</span>
               {% endif %}
               {% if incident.acked %}
-                <span class="badge badge-primary">Acknowledged</span>
+                <span class="badge badge-success">Acknowledged</span>
               {% else %}
-                <span class="badge badge-accent">Unacknowledged</span>
+                <span class="badge badge-error">Unacknowledged</span>
               {% endif %}
               {% if incident.ticket_url %}
-                <span class="badge badge-primary"><a href="{{ incident.ticket_url }}" target="_blank">Ticket {{ incident.ticket_url }}</a></span>
+                <span class="badge badge-success"><a href="{{ incident.ticket_url }}" target="_blank">Ticket {{ incident.ticket_url }}</a></span>
               {% else %}
-                <span class="badge badge-accent">No ticket</span>
+                <span class="badge badge-error">No ticket</span>
               {% endif %}
             </p>
           </section>
