@@ -79,17 +79,10 @@ class IncidentFilterForm(forms.Form):
             return None
 
         try:
-            tags_list = set(tag.strip() for tag in tags.split(","))
-            tags_qss = Tag.objects.parse(*tags_list)
+            for tag in tags.split(","):
+                Tag.split(tag.strip())
         except ValueError:
             raise forms.ValidationError("Tags need to have the format key=value, key2=value2")
-
-        existing_tags = set()
-        for tags_qs in tags_qss:
-            existing_tags.update(set(str(tag) for tag in tags_qs))
-        missing_tags = tags_list - existing_tags
-        if missing_tags:
-            raise forms.ValidationError(f"The following tags could not be found: {', '.join(missing_tags)}")
 
         return tags
 
