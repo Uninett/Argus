@@ -9,5 +9,6 @@ urlpatterns = [
     path("create/", views.TimeslotCreateView.as_view(), name="timeslot-create"),
     path("<pk>/", views.TimeslotDetailView.as_view(), name="timeslot-detail"),
     path("<pk>/update/", views.TimeslotUpdateView.as_view(), name="timeslot-update"),
+    path("<pk>/<tr_pk>/field/days/", views.days_form_view, name="htmx:timeslot-timerecurrence-days-field-update"),
     path("<pk>/delete/", views.TimeslotDeleteView.as_view(), name="timeslot-delete"),
 ]

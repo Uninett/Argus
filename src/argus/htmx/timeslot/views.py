@@ -4,11 +4,13 @@ from typing import Optional
 
 from django import forms
 from django.contrib import messages
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+from django.views.decorators.http import require_GET
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
+from argus.htmx.request import HtmxHttpRequest
 from argus.htmx.widgets import BadgeDropdownMultiSelect
 from argus.notificationprofile.models import Timeslot, TimeRecurrence
 
@@ -20,6 +22,29 @@ class DaysMultipleChoiceField(forms.MultipleChoiceField):
     def to_python(self, value):
         value = super().to_python(value)
         return [int(day) for day in value]
+
+
+class DaysForm(forms.ModelForm):
+    days = DaysMultipleChoiceField()
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance.id:
+            partial_get = reverse(
+                "htmx:timeslot-timerecurrence-days-update",
+                kwargs={"pk": self.instance.timeslot.id},
+            )
+        else:
+            partial_get = reverse("htmx:timeslot-create")
+
+        self.fields["days"].widget = BadgeDropdownMultiSelect(
+            partial_get=partial_get,
+            attrs={
+                "placeholder": "select days...",
+                "field_styles": "input input-bordered border-b max-w-full justify-center",
+            },
+        )
+        self.fields["days"].choices = TimeRecurrence.Day.choices
 
 
 class TimeRecurrenceForm(forms.ModelForm):
@@ -103,6 +128,24 @@ def make_timerecurrence_formset(data: Optional[dict] = None, timeslot: Optional[
     prefix = f"timerecurrenceform-{timeslot.pk}" if timeslot else ""
     TimeRecurrenceFormSet.template_name_div = "htmx/timeslot/timerecurrence_div.html"
     return TimeRecurrenceFormSet(data=data, instance=timeslot, prefix=prefix)
+
+
+def _render_form_field(request: HtmxHttpRequest, form, partial_template_name, prefix=None):
+    # Not a view!
+    form = form(request.GET or None, prefix=prefix)
+    context = {"form": form}
+    return render(request, partial_template_name, context=context)
+
+
+@require_GET
+def days_form_view(request: HtmxHttpRequest, pk: int = None, tr_pk: int = None):
+    prefix = f"timerecurrenceform-{pk}" if pk else ""
+    return _render_form_field(
+        request,
+        DaysForm,
+        "htmx/timeslot/_timerecurrence_days_form.html",
+        prefix=prefix,
+    )
 
 
 class TimeslotMixin:
