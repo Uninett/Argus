@@ -68,9 +68,9 @@ class HtmxMessageMiddleware(MiddlewareMixin):
 
     def process_exception(self, request, exception):
         error_msg = "500 Internal Server Error"
-        if str(exception):
-            error_msg += f": {exception}"
         messages.error(request, error_msg)
+        if str(exception):
+            error_msg += f"{error_msg}: {exception}"
         LOG.error(error_msg)
         return None
 
@@ -102,8 +102,8 @@ class HtmxMessageMiddleware(MiddlewareMixin):
                     error_msg = error_msg.decode("utf-8")
                 if not error_msg:
                     error_msg = f"{response.status_code} {response.reason_phrase}"
-                messages.error(request, f"An unexpected error occured: {error_msg}. Please try again")
                 LOG.error("Unhandled exception: %s", error_msg)
+                messages.error(request, "An unexpected error occured. Please try again")
             # HTMX doesn't swap content for response codes >=400. However, we do want to show
             # the new messages, so we need to rewrite the response to 200, and make sure it only
             # swaps the oob notification content
