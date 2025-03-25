@@ -4545,6 +4545,16 @@ details.collapse summary::-webkit-details-marker {
   background-color: transparent;
 }
 
+.bg-error {
+  --tw-bg-opacity: 1;
+  background-color: var(--fallback-er,oklch(var(--er)/var(--tw-bg-opacity)));
+}
+
+.bg-success {
+  --tw-bg-opacity: 1;
+  background-color: var(--fallback-su,oklch(var(--su)/var(--tw-bg-opacity)));
+}
+
 .fill-primary {
   fill: var(--fallback-p,oklch(var(--p)/1));
 }
