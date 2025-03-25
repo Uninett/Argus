@@ -196,9 +196,10 @@ example::
 
       When given, this column is considered filterable and a filter input is
       attached to the column header that can provide a query param with
-      ``filter_field`` as the key. The key must ..
+      ``filter_field`` as the key. The key must match a form field that is
+      recognized by ``incident_list_filter()``.
 
-      Adds a pop-up-able free text search field for that column, in the ``<th>``.
+      Adds a pop-up-able free text search field in the ``<th>``.
 
    .. py:attribute:: header_template
 
