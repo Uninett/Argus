@@ -9,35 +9,62 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
+from argus.htmx.widgets import BadgeDropdownMultiSelect
 from argus.notificationprofile.models import Timeslot, TimeRecurrence
 
 
 LOG = logging.getLogger(__name__)
 
 
+class DaysMultipleChoiceField(forms.MultipleChoiceField):
+    def to_python(self, value):
+        value = super().to_python(value)
+        return [int(day) for day in value]
+
+
 class TimeRecurrenceForm(forms.ModelForm):
+    days = DaysMultipleChoiceField()
+
     class Meta:
+        TIMEINPUT_FORMAT = "%H:%M"
+        TIMEINPUT_ATTRS = {
+            "type": "text",
+            "pattern": "[012]\d:[0-5]\d",
+            "class": "input-bordered",
+            "placeholder": "HH:MM",
+        }
+
         model = TimeRecurrence
         exclude = ["timeslot"]
         widgets = {
             "start": forms.TimeInput(
-                format="%H:%M",
-                attrs={
-                    "type": "text",
-                    "pattern": "[012]\d:[0-5]\d",
-                    "class": "input-bordered",
-                    "placeholder": "HH:MM",
-                },
+                format=TIMEINPUT_FORMAT,
+                attrs=TIMEINPUT_ATTRS,
             ),
             "end": forms.TimeInput(
-                format="%H:%M",
-                attrs={
-                    "type": "time",
-                    "step": 60,
-                    "class": "input-bordered",
-                },
+                format=TIMEINPUT_FORMAT,
+                attrs=TIMEINPUT_ATTRS,
             ),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance.id:
+            partial_get = reverse(
+                "htmx:timeslot-update",
+                kwargs={"pk": self.instance.timeslot.id},
+            )
+        else:
+            partial_get = reverse("htmx:timeslot-create")
+
+        self.fields["days"].widget = BadgeDropdownMultiSelect(
+            partial_get=partial_get,
+            attrs={
+                "placeholder": "select days...",
+                "field_styles": "input input-bordered border-b max-w-full justify-center",
+            },
+        )
+        self.fields["days"].choices = TimeRecurrence.Day.choices
 
     def clean_start(self):
         timeobj = self.cleaned_data["start"]
@@ -74,6 +101,7 @@ def make_timerecurrence_formset(data: Optional[dict] = None, timeslot: Optional[
         min_num=1,
     )
     prefix = f"timerecurrenceform-{timeslot.pk}" if timeslot else ""
+    TimeRecurrenceFormSet.template_name_div = "htmx/timeslot/timerecurrence_div.html"
     return TimeRecurrenceFormSet(data=data, instance=timeslot, prefix=prefix)
 
 
@@ -134,20 +162,24 @@ class FormsetMixin:
         self.object = form.save(commit=False)
         self.object.user = self.request.user
         self.object.save()
-        formset.save(commit=False)
+        old_trs = self.object.time_recurrences.all()
+        trs = formset.save(commit=False)
+        for tr in trs:
+            tr.timeslot = self.object
+            tr.save()
 
         message_list = []
-        timeslot_message = f"Set timeslot name to {self.object.name}"
-        changed_message = f"Saved timeslot {self.object}"
+        timeslot_message = f"Set timeslot name to {self.object.name}."
+        changed_message = f"Saved timeslot {self.object}."
 
+        # bail out early if the only change is timeslot name
         if form.has_changed():
-            message_list.append(timeslot_message)
             if not (formset.changed_objects or formset.new_objects or formset.deleted_objects):
                 messages.success(self.request, timeslot_message)
                 return HttpResponseRedirect(self.get_success_url())
 
-        if not formset.changed_objects:
-            no_forms_msg = f'There are no time recurrences in timeslot "{self.object}". Click the "Delete"-button to delete the entire timeslot.'
+        if not old_trs.exists() and not len(trs):
+            no_forms_msg = f'There are no time recurrences in timeslot "{self.object}". Click the "Delete"-button if you wish to delete the entire timeslot.'
             messages.warning(self.request, no_forms_msg)
             return HttpResponseRedirect(self.get_success_url())
 
@@ -157,27 +189,22 @@ class FormsetMixin:
             LOG.debug("Delete %s (%s)", tr, tr.id)
             tr.delete()
         if deleted:
-            delete_message = "Deleted " + ", ".join(deleted) + f" from {self.object}"
+            delete_message = "Deleted " + ", ".join(deleted) + f" from {self.object}."
             message_list.append(delete_message)
 
         if formset.new_objects:
-            new_message = f"Added time recurrence to timeslot {self.object}"
+            new_message = f"Added time recurrence to timeslot {self.object}."
             message_list.append(new_message)
-            for tr in formset.new_objects:
-                LOG.debug("Add %s", tr)
-                tr.timeslot = self.object
-                tr.save()
+            for new_tr in formset.new_objects:
+                LOG.debug("Add %s", new_tr)
 
         if form.has_changed() or formset.changed_objects:
             message_list.append(changed_message)
-            for tr, changed in formset.changed_objects:
-                # For some reason this is *always* run
-                LOG.debug("Update %s (%s), %s", tr, tr.id, changed)
-                tr.timeslot = self.object
-                tr.save()
+            for changed_tr, changed in formset.changed_objects:
+                LOG.debug("Update %s (%s), %s", changed_tr, changed_tr.id, changed)
 
         if message_list:
-            message = ". ".join(message_list)
+            message = " ".join(message_list)
             LOG.info(message)
             messages.success(self.request, message)
         return HttpResponseRedirect(self.get_success_url())
@@ -228,6 +255,9 @@ class TimeslotUpdateView(FormsetMixin, TimeslotMixin, UpdateView):
 
 
 class TimeslotDeleteView(TimeslotMixin, DeleteView):
+    def post(self, request, *args, **kwargs):
+        return self.delete(request, *args, **kwargs)
+
     def delete(self, request, *args, **kwargs):
         self.object = self.get_object()
         success_url = self.get_success_url()
