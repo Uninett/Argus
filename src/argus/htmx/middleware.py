@@ -71,7 +71,7 @@ class HtmxMessageMiddleware(MiddlewareMixin):
         messages.error(request, error_msg)
         if str(exception):
             error_msg += f"{error_msg}: {exception}"
-        LOG.error(error_msg)
+        LOG.exception(error_msg)
         return None
 
     def process_response(self, request: HtmxHttpRequest, response: HttpResponse) -> HttpResponse:
