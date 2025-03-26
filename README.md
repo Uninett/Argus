@@ -15,6 +15,14 @@ This repository hosts the backend built with Django. There is also a
 
 See also the the [Python client library](https://github.com/Uninett/pyargus).
 
+> [!IMPORTANT]
+> * API v1 has been deprecated. API v2 is the new stable. Support for API v1
+>   will be dropped in version 2.0 of argus-server. Please upgrade your glue
+>   services!
+> * Support for the REACT frontend will be dropped in version 2.0 of
+>   argus-server. Please try out the new built-in one.
+
+
 ## Installation
 
 There are several ways to install Argus.
@@ -23,10 +31,16 @@ There are several ways to install Argus.
 
 #### Requirements
 
-* Python 3.8+
-* Django 4.2 or 5.0
+* Python 3.9+
+* Django 4.2 or 5.1
 * pip
-* PostgreSQL
+* PostgreSQL 12+
+
+> [!WARNING]
+> The next [Django LTS](https://docs.djangoproject.com/en/5.2/releases/5.2/)
+> will not support any PostgreSQL older than version 14!
+> [PostgreSQL 17.4](https://www.postgresql.org/docs/17/release-17-4.html) is
+> the newest version as of this writing.
 
 #### Optional requirements
 
@@ -45,6 +59,11 @@ will do it.
 
 #### Optional: Old frontend
 
+> [!WARNING]
+> Support for this backend will be dropped in version 2 of argus-server. Please
+> try the new backend.
+
+
 The old frontend needs:
 
 * **Redis**. Redis backs the websockets, in order to push realtime updates to
@@ -56,6 +75,7 @@ Get the python dependencies via:
 
 ```
 pip install argus-server[spa]
+
 ```
 
 #### Optional: Dataporten registration
