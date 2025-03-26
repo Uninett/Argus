@@ -8,6 +8,90 @@ This project uses [*towncrier*](https://towncrier.readthedocs.io/) and the chang
 
 <!-- towncrier release notes start -->
 
+## [1.34.0] - 2025-03-26
+
+**This release marks the beginning of the process towards argus-server 2.0!**
+
+API V2 is hereby declared stable, and V1 is hereby deprecated.
+
+Version 2 will *drop support* for API V1 *and* the old frontend. Please try the
+new frontend and send us some feedback!
+
+The next Django LTS, 5.2, will not support any PostgreSQL older than version
+14, so please upgrade ASAP.
+
+The incident list in the new frontend is now feature complete. The timeslots
+page has been prettified but also has some bugs. There's lots of remaining UX
+things to do.
+
+### Added
+
+- There's now a troubleshooting guide in the docs, for storing debugging tips.
+- Made it possible to filter and search on `ticket_url` and `details_url` in
+  admin.
+
+### HTMX app
+
+#### Added
+
+- We now have a unique color per severity level.
+  ([#996](https://github.com/Uninett/Argus/issues/996))
+- Added button on the incident details page for autocreating a ticket.
+  ([#1202](https://github.com/Uninett/Argus/issues/1202))
+- Saved filters can now be both updated and deleted.
+  ([#1207](https://github.com/Uninett/Argus/issues/1207), [#1231](https://github.com/Uninett/Argus/issues/1231))
+- Added documentation on how to customize incident actions.
+  ([#1212](https://github.com/Uninett/Argus/issues/1212))
+- Added borders between table rows.
+  ([#1253](https://github.com/Uninett/Argus/issues/1253))
+- Added column to show combined status (openness+ackedness) as a color, for
+  feature parity with the old frontend incident list.
+- Made it possible to delete one or more timerecurrences from a timeslot.
+
+#### Changed
+
+NOTE! Version v1 of the API is hereby deprecated! It *will* be removed one
+day. Update your glue services, please. Version v2 is the new stable API.
+
+- Selecting '---' from existing filters now resets the filter parameters.
+  ([#1144](https://github.com/Uninett/Argus/issues/1144))
+- Simplified the filter select and filter create logic by refreshing the
+  whole view on those operations.
+  ([#1251](https://github.com/Uninett/Argus/issues/1251))
+- The color of the status badges was changed to better represent either error
+  or success state. The colors are universal across the themes.
+  ([#1294](https://github.com/Uninett/Argus/issues/1294))
+- Show empty list instead of error if tags do not match any incidents.
+  ([#1302](https://github.com/Uninett/Argus/issues/1302))
+- Otherwise uncaught exceptions are caught and logged. A less chatty version is
+  shown to end users via messages.error.
+- Improved the looks and UX of the timeslots page greatly. There are still
+  remaining issues.
+- In the status-badges use the same color for 'open' and 'unacked' and the same
+  for 'closed' and 'acked'.
+- It is now possible to add a link to the details page from any cell in the
+  incident list, by using a different wrapper template. See the improved docs
+  for customizing incident list columns.
+- Moved notification links into the user menu, and removed the now sole
+  remaining link that redundantly points to the incident list.
+- Set default opacity of loading overlay to 50%.
+- Several of our easily accessible users didn't like the frequent use of the
+  reddish color as an accent in the "argus" theme, they prefer reserving
+  reddish hues for extra important things. We've cut down on the use of
+  "accent"-color everywhere: in the incidents page we now use the primary color
+  instead, everywhere else we will fall back to the default for the
+  tailwind/daisy class.
+
+#### Fixed
+
+- Users are now prohibited user from creating profile with same name as
+  existing one.
+  ([#1139](https://github.com/Uninett/Argus/issues/1139))
+- Fixed a bug where the update filter modal was shown when trying to delete
+  a given filter.
+  ([#1266](https://github.com/Uninett/Argus/issues/1266))
+
+
 ## [1.33.0] - 2025-03-05
 
 ### Fixed

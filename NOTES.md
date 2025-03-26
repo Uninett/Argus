@@ -3,6 +3,22 @@
 This file documents changes to Argus that are relevant for operations,
 customizers and end-users.
 
+## [1.34.0] - 2025-03-26
+
+**This release marks the start of the process towards argus-server 2.0!**
+
+API V2 is hereby declared stable, and V1 is hereby deprecated.
+
+Version 2 will *drop support* for API V1 *and* the old frontend. Please try the
+new frontend and send us some feedback!
+
+The next Django LTS, 5.2, will not support any PostgreSQL older than version
+14, so please upgrade ASAP.
+
+The incident list in the new frontend is now feature complete. The timeslots
+page has been prettified but also has some bugs. There's lots of remaining UX
+things to do.
+
 ## [1.33.0] - 2025-03-05
 
 Moved channels app from base settings to spa settings, where it belongs. This
