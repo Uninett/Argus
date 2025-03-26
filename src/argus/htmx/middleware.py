@@ -70,7 +70,7 @@ class HtmxMessageMiddleware(MiddlewareMixin):
         error_msg = "500 Internal Server Error"
         messages.error(request, error_msg)
         if str(exception):
-            error_msg += f"{error_msg}: {exception}"
+            error_msg = f"{error_msg}: {exception}"
         LOG.exception(error_msg)
         return None
 
