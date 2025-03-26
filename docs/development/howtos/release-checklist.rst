@@ -55,6 +55,12 @@ Checklist
 
         $ git status
 
+#. Stash away all files git does not know about:
+
+    .. code:: console
+
+        $ git stash -u
+
 #. Run the tests one last time:
 
     .. code:: console
@@ -150,6 +156,12 @@ Checklist
 
    Use your own user if you've been given access or ask for a token for
    the team-user, see also :file:`~/.pypirc`.
+
+#. Unstash any files git does not know about, development can continue:
+
+    .. code:: console
+
+        $ git stash pop
 
 #. Turn the tag into a release on Github:
 
