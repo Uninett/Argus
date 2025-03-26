@@ -3,6 +3,10 @@
 This file documents changes to Argus that are relevant for operations,
 customizers and end-users.
 
+## [1.34.1] - 2025-03-26
+
+Bugfix release, docker files should be able to run argus again.
+
 ## [1.34.0] - 2025-03-26
 
 **This release marks the start of the process towards argus-server 2.0!**

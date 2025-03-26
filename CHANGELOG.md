@@ -8,6 +8,19 @@ This project uses [*towncrier*](https://towncrier.readthedocs.io/) and the chang
 
 <!-- towncrier release notes start -->
 
+## [1.34.1] - 2025-03-26
+
+### Changed
+
+- Updated README to highlight the deprecation of API v1, that the old
+  frontend will soon not be supported and that Django will soon not support
+  PostGRESQL older than 14.
+- Updated the release checklist.
+
+### Fixed
+
+- Changed docker entrypoint script files that used the wrong path for `asgi.py`.
+
 ## [1.34.0] - 2025-03-26
 
 **This release marks the beginning of the process towards argus-server 2.0!**
