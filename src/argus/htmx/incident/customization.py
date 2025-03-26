@@ -12,6 +12,10 @@ from django.conf import settings
 
 from argus.htmx import defaults as argus_htmx_settings
 
+# for editor typeahead
+CELL_WRAPPER_TEMPLATE_DEFAULT = "htmx/incident/_incident_table_cell_wrapper_default.html"
+CELL_WRAPPER_TEMPLATE_LINK_TO_DETAILS = "htmx/incident/_incident_table_cell_wrapper_link_to_details.html"
+
 
 @dataclass
 class IncidentTableColumn:
@@ -33,7 +37,7 @@ class IncidentTableColumn:
     header_template: Optional[str] = None
     context: Optional[dict] = None
     filter_field: Optional[str] = None
-    cell_wrapper_template: str = "htmx/incident/_incident_table_cell_wrapper_default.html"
+    cell_wrapper_template: str = CELL_WRAPPER_TEMPLATE_DEFAULT
     column_classes: str = ""
 
 
@@ -55,40 +59,40 @@ _BUILTIN_COLUMN_LIST = [
         "id",
         "ID",
         "htmx/incident/cells/_incident_pk.html",
-        cell_wrapper_template="htmx/incident/_incident_table_cell_wrapper_link_to_details.html",
+        cell_wrapper_template=CELL_WRAPPER_TEMPLATE_LINK_TO_DETAILS,
     ),
     IncidentTableColumn(
         "start_time",
         "Timestamp",
         "htmx/incident/cells/_incident_start_time.html",
         header_template="htmx/incident/cells/_incident_start_time_header.html",
-        cell_wrapper_template="htmx/incident/_incident_table_cell_wrapper_link_to_details.html",
+        cell_wrapper_template=CELL_WRAPPER_TEMPLATE_LINK_TO_DETAILS,
     ),
     IncidentTableColumn("status", "Status", "htmx/incident/cells/_incident_status.html"),
     IncidentTableColumn(
         "level",
         "Severity level",
         "htmx/incident/cells/_incident_level.html",
-        cell_wrapper_template="htmx/incident/_incident_table_cell_wrapper_link_to_details.html",
+        cell_wrapper_template=CELL_WRAPPER_TEMPLATE_LINK_TO_DETAILS,
     ),
     IncidentTableColumn(
         "source",
         "Source",
         "htmx/incident/cells/_incident_source.html",
-        cell_wrapper_template="htmx/incident/_incident_table_cell_wrapper_link_to_details.html",
+        cell_wrapper_template=CELL_WRAPPER_TEMPLATE_LINK_TO_DETAILS,
     ),
     IncidentTableColumn(
         "description",
         "Description",
         "htmx/incident/cells/_incident_description.html",
-        cell_wrapper_template="htmx/incident/_incident_table_cell_wrapper_link_to_details.html",
+        cell_wrapper_template=CELL_WRAPPER_TEMPLATE_LINK_TO_DETAILS,
     ),
     IncidentTableColumn("ack", "Ack", "htmx/incident/cells/_incident_ack.html"),
     IncidentTableColumn(
         "combined_status",
         "Status",
         "htmx/incident/cells/_incident_combined_status.html",
-        cell_wrapper_template="htmx/incident/_incident_table_cell_wrapper_link_to_details.html",
+        cell_wrapper_template=CELL_WRAPPER_TEMPLATE_LINK_TO_DETAILS,
     ),
     IncidentTableColumn(
         "ticket",
