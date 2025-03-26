@@ -264,6 +264,12 @@ class IncidentQuerySet(models.QuerySet):
     def lacks_ticket(self):
         return self.filter(ticket_url="")
 
+    def has_details_url(self):
+        return self.exclude(details_url="")
+
+    def lacks_details_url(self):
+        return self.filter(details_url="")
+
     def prefetch_default_related(self):
         return self.prefetch_related("incident_tag_relations__tag", "source__type")
 
