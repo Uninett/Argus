@@ -6,8 +6,7 @@
   {% block input_rendering %}
     <div class="indicator w-full">
       {% if is_required %}
-        <span
-            class="indicator-item indicator-top indicator-end badge border-none mask mask-circle text-warning text-base">＊</span>
+        <span class="indicator-item indicator-top indicator-end badge border-none mask mask-circle text-warning text-base">＊</span>
       {% endif %}
       {% if field %}
         {% render_field field class+="input input-bordered border-b w-full" %}
@@ -18,18 +17,16 @@
                value="{{ value|default:"" }}"
                {% if is_required %}required{% endif %}
                autocomplete="off"
-               class="input input-bordered border-b w-full"/>
+               class="input input-bordered border-b w-full" />
       {% endif %}
     </div>
   {% endblock input_rendering %}
   {% if help_text or errors %}
     <label class="label">
-    {% if help_text %}
-      <span class="label-text-alt">{{ help_text }}</span>
+      {% if help_text %}<span class="label-text-alt">{{ help_text }}</span>{% endif %}
+      {% if errors %}
+        {% for error in errors %}<span class="label-text-alt text-error">{{ error }}</span>{% endfor %}
+      {% endif %}
     {% endif %}
-    {% if errors %}
-      {% for error in errors %}<span class="label-text-alt text-error">{{ error }}</span>{% endfor %}
-    {% endif %}
-  {% endif %}
   </label>
 </div>
