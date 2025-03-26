@@ -4,12 +4,5 @@
   hx-include="#incident-filter-box fieldset, [name='filter_name']"
 {% endblock form_control %}
 {% block dialogform %}
-  <label class="indicator input input-bordered flex items-center gap-2 w-full">
-    Filter name
-    <span class="indicator-item indicator-top indicator-start badge border-none mask mask-circle text-warning text-base">＊</span>
-    <input name="filter_name"
-           type="text"
-           required
-           class="appearance-none grow border-none" />
-  </label>
+  {% include "htmx/forms/input_field.html" with label=" Filter name" is_required="true" name="filter_name" type="text" %}
 {% endblock dialogform %}
