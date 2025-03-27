@@ -90,7 +90,7 @@
                 <h3 class="font-bold">More details at</h3>
                 <p>
                   {% if incident.details_url %}
-                    <a href="{{ incident.pp_details_url }}">{{ incident.pp_details_url }}</a>
+                    <a class="text-wrap break-words" href="{{ incident.pp_details_url }}">{{ incident.pp_details_url }}</a>
                   {% else %}
                     —
                   {% endif %}
