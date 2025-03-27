@@ -2697,18 +2697,6 @@ details.collapse summary::-webkit-details-marker {
   outline-color: var(--fallback-p,oklch(var(--p)/1));
 }
 
-.input-accent {
-  --tw-border-opacity: 1;
-  border-color: var(--fallback-a,oklch(var(--a)/var(--tw-border-opacity)));
-}
-
-.input-accent:focus,
-    .input-accent:focus-within {
-  --tw-border-opacity: 1;
-  border-color: var(--fallback-a,oklch(var(--a)/var(--tw-border-opacity)));
-  outline-color: var(--fallback-a,oklch(var(--a)/1));
-}
-
 .input:has(> input[disabled]),
   .input-disabled,
   .input:disabled,
