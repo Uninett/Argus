@@ -21,7 +21,7 @@ class TestIncidentFilterForm(TestCase):
     def setUp(self) -> None:
         disconnect_signals()
         source = SourceSystemFactory(name="testsource")
-        valid_field_values = {
+        self.valid_field_values = {
             "open": True,
             "closed": False,
             "acked": True,
@@ -30,35 +30,36 @@ class TestIncidentFilterForm(TestCase):
             "tags": "tag1=value1, tag2=value2",
             "maxlevel": 1,
         }
-        self.valid_form = IncidentFilterForm(valid_field_values)
+        self.valid_form = IncidentFilterForm(self.valid_field_values)
 
     def teardown(self):
         connect_signals()
 
     def test_if_form_is_valid_then_filterblob_should_contain_correct_open_value(self):
         filterblob = self.valid_form.to_filterblob()
-        assert filterblob["open"] == self.valid_form.cleaned_data["open"]
+        assert filterblob["open"] == self.valid_field_values["open"]
 
     def test_if_form_is_valid_then_filterblob_should_contain_correct_closed_value(self):
         filterblob = self.valid_form.to_filterblob()
-        assert filterblob["closed"] == self.valid_form.cleaned_data["closed"]
+        assert filterblob["closed"] == self.valid_field_values["closed"]
 
     def test_if_form_is_valid_then_filterblob_should_contain_correct_acked_value(self):
         filterblob = self.valid_form.to_filterblob()
-        assert filterblob["acked"] == self.valid_form.cleaned_data["acked"]
+        assert filterblob["acked"] == self.valid_field_values["acked"]
 
     def test_if_form_is_valid_then_filterblob_should_contain_correct_unacked_value(self):
         filterblob = self.valid_form.to_filterblob()
-        assert filterblob["unacked"] == self.valid_form.cleaned_data["unacked"]
+        assert filterblob["unacked"] == self.valid_field_values["unacked"]
 
     def test_if_form_is_valid_then_filterblob_should_contain_correct_sourcesystemids_value(self):
         filterblob = self.valid_form.to_filterblob()
-        assert filterblob["sourceSystemIds"] == self.valid_form.cleaned_data["sourceSystemIds"]
+        # sourceSystemIds seem to be represented as a list of strings sometimes
+        assert len(filterblob["sourceSystemIds"]) == 1
+        assert int(filterblob["sourceSystemIds"][0]) == int(self.valid_field_values["sourceSystemIds"][0])
 
     def test_if_form_is_valid_then_filterblob_should_contain_correct_tags_value(self):
         filterblob = self.valid_form.to_filterblob()
-        cleaned_data = self.valid_form.cleaned_data
-        assert filterblob["tags"] == [tag.strip() for tag in cleaned_data["tags"].split(",")]
+        assert filterblob["tags"] == [tag.strip() for tag in self.valid_field_values["tags"].split(",")]
 
     def test_if_form_is_not_valid_then_to_filterblob_should_return_an_empty_dict(self):
         form = IncidentFilterForm({"tags": "invalidtags"})
