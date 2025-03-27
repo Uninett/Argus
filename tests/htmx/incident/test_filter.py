@@ -53,8 +53,8 @@ class TestIncidentFilterForm(TestCase):
 
     def test_if_form_is_valid_then_filterblob_should_contain_correct_sourcesystemids_value(self):
         filterblob = self.valid_form.to_filterblob()
-        # sourceSystemIds seem to be represented as a list of strings sometimes
         assert len(filterblob["sourceSystemIds"]) == 1
+        # sourceSystemIds seem to be represented as a list of strings sometimes
         assert int(filterblob["sourceSystemIds"][0]) == int(self.valid_field_values["sourceSystemIds"][0])
 
     def test_if_form_is_valid_then_filterblob_should_contain_correct_tags_value(self):
