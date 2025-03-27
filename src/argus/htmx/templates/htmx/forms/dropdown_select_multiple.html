@@ -10,7 +10,7 @@
      {% endblock field_control %}>
   <div tabindex="0"
        role="button"
-       class="show-selected-box {{ widget.attrs.field_styles|default:"input input-accent input-bordered input-md border h-auto max-w-xs" }} overflow-y-auto min-h-8 max-h-16 leading-tight flex flex-wrap items-center gap-0.5">
+       class="show-selected-box {{ widget.attrs.field_styles|default:"input input-primary input-bordered border input-sm h-auto max-w-xs" }} overflow-y-auto min-h-8 max-h-16 leading-tight flex flex-wrap items-center gap-0.5">
     {% if not widget.has_selected %}<p class="text-base-content/50">{{ widget.attrs.placeholder }}</p>{% endif %}
     {% for _, options, _ in widget.optgroups %}
       {% for option in options %}
