@@ -26,7 +26,7 @@
               <label class="cursor-pointer label">
                 <span class="label-text">{{ field.label }}</span>
                 {% if field|field_type == "booleanfield" %}
-                  {{ field|add_class:"checkbox checkbox-primary border" }}
+                  {{ field|add_class:"checkbox checkbox-primary" }}
                 {% elif field.name == "maxlevel" %}
                   <div class="pt-4">
                     {{ field|add_class:"range range-primary range-xs" }}
@@ -35,11 +35,11 @@
                     </div>
                   </div>
                 {% elif field|field_type == "choicefield" %}
-                  {{ field|add_class:"select select-primary border" }}
+                  {{ field|add_class:"select select-primary" }}
                 {% elif field|field_type == "multiplechoicefield" %}
-                  {{ field|attr:"size:1"|add_class:"select select-primary border" }}
+                  {{ field|attr:"size:1"|add_class:"select select-primary" }}
                 {% elif field|field_type == "charfield" %}
-                  {{ field|add_class:"input input-primary input-bordered border" }}
+                  {{ field|add_class:"input input-primary input-bordered" }}
                 {% endif %}
               </label>
             {% endif %}
