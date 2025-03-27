@@ -137,27 +137,42 @@ class RequestDestinationConfigSerializer(serializers.ModelSerializer):
         ]
 
     def validate(self, attrs: dict):
-        if self.instance and "media" in attrs.keys() and not attrs["media"].slug == self.instance.media.slug:
-            raise serializers.ValidationError("Media cannot be updated, only settings.")
-        if "settings" in attrs.keys():
-            if not isinstance(attrs["settings"], dict):
-                raise serializers.ValidationError("Settings has to be a dictionary.")
-            if self.instance:
-                medium = api_safely_get_medium_object(self.instance.media.slug)
-            else:
-                medium = api_safely_get_medium_object(attrs["media"].slug)
-            attrs["settings"] = medium.validate(self, attrs, self.context["request"].user)
+        settings = attrs.get("settings", None)
+        if not settings:
+            raise serializers.ValidationError("Settings cannot be empty")
+
+        if self.instance:
+            medium = api_safely_get_medium_object(self.instance.media.slug)
+            # A PATCH need not contain the media key
+            if attrs.get("media", self.instance.media) != self.instance.media:
+                raise serializers.ValidationError(medium.error_messages["readonly_medium"])
+            user = self.instance.user
+            if user != self.context["request"].user:
+                raise serializers.ValidationError(medium.error_messages["readonly_user"])
+        else:
+            # new, not a PATCH
+            medium = api_safely_get_medium_object(attrs["media"].slug)
+            user = self.context["request"].user
+
+        if not isinstance(attrs["settings"], dict):
+            raise serializers.ValidationError(medium.error_messages["settings_type"])
+
+        settings_form = medium.validate_settings(
+            attrs["settings"],
+            user,
+            instance=self.instance,
+        )
+        if not settings_form.is_valid():
+            raise serializers.ValidationError(settings_form.errors.get_json_data())
+
+        attrs["settings"] = settings_form.cleaned_data
 
         return attrs
 
     def update(self, destination: DestinationConfig, validated_data: dict):
         medium = api_safely_get_medium_object(destination.media.slug)
         updated_destination = medium.update(destination, validated_data)
-
-        if updated_destination:
-            return updated_destination
-
-        return super().update(destination, validated_data)
+        return updated_destination
 
 
 class DuplicateDestinationSerializer(serializers.Serializer):
