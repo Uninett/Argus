@@ -577,10 +577,21 @@ class Incident(models.Model):
         path = self.details_url.strip()
         if not path:
             return ""
-        base_url = self.source.base_url.strip()
-        if base_url:
-            return urljoin(base_url, path)
-        return path  # Just show the relative url
+        validate_url = URLValidator()
+        try:
+            validate_url(path)
+        except ValidationError:
+            base_url = self.source.base_url.strip()
+            if base_url:
+                full_url = urljoin(base_url, path)
+                try:
+                    validate_url(full_url)
+                except ValidationError:
+                    pass
+                else:
+                    return full_url
+        # Fallback, just show the relative url
+        return path
 
     def pp_level(self):
         return Level(self.level).label
