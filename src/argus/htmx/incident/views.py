@@ -215,6 +215,7 @@ def incident_list(request: HtmxHttpRequest) -> HttpResponse:
         base_template = "htmx/incident/responses/_incident_list_refresh.html"
     else:
         base_template = "htmx/incident/_base.html"
+    last_page_num = page.paginator.num_pages
     context = {
         "columns": columns,
         "filtered_count": filtered_count,
@@ -223,6 +224,8 @@ def incident_list(request: HtmxHttpRequest) -> HttpResponse:
         "page_title": "Incidents",
         "base": base_template,
         "page": page,
+        "last_page_num": last_page_num,
+        "second_to_last_page": last_page_num - 1,
         "last_refreshed": last_refreshed,
     }
 
