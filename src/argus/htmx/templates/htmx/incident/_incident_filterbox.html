@@ -28,7 +28,7 @@
                 {% if field|field_type == "booleanfield" %}
                   {{ field|add_class:"checkbox checkbox-primary border" }}
                 {% elif field.name == "maxlevel" %}
-                  <div>
+                  <div class="pt-4">
                     {{ field|add_class:"range range-primary range-xs" }}
                     <div class="flex w-full justify-between px-2 text-xs">
                       {% for tick in "12345" %}<span>{{ tick }}</span>{% endfor %}
