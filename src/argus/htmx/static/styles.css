@@ -4303,14 +4303,6 @@ details.collapse summary::-webkit-details-marker {
   max-width: 30%;
 }
 
-.max-w-lg {
-  max-width: 32rem;
-}
-
-.max-w-md {
-  max-width: 28rem;
-}
-
 .max-w-xs {
   max-width: 20rem;
 }
@@ -4339,10 +4331,6 @@ details.collapse summary::-webkit-details-marker {
   flex-basis: 25%;
 }
 
-.border-collapse {
-  border-collapse: collapse;
-}
-
 .border-separate {
   border-collapse: separate;
 }
@@ -4355,12 +4343,6 @@ details.collapse summary::-webkit-details-marker {
 
 .cursor-pointer {
   cursor: pointer;
-}
-
-.appearance-none {
-  -webkit-appearance: none;
-     -moz-appearance: none;
-          appearance: none;
 }
 
 .flex-row {

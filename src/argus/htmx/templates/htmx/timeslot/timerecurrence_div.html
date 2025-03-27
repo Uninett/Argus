@@ -12,22 +12,12 @@
       </label>
     </div>
     <div class="flex gap-2 w-full flex-nowrap max-sm:flex-wrap">
-      <label class="form-control w-full max-w-md">
-        <div class="label">
-          <span class="label-text">{{ form.start.label }}</span>
-        </div>
-        {% render_field form.start class+="input input-bordered border-b" %}
-      </label>
-      <label class="form-control w-full max-w-lg">
-        <div class="label">
-          <span class="label-text">{{ form.end.label }}</span>
-        </div>
-        {% render_field form.end class+="input input-bordered border-b" %}
-      </label>
+      {% include "htmx/forms/input_field.html" with label=form.start.label max_width="md" field=form.start %}
+      {% include "htmx/forms/input_field.html" with label=form.end.label max_width="md" field=form.end %}
     </div>
     <label class="form-control w-full self-center">
       <div class="label">
-        <span class="label-text">{{ form.days.label }}</span>
+        <span class="label-text italic">{{ form.days.label }}</span>
       </div>
       {% render_field form.days %}
     </label>
