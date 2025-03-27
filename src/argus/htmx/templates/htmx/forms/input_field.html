@@ -24,9 +24,7 @@
   {% if help_text or errors %}
     <label class="label">
       {% if help_text %}<span class="label-text-alt">{{ help_text }}</span>{% endif %}
-      {% if errors %}
-        {% for error in errors %}<span class="label-text-alt text-error">{{ error }}</span>{% endfor %}
-      {% endif %}
+      {% for error in errors %}<span class="label-text-alt text-error">{{ error }}</span>{% endfor %}
     {% endif %}
   </label>
 </div>
