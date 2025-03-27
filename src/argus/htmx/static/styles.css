@@ -4463,8 +4463,16 @@ details.collapse summary::-webkit-details-marker {
   white-space: nowrap;
 }
 
+.text-wrap {
+  text-wrap: wrap;
+}
+
 .text-nowrap {
   text-wrap: nowrap;
+}
+
+.break-all {
+  word-break: break-all;
 }
 
 .rounded-box {
