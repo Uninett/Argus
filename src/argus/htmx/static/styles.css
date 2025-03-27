@@ -4002,6 +4002,18 @@ details.collapse summary::-webkit-details-marker {
   --tw-divide-x-reverse: 1;
 }
 
+.table-xs :not(thead):not(tfoot) tr {
+  font-size: 0.75rem;
+  line-height: 1rem;
+}
+
+.table-xs :where(th, td) {
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+}
+
 .alert.info {
   --tw-border-opacity: 1;
   border-color: var(--fallback-in,oklch(var(--in)/var(--tw-border-opacity, 1)));
