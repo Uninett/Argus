@@ -4662,24 +4662,24 @@ details.collapse summary::-webkit-details-marker {
   padding-bottom: 0.5rem;
 }
 
-.pb-0\.5 {
-  padding-bottom: 0.125rem;
-}
-
-.pb-1 {
-  padding-bottom: 0.25rem;
+.pb-0 {
+  padding-bottom: 0px;
 }
 
 .pl-8 {
   padding-left: 2rem;
 }
 
-.pt-0\.5 {
-  padding-top: 0.125rem;
+.pt-0 {
+  padding-top: 0px;
 }
 
-.pt-1 {
-  padding-top: 0.25rem;
+.pb-0\.5 {
+  padding-bottom: 0.125rem;
+}
+
+.pt-0\.5 {
+  padding-top: 0.125rem;
 }
 
 .text-center {
