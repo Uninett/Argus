@@ -1,7 +1,7 @@
 # This Dockerfile is designed to run a development environment for Argus,
 # with the Argus source code tree mounted at /argus
 #
-FROM python:3.10
+FROM python:3.12
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get install -y --no-install-recommends tini \
