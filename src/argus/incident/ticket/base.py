@@ -18,6 +18,10 @@ class TicketPluginException(Exception):
     """Ticket plugin exception"""
 
 
+class TicketPluginImportException(TicketPluginException):
+    """Ticket plugin could not be imported"""
+
+
 class TicketSettingsException(TicketPluginException):
     """Some of the settings required for the ticket plugins are not set
     properly

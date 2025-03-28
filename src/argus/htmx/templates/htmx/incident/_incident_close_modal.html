@@ -1,0 +1,4 @@
+{% extends "htmx/incident/_base_incident_update_modal.html" %}
+{% block dialogform %}
+  {% include "htmx/forms/input_field.html" with label="Reason for closing" name="description" type="text" placeholder="Closing message" %}
+{% endblock dialogform %}

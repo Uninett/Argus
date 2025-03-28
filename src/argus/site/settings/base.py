@@ -10,12 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
-from urllib.parse import urlsplit
-
 import dj_database_url
 
 # Import some helpers
-from . import get_bool_env, get_str_env, get_int_env, setup_logging, normalize_url, get_json_env, validate_app_setting
+from . import get_bool_env, get_str_env, get_int_env, setup_logging, get_json_env, validate_app_setting
 from ..utils import update_settings
 
 # Quick-start development settings - unsuitable for production
@@ -24,12 +22,13 @@ from ..utils import update_settings
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = get_bool_env("DEBUG", False)
 
+# Explicit is better than implicit!
 ALLOWED_HOSTS = []
+INTERNAL_IPS = []
 
 # fmt: off
 # fsck off, black
 INSTALLED_APPS = [
-    "channels",  # Must be early
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -45,12 +44,12 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "django_filters",
     "phonenumber_field",
+    "knox",  # token auth
 
     # Argus apps
     "argus.auth",
     "argus.base",
     "argus.incident",
-    "argus.ws",
     "argus.filter",
     "argus.notificationprofile",
     "argus.dev",
@@ -184,17 +183,13 @@ if LOGGING_MODULE:
 # For permalinks to incidents in argus dashboard
 FRONTEND_URL = get_str_env("ARGUS_FRONTEND_URL")
 
-# django-cors-headers
-CORS_ALLOWED_ORIGINS = []
-if FRONTEND_URL:
-    CORS_ALLOWED_ORIGINS.append(normalize_url(FRONTEND_URL))
-
 # django-rest-framework
 
 # fmt: off
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
-        "argus.auth.authentication.ExpiringTokenAuthentication",
+        "argus.auth.authentication.DeprecatedExpiringTokenAuthentication",
+        "knox.auth.TokenAuthentication",
         # For BrowsableAPIRenderer
         "rest_framework.authentication.SessionAuthentication",
     ),
@@ -219,23 +214,6 @@ REST_FRAMEWORK = {
 # fmt: on
 
 AUTH_TOKEN_EXPIRES_AFTER_DAYS = 14
-
-
-# django-channels
-
-ASGI_APPLICATION = "argus.ws.asgi.application"
-
-# fmt: off
-_REDIS = urlsplit("//" + get_str_env("ARGUS_REDIS_SERVER", "127.0.0.1:6379"))
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [(_REDIS.hostname, _REDIS.port or 6379)],
-        },
-    },
-}
-# fmt: on
 
 # Project specific settings
 

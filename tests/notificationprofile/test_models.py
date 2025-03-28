@@ -1,9 +1,10 @@
-from datetime import datetime
+from datetime import datetime, time
 
 from django.test import TestCase, tag
 from django.utils.dateparse import parse_datetime, parse_time
 from django.utils.timezone import make_aware
 
+from argus.auth.factories import PersonUserFactory
 from argus.notificationprofile.models import TimeRecurrence
 from argus.notificationprofile.factories import (
     TimeslotFactory,
@@ -63,6 +64,30 @@ class TimeRecurrenceTests(TestCase, IncidentAPITestCaseHelper):
 
     def test_timestamp_is_within_false_if_after_recurrence(self):
         self.assertFalse(self.recurrence1.timestamp_is_within(set_time(self.monday_datetime, "00:30:02")))
+
+
+@tag("database")
+class TimeRecurrenceStrTests(TestCase):
+    def setUp(self):
+        self.user = PersonUserFactory()
+
+    def test_time_recurrence_is_24_7_returns_24_7(self):
+        ts = TimeslotFactory(user=self.user)
+        tr = TimeRecurrence(timeslot=ts, days=[1, 2, 3, 4, 5, 6, 7], start=time.min, end=time.max)
+        result = str(tr)
+        self.assertEqual(result, "24/7")
+
+    def test_time_recurrence_is_every_day_returns_string_with_every_day(self):
+        ts = TimeslotFactory(user=self.user)
+        tr = TimeRecurrence(timeslot=ts, days=[1, 2, 3, 4, 5, 6, 7], start=time.min, end=time(hour=1))
+        result = str(tr)
+        self.assertTrue(result.endswith(", every day"))
+
+    def test_time_recurrence_is_every_hour_but_not_every_day_returns_string_with_around_the_clock(self):
+        ts = TimeslotFactory(user=self.user)
+        tr = TimeRecurrence(timeslot=ts, days=[1], start=time.min, end=time.max)
+        result = str(tr)
+        self.assertTrue(result.startswith("around the clock"))
 
 
 @tag("database")

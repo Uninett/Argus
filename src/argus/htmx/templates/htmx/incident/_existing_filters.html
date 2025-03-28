@@ -1,0 +1,11 @@
+{% for filter in filters %}
+  <li>
+    <a class="flex">
+      {% if action == "delete" %}
+        {% include "htmx/incident/_delete_filter_confirm_dialog.html" with item_class="w-full text-start" dialog_id="filter-delete-confirm" item_title=filter.name action="Delete filter" item_id=filter.id confirmation_message="Are you sure you want to delete this filter?" %}
+      {% else %}
+        {% include "htmx/incident/_update_filter_confirm_dialog.html" with item_class="w-full text-start" dialog_id="filter-update-confirm" item_title=filter.name action="Update filter" item_id=filter.id confirmation_message="Are you sure you want to override this filter?" %}
+      {% endif %}
+    </a>
+  </li>
+{% endfor %}

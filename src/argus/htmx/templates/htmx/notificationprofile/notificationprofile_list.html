@@ -1,0 +1,12 @@
+{% extends "./base.html" %}
+{% block profile_main %}
+  <div>
+    <button class="contents">
+      <a class="btn btn-primary"
+         href="{% url "htmx:notificationprofile-create" %}">Create new profile</a>
+    </button>
+    {% for form in form_list %}
+      <div class="card my-4 bg-base-100 shadow-2xl">{% include "./_notificationprofile_form.html" %}</div>
+    {% endfor %}
+  </div>
+{% endblock profile_main %}

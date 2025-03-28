@@ -16,23 +16,22 @@ Including another URLconf
 
 from django.conf import settings
 from django.contrib import admin
-from django.urls import include, path, re_path
+from django.urls import include, path
 from django.views.generic.base import RedirectView
 
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
-from argus.auth.views import ObtainNewAuthToken
 from argus.notificationprofile.views import SchemaView
 from argus.site.utils import get_urlpatterns
-from argus.site.views import error, index, MetadataView
+from argus.site.views import index, MetadataView
 
 
 urlpatterns = [
     path("favicon.ico", RedirectView.as_view(url="/static/favicon.svg", permanent=True)),
     # path(".error/", error),  # Only needed when testing error pages and error behavior
     path("admin/", admin.site.urls),
-    path("api/schema/", SpectacularAPIView.as_view(api_version="v1"), name="schema-v1-old"),
-    path("api/schema/swagger-ui/", SpectacularSwaggerView.as_view(url_name="schema-v1-old"), name="swagger-ui-v1-old"),
+    path("api/schema/", SpectacularAPIView.as_view(api_version="v2"), name="schema-v2"),
+    path("api/schema/swagger-ui/", SpectacularSwaggerView.as_view(url_name="schema-v2"), name="swagger-ui-v2"),
     path("api/v1/", include(("argus.site.api_v1_urls", "api"), namespace="v1")),
     path("api/v2/", include(("argus.site.api_v2_urls", "api"), namespace="v2")),
     # path('api/sessionauth/', include('rest_framework.urls', namespace='rest_framework')),

@@ -1,3 +1,5 @@
+.. _HTMX HowTos:
+
 =============================
 How Tos for the HTMx Frontend
 =============================

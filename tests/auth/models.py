@@ -1,6 +1,6 @@
 from django import forms
 
-from argus.auth.models import preferences
+from argus.auth.models import PreferenceField, preferences
 
 
 class MagicNumberForm(forms.Form):
@@ -9,12 +9,7 @@ class MagicNumberForm(forms.Form):
 
 @preferences(namespace="mypref")
 class MyPreferences:
-    FORMS = {
-        "magic_number": MagicNumberForm,
-    }
-    _FIELD_DEFAULTS = {
-        "magic_number": 42,
-    }
+    FIELDS = {"magic_number": PreferenceField(form=MagicNumberForm, default=42)}
 
     class Meta:
         app_label = "auth"  # not needed outside tests
@@ -22,12 +17,7 @@ class MyPreferences:
 
 @preferences(namespace="myotherpref")
 class MyOtherPreferences:
-    FORMS = {
-        "magic_number": MagicNumberForm,
-    }
-    _FIELD_DEFAULTS = {
-        "magic_number": 5,
-    }
+    FIELDS = {"magic_number": PreferenceField(form=MagicNumberForm, default=5)}
 
     class Meta:
         app_label = "auth"  # not needed outside tests

@@ -1,0 +1,4 @@
+{% load argus_htmx %}
+<span class="badge text-nowrap {% if incident.level == 1 %} bg-severity-primary-1 border-severity-primary-1 text-severity-secondary-1  {% elif incident.level == 2 %} bg-severity-primary-2 border-severity-primary-2 text-severity-secondary-2  {% elif incident.level == 3 %} bg-severity-primary-3 border-severity-primary-3 text-severity-secondary-3 {% elif incident.level == 4 %} bg-severity-primary-4 border-severity-primary-4 text-severity-secondary-4  {% elif incident.level == 5 %} bg-severity-primary-5 border-severity-primary-5 text-severity-secondary-5  {% endif %}">
+  {{ incident.level }} - {{ incident.level|pp_level }}
+</span>

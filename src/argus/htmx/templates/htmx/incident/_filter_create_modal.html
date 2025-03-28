@@ -1,0 +1,8 @@
+{% extends "htmx/_base_form_modal.html" %}
+{% block form_control %}
+  hx-post="{% url 'htmx:filter-create' %}"
+  hx-include="#incident-filter-box fieldset, [name='filter_name']"
+{% endblock form_control %}
+{% block dialogform %}
+  {% include "htmx/forms/input_field.html" with label=" Filter name" is_required="true" name="filter_name" type="text" %}
+{% endblock dialogform %}

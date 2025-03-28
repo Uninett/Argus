@@ -1,0 +1,24 @@
+<details>
+  <summary>
+    Update interval
+    <span class="badge badge-primary">{{ preferences.argus_htmx.update_interval }}</span>
+  </summary>
+  <ul class="max-h-64 overflow-y-scroll">
+    {% for item in preferences_choices.argus_htmx.update_interval %}
+      <li>
+        <input type="radio"
+               class="btn btn-sm btn-block btn-ghost justify-start"
+               value="{{ item }}"
+               aria-label="{{ item }}"
+               name="update_interval"
+               hx-post="{% url 'htmx:update-preferences' namespace='argus_htmx' %}"
+               hx-trigger="change"
+               hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' />
+      </li>
+    {% empty %}
+      <li>
+        <p>No update intervals configured</p>
+      </li>
+    {% endfor %}
+  </ul>
+</details>

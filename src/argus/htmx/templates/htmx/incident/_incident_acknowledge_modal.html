@@ -1,0 +1,5 @@
+{% extends "htmx/incident/_base_incident_update_modal.html" %}
+{% block dialogform %}
+  {% include "htmx/forms/input_field.html" with label="Message" is_required="true" name="description" type="text" placeholder="Acknowledgment message" %}
+  {% include "htmx/forms/input_field.html" with label="Expiration" name="expiration" type="date" placeholder="Expiry date" %}
+{% endblock dialogform %}

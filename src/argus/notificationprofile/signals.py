@@ -3,8 +3,6 @@ import logging
 from django.contrib.auth import get_user_model
 from django.db.utils import ProgrammingError
 
-from rest_framework.exceptions import APIException
-
 from .models import DestinationConfig, TimeRecurrence, Timeslot
 
 LOG = logging.getLogger(__name__)
@@ -22,7 +20,7 @@ def sync_media(sender, **kwargs):
 
     Check if all media in Media has a respective class"""
 
-    from .media import MEDIA_CLASSES, MEDIA_CLASSES_DICT
+    from .media import MEDIA_CLASSES_DICT
 
     apps = kwargs["apps"]
     try:
@@ -44,7 +42,7 @@ def sync_media(sender, **kwargs):
     # Check if all media plugins are also saved in Media
     new_media = [
         Media(slug=media_class.MEDIA_SLUG, name=media_class.MEDIA_NAME)
-        for media_class in MEDIA_CLASSES
+        for media_class in MEDIA_CLASSES_DICT.values()
         if not Media.objects.filter(slug=media_class.MEDIA_SLUG)
     ]
     if new_media:

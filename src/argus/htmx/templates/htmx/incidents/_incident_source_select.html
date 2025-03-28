@@ -1,8 +1,0 @@
-{% extends "htmx/forms/dropdown_select_multiple.html" %}
-{% block field_control %}
-  {{ block.super }}
-  hx-get="{% url 'htmx:incidents-filter' %}"
-{% endblock field_control %}
-{% block show_selected %}
-  <span class="badge badge-primary">{{ option.label }}</span>
-{% endblock show_selected %}

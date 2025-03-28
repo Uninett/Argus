@@ -1,0 +1,14 @@
+<div class="card shadow-xl">
+  <details class="collapse collapse-arrow" open="">
+    <summary class="collapse-title text-xl font-medium">{{ media.name }} ({{ forms|length }})</summary>
+    <div class="collapse-content">
+      {% if error_msg %}<p class="text-error">{{ error_msg }}</p>{% endif %}
+      {% for form in forms %}
+        <div class="flex w-full h-fit items-center justify-center">
+          {% include "htmx/destination/_edit_form.html" %}
+          {% include "htmx/destination/_delete_form.html" %}
+        </div>
+      {% endfor %}
+    </div>
+  </details>
+</div>

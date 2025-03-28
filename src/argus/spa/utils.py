@@ -1,7 +1,6 @@
 from django.contrib.auth.backends import ModelBackend
 
 from rest_framework.reverse import reverse
-from social_core.backends.base import BaseAuth
 from social_core.backends.oauth import BaseOAuth2
 
 from argus.auth.utils import get_authentication_backend_classes

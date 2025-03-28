@@ -70,6 +70,7 @@ How to customize the look:
         "dim",
         "autumn",
         { "mytheme": {
+            "color-scheme": "dark",
             "primary": "#009eb6",
             "primary-content": "#00090c",
             "secondary": "#00ac00",
@@ -133,17 +134,83 @@ example::
         BUILTIN_COLUMNS["description"], # equivalent to just "description"
         IncidentTableColumn( # a new column definition
             name="name",
-            label="Custom"
-            cell_template="/path/to/template.html"
-            context={
-                "additional": "value"
-            }
+            label="Custom",
+            cell_template="/path/to/template.html",  # contents of cell
         ),
 
     ]
 
-For inbuilt support for other types of columns see the howtos in
-`the local docs <docs/development/howtos/htmx-frontend/>`_.
+
+.. py:class:: IncidentTableColumn
+
+   .. py:attribute:: name
+
+      :type: str
+
+      The identifier for the column
+
+   .. py:attribute:: label
+
+      :type: str
+
+      The column header, put inside ``<th></th>``
+
+   .. py:attribute:: cell_template
+
+      :type: str
+
+      Template to use when rendering a cell for this column.
+
+      For the contents of a cell, put inside ``<td></td>``
+
+   .. py:attribute:: cell_wrapper_template
+
+      :type: str
+      :value: htmx/incident/_incident_table_cell_wrapper_default.html
+
+      A template that by default includes the ``cell_template`` and wraps it in
+      a ``<td>``-tag. This makes it possible to add attributes to the
+      ``<td>``-tag or skip including the ``cell_template`` altogether.
+
+      Replacing the default with
+      ``htmx/incident/_incident_table_cell_wrapper_link_to_details.html`` will
+      result in the ``cell_template`` being wrapped in a link (``<a>``) to the
+      details page.
+
+   .. py:attribute:: column_classes
+
+      :type: str
+      :value: ""
+
+      Additional classes to set on ``<th>``, handy for controlling width.
+
+   .. py:attribute:: context
+
+      :type: Optional[dict]
+      :value: None
+
+      Additional context to pass to the rendering cell.
+
+   .. py:attribute:: filter_field
+
+      :type: Optional[str]
+
+      When given, this column is considered filterable and a filter input is
+      attached to the column header that can provide a query param with
+      ``filter_field`` as the key. The key must match a text input form field
+      that is recognized by ``incident_list_filter()``.
+
+      Adds a pop-up-able free text search field in the ``<th>``.
+
+   .. py:attribute:: header_template
+
+      :type: Optional[str]
+      :value: None
+
+      A template overriding the default ``<th>`` for the column.
+
+For inbuilt support for other types of columns see the
+:ref:`HTMX HowTos`.
 
 
 .. _django-htmx: https://github.com/adamchainz/django-htmx
@@ -173,3 +240,25 @@ You could then create ``path/to/_extra_widget.html`` as following::
     <div id="service-status" class="border border-primary rounded-2xl h-full p-2">
       My custom widget
     </div>
+
+
+Toast messages
+--------------
+
+``argus_htmx`` uses the `Django Messages`_ framework to dynamically display notifications toast
+messages to the user. Some of these messages stay on screen until the user refreshes, while others
+automatically close (disappear) after a certain time. This can be customized by modifying or
+overriding the ``NOTIFICATION_TOAST_AUTOCLOSE_SECONDS`` setting. The default value for this setting
+is::
+
+  NOTIFICATION_TOAST_AUTOCLOSE_SECONDS = {
+      "success": 10,
+      "autoclose": 10,
+  }
+
+This means that any message that has either the `tag`_ ``"success"`` or ``"autoclose"`` will
+automatically close after 10 seconds. You can update this dictionary with existing tags such as
+``"warning"`` or ``"error"``, or make up your own.
+
+.. _Django Messages: https://docs.djangoproject.com/en/5.1/ref/contrib/messages
+.. _tag: https://docs.djangoproject.com/en/5.1/ref/contrib/messages/#message-tags

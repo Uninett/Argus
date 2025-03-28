@@ -1,5 +1,8 @@
+from __future__ import annotations
+
+import dataclasses
 import functools
-from typing import Any, Optional, Union, Protocol
+from typing import Any, Optional, Sequence, Union, Protocol
 
 from django.contrib.auth.models import AbstractUser, Group
 from django.db import models
@@ -18,6 +21,14 @@ def preferences_manager(namespace):
     return Manager()
 
 
+@dataclasses.dataclass
+class PreferenceField:
+    form: forms.Form
+    choices: Optional[Sequence] = None
+    default: Optional[Any] = None
+    partial_response_template: Optional[str] = None
+
+
 def preferences(cls: Optional[type] = None, namespace: Optional[str] = None):
     """Use this decorator to declare a namespaced subclass of ``Preferences`` without manually
     subclassing it. This decorator will add the Preferences model as a base and set the required
@@ -26,10 +37,13 @@ def preferences(cls: Optional[type] = None, namespace: Optional[str] = None):
 
     Use like the following:
 
+    class MagicNumberForm(forms.Form):
+        magic_number = forms.IntegerField()
+
     @prefrences(namespace="my_namespace")
     class MyPreferences:
-        _FIELD_DEFAULTS = {
-          "example_pref": "some value"
+        FIELDS = {
+            "magic_number": PreferenceField(form=MagicNumberForm, default=42),
         }
 
     In order to get code/method completion, you can inherit from the ``PreferencesBase`` Protocol,
@@ -92,19 +106,19 @@ class User(AbstractUser):
         # user is not considered in use
         return False
 
-    def get_or_create_preferences(self):
-        Preferences.ensure_for_user(self)
-        return self.preferences.filter(namespace__in=Preferences.NAMESPACES)
-
     def get_preferences_context(self):
-        pref_sets = self.get_or_create_preferences()
+        pref_sets = Preferences.ensure_for_user(self)
         prefdict = {}
         for pref_set in pref_sets:
-            prefdict[pref_set._namespace] = pref_set.get_context()
+            prefdict[pref_set.namespace] = pref_set.get_context()
         return prefdict
 
     def get_namespaced_preferences(self, namespace):
-        return self.get_or_create_preferences().get(namespace=namespace)
+        obj, _ = Preferences.objects.get_or_create(user=self, namespace=namespace)
+        if not obj.preferences and (defaults := obj.get_defaults()):
+            obj.preferences = defaults
+            obj.save()
+        return obj
 
 
 class PreferencesManager(models.Manager):
@@ -113,13 +127,6 @@ class PreferencesManager(models.Manager):
 
     def get_by_natural_key(self, user, namespace):
         return self.get(user=user, namespace=namespace)
-
-    def create_missing_preferences(self):
-        precount = Preferences.objects.count()
-        for namespace, subclass in Preferences.NAMESPACES.items():
-            for user in User.objects.all():
-                Preferences.ensure_for_user(user)
-        return (precount, Preferences.objects.count())
 
     def get_all_defaults(self):
         prefdict = {}
@@ -150,8 +157,6 @@ class SessionPreferences:
         self._namespace = namespace
         self.namespace = namespace
         self.prefclass = Preferences.NAMESPACES[namespace]
-        self.FORMS = self.prefclass.FORMS.copy()
-        self._FIELD_DEFAULTS = self.prefclass._FIELD_DEFAULTS.copy()
         self.session.setdefault("preferences", dict())
         self.session["preferences"].setdefault(namespace, self.get_defaults())
         self.preferences = self.session["preferences"][namespace]
@@ -169,17 +174,18 @@ class SessionPreferences:
     def get_instance(self):
         raise NotImplementedError
 
-    def get_defaults(self):
-        return self.prefclass.get_defaults()
+    _proxy_attrs = (
+        "get_forms",
+        "get_defaults",
+        "update_context",
+        "get_context",
+        "get_preference",
+    )
 
-    def update_context(self, context):
-        return self.prefclass.update_context(context)
-
-    def get_context(self):
-        return self.prefclass.get_context()
-
-    def get_preference(self, name):
-        return self.prefclass.get_preference(name)
+    def __getattr__(self, name):
+        if name in self._proxy_attrs:
+            return getattr(self.prefclass, name)
+        return super().__getattr__(name)
 
     def save_preference(self, name, value):
         self.preferences[name] = value
@@ -187,8 +193,7 @@ class SessionPreferences:
 
 
 class PreferencesBase(Protocol):
-    FORMS: dict[str, forms.Form]
-    _FIELD_DEFAULTS: dict[str, Any]
+    FIELDS: dict[str, PreferenceField]
 
     @classmethod
     def get_defaults(cls) -> dict[str, Any]:
@@ -206,7 +211,7 @@ class Preferences(models.Model):
             models.UniqueConstraint(name="unique_preference", fields=["user", "namespace"]),
         ]
 
-    NAMESPACES = {}
+    NAMESPACES: dict[str, type[Preferences]] = {}
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="preferences")
     namespace = models.CharField(blank=False, max_length=255)
@@ -215,15 +220,17 @@ class Preferences(models.Model):
     objects = PreferencesManager()
     unregistered = UnregisteredPreferencesManager()
 
-    # storage for field forms in preference
-    FORMS = None
-    # storage for field defaults in preference
-    _FIELD_DEFAULTS = None
+    # must be set by the subclasses
+    FIELDS: dict[str, PreferenceField]
 
     # django methods
 
     # called when subclass is constructing itself
     def __init_subclass__(cls, **kwargs):
+        FIELDS = getattr(cls, "FIELDS", None)
+        if FIELDS is None or not all(isinstance(k, str) and isinstance(v, PreferenceField) for k, v in FIELDS.items()):
+            raise TypeError(f"{cls.__name__}.FIELDS must be set to a dict[str, PreferenceField]")
+
         super().__init_subclass__(**kwargs)
         cls.NAMESPACES[cls._namespace] = cls
 
@@ -245,17 +252,29 @@ class Preferences(models.Model):
             self.__class__ = subclass
 
     @classmethod
-    def get_defaults(cls):
-        "Override to add magic"
-        return cls._FIELD_DEFAULTS.copy() if cls._FIELD_DEFAULTS else {}
+    def get_forms(cls):
+        return {key: field.form for key, field in cls.FIELDS.items()}
 
     @classmethod
-    def ensure_for_user(cls, user):
+    def get_defaults(cls):
+        "Override to add magic"
+        return {key: field.default for key, field in cls.FIELDS.items()}
+
+    @classmethod
+    def ensure_for_user(cls, user) -> list[Preferences]:
+        all_preferences = {p.namespace: p for p in user.preferences.all()}
+        valid_preferences = []
+
         for namespace, subclass in cls.NAMESPACES.items():
-            obj, _ = subclass.objects.get_or_create(user=user, namespace=namespace)
-            if not obj.preferences and (defaults := subclass.get_defaults()):
-                obj.preferences = defaults
-                obj.save()
+            if namespace in all_preferences:
+                valid_preferences.append(all_preferences[namespace])
+                continue
+            obj = subclass.objects.create(user=user, namespace=namespace)
+            obj.preferences = subclass.get_defaults()
+            obj.save()
+            valid_preferences.append(obj)
+
+        return valid_preferences
 
     def update_context(self, context):
         "Override this to change what is put in context"

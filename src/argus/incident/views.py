@@ -9,7 +9,6 @@ from django.utils import timezone
 from django_filters import rest_framework as filters
 from rest_framework.filters import SearchFilter
 from drf_rw_serializers import viewsets as rw_viewsets
-from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from drf_spectacular.utils import OpenApiParameter, OpenApiResponse
 from rest_framework import mixins, serializers, status, viewsets
@@ -22,28 +21,13 @@ from rest_framework.response import Response
 from rest_framework.reverse import reverse
 
 from argus.drf.permissions import IsSuperuserOrReadOnly
-from argus.incident.models import Acknowledgement, Event
-from argus.incident.ticket.base import (
-    TicketClientException,
-    TicketCreationException,
-    TicketPluginException,
-    TicketSettingsException,
-)
-from argus.incident.ticket.utils import (
-    get_autocreate_ticket_plugin,
-    serialize_incident_for_ticket_autocreation,
-)
-from argus.notificationprofile.media import (
-    send_notifications_to_users,
-    background_send_notification,
-)
 from argus.filter import get_filter_backend
 from argus.util.datetime_utils import INFINITY_REPR
 from argus.util.signals import bulk_changed
-from argus.util.utils import import_class_from_dotted_path
 
 from .forms import AddSourceSystemForm
 from .models import (
+    Acknowledgement,
     ChangeEvent,
     Event,
     Incident,
@@ -69,6 +53,14 @@ from .serializers import (
     TagSerializer,
     IncidentTagRelation,
 )
+from .ticket.base import (
+    TicketClientException,
+    TicketCreationException,
+    TicketPluginException,
+    TicketPluginImportException,
+    TicketSettingsException,
+)
+from .ticket.utils import autocreate_ticket
 
 filter_backend = get_filter_backend()
 IncidentFilter = filter_backend.IncidentFilter
@@ -318,20 +310,12 @@ class TicketPluginViewSet(viewsets.ViewSet):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            ticket_plugin = get_autocreate_ticket_plugin()
+            url = autocreate_ticket(incident, request.user)
         except TicketSettingsException as e:
             # shouldn't this be a 500 Server Error?
             return Response(data=str(e), status=status.HTTP_400_BAD_REQUEST)
-
-        serialized_incident = serialize_incident_for_ticket_autocreation(incident, request.user)
-
-        try:
-            url = ticket_plugin.create_ticket(serialized_incident)
-        except TicketSettingsException as e:
-            return Response(
-                data=str(e),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+        except TicketPluginImportException as e:
+            return Response(data=str(e), status=status.HTTP_500_BAD_REQUEST)
         except TicketClientException as e:
             return Response(
                 data=str(e),
@@ -349,8 +333,7 @@ class TicketPluginViewSet(viewsets.ViewSet):
             )
 
         if url:
-            incident.change_ticket_url(request.user, url, timezone.now())
-            serializer = self.serializer_class(data={"ticket_url": incident.ticket_url})
+            serializer = self.serializer_class(data={"ticket_url": url})
             if serializer.is_valid():
                 return Response(serializer.data, status=status.HTTP_200_OK)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

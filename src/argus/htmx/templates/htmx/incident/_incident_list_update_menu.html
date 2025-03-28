@@ -1,0 +1,10 @@
+<div class="menu menu-horizontal gap-2">
+  {% block update_menu_content %}
+    {% with action_type="bulk-update" endpoint="htmx:incident-update" %}
+      {% include "htmx/incident/_incident_ticket_edit_modal.html" with action="update-ticket" dialog_id="add-ticket-dialog" button_class="btn-primary" button_title="Change ticket" header="Update ticket URL" explanation="Write an URL of an existing ticket, or nothing to remove existing ticket URLs" cancel_text="Cancel" submit_text="Submit" %}
+      {% include "htmx/incident/_incident_acknowledge_modal.html" with action="ack" dialog_id="create-acknowledgment-dialog" button_class="btn-primary" button_title="Acknowledge" header="Submit acknowledgment" explanation="Write a message describing why these incidents were acknowledged" cancel_text="Cancel" submit_text="Submit" %}
+      {% include "htmx/incident/_incident_close_modal.html" with action="close" dialog_id="close_incident-dialog" button_class="btn-primary" button_title="Close" header="Manually close incidents" explanation="Write a message describing why these incidents were manually closed" cancel_text="Cancel" submit_text="Close now" %}
+      {% include "htmx/incident/_incident_reopen_modal.html" with action="reopen" dialog_id="reopen-incident-dialog" button_class="btn-primary" button_title="Reopen" header="Manually reopen incidents" explanation="Write a message describing why these incidents were manually reopened" cancel_text="Cancel" submit_text="Reopen now" %}
+    {% endwith %}
+  {% endblock update_menu_content %}
+</div>

@@ -1,0 +1,9 @@
+<label for="select-incident-{{ incident.pk }}" class="sr-only">Select all visible</label>
+<input id="select-incident-{{ incident.pk }}"
+       hx-preserve
+       type="checkbox"
+       autocomplete="off"
+       class="row-select checkbox checkbox-sm checkbox-primary border"
+       hx-on:change="event.target.checked ? htmx.find('.tab-select').checked = event.target.checked : null;"
+       name="incident_ids"
+       value="{{ incident.pk }}">

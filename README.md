@@ -2,6 +2,7 @@
 [![test badge](https://github.com/Uninett/Argus/actions/workflows/python.yml/badge.svg)](https://github.com/Uninett/Argus/actions)
 [![codecov badge](https://codecov.io/gh/Uninett/Argus/branch/master/graph/badge.svg)](https://codecov.io/gh/Uninett/Argus)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
+[![djLint](https://img.shields.io/badge/html%20style-djlint-blue.svg)](https://www.djlint.com)
 [![docs badge](https://readthedocs.org/projects/argus-server/badge/?version=latest&style=flat)](http://argus-server.rtfd.io/en/latest/)
 
 Argus is a platform for aggregating incidents across network management systems, and
@@ -14,6 +15,14 @@ This repository hosts the backend built with Django. There is also a
 
 See also the the [Python client library](https://github.com/Uninett/pyargus).
 
+> [!IMPORTANT]
+> * API v1 has been deprecated. API v2 is the new stable. Support for API v1
+>   will be dropped in version 2.0 of argus-server. Please upgrade your glue
+>   services!
+> * Support for the REACT frontend will be dropped in version 2.0 of
+>   argus-server. Please try out the new built-in one.
+
+
 ## Installation
 
 There are several ways to install Argus.
@@ -22,43 +31,60 @@ There are several ways to install Argus.
 
 #### Requirements
 
-* Python 3.8+
-* Django 4.2 or 5.0
+* Python 3.9+
+* Django 4.2 or 5.1
 * pip
+* PostgreSQL 12+
+
+> [!WARNING]
+> The next [Django LTS](https://docs.djangoproject.com/en/5.2/releases/5.2/)
+> will not support any PostgreSQL older than version 14!
+> [PostgreSQL 17.4](https://www.postgresql.org/docs/17/release-17-4.html) is
+> the newest version as of this writing.
 
 #### Optional requirements
 
-* **Redis**
-  is recommended if you are going to run the frontend.
-  Redis backs the websockets, in order to push realtime updates to the frontend.
-* [Argus-frontend](https://github.com/Uninett/Argus-frontend/)
-* PostgreSQL
-* Docker and Docker Compose to run Argus in Docker
-
-#### Optional: Dataporten registration
-
-Dataporten authentication is supported by Argus and can be used to log into
-Argus-frontend.
-Refer to the [Dataporten](https://argus-server.rtfd.io/en/latest/authentication.html#dataporten) section of the documentation to learn
-about Dataporten registration, and how to set it up with Argus.
+* Docker and Docker Compose to run Argus in Docker. This will also run
+  a PostgreSQL server for you.
 
 #### Optional: New frontend
 
-You need to have the frontend dependencies installed.
-
-Either of
+You need to have the new frontend dependencies installed.
 
 ```
 pip install argus-server[htmx]
 ```
 
-or
-
-```
-pip install -r requirements/htmx.txt
-```
-
 will do it.
+
+#### Optional: Old frontend
+
+> [!WARNING]
+> Support for this backend will be dropped in version 2 of argus-server. Please
+> try the new backend.
+
+
+The old frontend needs:
+
+* **Redis**. Redis backs the websockets, in order to push realtime updates to
+  the frontend. See the included `docker compose` file for the quickest way.
+* [Argus-frontend](https://github.com/Uninett/Argus-frontend/), javascript that
+  uses the API.
+
+Get the python dependencies via:
+
+```
+pip install argus-server[spa]
+
+```
+
+#### Optional: Dataporten registration
+
+Dataporten authentication is supported by Argus and can be used to log into
+Argus-frontend. Refer to the
+[Dataporten](https://argus-server.rtfd.io/en/latest/authentication.html#dataporten)
+section of the documentation to learn about Dataporten registration, and how to
+set it up with Argus.
 
 ### Install Argus using pip
 
@@ -225,8 +251,10 @@ You will find Argus running at http://localhost:8000/.
 
 ### Code style
 
-Argus uses ruff as a source code formatter. Ruff will automatically install
-with the [dev requirements](requirements/dev.txt).
+Argus uses [ruff](https://docs.astral.sh/ruff/) as a Python source code
+formatter and linter and [djLint](https://djlint.com/) as an HTML formatter and
+linter. Ruff and djLint will automatically install with the
+[dev requirements](requirements/dev.txt).
 
 A pre-commit hook will format new code automatically before committing.
 To enable this pre-commit hook, run
@@ -253,46 +281,7 @@ $ tox
 An [HTML coverage report](htmlcov/index.html) will be generated.
 Refer to the [tox.ini](tox.ini) file for further options.
 
-## Using towncrier to automatically produce the changelog
-### Before merging a pull request
-To be able to automatically produce the changelog for a release one file for each
-pull request (also called news fragment) needs to be added to the folder
-`changelog.d/`.
 
-The name of the file consists of three parts separated by a period:
-1. The identifier: either the issue number (in case the pull request fixes that issue)
-or the pull request number. If we don't want to add a link to the resulting changelog
-entry then a `+` followed by a unique short description.
-2. The type of the change: we use `security`, `removed`, `deprecated`, `added`,
-`changed` and `fixed`.
-3. The file suffix, e.g. `.md`, towncrier does not care which suffix a fragment has.
+## How to do maintenance
 
-So an example for a file name related to an issue/pull request would be `214.added.md`
-or for a file without corresponding issue `+fixed-pagination-bug.fixed.md`.
-
-This file can either be created manually with a file name as specified above and the
-changelog text as content or one can use towncrier to create such a file as following:
-
-```console
-$ towncrier create -c "Changelog content" 214.added.md
-```
-
-When opening a pull request there will be a check to make sure that a news fragment is
-added and it will fail if it is missing.
-
-### Before a release
-To add all content from the `changelog.d/` folder to the changelog file simply run
-```console
-$ towncrier build --version {version}
-```
-This will also delete all files in `changelog.d/`.
-
-To preview what the addition to the changelog file would look like add the flag
-`--draft`. This will not delete any files or change `CHANGELOG.md`. It will only output
-the preview in the terminal.
-
-A few other helpful flags:
-- `date DATE` - set the date of the release, default is today
-- `keep` - do not delete the files in `changelog.d/`
-
-More information about [towncrier](https://towncrier.readthedocs.io).
+See [MAINTAINING.rst](MAINTAINING.rst).
