@@ -1,14 +1,14 @@
 <table id="table"
   {# djlint:off #}
        {% with preferences.argus_htmx.update_interval as update_interval %}
-         {% if update_interval != 'never' %}
            hx-get="?page={{ page.number }}"
            hx-target="this"
            hx-swap="outerHTML"
-           hx-trigger="every {{ update_interval }}s"
+           {% if update_interval != 'never' %}
+             hx-trigger="every {{ update_interval }}s"
+           {% endif %}
            hx-push-url="true"
            hx-include=".incident-list-param"
-         {% endif %}
        {% endwith %}
   class="border border-separate border-spacing-1 border-primary table">
   {# djlint:on #}
