@@ -1,0 +1,4 @@
+{% extends "htmx/_base_confirm_dialog.html" %}
+{% block confirm_action_control %}
+  hx-post="{% url 'htmx:filter-delete' pk=filter.id %}"
+{% endblock confirm_action_control %}

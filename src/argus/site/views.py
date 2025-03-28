@@ -110,11 +110,11 @@ class MetadataView(APIView):
         metadata = {
             "server-version": get_version(),
             "api-version": {
-                "stable": "v1",
-                "unstable": "v2",
+                "deprecated": "v1",
+                "stable": "v2",
             },
             "jsonapi-schema": {
-                "stable": reverse("schema-v1-old"),
+                "stable": reverse("schema-v2"),
                 "v1": "/api/v1/schema/",
                 "v2": "/api/v2/schema/",
             },

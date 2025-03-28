@@ -16,4 +16,8 @@
     @apply border-error;
     background-color: color-mix(in srgb, oklch(var(--er)), oklch(var(--b1)) 85%);
   }
+  .alert.autoclosing {
+    transition: opacity 0.2s ease-out;
+    opacity: 0;
+  }
 }

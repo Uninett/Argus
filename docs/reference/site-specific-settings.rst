@@ -38,6 +38,8 @@ Django-specific settings
   .. warning:: Keep the :setting:`SECRET_KEY` secret, as it is relevant to the
     security and integrity of your Argus instance.
 
+.. _site-specific-settings-additional-apps:
+
 Settings for adding additional Django apps
 ------------------------------------------
 
@@ -293,21 +295,6 @@ Ignore low priority incidents by default::
 Do both::
 
     ARGUS_FALLBACK_FILTER = {"acked": False, "maxlevel": 3}
-
-Realtime updates
-----------------
-
-.. setting:: ARGUS_REDIS_SERVER
-
-The Argus API can notify the frontend about changes in the list of open
-incidents in realtime using a websocket (implemented using Django
-Channels). The realtime interface requires access to a Redis server for message
-passing.
-
-By default, Argus will look for a Redis server on ``localhost:6379``. To use a
-different server, set the :setting:`ARGUS_REDIS_SERVER` environment variable, e.g::
-
-  ARGUS_REDIS_SERVER=my-redis-server.example.org:6379
 
 Token settings
 ------------------

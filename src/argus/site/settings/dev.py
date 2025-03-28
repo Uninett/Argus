@@ -22,6 +22,7 @@ ALLOWED_HOSTS = [
     "127.0.0.1",
     "localhost",
 ]
+INTERNAL_IPS = ["127.0.0.1"]
 
 
 INSTALLED_APPS += ["django_extensions"]  # noqa: F405

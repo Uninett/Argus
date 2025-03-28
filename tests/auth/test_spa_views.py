@@ -3,7 +3,7 @@ from django.test import override_settings, tag
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
-from argus.auth.factories import AdminUserFactory, BaseUserFactory
+from argus.auth.factories import BaseUserFactory
 from argus.util.testing import disconnect_signals, connect_signals
 
 

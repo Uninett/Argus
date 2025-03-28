@@ -1,5 +1,8 @@
+from typing import Literal, Union
 from django import template
-
+from django.contrib.messages.storage.base import Message
+from django.conf import settings
+from .. import defaults
 
 register = template.Library()
 
@@ -37,3 +40,23 @@ def pp_level(level: int) -> str:
 @register.filter
 def fieldvalue(form, fieldname):
     return form[fieldname].value() or ""
+
+
+@register.filter
+def autoclose_time(message: Message):
+    candidates = getattr(
+        settings,
+        "NOTIFICATION_TOAST_AUTOCLOSE_SECONDS",
+        defaults.NOTIFICATION_TOAST_AUTOCLOSE_SECONDS,
+    )
+    tags = set(message.tags.split()) & set(candidates.keys())
+    if not tags:
+        return -1
+    return min(candidates[tag] for tag in tags)
+
+
+@register.filter
+def update_interval_string(value: Union[int, Literal["never"]]):
+    if value == "never":
+        return "Never"
+    return f"{value}s"

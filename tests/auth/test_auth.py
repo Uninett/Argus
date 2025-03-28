@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.urls import reverse
+
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient, APITestCase
@@ -12,7 +13,7 @@ from . import assemble_token_auth_kwarg, expire_token
 User = get_user_model()
 
 
-class APITests(APITestCase):
+class AuthTokenAPITests(APITestCase):
     def setUp(self):
         self.superuser1_password = "best_admin#1"
         self.superuser1 = AdminUserFactory(username="superuser1", password=self.superuser1_password)

@@ -13,7 +13,7 @@ STORAGES["staticfiles"]["BACKEND"] = "whitenoise.storage.CompressedManifestStati
 #     "localhost",
 # ]
 
-if not CORS_ALLOWED_ORIGINS:
+if not FRONTEND_URL:
     raise ImproperlyConfigured('"FRONTEND_URL" has not been set in production!')
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"

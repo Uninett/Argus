@@ -1,0 +1,8 @@
+<p class="sr-only">{{ label }}</p>
+<label for="select-all-on-page-{{ page.number }}" class="sr-only">Select all visible</label>
+<input id="select-all-on-page-{{ page.number }}"
+       hx-preserve
+       type="checkbox"
+       autocomplete="off"
+       class="checkbox checkbox-sm checkbox-primary border"
+       hx-on:change="htmx.findAll('.row-select').forEach(peer => peer.checked = event.target.checked); event.target.checked ? htmx.find('.tab-select').checked = event.target.checked : null; " />

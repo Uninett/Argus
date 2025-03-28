@@ -1,0 +1,5 @@
+<div id="form-list" class="flex flex-col max-w-4xl w-full gap-4">
+  {% for media, forms in grouped_forms.items %}
+    {% include "htmx/destination/_collapse_with_forms.html" with error_msg=None %}
+  {% endfor %}
+</div>

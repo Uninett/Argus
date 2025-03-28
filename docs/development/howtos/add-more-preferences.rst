@@ -14,7 +14,7 @@ In order to add more preferences:
    of preferences for the app you could use the app name.
 3. Adapt the below boilerplate::
 
-        from argus.auth.models import preferences, PreferencesBase
+        from argus.auth.models import preferences, PreferencesBase, PreferenceField
 
         class MagicNumberForm(forms.Form):
             magic_number = forms.IntegerField()
@@ -23,11 +23,8 @@ In order to add more preferences:
         @preferences(namespace="mypref")
         class MyPreferences:  # Optionally you can inherit from PreferencesBase
                               # here to get method completion
-            FORMS = {
-                "magic_number": MagicNumberForm,
-            }
-            _FIELD_DEFAULTS = {
-                 "magic_number": 42,
+            FIELDS = {
+                "magic_number": PreferenceField(form=MagicNumberForm, default=42),
             }
 
             # Optional Meta for testing, not needed unless only used for tests

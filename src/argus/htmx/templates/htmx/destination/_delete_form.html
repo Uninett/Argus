@@ -1,0 +1,9 @@
+<form hx-post="{% url 'htmx:htmx-delete' form.instance.id %}"
+      hx-trigger="submit"
+      hx-target="closest details"
+      hx-swap="outerHTML">
+  {% csrf_token %}
+  <fieldset class="menu menu-horizontal menu-md items-center gap-4">
+    <input type="submit" value="Delete" class="btn btn-secondary">
+  </fieldset>
+</form>

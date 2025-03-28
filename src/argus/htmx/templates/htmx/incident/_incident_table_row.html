@@ -1,0 +1,7 @@
+<tr id="incident-{{ incident.pk }}-row" class="group hover">
+  {% block columns %}
+    {% for column in columns %}
+      {% include column.cell_wrapper_template %}
+    {% endfor %}
+  {% endblock columns %}
+</tr>

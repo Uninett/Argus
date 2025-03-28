@@ -1,7 +1,90 @@
 # Release Notes
 
-This file documents changes to Argus that are relevant for operations and
-end-users.
+This file documents changes to Argus that are relevant for operations,
+customizers and end-users.
+
+## [1.34.1] - 2025-03-26
+
+Bugfix release, docker files should be able to run argus again.
+
+## [1.34.0] - 2025-03-26
+
+**This release marks the start of the process towards argus-server 2.0!**
+
+API V2 is hereby declared stable, and V1 is hereby deprecated.
+
+Version 2 will *drop support* for API V1 *and* the old frontend. Please try the
+new frontend and send us some feedback!
+
+The next Django LTS, 5.2, will not support any PostgreSQL older than version
+14, so please upgrade ASAP.
+
+The incident list in the new frontend is now feature complete. The timeslots
+page has been prettified but also has some bugs. There's lots of remaining UX
+things to do.
+
+## [1.33.0] - 2025-03-05
+
+Moved channels app from base settings to spa settings, where it belongs. This
+avoids an ImportError on new installs.
+
+Filtering by tags now possible in the new frontend.
+
+## [1.32.0] - 2025-03-03
+
+Mostly changes to the new frontend again, as well as some new and improved
+docs.
+
+If you use the old frontend and have a heavily customized settings-file, make
+sure it is compatible with the settings in `argus.spa.settings`, as the spa-app
+is no longer included by default in `INSTALLED_APPS`. For the same reason,
+running `redis` is only necessary if using the spa settings.
+
+With the new frontend, visiting the root of the site will now redirect to the
+incidents list and therefore possibly triggering a log in.
+
+## [1.31.0] - 2025-01-17
+
+Mostly changes to the new frontend this time around.
+
+Two development-relevant changes that affect customization:
+
+- Refactor of incident-specific frontend pages, many files have new names
+- How to define a preference has changed
+
+There are visible changes to the destinations-page and profiles page as well.
+
+This release is the first round of polish for the profiles page. More is to
+come.
+
+## [1.30.0] - 2024-12-19
+
+Final release of the year! This was again mostly changes to the alpha frontend.
+
+This release adds support for showing, adding, changing and deleting timeslots
+and notificaton profiles, though with no graphical polish whatsoever.
+
+The only functionality that is still to be finished is in the filter box on the
+incidents page:
+
+* filtering on tags
+* loading and saving filters
+
+## [1.29.0] - 2024-12-06
+
+Mostly changes to the alpha frontend that will not be detailed here.
+
+Support for multple API tokens per user has been added, via django-rest-knox.
+For that reason, the old API endpoints for dealing with token authentication
+has been deprecated, and new endpoints have been added to v2 of the API.
+
+We've copied the linting rules from argus-htmx, so anything that have not been
+merged yet might have to be updated to keep the linters happy.
+
+### Deprecated
+
+All v1 API endpoints for dealing with phone numbers have been deprecated.
+Please see the v2 endpoints dealing with destinations instead.
 
 ## [1.28.0] - 2024-11-29
 
@@ -318,7 +401,7 @@ With this version, the API for bulk changes of incidents and sending of
 notifications to new and interesting destinations via destination plugins has
 been frozen, and should be ready for use, completing what was started in 1.10.
 
-## Added
+### Added
 - Also include frontend-url to incident in incident-serializer
 - Show installed plugins in the metadata view
 

@@ -1,0 +1,20 @@
+<form hx-post="{% url 'htmx:htmx-create' %}"
+      hx-trigger="submit"
+      hx-target="#destination-content"
+      hx-swap="outerHTML"
+      class="max-w-4xl w-full card mt-4 mb-8 bg-base-200/40 shadow-xl p-2">
+  {% csrf_token %}
+  <fieldset class="p-2 border rounded-box border-primary items-center gap-4 flex items-end justify-center">
+    <legend class="menu-title">Create destination</legend>
+    {% for field in create_form %}
+      {% if field.errors %}
+        {% include "htmx/forms/input_field.html" with label=field.label wrapper_classes="form_control mb-auto" field=field errors=field.errors %}
+      {% else %}
+        {% include "htmx/forms/input_field.html" with label=field.label wrapper_classes="form_control mb-8" field=field %}
+      {% endif %}
+    {% empty %}
+      <p>Something went wrong</p>
+    {% endfor %}
+    <input type="submit" value="Create" class="btn btn-primary">
+  </fieldset>
+</form>

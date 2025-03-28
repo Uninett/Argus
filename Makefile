@@ -1,4 +1,4 @@
-.PHONY: clean testclean distclean coverageclean cacheclean nuke tailwind
+.PHONY: clean testclean distclean coverageclean cacheclean nuke tailwind docclean
 
 TAILWINDDIR=src/argus/htmx/tailwindtheme
 STATICDIR=src/argus/htmx/static
@@ -15,6 +15,9 @@ distclean:
 	-rm -rf ./dist
 	-rm -rf ./build
 
+docclean:
+	-rm -rf ./docs/_build
+
 coverageclean:
 	-rm .coverage
 	-rm .coverage.*
@@ -24,7 +27,7 @@ coverageclean:
 testclean: coverageclean clean
 	-rm -rf .tox
 
-nuke: clean distclean testclean cacheclean
+nuke: clean docclean distclean testclean cacheclean
 
 tailwind:
 	tailwindcss -c $(TAILWINDDIR)/tailwind.config.js -i $(TAILWINDDIR)/styles.css -o $(STATICDIR)/styles.css

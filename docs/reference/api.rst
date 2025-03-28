@@ -2,9 +2,14 @@
 API Endpoints
 =============
 
-Administration endpoint
------------------------
-Use ``/admin/`` to access the project’s admin pages.
+Endpoints, API v1
+=================
+
+.. warning::
+
+     v1 of the API is deprecated and will be removed.
+
+
 
 Authorization
 -------------
@@ -12,8 +17,7 @@ Authorization
 All endpoints require requests to contain a header with key
 ``Authorization`` and value ``Token {token}``, where ``{token}`` is
 replaced by a registered auth token. These are generated per user by
-logging in through Feide, and can be found at
-``/admin/authtoken/token/``.
+logging in through Feide, and can afterwards be found in the admin.
 
 .. _api-auth-endpoints:
 
@@ -881,17 +885,21 @@ Notification profile endpoints
            "sourceSystemIds": [<SourceSystem.pk>, ...]
        }
 
-Endpoints v2 API
-------------------------------
-.. note::
+Endpoints, API v2
+=================
 
-     v2 of the API is not stable yet.
+Authorization
+-------------
 
+All endpoints require requests to contain a header with key
+``Authorization`` and value ``Token {token}``, where ``{token}`` is
+replaced by a registered auth token. These are generated per user by
+logging in through Feide, and can afterwards be found in the admin.
 
 .. _api-auth-endpoints-v2:
 
 Auth endpoints
-==============================
+--------------
 
 -  ``GET`` to ``/api/v2/auth/user/``: returns the logged in user
 
@@ -941,7 +949,7 @@ Auth endpoints
 .. _api-incident-endpoints-v2:
 
 Incident endpoints
-==============================
+------------------
 
 
 -  ``/api/v2/incidents/``:
@@ -1445,7 +1453,7 @@ Incident endpoints
           }
 
 Notification profile endpoints
-==============================
+------------------------------
 
 -  ``/api/v2/notificationprofiles/``:
 

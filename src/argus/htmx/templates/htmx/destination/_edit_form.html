@@ -1,0 +1,20 @@
+<form hx-post="{% url 'htmx:htmx-update' form.instance.id %}"
+      hx-trigger="submit"
+      hx-target="closest details"
+      hx-swap="outerHTML"
+      class="flex flex-nowrap items-center gap-4">
+  {% csrf_token %}
+  <fieldset class="flex flex-nowrap items-center gap-4">
+    {% for hidden_field in form.hidden_fields %}{{ hidden_field }}{% endfor %}
+    {% for field in form.visible_fields %}
+      {% if field.errors %}
+        {% include "htmx/forms/input_field.html" with label=field.label wrapper_classes="form_control mb-auto" field=field errors=field.errors %}
+      {% else %}
+        {% include "htmx/forms/input_field.html" with label=field.label wrapper_classes="form_control mb-8" field=field %}
+      {% endif %}
+    {% empty %}
+      <p>Something went wrong</p>
+    {% endfor %}
+  </fieldset>
+  <input type="submit" value="Update" class="btn btn-primary">
+</form>
