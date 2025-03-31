@@ -11,7 +11,7 @@
       onkeydown="if (event.keyCode === 13) event.preventDefault();">
   <fieldset>
     <legend class="sr-only">Filter incidents</legend>
-    <ul class="menu menu-horizontal menu-sm flex items-center gap-2 py-1.5">
+    <ul class="menu menu-horizontal menu-xs flex items-center gap-0.5 py-0">
       {% for field in filter_form %}
         {% if not field.field.in_header %}
           <li class="form-control">
