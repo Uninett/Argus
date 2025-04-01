@@ -12,7 +12,7 @@ There was a *long* debate about what to call the primary object of study in Argu
 * incident
 * happening
 * event
-* .. se synonym dictionary for more
+* .. see synonym dictionary for more
 
 As it turns out, different groups use different terms, and even if they use the
 same term, they have different expectations and definitions. We chose
@@ -22,7 +22,7 @@ simple as we could make it.
 An *incident* is reported (pushed) by a machine *source*. That source has a *type*. Any
 change in the incident at the source is reported by the source as an *event*.
 Any changes done by humans on a specific incident are also reported as an
-*event*. The machine source can categorize incidents via *tags*, but argus does
+*event*. The machine source can categorize incidents via *tags*, but Argus does
 not know or care what the tags mean. *Notifications* can be set up via
 *filters* for a subset of the events.
 
@@ -50,7 +50,7 @@ things well:
 
 * Argus is not an inventory system
 * Argus is not a monitoring system, real-time or other
-* There is no pull. The source pushes incidents, argus pushes notifications.
+* There is no pull. The source pushes incidents, Argus pushes notifications.
 * Argus. Will. Not. Spam.
 
 .. rubric:: Footnotes
@@ -58,5 +58,5 @@ things well:
 .. [1] There is of course Boolean logic underlying the filters but we will
    never allow the full expressitivity
 .. [2] There is no way to send notifications for ALL incidents/events. The
-   closes you can get is sending for all stateful incidents, which will then
+   closest you can get is sending for all stateful incidents, which will then
    not allow sending for stateless incidents.
