@@ -95,7 +95,7 @@ create a ``Form`` for the action and register it together with the action handle
           views.INCIDENT_UPDATE_ACTIONS['custom-action'] = (CustomActionForm, custom_action_handler)
 
 
-The UI part is aslo a little different. You need to override and extend the
+The UI part is also a little different. You need to override and extend the
 ``htmx/incident/_incident_list_update_menu.html`` template::
 
   {% extends "htmx/incident/_incident_list_update_menu.html" %}
@@ -115,6 +115,7 @@ Create the following template ``htmx/incident/_my_custom_action_modal.html``::
       Custom Field
       <span class="indicator-item indicator-top indicator-start badge border-none mask mask-circle text-warning text-base">＊</span>
       <input name="custom_field"
+             autocomplete="off"
              type="text"
              placeholder="Custom placeholder"
              required
