@@ -1,10 +1,10 @@
 {% extends "./base.html" %}
 {% block profile_main %}
   <div>
-    <button class="contents">
-      <a class="btn btn-primary"
-         href="{% url "htmx:notificationprofile-create" %}">Create new profile</a>
-    </button>
+    <div class="card mt-4 mb-8 bg-base-200/40 shadow-2xl"
+         hx-get="{% url "htmx:notificationprofile-create" %}"
+         hx-swap="innerHTML"
+         hx-trigger="load once"></div>
     {% for form in form_list %}
       <div class="card my-4 bg-base-100 shadow-2xl">{% include "./_notificationprofile_form.html" %}</div>
     {% endfor %}
