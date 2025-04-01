@@ -137,7 +137,9 @@ oauthlib==3.2.2
 phonenumberslite==9.0.2
     # via django-phonenumber-field
 psycopg2==2.9.10
-    # via argus-server (pyproject.toml)
+    # via
+    #   -r constraints.txt
+    #   argus-server (pyproject.toml)
 pyasn1==0.6.1
     # via
     #   pyasn1-modules
