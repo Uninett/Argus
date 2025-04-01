@@ -4,7 +4,7 @@
     {% for field in hidden_fields %}{{ field }}{% endfor %}
   </div>
 {% endif %}
-<div class="flex items-center justify-start gap-2 w-full flex-wrap">
+<div class="flex items-start justify-start gap-2 w-full flex-wrap">
   {% for field, errors in fields %}
     <div {% with classes=field.css_classes %}
          {% if classes %}class="{{ classes }}"{% endif %}
