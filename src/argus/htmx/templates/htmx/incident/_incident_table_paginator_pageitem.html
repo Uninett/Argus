@@ -1,0 +1,13 @@
+<!--
+For each link we use hx-get to tell htmx to fetch that URL and
+swap it in. We also repeat the URL in the href attribute so the
+page works without JavaScript, and to ensure the link is
+displayed as clickable.
+-->
+<li>
+  <a hx-get="?page={{ page_number }}"
+     href="?page={{ page_number }}"
+     hx-indicator="#incident-list .htmx-indicator"
+     hx-include=".incident-list-param"
+     class="join-item btn btn-neutral">{{ page_prefix }}{{ page_name|default:page_number }}{{ page_suffix }}</a>
+</li>

@@ -43,66 +43,15 @@
           {% block refresh_info %}
             {% include "htmx/incident/_incident_list_refresh_info.html" %}
           {% endblock refresh_info %}
-          <!--
-                The htmx attributes set on the nav here are inherited by the child links.
-                hx-target tells where htmx to swap the fetched content in, and hx-swap
-                tells it how to swap it - by replacing the 'outerHTML' attribute of the
-                target, i.e. replacing the target's actual DOM node. hx-push-url tells
-                htmx to push the fetched URL into the browser history, so we can use
-                the backwards/forwards buttons to navigate these subpages.
-                -->
-          <ul class="join"
-              hx-target="#table"
-              hx-swap="outerHTML"
-              hx-push-url="true">
-            {% if page.number != 1 %}
+          {% if page.paginator.num_pages > 1 %}
+            {% include "./_incident_table_paginator.html" %}
+          {% else %}
+            <ul class="join">
               <li>
-                <!--
-                              For each link we use hx-get to tell htmx to fetch that URL and
-                              swap it in. We also repeat the URL in the href attribute so the
-                              page works without JavaScript, and to ensure the link is
-                              displayed as clickable.
-                            -->
-                <a hx-get="?page=1"
-                   href="?page=1"
-                   hx-indicator="#incident-list .htmx-indicator"
-                   class="join-item btn btn-neutral">« First</a>
+                <button class="btn btn-active btn-neutral">1</button>
               </li>
-            {% endif %}
-            {% if page.has_previous %}
-              <li>
-                <a hx-get="?page={{ page.previous_page_number }}"
-                   href="?page={{ page.previous_page_number }}"
-                   hx-indicator="#incident-list .htmx-indicator"
-                   class="join-item btn btn-neutral">{{ page.previous_page_number }}</a>
-              </li>
-            {% endif %}
-            {% if page.paginator.num_pages > 1 %}
-              <li>
-                <button class="join-item btn btn-active btn-neutral">{{ page.number }}</button>
-              </li>
-            {% else %}
-              <li>
-                <button class="btn btn-active btn-neutral">{{ page.number }}</button>
-              </li>
-            {% endif %}
-            {% if page.has_next %}
-              <li>
-                <a hx-get="?page={{ page.next_page_number }}"
-                   href="?page={{ page.next_page_number }}"
-                   hx-indicator="#incident-list .htmx-indicator"
-                   class="join-item btn btn-neutral">{{ page.next_page_number }}</a>
-              </li>
-            {% endif %}
-            {% if page.number != page.paginator.num_pages %}
-              <li>
-                <a hx-get="?page={{ page.paginator.num_pages }}"
-                   href="?page={{ page.paginator.num_pages }}"
-                   hx-indicator="#incident-list .htmx-indicator"
-                   class="join-item btn btn-neutral">» Last</a>
-              </li>
-            {% endif %}
-          </ul>
+            </ul>
+          {% endif %}
         </div>
       </td>
     </tr>
