@@ -24,11 +24,11 @@ the backwards/forwards buttons to navigate these subpages.
   <li>
     <button class="join-item btn btn-active btn-neutral pointer-events-none">{{ page.number }}</button>
   </li>
-  {% if page.has_next %}
+  {% if page.has_next and page.number != second_to_last_page %}
     {% include "./_incident_table_paginator_pageitem.html" with page_number=page.next_page_number page_suffix=" ›" %}
   {% endif %}
   {% if page.number != last_page_num %}
-    {% if page.number != second_to_last_page %}
+    {% if page.next_page_number < second_to_last_page %}
       <li>
         <button class="join-item btn btn-neutral pointer-events-none">…</button>
       </li>
