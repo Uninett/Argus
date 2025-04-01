@@ -34,7 +34,7 @@
             <p class="card-body flex-row flex-wrap gap-0.5">
               {% for tag in incident.deprecated_tags %}
                 <span class="badge badge-neutral badge-outline  h-auto text-wrap break-all text-center text-xs">
-                  {{ tag.key }}=
+                  {{ tag.key }}{{ tag.TAG_DELIMITER }}
                   {% if "http" in tag.value %}
                     <a href="{{ tag.value }}" target="_blank" rel="noreferrer">{{ tag.value }}</a>
                   {% else %}
