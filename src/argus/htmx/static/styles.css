@@ -4139,10 +4139,6 @@ details.collapse summary::-webkit-details-marker {
   z-index: 1;
 }
 
-.order-first {
-  order: -9999;
-}
-
 .m-1 {
   margin: 0.25rem;
 }
@@ -4368,6 +4364,10 @@ details.collapse summary::-webkit-details-marker {
   flex-basis: 25%;
 }
 
+.border-collapse {
+  border-collapse: collapse;
+}
+
 .border-separate {
   border-collapse: separate;
 }
@@ -4488,6 +4488,10 @@ details.collapse summary::-webkit-details-marker {
 
 .text-nowrap {
   text-wrap: nowrap;
+}
+
+.break-words {
+  overflow-wrap: break-word;
 }
 
 .break-all {
