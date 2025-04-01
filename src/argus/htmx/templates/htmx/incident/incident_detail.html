@@ -36,7 +36,7 @@
                 <span class="badge badge-neutral badge-outline  h-auto text-wrap break-all text-center text-xs">
                   {{ tag.key }}=
                   {% if "http" in tag.value %}
-                    <a href="{{ tag.value }}" target="_blank">{{ tag.value }}</a>
+                    <a href="{{ tag.value }}" target="_blank" rel="noreferrer">{{ tag.value }}</a>
                   {% else %}
                     {{ tag.value }}
                   {% endif %}
