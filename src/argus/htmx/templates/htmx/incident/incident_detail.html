@@ -149,7 +149,7 @@
             <div class="card-actions grow-0">
               {% if incident.stateful %}
                 {% if incident.open %}
-                  {% include "htmx/incident/_incident_close_modal.html" with action="close" dialog_id="close-incident-dialog" button_title="Close" header="Manually close incident" explanation="Write a message describing why the incident was manually closed" cancel_text="Cancel" submit_text="Close now" %}
+                  {% include "htmx/incident/_incident_close_modal.html" with action="close" dialog_id="close-incident-dialog" button_title="Close incident" header="Manually close incident" explanation="Write a message describing why the incident was manually closed" cancel_text="Cancel" submit_text="Close now" %}
                 {% else %}
                   {% include "htmx/incident/_incident_reopen_modal.html" with action="reopen" dialog_id="reopen-incident-dialog" button_title="Reopen" header="Manually reopen incident" explanation="Write a message describing why the incident was manually reopend" cancel_text="Cancel" submit_text="Reopen now" %}
                 {% endif %}
