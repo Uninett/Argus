@@ -79,6 +79,8 @@ class NotificationProfileForm(DestinationFieldMixin, FilterFieldMixin, NoColonMi
         self.user = kwargs.pop("user")
         super().__init__(*args, **kwargs)
 
+        self.template_name_div = "htmx/notificationprofile/_notificationprofile_form_div.html"
+
         self.fields["timeslot"].queryset = Timeslot.objects.filter(user=self.user)
         self.fields["active"].widget.attrs["class"] = "checkbox checkbox-sm border"
         self.fields["active"].widget.attrs["autocomplete"] = "off"
