@@ -9,16 +9,22 @@
     <div {% with classes=field.css_classes %}
          {% if classes %}class="{{ classes }}"{% endif %}
          {% endwith %}>
-      {% if field.use_fieldset %}
-        <fieldset>
-          {% if field.label %}{{ field.legend_tag }}{% endif %}
-        {% else %}
-          {% if field.label %}{{ field.label_tag }}{% endif %}
-        {% endif %}
-        {% if field.help_text %}<div class="helptext">{{ field.help_text|safe }}</div>{% endif %}
-        {{ errors }}
-        {{ field }}
-        {% if field.use_fieldset %}</fieldset>{% endif %}
+      {% if field.name == "name" or field.name == "timeslot" %}
+        {% include "htmx/forms/input_field.html" with label=field.label max_width="md" field=field %}
+      {% elif field.name == "active" %}
+        {% include "htmx/forms/input_field.html" with label=field.label field=field input_classes="checkbox border-b border-1" %}
+      {% else %}
+        {% if field.use_fieldset %}
+          <fieldset>
+            {% if field.label %}{{ field.legend_tag }}{% endif %}
+          {% else %}
+            {% if field.label %}{{ field.label_tag }}{% endif %}
+          {% endif %}
+          {% if field.help_text %}<div class="helptext">{{ field.help_text|safe }}</div>{% endif %}
+          {{ errors }}
+          {{ field }}
+          {% if field.use_fieldset %}</fieldset>{% endif %}
+      {% endif %}
       {% if forloop.last %}
         {% for field in hidden_fields %}{{ field }}{% endfor %}
       {% endif %}

@@ -4514,6 +4514,10 @@ details.collapse summary::-webkit-details-marker {
   border-width: 2px;
 }
 
+.border-1 {
+  border-width: 1px;
+}
+
 .border-2 {
   border-width: 2px;
 }
