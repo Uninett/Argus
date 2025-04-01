@@ -1,7 +1,9 @@
 <section class="card-body">
   <form method="post" action="{{ form.action }}" class="flex flex-row gap-4">
     {% csrf_token %}
-    {{ form.as_div }}
-    {% include "./_notificationprofile_buttons.html" with object=form.instance %}
+    <div class="flex items-center justify-between gap-2 w-full flex-nowrap">
+      {{ form.as_div }}
+      {% include "./_notificationprofile_buttons.html" with object=form.instance %}
+    </div>
   </form>
 </section>
