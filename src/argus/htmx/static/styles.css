@@ -4359,8 +4359,9 @@ details.collapse summary::-webkit-details-marker {
   flex-basis: 25%;
 }
 
-.border-collapse {
-  border-collapse: collapse;
+.basis-1\/5 {
+  flex-basis: 20%;
+}
 }
 
 .border-separate {

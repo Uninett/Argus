@@ -8,7 +8,7 @@
 <div class="flex items-start justify-start gap-2 w-full flex-wrap">
   {% for field, errors in fields %}
     <div {% with classes=field.css_classes %}
-         {% if classes %}class="{{ classes }}"{% endif %}
+         {% if classes %}class="{{ classes }}"{% elif field.name != "active" %}class="basis-1/5 shrink-0 grow-0"{% endif %}
          {% endwith %}>
       {% if field.name == "name" or field.name == "timeslot" %}
         {% include "htmx/forms/input_field.html" with label=field.label max_width="md" field=field %}
