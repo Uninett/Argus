@@ -1,3 +1,4 @@
+{% load widget_tweaks %}
 {{ errors }}
 {% if errors and not fields %}
   <div>
@@ -14,16 +15,12 @@
       {% elif field.name == "active" %}
         {% include "htmx/forms/input_field.html" with label=field.label field=field input_classes="checkbox border-b border-1" %}
       {% else %}
-        {% if field.use_fieldset %}
-          <fieldset>
-            {% if field.label %}{{ field.legend_tag }}{% endif %}
-          {% else %}
-            {% if field.label %}{{ field.label_tag }}{% endif %}
-          {% endif %}
+        <div class="form-control">
+          <label class="label label-text italic">{{ field.label }}</label>
           {% if field.help_text %}<div class="helptext">{{ field.help_text|safe }}</div>{% endif %}
           {{ errors }}
-          {{ field }}
-          {% if field.use_fieldset %}</fieldset>{% endif %}
+          {% render_field field %}
+        </div>
       {% endif %}
       {% if forloop.last %}
         {% for field in hidden_fields %}{{ field }}{% endfor %}

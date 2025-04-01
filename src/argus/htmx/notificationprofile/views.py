@@ -43,7 +43,10 @@ class DestinationFieldMixin:
             partial_get = reverse("htmx:notificationprofile-destinations-field-create")
         self.fields["destinations"].widget = DropdownMultiSelect(
             partial_get=partial_get,
-            attrs={"placeholder": "select destination..."},
+            attrs={
+                "placeholder": "select destination...",
+                "field_styles": "input input-bordered border-b max-w-xs",
+            },
         )
         self.fields["destinations"].choices = self._get_destination_choices(user)
 
@@ -62,7 +65,10 @@ class FilterFieldMixin:
             partial_get = reverse("htmx:notificationprofile-filters-field-create")
         self.fields["filters"].widget = DropdownMultiSelect(
             partial_get=partial_get,
-            attrs={"placeholder": "select filter..."},
+            attrs={
+                "placeholder": "select filter...",
+                "field_styles": "input input-bordered border-b max-w-xs",
+            },
         )
         self.fields["filters"].choices = tuple(qs.values_list("id", "name"))
 
