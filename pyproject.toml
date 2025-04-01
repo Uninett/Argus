@@ -48,7 +48,6 @@ dynamic = ["version"]
 "Homepage" = "https://github.com/Uninett/Argus"
 
 [project.optional-dependencies]
-docs = ["sphinx>=2.2.0"]
 htmx = [
     "django-htmx",
     "django-widget-tweaks==1.5.0",
@@ -59,19 +58,31 @@ spa = [
     "channels[daphne]>=4.0.0,<5",
     "channels-redis>=4",
 ]
+
+[dependency-groups]
 dev = [
     "django-debug-toolbar",
-    "coverage",
     "django-extensions",
     "ruff",
     "djlint",
     "ipython",
     "pre-commit",
     "python-dotenv",
-    "towncrier",
     "werkzeug",
+    "towncrier",
+    {include-group = "build"},
+    {include-group = "docs"},
+    {include-group = "test"},
+]
+test = [
+    "coverage",
     "tox>=4",
+]
+build = [
     "build",  # for debugging builds/installs
+]
+docs = [
+    "sphinx>=2.2.0",
 ]
 
 [tool.djlint]
