@@ -1,6 +1,7 @@
 {% load widget_tweaks %}
 <div class="{{ wrapper_classes|default:"form-control w-full" }} max-w-{{ max_width|default:"xs" }}">
-  <label class="label">
+  <label class="label"
+         {% if field %}for="{{ field.auto_id }}"{% else %}for=""{{ id|default:"id_"|add:name }}""{% endif %}>
     <span class="label-text italic">{{ label }}</span>
   </label>
   {% block input_rendering %}
@@ -11,7 +12,8 @@
       {% if field %}
         {% render_field field class+="input input-bordered border-b w-full" %}
       {% else %}
-        <input name="{{ name }}"
+        <input id="{{ id|default:"id_"|add:name }}"
+               name="{{ name }}"
                type="{{ type|default:"" }}"
                placeholder="{{ placeholder|default:"" }}"
                value="{{ value|default:"" }}"
