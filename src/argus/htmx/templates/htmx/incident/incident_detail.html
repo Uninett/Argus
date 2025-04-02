@@ -159,7 +159,9 @@
             {% for event in incident.events.all %}
               {% if not event.ack %}
                 <div class="px-2 space-y-2">
-                  <p>{{ event.get_type_display }}</p>
+                  <p>
+                    <strong>{{ event.get_type_display }}</strong>
+                  </p>
                   <p class="whitespace-pre-line break-all">{{ event.description }}</p>
                   <p>
                     {{ event.actor }}
