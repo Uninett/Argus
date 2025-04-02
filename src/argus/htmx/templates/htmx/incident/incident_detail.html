@@ -132,7 +132,7 @@
             </div>
             {% for ack in incident.acks %}
               <div class="px-2 space-y-2">
-                <p>{{ ack.event.description }}</p>
+                <p class="whitespace-pre-line break-all">{{ ack.event.description }}</p>
                 <p>
                   {{ ack.event.actor }}
                   {{ ack.event.timestamp|date:preferences.argus_htmx.datetime_format }}
@@ -159,7 +159,7 @@
               {% if not event.ack %}
                 <div class="px-2 space-y-2">
                   <p>{{ event.get_type_display }}</p>
-                  <p class="whitespace-pre-line">{{ event.description }}</p>
+                  <p class="whitespace-pre-line break-all">{{ event.description }}</p>
                   <p>
                     {{ event.actor }}
                     {{ event.timestamp|date:preferences.argus_htmx.datetime_format }}
