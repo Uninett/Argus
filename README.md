@@ -31,10 +31,10 @@ There are several ways to install Argus.
 
 #### Requirements
 
-* Python 3.9+
+* Python 3.10+
 * Django 4.2 or 5.1
 * pip
-* PostgreSQL 12+
+* PostgreSQL 14+
 
 > [!WARNING]
 > The next [Django LTS](https://docs.djangoproject.com/en/5.2/releases/5.2/)

@@ -7,19 +7,20 @@ name = "argus-server"
 description = "Argus is an alert aggregator for monitoring systems"
 authors = [{name="Uninett Opensource", email="opensource@uninett.no"}]
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 license = {text = "GPL-3.0-or-later"}
 classifiers = [
     "Framework :: Django",
     "Framework :: Django :: 4.2",
+    "Framework :: Django :: 5.1",
     "Intended Audience :: Information Technology",
     "Intended Audience :: System Administrators",
     "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Topic :: System :: Monitoring",
 ]
 dependencies = [
