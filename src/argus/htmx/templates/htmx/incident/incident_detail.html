@@ -135,6 +135,7 @@
                 <p class="whitespace-pre-line break-all">{{ ack.event.description }}</p>
                 <p>
                   {{ ack.event.actor }}
+                  @
                   {{ ack.event.timestamp|date:preferences.argus_htmx.datetime_format }}
                 </p>
                 {% if ack.expiration %}<p>Expires: {{ ack.expiration|date:preferences.argus_htmx.datetime_format }}</p>{% endif %}
@@ -162,6 +163,7 @@
                   <p class="whitespace-pre-line break-all">{{ event.description }}</p>
                   <p>
                     {{ event.actor }}
+                    @
                     {{ event.timestamp|date:preferences.argus_htmx.datetime_format }}
                   </p>
                 </div>
