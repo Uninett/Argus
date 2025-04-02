@@ -131,7 +131,7 @@
               {% include "htmx/incident/_incident_acknowledge_modal.html" with action="ack" dialog_id="create-acknowledgment-dialog" button_title="Create acknowledgment" header="Submit acknowledgment" explanation="Write a message describing why this incident was acknowledged" cancel_text="Cancel" submit_text="Submit" %}
             </div>
             {% for ack in incident.acks %}
-              <div class="px-2">
+              <div class="px-2 space-y-2">
                 <p>{{ ack.event.description }}</p>
                 <p>
                   {{ ack.event.actor }}
@@ -157,7 +157,7 @@
             </div>
             {% for event in incident.events.all %}
               {% if not event.ack %}
-                <div class="px-2">
+                <div class="px-2 space-y-2">
                   <p>{{ event.get_type_display }}</p>
                   <p>{{ event.description }}</p>
                   <p>
