@@ -4481,6 +4481,10 @@ details.collapse summary::-webkit-details-marker {
   white-space: nowrap;
 }
 
+.whitespace-pre-line {
+  white-space: pre-line;
+}
+
 .text-wrap {
   text-wrap: wrap;
 }
