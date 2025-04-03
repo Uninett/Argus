@@ -43,7 +43,7 @@
             <div class="card-body">
               <section>
                 <h3 class="font-bold">Description</h3>
-                <p>{{ incident.description }}</p>
+                <p class="whitespace-pre-line break-all">{{ incident.description }}</p>
               </section>
               {% if incident.stateful %}
                 <section>
@@ -131,10 +131,11 @@
               {% include "htmx/incident/_incident_acknowledge_modal.html" with action="ack" dialog_id="create-acknowledgment-dialog" button_title="Create acknowledgment" header="Submit acknowledgment" explanation="Write a message describing why this incident was acknowledged" cancel_text="Cancel" submit_text="Submit" %}
             </div>
             {% for ack in incident.acks %}
-              <div class="px-2">
-                <p>{{ ack.event.description }}</p>
+              <div class="px-2 space-y-2">
+                <p class="whitespace-pre-line break-all">{{ ack.event.description }}</p>
                 <p>
                   {{ ack.event.actor }}
+                  @
                   {{ ack.event.timestamp|date:preferences.argus_htmx.datetime_format }}
                 </p>
                 {% if ack.expiration %}<p>Expires: {{ ack.expiration|date:preferences.argus_htmx.datetime_format }}</p>{% endif %}
@@ -157,11 +158,14 @@
             </div>
             {% for event in incident.events.all %}
               {% if not event.ack %}
-                <div class="px-2">
-                  <p>{{ event.get_type_display }}</p>
-                  <p>{{ event.description }}</p>
+                <div class="px-2 space-y-2">
+                  <p>
+                    <strong>{{ event.get_type_display }}</strong>
+                  </p>
+                  <p class="whitespace-pre-line break-all">{{ event.description }}</p>
                   <p>
                     {{ event.actor }}
+                    @
                     {{ event.timestamp|date:preferences.argus_htmx.datetime_format }}
                   </p>
                 </div>
