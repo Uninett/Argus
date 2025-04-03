@@ -67,7 +67,7 @@ def update_interval_string(value: Union[int, Literal["never"]]):
 
 @register.filter
 def is_valid_url(value: str) -> bool:
-    """Returns True of the given string is a valid URL, False otherwise."""
+    """Returns True if the given string is a valid URL, False otherwise."""
     url_validator = URLValidator()
     try:
         url_validator(value)
