@@ -23,7 +23,9 @@ class TestIncidentFilterForm(TestCase):
         source = SourceSystemFactory(name="testsource")
         self.valid_field_values = {
             "open": True,
+            "closed": False,
             "acked": True,
+            "unacked": False,
             "sourceSystemIds": [source.id],
             "tags": "tag1=value1, tag2=value2",
             "maxlevel": 1,
