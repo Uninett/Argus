@@ -4363,8 +4363,9 @@ details.collapse summary::-webkit-details-marker {
   flex-basis: 25%;
 }
 
-.border-collapse {
-  border-collapse: collapse;
+.basis-1\/5 {
+  flex-basis: 20%;
+}
 }
 
 .border-separate {
@@ -4520,6 +4521,10 @@ details.collapse summary::-webkit-details-marker {
 
 .border {
   border-width: 2px;
+}
+
+.border-1 {
+  border-width: 1px;
 }
 
 .border-2 {

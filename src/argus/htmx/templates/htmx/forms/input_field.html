@@ -10,7 +10,9 @@
         <span class="indicator-item indicator-top indicator-end badge border-none mask mask-circle text-warning text-base">＊</span>
       {% endif %}
       {% if field %}
-        {% render_field field class+="input input-bordered border-b w-full" %}
+        {% with classes=input_classes|default:"input input-bordered border-b w-full" %}
+          {% render_field field class+=classes %}
+        {% endwith %}
       {% else %}
         <input id="{{ id|default:"id_"|add:name }}"
                name="{{ name }}"
@@ -19,7 +21,7 @@
                value="{{ value|default:"" }}"
                {% if is_required %}required{% endif %}
                autocomplete="off"
-               class="input input-bordered border-b w-full" />
+               class="{{ input_classes|default:"input input-bordered border-b w-full" }}" />
       {% endif %}
     </div>
   {% endblock input_rendering %}
