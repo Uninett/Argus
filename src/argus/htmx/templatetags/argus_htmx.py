@@ -2,6 +2,9 @@ from typing import Literal, Union
 from django import template
 from django.contrib.messages.storage.base import Message
 from django.conf import settings
+from django.core.exceptions import ValidationError
+from django.core.validators import URLValidator
+
 from .. import defaults
 
 register = template.Library()
@@ -60,3 +63,14 @@ def update_interval_string(value: Union[int, Literal["never"]]):
     if value == "never":
         return "Never"
     return f"{value}s"
+
+
+@register.filter
+def is_valid_url(value: str) -> bool:
+    """Returns True of the given string is a valid URL, False otherwise."""
+    url_validator = URLValidator()
+    try:
+        url_validator(value)
+        return True
+    except ValidationError:
+        return False
