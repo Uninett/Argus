@@ -15,3 +15,8 @@ tests see by
 ``@override_settings(ROOT_URLCONF="i.want.to.test.these.urls.py")``, replacing
 "i.want.to.test.these.urls.py" with whatever urls.py defines the namespace in
 question.
+
+Docker file won't build, can't install packages
+===============================================
+
+Are you running a VPN? Try turning it off.
