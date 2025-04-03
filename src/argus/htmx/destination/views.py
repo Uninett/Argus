@@ -53,7 +53,9 @@ def delete_htmx(request, pk: int) -> HttpResponse:
 def update_htmx(request, pk: int) -> HttpResponse:
     destination = DestinationConfig.objects.get(pk=pk)
     media = destination.media
-    form = DestinationFormUpdate(request.POST or None, instance=destination, request=request)
+    form = DestinationFormUpdate(
+        request.POST or None, instance=destination, prefix=f"destination_{destination.pk}", request=request
+    )
     if is_valid := form.is_valid():
         form.save()
 
@@ -107,7 +109,10 @@ def _get_update_forms(user, media: Media = None) -> list[DestinationFormUpdate]:
         destinations = user.destinations.all()
     # Sort by oldest first
     destinations = destinations.order_by("pk")
-    return [DestinationFormUpdate(instance=destination) for destination in destinations]
+    return [
+        DestinationFormUpdate(instance=destination, prefix=f"destination_{destination.pk}")
+        for destination in destinations
+    ]
 
 
 def _group_update_forms_by_media(
