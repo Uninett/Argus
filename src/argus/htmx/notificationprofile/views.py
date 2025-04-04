@@ -27,7 +27,6 @@ class DeleteModal(ConfirmationModal):
     button_title: str = "Delete"
     header: str = "Delete notification profile"
     submit_text: str = "Delete"
-    explanation: str = "Delete this notification profile?"
 
 
 class DestinationFieldMixin:
@@ -241,6 +240,7 @@ class NotificationProfileListView(NotificationProfileMixin, ListView):
         for obj in self.get_queryset():
             form = NotificationProfileForm(None, prefix=f"npf{obj.pk}", user=self.request.user, instance=obj)
             form.modal = DeleteModal(
+                explanation=f'Delete the notification profile "{obj}"?',
                 dialog_id=f"delete-modal-{obj.pk}",
                 endpoint=reverse("htmx:notificationprofile-delete", kwargs={"pk": obj.pk}),
             )
