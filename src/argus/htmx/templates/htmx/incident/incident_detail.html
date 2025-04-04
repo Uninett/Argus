@@ -129,54 +129,60 @@
             </div>
           </section>
         </section>
-        <section id="acknowledgements" class="basis-1/4 max-w-[30%] card shadow-md">
-          <h2 class="card-title pl-8">Acknowledgements</h2>
-          <div class="card-body gap-4 grow-0">
-            <div class="card-actions grow-0">
-              {% include "htmx/incident/_incident_acknowledge_modal.html" with action="ack" dialog_id="create-acknowledgment-dialog" button_title="Create acknowledgment" header="Submit acknowledgment" explanation="Write a message describing why this incident was acknowledged" cancel_text="Cancel" submit_text="Submit" %}
-            </div>
-            {% for ack in incident.acks %}
-              <div class="px-2 space-y-2">
-                <p class="whitespace-pre-line break-all">{{ ack.event.description }}</p>
-                <p>
-                  {{ ack.event.actor }}
-                  @
-                  {{ ack.event.timestamp|date:preferences.argus_htmx.datetime_format }}
-                </p>
-                {% if ack.expiration %}<p>Expires: {{ ack.expiration|date:preferences.argus_htmx.datetime_format }}</p>{% endif %}
+        <section id="acknowledgements"
+                 class="flex flex-col basis-1/4 max-w-[30%] card shadow-md">
+          <div class="basis-0 grow overflow-y-scroll">
+            <h2 class="card-title pl-8 sticky top-0">Acknowledgements</h2>
+            <div class="card-body gap-4 grow-0">
+              <div class="card-actions grow-0 sticky top-10">
+                {% include "htmx/incident/_incident_acknowledge_modal.html" with action="ack" dialog_id="create-acknowledgment-dialog" button_title="Create acknowledgment" header="Submit acknowledgment" explanation="Write a message describing why this incident was acknowledged" cancel_text="Cancel" submit_text="Submit" %}
               </div>
-              {% if not forloop.last %}<hr />{% endif %}
-            {% endfor %}
-          </div>
-        </section>
-        <section id="events" class="basis-1/4 max-w-[30%] card shadow-md">
-          <h2 class="card-title pl-8">Related events</h2>
-          <div class="gap-4 card-body flex-none">
-            <div class="card-actions grow-0">
-              {% if incident.stateful %}
-                {% if incident.open %}
-                  {% include "htmx/incident/_incident_close_modal.html" with action="close" dialog_id="close-incident-dialog" button_title="Close incident" header="Manually close incident" explanation="Write a message describing why the incident was manually closed" cancel_text="Cancel" submit_text="Close now" %}
-                {% else %}
-                  {% include "htmx/incident/_incident_reopen_modal.html" with action="reopen" dialog_id="reopen-incident-dialog" button_title="Reopen incident" header="Manually reopen incident" explanation="Write a message describing why the incident was manually reopend" cancel_text="Cancel" submit_text="Reopen now" %}
-                {% endif %}
-              {% endif %}
-            </div>
-            {% for event in incident.events.all %}
-              {% if not event.ack %}
+              {% for ack in incident.acks %}
                 <div class="px-2 space-y-2">
+                  <p class="whitespace-pre-line break-all">{{ ack.event.description }}</p>
                   <p>
-                    <strong>{{ event.get_type_display }}</strong>
-                  </p>
-                  <p class="whitespace-pre-line break-all">{{ event.description }}</p>
-                  <p>
-                    {{ event.actor }}
+                    {{ ack.event.actor }}
                     @
-                    {{ event.timestamp|date:preferences.argus_htmx.datetime_format }}
+                    {{ ack.event.timestamp|date:preferences.argus_htmx.datetime_format }}
                   </p>
+                  {% if ack.expiration %}<p>Expires: {{ ack.expiration|date:preferences.argus_htmx.datetime_format }}</p>{% endif %}
                 </div>
                 {% if not forloop.last %}<hr />{% endif %}
-              {% endif %}
-            {% endfor %}
+              {% endfor %}
+            </div>
+          </div>
+        </section>
+        <section id="events"
+                 class="flex flex-col basis-1/4 max-w-[30%] card shadow-md">
+          <div class="basis-0 grow overflow-y-scroll">
+            <h2 class="card-title pl-8 sticky top-0">Related events</h2>
+            <div class="gap-4 card-body flex-none">
+              <div class="card-actions grow-0 sticky top-10">
+                {% if incident.stateful %}
+                  {% if incident.open %}
+                    {% include "htmx/incident/_incident_close_modal.html" with action="close" dialog_id="close-incident-dialog" button_title="Close incident" header="Manually close incident" explanation="Write a message describing why the incident was manually closed" cancel_text="Cancel" submit_text="Close now" %}
+                  {% else %}
+                    {% include "htmx/incident/_incident_reopen_modal.html" with action="reopen" dialog_id="reopen-incident-dialog" button_title="Reopen incident" header="Manually reopen incident" explanation="Write a message describing why the incident was manually reopend" cancel_text="Cancel" submit_text="Reopen now" %}
+                  {% endif %}
+                {% endif %}
+              </div>
+              {% for event in incident.events.all %}
+                {% if not event.ack %}
+                  <div class="px-2 space-y-2">
+                    <p>
+                      <strong>{{ event.get_type_display }}</strong>
+                    </p>
+                    <p class="whitespace-pre-line break-all">{{ event.description }}</p>
+                    <p>
+                      {{ event.actor }}
+                      @
+                      {{ event.timestamp|date:preferences.argus_htmx.datetime_format }}
+                    </p>
+                  </div>
+                  {% if not forloop.last %}<hr />{% endif %}
+                {% endif %}
+              {% endfor %}
+            </div>
           </div>
         </section>
       </div>
