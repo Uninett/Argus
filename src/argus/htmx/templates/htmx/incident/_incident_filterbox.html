@@ -3,7 +3,7 @@
       class="incident-list-param"
       hx-get="{% url 'htmx:incident-list' %}"
       hx-include=".incident-list-param"
-      hx-trigger="keydown[keyCode==13], change delay:100ms"
+      hx-trigger="keydown[keyCode==13], change delay:100ms, load once"
       hx-target="#table"
       hx-swap="outerHTML"
       hx-push-url="true"
