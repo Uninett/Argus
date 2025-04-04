@@ -1,0 +1,10 @@
+<li>
+  <h2 class="menu-title">User preferences</h2>
+  <ul>
+    <li>{% include "htmx/user/_theme_dropdown.html" %}</li>
+    <li>{% include "htmx/user/_dateformat_dropdown.html" %}</li>
+    <li>
+      <a href="{% url 'htmx:user-preferences' %}">More preferences…</a>
+    </li>
+  </ul>
+</li>
