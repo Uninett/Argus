@@ -32,3 +32,8 @@ class Modal(RenderableMixin, BaseModel):
 
 class ConfirmationModal(Modal):
     pass
+
+
+class DeleteModal(ConfirmationModal):
+    button_title: str = "Delete"
+    submit_text: str = "Delete"
