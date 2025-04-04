@@ -16,7 +16,9 @@
       {% for option in options %}
         {% if option.selected %}
           {% block show_selected %}
-            <p class="text-primary italic font-medium">{{ option.label }},</p>
+            <p class="text-primary font-medium">
+              <em>{{ option.label }}</em>,
+            </p>
           {% endblock show_selected %}
         {% endif %}
       {% endfor %}

@@ -14,7 +14,9 @@ In this case the item_id attribute can be omitted when extending from this templ
       <div class="divider divider-start">
         <h3 class="card-title">
           {{ action }}
-          <p class="italic">{{ item_title|default:"" }}</p>
+          <p>
+            <em>{{ item_title|default:"" }}</em>
+          </p>
         </h3>
       </div>
       <p class="antialiased text-base font-normal">{{ confirmation_message }}</p>

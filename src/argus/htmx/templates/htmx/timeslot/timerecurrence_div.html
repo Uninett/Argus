@@ -16,7 +16,7 @@
       {% include "htmx/forms/input_field.html" with label=form.end.label max_width="md" field=form.end %}
     </div>
     <div class="form-control w-full self-center">
-      <label class="label label-text italic" for={{ form.days.auto_id }}>{{ form.days.label }}
+      <label class="label label-text" for={{ form.days.auto_id }}><em>{{ form.days.label }}</em>
       </label>
       {{ errors }}
       {% render_field form.days %}

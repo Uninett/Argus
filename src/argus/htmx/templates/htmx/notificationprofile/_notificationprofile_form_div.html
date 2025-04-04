@@ -16,7 +16,7 @@
         {% include "htmx/forms/input_field.html" with label=field.label field=field input_classes="checkbox border-b border-1" %}
       {% else %}
         <div class="form-control">
-          <label class="label label-text italic" for={{ field.auto_id }}>{{ field.label }}
+          <label class="label label-text" for={{ field.auto_id }}><em>{{ field.label }}</em>
           </label>
           {% if field.help_text %}<div class="helptext">{{ field.help_text }}</div>{% endif %}
           {{ errors }}

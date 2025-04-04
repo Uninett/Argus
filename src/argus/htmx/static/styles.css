@@ -4769,10 +4769,6 @@ details.collapse summary::-webkit-details-marker {
   text-transform: capitalize;
 }
 
-.italic {
-  font-style: italic;
-}
-
 .leading-9 {
   line-height: 2.25rem;
 }
