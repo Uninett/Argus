@@ -15,7 +15,7 @@ RUN mkdir -p /static && chown argus /static
 ENV STATIC_ROOT=/static
 
 COPY . /src
-RUN pip install /src && rm -rf /src
+RUN pip install '/src[spa]' && rm -rf /src
 
 # Install API backend settings suitable for Docker deployment
 RUN mkdir /extrapython
