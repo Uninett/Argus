@@ -191,7 +191,8 @@ def filter_select(request: HtmxHttpRequest):
             filter_form, _ = incident_list_filter(request, None, use_default_filter=True)
             context = {"filter_form": filter_form}
             return render(request, "htmx/incident/_incident_filterbox.html", context=context)
-    return HttpResponseClientRefresh()
+        else:
+            return retarget(HttpResponse(), "#incident-filter-select")
 
 
 @require_GET
