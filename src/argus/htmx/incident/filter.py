@@ -133,7 +133,7 @@ class FilterListView(FilterMixin, ListView):
     pass
 
 
-def incident_list_filter(request, qs):
+def incident_list_filter(request, qs, use_default_filter=False):
     filter_pk, filter_obj = request.session.get("selected_filter", None), None
     if filter_pk:
         filter_obj = Filter.objects.get(pk=filter_pk)
@@ -146,7 +146,16 @@ def incident_list_filter(request, qs):
         if request.method == "POST":
             form = IncidentFilterForm(request.POST)
         else:
-            form = IncidentFilterForm(request.GET or None)
+            if use_default_filter:
+                filterblob = {}
+                filterblob["open"] = None
+                filterblob["acked"] = None
+                filterblob["sourceSystemIds"] = []
+                filterblob["tags"] = ""
+                filterblob["maxlevel"] = max(Level).value
+                form = IncidentFilterForm(filterblob)
+            else:
+                form = IncidentFilterForm(request.GET or None)
 
     if form.is_valid():
         filterblob = form.to_filterblob()
