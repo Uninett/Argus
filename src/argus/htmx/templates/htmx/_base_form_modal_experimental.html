@@ -1,0 +1,50 @@
+<button class="btn {{ modal.button_class }}"
+        type="button"
+        onclick="htmx.find('#{{ modal.dialog_id }}').showModal()">{{ modal.button_title }}</button>
+<dialog id="{{ modal.dialog_id }}" class="modal">
+  <div class="modal-box card card-compact shadow-xl loading-box">
+    <div class="w-full">
+      <div class="divider divider-start">
+        <h3 class="card-title">{{ modal.header }}</h3>
+      </div>
+      <form id="{{ modal.dialog_id }}-form"
+            class="card-body"
+            {% block form_control %}
+            method="post"
+            action="{{ modal.endpoint }}"
+            {% endblock form_control %}>
+        {% csrf_token %}
+        <fieldset class="menu menu-vertical gap-4">
+          <legend class="antialiased text-base font-bold py-2">{{ modal.explanation }}</legend>
+        </fieldset>
+      </form>
+      <div class="modal-action card-actions">
+        <form method="dialog" class="w-full">
+          {% csrf_token %}
+          <div class="divider divider-end">
+            <button type="button"
+                    class="btn {{ modal.button_class }}"
+                    {% block confirm_action_control %}
+                    hx-post="{{ modal.endpoint }}"
+                    hx-target="body"
+                    hx-swap="outerHTML"
+                    {% endblock confirm_action_control %}>
+              <span>{{ modal.submit_text }}</span>
+            </button>
+            <button class="btn"
+                    type="button"
+                    {% block cancel_action_control %}
+                    onclick="htmx.find('#{{ modal.dialog_id }}').close()"
+                    {% endblock cancel_action_control %}>
+              <span>{{ modal.cancel_text }}</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div class="htmx-indicator loading loading-spinner text-primary"></div>
+  </div>
+  <form method="dialog" class="modal-backdrop">
+    <button>close</button>
+  </form>
+</dialog>
