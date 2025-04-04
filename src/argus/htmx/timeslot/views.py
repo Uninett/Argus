@@ -9,6 +9,7 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
+from argus.htmx.modals import DeleteModal
 from argus.htmx.widgets import BadgeDropdownMultiSelect
 from argus.notificationprofile.models import Timeslot, TimeRecurrence
 
@@ -216,6 +217,13 @@ class TimeslotListView(TimeslotMixin, ListView):
         forms = []
         for obj in self.get_queryset():
             form = TimeslotForm(None, instance=obj, prefix=self._get_prefix(obj.pk))
+            form.modal = DeleteModal(
+                header="Delete timeslot",
+                button_title="Delete timeslot",
+                explanation=f'Delete the timeslot "{obj}"?',
+                dialog_id=f"timeslot-delete-confirm-{obj.pk}",
+                endpoint=reverse("htmx:timeslot-delete", kwargs={"pk": obj.pk}),
+            )
             formset = make_timerecurrence_formset(timeslot=obj)
             forms.append({"form": form, "formset": formset})
         context["form_list"] = forms
