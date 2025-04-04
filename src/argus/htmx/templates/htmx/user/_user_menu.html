@@ -6,6 +6,11 @@
   {% block items %}
     <li>{% include "htmx/user/_theme_dropdown.html" %}</li>
     <li>{% include "htmx/user/_dateformat_dropdown.html" %}</li>
+    {% if request.user.is_staff %}
+      <li>
+        <a href="{% url 'admin:index' %}" target="_blank">Admin</a>
+      </li>
+    {% endif %}
     <li>{% include "htmx/user/_user_menu_preferences.html" %}</li>
     {% block notification_links %}
       {% include "htmx/user/_user_menu_notification_config.html" %}

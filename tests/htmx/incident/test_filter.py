@@ -39,17 +39,9 @@ class TestIncidentFilterForm(TestCase):
         filterblob = self.valid_form.to_filterblob()
         assert filterblob["open"] == self.valid_field_values["open"]
 
-    def test_if_form_is_valid_then_filterblob_should_contain_correct_closed_value(self):
-        filterblob = self.valid_form.to_filterblob()
-        assert filterblob["closed"] == self.valid_field_values["closed"]
-
     def test_if_form_is_valid_then_filterblob_should_contain_correct_acked_value(self):
         filterblob = self.valid_form.to_filterblob()
         assert filterblob["acked"] == self.valid_field_values["acked"]
-
-    def test_if_form_is_valid_then_filterblob_should_contain_correct_unacked_value(self):
-        filterblob = self.valid_form.to_filterblob()
-        assert filterblob["unacked"] == self.valid_field_values["unacked"]
 
     def test_if_form_is_valid_then_filterblob_should_contain_correct_sourcesystemids_value(self):
         filterblob = self.valid_form.to_filterblob()
@@ -94,9 +86,7 @@ class TestIncidentListFilter(TestCase):
         self.valid_filter = FilterFactory(
             filter={
                 "open": True,
-                "closed": False,
                 "acked": True,
-                "unacked": False,
                 "maxlevel": 1,
                 "tags": [],
             }
@@ -158,9 +148,7 @@ class TestCreateNamedFilter(TestCase):
         self.request.user = PersonUserFactory()
         self.filterblob = {
             "open": True,
-            "closed": False,
             "acked": True,
-            "unacked": False,
         }
 
     def teardown(self):

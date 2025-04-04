@@ -90,11 +90,11 @@ class IncidentFilterForm(forms.Form):
         on = self.cleaned_data.get(onkey, None)
         off = self.cleaned_data.get(offkey, None)
         if on == off:
-            return None, None
+            return None
         if on and not off:
-            return True, False
+            return True
         if off and not on:
-            return False, True
+            return False
 
     def to_filterblob(self):
         if not self.is_valid():
@@ -102,13 +102,11 @@ class IncidentFilterForm(forms.Form):
 
         filterblob = {}
 
-        open, closed = self._tristate("open", "closed")
+        open = self._tristate("open", "closed")
         filterblob["open"] = open
-        filterblob["closed"] = closed
 
-        acked, unacked = self._tristate("acked", "unacked")
+        acked = self._tristate("acked", "unacked")
         filterblob["acked"] = acked
-        filterblob["unacked"] = unacked
 
         sourceSystemIds = self.cleaned_data.get("sourceSystemIds", [])
         if sourceSystemIds:
