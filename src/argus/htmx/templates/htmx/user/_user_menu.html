@@ -1,7 +1,7 @@
 <ul class="menu menu-md dropdown-content bg-base-200 text-base-content rounded-box z-[1] mt-3 w-52 p-2 shadow max-h-svh">
   <li class="menu-title">
     Logged in as: <span class="text-info">{{ request.user }}</span>
-    <div class="divider divider-secondary my-0"></div>
+    <div class="divider divider-secondary my-0 pointer-events-none"></div>
   </li>
   {% block items %}
     {% block user_preferences_links %}
@@ -16,7 +16,7 @@
       </li>
     {% endif %}
     <li>
-      <div class="divider divider-secondary pl-2 pr-4 my-0"></div>
+      <div class="divider divider-secondary pl-2 pr-4 my-0 pointer-events-none"></div>
       {% include "htmx/user/_user_menu_logout.html" %}
     </li>
   {% endblock items %}
