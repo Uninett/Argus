@@ -4408,10 +4408,6 @@ details.collapse summary::-webkit-details-marker {
   flex-basis: 20%;
 }
 
-.border-collapse {
-  border-collapse: collapse;
-}
-
 .border-separate {
   border-collapse: separate;
 }
@@ -4749,8 +4745,16 @@ details.collapse summary::-webkit-details-marker {
   padding-bottom: 0.125rem;
 }
 
+.pl-2 {
+  padding-left: 0.5rem;
+}
+
 .pl-8 {
   padding-left: 2rem;
+}
+
+.pr-4 {
+  padding-right: 1rem;
 }
 
 .pt-0 {
