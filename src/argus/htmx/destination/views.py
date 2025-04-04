@@ -8,7 +8,7 @@ from argus.notificationprofile.models import DestinationConfig, Media
 from argus.notificationprofile.media import api_safely_get_medium_object
 from argus.notificationprofile.media.base import NotificationMedium
 
-from .forms import DestinationFormCreate, DestinationFormUpdate
+from .forms import DestinationCreateForm, DestinationUpdateForm
 
 
 @require_http_methods(["GET"])
@@ -18,7 +18,7 @@ def destination_list(request):
 
 @require_http_methods(["POST"])
 def create_htmx(request) -> HttpResponse:
-    form = DestinationFormCreate(request.POST or None, request=request)
+    form = DestinationCreateForm(request.POST or None, request=request)
     template = "htmx/destination/_content.html"
     if form.is_valid():
         form.save()
@@ -53,7 +53,7 @@ def delete_htmx(request, pk: int) -> HttpResponse:
 def update_htmx(request, pk: int) -> HttpResponse:
     destination = DestinationConfig.objects.get(pk=pk)
     media = destination.media
-    form = DestinationFormUpdate(
+    form = DestinationUpdateForm(
         request.POST or None, instance=destination, prefix=f"destination_{destination.pk}", request=request
     )
     if is_valid := form.is_valid():
@@ -74,8 +74,8 @@ def update_htmx(request, pk: int) -> HttpResponse:
 
 def _render_destination_list(
     request,
-    create_form: Optional[DestinationFormCreate] = None,
-    update_forms: Optional[Sequence[DestinationFormUpdate]] = None,
+    create_form: Optional[DestinationCreateForm] = None,
+    update_forms: Optional[Sequence[DestinationUpdateForm]] = None,
     template: str = "htmx/destination/destination_list.html",
 ) -> HttpResponse:
     """Function to render the destinations page.
@@ -87,7 +87,7 @@ def _render_destination_list(
     If this is None, the update forms will be generated from the user's destinations."""
 
     if create_form is None:
-        create_form = DestinationFormCreate()
+        create_form = DestinationCreateForm()
     if update_forms is None:
         update_forms = _get_update_forms(request.user)
     grouped_forms = _group_update_forms_by_media(update_forms)
@@ -99,7 +99,7 @@ def _render_destination_list(
     return render(request, template, context=context)
 
 
-def _get_update_forms(user, media: Media = None) -> list[DestinationFormUpdate]:
+def _get_update_forms(user, media: Media = None) -> list[DestinationUpdateForm]:
     """Get a list of update forms for the user's destinations.
     :param media: if provided, only return destinations for this media.
     """
@@ -109,15 +109,16 @@ def _get_update_forms(user, media: Media = None) -> list[DestinationFormUpdate]:
         destinations = user.destinations.all()
     # Sort by oldest first
     destinations = destinations.order_by("pk")
-    return [
-        DestinationFormUpdate(instance=destination, prefix=f"destination_{destination.pk}")
+    forms = [
+        DestinationUpdateForm(instance=destination, prefix=f"destination_{destination.pk}")
         for destination in destinations
     ]
+    return forms
 
 
 def _group_update_forms_by_media(
-    destination_forms: Sequence[DestinationFormUpdate],
-) -> dict[Media, list[DestinationFormUpdate]]:
+    destination_forms: Sequence[DestinationUpdateForm],
+) -> dict[Media, list[DestinationUpdateForm]]:
     grouped_destinations = {}
 
     # Adding a media to the dict even if there are no destinations for it
@@ -131,7 +132,7 @@ def _group_update_forms_by_media(
     return grouped_destinations
 
 
-def _replace_form_in_list(forms: list[DestinationFormUpdate], form: DestinationFormUpdate):
+def _replace_form_in_list(forms: list[DestinationUpdateForm], form: DestinationUpdateForm):
     for index, f in enumerate(forms):
         if f.instance.pk == form.instance.pk:
             forms[index] = form

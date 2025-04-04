@@ -6,7 +6,7 @@ from argus.notificationprofile.serializers import RequestDestinationConfigSerial
 from argus.notificationprofile.media import api_safely_get_medium_object
 
 
-class DestinationFormCreate(ModelForm):
+class DestinationCreateForm(ModelForm):
     settings = forms.CharField(required=True)
 
     def __init__(self, *args, **kwargs):
@@ -76,7 +76,7 @@ class DestinationFormCreate(ModelForm):
         return self.cleaned_data
 
 
-class DestinationFormUpdate(DestinationFormCreate):
+class DestinationUpdateForm(DestinationCreateForm):
     def __init__(self, *args, **kwargs):
         if instance := kwargs.get("instance"):
             settings_key = _get_settings_key_for_media(instance.media)
