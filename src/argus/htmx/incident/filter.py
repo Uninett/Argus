@@ -4,9 +4,9 @@ from django.urls import reverse
 from django.views.generic import ListView
 
 from argus.filter import get_filter_backend
-from argus.incident.models import SourceSystem, Tag
-from argus.incident.constants import Level
 from argus.htmx.widgets import BadgeDropdownMultiSelect
+from argus.incident.constants import AckedStatus, Level, OpenStatus
+from argus.incident.models import SourceSystem, Tag
 from argus.notificationprofile.models import Filter
 
 filter_backend = get_filter_backend()
@@ -35,10 +35,22 @@ class FilterMixin:
 
 
 class IncidentFilterForm(forms.Form):
-    open = forms.BooleanField(required=False)
-    closed = forms.BooleanField(required=False)
-    acked = forms.BooleanField(required=False)
-    unacked = forms.BooleanField(required=False)
+    open = forms.IntegerField(
+        widget=forms.NumberInput(
+            attrs={"type": "range", "step": "1", "min": min(OpenStatus).value, "max": max(OpenStatus).value}
+        ),
+        label="Open state",
+        initial=OpenStatus.BOTH.value,
+        required=False,
+    )
+    acked = forms.IntegerField(
+        widget=forms.NumberInput(
+            attrs={"type": "range", "step": "1", "min": min(AckedStatus).value, "max": max(AckedStatus).value}
+        ),
+        label="Acked",
+        initial=AckedStatus.BOTH.value,
+        required=False,
+    )
     sourceSystemIds = forms.MultipleChoiceField(
         widget=BadgeDropdownMultiSelect(
             attrs={"placeholder": "select sources..."},
@@ -86,15 +98,29 @@ class IncidentFilterForm(forms.Form):
 
         return tags
 
-    def _tristate(self, onkey, offkey):
-        on = self.cleaned_data.get(onkey, None)
-        off = self.cleaned_data.get(offkey, None)
-        if on == off:
-            return None
-        if on and not off:
+    def _open_tristate(self):
+        """Returns True if incidents should be open, False if they should be closed
+        and None if both should be shown
+        """
+        open_status = self.cleaned_data.get("open", None)
+        if open_status == OpenStatus.OPEN:
             return True
-        if off and not on:
+        elif open_status == OpenStatus.CLOSED:
             return False
+        else:
+            return None
+
+    def _acked_tristate(self):
+        """Returns True if incidents should be acked, False if they should be unacked
+        and None if both should be shown
+        """
+        acked_status = self.cleaned_data.get("acked", None)
+        if acked_status == AckedStatus.ACKED:
+            return True
+        elif acked_status == AckedStatus.UNACKED:
+            return False
+        else:
+            return None
 
     def to_filterblob(self):
         if not self.is_valid():
@@ -102,11 +128,9 @@ class IncidentFilterForm(forms.Form):
 
         filterblob = {}
 
-        open = self._tristate("open", "closed")
-        filterblob["open"] = open
+        filterblob["open"] = self._open_tristate()
 
-        acked = self._tristate("acked", "unacked")
-        filterblob["acked"] = acked
+        filterblob["acked"] = self._acked_tristate()
 
         sourceSystemIds = self.cleaned_data.get("sourceSystemIds", [])
         if sourceSystemIds:
@@ -138,10 +162,7 @@ def incident_list_filter(request, qs):
     if filter_pk:
         filter_obj = Filter.objects.get(pk=filter_pk)
     if filter_obj:
-        filterblob = filter_obj.filter
-        if "tags" in filterblob.keys():
-            filterblob["tags"] = ", ".join(filterblob["tags"])
-        form = IncidentFilterForm(filter_obj.filter)
+        form = IncidentFilterForm(_convert_filterblob(filter_obj.filter))
     else:
         if request.method == "POST":
             form = IncidentFilterForm(request.POST)
@@ -155,6 +176,32 @@ def incident_list_filter(request, qs):
         for field, error_messages in form.errors.items():
             messages.error(request, f"{field}: {','.join(error_messages)}")
     return form, qs
+
+
+def _convert_filterblob(filterblob):
+    """Converts values in filterblob so it can be used as valid input for IncidentFilterForm"""
+    if "tags" in filterblob.keys():
+        filterblob["tags"] = ", ".join(filterblob["tags"])
+
+    if "open" in filterblob.keys():
+        open_state = filterblob["open"]
+        if open_state is True:
+            filterblob["open"] = OpenStatus.OPEN
+        elif open_state is False:
+            filterblob["open"] = OpenStatus.CLOSED
+        else:
+            filterblob["open"] = OpenStatus.BOTH
+
+    if "acked" in filterblob.keys():
+        acked_state = filterblob["acked"]
+        if acked_state is True:
+            filterblob["acked"] = AckedStatus.ACKED
+        elif acked_state is False:
+            filterblob["acked"] = AckedStatus.UNACKED
+        else:
+            filterblob["acked"] = AckedStatus.BOTH
+
+    return filterblob
 
 
 def create_named_filter(request, filter_name: str, filterblob: dict):
