@@ -183,7 +183,14 @@ class DestinationConfig(models.Model):
     def __str__(self):
         if self.label:
             return self.label
-        return f"{self.media.name}: {list(self.settings.values())}"
+        if isinstance(self.settings, str):
+            settings = self.settings
+        if isinstance(self.settings, dict):
+            settings = str(list(self.settings.values()))
+        else:
+            settings = str(self.settings)
+            LOG.warn("WTF, this should be a dict (%s)", settings)
+        return f"{self.media.name}: {settings}"
 
 
 class NotificationProfile(models.Model):

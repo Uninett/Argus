@@ -1,9 +1,11 @@
 from typing import Optional, Sequence
-from django.shortcuts import render, get_object_or_404
 
-from django.views.decorators.http import require_http_methods
 from django.http import HttpResponse
+from django.shortcuts import render, get_object_or_404, redirect
+from django.urls import reverse
+from django.views.decorators.http import require_http_methods
 
+from argus.htmx.modals import DeleteModal
 from argus.notificationprofile.models import DestinationConfig, Media
 from argus.notificationprofile.media import api_safely_get_medium_object
 from argus.notificationprofile.media.base import NotificationMedium
@@ -38,6 +40,7 @@ def delete_htmx(request, pk: int) -> HttpResponse:
         error_msg = " ".join(e.args)
     else:
         destination.delete()
+        return redirect(reverse("htmx:destination-list"))
 
     forms = _get_update_forms(request.user, media=media)
 
@@ -109,10 +112,16 @@ def _get_update_forms(user, media: Media = None) -> list[DestinationUpdateForm]:
         destinations = user.destinations.all()
     # Sort by oldest first
     destinations = destinations.order_by("pk")
-    forms = [
-        DestinationUpdateForm(instance=destination, prefix=f"destination_{destination.pk}")
-        for destination in destinations
-    ]
+    forms = []
+    for obj in destinations:
+        form = DestinationUpdateForm(instance=obj, prefix=f"destination_{obj.pk}")
+        form.modal = DeleteModal(
+            header="Delete destination",
+            explanation=f'Delete destination "{obj}"',
+            dialog_id=f"destination-delete-dialog-{obj.pk}",
+            endpoint=reverse("htmx:htmx-delete", kwargs={"pk": obj.pk}),
+        )
+        forms.append(form)
     return forms
 
 
