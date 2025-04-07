@@ -2168,10 +2168,6 @@ input.tab:checked + .tab-content,
   .btn-secondary {
     --btn-color: var(--fallback-s);
   }
-
-  .btn-neutral {
-    --btn-color: var(--fallback-n);
-  }
 }
 
 @supports (color: color-mix(in oklab, black, black)) {
@@ -2244,22 +2240,12 @@ input.tab:checked + .tab-content,
   .btn-secondary {
     --btn-color: var(--s);
   }
-
-  .btn-neutral {
-    --btn-color: var(--n);
-  }
 }
 
 .btn-secondary {
   --tw-text-opacity: 1;
   color: var(--fallback-sc,oklch(var(--sc)/var(--tw-text-opacity)));
   outline-color: var(--fallback-s,oklch(var(--s)/1));
-}
-
-.btn-neutral {
-  --tw-text-opacity: 1;
-  color: var(--fallback-nc,oklch(var(--nc)/var(--tw-text-opacity)));
-  outline-color: var(--fallback-n,oklch(var(--n)/1));
 }
 
 .btn.glass {
