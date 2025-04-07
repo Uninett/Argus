@@ -6,6 +6,14 @@ from django_htmx.http import HttpResponseClientRefresh
 
 from argus.auth.utils import get_preference_obj, save_preferences
 from argus.htmx.incident.views import HtmxHttpRequest
+from argus.htmx.modals import ConfirmationModal
+
+
+class LogoutModal(ConfirmationModal):
+    header: str = "Log out"
+    submit_text: str = header
+    button_title: str = header
+    explanation: str = "Log out of Argus?"
 
 
 @require_GET

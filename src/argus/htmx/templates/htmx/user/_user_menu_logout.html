@@ -1,3 +1,4 @@
+{% include logout_modal.template_name with modal=logout_modal %}
 <form class="flex" action="{% url "htmx:logout" %}" method="post">
   {% csrf_token %}
   <button class="flex-1 text-start" type="submit">Log out</button>
