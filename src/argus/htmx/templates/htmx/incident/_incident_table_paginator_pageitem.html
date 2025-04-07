@@ -9,5 +9,5 @@ displayed as clickable.
      href="?page={{ page_number }}"
      hx-indicator="#incident-list .htmx-indicator"
      hx-include=".incident-list-param"
-     class="join-item btn">{{ page_prefix }}{{ page_name|default:page_number }}{{ page_suffix }}</a>
+     class="join-item btn btn-sm">{{ page_prefix }}{{ page_name|default:page_number }}{{ page_suffix }}</a>
 </li>
