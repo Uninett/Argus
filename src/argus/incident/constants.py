@@ -14,11 +14,11 @@ class Level(models.IntegerChoices):
 
 class AckedStatus(models.IntegerChoices):
     ACKED = 1, "Acked"
-    UNACKED = 2, "Unacked"
-    BOTH = 3, "Both"
+    BOTH = 2, "Both"
+    UNACKED = 3, "Unacked"
 
 
 class OpenStatus(models.IntegerChoices):
     OPEN = 1, "Open"
-    CLOSED = 2, "Closed"
-    BOTH = 3, "Both"
+    BOTH = 2, "Both"
+    CLOSED = 3, "Closed"
