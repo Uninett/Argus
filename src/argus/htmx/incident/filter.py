@@ -67,6 +67,14 @@ class IncidentFilterForm(forms.Form):
         required=False,
     )
 
+    DEFAULT_FILTERBLOB = {
+        "open": None,
+        "acked": None,
+        "sourceSystemIds": [],
+        "tags": "",
+        "maxlevel": max(Level).value,
+    }
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # mollify tests
@@ -147,12 +155,7 @@ def incident_list_filter(request, qs, use_default_filter=False):
             form = IncidentFilterForm(request.POST)
         else:
             if use_default_filter:
-                filterblob = {}
-                filterblob["open"] = None
-                filterblob["acked"] = None
-                filterblob["sourceSystemIds"] = []
-                filterblob["tags"] = ""
-                filterblob["maxlevel"] = max(Level).value
+                filterblob = IncidentFilterForm.DEFAULT_FILTERBLOB
                 form = IncidentFilterForm(filterblob)
             else:
                 form = IncidentFilterForm(request.GET or None)
