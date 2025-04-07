@@ -1,4 +1,4 @@
-from django.test import override_settings, tag, TestCase
+from django.test import tag, TestCase
 
 from argus.auth.factories import PersonUserFactory
 from argus.filter.factories import FilterFactory
@@ -8,9 +8,6 @@ from argus.util.testing import connect_signals, disconnect_signals
 
 
 @tag("integration")
-@override_settings(
-    ROOT_URLCONF="argus.htmx.root_urls",
-)
 class NotificationProfileFormTests(TestCase):
     def setUp(self):
         disconnect_signals()

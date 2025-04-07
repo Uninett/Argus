@@ -11,6 +11,7 @@ os.environ.setdefault("ARGUS_SPA_COOKIE_DOMAIN", "localhost")
 from argus.htmx.appconfig import APP_SETTINGS
 
 update_settings(globals(), APP_SETTINGS)
+ROOT_URLCONF = "argus.htmx.root_urls"
 
 DEBUG = get_bool_env("DEBUG", True)
 TEMPLATES[0]["OPTIONS"]["debug"] = get_bool_env("TEMPLATE_DEBUG", True)  # noqa: F405

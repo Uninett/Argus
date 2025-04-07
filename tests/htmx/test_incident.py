@@ -28,7 +28,6 @@ def incident_list_filter_factory(form_cls):
 
 
 @test.override_settings(
-    ROOT_URLCONF="argus.htmx.root_urls",
     ARGUS_HTMX_FILTER_FUNCTION=incident_list_filter_factory(IncidentRegularFilterForm),
     INCIDENT_TABLE_COLUMNS=[
         IncidentTableColumn(
@@ -54,7 +53,6 @@ class TestRegularColumn(test.TestCase):
 
 
 @test.override_settings(
-    ROOT_URLCONF="argus.htmx.root_urls",
     ARGUS_HTMX_FILTER_FUNCTION=incident_list_filter_factory(IncidentColumnFilterForm),
     INCIDENT_TABLE_COLUMNS=[
         IncidentTableColumn(

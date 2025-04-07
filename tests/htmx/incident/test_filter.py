@@ -3,7 +3,7 @@ from unittest.mock import Mock
 from django.contrib.messages.middleware import MessageMiddleware
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.http import QueryDict
-from django.test import RequestFactory, TestCase, override_settings
+from django.test import RequestFactory, TestCase
 
 from argus.auth.factories import PersonUserFactory
 from argus.filter.factories import FilterFactory
@@ -14,9 +14,6 @@ from argus.notificationprofile.models import Filter
 from argus.util.testing import connect_signals, disconnect_signals
 
 
-@override_settings(
-    ROOT_URLCONF="argus.htmx.root_urls",
-)
 class TestIncidentFilterForm(TestCase):
     def setUp(self) -> None:
         disconnect_signals()
@@ -71,9 +68,6 @@ class TestIncidentFilterForm(TestCase):
         assert "tags" in form.errors
 
 
-@override_settings(
-    ROOT_URLCONF="argus.htmx.root_urls",
-)
 class TestIncidentListFilter(TestCase):
     def setUp(self) -> None:
         disconnect_signals()
