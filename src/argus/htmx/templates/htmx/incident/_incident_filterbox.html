@@ -24,9 +24,10 @@
               </div>
             {% elif field.name == "open" %}
               <label class="cursor-pointer label">
+                <span class="label-text">{{ field.label }}</span>
                 <div class="pt-4">
                   {{ field|add_class:"range range-primary range-xs" }}
-                  <div class="flex w-full justify-between px-2 text-xs">
+                  <div class="flex w-full justify-between gap-2 text-xs">
                     <span>Open</span>
                     <span>Both</span>
                     <span>Closed</span>
@@ -35,9 +36,10 @@
               </label>
             {% elif field.name == "acked" %}
               <label class="cursor-pointer label">
+                <span class="label-text">{{ field.label }}</span>
                 <div class="pt-4">
                   {{ field|add_class:"range range-primary range-xs" }}
-                  <div class="flex w-full justify-between px-2 text-xs">
+                  <div class="flex w-full justify-between gap-2 text-xs">
                     <span>Acked</span>
                     <span>Both</span>
                     <span>Unacked</span>

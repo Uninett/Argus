@@ -39,7 +39,7 @@ class IncidentFilterForm(forms.Form):
         widget=forms.NumberInput(
             attrs={"type": "range", "step": "1", "min": min(OpenStatus).value, "max": max(OpenStatus).value}
         ),
-        label="Open state",
+        label="Open State",
         initial=OpenStatus.BOTH.value,
         required=False,
     )
