@@ -183,10 +183,13 @@ class DestinationConfig(models.Model):
     def __str__(self):
         if self.label:
             return self.label
-        if isinstance(self.settings, str):
-            settings = self.settings
         if isinstance(self.settings, dict):
             settings = str(list(self.settings.values()))
+        elif isinstance(self.settings, str):
+            # This is due to transmogrifying what is in settings on the
+            # form/obj and is dangerous. Should go away when validating with
+            # forms.
+            settings = self.settings
         else:
             settings = str(self.settings)
             LOG.warn("WTF, this should be a dict (%s)", settings)
