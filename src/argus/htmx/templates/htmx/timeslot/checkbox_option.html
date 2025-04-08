@@ -1,0 +1,12 @@
+<span class="flex flex-nowrap items-center gap-1">
+  <input type="checkbox"
+         name="{{ widget.name }}"
+         {% if widget.value != None %}value="{{ widget.value|stringformat:'s' }}"{% endif %}
+         {% for name, value in widget.attrs.items %}{% if name != "class" %}{% if value is not False %} {{ name }}{% if value is not True %}="{{ value|stringformat:'s' }}"{% endif %}
+         {% endif %}
+         {% endif %}
+         {% endfor %}
+         class="checkbox checkbox-sm checkbox-primary border">
+  <label class="label cursor-pointer"
+         {% if widget.attrs.id %}for="{{ widget.attrs.id }}"{% endif %}>{{ widget.label }}</label>
+</span>

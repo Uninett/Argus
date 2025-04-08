@@ -10,7 +10,6 @@ from django.urls import reverse
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
 from argus.htmx.modals import DeleteModal
-from argus.htmx.widgets import BadgeDropdownMultiSelect
 from argus.notificationprofile.models import Timeslot, TimeRecurrence
 
 
@@ -18,6 +17,9 @@ LOG = logging.getLogger(__name__)
 
 
 class DaysMultipleChoiceField(forms.MultipleChoiceField):
+    widget = forms.CheckboxSelectMultiple
+    widget.option_template_name = "htmx/timeslot/checkbox_option.html"
+
     def to_python(self, value):
         value = super().to_python(value)
         return [int(day) for day in value]
@@ -50,21 +52,7 @@ class TimeRecurrenceForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if self.instance.id:
-            partial_get = reverse(
-                "htmx:timeslot-update",
-                kwargs={"pk": self.instance.timeslot.id},
-            )
-        else:
-            partial_get = reverse("htmx:timeslot-create")
-
-        self.fields["days"].widget = BadgeDropdownMultiSelect(
-            partial_get=partial_get,
-            attrs={
-                "placeholder": "select days...",
-                "field_styles": "input input-bordered border-b max-w-full justify-center",
-            },
-        )
+        self.fields["days"].widget.attrs["class"] = "flex flex-row flex-wrap justify-between gap-2"
         self.fields["days"].choices = TimeRecurrence.Day.choices
 
     def clean_start(self):

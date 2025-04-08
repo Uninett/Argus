@@ -4408,6 +4408,10 @@ details.collapse summary::-webkit-details-marker {
   flex-basis: 20%;
 }
 
+.border-collapse {
+  border-collapse: collapse;
+}
+
 .border-separate {
   border-collapse: separate;
 }
@@ -4468,6 +4472,10 @@ details.collapse summary::-webkit-details-marker {
 
 .gap-0\.5 {
   gap: 0.125rem;
+}
+
+.gap-1 {
+  gap: 0.25rem;
 }
 
 .gap-16 {
