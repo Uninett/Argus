@@ -83,14 +83,12 @@ def get_incident_ids_to_update(request):
     return request.POST.getlist("incident_ids", [])
 
 
-def get_form_data(request, formclass: Optional[forms.Form]):
+def get_form(request, formclass: Optional[forms.Form]):
     formdata = request.POST or None
-    cleaned_form = None
+    form = None
     if formclass and formdata:
         form = formclass(formdata)
-        if form.is_valid():
-            cleaned_form = form.cleaned_data
-    return cleaned_form
+    return form
 
 
 @require_POST
@@ -101,9 +99,19 @@ def incident_update(request: HtmxHttpRequest, action: str):
         LOG.error("Unrecognized action name %s when updating incidents.", action)
         return HttpResponseBadRequest("Invalid update action")
     incident_ids = get_incident_ids_to_update(request)
-    formdata = get_form_data(request, formclass)
-    if incident_ids:
-        bulk_change_incidents(request.user, incident_ids, formdata, callback_func)
+    if not incident_ids:
+        messages.warning(request, "No incidents selected, nothing to change")
+        return HttpResponseClientRefresh()
+
+    if action == "autocreate-ticket":
+        single_autocreate_ticket_url_queryset(request.actor, incident_ids, {"timestamp": tznow()})
+        return HttpResponseClientRefresh()
+
+    form = get_form(request, formclass)
+    if form.is_valid():
+        bulk_change_incidents(request.user, incident_ids, form.cleaned_data, callback_func)
+    else:
+        messages.error(request, form.errors)
     return HttpResponseClientRefresh()
 
 
