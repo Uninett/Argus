@@ -4470,6 +4470,10 @@ details.collapse summary::-webkit-details-marker {
   justify-content: space-between;
 }
 
+.justify-around {
+  justify-content: space-around;
+}
+
 .gap-0\.5 {
   gap: 0.125rem;
 }
