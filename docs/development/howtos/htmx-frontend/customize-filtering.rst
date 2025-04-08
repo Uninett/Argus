@@ -7,7 +7,7 @@ function is located at ``argus.htmx.incidents.filter.incident_list_filter`` but 
 can be changed by overriding the ``ARGUS_HTMX_FILTER_FUNCTION`` to point to a different function.
 The function has the the following signature::
 
-  def incident_list_filter(request: HttpRequest, qs: IncidentQuerySet) -> tuple[Form, IncidentQuerySet]:
+  def incident_list_filter(request: HttpRequest, qs: IncidentQuerySet, use_empty_filter: bool = False) -> tuple[Form, IncidentQuerySet]:
       ...
 
 The ``ARGUS_HTMX_FILTER_FUNCTION`` can either take a function directly or a dotted path to an
@@ -18,6 +18,7 @@ to a module instead of a function. Argus will then look for a function called
 When loading the incidents list, the incident_list_filter function is called with the request and
 the base incident queryset, and allows for updating this queryset. This way, the queryset can for
 example be filtered, reordered and/or data may be added (such as through ``annotate``).
+It is also possible to specify whether the default (empty) filter should be used or not.
 
 Aside from the updated queryset, ``incident_list_filter`` returns a ``django.forms.Form``. This
 form is used to populate the incident filterbox and any filterable columns

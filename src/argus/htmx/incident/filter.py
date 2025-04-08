@@ -67,6 +67,14 @@ class IncidentFilterForm(forms.Form):
         required=False,
     )
 
+    EMPTY_FILTERBLOB = {
+        "open": None,
+        "acked": None,
+        "sourceSystemIds": [],
+        "tags": "",
+        "maxlevel": max(Level).value,
+    }
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # mollify tests
@@ -133,7 +141,7 @@ class FilterListView(FilterMixin, ListView):
     pass
 
 
-def incident_list_filter(request, qs):
+def incident_list_filter(request, qs, use_empty_filter=False):
     filter_pk, filter_obj = request.session.get("selected_filter", None), None
     if filter_pk:
         filter_obj = Filter.objects.get(pk=filter_pk)
@@ -146,7 +154,11 @@ def incident_list_filter(request, qs):
         if request.method == "POST":
             form = IncidentFilterForm(request.POST)
         else:
-            form = IncidentFilterForm(request.GET or None)
+            if use_empty_filter:
+                filterblob = IncidentFilterForm.EMPTY_FILTERBLOB
+                form = IncidentFilterForm(filterblob)
+            else:
+                form = IncidentFilterForm(request.GET or None)
 
     if form.is_valid():
         filterblob = form.to_filterblob()

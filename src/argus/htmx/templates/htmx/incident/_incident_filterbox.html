@@ -3,13 +3,17 @@
       class="incident-list-param"
       hx-get="{% url 'htmx:incident-list' %}"
       hx-include=".incident-list-param"
-      hx-trigger="keydown[keyCode==13], change delay:100ms"
+      {% block filter_trigger_control %}
+      hx-trigger="keydown[keyCode==13], change delay:100ms, load once"
+      {% endblock filter_trigger_control %}
       hx-target="#table"
       hx-swap="outerHTML"
       hx-push-url="true"
       hx-indicator="#incident-list .htmx-indicator"
       onkeydown="if (event.keyCode === 13) event.preventDefault();">
-  <fieldset>
+  <fieldset {% block filter_select_custom_control %}
+            hx-on:change="htmx.ajax('GET', '{% url 'htmx:select-filter' %}');"
+            {% endblock filter_select_custom_control %}>
     <legend class="sr-only">Filter incidents</legend>
     <ul class="menu menu-horizontal menu-xs flex items-center gap-0.5 py-0">
       {% for field in filter_form %}
