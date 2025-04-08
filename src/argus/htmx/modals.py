@@ -13,6 +13,7 @@ class Modal(RenderableMixin, BaseModel):
 
     model_config = {"arbitrary_types_allowed": True}
 
+    opener_button_template_name: str = "htmx/_base_form_modal_button.html"
     template_name: str = "htmx/_base_form_modal_experimental.html"
 
     # needed by template

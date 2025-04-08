@@ -1,6 +1,4 @@
-<button class="btn {{ modal.button_class }}"
-        type="button"
-        onclick="htmx.find('#{{ modal.dialog_id }}').showModal()">{{ modal.button_title }}</button>
+{% include modal.opener_button_template_name %}
 <dialog id="{{ modal.dialog_id }}" class="modal">
   <div class="modal-box card card-compact shadow-xl loading-box">
     <div class="w-full">
