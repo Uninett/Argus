@@ -67,7 +67,7 @@ class IncidentFilterForm(forms.Form):
         required=False,
     )
 
-    DEFAULT_FILTERBLOB = {
+    EMPTY_FILTERBLOB = {
         "open": None,
         "acked": None,
         "sourceSystemIds": [],
@@ -155,7 +155,7 @@ def incident_list_filter(request, qs, use_default_filter=False):
             form = IncidentFilterForm(request.POST)
         else:
             if use_default_filter:
-                filterblob = IncidentFilterForm.DEFAULT_FILTERBLOB
+                filterblob = IncidentFilterForm.EMPTY_FILTERBLOB
                 form = IncidentFilterForm(filterblob)
             else:
                 form = IncidentFilterForm(request.GET or None)
