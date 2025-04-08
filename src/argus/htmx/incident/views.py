@@ -188,7 +188,7 @@ def filter_select(request: HtmxHttpRequest):
         request.session["selected_filter"] = None
         if request.htmx.trigger:
             incident_list_filter = get_filter_function()
-            filter_form, _ = incident_list_filter(request, None, use_default_filter=True)
+            filter_form, _ = incident_list_filter(request, None, use_empty_filter=True)
             context = {"filter_form": filter_form}
             return render(request, "htmx/incident/_incident_filterbox.html", context=context)
         else:

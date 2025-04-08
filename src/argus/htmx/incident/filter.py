@@ -141,7 +141,7 @@ class FilterListView(FilterMixin, ListView):
     pass
 
 
-def incident_list_filter(request, qs, use_default_filter=False):
+def incident_list_filter(request, qs, use_empty_filter=False):
     filter_pk, filter_obj = request.session.get("selected_filter", None), None
     if filter_pk:
         filter_obj = Filter.objects.get(pk=filter_pk)
@@ -154,7 +154,7 @@ def incident_list_filter(request, qs, use_default_filter=False):
         if request.method == "POST":
             form = IncidentFilterForm(request.POST)
         else:
-            if use_default_filter:
+            if use_empty_filter:
                 filterblob = IncidentFilterForm.EMPTY_FILTERBLOB
                 form = IncidentFilterForm(filterblob)
             else:
