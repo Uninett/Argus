@@ -7,5 +7,6 @@
          {% endif %}
          {% endfor %}
          class="checkbox checkbox-sm checkbox-primary border">
-  <label {% if widget.attrs.id %}for="{{ widget.attrs.id }}"{% endif %}>{{ widget.label }}</label>
+  <label class="label cursor-pointer"
+         {% if widget.attrs.id %}for="{{ widget.attrs.id }}"{% endif %}>{{ widget.label }}</label>
 </span>
