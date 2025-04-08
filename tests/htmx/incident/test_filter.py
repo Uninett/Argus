@@ -8,6 +8,7 @@ from django.test import RequestFactory, TestCase
 from argus.auth.factories import PersonUserFactory
 from argus.filter.factories import FilterFactory
 from argus.htmx.incident.filter import IncidentFilterForm, NamedFilterForm, create_named_filter, incident_list_filter
+from argus.incident.constants import AckedStatus, OpenStatus
 from argus.incident.factories import IncidentFactory, SourceSystemFactory
 from argus.incident.models import Incident
 from argus.notificationprofile.models import Filter
@@ -19,10 +20,8 @@ class TestIncidentFilterForm(TestCase):
         disconnect_signals()
         source = SourceSystemFactory(name="testsource")
         self.valid_field_values = {
-            "open": True,
-            "closed": False,
-            "acked": True,
-            "unacked": False,
+            "open": OpenStatus.OPEN,
+            "acked": AckedStatus.ACKED,
             "sourceSystemIds": [source.id],
             "tags": "tag1=value1, tag2=value2",
             "maxlevel": 1,
@@ -34,11 +33,11 @@ class TestIncidentFilterForm(TestCase):
 
     def test_if_form_is_valid_then_filterblob_should_contain_correct_open_value(self):
         filterblob = self.valid_form.to_filterblob()
-        assert filterblob["open"] == self.valid_field_values["open"]
+        assert filterblob["open"] is True
 
     def test_if_form_is_valid_then_filterblob_should_contain_correct_acked_value(self):
         filterblob = self.valid_form.to_filterblob()
-        assert filterblob["acked"] == self.valid_field_values["acked"]
+        assert filterblob["acked"] is True
 
     def test_if_form_is_valid_then_filterblob_should_contain_correct_sourcesystemids_value(self):
         filterblob = self.valid_form.to_filterblob()

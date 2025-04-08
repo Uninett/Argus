@@ -10,3 +10,15 @@ class Level(models.IntegerChoices):
     MODERATE = 3, "Moderate"
     LOW = 4, "Low"
     INFORMATION = 5, "Information"
+
+
+class AckedStatus(models.IntegerChoices):
+    ACKED = 1, "Acked"
+    BOTH = 2, "Both"
+    UNACKED = 3, "Unacked"
+
+
+class OpenStatus(models.IntegerChoices):
+    OPEN = 1, "Open"
+    BOTH = 2, "Both"
+    CLOSED = 3, "Closed"
