@@ -92,7 +92,7 @@ class TimeRecurrence(models.Model):
         if all_hours:
             hour_range = "around the clock"
         else:
-            hour_range = f"{self.start}-{self.end}"
+            hour_range = f"{self.start.strftime('%H:%M')}-{self.end.strftime('%H:%M')}"
         all_days = self.is_every_day
         if all_days:
             days = ", every day"
