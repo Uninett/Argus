@@ -3,6 +3,13 @@
 This file documents changes to Argus that are relevant for operations,
 customizers and end-users.
 
+## [1.35.0] - 2025-04-09
+
+The new frontend is now just about on par feature-wise with the old frontend,
+though we do not aim for bug compatibility =)
+
+Feel free to switch over to the new frontend.
+
 ## [1.34.1] - 2025-03-26
 
 Bugfix release, docker files should be able to run argus again.

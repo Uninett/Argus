@@ -8,6 +8,98 @@ This project uses [*towncrier*](https://towncrier.readthedocs.io/) and the chang
 
 <!-- towncrier release notes start -->
 
+## [1.35.0] - 2025-04-09
+
+### Removed
+
+- Dropped support for testing and running on Python 3.9 and Django 5.0.
+
+### Fixed
+
+- Fix broken Docker images to still work with SPA front-end
+  ([#1310](https://github.com/Uninett/Argus/issues/1310))
+
+### Frontend
+
+The new frontend is now just about on par feature-wise with the old frontend,
+though we do not aim for bug compatibility =)
+
+#### Added
+
+- Admins now see an admin link in the user menu dropdown
+  ([#1261](https://github.com/Uninett/Argus/issues/1261))
+- A new parameter `use_empty_filter` to the `incident_list_filter` function.
+  `use_empty_filter` defaults to `False`.
+  ([#1360](https://github.com/Uninett/Argus/issues/1360))
+- Allow testing on Django 5.2 in anticipation of dropping Django 4.2.
+
+#### Changed
+
+- Change tristate selection from checkboxes to slider. More changes to come.
+  ([#1048](https://github.com/Uninett/Argus/issues/1048))
+- Made the incidents page more compact.
+  ([#1246](https://github.com/Uninett/Argus/issues/1246))
+- Grouped user preferences in user menu dropdown
+  ([#1256](https://github.com/Uninett/Argus/issues/1256))
+- Fixed styling of input fields in modals. Made all basic inputs (text, date,
+  email etc) on the incidents, timeslots and destinations pages have the same
+  universal design. ([#1311](https://github.com/Uninett/Argus/issues/1311))
+- Improved the UX for forms on the profiles page.
+  ([#1312](https://github.com/Uninett/Argus/issues/1312))
+- Made styling of the tag badges on the details page more subtle.
+  ([#1314](https://github.com/Uninett/Argus/issues/1314))
+- Polished styling and alignment of the inputs in filterbox.
+  ([#1316](https://github.com/Uninett/Argus/issues/1316))
+- Incident tags that contain URL are now clickable on the incident detail page.
+  ([#1329](https://github.com/Uninett/Argus/issues/1329))
+- Switched to setting italic font using HTML instead of CSS for better
+  accessibility. ([#1343](https://github.com/Uninett/Argus/issues/1343))
+- Give the sections in the details page a drop shadow. This stranded the
+  close/reopen button at the bottom, so it was moved to just above the list of
+  events.
+- In the details page: Make free text look better by breaking long lines and
+  preserving newlines. Also make event types and ack/event author and timestamp
+  stand out better.
+- Made sure all non-button form inputs have `autocomplete="off"` set which
+  fixes some annoying behavior in Firefox when filling in forms. This is
+  documented in the troubleshooting guide.
+- Make an abstraction for modals deleting things, as part of the modal cleanup.
+- Modularized the incident pagination and improved it as per user feedback.
+- Replaced the fancy days selector in the timeslots page with checkboxes.
+- Support testing/running on Python 3.13. We need to stay on psycopg2 a while
+  longer since we use PostgreSQL "infinity" for incident `end_time`.
+- Upgraded all dependencies that could be upgraded and removes pytz as it is
+  now unused.
+- When showing the details url in the details page, use the generated absolute
+  url from the `Incident.details_url` and the `Source.base_url`. Validates that
+  the combination is valid and falls back to using the raw details url if not.
+
+#### Fixed
+
+- Bug with very long text in badges on the details page overflowing and
+  becoming unreadable. ([#1244](https://github.com/Uninett/Argus/issues/1244))
+- Made the height of the feeds on details page always conform to the max height
+  of the details section. Any vertical overflow in the feed will now be
+  scrollable. ([#1327](https://github.com/Uninett/Argus/issues/1327))
+- Programmatically connected labels to corresponding inputs.
+  ([#1332](https://github.com/Uninett/Argus/issues/1332))
+- Removes "unacked" and "closed" from filterblobs.
+  ([#1342](https://github.com/Uninett/Argus/issues/1342))
+- Made filter selector more robust in general and fixed bugs:
+  [#1344](https://github.com/Uninett/Argus/issues/1344),
+  [#1353](https://github.com/Uninett/Argus/issues/1353),
+  [#1355](https://github.com/Uninett/Argus/issues/1355).
+  ([#1360](https://github.com/Uninett/Argus/issues/1360))
+- Fixed color contrast for incident tags badges and table separators (temporary
+  fix)
+  ([#1375](https://github.com/Uninett/Argus/issues/1375),
+  [#1378](https://github.com/Uninett/Argus/issues/1378))
+- No longer erases a ticket url if attempting to save an invalid one when
+  editing. There's an error message in a popup. Made ticket url always
+  optional.
+  ([#1371](https://github.com/Uninett/Argus/issues/1371))
+
+
 ## [1.34.1] - 2025-03-26
 
 ### Changed
