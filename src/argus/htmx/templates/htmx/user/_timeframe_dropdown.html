@@ -1,0 +1,21 @@
+<details>
+  <summary>
+    Timeframe
+    <span class="badge badge-primary">{{ preferences.argus_htmx.pp_timeframe }}</span>
+  </summary>
+  <ul class="max-h-64 overflow-y-scroll">
+    {% for item in preferences_choices.argus_htmx.timeframe %}
+      <li>
+        <input type="radio"
+               class="btn btn-sm btn-block btn-ghost justify-start"
+               value="{{ item.0 }}"
+               aria-label="{{ item.1 }}"
+               name="timeframe"
+               autocomplete="off"
+               hx-post="{% url 'htmx:update-preferences' namespace='argus_htmx' %}"
+               hx-trigger="change"
+               hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' />
+      </li>
+    {% endfor %}
+  </ul>
+</details>
