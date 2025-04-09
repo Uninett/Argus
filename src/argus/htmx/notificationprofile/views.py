@@ -171,6 +171,15 @@ class NotificationProfileMixin:
 
     model = NotificationProfile
 
+    def _set_delete_modal(self, form, obj):
+        form.modal = DeleteModal(
+            header="Delete notification profile",
+            explanation=f'Delete the notification profile "{obj}"?',
+            dialog_id=f"delete-modal-{obj.pk}",
+            endpoint=reverse("htmx:notificationprofile-delete", kwargs={"pk": obj.pk}),
+        )
+        return form
+
     def get_queryset(self):
         qs = (
             super()
@@ -233,12 +242,7 @@ class NotificationProfileListView(NotificationProfileMixin, ListView):
         forms = []
         for obj in self.get_queryset():
             form = NotificationProfileForm(None, prefix=f"npf{obj.pk}", user=self.request.user, instance=obj)
-            form.modal = DeleteModal(
-                header="Delete notification profile",
-                explanation=f'Delete the notification profile "{obj}"?',
-                dialog_id=f"delete-modal-{obj.pk}",
-                endpoint=reverse("htmx:notificationprofile-delete", kwargs={"pk": obj.pk}),
-            )
+            form = self._set_delete_modal(form, obj)
             forms.append(form)
         context["form_list"] = forms
         return context
@@ -255,7 +259,11 @@ class NotificationProfileCreateView(ChangeMixin, NotificationProfileMixin, Creat
 
 
 class NotificationProfileUpdateView(ChangeMixin, NotificationProfileMixin, UpdateView):
-    pass
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        form = context["form"]
+        context["form"] = self._set_delete_modal(form, self.object)
+        return context
 
 
 class NotificationProfileDeleteView(NotificationProfileMixin, DeleteView):

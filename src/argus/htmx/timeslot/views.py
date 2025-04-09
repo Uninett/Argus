@@ -103,6 +103,16 @@ class TimeslotMixin:
             return self.prefix + f"-{pk}"
         return self.prefix
 
+    def _set_delete_modal(self, form, obj):
+        form.modal = DeleteModal(
+            header="Delete timeslot",
+            button_title="Delete timeslot",
+            explanation=f'Delete the timeslot "{obj}"?',
+            dialog_id=f"timeslot-delete-confirm-{obj.pk}",
+            endpoint=reverse("htmx:timeslot-delete", kwargs={"pk": obj.pk}),
+        )
+        return form
+
     def get_prefix(self):
         return self._get_prefix(getattr(self.object, "pk", None))
 
@@ -205,13 +215,7 @@ class TimeslotListView(TimeslotMixin, ListView):
         forms = []
         for obj in self.get_queryset():
             form = TimeslotForm(None, instance=obj, prefix=self._get_prefix(obj.pk))
-            form.modal = DeleteModal(
-                header="Delete timeslot",
-                button_title="Delete timeslot",
-                explanation=f'Delete the timeslot "{obj}"?',
-                dialog_id=f"timeslot-delete-confirm-{obj.pk}",
-                endpoint=reverse("htmx:timeslot-delete", kwargs={"pk": obj.pk}),
-            )
+            form = self._set_delete_modal(form, obj)
             formset = make_timerecurrence_formset(timeslot=obj)
             forms.append({"form": form, "formset": formset})
         context["form_list"] = forms
@@ -243,6 +247,9 @@ class TimeslotUpdateView(FormsetMixin, TimeslotMixin, UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["formset"] = make_timerecurrence_formset(timeslot=self.object)
+        form = context["form"]
+        form = self._set_delete_modal(form, self.object)
+        context["form"] = form
         return context
 
     def post(self, request, *args, **kwargs):
