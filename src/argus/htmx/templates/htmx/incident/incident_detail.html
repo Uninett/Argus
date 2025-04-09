@@ -35,7 +35,7 @@
             <h2 class="card-title pl-8">Tags</h2>
             <p class="card-body flex-row flex-wrap gap-0.5">
               {% for tag in incident.deprecated_tags %}
-                <span class="badge badge-content badge-outline  h-auto text-wrap break-all text-center text-xs">
+                <span class="badge badge-neutral-content badge-outline  h-auto text-wrap break-all text-center text-xs">
                   {# djlint:off #}
                   {{ tag.key }}{{ tag.TAG_DELIMITER }}{% if tag.value|is_valid_url %}<a href="{{ tag.value }}" target="_blank" rel="noreferrer">{{ tag.value }}</a>{% else %}{{ tag.value }}{% endif %}
                   {# djlint:on #}
