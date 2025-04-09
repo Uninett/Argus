@@ -217,13 +217,14 @@ def incident_list(request: HtmxHttpRequest) -> HttpResponse:
 
     incident_list_filter = get_filter_function()
     filter_form, qs = incident_list_filter(request, qs)
-    filtered_count = qs.count()
 
     # Limit by timeframe
     timeframe = get_preference(request, "argus_htmx", "timeframe")
     if timeframe:
         after = tznow() - timedelta(seconds=timeframe * 60)
         qs = qs.filter(start_time__gte=after)
+
+    filtered_count = qs.count()
 
     # Standard Django pagination
     page_size, _ = get_or_update_preference(request, request.GET, "argus_htmx", "page_size")
