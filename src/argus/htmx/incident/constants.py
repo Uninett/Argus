@@ -27,7 +27,7 @@ UPDATE_INTERVAL_CHOICES = tuple((interval, interval) for interval in UPDATE_INTE
 
 TIMEFRAME_DEFAULT = _no_timeframe
 TIMEFRAME_CHOICES = (
-    (_no_timeframe, "No timeframe"),
+    (_no_timeframe, "None"),
     (_hour, "Last hour"),
     (_hour * 3, "Last 3 hours"),
     (_hour * 12, "Last 12 hours"),
