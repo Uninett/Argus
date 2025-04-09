@@ -58,7 +58,7 @@
                 {% elif field.name == "maxlevel" %}
                   <div class="pt-4">
                     {{ field|add_class:"range range-primary range-xs" }}
-                    <div class="flex w-full justify-between px-2 text-xs">
+                    <div class="flex w-full justify-around gap-2 text-xs">
                       {% for tick in "12345" %}<span>{{ tick }}</span>{% endfor %}
                     </div>
                   </div>
