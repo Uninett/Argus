@@ -1,8 +1,8 @@
 {% extends "htmx/incident/_base_incident_update_modal.html" %}
 {% block dialogform %}
   {% if incident.ticket_url %}
-    {% include "htmx/forms/input_field.html" with label="Ticket URL" is_required="true" name="ticket_url" type="url" placeholder="Valid URL or nothing" value=incident.ticket_url %}
+    {% include "htmx/forms/input_field.html" with label="Ticket URL" name="ticket_url" type="url" placeholder="Valid URL or nothing" value=incident.ticket_url %}
   {% else %}
-    {% include "htmx/forms/input_field.html" with label="Ticket URL" is_required="true" name="ticket_url" type="url" placeholder="Valid URL or nothing" %}
+    {% include "htmx/forms/input_field.html" with label="Ticket URL" name="ticket_url" type="url" placeholder="Valid URL or nothing" %}
   {% endif %}
 {% endblock dialogform %}
