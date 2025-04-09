@@ -10,6 +10,9 @@ This project uses [*towncrier*](https://towncrier.readthedocs.io/) and the chang
 
 ## [1.35.0] - 2025-04-09
 
+Remember to migrate the database, unwanted crud might have snuck into the
+stored filters.
+
 ### Removed
 
 - Dropped support for testing and running on Python 3.9 and Django 5.0.

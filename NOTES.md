@@ -10,6 +10,8 @@ though we do not aim for bug compatibility =)
 
 Feel free to switch over to the new frontend.
 
+**Remember to migrate the database**
+
 ## [1.34.1] - 2025-03-26
 
 Bugfix release, docker files should be able to run argus again.
