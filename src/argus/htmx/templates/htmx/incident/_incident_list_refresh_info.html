@@ -47,10 +47,11 @@
                 hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
                 hx-indicator="#incident-list .htmx-indicator"
                 autocomplete="off">
-          {% for interval in preferences_choices.argus_htmx.update_interval %}
-            <option value="{{ interval|default:'never' }}"
+          {% for interval, interval_name in preferences_choices.argus_htmx.update_interval %}
+            <option class="bg-neutral"
+                    value="{{ interval|default:'never' }}"
                     {% if interval == preferences.argus_htmx.update_interval %}selected{% endif %}>
-              {{ interval|update_interval_string }}
+              {{ interval_name }}
             </option>
           {% endfor %}
         </select>
