@@ -1,15 +1,15 @@
 <details>
   <summary>
     Update interval
-    <span class="badge badge-primary">{{ preferences.argus_htmx.update_interval }}</span>
+    <span class="badge badge-primary">{{ preferences.argus_htmx.update_interval_pp }}</span>
   </summary>
   <ul class="max-h-64 overflow-y-scroll">
     {% for item in preferences_choices.argus_htmx.update_interval %}
       <li>
         <input type="radio"
                class="btn btn-sm btn-block btn-ghost justify-start"
-               value="{{ item }}"
-               aria-label="{{ item }}"
+               value="{{ item.0 }}"
+               aria-label="{{ item.1 }}"
                name="update_interval"
                autocomplete="off"
                hx-post="{% url 'htmx:update-preferences' namespace='argus_htmx' %}"

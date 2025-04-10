@@ -1,11 +1,12 @@
 from django.conf import settings
 
+from argus.htmx.incident.utils import update_interval_string
+
 
 __all__ = [
     "PAGE_SIZE_DEFAULT",
     "PAGE_SIZE_CHOICES",
     "UPDATE_INTERVAL_DEFAULT",
-    "UPDATE_INTERVAL_ALLOWED",
     "UPDATE_INTERVAL_CHOICES",
     "TIMEFRAME_DEFAULT",
     "TIMEFRAME_CHOICES",
@@ -20,9 +21,10 @@ _PAGE_SIZES = getattr(settings, "ARGUS_INCIDENTS_PAGE_SIZES", _PAGE_SIZE_FALLBAC
 PAGE_SIZE_DEFAULT = getattr(settings, "ARGUS_INCIDENTS_DEFAULT_PAGE_SIZE", 10)
 PAGE_SIZE_CHOICES = tuple((ps, ps) for ps in _PAGE_SIZES)
 
+_UPDATE_INTERVAL_FALLBACK = ["never", 5, 30, 60]
 UPDATE_INTERVAL_DEFAULT = getattr(settings, "ARGUS_INCIDENTS_UPDATE_INTERVAL_DEFAULT", 30)
-UPDATE_INTERVAL_ALLOWED = getattr(settings, "ARGUS_INCIDENTS_UPDATE_INTERVALS", ["never", 5, 30, 60])
-UPDATE_INTERVAL_CHOICES = tuple((interval, interval) for interval in UPDATE_INTERVAL_ALLOWED)
+_UPDATE_INTERVALS = getattr(settings, "ARGUS_INCIDENTS_UPDATE_INTERVALS", _UPDATE_INTERVAL_FALLBACK)
+UPDATE_INTERVAL_CHOICES = tuple((interval, update_interval_string(interval)) for interval in _UPDATE_INTERVALS)
 
 TIMEFRAME_DEFAULT = _no_timeframe
 TIMEFRAME_CHOICES = (
