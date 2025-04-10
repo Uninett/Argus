@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Optional
 
 from django import forms
@@ -25,7 +25,7 @@ from ..request import HtmxHttpRequest
 
 from .customization import get_incident_table_columns
 from .utils import get_filter_function
-from .forms import AckForm, DescriptionOptionalForm, EditTicketUrlForm, AddTicketUrlForm
+from .forms import AckForm, DescriptionOptionalForm, EditTicketUrlForm, AddTicketUrlForm, TimeframeForm
 from ..utils import (
     single_autocreate_ticket_url_queryset,
     bulk_change_incidents,
@@ -212,14 +212,25 @@ def incident_list(request: HtmxHttpRequest) -> HttpResponse:
     total_count = qs.count()
     last_refreshed = make_aware(datetime.now())
 
+    # make dict from QueryDict
     params = dict(request.GET.items())
 
     incident_list_filter = get_filter_function()
     filter_form, qs = incident_list_filter(request, qs)
+
+    # Limit by timeframe
+    timeframe_form = TimeframeForm(request.GET)
+    timeframe = 0
+    if timeframe_form.is_valid():
+        timeframe = timeframe_form.cleaned_data["timeframe"]
+
+    if timeframe:
+        after = tznow() - timedelta(seconds=timeframe * 60)
+        qs = qs.filter(start_time__gte=after)
+
     filtered_count = qs.count()
 
     # Standard Django pagination
-
     page_size, _ = get_or_update_preference(request, request.GET, "argus_htmx", "page_size")
 
     paginator = Paginator(object_list=qs, per_page=page_size)
@@ -239,6 +250,8 @@ def incident_list(request: HtmxHttpRequest) -> HttpResponse:
         "filtered_count": filtered_count,
         "count": total_count,
         "filter_form": filter_form,
+        "timeframe_form": timeframe_form,
+        "timeframe": timeframe,
         "page_title": "Incidents",
         "base": base_template,
         "page": page,
