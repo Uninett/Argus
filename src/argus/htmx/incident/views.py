@@ -15,7 +15,7 @@ from django.core.paginator import Paginator
 from django.http import HttpResponse, HttpResponseBadRequest
 from django_htmx.http import HttpResponseClientRefresh, retarget
 
-from argus.auth.utils import get_or_update_preference, get_preference
+from argus.auth.utils import get_or_update_preference
 from argus.incident.models import Incident
 from argus.incident.ticket.utils import get_ticket_plugin_path
 from argus.notificationprofile.models import Filter
@@ -25,7 +25,7 @@ from ..request import HtmxHttpRequest
 
 from .customization import get_incident_table_columns
 from .utils import get_filter_function
-from .forms import AckForm, DescriptionOptionalForm, EditTicketUrlForm, AddTicketUrlForm
+from .forms import AckForm, DescriptionOptionalForm, EditTicketUrlForm, AddTicketUrlForm, TimeframeForm
 from ..utils import (
     single_autocreate_ticket_url_queryset,
     bulk_change_incidents,
@@ -219,7 +219,11 @@ def incident_list(request: HtmxHttpRequest) -> HttpResponse:
     filter_form, qs = incident_list_filter(request, qs)
 
     # Limit by timeframe
-    timeframe = get_preference(request, "argus_htmx", "timeframe")
+    timeframe_form = TimeframeForm(request.GET)
+    timeframe = 0
+    if timeframe_form.is_valid():
+        timeframe = timeframe_form.cleaned_data["timeframe"]
+
     if timeframe:
         after = tznow() - timedelta(seconds=timeframe * 60)
         qs = qs.filter(start_time__gte=after)
@@ -246,6 +250,8 @@ def incident_list(request: HtmxHttpRequest) -> HttpResponse:
         "filtered_count": filtered_count,
         "count": total_count,
         "filter_form": filter_form,
+        "timeframe_form": timeframe_form,
+        "timeframe": timeframe,
         "page_title": "Incidents",
         "base": base_template,
         "page": page,

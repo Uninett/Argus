@@ -14,8 +14,6 @@ from argus.htmx.constants import (
     UPDATE_INTERVAL_ALLOWED,
     UPDATE_INTERVAL_DEFAULT,
     UPDATE_INTERVAL_CHOICES,
-    TIMEFRAME_DEFAULT,
-    TIMEFRAME_CHOICES,
 )
 
 
@@ -37,14 +35,6 @@ class ThemeForm(forms.Form):
     theme = forms.ChoiceField(choices=THEME_CHOICES)
 
 
-class TimeframeForm(forms.Form):
-    timeframe = forms.TypedChoiceField(
-        required=False,
-        choices=TIMEFRAME_CHOICES,
-        coerce=int,
-    )
-
-
 @preferences(namespace="argus_htmx")
 class ArgusHtmxPreferences:
     FIELDS = {
@@ -61,21 +51,13 @@ class ArgusHtmxPreferences:
         "update_interval": PreferenceField(
             form=UpdateIntervalForm, default=UPDATE_INTERVAL_DEFAULT, choices=UPDATE_INTERVAL_ALLOWED
         ),
-        "timeframe": PreferenceField(
-            form=TimeframeForm,
-            default=TIMEFRAME_DEFAULT,
-            choices=TIMEFRAME_CHOICES,
-        ),
     }
 
     def update_context(self, context):
         datetime_format_name = context.get("datetime_format_name", DATETIME_DEFAULT)
         datetime_format = DATETIME_FORMATS[datetime_format_name]
-        timeframe = int(context["timeframe"])
-        pp_timeframe = dict(TIMEFRAME_CHOICES)[timeframe]
         return {
             "datetime_format": datetime_format.datetime,
             "date_format": datetime_format.date,
             "time_format": datetime_format.time,
-            "pp_timeframe": pp_timeframe,
         }
