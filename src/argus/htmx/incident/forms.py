@@ -1,6 +1,8 @@
 from django import forms
 
 from argus.htmx.constants import (
+    PAGE_SIZE_CHOICES,
+    PAGE_SIZE_DEFAULT,
     TIMEFRAME_CHOICES,
     TIMEFRAME_DEFAULT,
 )
@@ -35,6 +37,16 @@ class IncidentListRefreshInfoSelect(forms.Select):
 
 
 # incident filter, not stored
+
+
+class PageSizeForm(forms.Form):
+    page_size = forms.TypedChoiceField(
+        required=False,
+        choices=PAGE_SIZE_CHOICES,
+        coerce=int,
+        initial=PAGE_SIZE_DEFAULT,
+        widget=IncidentListRefreshInfoSelect,
+    )
 
 
 class TimeframeForm(forms.Form):

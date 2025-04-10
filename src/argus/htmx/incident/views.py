@@ -27,7 +27,7 @@ from ..request import HtmxHttpRequest
 
 from .customization import get_incident_table_columns
 from .utils import get_filter_function
-from .forms import AckForm, DescriptionOptionalForm, EditTicketUrlForm, AddTicketUrlForm, TimeframeForm
+from .forms import AckForm, DescriptionOptionalForm, EditTicketUrlForm, AddTicketUrlForm, TimeframeForm, PageSizeForm
 from ..utils import (
     single_autocreate_ticket_url_queryset,
     bulk_change_incidents,
@@ -271,6 +271,8 @@ def incident_list(request: HtmxHttpRequest) -> HttpResponse:
     filtered_count = qs.count()
 
     # Standard Django pagination
+    page_size_form = PageSizeForm(request.GET)
+    page_size_form.is_valid()
     page_size, _ = get_or_update_preference(request, request.GET, "argus_htmx", "page_size")
 
     paginator = Paginator(object_list=qs, per_page=page_size)
@@ -291,6 +293,8 @@ def incident_list(request: HtmxHttpRequest) -> HttpResponse:
         "count": total_count,
         "filter_form": filter_form,
         "timeframe_form": timeframe_form,
+        "page_size_form": page_size_form,
+        "page_size": page_size,
         "page_title": "Incidents",
         "base": base_template,
         "page": page,
