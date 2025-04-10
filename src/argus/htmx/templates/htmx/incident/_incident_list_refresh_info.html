@@ -25,9 +25,9 @@
                 hx-push-url="true"
                 hx-include=".incident-list-param"
                 hx-indicator="#incident-list .htmx-indicator">
-          {% for ps in preferences_choices.argus_htmx.page_size %}
+          {% for ps, ps_name in preferences_choices.argus_htmx.page_size %}
             <option value="{{ ps }}"
-                    {% if ps == preferences.argus_htmx.page_size %}selected{% endif %}>{{ ps }}</option>
+                    {% if ps == preferences.argus_htmx.page_size %}selected{% endif %}>{{ ps_name }}</option>
           {% endfor %}
         </select>
       </dd>

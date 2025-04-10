@@ -2,14 +2,13 @@ from django import forms
 
 from argus.auth.models import PreferenceField, preferences
 from argus.htmx.constants import (
-    ALLOWED_PAGE_SIZES,
     DATETIME_CHOICES,
     DATETIME_DEFAULT,
     DATETIME_FORMATS,
-    DEFAULT_PAGE_SIZE,
     INCIDENTS_TABLE_LAYOUT_ALLOWED,
     INCIDENTS_TABLE_LAYOUT_CHOICES,
     INCIDENTS_TABLE_LAYOUT_DEFAULT,
+    PAGE_SIZE_DEFAULT,
     PAGE_SIZE_CHOICES,
     THEME_CHOICES,
     THEME_DEFAULT,
@@ -48,7 +47,7 @@ class ArgusHtmxPreferences:
         "datetime_format_name": PreferenceField(
             form=DateTimeFormatForm, default=DATETIME_DEFAULT, choices=DATETIME_FORMATS
         ),
-        "page_size": PreferenceField(form=PageSizeForm, default=DEFAULT_PAGE_SIZE, choices=ALLOWED_PAGE_SIZES),
+        "page_size": PreferenceField(form=PageSizeForm, default=PAGE_SIZE_DEFAULT, choices=PAGE_SIZE_CHOICES),
         "theme": PreferenceField(
             form=ThemeForm,
             default=THEME_DEFAULT,
