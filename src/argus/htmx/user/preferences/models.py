@@ -19,9 +19,6 @@ from argus.htmx.constants import (
 )
 
 
-_PAGE_SIZES = dict(PAGE_SIZE_CHOICES).keys()
-
-
 class DateTimeFormatForm(forms.Form):
     datetime_format_name = forms.ChoiceField(required=False, choices=DATETIME_CHOICES)
 
@@ -50,7 +47,7 @@ class ArgusHtmxPreferences:
         "datetime_format_name": PreferenceField(
             form=DateTimeFormatForm, default=DATETIME_DEFAULT, choices=DATETIME_FORMATS
         ),
-        "page_size": PreferenceField(form=PageSizeForm, default=PAGE_SIZE_DEFAULT, choices=_PAGE_SIZES),
+        "page_size": PreferenceField(form=PageSizeForm, default=PAGE_SIZE_DEFAULT, choices=PAGE_SIZE_CHOICES),
         "theme": PreferenceField(
             form=ThemeForm,
             default=THEME_DEFAULT,
