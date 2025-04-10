@@ -64,7 +64,7 @@
                   </section>
                   <section>
                     <h3 class="font-bold">Current duration</h3>
-                    <p>{{ incident.duration }}</p>
+                    <p>{{ incident.start_time|timesince }}</p>
                   </section>
                 {% else %}
                   <section>
@@ -75,7 +75,7 @@
                   </section>
                   <section>
                     <h3 class="font-bold">Total duration</h3>
-                    <p>{{ incident.duration }}</p>
+                    <p>{{ incident.start_time|timesince:incident.end_time }}</p>
                   </section>
                 {% endif %}
               {% else %}
