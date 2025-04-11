@@ -43,15 +43,7 @@
           {% block refresh_info %}
             {% include "htmx/incident/_incident_list_refresh_info.html" %}
           {% endblock refresh_info %}
-          {% if page.paginator.num_pages > 1 %}
-            {% include "./_incident_table_paginator.html" %}
-          {% else %}
-            <ul class="join">
-              <li>
-                <button class="btn btn-active btn-neutral">1</button>
-              </li>
-            </ul>
-          {% endif %}
+          {% include "./_incident_table_paginator.html" %}
         </div>
       </td>
     </tr>
