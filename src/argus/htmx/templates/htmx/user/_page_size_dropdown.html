@@ -4,12 +4,12 @@
     <span class="badge badge-primary">{{ preferences.argus_htmx.page_size }}</span>
   </summary>
   <ul class="max-h-64 overflow-y-scroll">
-    {% for item in preferences_choices.argus_htmx.page_size %}
+    {% for page_size, page_size_name in preferences_choices.argus_htmx.page_size %}
       <li>
         <input type="radio"
                class="btn btn-sm btn-block btn-ghost justify-start"
-               value="{{ item }}"
-               aria-label="{{ item }}"
+               value="{{ page_size }}"
+               aria-label="{{ page_size_name }}"
                name="page_size"
                autocomplete="off"
                hx-post="{% url 'htmx:update-preferences' namespace='argus_htmx' %}"
