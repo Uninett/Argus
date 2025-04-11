@@ -15,7 +15,7 @@ the backwards/forwards buttons to navigate these subpages.
       {% include "./_incident_table_paginator_pageitem.html" with page_number=1 page_prefix="« " page_name="1" %}
       {% if page.number > 3 %}
         <li>
-          <button class="join-item btn btn-sm pointer-events-none">…</button>
+          <button class="join-item btn pointer-events-none">…</button>
         </li>
       {% endif %}
     {% endif %}
@@ -23,7 +23,7 @@ the backwards/forwards buttons to navigate these subpages.
       {% include "./_incident_table_paginator_pageitem.html" with page_number=page.previous_page_number page_prefix="‹ " page_name=page.previous_page_number %}
     {% endif %}
     <li>
-      <button class="join-item btn btn-sm btn-active pointer-events-none">{{ page.number }}</button>
+      <button class="join-item btn btn-active pointer-events-none">{{ page.number }}</button>
     </li>
     {% if page.has_next and page.number != second_to_last_page %}
       {% include "./_incident_table_paginator_pageitem.html" with page_number=page.next_page_number page_suffix=" ›" %}
@@ -31,7 +31,7 @@ the backwards/forwards buttons to navigate these subpages.
     {% if page.number != last_page_num %}
       {% if page.next_page_number < second_to_last_page %}
         <li>
-          <button class="join-item btn btn-sm pointer-events-none">…</button>
+          <button class="join-item btn pointer-events-none">…</button>
         </li>
       {% endif %}
       {% include "./_incident_table_paginator_pageitem.html" with page_number=last_page_num page_name=last_page_number page_suffix=" »" %}
@@ -40,7 +40,7 @@ the backwards/forwards buttons to navigate these subpages.
 {% else %}
   <ul class="join">
     <li>
-      <button class="btn btn-sm btn-active">1</button>
+      <button class="btn btn-active">1</button>
     </li>
   </ul>
 {% endif %}
