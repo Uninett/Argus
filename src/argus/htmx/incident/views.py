@@ -63,14 +63,6 @@ def prefetch_incident_daughters():
 @require_GET
 def incident_detail(request, pk: int):
     incident = get_object_or_404(Incident, id=pk)
-    duration = None
-    now = tznow()
-    if incident.end_time:
-        if incident.end_time <= now:
-            duration = incident.end_time - incident.start_time
-        else:
-            duration = now - incident.start_time
-    incident.duration = duration
     context = {
         "incident": incident,
         "page_title": str(incident),
