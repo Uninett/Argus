@@ -33,9 +33,6 @@ from .serializers import (
 
 @extend_schema_view(
     retrieve=extend_schema(deprecated=True),
-    destroy=extend_schema(deprecated=True),
-    update=extend_schema(deprecated=True),
-    partial_update=extend_schema(deprecated=True),
     create=extend_schema(deprecated=True),
     list=extend_schema(deprecated=True),
 )
@@ -46,8 +43,6 @@ class EventViewSetV1(EventViewSet):
 @extend_schema_view(
     retrieve=extend_schema(deprecated=True),
     destroy=extend_schema(deprecated=True),
-    update=extend_schema(deprecated=True),
-    partial_update=extend_schema(deprecated=True),
     create=extend_schema(deprecated=True),
     list=extend_schema(deprecated=True),
 )
@@ -57,7 +52,6 @@ class IncidentTagViewSetV1(IncidentTagViewSet):
 
 @extend_schema_view(
     retrieve=extend_schema(deprecated=True),
-    destroy=extend_schema(deprecated=True),
     update=extend_schema(deprecated=True),
     partial_update=extend_schema(deprecated=True),
     create=extend_schema(deprecated=True),
@@ -69,9 +63,6 @@ class SourceSystemViewSetV1(SourceSystemViewSet):
 
 @extend_schema_view(
     retrieve=extend_schema(deprecated=True),
-    destroy=extend_schema(deprecated=True),
-    update=extend_schema(deprecated=True),
-    partial_update=extend_schema(deprecated=True),
     create=extend_schema(deprecated=True),
     list=extend_schema(deprecated=True),
 )
