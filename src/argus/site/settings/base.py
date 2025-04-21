@@ -168,8 +168,8 @@ SILENCED_SYSTEM_CHECKS = [
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 EMAIL_HOST = get_str_env("EMAIL_HOST", "localhost")
 EMAIL_HOST_USER = get_str_env("EMAIL_HOST_USER")
-EMAIL_PORT = get_int_env("EMAIL_PORT", 587)
-EMAIL_USE_TLS = True
+EMAIL_PORT = get_int_env("EMAIL_PORT", 25)
+EMAIL_USE_TLS = get_bool_env("EMAIL_USE_TLS", default=False)
 EMAIL_HOST_PASSWORD = get_str_env("EMAIL_HOST_PASSWORD")
 DEFAULT_FROM_EMAIL = get_str_env("DEFAULT_FROM_EMAIL", "argus@localhost")
 
