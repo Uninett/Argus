@@ -10,7 +10,6 @@ HYPERSCRIPT_PATH_DEFAULT = "hyperscript-0.9.13.min.js"
 INCIDENT_TABLE_COLUMNS = [
     "color_status",
     "row_select",
-    "id",
     "start_time",
     "combined_status",
     "level",
