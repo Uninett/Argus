@@ -5,8 +5,10 @@
       {{ column.label }}
       <span>
         <button type="button"
-                class="btn btn-xs {% if filter_value %} btn-primary {% else %} btn-ghost {% endif %} min-h-4 h-4"
-                _="on click toggle .hidden on next .column-filter">🔍</button>
+                class="btn btn-xs {% if filter_value %} btn-primary {% else %} btn-ghost text-primary {% endif %} min-h-4 h-4"
+                _="on click toggle .hidden on next .column-filter">
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </button>
       </span>
     </div>
     <div class="absolute flex gap-2 column-filter hidden bg-base-100 border-primary border p-2 rounded-lg w-72 top-5 z-10"
