@@ -8,6 +8,47 @@ This project uses [*towncrier*](https://towncrier.readthedocs.io/) and the chang
 
 <!-- towncrier release notes start -->
 
+## [1.36.0] - 2025-04-22
+
+The new frontend is feature complete.
+
+No development or support will be done on the *old* frontend from now on,
+please switch to the new one ASAP.
+
+### Changed
+
+- Update email settings to use port 25 by default, override defaults in prod.py
+  ([#1395](https://github.com/Uninett/Argus/issues/1395))
+
+### Frontend
+
+#### Added
+
+- Add font-awesome icon pack
+  ([#1389](https://github.com/Uninett/Argus/issues/1389))
+- Convert filterable column unicode search icon to fontawesome
+  ([#1390](https://github.com/Uninett/Argus/issues/1390))
+- Added new incident page filter parameter "timeframe" to be on par with the
+  old frontend. This allows hiding older incidents by age. The chosen "ages"
+  are hard-coded, as it was in the old frontend.
+
+#### Changed
+
+- Made styling of the elements in the footer more blended in.
+  ([#1363](https://github.com/Uninett/Argus/issues/1363))
+- Made select dropdowns in incident list table footer more consistent with rest
+  of footer ([#1393](https://github.com/Uninett/Argus/issues/1393))
+- Dropped the "id"-column from the default incident columns config since most
+  other colmns now are links to the details-page.
+
+#### Fixed
+
+- Make incident duration on details page more human readable
+  ([#1196](https://github.com/Uninett/Argus/issues/1196))
+- Center header text on incident details page
+  ([#1298](https://github.com/Uninett/Argus/issues/1298))
+
+
 ## [1.35.0] - 2025-04-09
 
 Remember to migrate the database, unwanted crud might have snuck into the

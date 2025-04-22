@@ -3,6 +3,13 @@
 This file documents changes to Argus that are relevant for operations,
 customizers and end-users.
 
+## [1.36.0] - 2025-04-22
+
+The new frontend is feature complete.
+
+No development or support will be done on the *old* frontend from now on,
+please switch to the new one ASAP.
+
 ## [1.35.0] - 2025-04-09
 
 The new frontend is now just about on par feature-wise with the old frontend,
