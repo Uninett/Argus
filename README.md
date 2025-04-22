@@ -32,7 +32,7 @@ There are several ways to install Argus.
 #### Requirements
 
 * Python 3.10+
-* Django 4.2 or 5.1
+* Django 4.2, 5.1 or 5.2
 * pip
 * PostgreSQL 14+
 
@@ -42,14 +42,21 @@ There are several ways to install Argus.
 > [PostgreSQL 17.4](https://www.postgresql.org/docs/17/release-17-4.html) is
 > the newest version as of this writing.
 
+> [!IMPORTANT]
+> Please switch to Django 5.2, we are planning to drop support for anything
+> older.
+
 #### Optional requirements
 
 * Docker and Docker Compose to run Argus in Docker. This will also run
   a PostgreSQL server for you.
 
-#### Optional: New frontend
+#### Optional: Frontend
 
-You need to have the new frontend dependencies installed.
+> [!IMPORTANT]
+> This frontend is now on par with the old frontend and is what we use ourselves.
+
+You need to have the frontend-specific dependencies installed.
 
 ```
 pip install argus-server[htmx]
@@ -60,16 +67,16 @@ will do it.
 #### Optional: Old frontend
 
 > [!WARNING]
-> Support for this backend will be dropped in version 2 of argus-server. Please
-> try the new backend.
-
+> This frontend is DEPRECATED. We are no longer using this frontend ourselves.
+> Support for this backend will be dropped in version 2 of argus-server.
+> If you want a frontend, use the new one!
 
 The old frontend needs:
 
 * **Redis**. Redis backs the websockets, in order to push realtime updates to
   the frontend. See the included `docker compose` file for the quickest way.
 * [Argus-frontend](https://github.com/Uninett/Argus-frontend/), javascript that
-  uses the API.
+  uses the API. By default it is designed to run on a separate server.
 
 Get the python dependencies via:
 
@@ -232,6 +239,9 @@ Refer to the [development notes](http://argus-server.rtfd.io/en/latest/developme
 useful hints on managing Argus in development mode.
 
 #### Settings for old frontend
+
+> [!WARNING]
+> Stop using this frontend, it is deprecated. Switch to the new one!
 
 See https://argus-server.erfd.io/en/latest/reference/react-frontend.html
 
