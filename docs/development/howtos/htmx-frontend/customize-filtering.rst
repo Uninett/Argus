@@ -35,7 +35,7 @@ example to allow the filtering "Description" column, add/update the ``IncidentTa
     IncidentTableColumn(
         "description",
         label="Description",
-        cell_template="htmx/incidents/_incident_description.html",
+        cell_template="htmx/incident/cells/_incident_description.html",
         filter_field="description",
     ),
     ...
