@@ -3,6 +3,21 @@
 This file documents changes to Argus that are relevant for operations,
 customizers and end-users.
 
+## [1.36.1] - 2025-04-23
+
+The fallback setting of `EMAIL_USE_TLS` changed from a hardcoded `True` to
+reading from an environment variable with a fallback to `False` in 1.36.0.
+This broke at least one site that used the settings file
+`argus.site.settings.base` directly and did not set `EMAIL_USE_TLS` explicitly.
+This prevented the sending of emails.
+
+We recommend setting `EMAIL_USE_TLS` explicitly in your own settings, either as
+an environment variable (`"1"` for `True`, `"0"` for `False`) or directly in
+a production settings file.
+
+There was also a bug in the automatic creation of tickets in the new frontend
+that should now be fixed.
+
 ## [1.36.0] - 2025-04-22
 
 The new frontend is feature complete.
