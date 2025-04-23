@@ -96,7 +96,7 @@ def incident_update(request: HtmxHttpRequest, action: str):
         return HttpResponseClientRefresh()
 
     if action == "autocreate-ticket":
-        single_autocreate_ticket_url_queryset(request.actor, incident_ids, {"timestamp": tznow()})
+        single_autocreate_ticket_url_queryset(request.user, incident_ids, {"timestamp": tznow()})
         return HttpResponseClientRefresh()
 
     form = get_form(request, formclass)
