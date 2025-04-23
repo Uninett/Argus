@@ -32,5 +32,4 @@ def preferences(request):
     if "preferences" in request.session:
         for namespace, values in request.session["preferences"].items():
             prefdict[namespace].update(values)
-
     return {"preferences": prefdict, "preferences_choices": preferences_choices}
