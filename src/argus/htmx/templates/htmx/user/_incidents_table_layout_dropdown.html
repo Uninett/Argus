@@ -1,0 +1,25 @@
+<details>
+  <summary>
+    Incidents table layout
+    <span class="badge badge-primary">{{ preferences.argus_htmx.incidents_table_layout }}</span>
+  </summary>
+  <ul class="max-h-64 overflow-y-scroll">
+    {% for item in preferences_choices.argus_htmx.incidents_table_layout %}
+      <li>
+        <input type="radio"
+               class="btn btn-sm btn-block btn-ghost justify-start"
+               value="{{ item }}"
+               aria-label="{{ item }}"
+               name="incidents_table_layout"
+               autocomplete="off"
+               hx-post="{% url 'htmx:update-preferences' namespace='argus_htmx' %}"
+               hx-trigger="change"
+               hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' />
+      </li>
+    {% empty %}
+      <li>
+        <p>No incident table layouts configured</p>
+      </li>
+    {% endfor %}
+  </ul>
+</details>
