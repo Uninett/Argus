@@ -18,6 +18,7 @@ from django_htmx.http import HttpResponseClientRefresh, retarget
 from argus.auth.utils import get_or_update_preference
 from argus.incident.models import Incident
 from argus.incident.ticket.utils import get_ticket_plugin_path
+from argus.incident.ticket.base import TicketPluginException
 from argus.notificationprofile.models import Filter
 from argus.util.datetime_utils import make_aware
 
@@ -96,7 +97,10 @@ def incident_update(request: HtmxHttpRequest, action: str):
         return HttpResponseClientRefresh()
 
     if action == "autocreate-ticket":
-        single_autocreate_ticket_url_queryset(request.user, incident_ids, {"timestamp": tznow()})
+        try:
+            single_autocreate_ticket_url_queryset(request.user, incident_ids, {"timestamp": tznow()})
+        except TicketPluginException as e:
+            messages.error(request, str(e))
         return HttpResponseClientRefresh()
 
     form = get_form(request, formclass)
