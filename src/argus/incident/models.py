@@ -151,6 +151,7 @@ class TagQuerySet(models.QuerySet):
 class Tag(models.Model):
     TAG_DELIMITER = "="
 
+    id = models.BigAutoField(primary_key=True)
     key = models.TextField(validators=[validate_key])
     value = models.TextField()
 
@@ -222,6 +223,7 @@ class Event(models.Model):
     }
     ALLOWED_TYPES_FOR_END_USERS = {Type.CLOSE, Type.REOPEN, Type.ACKNOWLEDGE, Type.OTHER}
 
+    id = models.BigAutoField(primary_key=True)
     incident = models.ForeignKey(to="Incident", on_delete=models.PROTECT, related_name="events")
     actor = models.ForeignKey(to=User, on_delete=models.PROTECT, related_name="caused_events")
     timestamp = models.DateTimeField()
@@ -373,6 +375,7 @@ class IncidentQuerySet(models.QuerySet):
 class Incident(models.Model):
     LEVEL_CHOICES = tuple(zip(Level.values, map(str, Level.values)))
 
+    id = models.BigAutoField(primary_key=True)
     start_time = models.DateTimeField(help_text="The time the incident was created.")
     end_time = DateTimeInfinityField(
         null=True,
