@@ -8,6 +8,12 @@ This project uses [*towncrier*](https://towncrier.readthedocs.io/) and the chang
 
 <!-- towncrier release notes start -->
 
+## [1.36.2] - 2025-04-29
+
+### Changed, frontend
+
+- Show better messages when handling errors when autocreating tickets.
+
 ## [1.36.1] - 2025-04-23
 
 The fallback setting of `EMAIL_USE_TLS` changed from a hardcoded `True` to
