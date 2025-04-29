@@ -4,6 +4,7 @@
 !.gitattributes
 !.github
 !.gitignore
+!.gitkeep
 !.pre-commit-config.yaml
 !.readthedocs.yaml
 !.sonarcloud.properties
