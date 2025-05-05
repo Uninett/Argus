@@ -55,6 +55,12 @@ dynamic = ["version"]
 [project.optional-dependencies]
 htmx = []  # for outdated install procedures
 docs = ["sphinx>=2.2.0"]
+htmx-mfa = [
+    "django-allauth[mfa]",
+]
+htmx-social = [
+    "django-allauth[socialaccount]",
+]
 dev = [
     "django-debug-toolbar",
     "coverage",
