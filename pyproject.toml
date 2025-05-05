@@ -55,6 +55,12 @@ psa = [
     "social-auth-app-django>=5.0",
     "python-dataporten-auth",
 ]
+allauth-mfa = [
+    "django-allauth[mfa]",
+]
+allauth-social = [
+    "django-allauth[socialaccount]",
+]
 dev = [
     "django-debug-toolbar",
     "coverage",
