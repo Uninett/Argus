@@ -10,7 +10,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from social_django import views as social_views
 
-from .utils import get_authentication_backend_name_and_type
+from argus.auth.psa.utils import get_authentication_backend_name_and_type
 
 
 class AuthMethodSerializer(serializers.Serializer):
