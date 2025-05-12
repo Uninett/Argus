@@ -110,12 +110,10 @@ class MetadataView(APIView):
         metadata = {
             "server-version": get_version(),
             "api-version": {
-                "deprecated": "v1",
                 "stable": "v2",
             },
             "jsonapi-schema": {
                 "stable": reverse("schema-v2"),
-                "v1": "/api/v1/schema/",
                 "v2": "/api/v2/schema/",
             },
             "ticket_plugin": getattr(settings, "TICKET_PLUGIN", None),
