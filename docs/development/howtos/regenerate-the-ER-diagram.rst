@@ -21,7 +21,7 @@ Test by making a .dot-file
 To test if everything is installed correctly, run::
 
     python manage.py graph_models argus_auth argus_incident argus_notificationprofile \
-    --group-models -X Permission,AbstractBaseUser,PermissionsMixin
+    --group-models -X Permission,AbstractUser,AbstractBaseUser,PermissionsMixin
 
 This will dump a `.dot-file <https://graphviz.org/doc/info/lang.html>`_, the
 textual representation of the graph, to standard out.
@@ -43,7 +43,7 @@ We need to have one more dependency installed: one of ``pygraphviz`` or
 To generate the final PNG in the correct location, run::
 
     python manage.py graph_models argus_auth argus_incident argus_notificationprofile \
-    --group-models -X Permission,AbstractBaseUser,PermissionsMixin \
+    --group-models -X Permission,AbstractUser,AbstractBaseUser,PermissionsMixin \
     -o docs/reference/img/ER_model.png
 
 Use ``graphviz`` directly on a .dot-file
@@ -53,11 +53,11 @@ Use ``graphviz`` directly on a .dot-file
 2. Generate the dot-file with::
 
     python manage.py graph_models argus_auth argus_incident argus_notificationprofile \
-    --group-models -X Permission,AbstractBaseUser,PermissionsMixin \
+    --group-models -X Permission,AAbstractUser,AbstractBaseUser,PermissionsMixin \
     -o ER_model.dot
 3. Generate the PNG with ``dot``::
 
-   dot -T png -o docs/reference/img/ER_model.png ER_model.dot
+    dot -T png -o docs/reference/img/ER_model.png ER_model.dot
 4. You can now delete ``ER_model.dot``
 
 Commit!
