@@ -4,10 +4,10 @@
 {% block main %}
   <section class="card border border-primary">
     <div class="card-body flex flex-col gap-4 justify-center max-w-4xl">
-      <div>
-        <strong>Menu</strong>
-        <ul>
-          {% if user.is_authenticated %}
+      {% if user.is_authenticated %}
+        <div>
+          <strong>Menu</strong>
+          <ul>
             {% url 'account_email' as email_url_ %}
             {% if email_url_ %}
               <li>
@@ -39,9 +39,9 @@
               </li>
             {% endif %}
             {% url 'account_logout' as logout_url_ %}
-          {% endif %}
-        </ul>
-      </div>
+          </ul>
+        </div>
+      {% endif %}
       {% block content %}
       {% endblock content %}
     </div>
