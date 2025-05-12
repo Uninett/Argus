@@ -53,7 +53,7 @@ Use ``graphviz`` directly on a .dot-file
 2. Generate the dot-file with::
 
     python manage.py graph_models argus_auth argus_incident argus_notificationprofile \
-    --group-models -X Permission,AAbstractUser,AbstractBaseUser,PermissionsMixin \
+    --group-models -X Permission,AbstractUser,AbstractBaseUser,PermissionsMixin \
     -o ER_model.dot
 3. Generate the PNG with ``dot``::
 
