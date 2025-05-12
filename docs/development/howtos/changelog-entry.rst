@@ -21,9 +21,10 @@ or for a file without corresponding issue ``+fixed-pagination-bug.fixed.md``.
 
 This file can either be created manually with a file name as specified above and the
 changelog text as content or one can use towncrier to create such a file as following:
-    .. code:: console
 
-        $ towncrier create -c "Changelog content" 214.added.md
+.. code:: console
+
+   $ towncrier create -c "Changelog content" 214.added.md
 
 When opening a pull request there will be a check to make sure that a news fragment is
 added and it will fail if it is missing.

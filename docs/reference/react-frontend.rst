@@ -42,8 +42,6 @@ Domain settings
 * :setting:`ARGUS_SPA_COOKIE_DOMAIN` holds the domain of the Argus instance. This is the domain
   that the cookie is set for. It is needed to log into the frontend.
 
-.. setting:: ARGUS_FRONTEND_URL
-
 * :setting:`ARGUS_FRONTEND_URL` is used for redirecting back to frontend after logging in
   through Feide and CORS. Must either be a subdomain of or the same as
   :setting:`ARGUS_SPA_COOKIE_DOMAIN`. It is also used for building permalinks
