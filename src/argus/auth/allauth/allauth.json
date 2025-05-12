@@ -1,0 +1,32 @@
+[
+  {
+    "app_name": "allauth"
+  },
+  {
+    "app_name": "allauth.account",
+    "middleware": {
+      "allauth.account.middleware.AccountMiddleware": "end"
+    },
+    "settings": {
+      "ACCOUNT_MAX_EMAIL_ADDRESSES": 1
+    }
+  },
+  {
+    "app_name": "allauth.mfa",
+    "settings": {
+      "MFA_ADAPTER": "allauth.mfa.adapter.DefaultMFAAdapter",
+      "MFA_TOTP_ISSUER": "Argus",
+      "MFA_TOTP_TOLERANCE": 0
+    }
+  },
+  {
+    "app_name": "allauth.socialaccount",
+    "urls": {
+      "path": "auth/",
+      "urlpatterns_module": "allauth.urls"
+    }
+  },
+  {
+    "app_name": "allauth.socialaccount.providers.dataporten"
+  }
+]
