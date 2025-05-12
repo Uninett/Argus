@@ -7,7 +7,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ("argus_auth", "0004_add_preferences_model"),
+        ("argus_auth", "0002_squashed_auth_20250512_add_preferences_model"),
     ]
 
     operations = [
