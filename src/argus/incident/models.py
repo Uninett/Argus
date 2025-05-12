@@ -30,8 +30,13 @@ def get_or_create_default_instances():
     return (argus_user, sst, ss)
 
 
-def create_fake_incident(tags=None, description=None, stateful=True, level=None, metadata=None):
+def create_fake_incident(tags=None, description=None, source=None, stateful=True, level=None, metadata=None):
     argus_user, _, source_system = get_or_create_default_instances()
+    if source:
+        try:
+            source_system = SourceSystem.objects.get(name=source)
+        except SourceSystem.DoesNotExist:
+            raise ValueError(f"No source with the name '{source}' exists.")
     end_time = INFINITY_REPR if stateful else None
 
     MAX_ID = 2**32 - 1
