@@ -94,6 +94,13 @@ To add a custom description add the `-d` flag to the command as such:
 
         $ python manage.py create_fake_incident -d "Custom description"
 
+To use a different source than 'argus' add the `-s` flag to the command as
+such:
+
+    .. code:: console
+
+        $ python manage.py create_fake_incident -s "Notargus"
+
 To set the level of the incident add the `-l` flag to the command as such
 and choose a level between 1 and 5 (1 being the highest severity, 5 the
 lowest):
