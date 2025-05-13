@@ -9,7 +9,7 @@ from argus.util.testing import disconnect_signals, connect_signals
 
 @tag("API", "integration", "spa")
 @override_settings(
-    ROOT_URLCONF="argus.spa.root_urls",
+    ROOT_URLCONF="tests.V1.v1_root_urls",
 )
 class SpaViewTests(APITestCase):
     def setUp(self):
