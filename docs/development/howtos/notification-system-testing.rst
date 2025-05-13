@@ -154,4 +154,4 @@ methods:
 We do not recommend making an incident directly in the database, because the
 event that triggers the notification is made by Python.
 
-.. _override_settings: https://docs.djangoproject.com/en/4.2/topics/testing/tools/#django.test.override_settings
+.. _override_settings: https://docs.djangoproject.com/en/5.2/topics/testing/tools/#django.test.override_settings

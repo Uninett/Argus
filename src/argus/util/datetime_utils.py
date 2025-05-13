@@ -62,7 +62,7 @@ def parse_infinity(value: str, *, return_localized=True):
     return None
 
 
-# Code based on https://github.com/django/django/blob/4.2/django/db/backends/sqlite3/operations.py#L311-L317
+# Code based on https://github.com/django/django/blob/5.2/django/db/backends/sqlite3/operations.py#L315-L321
 def convert_datetimefield_value(value, connection):
     if value is not None:
         if not isinstance(value, datetime):
