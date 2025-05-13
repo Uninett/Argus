@@ -206,7 +206,7 @@ REST_FRAMEWORK = {
     ),
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_VERSIONING_CLASS": "rest_framework.versioning.NamespaceVersioning",
-    "DEFAULT_VERSION": "v1",
+    "DEFAULT_VERSION": "v2",
     "EXCEPTION_HANDLER": "argus.drf.exception_handler",
     "TEST_REQUEST_DEFAULT_FORMAT": "json",
     "PAGE_SIZE": 100,
