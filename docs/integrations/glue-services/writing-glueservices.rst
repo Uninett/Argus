@@ -84,7 +84,7 @@ Creating a new incident
 -----------------------
 
 Creating a new incident in Argus is done by **POST**-ing a JSON payload to the
-REST API endpoint ``/api/v1/incidents/`` (See the :ref:`api-incident-endpoints`
+REST API endpoint ``/api/v2/incidents/`` (See the :ref:`api-incident-endpoints`
 documentation).
 
 At minimum, you need to provide these incident attributes:
@@ -119,9 +119,9 @@ Optionally, you may want to provide these attributes as well:
        "start_time": "2020-12-11 15:50:42",
        "end_time": "infinity",
        "tags": [
-	 {"tag": "host=foobar-sw.example.org"},
-	 {"tag": "location=Campus Rotvoll"},
-	 {"tag": "customer=himunkholmen.no"}
+           {"tag": "host=foobar-sw.example.org"},
+           {"tag": "location=Campus Rotvoll"},
+           {"tag": "customer=himunkholmen.no"}
        ]
    }
 
@@ -193,14 +193,14 @@ In this scenario, the source system should already have some identifier for the
 resolved state, and you should already have posted this value in the
 ``source_incident_id`` when you first created the Argus incident.
 
-The API endpoint ``/api/v1/incidents/mine/`` is useful in this regard. It
-functions mostly the same as the ``/api/v1/incidents/`` endpoint, but will only
+The API endpoint ``/api/v2/incidents/mine/`` is useful in this regard. It
+functions mostly the same as the ``/api/v2/incidents/`` endpoint, but will only
 ever look at incidents reported from the source system whose API token you are
 currently using to access the API.
 
 If your source system reports that it resolved a problem whose identifier was
 ``42``, you can simply find the corresponding Argus incident by issuing a
-**GET** request for ``/api/v1/incidents/mine/?source_incident_id=42``.
+**GET** request for ``/api/v2/incidents/mine/?source_incident_id=42``.
 
 When the source system does not track internal state
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -215,7 +215,7 @@ a strategy to track state itself. Suggested strategies may be:
   incident's ``source_incident_id``, and then use the same strategy as for
   state-tracking source systems.
 * The glue service can fetch the list of open Argus incidents posted by itself
-  (from ``/api/v1/incidents/mine/?open=true``), then use as complicated a
+  (from ``/api/v2/incidents/mine/?open=true``), then use as complicated a
   custom algorithm as necessary to determine which of these Incidents match up
   with the resolving event it is currently processing.
 
@@ -233,7 +233,7 @@ it. An Argus incident is closed by posting a closing event to the incident's
 event log. The closing event can contain its own description, if need be.
 
 An incident with the id ``27`` can be closed by **POST**-ing a new event to
-``/api/v1/incidents/27/events/``:
+``/api/v2/incidents/27/events/``:
 
 .. code-block:: json
 
