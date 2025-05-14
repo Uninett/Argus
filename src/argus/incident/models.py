@@ -189,6 +189,7 @@ class Tag(models.Model):
 
 
 class IncidentTagRelation(models.Model):
+    id = models.BigAutoField(primary_key=True)
     tag = models.ForeignKey(to=Tag, on_delete=models.CASCADE, related_name="incident_tag_relations")
     incident = models.ForeignKey(to="Incident", on_delete=models.CASCADE, related_name="incident_tag_relations")
     added_by = models.ForeignKey(to=User, on_delete=models.PROTECT, related_name="tags_added")
