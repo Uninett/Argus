@@ -3,6 +3,56 @@
 This file documents changes to Argus that are relevant for operations,
 customizers and end-users.
 
+## [1.37.0] - 2025-05-14
+
+This is the first release to not support any Django older than 5.2.
+
+There's a very important future-proofing database schema change in this release.
+
+The primary keys of the models Incident, Tag, IncidentTagRelation and Event
+(and indirectly Acknowledgment) were changed from a 32-bit signed integer to
+a 64-bit signed integer since these may grow for all eternity.
+
+### How to check if you can migrate as usual
+
+You can upgrade with a standard `python manage.py migrate` *iff* your database
+is still small enough. You should probably test first. Make a *copy* of the
+production database. If even making a copy takes forever you cannot migrate as
+usual.
+
+Migrate the *copy* while you time how long it takes. If it is quick enough
+(less than a minute, say), you can migrate yor production database as usual. If
+it takes more than a single digit of minutes you should probably do it in
+a maintenance window with the appropriate people notified in advance. If it
+takes *hours* you should *not* use the included migration!
+
+### What to do if you *can't* migrate as usual
+
+Fake the migration. You do that by running
+
+```
+python manage.py migrate argus_incident 0009 --fake
+```
+
+This creates a single new row in the table `django_migrations` and should be
+over in microseconds. After this, you can upgrade as usual later.
+
+Your database might eventually run out of ids, depending on how many new
+incidents are recorded per hour.
+
+### How to migrate the hard and unusual way
+
+Record the output of
+
+```
+python manage.py sqlmigrate argus_incident 0009
+```
+
+which is what the migration does to the database schema. Give that record to
+your DBA.
+
+We plan to add suggestions for how to migrate the hard way at a later date.
+
 ## [1.36.1] - 2025-04-23
 
 The fallback setting of `EMAIL_USE_TLS` changed from a hardcoded `True` to

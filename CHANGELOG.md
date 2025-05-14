@@ -8,6 +8,26 @@ This project uses [*towncrier*](https://towncrier.readthedocs.io/) and the chang
 
 <!-- towncrier release notes start -->
 
+## [1.37.0] - 2025-05-14
+
+There's a very important change to the database schema in this release.
+Depending on the amount of incidents in your database you might not be able to
+migrate the normal way. Please see the NOTES.
+
+This is the first release to not support any Django older than 5.2.
+
+### Added
+
+- Add source argument to `create_fake_incident` CLI command
+
+### Changed
+
+- Drop support for all Django versions older than 5.2.
+- The primary keys of the models Incident, Tag, IncidentTagRelation and Event
+  (and indirectly Acknowledgment) were changed from a 32-bit signed integer to
+  a 64-bit signed integer since these may grow for all eternity.
+
+
 ## [1.36.2] - 2025-04-29
 
 ### Changed, frontend
