@@ -189,7 +189,7 @@ todo_include_todos = True
 
 intersphinx_mapping = {
     "django": (
-        "http://docs.djangoproject.com/en/4.2/",
-        "http://docs.djangoproject.com/en/4.2/_objects/",
+        "http://docs.djangoproject.com/en/5.2/",
+        "http://docs.djangoproject.com/en/5.2/_objects/",
     ),
 }

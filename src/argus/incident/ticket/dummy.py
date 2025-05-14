@@ -3,7 +3,7 @@ Minimal ticket creation plugin
 
 Serves as an example and is also used for testing.
 
-Inspired by django.core.mail.outbox, see https://docs.djangoproject.com/en/4.2/topics/testing/tools/#email-services
+Inspired by django.core.mail.outbox, see https://docs.djangoproject.com/en/5.2/topics/testing/tools/#email-services
 """
 
 from __future__ import annotations

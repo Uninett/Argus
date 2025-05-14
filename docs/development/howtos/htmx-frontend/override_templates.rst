@@ -89,4 +89,4 @@ an extensive list, but can provide entry points or inspiration:
 
 
 
-.. _Django template tags: https://docs.djangoproject.com/en/4.2/ref/templates/builtins/
+.. _Django template tags: https://docs.djangoproject.com/en/5.2/ref/templates/builtins/
