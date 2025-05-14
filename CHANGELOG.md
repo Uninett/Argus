@@ -12,7 +12,7 @@ This project uses [*towncrier*](https://towncrier.readthedocs.io/) and the chang
 
 There's a very important change to the database schema in this release.
 Depending on the amount of incidents in your database you might not be able to
-migrate the normal way. Please see the NOTES.
+migrate the normal way. Please see the [NOTES](./NOTES.md).
 
 This is the first release to not support any Django older than 5.2.
 
