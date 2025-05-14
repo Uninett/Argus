@@ -9,7 +9,7 @@ cover it, you can omit this.
 ### This pull request
 * adds/changes/removes a dependency
 * changes the database
-* changes the API <!-- Ensure that v1 is backwards compatible, v2 can be changing things -->
+* changes the API <!-- Ensure that v2 is backwards compatible, v3 can be changing things -->
 
 
 ## Contributor Checklist
