@@ -21,8 +21,8 @@ production database. If even making a copy takes forever you cannot migrate as
 usual.
 
 Migrate the *copy* while you time how long it takes. If it is quick enough
-(less than a minute, say), you can migrate yor production database as usual. If
-it takes more than a single digit of minutes you should probably do it in
+(less than a minute, say), you can migrate your production database as usual.
+If it takes more than a single digit of minutes you should probably do it in
 a maintenance window with the appropriate people notified in advance. If it
 takes *hours* you should *not* use the included migration!
 
