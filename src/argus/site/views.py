@@ -42,7 +42,7 @@ index.login_required = False
 
 
 # fmt: off
-@api_view(["GET", "HEAD"])
+@api_view(["GET", "HEAD", "POST"])
 @permission_classes([permissions.AllowAny])
 def api_gone(request, message: str = "Gone"):
     data = {
