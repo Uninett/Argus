@@ -43,9 +43,6 @@ There are several ways to install Argus.
 
 #### Optional: Frontend
 
-> [!IMPORTANT]
-> This frontend is now on par with the old frontend and is what we use ourselves.
-
 You need to have the frontend-specific dependencies installed.
 
 ```
@@ -54,34 +51,9 @@ pip install argus-server[htmx]
 
 will do it.
 
-#### Optional: Old frontend (DEPRECATED)
+#### Optional: Fedrated login for frontend
 
-> [!WARNING]
-> This frontend is DEPRECATED. We are no longer using this frontend ourselves.
-> Support for this backend will be dropped in version 2 of argus-server.
-> If you want a frontend, use the new one!
-
-The old frontend needs:
-
-* **Redis**. Redis backs the websockets, in order to push realtime updates to
-  the frontend. See the included `docker compose` file for the quickest way.
-* [Argus-frontend](https://github.com/Uninett/Argus-frontend/), javascript that
-  uses the API. By default it is designed to run on a separate server.
-
-Get the python dependencies via:
-
-```
-pip install argus-server[spa]
-
-```
-
-#### Optional: Dataporten registration
-
-Dataporten authentication is supported by Argus and can be used to log into
-Argus-frontend. Refer to the
-[Dataporten](https://argus-server.rtfd.io/en/latest/authentication.html#dataporten)
-section of the documentation to learn about Dataporten registration, and how to
-set it up with Argus.
+See [Federated Login @ Read The Docs](https://argus-server.rtfd.io/en/latest/development/howtos/federated-logins.html) or [local copy of Federated Login docs](docs/development/howtos/federated-logins.rst).
 
 ### Install Argus using pip
 
