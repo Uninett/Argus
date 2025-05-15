@@ -2,12 +2,15 @@ import argparse
 import json
 from pathlib import Path
 
-from django.core.management import CommandError
-from django.core.management.base import BaseCommand
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
+from django.core.management import CommandError, call_command
+from django.core.management.base import BaseCommand
 
 from argus.incident.constants import Level
 from argus.incident.models import create_fake_incident
+
+User = get_user_model()
 
 
 class Range(argparse.Action):
@@ -73,6 +76,9 @@ class Command(BaseCommand):
             if metadata_path:
                 with metadata_path.open() as jsonfile:
                     metadata = json.load(jsonfile)
+
+        call_command("create_source", [source, f"-t={source}"])
+
         for i in range(batch_size):
             try:
                 create_fake_incident(
