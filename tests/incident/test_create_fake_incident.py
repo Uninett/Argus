@@ -1,11 +1,12 @@
 from django.test import TestCase
 
-
+from argus.auth.factories import SourceUserFactory
+from argus.incident.factories import SourceSystemFactory, SourceSystemTypeFactory
 from argus.incident.models import IncidentTagRelation, create_fake_incident
 from argus.util.testing import disconnect_signals, connect_signals
 
 
-class EventViewSetTestCase(TestCase):
+class CreateFakeIncidentTestCase(TestCase):
     def setUp(self):
         disconnect_signals()
 
@@ -37,3 +38,16 @@ class EventViewSetTestCase(TestCase):
         incident = create_fake_incident(level=level)
 
         self.assertEqual(incident.level, level)
+
+    def test_create_fake_incident_creates_incident_with_set_existing_source(self):
+        source_name = "source_a"
+        sst = SourceSystemTypeFactory(name=source_name)
+        user = SourceUserFactory(username=source_name)
+        SourceSystemFactory(name=source_name, type=sst, user=user)
+        incident = create_fake_incident(source=source_name)
+
+        self.assertEqual(incident.source.name, source_name)
+
+    def test_create_fake_incident_raises_error_on_non_existent_source(self):
+        with self.assertRaises(ValueError):
+            create_fake_incident(source="non-existent")

@@ -3,7 +3,6 @@ from io import StringIO
 from django.core.management import CommandError, call_command
 from django.test import TestCase
 
-from argus.incident.factories import SourceSystemFactory, SourceSystemTypeFactory, SourceUserFactory
 from argus.incident.models import Incident, SourceSystem, Tag
 from argus.util.testing import connect_signals, disconnect_signals
 
@@ -72,9 +71,6 @@ class CreateFakeIncidentTests(TestCase):
         previous_incidents_pks = [incident.id for incident in Incident.objects.all()]
 
         source_name = "notargus"
-        sst = SourceSystemTypeFactory(name="source_type")
-        user = SourceUserFactory(username=source_name)
-        SourceSystemFactory(name=source_name, type=sst, user=user)
 
         out = self.call_command(f"--source={source_name}")
 
