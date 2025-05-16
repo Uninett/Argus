@@ -87,18 +87,18 @@ production, CORS headers must be set correctly. See the documentation at
 `django-cors-headers <https://pypi.org/project/django-cors-headers/>`_ for what
 is possible.
 
-Dataporten via OAuth2
----------------------
+OAuth2
+------
 
 .. setting:: ARGUS_DATAPORTEN_KEY
 
-* :setting:`ARGUS_DATAPORTEN_KEY` holds the id/key for using dataporten for authentication.
+* :setting:`ARGUS_DATAPORTEN_KEY` holds the id/key for using OAuth2 for authentication.
 
 .. setting:: ARGUS_DATAPORTEN_SECRET
 
-* :setting:`ARGUS_DATAPORTEN_SECRET` holds the dataporten password.
+* :setting:`ARGUS_DATAPORTEN_SECRET` holds the OAuth2 password.
 
-Refer to the section :ref:`dataporten <dataporten-reference>` for more information.
+Refer to the section :ref:`<federated-logins>` for more information.
 
 API Endpoints
 =============
