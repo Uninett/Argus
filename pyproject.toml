@@ -1,6 +1,6 @@
 [build-system]
-requires = ["setuptools>=61.0", "wheel", "setuptools_scm[toml]>=6.2"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling", "versioningit>=3.0.0"]
+build-backend = "hatchling.build"
 
 [project]
 name = "argus-server"
@@ -75,32 +75,26 @@ dev = [
     "build",  # for debugging builds/installs
 ]
 
+[tool.hatch.version]
+source = "versioningit"
+
+[tool.hatch.build]
+artifacts = ["src/argus/version.py"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/argus"]
+
+[tool.hatch.build.targets.sdist]
+exclude = ["/.github"]
+
+[tool.versioningit.write]
+file = "src/argus/version.py"
+
 [tool.djlint]
 profile="django"
 indent = 2
 ignore="H006"
 use_gitignore=true
-
-[tool.setuptools]
-include-package-data = true
-zip-safe = false
-platforms = ["any"]
-
-[tool.setuptools.packages.find]
-where = ["src"]
-exclude = ["tests*"]
-
-[tool.setuptools.package-data]
-"*" = [
-    "templates/",
-    "*.rst",
-]
-
-[tool.setuptools.exclude-package-data]
-"*" = ["tests/"]
-
-[tool.setuptools_scm]
-write_to = "src/argus/version.py"
 
 [tool.ruff]
 line-length = 120
