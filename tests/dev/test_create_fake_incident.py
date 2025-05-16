@@ -1,5 +1,7 @@
+import json
 from io import StringIO
 
+from django.core.files.temp import NamedTemporaryFile
 from django.core.management import CommandError, call_command
 from django.test import TestCase
 
@@ -140,3 +142,56 @@ class CreateFakeIncidentTests(TestCase):
             .filter(incident_tag_relations__tag=test_tag)
             .exists()
         )
+
+    def test_create_fake_incident_will_create_single_fake_incident_with_set_metadata(self):
+        previous_incidents_pks = [incident.id for incident in Incident.objects.all()]
+        metadata = '{"a":"b"}'
+        out = self.call_command(f"--metadata={metadata}")
+
+        self.assertFalse(out)
+
+        test_tag = Tag.objects.get(key="problem_type", value="test")
+        self.assertTrue(
+            Incident.objects.exclude(id__in=previous_incidents_pks)
+            .filter(incident_tag_relations__tag=test_tag)
+            .filter(metadata=json.loads(metadata))
+            .exists()
+        )
+
+    def test_create_fake_incident_will_create_single_fake_incident_with_set_metadata_from_file(self):
+        previous_incidents_pks = [incident.id for incident in Incident.objects.all()]
+
+        metadata = b'{"a": "b"}'
+        metadata_file = NamedTemporaryFile(delete=True)
+        metadata_file.write(metadata)
+        metadata_file.flush()
+        out = self.call_command(f"--metadata-file={metadata_file.name}")
+
+        self.assertFalse(out)
+
+        test_tag = Tag.objects.get(key="problem_type", value="test")
+        self.assertTrue(
+            Incident.objects.exclude(id__in=previous_incidents_pks)
+            .filter(incident_tag_relations__tag=test_tag)
+            .filter(metadata=json.loads(metadata))
+            .exists()
+        )
+
+    def test_create_fake_incident_will_raise_error_for_extra_arguments_to_file(self):
+        incident_data = {
+            "start_time": "2025-05-14T11:14:41.391Z",
+            "end_time": "2025-05-16T11:14:41.391Z",
+            "source_incident_id": "1234",
+            "details_url": "nav.example.com/event/1131",
+            "description": "Box down router.lab.example.com",
+            "level": 2,
+            "tags": [{"location": "Teknobyen", "customer": "Sikt"}],
+        }
+
+        data = json.dumps(incident_data).encode("utf-8")
+        file = NamedTemporaryFile(delete=True)
+        file.write(data)
+        file.flush()
+
+        with self.assertRaises(CommandError):
+            self.call_command(f"--file={file.name}", "--level=3")
