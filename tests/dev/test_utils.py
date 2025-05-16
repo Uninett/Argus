@@ -54,8 +54,5 @@ class StressTesterTests(TestCase):
     def test_get_auth_header_returns_correct_header_values(self):
         self.assertEqual(self.stresstester._get_auth_header(), {"Authorization": "Token token"})
 
-    def test_get_incidents_v1_url_returns_correct_url(self):
-        self.assertEqual(self.stresstester._get_incidents_v1_url(), "http://localhost.com/api/v1/incidents/")
-
     def test_get_incidents_v2_url_returns_correct_url(self):
         self.assertEqual(self.stresstester._get_incidents_v2_url(), "http://localhost.com/api/v2/incidents/")

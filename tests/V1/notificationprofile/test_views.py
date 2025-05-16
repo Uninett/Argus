@@ -1,6 +1,6 @@
 import json
 
-from django.test import tag
+from django.test import tag, override_settings
 
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -31,6 +31,7 @@ from argus.util.testing import disconnect_signals, connect_signals
 
 
 @tag("API", "integration")
+@override_settings(ROOT_URLCONF="tests.V1.v1_root_urls")
 class ViewTests(APITestCase):
     def setUp(self):
         disconnect_signals()
