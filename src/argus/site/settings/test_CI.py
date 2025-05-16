@@ -6,8 +6,6 @@ from . import get_bool_env, get_str_env
 from .base import *  # noqa: F403
 from ..utils import update_settings
 
-os.environ.setdefault("ARGUS_SPA_COOKIE_DOMAIN", "localhost")
-# from argus.htmx.spa_settings import *  # noqa: F403
 from argus.htmx.appconfig import APP_SETTINGS
 
 update_settings(globals(), APP_SETTINGS)
