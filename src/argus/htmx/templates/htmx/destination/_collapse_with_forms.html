@@ -4,9 +4,9 @@
     <div class="collapse-content">
       {% if error_msg %}<p class="text-error">{{ error_msg }}</p>{% endif %}
       {% for form in forms %}
-        <div class="flex w-full h-fit items-center justify-center">
+        <div class="flex w-full h-fit items-center gap-2 justify-center">
           {% include "htmx/destination/_edit_form.html" %}
-          {% include "htmx/destination/_delete_form.html" %}
+          {% include form.modal.template_name with modal=form.modal %}
         </div>
       {% endfor %}
     </div>
