@@ -40,8 +40,9 @@ The API and the user interface
 ------------------------------
 
 In keeping with the single responsibility principle, a complete Argus setup
-consists of two separate components, with separate concerns: The Argus API server,
-and the Argus frontend.
+consists of two separate components, with separate concerns: The Argus API
+server, and the Argus frontend. They are in the same code base for ease of
+deploying both at the same time.
 
 The Argus server provides a REST API to interact with the incident database and
 the database of user notification profiles. The server handles incidents
@@ -51,14 +52,15 @@ It also supports setting up user-specific notification profiles, and sends
 notifications to users based on said profiles.
 The Argus server does not provide a user interface targeted at end users.
 
-Conversely, the `Argus frontend application`_ acts as a client to provide end
+Conversely, the Argus frontend application acts as a client to provide end
 users with a web-based user interface to the Argus API server. Using the
 frontend application, users can view, filter and interact with the contents of
 the incident database, and create personal notification profiles conveniently
 in their web browsers.
 
-This documentation will describe how to use the Argus API server.
-The frontend application documentation is provided separately.
+It is possible to run only the server, only the client (given that it has
+access to a database updated via a server running somewhere else) or both at
+the same time and in the same deployment.
 
 
 The Argus server admin interface
@@ -71,5 +73,3 @@ server, such as:
 * Administration of Argus user accounts
 * Creating API authentication tokens for users
 * Defining new source systems to collect incidents from
-
-.. _`Argus frontend application`: https://github.com/Uninett/argus-frontend
