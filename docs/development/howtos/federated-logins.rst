@@ -10,13 +10,13 @@ Externally by setting REMOTE_USER
 We only know of SAML-support.
 
 * Apache: see mod_auth_mellon
-* Nginx: See nginx-saml
+* Nginx: see nginx-saml
 
 Internally with the help of a library
 ======================================
 
 We use the 3rd party framework `python-social-auth`_, aka. ``PSA``, for
-handling federated logins/logouts internally. The minimum dependenc is
+handling federated logins/logouts internally. The minimum dependency is
 `social-auth-core`.
 
 The settings-files add support for easier configuration of the OAuth2 provider
@@ -26,14 +26,18 @@ we use ourselves but you can add similar support for your chosen provider.
 SAML
 ----
 
-See `Python Social Auth SAML <https://python-social-auth.readthedocs.io/en/latest/backends/saml.html>`_, which has the additional dependency `social-auth-core[saml]`.
-We haven't as of yet tried the SAML-support.
+See `Python Social Auth SAML
+<https://python-social-auth.readthedocs.io/en/latest/backends/saml.html>`_,
+which has the additional dependency `social-auth-core[saml]`. We haven't as of
+yet tried the SAML-support.
 
 ----
 OIDC
 ----
 
-You need to install ``social-auth-core[openidconnect]`` then look at `Python Social Auth OIDC <https://python-social-auth.readthedocs.io/en/latest/backends/oidc.html>`_
+You need to install ``social-auth-core[openidconnect]`` then look at `Python
+Social Auth OIDC
+<https://python-social-auth.readthedocs.io/en/latest/backends/oidc.html>`_
 
 ------
 OAuth2
