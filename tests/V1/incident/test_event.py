@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 
-from django.test import Client
+from django.test import Client, override_settings
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
@@ -15,6 +15,7 @@ from argus.incident.models import Event, Incident
 from . import IncidentBasedAPITestCaseHelper
 
 
+@override_settings(ROOT_URLCONF="tests.V1.v1_root_urls")
 class EventAPITests(APITestCase, IncidentBasedAPITestCaseHelper):
     def setUp(self):
         disconnect_signals()
@@ -33,7 +34,7 @@ class EventAPITests(APITestCase, IncidentBasedAPITestCaseHelper):
         )
         self.stateless_incident1.create_first_event()
 
-        self.events_url = lambda incident: reverse("v2:incident:incident-events", args=[incident.pk])
+        self.events_url = lambda incident: reverse("v1:incident:incident-events", args=[incident.pk])
 
     def tearDown(self):
         connect_signals()
