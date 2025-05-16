@@ -12,6 +12,17 @@ from argus.incident.models import create_fake_incident
 
 User = get_user_model()
 
+COMMAND_ARGUMENTS = [
+    "tags",
+    "description",
+    "source",
+    "batch_size",
+    "level",
+    "stateful",
+    "metadata",
+    "metadata_path",
+]
+
 
 class Range(argparse.Action):
     def __init__(self, minimum=None, maximum=None, *args, **kwargs):
@@ -51,6 +62,12 @@ class Command(BaseCommand):
             help="Use this source for the incident (the source needs to exist, see 'create_source' for creating one)",
         )
         parser.add_argument("--stateless", action="store_true", help="Create a stateless incident (end_time = None)")
+        parser.add_argument(
+            "--file",
+            type=lambda p: Path(p).absolute(),
+            help="Path to json-file containing all data for the fake incident",
+        )
+
         metadata_parser = parser.add_mutually_exclusive_group()
         metadata_parser.add_argument(
             "--metadata",
@@ -64,18 +81,26 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        tags = options.get("tags") or []
-        description = options.get("description") or None
-        source = options.get("source") or None
-        batch_size = options.get("batch_size") or 1
-        level = options.get("level") or None
-        stateful = False if options.get("stateless") else True
-        if metadata := options.get("metadata", "{}"):
-            metadata = json.loads(metadata)
-        if metadata_path := options.get("metadata_file", ""):
-            if metadata_path:
-                with metadata_path.open() as jsonfile:
-                    metadata = json.load(jsonfile)
+        if (file_path := options.get("file", "")) and any(options.get(name, None) for name in COMMAND_ARGUMENTS):
+            raise CommandError("If argument 'file' is given no other arguments are allowed")
+
+        content = {}
+        if file_path:
+            with file_path.open() as jsonfile:
+                content = json.load(jsonfile)
+        else:
+            tags = options.get("tags") or []
+            description = options.get("description") or None
+            source = options.get("source") or None
+            batch_size = options.get("batch_size") or 1
+            level = options.get("level") or None
+            stateful = False if options.get("stateless") else True
+            if metadata := options.get("metadata", "{}"):
+                metadata = json.loads(metadata)
+            if metadata_path := options.get("metadata_file", ""):
+                if metadata_path:
+                    with metadata_path.open() as jsonfile:
+                        metadata = json.load(jsonfile)
 
         call_command("create_source", [source, f"-t={source}"])
 
