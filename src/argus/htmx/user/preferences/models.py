@@ -7,6 +7,9 @@ from argus.htmx.constants import (
     DATETIME_DEFAULT,
     DATETIME_FORMATS,
     DEFAULT_PAGE_SIZE,
+    INCIDENTS_TABLE_LAYOUT_ALLOWED,
+    INCIDENTS_TABLE_LAYOUT_CHOICES,
+    INCIDENTS_TABLE_LAYOUT_DEFAULT,
     PAGE_SIZE_CHOICES,
     THEME_CHOICES,
     THEME_DEFAULT,
@@ -19,6 +22,10 @@ from argus.htmx.constants import (
 
 class DateTimeFormatForm(forms.Form):
     datetime_format_name = forms.ChoiceField(required=False, choices=DATETIME_CHOICES)
+
+
+class IncidentsTableLayout(forms.Form):
+    incidents_table_layout = forms.ChoiceField(required=False, choices=INCIDENTS_TABLE_LAYOUT_CHOICES)
 
 
 class PageSizeForm(forms.Form):
@@ -51,13 +58,18 @@ class ArgusHtmxPreferences:
         "update_interval": PreferenceField(
             form=UpdateIntervalForm, default=UPDATE_INTERVAL_DEFAULT, choices=UPDATE_INTERVAL_ALLOWED
         ),
+        "incidents_table_layout": PreferenceField(
+            form=IncidentsTableLayout, default=INCIDENTS_TABLE_LAYOUT_DEFAULT, choices=INCIDENTS_TABLE_LAYOUT_ALLOWED
+        ),
     }
 
     def update_context(self, context):
         datetime_format_name = context.get("datetime_format_name", DATETIME_DEFAULT)
         datetime_format = DATETIME_FORMATS[datetime_format_name]
+        incidents_table_layout = context.get("incidents_table_layout", INCIDENTS_TABLE_LAYOUT_DEFAULT)
         return {
             "datetime_format": datetime_format.datetime,
             "date_format": datetime_format.date,
             "time_format": datetime_format.time,
+            "incidents_table_layout_compact": incidents_table_layout == "compact",
         }
