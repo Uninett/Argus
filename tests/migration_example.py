@@ -1,9 +1,19 @@
+"""
+This shows how to write a test-case for testing a data-migration!
+
+When migrations are squashed, remember to remove tests for migrations that no
+longer exist.
+"""
+
+from unittest import skip
+
 from django.test import TestCase
 
 from tests.helpers import Migrator
 
 
-class MigrationTest(TestCase):
+@skip
+class SomethingSomethingMigrationTest(TestCase):
     base_migration = ("argus_notificationprofile", "0016_noop")
     test_migration = ("argus_notificationprofile", "0017_change_event_type_to_event_types")
 
