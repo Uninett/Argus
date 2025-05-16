@@ -51,7 +51,7 @@ pip install argus-server[htmx]
 
 will do it.
 
-#### Optional: Fedrated login for frontend
+#### Optional: Federated login for frontend
 
 See [Federated Login @ Read The Docs](https://argus-server.rtfd.io/en/latest/development/howtos/federated-logins.html) or [local copy of Federated Login docs](docs/development/howtos/federated-logins.rst).
 
