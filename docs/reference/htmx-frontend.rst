@@ -84,7 +84,8 @@ Configure
 If *all the settings you need to change* can be set via environment variables,
 use ``argus.htmx.settings`` as your settings-file. Otherwise, read on.
 
-Do this in your workdir, which could be the checked out `argus-server`_ repo.
+Do this in your workdir, which could be the checked out `argus-server
+<https://github.com/Uninett/Argus>`_ repo.
 
 This assumes that you have a local settings file (we recommend calling it
 "localsettings.py" since that is hidden by .gitignore) as a sibling of
