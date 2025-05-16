@@ -30,7 +30,7 @@ def get_or_create_default_instances():
     return (argus_user, sst, ss)
 
 
-def create_fake_incident(tags=None, description=None, source=None, stateful=True, level=None, metadata=None):
+def create_fake_incident(tags=None, description=None, source=None, stateful=True, level=None, metadata=None, **kwargs):
     argus_user, _, source_system = get_or_create_default_instances()
     if source:
         try:
@@ -69,6 +69,10 @@ def create_fake_incident(tags=None, description=None, source=None, stateful=True
         tag, _ = Tag.objects.get_or_create(key=k, value=v)
         IncidentTagRelation.objects.create(tag=tag, incident=incident, added_by=argus_user)
         LOG.debug('Incident: Added tag "%s" on incident %i', str(tag), incident.id)
+
+    if kwargs:
+        LOG.debug(f"Could not add extra data {kwargs} to incident #{source_incident_id}")
+
     incident.create_first_event()
     return incident
 

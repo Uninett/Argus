@@ -89,30 +89,23 @@ class Command(BaseCommand):
             with file_path.open() as jsonfile:
                 content = json.load(jsonfile)
         else:
-            tags = options.get("tags") or []
-            description = options.get("description") or None
-            source = options.get("source") or None
-            batch_size = options.get("batch_size") or 1
-            level = options.get("level") or None
-            stateful = False if options.get("stateless") else True
+            content["tags"] = options.get("tags") or []
+            content["description"] = options.get("description") or None
+            content["source"] = options.get("source") or None
+            content["batch_size"] = options.get("batch_size") or 1
+            content["level"] = options.get("level") or None
+            content["stateful"] = False if options.get("stateless") else True
             if metadata := options.get("metadata", "{}"):
-                metadata = json.loads(metadata)
+                content["metadata"] = json.loads(metadata)
             if metadata_path := options.get("metadata_file", ""):
                 if metadata_path:
                     with metadata_path.open() as jsonfile:
-                        metadata = json.load(jsonfile)
+                        content["metadata"] = json.load(jsonfile)
 
-        call_command("create_source", [source, f"-t={source}"])
+        call_command("create_source", [content["source"], f"-t={content['source']}"])
 
-        for i in range(batch_size):
+        for i in range(content.pop("batch_size", 1)):
             try:
-                create_fake_incident(
-                    tags=tags,
-                    description=description,
-                    source=source,
-                    stateful=stateful,
-                    level=level,
-                    metadata=metadata,
-                )
+                create_fake_incident(**content)
             except (ValueError, ValidationError) as e:
                 raise CommandError(str(e))
