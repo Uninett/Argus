@@ -37,7 +37,7 @@ OIDC
 
 You need to install ``social-auth-core[openidconnect]`` then look at `Python
 Social Auth OIDC
-<https://python-social-auth.readthedocs.io/en/latest/backends/oidc.html>`_
+<https://python-social-auth.readthedocs.io/en/latest/backends/oidc.html>`_.
 
 ------
 OAuth2
