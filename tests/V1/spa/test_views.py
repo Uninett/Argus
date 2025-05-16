@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.urls import reverse
+from django.test import override_settings
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient, APITestCase
@@ -12,6 +13,10 @@ from tests.auth import assemble_token_auth_kwarg, expire_token
 User = get_user_model()
 
 
+@override_settings(
+    ROOT_URLCONF="tests.V1.v1_root_urls",
+    ARGUS_SPA_TOKEN_COOKIE_NAME="token",
+)
 class APITests(APITestCase):
     def setUp(self):
         self.superuser1_password = "best_admin#1"

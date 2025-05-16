@@ -1,5 +1,5 @@
 from django.contrib.auth import get_user_model
-from django.test import Client, tag
+from django.test import Client, tag, override_settings
 from django.urls import reverse
 
 from rest_framework.authtoken.models import Token
@@ -14,6 +14,7 @@ User = get_user_model()
 
 
 @tag("api", "integration")
+@override_settings(ROOT_URLCONF="tests.V1.v1_root_urls")
 class SourceSystemPostingTests(APITestCase):
     def setUp(self):
         self.type1 = SourceSystemTypeFactory(name="nav")
@@ -32,7 +33,7 @@ class SourceSystemPostingTests(APITestCase):
         self.base_admin_url = f"admin:{SourceSystem._meta.app_label}_{SourceSystem._meta.model_name}"
         self.add_url = reverse(f"{self.base_admin_url}_add")
         self.change_url = lambda source_system: reverse(f"{self.base_admin_url}_change", args=[source_system.pk])
-        self.sources_url = reverse("v2:incident:sourcesystem-list")
+        self.sources_url = reverse("v1:incident:sourcesystem-list")
 
     def _post_source1_dict(self, url: str, client: Client):
         self.source1_dict = {
