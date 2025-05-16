@@ -2,7 +2,6 @@
 PyYAML>=5.4
 attrs # needed by twisted
 cryptography>=43.0.1
-pyopenssl>=24.2.1
 urllib3>=2.2
 psycopg2>=2.9.10
 packaging>=25.0  # fix for setuptools "License-Files" shenanigans
