@@ -1,5 +1,6 @@
 import argparse
 import json
+import logging
 from pathlib import Path
 
 from django.contrib.auth import get_user_model
@@ -10,6 +11,7 @@ from django.core.management.base import BaseCommand
 from argus.incident.constants import Level
 from argus.incident.models import create_fake_incident
 
+LOG = logging.getLogger(__name__)
 User = get_user_model()
 
 COMMAND_ARGUMENTS = [
@@ -113,4 +115,4 @@ class Command(BaseCommand):
             try:
                 create_fake_incident(**content)
             except (ValueError, ValidationError) as e:
-                raise CommandError(str(e))
+                LOG.error(e)
