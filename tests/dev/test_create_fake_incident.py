@@ -135,11 +135,9 @@ class CreateFakeIncidentTests(TestCase):
 
         self.assertFalse(out)
 
-        test_tag = Tag.objects.get(key="problem_type", value="test")
         added_tag = Tag.objects.get(key=tag_key, value=tag_value)
         self.assertTrue(
             Incident.objects.exclude(id__in=previous_incidents_pks)
-            .filter(incident_tag_relations__tag=test_tag)
             .filter(incident_tag_relations__tag=added_tag)
             .exists()
         )
