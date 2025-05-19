@@ -291,7 +291,7 @@ class TicketPluginViewSet(viewsets.ViewSet):
     """This endpoint will automatically create a pre-filled ticket in a ticket
     system that is configured in the settings and return its URL or return the
     URL of an existing linked ticket.
-    To change the URL the endpoint /api/v1/incidents/<int:pk>/ticket_url/
+    To change the URL the endpoint /api/v2/incidents/<int:pk>/ticket_url/
     should be used.
     """
 
