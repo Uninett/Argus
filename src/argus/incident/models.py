@@ -31,8 +31,9 @@ def get_or_create_default_instances():
 
 
 def create_fake_incident(tags=None, description=None, source=None, stateful=True, level=None, metadata=None, **kwargs):
-    argus_user, _, source_system = get_or_create_default_instances()
-    if source:
+    if not source:
+        argus_user, _, source_system = get_or_create_default_instances()
+    else:
         try:
             source_system = SourceSystem.objects.get(name=source)
         except SourceSystem.DoesNotExist:
