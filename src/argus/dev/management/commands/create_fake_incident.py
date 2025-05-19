@@ -86,8 +86,11 @@ class Command(BaseCommand):
 
         content = {}
         if file_path:
-            with file_path.open() as jsonfile:
-                content = json.load(jsonfile)
+            try:
+                with file_path.open() as jsonfile:
+                    content = json.load(jsonfile)
+            except Exception as e:
+                raise CommandError(e)
         else:
             content["tags"] = options.get("tags") or []
             content["description"] = options.get("description") or None
@@ -98,9 +101,11 @@ class Command(BaseCommand):
             if metadata := options.get("metadata", "{}"):
                 content["metadata"] = json.loads(metadata)
             if metadata_path := options.get("metadata_file", ""):
-                if metadata_path:
+                try:
                     with metadata_path.open() as jsonfile:
                         content["metadata"] = json.load(jsonfile)
+                except Exception as e:
+                    raise CommandError(e)
 
         call_command("create_source", [content["source"], f"-t={content['source']}"])
 

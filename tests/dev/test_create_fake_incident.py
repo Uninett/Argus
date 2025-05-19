@@ -177,6 +177,10 @@ class CreateFakeIncidentTests(TestCase):
             .exists()
         )
 
+    def test_create_fake_incident_will_raise_error_for_non_existent_metadata_file(self):
+        with self.assertRaises(CommandError):
+            self.call_command("--metadata-file=invalid")
+
     def test_create_fake_incident_will_raise_error_for_extra_arguments_to_file(self):
         incident_data = {
             "start_time": "2025-05-14T11:14:41.391Z",
@@ -195,3 +199,7 @@ class CreateFakeIncidentTests(TestCase):
 
         with self.assertRaises(CommandError):
             self.call_command(f"--file={file.name}", "--level=3")
+
+    def test_create_fake_incident_will_raise_error_for_non_existent_file(self):
+        with self.assertRaises(CommandError):
+            self.call_command("--file=invalid")
