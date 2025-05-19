@@ -53,10 +53,19 @@ htmx = [
     "django-htmx",
     "django-widget-tweaks==1.5.0",
     "fontawesomefree~=6.6",
+]
+psa = [
     "social-auth-core>=4.1",
     "social-auth-app-django>=5.0",
 ]
+allauth-mfa = [
+    "django-allauth[mfa]",
+]
+allauth-social = [
+    "django-allauth[socialaccount]",
+]
 spa = [
+    "argus-server[psa]",
     "channels[daphne]>=4.0.0,<5",
     "channels-redis>=4",
 ]
