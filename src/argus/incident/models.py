@@ -63,7 +63,8 @@ def create_fake_incident(
         else:
             description = f'Incident (stateless) #{source_incident_id} created via "create_fake_incident"'
 
-    taglist = [("location", "argus"), ("object", source_incident_id), ("problem_type", "test")]
+    if not tags:
+        tags = [("location=argus"), (f"object={source_incident_id}"), ("problem_type=test")]
 
     data = {
         "start_time": start_time,
@@ -71,7 +72,7 @@ def create_fake_incident(
         "source_incident_id": source_incident_id,
         "description": description,
         "level": level or choice(Level.values),
-        "tags": taglist,
+        "tags": tags,
         "metadata": metadata,
     }
 
