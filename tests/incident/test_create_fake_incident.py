@@ -72,6 +72,12 @@ class CreateFakeIncidentTestCase(TestCase):
 
         self.assertEqual(incident.details_url, details_url)
 
+    def test_create_fake_incident_creates_incident_with_set_ticket_url(self):
+        ticket_url = "https://www.example.com/ticket/11234"
+        incident = create_fake_incident(ticket_url=ticket_url)
+
+        self.assertEqual(incident.ticket_url, ticket_url)
+
     def test_create_fake_incident_creates_incident_with_set_existing_source(self):
         source_name = "source_a"
         sst = SourceSystemTypeFactory(name=source_name)

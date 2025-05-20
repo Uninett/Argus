@@ -40,6 +40,7 @@ def create_fake_incident(
     stateful=True,
     level=None,
     details_url=None,
+    ticket_url=None,
     metadata={},
     **kwargs,
 ):
@@ -95,6 +96,8 @@ def create_fake_incident(
 
     if details_url:
         data["details_url"] = details_url
+    if ticket_url:
+        data["ticket_url"] = ticket_url
 
     serializer = IncidentSerializer(data=data)
     if serializer.is_valid():
