@@ -32,6 +32,7 @@ def get_or_create_default_instances():
 
 def create_fake_incident(
     start_time=str(timezone.now()),
+    end_time=INFINITY_REPR,
     tags=None,
     description=None,
     source=None,
@@ -49,7 +50,8 @@ def create_fake_incident(
             source_system = SourceSystem.objects.get(name=source)
         except SourceSystem.DoesNotExist:
             raise ValueError(f"No source with the name '{source}' exists.")
-    end_time = INFINITY_REPR if stateful else None
+    if not stateful:
+        end_time = None
 
     MAX_ID = 2**32 - 1
     MIN_ID = 1
@@ -72,6 +74,13 @@ def create_fake_incident(
         "tags": taglist,
         "metadata": metadata,
     }
+
+    # IncidentSerializer expects following input for end_time
+    # stateless: end_time=None
+    # stateful & open: end_time missing
+    # stateful & closed: end_time=timestamp
+    if end_time == INFINITY_REPR:
+        data.pop("end_time")
 
     serializer = IncidentSerializer(data=data)
     if serializer.is_valid():

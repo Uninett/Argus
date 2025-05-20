@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from django.test import TestCase
 from django.utils import timezone
 
@@ -34,6 +36,18 @@ class CreateFakeIncidentTestCase(TestCase):
         incident = create_fake_incident(start_time=str(start_time))
 
         self.assertEqual(incident.start_time, start_time)
+
+    def test_create_fake_incident_creates_incident_with_set_end_time(self):
+        end_time = timezone.now() + timedelta(days=1)
+        incident = create_fake_incident(end_time=str(end_time))
+
+        self.assertEqual(incident.end_time, end_time)
+
+    def test_create_fake_incident_ignores_set_end_time_for_stateless_incident(self):
+        end_time = timezone.now() + timedelta(days=1)
+        incident = create_fake_incident(stateful=False, end_time=str(end_time))
+
+        self.assertEqual(incident.end_time, None)
 
     def test_create_fake_incident_creates_stateless_incident(self):
         incident = create_fake_incident(stateful=False)
