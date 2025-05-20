@@ -30,7 +30,16 @@ def get_or_create_default_instances():
     return (argus_user, sst, ss)
 
 
-def create_fake_incident(tags=None, description=None, source=None, stateful=True, level=None, metadata={}, **kwargs):
+def create_fake_incident(
+    start_time=str(timezone.now()),
+    tags=None,
+    description=None,
+    source=None,
+    stateful=True,
+    level=None,
+    metadata={},
+    **kwargs,
+):
     from .serializers import IncidentSerializer
 
     if not source:
@@ -55,7 +64,7 @@ def create_fake_incident(tags=None, description=None, source=None, stateful=True
     taglist = [("location", "argus"), ("object", source_incident_id), ("problem_type", "test")]
 
     data = {
-        "start_time": timezone.now(),
+        "start_time": start_time,
         "end_time": end_time,
         "source_incident_id": source_incident_id,
         "description": description,
