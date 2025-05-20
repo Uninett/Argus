@@ -1,5 +1,9 @@
 INSTALLED_APPS = [
-    "channels",  # Must be early
+    "django_htmx",
+    "widget_tweaks",
+    "argus.htmx",
+    "django.forms",
+    "fontawesomefree",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -14,9 +18,11 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "django_filters",
     "phonenumber_field",
+    "knox",
     # Argus apps
     "argus.auth",
     "argus.incident",
+    "argus.filter",
     "argus.notificationprofile",
     "argus.dev",
 ]

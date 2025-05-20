@@ -56,10 +56,6 @@ htmx = [
     "social-auth-core>=4.1",
     "social-auth-app-django>=5.0",
 ]
-spa = [
-    "channels[daphne]>=4.0.0,<5",
-    "channels-redis>=4",
-]
 dev = [
     "django-debug-toolbar",
     "coverage",
