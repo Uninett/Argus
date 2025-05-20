@@ -30,9 +30,11 @@ def get_or_create_default_instances():
     return (argus_user, sst, ss)
 
 
-def create_fake_incident(tags=None, description=None, source=None, stateful=True, level=None, metadata=None, **kwargs):
+def create_fake_incident(tags=None, description=None, source=None, stateful=True, level=None, metadata={}, **kwargs):
+    from .serializers import IncidentSerializer
+
     if not source:
-        argus_user, _, source_system = get_or_create_default_instances()
+        _, _, source_system = get_or_create_default_instances()
     else:
         try:
             source_system = SourceSystem.objects.get(name=source)
@@ -49,32 +51,28 @@ def create_fake_incident(tags=None, description=None, source=None, stateful=True
             description = f'Incident #{source_incident_id} created via "create_fake_incident"'
         else:
             description = f'Incident (stateless) #{source_incident_id} created via "create_fake_incident"'
-    incident = Incident.objects.create(
-        start_time=timezone.now(),
-        end_time=end_time,
-        source_incident_id=source_incident_id,
-        source=source_system,
-        description=description,
-        level=level or choice(Level.values),
-        metadata=metadata or {},
-    )
 
-    taglist = [("location", "argus"), ("object", f"{incident.id}"), ("problem_type", "test")]
-    if tags:
-        try:
-            tags = [Tag.split(tag) for tag in tags]
-        except (ValueError, ValidationError) as e:
-            raise ValidationError(str(e))
-        taglist.extend(tags)
-    for k, v in taglist:
-        tag, _ = Tag.objects.get_or_create(key=k, value=v)
-        IncidentTagRelation.objects.create(tag=tag, incident=incident, added_by=argus_user)
-        LOG.debug('Incident: Added tag "%s" on incident %i', str(tag), incident.id)
+    taglist = [("location", "argus"), ("object", source_incident_id), ("problem_type", "test")]
+
+    data = {
+        "start_time": timezone.now(),
+        "end_time": end_time,
+        "source_incident_id": source_incident_id,
+        "description": description,
+        "level": level or choice(Level.values),
+        "tags": taglist,
+        "metadata": metadata,
+    }
+
+    serializer = IncidentSerializer(data=data)
+    if serializer.is_valid():
+        incident = serializer.save(user=source_system.user, source=source_system)
+    else:
+        raise ValidationError(serializer.errors)
 
     if kwargs:
         LOG.debug(f"Could not add extra data {kwargs} to incident #{source_incident_id}")
 
-    incident.create_first_event()
     return incident
 
 
