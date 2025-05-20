@@ -39,6 +39,7 @@ def create_fake_incident(
     source=None,
     stateful=True,
     level=None,
+    details_url=None,
     metadata={},
     **kwargs,
 ):
@@ -91,6 +92,9 @@ def create_fake_incident(
     # stateful & closed: end_time=timestamp
     if end_time == INFINITY_REPR:
         data.pop("end_time")
+
+    if details_url:
+        data["details_url"] = details_url
 
     serializer = IncidentSerializer(data=data)
     if serializer.is_valid():
