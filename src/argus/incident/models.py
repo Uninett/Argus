@@ -66,6 +66,13 @@ def create_fake_incident(
     if not tags:
         tags = [("location=argus"), (f"object={source_incident_id}"), ("problem_type=test")]
 
+    # IncidentSerializer expects following form for tags
+    # [{"tag":"a=b"}, ...]
+    tags_serializer_format = []
+    for tag in tags:
+        tags_serializer_format.append({"tag": tag})
+    tags = tags_serializer_format
+
     data = {
         "start_time": start_time,
         "end_time": end_time,
