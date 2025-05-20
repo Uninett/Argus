@@ -109,7 +109,8 @@ class Command(BaseCommand):
                 except Exception as e:
                     raise CommandError(e)
 
-        call_command("create_source", [content["source"], f"-t={content['source']}"])
+        if content.get("source"):
+            call_command("create_source", [content["source"], f"-t={content['source']}"])
 
         for i in range(content.pop("batch_size", 1)):
             try:
