@@ -17,6 +17,11 @@ See :ref:`howto-change-settings`
 List of settings and environment variables
 ==========================================
 
+.. warning:: Environment variables and Argus settings may contain sensitive data, such
+  as login credentials, secrets and passwords.
+  Be mindful when setting these variables, and use appropriate safety precautions.
+  For example, do not check your ``localsettings.py`` files into version control.
+
 Django-specific settings
 ------------------------
 
@@ -310,6 +315,24 @@ Ticket system settings
 ``TICKET_PLUGIN``, ``TICKET_ENDPOINT``, ``TICKET_AUTHENTICATION_SECRET``,
 ``TICKET_INFORMATION`` are all described in :ref:`ticket-systems-settings`.
 
+Special environment settings
+----------------------------
+
+.. setting:: BANNER_MESSAGE
+
+* :setting:`BANNER_MESSAGE` is a message displayed below the navbar in
+  a banner. It can be used to communicate an important message to the users on
+  all Argus pages, for example, to announce maintenance work or indicate that
+  the Argus instance is running in demo mode. The default value is ``None``. If
+  set it should only contain plain text, not HTML.
+
+* Environment variable: `ARGUS_BANNER_MESSAGE`
+
+* Note: To enable the banner, the context processor
+  ``argus.htmx.context_processors.banner_message`` *must* be in the context
+  processors list in the ``django.template.backends.django.DjangoTemplates``
+  template backend.
+
 Debugging settings
 ------------------
 
@@ -322,37 +345,3 @@ Debugging settings
 * :setting:`TEMPLATE_DEBUG` (optional) provides a convenient way to turn debugging on and off
   for templates. If undefined it will default to the value of :setting:`DEBUG`.
 
-Special environment settings
-----------------------------
-
-.. setting:: BANNER_MESSAGE
-
-* :setting:`BANNER_MESSAGE` is a message displayed below the navbar in a banner.
-  It can be used to communicate an important message to the users on all Argus pages, for example,
-  to announce maintenance work or indicate that the Argus instance is running in demo mode.
-  The default value is ``None``.
-
-* Environment variable: `ARGUS_BANNER_MESSAGE`
-
-* Note: To enable the banner, the context processor ``argus.htmx.context_processors.banner_message``
-  must be added to the end of the context processors list in the ``django.template.backends.django.DjangoTemplates``
-  template backend.
-
-Other settings
---------------
-
-Normally, you shouldn't need to ever change these. If you do need to touch
-them, do it via a new settings file containing overrides.
-
-.. setting:: ARGUS_SPA_TOKEN_COOKIE_NAME
-
-* :setting:`ARGUS_SPA_TOKEN_COOKIE_NAME` is to control the name of the cookie that
-  contains a copy of the authentication token which is used when logging in via
-  the frontend. The default is ``token``, and you can change this to
-  something else if something you cannot change in the same system also creates
-  a cookie with the name ``token``.
-
-.. warning:: Environment variables and Argus settings may contain sensitive data, such
-  as login credentials, secrets and passwords.
-  Be mindful when setting these variables, and use appropriate safety precautions.
-  For example, do not check your ``localsettings.py`` files into version control.
