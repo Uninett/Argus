@@ -23,7 +23,6 @@ from rest_framework.reverse import reverse
 from argus.drf.permissions import IsSuperuserOrReadOnly
 from argus.filter import get_filter_backend
 from argus.util.datetime_utils import INFINITY_REPR
-from argus.util.signals import bulk_changed
 
 from .forms import AddSourceSystemForm
 from .models import (
@@ -73,10 +72,6 @@ User = get_user_model()
 
 
 LOG = logging.getLogger(__name__)
-
-
-def send_changed_incidents(incidents):
-    bulk_changed.send(sender=Incident, instances=incidents)
 
 
 class IncidentPagination(CursorPagination):
@@ -606,21 +601,15 @@ class BulkAcknowledgementViewSet(BulkHelper, viewsets.ViewSet):
         acks = qs.create_acks(actor, timestamp, description, expiration)
         # send notifications manually
 
-        event_ids = []
-        incidents = []
         for ack in acks:
             event = ack.event
-            event_ids.append(event.id)
             incident_id = event.incident_id
-            incidents.append(event.incident)
             changes[str(incident_id)] = {
                 "ack": ResponseAcknowledgementSerializer(instance=ack).to_representation(instance=ack),
                 "status": status.HTTP_201_CREATED,
                 "errors": None,
             }
             status_codes_seen.add(status.HTTP_201_CREATED)
-
-        send_changed_incidents(incidents)
 
         all_bad = status_codes_seen == set((status.HTTP_400_BAD_REQUEST,))
         return Response(
@@ -664,18 +653,14 @@ class BulkEventViewSet(BulkHelper, viewsets.ViewSet):
             events = qs.create_events(actor, event_type, timestamp, description)
         # send notifications manually
 
-        incidents = []
         for event in events:
             incident = event.incident
-            incidents.append(incident)
             changes[str(incident.id)] = {
                 "event": EventSerializer(instance=event).to_representation(instance=event),
                 "status": status.HTTP_201_CREATED,
                 "errors": None,
             }
             status_codes_seen.add(status.HTTP_201_CREATED)
-
-        send_changed_incidents(incidents)
 
         all_bad = status_codes_seen == set((status.HTTP_400_BAD_REQUEST,))
         return Response(
@@ -715,8 +700,6 @@ class BulkTicketUrlViewSet(BulkHelper, viewsets.ViewSet):
                 "errors": None,
             }
             status_codes_seen.add(status.HTTP_201_CREATED)
-
-        send_changed_incidents(incidents)
 
         all_bad = status_codes_seen == set((status.HTTP_400_BAD_REQUEST,))
         return Response(
