@@ -4,6 +4,7 @@ from io import StringIO
 from django.core.files.temp import NamedTemporaryFile
 from django.core.management import CommandError, call_command
 from django.test import TestCase
+from django.utils.dateparse import parse_datetime
 
 from argus.incident.models import Incident, SourceSystem, Tag
 from argus.util.testing import connect_signals, disconnect_signals
@@ -201,3 +202,41 @@ class CreateFakeIncidentTests(TestCase):
     def test_create_fake_incident_will_raise_error_for_non_existent_file(self):
         with self.assertRaises(CommandError):
             self.call_command("--file=invalid")
+
+    def test_create_fake_incident_will_create_single_fake_incident_with_set_data_from_file(self):
+        previous_incidents_pks = [incident.id for incident in Incident.objects.all()]
+
+        incident_data = {
+            "start_time": "2025-05-14T11:14:41.391Z",
+            "end_time": "2025-05-16T11:14:41.391Z",
+            "source_incident_id": "1234",
+            "source": "abc",
+            "details_url": "nav.example.com/event/1131",
+            "description": "Box down router.lab.example.com",
+            "level": 2,
+            "ticket_url": "https://www.example.com/ticket/11234",
+            "tags": ["location=Teknobyen", "customer=Sikt"],
+        }
+
+        data = json.dumps(incident_data).encode("utf-8")
+        file = NamedTemporaryFile(delete=True)
+        file.write(data)
+        file.flush()
+        out = self.call_command(f"--file={file.name}")
+
+        self.assertFalse(out)
+
+        incident = (
+            Incident.objects.exclude(id__in=previous_incidents_pks)
+            .filter(source_incident_id=incident_data["source_incident_id"])
+            .first()
+        )
+
+        self.assertTrue(incident)
+        self.assertEqual(incident.start_time, parse_datetime(incident_data["start_time"]))
+        self.assertEqual(incident.end_time, parse_datetime(incident_data["end_time"]))
+        self.assertEqual(incident.source.name, incident_data["source"])
+        self.assertEqual(incident.details_url, incident_data["details_url"])
+        self.assertEqual(incident.description, incident_data["description"])
+        self.assertEqual(incident.level, incident_data["level"])
+        self.assertEqual(incident.ticket_url, incident_data["ticket_url"])
