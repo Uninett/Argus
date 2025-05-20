@@ -60,6 +60,12 @@ class CreateFakeIncidentTestCase(TestCase):
 
         self.assertEqual(incident.level, level)
 
+    def test_create_fake_incident_creates_incident_with_set_source_incident_id(self):
+        source_incident_id = "1234"
+        incident = create_fake_incident(source_incident_id=source_incident_id)
+
+        self.assertEqual(incident.source_incident_id, source_incident_id)
+
     def test_create_fake_incident_creates_incident_with_set_existing_source(self):
         source_name = "source_a"
         sst = SourceSystemTypeFactory(name=source_name)

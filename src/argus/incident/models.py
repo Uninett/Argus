@@ -33,6 +33,7 @@ def get_or_create_default_instances():
 def create_fake_incident(
     start_time=str(timezone.now()),
     end_time=INFINITY_REPR,
+    source_incident_id=None,
     tags=None,
     description=None,
     source=None,
@@ -55,7 +56,8 @@ def create_fake_incident(
 
     MAX_ID = 2**32 - 1
     MIN_ID = 1
-    source_incident_id = randint(MIN_ID, MAX_ID)
+    if not source_incident_id:
+        source_incident_id = randint(MIN_ID, MAX_ID)
 
     if not description:
         if stateful:
