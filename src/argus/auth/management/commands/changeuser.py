@@ -8,7 +8,7 @@ User = get_user_model()
 
 
 class Command(BaseCommand):
-    help = "Create user"
+    help = "Change user"
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -98,41 +98,41 @@ class Command(BaseCommand):
         except User.DoesNotExist:
             raise CommandError(f'No user with the username "{username}" exists, did you mean the create a user?')
 
-        fields = set()
+        changed_fields = set()
 
         password = options["password"] or os.environ.get("DJANGO_USER_PASSWORD", None)
         if password is not None:
-            fields.add("password")
+            changed_fields.add("password")
 
         if options["superuser"] is not None:
             user.is_superuser = options["superuser"]
-            fields.add("is_superuser")
+            changed_fields.add("is_superuser")
             user.is_staff = options["superuser"]
-            fields.add("is_staff")
+            changed_fields.add("is_staff")
         if options["staff"] is not None:
             user.is_staff = options["staff"]
-            fields.add("is_staff")
+            changed_fields.add("is_staff")
         if options["email"] is not None:
             user.email = options["email"]
-            fields.add("email")
+            changed_fields.add("email")
         if options["first_name"] is not None:
             user.first_name = options["first_name"]
-            fields.add("first_name")
+            changed_fields.add("first_name")
         if options["last_name"] is not None:
             user.last_name = options["last_name"]
-            fields.add("last_name")
+            changed_fields.add("last_name")
 
         activation_msg = ""
         match options["active"]:
             case True:
                 user.is_active = True
-                fields.add("is_active")
+                changed_fields.add("is_active")
                 activation_msg = "Activated user"
             case False:
                 user.is_active = False
-                fields.add("is_active")
+                changed_fields.add("is_active")
                 user.set_unusable_password()
-                fields.add("password")
+                changed_fields.add("password")
                 activation_msg = "Deactivated user, unset the password"
             case _:
                 activation_msg = ""
@@ -145,6 +145,6 @@ class Command(BaseCommand):
             user.save()
             self.stdout.write(self.style.SUCCESS(f'Password changed for user "{username}"'))
         if options["verbosity"] >= 1:
-            self.stdout.write("Changed field(s): " + ", ".join(fields))
+            self.stdout.write("Changed field(s): " + ", ".join(changed_fields))
             if activation_msg:
                 self.stdout.write(activation_msg)

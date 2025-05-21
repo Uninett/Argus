@@ -64,7 +64,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         username = options["username"]
         if User.objects.filter(username=username).exists():
-            raise CommandError('A user with the username "{username}" already exists, cannot create')
+            raise CommandError(f'A user with the username "{username}" already exists, cannot create')
 
         if options["is_superuser"]:
             options["is_staff"] = True
