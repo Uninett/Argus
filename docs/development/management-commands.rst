@@ -6,6 +6,9 @@ Management commands
 
 This section will talk about all available management commands that Argus offers.
 
+Setup helpers
+=============
+
 .. _initial-setup:
 
 Initial setup
@@ -62,6 +65,9 @@ the command `gen_secret_key`:
 
 
 .. _create-fake-incident:
+
+Troubleshooting helpers
+=======================
 
 Create fake incidents
 ---------------------
@@ -235,7 +241,7 @@ It will lead to an error if no ids are given.
 .. _stresstest:
 
 Stresstest
-----------
+==========
 .. warning::
     You should be careful using the `stresstest` command against a production environment,
     as the incidents created during the stresstest can trigger notifications
@@ -300,3 +306,128 @@ If you are running Argus inside a Docker container, the stresstest can be run wi
     .. code:: console
 
         $ docker compose exec api python manage.py stresstest
+
+User management
+===============
+
+Create a new user
+-----------------
+
+There's a command ``createuser`` that can do this.
+
+Full signature is:
+
+.. code:: console
+
+   $ python manage.py createuser USERNAME -p PASSWORD -e EMAIL -f FIRST_NAME -l LAST_NAME --is-active --is-staff --is-superuser
+
+Only a username is needed to create a user, but in order for the user to be able
+to log in both ``--is-active`` and a password must be set.
+
+If ``--is-superuser`` is included, ``--is-staff`` will also be set. Just
+setting ``--is-staff`` will grant access to the admin.
+
+Instead of using the ``-p`` argument to set a password you can also set the
+environment variable ``DJANGO_USER_PASSWORD``.
+
+Change an existing user
+-----------------------
+
+The Swiss Army Knife command for this is ``changeuser``.
+
+Full signature is:
+
+.. code:: console
+
+   $ python manage.py changeuser USERNAME -p PASSWORD -e EMAIL -f FIRST_NAME -l LAST_NAME (-a | -d) (--staff | --nostaff) (--superuser | --nosuperuser)
+
+The flags ``-a`` and ``-d`` are mutually exclusive and activates or deactivates
+a user respectively.
+
+To deactivate a user run:
+
+.. code:: console
+
+   $ python manage.py changeuser USERNAME -d
+
+This will both deactivate the user **and** scramble their password, so on
+reactivation they need to set a new password.
+
+To (re)activate a user run:
+
+.. code:: console
+
+   $ python manage.py changeuser USERNAME -a
+
+This *will not* set a password if one has not already been set.
+
+Instead of using the ``-p`` argument to set a password you can also set the
+environment variable ``DJANGO_USER_PASSWORD``.
+
+The flags ``--staff`` and ``--nostaff`` are mutually exclusive and controls
+whether the user has access to the admin (staff) or not (nostaff).
+
+The flags ``--superuser`` and ``--nosuperuser`` are mutually exclusive and controls
+whether the user is a superuser (superuser) or not (nosuperuser). Superusers
+have by default access to the admin, but this can be turned off with
+``--nostaff``.
+
+Deprecated/overlapping commands
+===============================
+
+Grant superuser status to a user
+--------------------------------
+
+There is a command ``grantsuperuser`` but you might as well use ``changeuser``
+instead, like so:
+
+.. code:: console
+
+   $ python manage.py changeuser USERNAME --superuser
+
+
+Revoke superuser status from a user
+-----------------------------------
+
+There is a command ``revokesuperuser`` but you might as well use ``changeuser``
+instead, like so:
+
+.. code:: console
+
+   $ python manage.py changeuser USERNAME --nosuperuser
+
+Create a superuser
+------------------
+
+Django ships with a command ``createsuperuser`` but you might as well use
+``createuser`` instead, like so:
+
+.. code:: console
+
+   $ python manage.py createuser USERNAME --is-superuser
+
+Set a password
+--------------
+
+There is a command ``setpassword`` but you might as well use ``changeuser``
+instead, like so:
+
+.. code:: console
+
+   $ python manage.py changeuser USERNAME -p PASSWORD
+
+Instead of using the ``-p``-flag you can set the environment variable
+``DJANGO_USER_PASSWORD``.
+
+Change a password
+-----------------
+
+Django ships with a command ``changepassword`` but you might as well use
+``changeuser`` instead, like so:
+
+.. code:: console
+
+   $ python manage.py changeuser USERNAME -p PASSWORD
+
+Instead of using the ``-p``-flag you can set the environment variable
+``DJANGO_USER_PASSWORD``.
