@@ -1,108 +1,108 @@
 User’s guide to Argus
 =====================
 
--  `About Argus <#what-is-argus>`__
--  `Log in <#log-into-argus>`__
+-  `About Argus <#what-is-argus>`_
+-  `Log in <#log-into-argus>`_
 
    -  `Using username and
-      password <#login-using-username-and-password>`__
+      password <#login-using-username-and-password>`_
    -  `Using OAuth
-      2.0 <#login-using-oauth-20-feide-in-the-example-below>`__
-   -  `Debugging network errors <#debugging-network-errors-on-login>`__
+      2.0 <#login-using-oauth-20-feide-in-the-example-below>`_
+   -  `Debugging network errors <#debugging-network-errors-on-login>`_
 
--  `Manage alarms <#work-with-alarms-in-argus>`__
+-  `Manage alarms <#work-with-alarms-in-argus>`_
 
-   -  `What is an incident <#what-is-an-incident-in-argus>`__
-   -  `Access detailed incident view <#access-detailed-incident-view>`__
-   -  `Work with table <#work-with-incidents-table>`__
+   -  `What is an incident <#what-is-an-incident-in-argus>`_
+   -  `Access detailed incident view <#access-detailed-incident-view>`_
+   -  `Work with table <#work-with-incidents-table>`_
 
       -  `Change rows per
-         page <#change-how-many-rows-are-shown-per-incidents-table-page>`__
-      -  `Navigate table <#navigate-incidents-table>`__
+         page <#change-how-many-rows-are-shown-per-incidents-table-page>`_
+      -  `Navigate table <#navigate-incidents-table>`_
       -  `Change refresh
-         interval <#change-how-often-incidents-table-gets-refreshed>`__
+         interval <#change-how-often-incidents-table-gets-refreshed>`_
 
    -  `Filter
-      incidents <#decide-which-incidents-are-shown-in-the-table>`__
+      incidents <#decide-which-incidents-are-shown-in-the-table>`_
 
-      -  `Filter by open/close <#filter-by-openclose-status>`__
+      -  `Filter by open/close <#filter-by-openclose-status>`_
       -  `Filter by
-         acknowledgement <#filter-by-acknowledgement-status>`__
-      -  `Filter by sources <#filter-by-source-monitoring-system>`__
-      -  `Filter by tags <#filter-by-tags>`__
-      -  `Filter by severity level <#filter-by-severity-level>`__
-      -  `Filter out old incidents <#filter-out-older-incidents>`__
+         acknowledgement <#filter-by-acknowledgement-status>`_
+      -  `Filter by sources <#filter-by-source-monitoring-system>`_
+      -  `Filter by tags <#filter-by-tags>`_
+      -  `Filter by severity level <#filter-by-severity-level>`_
+      -  `Filter out old incidents <#filter-out-older-incidents>`_
 
-   -  `Work with stored filters <#work-with-stored-filters>`__
+   -  `Work with stored filters <#work-with-stored-filters>`_
 
-      -  `Save filter <#save-current-filter>`__
-      -  `Modify filter <#modify-existing-filter>`__
-      -  `Apply filter <#apply-existing-filter>`__
-      -  `Unselect applied filter <#unselect-applied-filter>`__
-      -  `Delete filter <#delete-existing-filter>`__
+      -  `Save filter <#save-current-filter>`_
+      -  `Modify filter <#modify-existing-filter>`_
+      -  `Apply filter <#apply-existing-filter>`_
+      -  `Unselect applied filter <#unselect-applied-filter>`_
+      -  `Delete filter <#delete-existing-filter>`_
 
-   -  `Update one incident <#update-one-incident>`__
+   -  `Update one incident <#update-one-incident>`_
 
       -  `Re-open closed (resolved)
-         incident <#re-open-a-closed-resolved-incident>`__
-      -  `Close (resolve) incident <#close-resolve-an-incident>`__
-      -  `Acknowledge incident <#add-acknowledgement-to-an-incident>`__
-      -  `Update ticket <#update-incident-ticket>`__
+         incident <#re-open-a-closed-resolved-incident>`_
+      -  `Close (resolve) incident <#close-resolve-an-incident>`_
+      -  `Acknowledge incident <#add-acknowledgement-to-an-incident>`_
+      -  `Update ticket <#update-incident-ticket>`_
 
          -  `Manually add ticket to
-            incident <#manually-add-ticket-url-to-an-incident>`__
-         -  `Edit ticket URL <#edit-ticket-url>`__
+            incident <#manually-add-ticket-url-to-an-incident>`_
+         -  `Edit ticket URL <#edit-ticket-url>`_
          -  `Remove ticket from
-            incident <#remove-ticket-url-from-an-incident>`__
+            incident <#remove-ticket-url-from-an-incident>`_
          -  `Automatically generate ticket from
-            incident <#automatically-generate-ticket>`__
+            incident <#automatically-generate-ticket>`_
 
-   -  `Update several incidents <#update-several-incidents-at-a-time>`__
+   -  `Update several incidents <#update-several-incidents-at-a-time>`_
 
-      -  `Re-open incidents <#re-open-closed-resolved-incidents>`__
-      -  `Close incidents <#close-resolve-incidents>`__
-      -  `Acknowledge incidents <#add-acknowledgement-to-incidents>`__
-      -  `Add ticket to incidents <#add-ticket-url-to-incidents>`__
+      -  `Re-open incidents <#re-open-closed-resolved-incidents>`_
+      -  `Close incidents <#close-resolve-incidents>`_
+      -  `Acknowledge incidents <#add-acknowledgement-to-incidents>`_
+      -  `Add ticket to incidents <#add-ticket-url-to-incidents>`_
       -  `Remove ticket from
-         incidents <#remove-ticket-url-from-incidents>`__
+         incidents <#remove-ticket-url-from-incidents>`_
 
--  `Customize notifications <#customize-alarm-notifications-in-argus>`__
+-  `Customize notifications <#customize-alarm-notifications-in-argus>`_
 
    -  `About components of notification
-      profiles <#about-components-of-notification-profiles>`__
+      profiles <#about-components-of-notification-profiles>`_
    -  `About the available notification
-      media <#about-the-available-notification-media>`__
+      media <#about-the-available-notification-media>`_
    -  `Access your notification
-      settings <#access-your-notification-profiles>`__
-   -  `Add notification profile <#add-new-notification-profile>`__
+      settings <#access-your-notification-profiles>`_
+   -  `Add notification profile <#add-new-notification-profile>`_
    -  `Edit notification
-      profile <#edit-existing-notification-profile>`__
-   -  `Disable notification profile <#disable-notification-profile>`__
-   -  `Delete notification profile <#delete-notification-profile>`__
+      profile <#edit-existing-notification-profile>`_
+   -  `Disable notification profile <#disable-notification-profile>`_
+   -  `Delete notification profile <#delete-notification-profile>`_
 
 -  `Manage notification
-   time <#manage-when-to-receive-notifications-in-argus>`__
+   time <#manage-when-to-receive-notifications-in-argus>`_
 
-   -  `What is a timeslot <#what-is-a-timeslot-in-argus>`__
-   -  `What is a recurrence <#what-is-a-recurrence-in-argus>`__
-   -  `Access your timeslots <#access-your-timeslots>`__
-   -  `Add recurrence <#add-new-recurrence>`__
-   -  `Edit recurrence <#edit-recurrence>`__
-   -  `Delete recurrence <#delete-recurrence>`__
-   -  `Add timeslot <#add-new-timeslot>`__
-   -  `Edit timeslot <#edit-existing-timeslot>`__
-   -  `Delete timeslot <#delete-timeslot>`__
+   -  `What is a timeslot <#what-is-a-timeslot-in-argus>`_
+   -  `What is a recurrence <#what-is-a-recurrence-in-argus>`_
+   -  `Access your timeslots <#access-your-timeslots>`_
+   -  `Add recurrence <#add-new-recurrence>`_
+   -  `Edit recurrence <#edit-recurrence>`_
+   -  `Delete recurrence <#delete-recurrence>`_
+   -  `Add timeslot <#add-new-timeslot>`_
+   -  `Edit timeslot <#edit-existing-timeslot>`_
+   -  `Delete timeslot <#delete-timeslot>`_
 
 -  `Manage contact details
-   (destinations) <#manage-your-contact-details-destinations-in-argus>`__
+   (destinations) <#manage-your-contact-details-destinations-in-argus>`_
 
    -  `Access your
-      destinations <#access-your-destinations-in-settings>`__
-   -  `Add destination <#add-new-destination-in-settings>`__
-   -  `Edit destination <#edit-existing-destination-in-settings>`__
-   -  `Delete destination <#delete-destination-in-settings>`__
+      destinations <#access-your-destinations-in-settings>`_
+   -  `Add destination <#add-new-destination-in-settings>`_
+   -  `Edit destination <#edit-existing-destination-in-settings>`_
+   -  `Delete destination <#delete-destination-in-settings>`_
 
--  `Log out <#log-out-from-argus>`__
+-  `Log out <#log-out-from-argus>`_
 
 What is Argus?
 --------------
@@ -151,14 +151,14 @@ If you get a following error message at the top of the *Login* page:
       settings.
 
 Please visit `Argus
-documentation <https://argus-server.readthedocs.io/en/latest/index.html>`__
+documentation <https://argus-server.readthedocs.io/en/latest/index.html>`_
 if you need help with the configuration.
 
 Note that we intend to direct you to the browser’s developer console for
 a specific error message in the case of network errors. This is due to
 the fact that some network requests are meant to be delegated to
 browsers, not the web applications (f.e. `preflight
-requests <https://developer.mozilla.org/en-US/docs/Glossary/Preflight_request>`__).
+requests <https://developer.mozilla.org/en-US/docs/Glossary/Preflight_request>`_).
 
 Work with alarms in Argus
 -------------------------
@@ -352,7 +352,7 @@ Filter out older incidents
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Note that you can not save this parameter in `stored
-filters <#work-with-stored-filters>`__. 1. Click on the *gears icon* to
+filters <#work-with-stored-filters>`_. 1. Click on the *gears icon* to
 the right below the header.
 
 2. Open the *Timeframe* drop-down menu.
@@ -364,16 +364,16 @@ Work with stored filters
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 After you `have set the preferred filter parameters for
-incidents <#decide-which-incidents-are-shown-in-the-table>`__, you can
+incidents <#decide-which-incidents-are-shown-in-the-table>`_, you can
 save your preferences as a *filter*. Stored *filters* can be used when
 `customizing alarm
-notifications <#customize-alarm-notifications-in-argus>`__.
+notifications <#customize-alarm-notifications-in-argus>`_.
 
 Save current filter
 ^^^^^^^^^^^^^^^^^^^
 
 1. `Set the preferred filter
-   parameters <#decide-which-incidents-are-shown-in-the-table>`__.
+   parameters <#decide-which-incidents-are-shown-in-the-table>`_.
 
 2. Click on the *plus icon* within the *Filter input field*.
 
@@ -384,7 +384,7 @@ Modify existing filter
 ^^^^^^^^^^^^^^^^^^^^^^
 
 1. `Make desired changes to filter
-   parameters <#decide-which-incidents-are-shown-in-the-table>`__.
+   parameters <#decide-which-incidents-are-shown-in-the-table>`_.
 
 2. Click on the *save icon* within the *Filter input field*.
 
@@ -417,7 +417,7 @@ Update one incident
 Re-open a closed (resolved) incident
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. `Open incident in detailed view <#access-detailed-incident-view>`__.
+1. `Open incident in detailed view <#access-detailed-incident-view>`_.
 
 2. Press ``OPEN INCIDENT``.
 
@@ -426,7 +426,7 @@ Re-open a closed (resolved) incident
 Close (resolve) an incident
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. `Open incident in detailed view <#access-detailed-incident-view>`__.
+1. `Open incident in detailed view <#access-detailed-incident-view>`_.
 
 2. Press ``CLOSE INCIDENT``.
 
@@ -436,7 +436,7 @@ Close (resolve) an incident
 Add acknowledgement to an incident
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. `Open incident in detailed view <#access-detailed-incident-view>`__.
+1. `Open incident in detailed view <#access-detailed-incident-view>`_.
 
 2. Press ``CREATE ACKNOWLEDGEMENT``.
 
@@ -450,7 +450,7 @@ Update incident ticket
 Manually add ticket URL to an incident
 ''''''''''''''''''''''''''''''''''''''
 
-1. `Open incident in detailed view <#access-detailed-incident-view>`__.
+1. `Open incident in detailed view <#access-detailed-incident-view>`_.
 
 2. Type/paste in ticket URL into the *Ticket input field*. Note that the
    URL has to be absolute (full website address).
@@ -460,7 +460,7 @@ Manually add ticket URL to an incident
 Edit ticket URL
 '''''''''''''''
 
-1. `Open incident in detailed view <#access-detailed-incident-view>`__.
+1. `Open incident in detailed view <#access-detailed-incident-view>`_.
 2. Press ``EDIT TICKET URL``.
 
 3. Type/paste in ticket URL into the *Ticket input field* and press
@@ -470,7 +470,7 @@ Edit ticket URL
 Remove ticket URL from an incident
 ''''''''''''''''''''''''''''''''''
 
-1. `Open incident in detailed view <#access-detailed-incident-view>`__.
+1. `Open incident in detailed view <#access-detailed-incident-view>`_.
 2. Press ``EDIT TICKET URL``.
 
 3. Remove URL from the *Ticket input field* and press
@@ -482,9 +482,9 @@ Automatically generate ticket
 Argus supports automatic ticket generation from the incident. This
 feature needs additional configuration. Read more in the `Argus
 documentation for ticket
-systems <https://argus-server.readthedocs.io/en/latest/ticket-systems.html>`__.
+systems <https://argus-server.readthedocs.io/en/latest/ticket-systems.html>`_.
 
-1. `Open incident in detailed view <#access-detailed-incident-view>`__.
+1. `Open incident in detailed view <#access-detailed-incident-view>`_.
 
 2. Press ``CREATE TICKET``.
 
@@ -498,7 +498,7 @@ Please, check that your ticket system configuration in Argus is complete
 if you get a following error message:
 
 You can read more about ticket system settings
-`here <https://argus-server.readthedocs.io/en/latest/ticket-systems/settings.html>`__.
+`here <https://argus-server.readthedocs.io/en/latest/ticket-systems/settings.html>`_.
 
 Update several incidents at a time
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -544,7 +544,7 @@ Edit ticket URL for several incidents
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Same process as `adding ticket URL to
-incidents <#add-ticket-url-to-incidents>`__.
+incidents <#add-ticket-url-to-incidents>`_.
 
 Remove ticket URL from incidents
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -575,7 +575,7 @@ About components of notification profiles
    the alarm notifications. You can choose multiple destinations per
    notification profile. Destinations are reusable across multiple
    notification profiles. Destinations may be of `different media
-   types <#about-the-available-notification-media>`__.
+   types <#about-the-available-notification-media>`_.
 
 About the available notification media
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -585,7 +585,7 @@ The notification media that are available in Argus by default are: - SMS
 
 If you wish to receive notifications to other media, read about
 configurable media types in the `Argus documentation for notification
-plugins <https://argus-server.readthedocs.io/en/latest/notifications.html#other-notification-plugins>`__.
+plugins <https://argus-server.readthedocs.io/en/latest/notifications.html#other-notification-plugins>`_.
 
 Access your notification profiles
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -596,16 +596,16 @@ Add new notification profile
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 1. `Go to your notification
-   profiles <#access-your-notification-profiles>`__.
+   profiles <#access-your-notification-profiles>`_.
 2. Click on the ``CREATE NEW PROFILE`` button.
 
 3. Select a timeslot for when to receive notifications in the *Timeslot
    drop-down*. If the drop-down menu is empty, `create a
-   timeslot <#add-new-timeslot>`__ first.
+   timeslot <#add-new-timeslot>`_ first.
 
 4. Select what alarms you want to receive notifications about in the
    *Filters drop-down*. If the drop-down menu is empty, `create a
-   filter <#save-current-filter>`__ first. Note that if no filter is
+   filter <#save-current-filter>`_ first. Note that if no filter is
    selected no notification will be sent. You can select multiple
    filters per notification profile.
 
@@ -619,7 +619,7 @@ Edit existing notification profile
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 1. `Go to your notification
-   profiles <#access-your-notification-profiles>`__.
+   profiles <#access-your-notification-profiles>`_.
 2. Change a timeslot for when to receive notifications in the *Timeslot
    drop-down* (if needed).
 
@@ -635,7 +635,7 @@ Disable notification profile
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 1. `Go to your notification
-   profiles <#access-your-notification-profiles>`__.
+   profiles <#access-your-notification-profiles>`_.
 2. Uncheck the *Active checkbox* inside one of your existing
    notification profiles.
 
@@ -645,7 +645,7 @@ Delete notification profile
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 1. `Go to your notification
-   profiles <#access-your-notification-profiles>`__.
+   profiles <#access-your-notification-profiles>`_.
 2. Press ``DELETE`` inside one of your existing notification profiles.
 
 Manage when to receive notifications in Argus
@@ -658,7 +658,7 @@ What is a timeslot in Argus
 
 A timeslot is a collection of one or more recurrences with a meaningful
 name. Saved timeslots can be used when `customizing alarm
-notifications <#customize-alarm-notifications-in-argus>`__. Each
+notifications <#customize-alarm-notifications-in-argus>`_. Each
 timeslot represents a window (or several windows) of time for when it is
 OK to receive alarm notifications.
 
@@ -691,14 +691,14 @@ Add new recurrence
 Each timeslot has at least one recurrence by default. In the *Create New
 Timeslot* box the default recurrence is from 8 a.m. to 4 p.m. on
 business days. Add more recurrences if your timeslot needs more than
-one. 1. `Go to your timeslots <#access-your-timeslots>`__. 2. Press
+one. 1. `Go to your timeslots <#access-your-timeslots>`_. 2. Press
 ``ADD RECURRENCE`` either in the *Create New Timeslot* box, or in one of
 your existing timeslots.
 
 Edit recurrence
 ~~~~~~~~~~~~~~~
 
-1. `Go to your timeslots <#access-your-timeslots>`__.
+1. `Go to your timeslots <#access-your-timeslots>`_.
 2. Modify one of the existing recurrences either in the *Create New
    Timeslot* box, or in one of your existing timeslots:
 
@@ -724,7 +724,7 @@ Edit recurrence
 Delete recurrence
 ~~~~~~~~~~~~~~~~~
 
-1. `Go to your timeslots <#access-your-timeslots>`__.
+1. `Go to your timeslots <#access-your-timeslots>`_.
 
 2. Press ``REMOVE`` inside one of the existing recurrences either in the
    *Create New Timeslot* box, or inside one of your existing timeslots.
@@ -732,7 +732,7 @@ Delete recurrence
 Add new timeslot
 ~~~~~~~~~~~~~~~~
 
-1. `Go to your timeslots <#access-your-timeslots>`__.
+1. `Go to your timeslots <#access-your-timeslots>`_.
 
 2. Go to the *Create New Timeslot* box.
 
@@ -743,11 +743,11 @@ Add new timeslot
 
 3. Type in a (meaningful) timeslot name.
 
-4. `Add another recurrence(s) <#add-new-recurrence>`__ if needed.
+4. `Add another recurrence(s) <#add-new-recurrence>`_ if needed.
 
-5. `Edit recurrence(s) <#edit-recurrence>`__ if needed.
+5. `Edit recurrence(s) <#edit-recurrence>`_ if needed.
 
-6. `Remove recurrence(s) <#delete-recurrence>`__ if needed.
+6. `Remove recurrence(s) <#delete-recurrence>`_ if needed.
 
 7. Press ``CREATE``.
 
@@ -758,17 +758,17 @@ Add new timeslot
 Edit existing timeslot
 ~~~~~~~~~~~~~~~~~~~~~~
 
-1. `Go to your timeslots <#access-your-timeslots>`__.
+1. `Go to your timeslots <#access-your-timeslots>`_.
 
 2. Modify one of your existing timeslots:
 
    -  Change the name if needed.
 
-   -  `Add another recurrence(s) <#add-new-recurrence>`__ if needed.
+   -  `Add another recurrence(s) <#add-new-recurrence>`_ if needed.
 
-   -  `Edit recurrence(s) <#edit-recurrence>`__ if needed.
+   -  `Edit recurrence(s) <#edit-recurrence>`_ if needed.
 
-   -  `Remove recurrence(s) <#delete-recurrence>`__ if needed.
+   -  `Remove recurrence(s) <#delete-recurrence>`_ if needed.
 
 3. Press ``SAVE``. Note that the ``SAVE``-button is inactive if no
    changes were made. The ``SAVE``-button is also inactive if some
@@ -778,7 +778,7 @@ Edit existing timeslot
 Delete timeslot
 ~~~~~~~~~~~~~~~
 
-1. `Go to your timeslots <#access-your-timeslots>`__.
+1. `Go to your timeslots <#access-your-timeslots>`_.
 
 2. Press ``DELETE`` inside one of the existing timeslots. Note that the
    ``DELETE``-button is disabled in the *Create New Timeslot* box.
@@ -789,13 +789,13 @@ Manage your contact details (destinations) in Argus
 Add, edit or delete contact details, aka destinations, in your settings.
 Destinations that are present in your settings can be used when
 `customizing alarm
-notifications <#customize-alarm-notifications-in-argus>`__.
+notifications <#customize-alarm-notifications-in-argus>`_.
 
 In Argus, *emails* and *phone numbers* are the destinations that are
 configured by default. If you wish to receive notifications to other
 media, read about configurable media types in the `Argus documentation
 for notification
-plugins <https://argus-server.readthedocs.io/en/latest/notifications.html#other-notification-plugins>`__.
+plugins <https://argus-server.readthedocs.io/en/latest/notifications.html#other-notification-plugins>`_.
 
 Access your destinations in settings
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -808,7 +808,7 @@ Add new destination in settings
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 1. `Go to your contact
-   details <#access-your-destinations-in-settings>`__.
+   details <#access-your-destinations-in-settings>`_.
 
 2. Click on the *Plus* button in the *Destinations* header to open the
    *Create new destination* menu.
@@ -822,7 +822,7 @@ Edit existing destination in settings
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 1. `Go to your contact
-   details <#access-your-destinations-in-settings>`__.
+   details <#access-your-destinations-in-settings>`_.
 
 2. Modify one of the existing destinations.
 
@@ -832,7 +832,7 @@ Delete destination in settings
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 1. `Go to your contact
-   details <#access-your-destinations-in-settings>`__.
+   details <#access-your-destinations-in-settings>`_.
 
 2. Press ``DELETE`` inside one of your saved destinations.
 
