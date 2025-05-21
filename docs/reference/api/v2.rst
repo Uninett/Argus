@@ -138,7 +138,7 @@ Incident endpoints
       .. code-block::
         :caption: URL reformatted for readability
 
-          /api/v1/incidents/?acked=false\
+          /api/v2/incidents/?acked=false\
                           &open=true\
                           &stateful=true\
                           &source__id__in=1\
@@ -176,7 +176,7 @@ Incident endpoints
         :caption: Example response body
 
           {
-              "next": "http://localhost:8000/api/v1/incidents/?cursor=cD0yMDIwLTA5LTIzKzEzJTNBMDIlM0ExNi40NTU4MzIlMkIwMCUzQTAw&page_size=10",
+              "next": "http://localhost:8000/api/v2/incidents/?cursor=cD0yMDIwLTA5LTIzKzEzJTNBMDIlM0ExNi40NTU4MzIlMkIwMCUzQTAw&page_size=10",
               "previous": null,
               "results": [
                   {
@@ -395,7 +395,7 @@ Incident endpoints
 
       -  ``ACK`` - Acknowledge
 
-        Use the ``/api/v1/incidents/<int:pk>/acks/`` endpoint.
+        Use the ``/api/v2/incidents/<int:pk>/acks/`` endpoint.
 
       -  ``OTH`` - Other
 
