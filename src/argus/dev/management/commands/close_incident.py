@@ -1,0 +1,136 @@
+import json
+import logging
+from pathlib import Path
+from typing import Optional
+
+from django.core.management import CommandError
+from django.core.management.base import BaseCommand
+from django.utils import timezone
+from django.utils.dateparse import parse_duration
+
+from argus.incident.models import Incident
+
+COMMAND_ARGUMENTS = ["id", "source", "source_incident_id", "duration", "closing_message"]
+LOG = logging.getLogger(__name__)
+
+
+class Command(BaseCommand):
+    help = "Close one or multiple incidents"
+
+    def add_arguments(self, parser):
+        parser.add_argument("--id", type=int, help="Close the incident with the id <id>")
+        parser.add_argument(
+            "--source",
+            type=str,
+            help="Close the incident from the source <source>, needs source_system_id to find the right incident",
+        )
+        parser.add_argument(
+            "--source-incident-id",
+            type=int,
+            help="Close the incident with the id from the source system <source_incident_id>",
+        )
+        parser.add_argument(
+            "--duration",
+            type=str,
+            help="Only close the incident after it has been open for the duration <duration>, duration should be in the format 'DD HH:MM:SS.uuuuuu'",
+        )
+        parser.add_argument(
+            "--closing-message",
+            type=str,
+            help="Close the incident with the message <closing-message>",
+        )
+        parser.add_argument(
+            "-f",
+            "--files",
+            nargs="+",
+            type=str,
+            help="List of paths to json-file containing all data needed to find the incidents that should be closed (id or source + source_incident_id) and optional duration",
+        )
+
+    def parse_duration_or_raise_error(self, duration: Optional[str] = None, file_name: Optional[str] = None):
+        """
+        Parses the given string duration into timedelta format
+
+        Raises ValueError if the duration is invalid or not well formatted
+        """
+        if not duration:
+            return
+
+        try:
+            parsed_duration = parse_duration(duration)
+        except ValueError as e:
+            error = "Could not parse duration " + duration
+            if file_name:
+                error += " in file " + file_name
+            error += ": " + e
+            raise ValueError(error)
+
+        if not parsed_duration:
+            raise ValueError(f"Could not parse duration {duration}, it was not well formatted")
+
+        return parsed_duration
+
+    def handle(self, *args, **options):
+        if (file_paths := options.get("files", [])) and any(options.get(name, None) for name in COMMAND_ARGUMENTS):
+            raise CommandError("If argument 'files' is given no other arguments are allowed")
+
+        incident_list = []
+        if file_paths:
+            for file_path in file_paths:
+                try:
+                    with Path(file_path).absolute().open() as jsonfile:
+                        content = json.load(jsonfile)
+                        incident_data = {}
+                        incident_data["incident_id"] = content.get("id")
+                        incident_data["source"] = content.get("source")
+                        incident_data["source_incident_id"] = content.get("source_incident_id")
+                        try:
+                            incident_data["duration"] = self.parse_duration_or_raise_error(
+                                content.get("duration"), file_name=file_path
+                            )
+                        except ValueError as e:
+                            self.stderr.write(self.style.ERROR(str(e)))
+                            continue
+                        incident_data["closing_message"] = content.get("closing_message", "")
+                        incident_data["file_path"] = file_path
+
+                        incident_list.append(incident_data)
+                except Exception:
+                    self.stderr.write(self.style.ERROR(f"Could not open file {file_path}"))
+        else:
+            incident_data = {}
+            incident_data["incident_id"] = options.get("id") or None
+            incident_data["source"] = options.get("source") or None
+            incident_data["source_incident_id"] = options.get("source_incident_id") or None
+            try:
+                incident_data["duration"] = self.parse_duration_or_raise_error(options.get("duration"))
+            except ValueError as e:
+                self.stderr.write(self.style.ERROR(str(e)))
+                return
+
+            incident_data["closing_message"] = options.get("closing_message") or ""
+            incident_list.append(incident_data)
+
+        for incident_data in incident_list:
+            incident_qs = None
+            if incident_data["incident_id"]:
+                incident_qs = Incident.objects.filter(id=incident_data["incident_id"])
+            # is not None is important here since 0 is a valid value for source_incident_id
+            elif incident_data["source"] and incident_data["source_incident_id"] is not None:
+                incident_qs = Incident.objects.filter(
+                    source__name=incident_data["source"], source_incident_id=incident_data["source_incident_id"]
+                )
+
+            if not incident_qs or not incident_qs.exists():
+                error = "Could not find incident"
+                if incident_data.get("file_path"):
+                    error += " from file " + incident_data.get("file_path")
+                self.stderr.write(self.style.ERROR(error + "."))
+                return
+
+            incident = incident_qs.first()
+
+            if incident.open and (
+                not incident_data["duration"] or (timezone.now() - incident.start_time) >= incident_data["duration"]
+            ):
+                incident_qs.close(actor=incident.source.user, description=incident_data["closing_message"])
