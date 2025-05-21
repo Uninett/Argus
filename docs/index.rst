@@ -11,6 +11,7 @@ Welcome to Argus' documentation!
 .. toctree::
    about-argus
    reference
+   user-manual
    integrations/index
    customization
    development
