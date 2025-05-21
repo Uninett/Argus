@@ -6,7 +6,7 @@ from django.core.management import CommandError, call_command
 from django.test import TestCase
 from django.utils.dateparse import parse_datetime
 
-from argus.incident.models import Incident, SourceSystem, Tag
+from argus.incident.models import Incident, SourceSystem, Tag, get_or_create_default_instances
 from argus.util.testing import connect_signals, disconnect_signals
 
 
@@ -240,3 +240,49 @@ class CreateFakeIncidentTests(TestCase):
         self.assertEqual(incident.description, incident_data["description"])
         self.assertEqual(incident.level, incident_data["level"])
         self.assertEqual(incident.ticket_url, incident_data["ticket_url"])
+
+    def test_create_fake_incident_will_use_argus_source_if_none_specified(self):
+        previous_incidents_pks = [incident.id for incident in Incident.objects.all()]
+
+        incident_data = {"source_incident_id": "1234"}
+
+        data = json.dumps(incident_data).encode("utf-8")
+        file = NamedTemporaryFile(delete=True)
+        file.write(data)
+        file.flush()
+        out = self.call_command(f"--file={file.name}")
+
+        self.assertFalse(out)
+
+        incident = (
+            Incident.objects.exclude(id__in=previous_incidents_pks)
+            .filter(source_incident_id=incident_data["source_incident_id"])
+            .first()
+        )
+
+        _, _, argus_source_system = get_or_create_default_instances()
+
+        self.assertTrue(incident)
+        self.assertEqual(incident.source, argus_source_system)
+
+    def test_create_fake_incident_will_silently_fail_on_invalid_data_from_file(self):
+        previous_incidents_pks = [incident.id for incident in Incident.objects.all()]
+
+        incident_data = {
+            "source_incident_id": "1234",
+            "ticket_url": "invalid-url",
+        }
+
+        data = json.dumps(incident_data).encode("utf-8")
+        file = NamedTemporaryFile(delete=True)
+        file.write(data)
+        file.flush()
+        out = self.call_command(f"--file={file.name}")
+
+        self.assertFalse(out)
+
+        self.assertFalse(
+            Incident.objects.exclude(id__in=previous_incidents_pks)
+            .filter(source_incident_id=incident_data["source_incident_id"])
+            .exists()
+        )

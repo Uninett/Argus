@@ -1,5 +1,6 @@
 from datetime import timedelta
 
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils import timezone
 
@@ -90,3 +91,10 @@ class CreateFakeIncidentTestCase(TestCase):
     def test_create_fake_incident_raises_error_on_non_existent_source(self):
         with self.assertRaises(ValueError):
             create_fake_incident(source="non-existent")
+
+    def test_create_fake_incident_raises_error_on_invalid_ticket_url(self):
+        with self.assertRaises(ValidationError):
+            create_fake_incident(ticket_url="not-a-url")
+
+    def test_create_fake_incident_does_not_raise_error_on_extra_args(self):
+        create_fake_incident(extra_arg="extra")
