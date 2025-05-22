@@ -16,7 +16,6 @@ from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError, PermissionDenied, MethodNotAllowed
 from rest_framework.generics import get_object_or_404
 from rest_framework.pagination import CursorPagination
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 
@@ -92,7 +91,6 @@ class EventPagination(CursorPagination):
 class SourceSystemTypeViewSet(
     mixins.CreateModelMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet
 ):
-    permission_classes = [IsAuthenticated]
     serializer_class = SourceSystemTypeSerializer
     queryset = SourceSystemType.objects.all()
 
@@ -104,7 +102,7 @@ class SourceSystemViewSet(
     mixins.ListModelMixin,
     viewsets.GenericViewSet,
 ):
-    permission_classes = [IsSuperuserOrReadOnly]
+    permission_classes = [*viewsets.GenericViewSet.permission_classes, IsSuperuserOrReadOnly]
     queryset = SourceSystem.objects.all()
     serializer_class = SourceSystemSerializer
 
@@ -142,7 +140,6 @@ class BaseIncidentViewSet(
     viewsets.GenericViewSet,
 ):
     pagination_class = IncidentPagination
-    permission_classes = [IsAuthenticated]
     queryset = Incident.objects.prefetch_default_related()
     search_fields = ["description", "search_text"]
 
@@ -295,7 +292,6 @@ class TicketPluginViewSet(viewsets.ViewSet):
     should be used.
     """
 
-    permission_classes = [IsAuthenticated]
     serializer_class = IncidentTicketUrlSerializer
     queryset = Incident.objects.all()
 
@@ -415,7 +411,6 @@ class IncidentTagViewSet(
 class AllEventsViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     pagination_class = EventPagination
     queryset = Event.objects.none()
-    permission_classes = [IsAuthenticated]
     serializer_class = EventSerializer
 
     def get_queryset(self):
@@ -432,7 +427,6 @@ class AllEventsViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
 )
 class EventViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
     queryset = Incident.objects.none()  # For OpenAPI
-    permission_classes = [IsAuthenticated]
     serializer_class = EventSerializer
 
     def get_queryset(self):
@@ -525,7 +519,6 @@ class EventViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, mixins.Retrie
 )
 class AcknowledgementViewSet(rw_viewsets.ModelViewSet):
     queryset = Incident.objects.none()  # For OpenAPI
-    permission_classes = [IsAuthenticated]
     serializer_class = ResponseAcknowledgementSerializer
     read_serializer_class = ResponseAcknowledgementSerializer
 
@@ -582,7 +575,6 @@ class BulkHelper:
     )
 )
 class BulkAcknowledgementViewSet(BulkHelper, viewsets.ViewSet):
-    permission_classes = [IsAuthenticated]
     serializer_class = ResponseBulkSerializer
     write_serializer_class = RequestBulkAcknowledgementSerializer
     queryset = Incident.objects.all()
@@ -635,7 +627,6 @@ class BulkAcknowledgementViewSet(BulkHelper, viewsets.ViewSet):
     )
 )
 class BulkEventViewSet(BulkHelper, viewsets.ViewSet):
-    permission_classes = [IsAuthenticated]
     serializer_class = ResponseBulkSerializer
     write_serializer_class = RequestBulkEventSerializer
     queryset = Incident.objects.all()
@@ -690,7 +681,6 @@ class BulkEventViewSet(BulkHelper, viewsets.ViewSet):
     )
 )
 class BulkTicketUrlViewSet(BulkHelper, viewsets.ViewSet):
-    permission_classes = [IsAuthenticated]
     serializer_class = ResponseBulkSerializer
     write_serializer_class = RequestBulkTicketUrlSerializer
     queryset = Incident.objects.all()
