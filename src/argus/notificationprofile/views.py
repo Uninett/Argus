@@ -5,7 +5,6 @@ from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from rest_framework.views import APIView
@@ -48,7 +47,7 @@ FilterBlobSerializer = filter_backend.FilterBlobSerializer
     ),
 )
 class NotificationProfileViewSet(rw_viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated, IsOwner]
+    permission_classes = [*rw_viewsets.ModelViewSet.permission_classes, IsOwner]
     serializer_class = ResponseNotificationProfileSerializer
     read_serializer_class = ResponseNotificationProfileSerializer
     write_serializer_class = RequestNotificationProfileSerializer
@@ -123,7 +122,6 @@ class SchemaView(DetailView):
 
 
 class MediaViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated]
     serializer_class = MediaSerializer
     queryset = Media.objects.none()
     http_method_names = ["get", "head"]
@@ -161,7 +159,7 @@ class MediaViewSet(viewsets.ModelViewSet):
     ),
 )
 class DestinationConfigViewSet(rw_viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated, IsOwner]
+    permission_classes = [*rw_viewsets.ModelViewSet.permission_classes, IsOwner]
     serializer_class = ResponseDestinationConfigSerializer
     read_serializer_class = ResponseDestinationConfigSerializer
     write_serializer_class = RequestDestinationConfigSerializer
@@ -209,7 +207,7 @@ class DestinationConfigViewSet(rw_viewsets.ModelViewSet):
 
 
 class TimeslotViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated, IsOwner]
+    permission_classes = [*viewsets.ModelViewSet.permission_classes, IsOwner]
     serializer_class = TimeslotSerializer
     queryset = Timeslot.objects.none()
 
@@ -221,7 +219,7 @@ class TimeslotViewSet(viewsets.ModelViewSet):
 
 
 class FilterViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated, IsOwner]
+    permission_classes = [*viewsets.ModelViewSet.permission_classes, IsOwner]
     serializer_class = FilterSerializer
     queryset = Filter.objects.none()
 
