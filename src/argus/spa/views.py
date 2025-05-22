@@ -56,7 +56,7 @@ def login_wrapper(request, backend, *args, **kwargs):
 
 
 class LogoutView(APIView):
-    permission_classes = []
+    permission_classes = [AllowAny]
 
     @extend_schema(request=None, responses={"200": None})
     def post(self, request, *args, **kwargs):

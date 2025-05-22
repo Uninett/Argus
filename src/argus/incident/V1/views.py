@@ -4,7 +4,6 @@ from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiPara
 from rest_framework import generics, mixins, viewsets
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from argus.filter.filters import BooleanStringOAEnum
@@ -236,7 +235,6 @@ class AcknowledgementViewSetV1(
     viewsets.GenericViewSet,
 ):
     queryset = Incident.objects.none()  # For OpenAPI
-    permission_classes = [IsAuthenticated]
     serializer_class = AcknowledgementSerializerV1
 
     def get_serializer_class(self):
