@@ -36,40 +36,41 @@ party services, but relies on reports delivered to it through the API. These
 services are called *source systems*.
 
 
-The API and the user interface
-------------------------------
+The API
+-------
 
-In keeping with the single responsibility principle, a complete Argus setup
-consists of two separate components, with separate concerns: The Argus API
-server, and the Argus frontend. They are in the same code base for ease of
-deploying both at the same time.
+Argus provides a REST API to interact with the incident database and the
+database of user notification profiles. It handles incidents received from
+source systems, and allows viewing and processing them via the REST API.
 
-The Argus server provides a REST API to interact with the incident database and
-the database of user notification profiles. The server handles incidents
-received from source systems, and allows viewing and processing them via the
-REST API.
 It also supports setting up user-specific notification profiles, and sends
 notifications to users based on said profiles.
-The Argus server does not provide a user interface targeted at end users.
 
-Conversely, the Argus frontend application acts as a client to provide end
-users with a web-based user interface to the Argus API server. Using the
-frontend application, users can view, filter and interact with the contents of
-the incident database, and create personal notification profiles conveniently
-in their web browsers.
+It is complete enough to build a separate frontend as a single page application
+(SPA).
 
-It is possible to run only the server, only the client (given that it has
-access to a database updated via a server running somewhere else) or both at
-the same time and in the same deployment.
+The user interface
+------------------
 
+The Argus frontend acts as a client to provide end users with a web-based user
+interface to Argus. Using the frontend, users can view, filter and interact
+with the contents of the incident database, and create personal notification
+profiles conveniently in their web browsers.
 
-The Argus server admin interface
---------------------------------
+The Argus admin interface
+-------------------------
 
-Besides the REST API, the Argus server has an administration interface.
+Besides the REST API, Argus has an administration interface.
 It can be used to perform low-level administration tasks on a running Argus
 server, such as:
 
 * Administration of Argus user accounts
 * Creating API authentication tokens for users
 * Defining new source systems to collect incidents from
+
+Pick and choose
+---------------
+
+It is possible to run only the API, only the frontend (given that it has access
+to a database receiving incidents by something else) or both at the same time
+and in the same deployment.
