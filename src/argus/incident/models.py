@@ -4,6 +4,7 @@ from functools import reduce
 import logging
 from operator import and_
 from random import randint, choice
+from typing import Optional
 from urllib.parse import urljoin
 
 from django.contrib.auth import get_user_model
@@ -14,6 +15,7 @@ from django.db.models import F, Q
 from django.utils import timezone
 
 from argus.util.datetime_utils import INFINITY_REPR, get_infinity_repr
+from argus.util.exceptions import InconsistentDatabaseException
 from .constants import Level
 from .fields import DateTimeInfinityField
 from .validators import validate_lowercase, validate_key
@@ -222,7 +224,28 @@ class Event(models.Model):
         Type.INCIDENT_CHANGE,
         Type.STATELESS,
     }
-    ALLOWED_TYPES_FOR_END_USERS = {Type.CLOSE, Type.REOPEN, Type.ACKNOWLEDGE, Type.OTHER}
+    ALLOWED_TYPES_FOR_END_USERS = {
+        Type.ACKNOWLEDGE,
+        Type.OTHER,
+        Type.CLOSE,
+        Type.REOPEN,
+    }
+    CLOSING_TYPES = {
+        Type.INCIDENT_END,
+        Type.CLOSE,
+    }
+    OPENING_TYPES = {
+        Type.INCIDENT_START,
+        Type.REOPEN,
+    }
+    STATE_TYPES = OPENING_TYPES | CLOSING_TYPES
+    SHARED_TYPES = {
+        Type.ACKNOWLEDGE,
+        Type.OTHER,
+        Type.INCIDENT_CHANGE,
+    }
+    STATELESS_TYPES = SHARED_TYPES | {Type.STATELESS}
+    STATEFUL_TYPES = SHARED_TYPES | STATE_TYPES
 
     id = models.BigAutoField(primary_key=True)
     incident = models.ForeignKey(to="Incident", on_delete=models.PROTECT, related_name="events")
@@ -348,8 +371,9 @@ class IncidentQuerySet(models.QuerySet):
 
     def close(self, actor: User, timestamp=None, description=""):
         "Close incidents correctly and create the needed events"
+        timestamp = timestamp or timezone.now()
         qs = self.open()
-        qs.update(end_time=timestamp or timezone.now())
+        qs.update(end_time=timestamp)
         qs = self.all()  # Reload changes from database
         event_type = Event.Type.CLOSE
         events = qs.create_events(actor, event_type, timestamp, description)
@@ -454,17 +478,36 @@ class Incident(models.Model):
     def incident_relations(self):
         return IncidentRelation.objects.filter(Q(incident1=self) | Q(incident2=self))
 
+    def all_opening_events(self):
+        open_events = Event.OPENING_TYPES
+        return self.events.filter(type__in=open_events).order_by("timestamp")
+
+    def all_reopen_events(self):
+        return self.events.filter(type=Event.Type.REOPEN).order_by("timestamp")
+
+    def all_closing_events(self):
+        close_events = Event.CLOSING_TYPES
+        return self.events.filter(type__in=close_events).order_by("timestamp")
+
     @property
     def start_event(self):
         return self.events.filter(type=Event.Type.INCIDENT_START).order_by("timestamp").first()
+
+    @property
+    def reopen_event(self):
+        return self.all_reopen_events().last()
 
     @property
     def end_event(self):
         return self.events.filter(type=Event.Type.INCIDENT_END).order_by("timestamp").first()
 
     @property
+    def close_event(self):
+        return self.events.filter(type=Event.Type.CLOSE).order_by("timestamp").first()
+
+    @property
     def last_close_or_end_event(self):
-        return self.events.filter(type__in=(Event.Type.CLOSE, Event.Type.INCIDENT_END)).order_by("timestamp").last()
+        return self.all_closing_events().last()
 
     @property
     def latest_change_event(self):
@@ -489,6 +532,68 @@ class Incident(models.Model):
         ack_is_just_being_created = Q(type=Event.Type.ACKNOWLEDGE) & Q(ack__isnull=True)
 
         return self.events.filter((acks_query & acks_not_expired_query) | ack_is_just_being_created).exists()
+
+    def event_already_exists(self, event_type):
+        return self.events.filter(type=event_type).exists()
+
+    def repair_end_time(self) -> Optional[bool]:
+        """Repairs end_time if there is a mismatch between events and end_time
+
+        This can happen under race-conditions and because we still cannot use
+        the ``atomic``-decorator everwhere.
+
+        Returns:
+        * True if a repair needed to be made
+        * False if it was stateful and ok
+        * None if it was stateless and ok
+        """
+        LOG.info("Incident %s: Detected potential mismatch of end_time and events", self.pk)
+
+        if not self.stateful:
+            # the vital part for statelessness is set correctly
+            LOG.info("Incident %s: No mismatch, correctly stateless", self.pk)
+            return
+
+        if self.stateless_event:
+            # Weird, stateless event without stateless end_time, fix
+            self.end_time = None
+            self.save()
+            LOG.warn("Mismatch between self %s end_time and event type: set stateless", self.pk)
+            return True
+
+        # Only stateful incidents from this point on
+
+        close_events = self.all_closing_events()
+        if not close_events.exists():
+            if self.open:
+                # Golden path for open incidents
+                LOG.info("Incident %s: No mismatch, correctly stateful and open", self.pk)
+                return False
+            else:
+                # missing close event. This is serious. 500 Internal Server Error serious.
+                message = "Incident %s was previously closed without the creation of an appropriate event"
+                LOG.error(message, self.pk)
+                raise InconsistentDatabaseException(message % self.pk)
+
+        # Only incidents with at least one close event from this point on
+
+        if not self.open:
+            # Golden path for closed incidents
+            LOG.info("Incident %s: No mismatch, correctly stateful and closed", self.pk)
+            return False
+
+        reopen_event = self.reopen_event
+        last_close_event = close_events.last()
+        if not reopen_event or reopen_event.timestamp < last_close_event.timestamp:
+            # end_time was not set when making closing event, fix
+            self.end_time = last_close_event.timestamp
+            self.save()
+            LOG.warn("Mismatch between self %s end_time and event type: set end_time to less than infinity", self.pk)
+            return True
+
+        # a reopen event correctly exists and the incident is correctly open
+        LOG.info("Incident %s: No mismatch, correctly stateful and reopened", self.pk)
+        return False
 
     def is_acked_by(self, group: str) -> bool:
         return group in self.acks.active().group_names()
