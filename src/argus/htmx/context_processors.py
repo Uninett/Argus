@@ -18,3 +18,7 @@ def static_paths(request):
         "htmx_path": getattr(settings, "HTMX_PATH", defaults.HTMX_PATH),
         "hyperscript_path": getattr(settings, "HYPERSCRIPT_PATH", defaults.HYPERSCRIPT_PATH),
     }
+
+
+def banner_message(request):
+    return {"BANNER_MESSAGE": getattr(settings, "BANNER_MESSAGE", None)}
