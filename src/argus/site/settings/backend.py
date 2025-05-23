@@ -26,3 +26,7 @@ SEND_NOTIFICATIONS = get_bool_env("ARGUS_SEND_NOTIFICATIONS", default=True)
 MEDIA_PLUGINS = [
     "argus.notificationprofile.media.email.EmailNotification",
 ]
+
+PUBLIC_URLS = [
+    "/api/",
+]
