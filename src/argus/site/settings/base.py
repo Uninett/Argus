@@ -306,3 +306,5 @@ _extra_apps_env = get_json_env("ARGUS_EXTRA_APPS", [], quiet=False)
 EXTRA_APPS = validate_app_setting(_extra_apps_env)
 del _extra_apps_env
 update_settings(globals(), EXTRA_APPS)
+
+BANNER_MESSAGE = get_str_env("ARGUS_BANNER_MESSAGE", default=None)
