@@ -1,4 +1,4 @@
-from argus.site.settings.backend import *
+from argus.site.settings.base import *
 
 ROOT_URLCONF = "argus.htmx.root_urls"
 
