@@ -322,6 +322,22 @@ Debugging settings
 * :setting:`TEMPLATE_DEBUG` (optional) provides a convenient way to turn debugging on and off
   for templates. If undefined it will default to the value of :setting:`DEBUG`.
 
+Special environment settings
+----------------------------
+
+.. setting:: BANNER_MESSAGE
+
+* :setting:`BANNER_MESSAGE` is a message displayed below the navbar in a banner.
+  It can be used to communicate an important message to the users on all Argus pages, for example,
+  to announce maintenance work or indicate that the Argus instance is running in demo mode.
+  The default value is ``None``.
+
+* Environment variable: `ARGUS_BANNER_MESSAGE`
+
+* Note: To enable the banner, the context processor ``argus.htmx.context_processors.banner_message``
+  must be added to the end of the context processors list in the ``django.template.backends.django.DjangoTemplates``
+  template backend.
+
 Other settings
 --------------
 
