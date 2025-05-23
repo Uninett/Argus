@@ -75,7 +75,13 @@ Configure
 ---------
 
 If *all the settings you need to change* can be set via environment variables,
-use ``argus.htmx.settings`` as your settings-file. Otherwise, read on.
+use ``argus.htmx.settings`` as your settings-file *for development*.
+
+For *production* you must set :setting::`ALLOWED_HOSTS`, have a look at
+``argus.site.settings.prod``.
+
+If you need to override settings not mirrored by environment variables, read
+on.
 
 Do this in your workdir, which could be the checked out `argus-server
 <https://github.com/Uninett/Argus>`_ repo.
@@ -86,14 +92,14 @@ This assumes that you have a local settings file (we recommend calling it
 
 At the top of this local settings file, copy the contents of
 ``argus.htmx.settings``. This will base the settings-file on
-``argus.site.settings.backend``.
+``argus.site.settings.base``.
 
-Example, top of settings-file for production::
+Example, from the start of the settings-file for production::
 
    from argus.htmx.settings import *
 
 While developing you will probably prefer to swap out
-``argus.site.settings.backend`` with ``argus.site.settings.dev``, as the former
+``argus.htmx.settings`` with ``argus.site.settings.dev``, as the former
 is almost production-ready while the latter is tuned for development and
 depends on the optional dependencies you can install via ``pip install
 argus-server[dev]``.
