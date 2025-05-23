@@ -30,7 +30,7 @@
     {% block header %}
       <h1>Argus Server: {{ page_title }}</h1>
     {% endblock header %}
-    {% if BANNER_MESSAGE %}
+    {% if banner_message %}
       {# djlint:off H021 #}
       <div class="relative isolate flex justify-center gap-x-4 overflow-hidden bg-red-700 px-4 py-1.5">
         <div class="absolute left-[max(-7rem,calc(50%-52rem))] top-1/2 -z-10 -translate-y-1/2 transform-gpu blur-2xl"
@@ -46,7 +46,7 @@
           </div>
         </div>
         <p class="text-sm leading-6 text-white">
-          <strong>{{ BANNER_MESSAGE }}</strong>
+          <strong>{{ banner_message }}</strong>
         </p>
       </div>
       {# djlint:on H021 #}

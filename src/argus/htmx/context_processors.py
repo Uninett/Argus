@@ -21,4 +21,4 @@ def static_paths(request):
 
 
 def banner_message(request):
-    return {"BANNER_MESSAGE": getattr(settings, "BANNER_MESSAGE", None)}
+    return {"banner_message": getattr(settings, "BANNER_MESSAGE", None)}
