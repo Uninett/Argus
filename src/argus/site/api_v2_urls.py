@@ -2,7 +2,7 @@ from django.urls import include, path
 
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
-from argus.auth.spa.views import ObtainNewAuthToken
+from argus.auth.drftoken.views import ObtainNewAuthToken
 
 openapi_urls = [
     path("", SpectacularAPIView.as_view(api_version="v2"), name="schema"),

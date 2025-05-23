@@ -33,7 +33,7 @@ class EventAPITests(APITestCase, IncidentBasedAPITestCaseHelper):
         )
         self.stateless_incident1.create_first_event()
 
-        self.events_url = lambda incident: reverse("v1:incident:incident-events", args=[incident.pk])
+        self.events_url = lambda incident: reverse("v2:incident:incident-events", args=[incident.pk])
 
     def tearDown(self):
         connect_signals()

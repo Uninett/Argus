@@ -10,11 +10,6 @@ from django.utils import timezone
 
 from argus.incident.models import Incident
 from argus.incident.ticket.utils import autocreate_ticket
-from argus.util.signals import bulk_changed
-
-
-def send_changed_incidents(incidents):
-    bulk_changed.send(sender=Incident, instances=incidents)
 
 
 def get_qs_for_incident_ids(incident_ids: list[int], qs=None):
@@ -95,5 +90,4 @@ def bulk_change_incidents(actor, incident_ids: list[int], data: dict[str, Any], 
     if not data.get("timestamp"):
         data["timestamp"] = timezone.now()
     incidents = func(actor, qs, data)
-    send_changed_incidents(incidents)
     return incidents, missing_ids

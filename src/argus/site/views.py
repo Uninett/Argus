@@ -11,8 +11,10 @@ from django.http import (
 )
 from django.shortcuts import render, reverse
 
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.views import APIView
 from rest_framework import permissions
+from rest_framework import status as drf_status
 from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema, extend_schema_view
 
@@ -36,6 +38,19 @@ def index(request):
     }
     return render(request, "index.html", context=context)
 index.login_required = False
+# fmt: on
+
+
+# fmt: off
+@api_view(["GET", "HEAD", "POST"])
+@permission_classes([permissions.AllowAny])
+def api_gone(request, message: str = "Gone"):
+    data = {
+        "status_code": drf_status.HTTP_410_GONE,
+        "status": message,
+    }
+    return Response(data, status=drf_status.HTTP_410_GONE)
+api_gone.login_required = False
 # fmt: on
 
 
@@ -110,12 +125,10 @@ class MetadataView(APIView):
         metadata = {
             "server-version": get_version(),
             "api-version": {
-                "deprecated": "v1",
                 "stable": "v2",
             },
             "jsonapi-schema": {
                 "stable": reverse("schema-v2"),
-                "v1": "/api/v1/schema/",
                 "v2": "/api/v2/schema/",
             },
             "ticket_plugin": getattr(settings, "TICKET_PLUGIN", None),
