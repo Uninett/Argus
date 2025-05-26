@@ -8,6 +8,65 @@ This project uses [*towncrier*](https://towncrier.readthedocs.io/) and the chang
 
 <!-- towncrier release notes start -->
 
+## [2.0.0] - 2025-05-26
+
+This release completely removes version 1 of the API. If you have not done so,
+please update your glue services and other integrations using API v1 to use
+version 2!
+
+We also archived the old frontend and dropped all support for it.
+
+Please make sure to first migrate to the last release (1.37.0) before upgrading
+to 2.0.0.
+
+If you have used the HTMX frontend already and are using a local settings file
+you should remove/comment out the lines
+
+`update_settings(globals(), APP_SETTINGS)`
+
+and
+
+`ROOT_URLCONF = "argus.htmx.root_urls"`
+
+and corresponding imports if you are getting the error
+
+`django.core.exceptions.ImproperlyConfigured: Application labels aren't unique,
+duplicates: django_htmx`.
+
+### Removed
+
+- Deleted API v1, its tests and mentions in the documentation. As well as all
+  support for the old frontend. Any endpoint starting with "/api/v1" replies
+  with "410 Gone". ([#1446](https://github.com/Uninett/Argus/pull/1446),
+  [#1445](https://github.com/Uninett/Argus/pull/1445),
+  [#1428](https://github.com/Uninett/Argus/pull/1428),
+  [#1427](https://github.com/Uninett/Argus/pull/1427),
+  [#1423](https://github.com/Uninett/Argus/pull/1423),
+  [#1422](https://github.com/Uninett/Argus/pull/1422),
+  [#1417](https://github.com/Uninett/Argus/pull/1417),
+  [#1415](https://github.com/Uninett/Argus/pull/1415))
+
+### Added
+
+- Added an optional banner below the navbar that can be filled with text
+  controlled via environment variable/Django setting.
+  ([#1164](https://github.com/Uninett/Argus/issues/1164))
+- Added two new management commands: `createuser` and `changeuser`.
+  ([#1449](https://github.com/Uninett/Argus/pull/1449))
+- Added support for creating a source when calling `create_fake_incident` if
+  the source does not exist.
+  ([#1424](https://github.com/Uninett/Argus/issues/1424))
+- Added option to set source type in `create_fake_incident` management command.
+  ([#1486](https://github.com/Uninett/Argus/issues/1486))
+
+### Changed
+
+- Squashed existing migrations for the benefit of future changes in
+  Argus v2. ([#1407](https://github.com/Uninett/Argus/issues/1407))
+- Upgraded a lot of dependencies.
+  ([#1485](https://github.com/Uninett/Argus/pull/1485))
+
+
 ## [1.37.0] - 2025-05-14
 
 There's a very important change to the database schema in this release.
