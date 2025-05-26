@@ -109,7 +109,7 @@ What is Argus?
 
 Argus is an *alert aggregator* designed for storing and managing alerts
 from different monitoring systems at one place. Argus is created for
-**ease of alarm management** and **customizable alarm notifications**.
+**ease of alarm management** via **personalized interface** and **customizable alarm notifications**.
 
 Log into Argus
 --------------
