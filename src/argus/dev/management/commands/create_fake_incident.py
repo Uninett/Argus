@@ -44,12 +44,8 @@ class Command(BaseCommand):
             help="Set level to <level>, otherwise a random number within the correct range is used",
         )
         parser.add_argument("-t", "--tags", nargs="+", type=str, help="Add the listed tags to the incident")
-        parser.add_argument(
-            "-s",
-            "--source",
-            type=str,
-            help="Use this source for the incident (the source needs to exist, see 'create_source' for creating one)",
-        )
+        parser.add_argument("-s", "--source", type=str, help="Use this source for the incident")
+        parser.add_argument("--source-type", type=str, help="Use this source type for the incident")
         parser.add_argument("--stateless", action="store_true", help="Create a stateless incident (end_time = None)")
         metadata_parser = parser.add_mutually_exclusive_group()
         metadata_parser.add_argument(
@@ -67,6 +63,7 @@ class Command(BaseCommand):
         tags = options.get("tags") or []
         description = options.get("description") or None
         source = options.get("source") or None
+        source_type = options.get("source_type") or None
         batch_size = options.get("batch_size") or 1
         level = options.get("level") or None
         stateful = False if options.get("stateless") else True
@@ -77,7 +74,7 @@ class Command(BaseCommand):
                 with metadata_path.open() as jsonfile:
                     metadata = json.load(jsonfile)
         if source:
-            call_command("create_source", [source, f"-t={source}"])
+            call_command("create_source", [source, f"-t={source_type or source}"])
 
         for i in range(batch_size):
             try:
