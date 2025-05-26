@@ -80,6 +80,23 @@ class CreateFakeIncidentTests(TestCase):
             Incident.objects.exclude(id__in=previous_incidents_pks).filter(source__name=source_name).exists()
         )
 
+    def test_create_fake_incident_will_create_single_fake_incident_with_set_source_and_source_type(self):
+        previous_incidents_pks = [incident.id for incident in Incident.objects.all()]
+
+        source_name = "notargus"
+        source_type = "abcd"
+
+        out = self.call_command(source=source_name, source_type=source_type)
+
+        self.assertFalse(out)
+
+        self.assertTrue(
+            Incident.objects.exclude(id__in=previous_incidents_pks)
+            .filter(source__name=source_name)
+            .filter(source__type__name=source_type)
+            .exists()
+        )
+
     def test_create_fake_incident_will_create_source_if_not_existing(self):
         source_name = "source_a"
 
