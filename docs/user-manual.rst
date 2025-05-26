@@ -139,29 +139,6 @@ Login using OAuth 2.0 (Feide in the example below)
 
 4. Continue with the preferred method for two-factor authentication.
 
-Debugging Network errors on Login
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-If you get a following error message at the top of the *Login* page:
-
-1. Open *developer console* in your browser.
-2. Check the error message in the console.
-
-   -  *Connection refused* error message indicates that the Argus API
-      server is unavailable.
-   -  *CORS* error message indicates misconfiguration of the Argus
-      settings.
-
-Please visit `Argus
-documentation <https://argus-server.readthedocs.io/en/latest/index.html>`_
-if you need help with the configuration.
-
-Note that we intend to direct you to the browser’s developer console for
-a specific error message in the case of network errors. This is due to
-the fact that some network requests are meant to be delegated to
-browsers, not the web applications (f.e. `preflight
-requests <https://developer.mozilla.org/en-US/docs/Glossary/Preflight_request>`_).
-
 Work with alarms in Argus
 -------------------------
 
