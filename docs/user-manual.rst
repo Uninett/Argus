@@ -114,22 +114,24 @@ from different monitoring systems at one place. Argus is created for
 Log into Argus
 --------------
 
-Argus supports several login mechanisms: \* *username-password login* \*
-*federated login with OAuth 2.0*
+Argus supports several login mechanisms:
 
-Log in and start using Argus at **/login**.
+* \ *username-password login* \
+* \ *federated login with OAuth 2.0* \
+
+Log in and start using Argus at **/accounts/login**.
 
 Login using username and password
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 1. Fill out *username* and *password*.
 
-2. Press ``LOGIN``.
+2. Press ``Log in``.
 
 Login using OAuth 2.0 (Feide in the example below)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-1. Press ``LOGIN WITH OAUTH2``.
+1. Under "Login with" Press ``dataporten_feide``.
 
 2. Select account you want to log in with.
 
