@@ -76,8 +76,8 @@ class Command(BaseCommand):
             if metadata_path:
                 with metadata_path.open() as jsonfile:
                     metadata = json.load(jsonfile)
-
-        call_command("create_source", [source, f"-t={source}"])
+        if source:
+            call_command("create_source", [source, f"-t={source}"])
 
         for i in range(batch_size):
             try:
