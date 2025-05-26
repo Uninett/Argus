@@ -9,17 +9,13 @@ Argus is a platform for aggregating incidents across network management systems,
 sending notifications to users. Users create notification profiles that define which
 incidents they subscribe to. See [Argus docs](http://argus-server.rtfd.io/en/latest/) for more details.
 
-This repository hosts the backend built with Django. There is also a
-[REACT SPA frontend](https://github.com/Uninett/Argus-frontend).
-
-
 See also the the [Python client library](https://github.com/Uninett/pyargus).
 
 > [!IMPORTANT]
-> * API v1 has been deprecated. API v2 is the new stable. Support for API v1
->   will be dropped in version 2.0 of argus-server. Please upgrade your glue
+> * API v1 has been removed. API v2 is the new stable. Support for API v1
+>   was dropped in version 2.0 of argus-server. Please upgrade your glue
 >   services!
-> * Support for the REACT frontend will be dropped in version 2.0 of
+> * Support for the REACT frontend was dropped in version 2.0 of
 >   argus-server. Please try out the new built-in one.
 
 
@@ -139,7 +135,7 @@ Site-specific settings can either be set using environment variables, using a
 
 For more information on both methods and a list of the settings, consult the
 documentation section on
-[site-specific settings](http://argus-server.rtfd.io/en/latest/site-specific-settings.html).
+[site-specific settings](https://argus-server.readthedocs.io/en/latest/reference/site-specific-settings.html).
 
 
 ## Running Argus in development
@@ -188,28 +184,19 @@ Required settings in `cmd.sh` are
 - `DJANGO_SETTINGS_MODULE` and
 - `SECRET_KEY`.
 
-The `DATAPORTEN` variables are optional. Refer to the dataporten section of
-[setting site-specific settings](http://argus-server.rtfd.io/en/latest/site-specific-settings.html) for details.
-
 `DJANGO_SETTINGS_MODULE` can be set to `argus.site.settings.dev`.
 
 If you need more complex settings than environment variables and ``cmd.sh`` can provide,
 we recommend having a `localsettings.py` in the same directory as `manage.py` with any
 overrides.
 
-Refer to the [development notes](http://argus-server.rtfd.io/en/latest/development.html) for further details and
-useful hints on managing Argus in development mode.
+Refer to the
+[development notes](https://argus-server.readthedocs.io/en/latest/development.html)
+for further details and useful hints on managing Argus in development mode.
 
-#### Settings for old frontend
+#### Settings for the frontend
 
-> [!WARNING]
-> Stop using this frontend, it is deprecated. Switch to the new one!
-
-See https://argus-server.erfd.io/en/latest/reference/react-frontend.html
-
-#### Settings for new frontend
-
-See http://argus-server.rtfd.io/en/latest/reference/htmx-frontend.html
+See https://argus-server.readthedocs.io/en/latest/reference/htmx-frontend.html.
 
 ### Step 3: Run Argus in development
 
