@@ -145,9 +145,12 @@ Work with alarms in Argus
 **View**, **filter** and **update** alarms that come to Argus from
 different sources (monitoring systems).
 
+.. image:: img/incidents_page.png
+  :width: 650
+
 You can see all of your monitoring systems that are connected to Argus
-in the *Sources selector*. Click on the *Sources selector* and all
-available monitoring systems will appear in the drop-down menu.
+in the *Sources* selector. Click on the *Sources* in the *Filter incidents*
+tab and all available monitoring systems will appear in the drop-down menu.
 
 What is an incident in Argus
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -167,6 +170,9 @@ Note that an incident’s event feed is also available in the detailed
 view. The event feed shows events like *closing* (resolving), and
 *acknowledgment* of an incident.
 
+.. image:: img/incident_details_view.png
+  :width: 650
+
 Each row in the *Incidents* table is one alarm. In the table you can see
 an incident’s *start time*, *closed/open status*, whether an incident
 has at least one *acknowledgement*, *severity level*, *source* (which
@@ -177,18 +183,8 @@ url* (label icon at the very end of the row).
 Access detailed incident view
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
--  Alternative 1:
-
-   1. Click on an incident row in the *Incidents* table.
-
-   2. Detailed incident will appear in a pop-up window.
-
--  Alternative 2:
-
-   1. Click on one of the icons under *Actions column* in the
-      *Incidents* table.
-
-   2. App will redirect you to the incident’s page.
+1. Click on an incident row in the *Incidents* table.
+2. App will redirect you to the incident’s page.
 
 Work with incidents table
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -198,7 +194,7 @@ Change how many rows are shown per incidents table page
 
 1. Scroll down to the bottom of the *Incidents* table.
 
-2. Click on the *Rows per page* drop-down.
+2. Click on the *Per page* drop-down.
 
 3. Select whether you want 10/25/50/100 incidents per page displayed.
 
@@ -206,37 +202,28 @@ Navigate incidents table
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. Scroll down to the bottom of the *Incidents* table.
+   In the right corner, there is a set of table navigation buttons.
 
-2. Click on the *right arrow icon* if you want to go to the next table
+2. Click on the button with a *single right arrow icon* if you want to go to the next table
    page.
 
-3. Click on the *left arrow icon* if you want to go to the previous
+3. Click on the button with a *single left arrow icon* if you want to go to the previous
    table page.
+
+4. Click on the button with a *double right arrow icon* if you want to go to the last table
+   page.
+
+5. Click on the button with a *double left arrow icon* if you want to go to the first table
+   page.
 
 Change how often incidents table gets refreshed
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. Click on the *gears icon* to the right below the header.
+1. Scroll down to the bottom of the *Incidents* table.
 
-2. Select refresh method in the *Auto Update selector*:
+2. Click on the *Updating every* drop-down.
 
-   -  If you want **no automatic table updates**, press ``NEVER`` in the
-      *Auto Update selector*. Note that you will have to refresh the
-      page yourself if you want the table to get updated.
-
-   -  If you want the table to update **in realtime**, press
-      ``REALTIME`` in the *Auto Update selector*.
-
-   -  If you want the table to get updated **every couple of seconds**,
-      press ``INTERVAL`` in the *Auto Update selector*.
-
-      -  You can see the value of the current refresh interval below the
-         *Incidents table*. The refresh interval is displayed **in whole
-         seconds**.
-
-      -  You can change the refresh interval value in
-         ``/src/config.tsx``. The refresh interval is stored **in whole
-         seconds**.
+3. Select whether you want incidents to be updated every 5/30/60 seconds, or Never.
 
 Decide which incidents are shown in the table
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -245,37 +232,38 @@ For ease of alarm management you can filter incidents so that only
 incidents that match all preferred parameters are shown in the
 *Incidents* table.
 
-Apply the preferred filter by using the *Filter toolbar*. Argus will
+Apply the preferred filter by using the *Filter incidents* toolbar. Argus will
 remember your filter settings from the last login session, and will use
 those until you change them.
 
-*Filter toolbar* is available: \* Below the header in full-screen view.
+*Filter incidents* toolbar is available below the header in full-screen view:
 
--  In the *Filter Options dropdown* in mobile view.
+.. image:: img/incidents_filter.png
+  :width: 650
 
 Filter by open/close status
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
--  If you only want *open* incidents to be displayed in the table, press
-   ``OPEN`` in the *Open State selector*.
+-  If you only want *open* incidents to be displayed in the table, select
+   ``Open`` in the *Open State* slider.
 
 -  If you only want *closed* (resolved) incidents to be displayed in the
-   table, press ``CLOSED`` in the *Open State selector*.
+   table, select ``Closed`` in the *Open State* slider.
 
 -  If you want both *open* and *closed* (resolved) incidents to be
-   displayed in the table, press ``BOTH`` in the *Open State selector*.
+   displayed in the table, press ``Both`` in the *Open State* slider.
 
 Filter by acknowledgement status
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 -  If you only want *acknowledged* incidents to be displayed in the
-   table, press ``ACKED`` in the *Acked selector*.
+   table, select ``Acked`` in the *Acked* slider.
 
 -  If you only want **un**\ *\ acknowledged* incidents to be displayed
-   in the table, press ``UNACKED`` in the *Acked selector*.
+   in the table, select ``Unacked`` in the *Acked* slider.
 
 -  If you want both *acknowledged* and *unacknowledged* incidents to be
-   displayed in the table, press ``BOTH`` in the *Acked selector*.
+   displayed in the table, select ``Both`` in the *Acked* slider.
 
 Filter by source monitoring system
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -283,19 +271,17 @@ Filter by source monitoring system
 -  If you want the table to display only incidents that came from a
    **specific monitoring system(s)**:
 
-   1. Click on the *Sources input field*.
+   1. Click on the *Sources* selector.
 
    2. In the drop-down that appears, you can see all available source
-      systems. Click on the preferred one.
-
-   3. Press *Enter*. The newly selected *source system* will appear in
+      systems. Click on the preferred one. The newly selected *source system* will appear in
       the input field.
 
-   4. Repeat the process if you want to filter by several monitoring
+   3. Repeat the process if you want to filter by several monitoring
       systems.
 
 -  If you want the table to display incidents from **any monitoring
-   system**, leave the *Sources field* empty.
+   system**, leave the *Sources* field empty.
 
 Filter by tags
 ^^^^^^^^^^^^^^
@@ -303,15 +289,16 @@ Filter by tags
 -  If you want the table to display only incidents that have a
    **specific tag(s)**:
 
-   1. Type in a *tag* into the *Tags input field* in the format
+   1. Type in a *tag* into the *Tags* input field in the format
       ``tag_name=tag_value``.
 
    2. Press *Enter*. The newly added tag will appear in the input field.
 
-   3. Repeat the process if you want to filter by several tags.
+   3. Repeat the process if you want to filter by several tags, and remember to separate
+      tags with a comma. For example, ``tag_name1=tag_value1, tag_name2=tag_value2``.
 
 -  If you want the table to display incidents with **any tags**, leave
-   the *Tags field* empty.
+   the *Tags* field empty.
 
 Filter by severity level
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -322,19 +309,17 @@ displayed in the table. If you select *max severity level* to be **2**,
 only incidents with severity **1** and **2** will be displayed in the
 table.
 
-To change *max severity level*: 1. Open the *Max severity level*
-drop-down.
-
-2. Select the preferred *max severity* option.
+To change *max severity level*: select the preferred *max severity* option in the *Level* slider.
 
 Filter out older incidents
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Note that you can not save this parameter in `stored
-filters <#work-with-stored-filters>`_. 1. Click on the *gears icon* to
-the right below the header.
+filters <#work-with-stored-filters>`_.
 
-2. Open the *Timeframe* drop-down menu.
+1. Scroll down to the bottom of the *Incidents* table.
+
+2. Click on the *Timeframe* drop-down.
 
 3. Select the preferred option of *report-time-not-later-than* for the
    incidents in the table.
@@ -348,15 +333,21 @@ save your preferences as a *filter*. Stored *filters* can be used when
 `customizing alarm
 notifications <#customize-alarm-notifications-in-argus>`_.
 
+You can save, modify, apply, unselect and delete filters in the *Filter*
+selector in the *Filter incidents* toolbar:
+
+.. image:: img/filter_selector.png
+  :width: 650
+
 Save current filter
 ^^^^^^^^^^^^^^^^^^^
 
 1. `Set the preferred filter
    parameters <#decide-which-incidents-are-shown-in-the-table>`_.
 
-2. Click on the *plus icon* within the *Filter input field*.
+2. Click on the *Create filter* button within the *Filter* selector.
 
-3. Give a (meaningful) name to your filter. Press ``CREATE``. Note that
+3. Give a (meaningful) name to your filter. Press ``Submit``. Note that
    you can not edit a filter’s name after it is created.
 
 Modify existing filter
@@ -365,21 +356,25 @@ Modify existing filter
 1. `Make desired changes to filter
    parameters <#decide-which-incidents-are-shown-in-the-table>`_.
 
-2. Click on the *save icon* within the *Filter input field*.
+2. Click on the *Update filter* button within the *Filter* selector.
 
-3. Click on the filter that you want to update, and press ``SAVE TO``.
+3. In the drop-down menu that appears, click on the filter that you want to update.
+
+4. Press ``Yes`` in the confirmation dialog that appears.
 
 Apply existing filter
 ^^^^^^^^^^^^^^^^^^^^^
 
-1. Click on the *Filter input field*.
+1. Click on the *Filter* selector.
 
 2. Click on the preferred filter in the drop-down menu.
 
 Unselect applied filter
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-1. Click on the *cross icon* inside the *Filter input field*.
+1. Click on the *Filter* selector.
+
+2. Click on the ``---`` option in the drop-down menu.
 
 Delete existing filter
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -398,18 +393,19 @@ Re-open a closed (resolved) incident
 
 1. `Open incident in detailed view <#access-detailed-incident-view>`_.
 
-2. Press ``OPEN INCIDENT``.
+2. Press ``Reopen incident`` at the top of the *Related events* feed.
 
-3. Confirm re-opening.
+3. Confirm re-opening. Note that you can provide a re-opening comment if
+   needed.
 
 Close (resolve) an incident
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. `Open incident in detailed view <#access-detailed-incident-view>`_.
 
-2. Press ``CLOSE INCIDENT``.
+2. Press ``Close incident`` at the top of the *Related events* feed.
 
-3. Press ``CLOSE NOW``. Note that you can provide a closing comment if
+3. Press ``Close now``. Note that you can provide a closing comment if
    needed.
 
 Add acknowledgement to an incident
@@ -417,11 +413,13 @@ Add acknowledgement to an incident
 
 1. `Open incident in detailed view <#access-detailed-incident-view>`_.
 
-2. Press ``CREATE ACKNOWLEDGEMENT``.
+2. Press ``Create acknowledgement`` at the top of the *Acknowledgements* feed.
 
-3. Press ``SUBMIT``. Note that you can optionally provide an
-   acknowledgement comment and/or a date when this acknowledgement is no
-   longer relevant.
+3. Provide an acknowledgement comment in the *Message* input
+   field. Note that you can optionally provide a date when this
+   acknowledgement is no longer relevant.
+
+4. Press ``Submit``.
 
 Update incident ticket
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -431,29 +429,33 @@ Manually add ticket URL to an incident
 
 1. `Open incident in detailed view <#access-detailed-incident-view>`_.
 
-2. Type/paste in ticket URL into the *Ticket input field*. Note that the
+2. Press ``Add ticket URL`` at the bottom of the *Primary details* section.
+
+3. Type/paste in ticket URL into the *Ticket URL* input field. Note that the
    URL has to be absolute (full website address).
 
-3. Press ``SAVE TICKET URL``.
+4. Press ``Add ticket``.
 
 Edit ticket URL
 '''''''''''''''
 
 1. `Open incident in detailed view <#access-detailed-incident-view>`_.
-2. Press ``EDIT TICKET URL``.
 
-3. Type/paste in ticket URL into the *Ticket input field* and press
-   ``SAVE TICKET URL``. Note that the URL has to be absolute (full
+2. Press ``Edit ticket URL`` at the bottom of the *Primary details* section.
+
+3. Type/paste in ticket URL into the *Ticket URL* input field and press
+   ``Edit ticket``. Note that the URL has to be absolute (full
    website address).
 
 Remove ticket URL from an incident
 ''''''''''''''''''''''''''''''''''
 
 1. `Open incident in detailed view <#access-detailed-incident-view>`_.
-2. Press ``EDIT TICKET URL``.
 
-3. Remove URL from the *Ticket input field* and press
-   ``SAVE TICKET URL``.
+2. Press ``Edit ticket URL`` at the bottom of the *Primary details* section.
+
+3. Remove URL from the *Ticket URL* input field and press
+   ``Edit ticket``.
 
 Automatically generate ticket
 '''''''''''''''''''''''''''''
@@ -461,23 +463,16 @@ Automatically generate ticket
 Argus supports automatic ticket generation from the incident. This
 feature needs additional configuration. Read more in the `Argus
 documentation for ticket
-systems <https://argus-server.readthedocs.io/en/latest/ticket-systems.html>`_.
+systems <https://argus-server.readthedocs.io/en/latest/integrations/ticket-systems/index.html>`_.
 
 1. `Open incident in detailed view <#access-detailed-incident-view>`_.
 
-2. Press ``CREATE TICKET``.
+2. Press ``Create ticket`` at the bottom of the *Primary details* section.
 
 3. Confirm automatic ticket generation.
 
-4. When ticket is successfully generated, the *Ticket input field* is
-   updated with a new ticket URL, and the ticket itself is opened in a
-   new browser tab.
-
-Please, check that your ticket system configuration in Argus is complete
-if you get a following error message:
-
-You can read more about ticket system settings
-`here <https://argus-server.readthedocs.io/en/latest/ticket-systems/settings.html>`_.
+4. When ticket is successfully generated, the *Ticket* field is
+   updated with a new ticket URL.
 
 Update several incidents at a time
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -485,38 +480,45 @@ Update several incidents at a time
 Re-open closed (resolved) incidents
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. Select several incidents in the *Incidents table* and press
-   ``RE-OPEN SELECTED`` in the *table toolbar*.
+1. Select several incidents in the *Incidents table* via checkbox
+   at the start of the row and press ``Reopen``
+   in the *Update incidents* toolbar that appears above the *Incidents table*.
 
-2. Confirm re-opening.
+2. Press ``Reopen now``. Note that you can provide a re-opening comment if
+   needed.
 
 Close (resolve) incidents
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. Select several incidents in the *Incidents table* and press
-   ``CLOSE SELECTED`` in the *table toolbar*.
+1. Select several incidents in the *Incidents table* via checkbox
+   at the start of the row and press ``Close``
+   in the *Update incidents* toolbar that appears above the *Incidents table*.
 
-2. Press ``CLOSE NOW``. Note that you can provide a closing comment if
+2. Press ``Close now``. Note that you can provide a closing comment if
    needed.
 
 Add acknowledgement to incidents
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. Select several incidents in the *Incidents table* and press ``ACK``
-   in the *table toolbar*.
+1. Select several incidents in the *Incidents table* via checkbox
+   at the start of the row and press ``Acknowledge``
+   in the *Update incidents* toolbar that appears above the *Incidents table*.
 
-2. Press ``SUBMIT``. Note that you can optionally provide an
-   acknowledgement comment and/or a date when these acknowledgements are
-   no longer relevant.
+2. Provide an acknowledgement comment in the *Message* input
+   field. Note that you can optionally provide a date when this
+   acknowledgement is no longer relevant.
+
+3. Press ``Submit``.
 
 Add ticket URL to incidents
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. Select several incidents in the *Incidents table* and press
-   ``ADD TICKET`` in the *table toolbar*.
+1. Select several incidents in the *Incidents table* via checkbox
+   at the start of the row and press ``Change ticket``
+   in the *Update incidents* toolbar that appears above the *Incidents table*.
 
-2. Type/paste in ticket URL into the *Valid ticket URL field* and press
-   ``SUBMIT``. Note that the URL has to be absolute (full website
+2. Type/paste in ticket URL into the *Ticket URL* input field and press
+   ``Submit``. Note that the URL has to be absolute (full website
    address).
 
 Edit ticket URL for several incidents
@@ -528,10 +530,11 @@ incidents <#add-ticket-url-to-incidents>`_.
 Remove ticket URL from incidents
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. Select several incidents in the *Incidents table* and press
-   ``ADD TICKET`` in the *table toolbar*.
+1. Select several incidents in the *Incidents table* via checkbox
+   at the start of the row and press ``Change ticket``
+   in the *Update incidents* toolbar that appears above the *Incidents table*.
 
-2. Leave the *Valid ticket URL field* empty and press ``SUBMIT``.
+2. Leave the *Ticket URL* input field empty and press ``Submit``.
 
 Customize alarm notifications in Argus
 --------------------------------------
