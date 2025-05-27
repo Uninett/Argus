@@ -880,6 +880,6 @@ and can not be deleted. In this case you will see an error message:
 Log out from Argus
 ------------------
 
-1. Click on the *user icon* in the header.
+1. `Open user menu`_.
 
-2. Click on ``Logout`` in the drop-down menu.
+2. Press ``Log out``.
