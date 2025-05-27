@@ -670,6 +670,9 @@ Manage when to receive notifications in Argus
 
 Add, edit or delete timeslots in *Timeslots*.
 
+.. image:: img/timeslots_view.png
+  :width: 650
+
 What is a timeslot in Argus
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -681,13 +684,18 @@ OK to receive alarm notifications.
 
 Note that every user has the default timeslot *All the time*:
 
+.. image:: img/default_timeslot.png
+  :width: 650
+
 What is a recurrence in Argus
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Recurrences are building blocks for timeslots. Each recurrence
 represents a time range on selected weekdays for when it is OK to
-receive alarm notifications. A time range can either be: \* a whole day,
-\* or a window of time
+receive alarm notifications. A time range can either be:
+
+* a whole day,
+* or a window of time
 
 Each recurrence has only one time range, and it applies to all days that
 are selected in a given recurrence.
@@ -697,66 +705,71 @@ are allowed from 4 p.m. to 8 a.m. on business days (note that it is not
 possible to have a recurrence that goes from one day to the next), and
 all hours on weekends:
 
+.. image:: img/example_timeslot.png
+  :width: 650
+
 Access your timeslots
 ~~~~~~~~~~~~~~~~~~~~~
 
-1. Press ``TIMESLOTS`` in the header.
+1. `Open user menu`_
+
+2. Press ``Timeslots`` in the *Notification config* section.
 
 Add new recurrence
 ~~~~~~~~~~~~~~~~~~
 
-Each timeslot has at least one recurrence by default. In the *Create New
-Timeslot* box the default recurrence is from 8 a.m. to 4 p.m. on
-business days. Add more recurrences if your timeslot needs more than
-one. 1. `Go to your timeslots <#access-your-timeslots>`_. 2. Press
-``ADD RECURRENCE`` either in the *Create New Timeslot* box, or in one of
-your existing timeslots.
+Each timeslot must have at least one recurrence.
+Add more recurrences if your timeslot needs more than
+one.
+
+1. `Go to your timeslots <#access-your-timeslots>`_.
+
+2. Modify the ``Unsaved`` recurrence either in the *Create New Timeslot* box, or in one of
+   your existing timeslots:
+
+   .. image:: img/unsaved_recurrence.png
+      :width: 650
+
+3. Press ``Create`` if it is a new timeslot, or ``Save`` if it is an
+   existing timeslot.
 
 Edit recurrence
 ~~~~~~~~~~~~~~~
 
 1. `Go to your timeslots <#access-your-timeslots>`_.
+
 2. Modify one of the existing recurrences either in the *Create New
    Timeslot* box, or in one of your existing timeslots:
 
-   -  If needed, change *start time* either by typing a new value or by
-      using the calendar icon.
+   -  If needed, change *start time* by typing a new value in format
+      ``HH:MM`` (24-hour format).
 
-   -  If needed, change *end time* either by typing a new value or by
-      using the calendar icon.
+   -  If needed, change *end time* by typing a new value in format
+      ``HH:MM`` (24-hour format). Note that the *end time* must be later
+      than the *start time*. If you want to have a recurrence that goes
+      from one day to the next, you need to create two separate
+      recurrences.
 
-   -  Check *All day* if you want the recurrence to be from 00:00 a.m.
-      to 11:59 p.m. Note that if *All day* is checked, you do not need
-      to provide *start-* and *end time*.
-
-   -  If needed, change day(s):
-
-      1. Open drop-down menu.
-
-      2. Select/de-select days for this recurrence by clicking on them
-         once. Selected days are highlighted in light-yellow.
-
-      3. Click away anywhere outside the drop-down menu.
+   -  Select day(s) via corresponding checkboxes.
 
 Delete recurrence
 ~~~~~~~~~~~~~~~~~
 
 1. `Go to your timeslots <#access-your-timeslots>`_.
 
-2. Press ``REMOVE`` inside one of the existing recurrences either in the
-   *Create New Timeslot* box, or inside one of your existing timeslots.
+2. Check the *Delete* checkbox in the top right corner inside one of the existing
+   recurrences either in the *Create New Timeslot* box, or inside one of your existing timeslots.
+
+3. Press ``Create`` if it is a new timeslot, or ``Save`` if it is an
+   existing timeslot.
 
 Add new timeslot
 ~~~~~~~~~~~~~~~~
 
 1. `Go to your timeslots <#access-your-timeslots>`_.
 
-2. Go to the *Create New Timeslot* box.
-
-   -  In full-screen view it is visible by default at the top:
-
-   -  In mobile-view press the button with the *pencil-icon* at the top
-      to unfold the *Create New Timeslot* box:
+2. Go to the *Create New Timeslot* box. It is visible by default at the top of the page
+    and is highlighted with a darker background than existing timeslots.
 
 3. Type in a (meaningful) timeslot name.
 
@@ -766,11 +779,12 @@ Add new timeslot
 
 6. `Remove recurrence(s) <#delete-recurrence>`_ if needed.
 
-7. Press ``CREATE``.
+7. Press ``Create``.
 
 8. The *Create New Timeslot* box will refresh to default and your newly
    created timeslot will appear at the bottom of the timeslot list. Note
-   that existing timeslots have a dark border at the top.
+   that existing timeslots have a lighter background than the *Create
+   New Timeslot* box.
 
 Edit existing timeslot
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -787,18 +801,15 @@ Edit existing timeslot
 
    -  `Remove recurrence(s) <#delete-recurrence>`_ if needed.
 
-3. Press ``SAVE``. Note that the ``SAVE``-button is inactive if no
-   changes were made. The ``SAVE``-button is also inactive if some
-   changes are invalid. In this case error messages inside the timeslot
-   box will help you.
+3. Press ``Save``.
 
 Delete timeslot
 ~~~~~~~~~~~~~~~
 
 1. `Go to your timeslots <#access-your-timeslots>`_.
 
-2. Press ``DELETE`` inside one of the existing timeslots. Note that the
-   ``DELETE``-button is disabled in the *Create New Timeslot* box.
+2. Press ``Delete`` inside one of the existing timeslots. Note that there is no
+   ``Delete``-button in the *Create New Timeslot* box.
 
 Manage your contact details (destinations) in Argus
 ---------------------------------------------------
