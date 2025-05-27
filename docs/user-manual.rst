@@ -556,6 +556,9 @@ Customize alarm notifications in Argus
 Choose **when**, **where** and **what** alarm notifications you want to
 receive by creating, editing and deleting *notification profiles*.
 
+.. image:: img/notification_profiles.png
+  :width: 650
+
 About components of notification profiles
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -576,73 +579,91 @@ About components of notification profiles
 About the available notification media
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The notification media that are available in Argus by default are: - SMS
+The notification media that are available in Argus by default are:
+
+- SMS
 - Email
 
 If you wish to receive notifications to other media, read about
 configurable media types in the `Argus documentation for notification
-plugins <https://argus-server.readthedocs.io/en/latest/notifications.html#other-notification-plugins>`_.
+plugins <https://argus-server.readthedocs.io/en/latest/integrations/notifications/
+index.html#notification-plugins-maintained-by-argus-developers-optional>`_.
 
 Access your notification profiles
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-1. Press ``PROFILES`` in the header.
+1. `Open user menu`_
+
+2. Press ``Profiles`` in the *Notification config* section.
 
 Add new notification profile
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 1. `Go to your notification
    profiles <#access-your-notification-profiles>`_.
-2. Click on the ``CREATE NEW PROFILE`` button.
 
-3. Select a timeslot for when to receive notifications in the *Timeslot
-   drop-down*. If the drop-down menu is empty, `create a
-   timeslot <#add-new-timeslot>`_ first.
+2. Start modifying the fields in the *New Notification Profile* box at the
+   top of the page:
 
-4. Select what alarms you want to receive notifications about in the
-   *Filters drop-down*. If the drop-down menu is empty, `create a
-   filter <#save-current-filter>`_ first. Note that if no filter is
-   selected no notification will be sent. You can select multiple
-   filters per notification profile.
+   .. image:: img/new_notification_profile.png
+      :width: 650
 
-5. Select what destination(s) you want to receive notifications to in
-   the *Destinations drop-down*. If the drop-down menu is empty, create
-   a new destination by clicking on the *Plus* button first.
+   - Type in a (meaningful) name for your notification profile in the
+     *Name* input field.
 
-6. Press ``CREATE``.
+   - Select a timeslot for when to receive notifications in the *Timeslot*
+     drop-down. If the drop-down menu is empty, `create a
+     timeslot <#add-new-timeslot>`_ first.
+
+   - Select what alarms you want to receive notifications about in the
+     *Filters* drop-down. If the drop-down menu is empty, `create a
+     filter <#save-current-filter>`_ first. Note that if no filter is
+     selected no notification will be sent. You can select multiple
+     filters per notification profile.
+
+   - Select what destination(s) you want to receive notifications to in
+     the *Destinations* drop-down. If the drop-down menu is empty, `create
+     a new destination <#add-new-destination-in-settings>`_ first.
+
+3. Press ``Save``.
 
 Edit existing notification profile
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 1. `Go to your notification
    profiles <#access-your-notification-profiles>`_.
-2. Change a timeslot for when to receive notifications in the *Timeslot
-   drop-down* (if needed).
 
-3. Change what alarms you want to receive notifications about in the
-   *Filters drop-down* (if needed).
+2. Change the name of the notification profile in the *Name* input field (if needed).
 
-4. Change what destinations(s) you want to receive notifications to in
-   the *Destinations drop-down* (if needed).
+3. Change a timeslot for when to receive notifications in the *Timeslot*
+   drop-down (if needed).
 
-5. Press ``SAVE``.
+4. Change what alarms you want to receive notifications about in the
+   *Filters* drop-down (if needed).
+
+5. Change what destinations(s) you want to receive notifications to in
+   the *Destinations* drop-down (if needed).
+
+6. Press ``Save``.
 
 Disable notification profile
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 1. `Go to your notification
    profiles <#access-your-notification-profiles>`_.
-2. Uncheck the *Active checkbox* inside one of your existing
+
+2. Uncheck the *Active* checkbox inside one of your existing
    notification profiles.
 
-3. Press ``SAVE``.
+3. Press ``Save``.
 
 Delete notification profile
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 1. `Go to your notification
    profiles <#access-your-notification-profiles>`_.
-2. Press ``DELETE`` inside one of your existing notification profiles.
+
+2. Press ``Delete`` inside one of your existing notification profiles.
 
 Manage when to receive notifications in Argus
 ---------------------------------------------
