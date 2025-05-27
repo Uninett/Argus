@@ -10,6 +10,9 @@ User’s guide to Argus
       2.0 <#login-using-oauth-20-feide-in-the-example-below>`_
    -  `Debugging network errors <#debugging-network-errors-on-login>`_
 
+-  `Configure user settings`_
+    -  `Open user menu`_
+
 -  `Manage alarms <#work-with-alarms-in-argus>`_
 
    -  `What is an incident <#what-is-an-incident-in-argus>`_
@@ -138,6 +141,17 @@ Login using OAuth 2.0 (Feide in the example below)
 3. Fill out *username* and *password* and press ``Log in``.
 
 4. Continue with the preferred method for two-factor authentication.
+
+Configure user settings
+-----------------------
+
+Open user menu
+~~~~~~~~~~~~~~
+
+To open user menu, click on the *user icon* in the header:
+
+.. image:: img/user_menu.png
+  :width: 650
 
 Work with alarms in Argus
 -------------------------
