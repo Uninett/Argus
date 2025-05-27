@@ -592,7 +592,7 @@ index.html#notification-plugins-maintained-by-argus-developers-optional>`_.
 Access your notification profiles
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-1. `Open user menu`_
+1. `Open user menu`_.
 
 2. Press ``Profiles`` in the *Notification config* section.
 
@@ -711,7 +711,7 @@ all hours on weekends:
 Access your timeslots
 ~~~~~~~~~~~~~~~~~~~~~
 
-1. `Open user menu`_
+1. `Open user menu`_.
 
 2. Press ``Timeslots`` in the *Notification config* section.
 
@@ -832,7 +832,7 @@ index.html#notification-plugins-maintained-by-argus-developers-optional>`_.
 Access your destinations in settings
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-1. `Open user menu`_
+1. `Open user menu`_.
 
 2. Press ``Destinations`` in the *Notification config* section.
 
