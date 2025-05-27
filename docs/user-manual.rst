@@ -819,18 +819,22 @@ Destinations that are present in your settings can be used when
 `customizing alarm
 notifications <#customize-alarm-notifications-in-argus>`_.
 
+.. image:: img/destinations_view.png
+  :width: 650
+
 In Argus, *emails* and *phone numbers* are the destinations that are
 configured by default. If you wish to receive notifications to other
 media, read about configurable media types in the `Argus documentation
 for notification
-plugins <https://argus-server.readthedocs.io/en/latest/notifications.html#other-notification-plugins>`_.
+plugins <https://argus-server.readthedocs.io/en/latest/integrations/notifications/
+index.html#notification-plugins-maintained-by-argus-developers-optional>`_.
 
 Access your destinations in settings
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-1. Click on the *user icon* in the header.
+1. `Open user menu`_
 
-2. Click on ``Destinations`` in the drop-down menu.
+2. Press ``Destinations`` in the *Notification config* section.
 
 Add new destination in settings
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -838,13 +842,16 @@ Add new destination in settings
 1. `Go to your contact
    details <#access-your-destinations-in-settings>`_.
 
-2. Click on the *Plus* button in the *Destinations* header to open the
-   *Create new destination* menu.
+2. Go to the *Create destination* box. It is visible by default at the top of the page
+   and is highlighted with a darker background than existing destinations.
 
-3. Select destination’s media type.
+3. Select destination’s media type via the *Media* drop-down.
 
-4. Type in a title (optional), and a destination value (required). Press
-   ``CREATE``.
+4. Type in a title in the *Name* input field (optional)
+
+5. Type in a destination value in the *Settings* input field (required).
+
+6. Press ``Create``.
 
 Edit existing destination in settings
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -852,9 +859,9 @@ Edit existing destination in settings
 1. `Go to your contact
    details <#access-your-destinations-in-settings>`_.
 
-2. Modify one of the existing destinations.
+2. Modify one of the existing destinations (either *Name* or *Settings* value).
 
-3. Press ``SAVE``.
+3. Press ``Update``.
 
 Delete destination in settings
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -862,11 +869,13 @@ Delete destination in settings
 1. `Go to your contact
    details <#access-your-destinations-in-settings>`_.
 
-2. Press ``DELETE`` inside one of your saved destinations.
+2. Press ``Delete`` inside one of your saved destinations.
 
 Note that some destinations are connected to your Argus user profile,
-and can not be deleted. The ``DELETE`` button is disabled for such
-destinations:
+and can not be deleted. In this case you will see an error message:
+
+.. image:: img/synced_destination_delete_error.png
+  :width: 650
 
 Log out from Argus
 ------------------
