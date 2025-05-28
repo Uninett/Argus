@@ -14,6 +14,7 @@ User’s guide to Argus
     -  `Open user menu`_
     -  `Select theme`_
     -  `Add your own theme`_
+    -  `Choose what columns are shown in the incidents table`_
     -  `Change date and time format`_
 
 -  `Manage alarms <#work-with-alarms-in-argus>`_
@@ -175,6 +176,15 @@ Talk to your system administrator if you want to add your own theme.
 You can either select from the `available daisyUI themes <https://daisyui.com/docs/themes/#list-of-themes>`_,
 or create your own. For creating your own theme, we recommend using the
 `daisyUI theme generator <https://v4.daisyui.com/theme-generator/>`_.
+
+Choose what columns are shown in the incidents table
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+It is possible to `add or remove columns
+<https://argus-server.readthedocs.io/en/latest/customization/htmx-frontend.html#incident-table-column-customization>`_
+in the *Incidents* table. Currently it is possible to
+customize columns only globally for all users of the same installation of Argus. Talk to your system
+administrator if you want to contribute to the customization of the *Incidents* table columns.
 
 Change date and time format
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
