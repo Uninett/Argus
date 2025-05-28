@@ -13,6 +13,7 @@ User’s guide to Argus
 -  `Configure user settings`_
     -  `Open user menu`_
     -  `Select theme`_
+    -  `Add your own theme`_
 
 -  `Manage alarms <#work-with-alarms-in-argus>`_
 
@@ -162,6 +163,17 @@ Select theme
 2. Click on the *Theme* drop-down under the *User preferences*.
 
 3. Select the preferred theme from the drop-down menu.
+
+Add your own theme
+~~~~~~~~~~~~~~~~~~
+
+There are 3 themes available out of the box in Argus: *Argus*, *Dark* and *Light*. You can
+add your own theme by `overriding the default DAISYUI_THEMES
+<https://argus-server.readthedocs.io/en/latest/customization/htmx-frontend.html#themes-and-styling>`_. \
+Talk to your system administrator if you want to add your own theme.
+You can either select from the `available daisyUI themes <https://daisyui.com/docs/themes/#list-of-themes>`_,
+or create your own. For creating your own theme, we recommend using the
+`daisyUI theme generator <https://v4.daisyui.com/theme-generator/>`_.
 
 Work with alarms in Argus
 -------------------------
