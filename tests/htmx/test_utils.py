@@ -3,6 +3,7 @@ from unittest.mock import Mock, patch
 
 from django import test
 from django.utils import timezone
+from django.test.client import RequestFactory
 
 from argus.htmx.utils import (
     bulk_ack_queryset,
@@ -56,8 +57,10 @@ class TestGetQSForIncidentIDs(test.TestCase):
 class TestBulkAckQueryset(test.TestCase):
     def setUp(self):
         disconnect_signals()
-        self.user = SourceUserFactory()
-        self.source = SourceSystemFactory(user=self.user)
+        request = RequestFactory().get("/foo")
+        request.user = SourceUserFactory()
+        self.source = SourceSystemFactory(user=request.user)
+        self.request = request
 
     def tearDown(self):
         connect_signals()
@@ -69,7 +72,7 @@ class TestBulkAckQueryset(test.TestCase):
         queryset = Incident.objects.filter(source=self.source)
         assert set(queryset.not_acked()) == set(created_incidents)
         data = {"timestamp": now, "description": "test description", "expiration": expiration}
-        bulk_ack_queryset(self.user, queryset, data)
+        bulk_ack_queryset(self.request, queryset, data)
         assert set(queryset.acked()) == set(created_incidents)
 
     def test_should_return_acked_incidents(self):
@@ -78,15 +81,17 @@ class TestBulkAckQueryset(test.TestCase):
         expiration = now + timedelta(hours=1)
         queryset = Incident.objects.filter(source=self.source)
         data = {"timestamp": now, "description": "test description", "expiration": expiration}
-        acked_incidents = bulk_ack_queryset(self.user, queryset, data)
+        acked_incidents = bulk_ack_queryset(self.request, queryset, data)
         assert set(acked_incidents) == set(created_incidents)
 
 
 class TestBulkCloseQueryset(test.TestCase):
     def setUp(self):
         disconnect_signals()
-        self.user = SourceUserFactory()
-        self.source = SourceSystemFactory(user=self.user)
+        request = RequestFactory().get("/foo")
+        request.user = SourceUserFactory()
+        self.source = SourceSystemFactory(user=request.user)
+        self.request = request
 
     def tearDown(self):
         connect_signals()
@@ -97,7 +102,7 @@ class TestBulkCloseQueryset(test.TestCase):
         queryset = Incident.objects.filter(source=self.source)
         assert set(queryset.open()) == set(created_incidents)
         data = {"timestamp": now, "description": "test description"}
-        bulk_close_queryset(self.user, queryset, data)
+        bulk_close_queryset(self.request, queryset, data)
         assert set(queryset.closed()) == set(created_incidents)
 
     def test_should_return_closed_incidents(self):
@@ -105,15 +110,17 @@ class TestBulkCloseQueryset(test.TestCase):
         now = timezone.now()
         queryset = Incident.objects.filter(source=self.source)
         data = {"timestamp": now, "description": "test description"}
-        closed_incidents = bulk_close_queryset(self.user, queryset, data)
+        closed_incidents = bulk_close_queryset(self.request, queryset, data)
         assert set(closed_incidents) == set(created_incidents)
 
 
 class TestBulkReopenQueryset(test.TestCase):
     def setUp(self):
         disconnect_signals()
-        self.user = SourceUserFactory()
-        self.source = SourceSystemFactory(user=self.user)
+        request = RequestFactory().get("/foo")
+        request.user = SourceUserFactory()
+        self.source = SourceSystemFactory(user=request.user)
+        self.request = request
 
     def tearDown(self):
         connect_signals()
@@ -124,7 +131,7 @@ class TestBulkReopenQueryset(test.TestCase):
         queryset = Incident.objects.filter(source=self.source)
         assert set(queryset.closed()) == set(created_incidents)
         data = {"timestamp": now, "description": "test description"}
-        bulk_reopen_queryset(self.user, queryset, data)
+        bulk_reopen_queryset(self.request, queryset, data)
         assert set(queryset.open()) == set(created_incidents)
 
     def test_should_return_reopened_incidents(self):
@@ -132,15 +139,17 @@ class TestBulkReopenQueryset(test.TestCase):
         created_incidents = [StatefulIncidentFactory(source=self.source, end_time=now) for _ in range(5)]
         queryset = Incident.objects.filter(source=self.source)
         data = {"timestamp": now, "description": "test description"}
-        reopened_incidents = bulk_reopen_queryset(self.user, queryset, data)
+        reopened_incidents = bulk_reopen_queryset(self.request, queryset, data)
         assert set(reopened_incidents) == set(created_incidents)
 
 
 class TestBulkChangeTicketUrlQueryset(test.TestCase):
     def setUp(self):
         disconnect_signals()
-        self.user = SourceUserFactory()
-        self.source = SourceSystemFactory(user=self.user)
+        request = RequestFactory().get("/foo")
+        request.user = SourceUserFactory()
+        self.source = SourceSystemFactory(user=request.user)
+        self.request = request
 
     def tearDown(self):
         connect_signals()
@@ -152,7 +161,7 @@ class TestBulkChangeTicketUrlQueryset(test.TestCase):
         [StatefulIncidentFactory(source=self.source, ticket_url=initial_ticket_url) for _ in range(5)]
         queryset = Incident.objects.filter(source=self.source)
         data = {"timestamp": now, "ticket_url": new_ticket_url}
-        bulk_change_ticket_url_queryset(self.user, queryset, data)
+        bulk_change_ticket_url_queryset(self.request, queryset, data)
         for incident in queryset:
             assert incident.ticket_url == new_ticket_url
 
@@ -165,15 +174,17 @@ class TestBulkChangeTicketUrlQueryset(test.TestCase):
         ]
         queryset = Incident.objects.filter(source=self.source)
         data = {"timestamp": now, "ticket_url": new_ticket_url}
-        returned_incidents = bulk_change_ticket_url_queryset(self.user, queryset, data)
+        returned_incidents = bulk_change_ticket_url_queryset(self.request, queryset, data)
         assert set(returned_incidents) == set(created_incidents)
 
 
 class TestSingleAutocreateTicketUrlQueryset(test.TestCase):
     def setUp(self):
         disconnect_signals()
-        self.user = SourceUserFactory()
-        self.source = SourceSystemFactory(user=self.user)
+        request = RequestFactory().get("/foo")
+        request.user = SourceUserFactory()
+        self.source = SourceSystemFactory(user=request.user)
+        self.request = request
 
     def tearDown(self):
         connect_signals()
@@ -187,7 +198,7 @@ class TestSingleAutocreateTicketUrlQueryset(test.TestCase):
         mocked_url = "mocked-url.com"
         mock_plugin.create_ticket.return_value = mocked_url
         with patch("argus.incident.ticket.utils.get_autocreate_ticket_plugin", return_value=mock_plugin):
-            incident = single_autocreate_ticket_url_queryset(self.user, queryset, data)
+            incident = single_autocreate_ticket_url_queryset(self.request, queryset, data)
             assert incident.ticket_url == initial_url
 
     def test_should_not_update_url_if_incident_already_has_a_ticket_url(self):
@@ -198,7 +209,7 @@ class TestSingleAutocreateTicketUrlQueryset(test.TestCase):
         mocked_url = "mocked-url.com"
         mock_plugin.create_ticket.return_value = mocked_url
         with patch("argus.incident.ticket.utils.get_autocreate_ticket_plugin", return_value=mock_plugin):
-            incident = single_autocreate_ticket_url_queryset(self.user, queryset, data)
+            incident = single_autocreate_ticket_url_queryset(self.request, queryset, data)
             assert incident.ticket_url == mocked_url
 
     def test_should_raise_exception_if_queryset_contains_more_than_one_result(self):
@@ -206,10 +217,10 @@ class TestSingleAutocreateTicketUrlQueryset(test.TestCase):
         queryset = Incident.objects.filter(source=self.source)
         data = {"timestamp": timezone.now()}
         with self.assertRaises(Incident.MultipleObjectsReturned):
-            single_autocreate_ticket_url_queryset(self.user, queryset, data)
+            single_autocreate_ticket_url_queryset(self.request, queryset, data)
 
     def test_should_raise_exception_if_queryset_contains_no_results(self):
         queryset = Incident.objects.filter(source=self.source)
         data = {"timestamp": timezone.now()}
         with self.assertRaises(Incident.DoesNotExist):
-            single_autocreate_ticket_url_queryset(self.user, queryset, data)
+            single_autocreate_ticket_url_queryset(self.request, queryset, data)
