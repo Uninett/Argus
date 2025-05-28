@@ -24,9 +24,9 @@ form of a dictionary ``argus.htmx.incident.views.INCIDENT_UPDATE_ACTIONS``. This
 contains a Form and a handling function for every action type. The Form is a ``django.forms.Form``
 and the handlers are functions with the following signature::
 
-  def action_handler(actor: User, qs: IncidentQuerySet, data: dict[str, Any]) -> Sequence[Incident]:
+  def action_handler(request: HtmxHttpRequest, qs: IncidentQuerySet, data: dict[str, Any]) -> Sequence[Incident]:
       """
-      :param actor: The user that requested the action
+      :param request: The django request that triggered the action
       :param qs: The queryset that contains all selected incidents
       :param data: a dictionary containing the Form's data
       :return: a sequence containing the incidents that have succesfully had the action applied
@@ -36,8 +36,8 @@ and the handlers are functions with the following signature::
 For the backend, all you need to do is update the action handler for the ``ack`` action. Let's
 assume that you have a custom action handler like this::
 
-  def custom_ack_handler(actor, qs, data):
-      incidents = bulk_ack_queryset(actor, qs, data) # the default behaviour
+  def custom_ack_handler(request, qs, data):
+      incidents = bulk_ack_queryset(request, qs, data) # the default behaviour
       ...  # add custom behaviour
       return incidents
 
@@ -84,7 +84,7 @@ create a ``Form`` for the action and register it together with the action handle
   class CustomActionForm(django.forms.Form):
       custom_field = django.forms.CharField()
 
-  def custom_action_handler(actor, qs, data):
+  def custom_action_handler(request, qs, data):
       ...
 
   class MyApp(AppConfig):
