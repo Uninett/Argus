@@ -12,6 +12,7 @@ User’s guide to Argus
 
 -  `Configure user settings`_
     -  `Open user menu`_
+    -  `Select theme`_
 
 -  `Manage alarms <#work-with-alarms-in-argus>`_
 
@@ -152,6 +153,15 @@ To open user menu, click on the *user icon* in the header:
 
 .. image:: img/user_menu.png
   :width: 650
+
+Select theme
+~~~~~~~~~~~~
+
+1. `Open user menu`_.
+
+2. Click on the *Theme* drop-down under the *User preferences*.
+
+3. Select the preferred theme from the drop-down menu.
 
 Work with alarms in Argus
 -------------------------
