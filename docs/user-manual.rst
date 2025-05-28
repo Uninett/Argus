@@ -14,6 +14,7 @@ User’s guide to Argus
     -  `Open user menu`_
     -  `Select theme`_
     -  `Add your own theme`_
+    -  `Change date and time format`_
 
 -  `Manage alarms <#work-with-alarms-in-argus>`_
 
@@ -174,6 +175,22 @@ Talk to your system administrator if you want to add your own theme.
 You can either select from the `available daisyUI themes <https://daisyui.com/docs/themes/#list-of-themes>`_,
 or create your own. For creating your own theme, we recommend using the
 `daisyUI theme generator <https://v4.daisyui.com/theme-generator/>`_.
+
+Change date and time format
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+1. `Open user menu`_.
+
+2. Click on the *Date format* drop-down under the *User preferences*.
+
+3. Select the preferred date format from the drop-down menu.
+   The date format will be applied to all dates in Argus.
+   Available options are:
+
+    -  ``LOCALE`` - uses the date format of your browser locale.
+    -  ``ISO`` - uses the ISO date format (YYYY-MM-DD HH:MM:SS).
+    -  ``RFC`` - uses the RFC date format (Day, DD Mon YYYY HH:MM:SS GMT).
+    -  ``EPOCH`` - uses the Unix epoch date format (seconds since 1970-01-01 00:00:00 UTC).
 
 Work with alarms in Argus
 -------------------------
