@@ -30,7 +30,20 @@ def get_or_create_default_instances():
     return (argus_user, sst, ss)
 
 
-def create_fake_incident(tags=None, description=None, source=None, stateful=True, level=None, metadata={}, **kwargs):
+def create_fake_incident(
+    tags=None,
+    description=None,
+    source=None,
+    stateful=True,
+    level=None,
+    metadata={},
+    start_time=None,
+    end_time=INFINITY_REPR,
+    source_incident_id=None,
+    details_url=None,
+    ticket_url=None,
+    **kwargs,
+):
     from .serializers import IncidentSerializer
 
     if not source:
@@ -40,11 +53,13 @@ def create_fake_incident(tags=None, description=None, source=None, stateful=True
             source_system = SourceSystem.objects.get(name=source)
         except SourceSystem.DoesNotExist:
             raise ValueError(f"No source with the name '{source}' exists.")
-    end_time = INFINITY_REPR if stateful else None
+    if not stateful:
+        end_time = None
 
     MAX_ID = 2**32 - 1
     MIN_ID = 1
-    source_incident_id = randint(MIN_ID, MAX_ID)
+    if not source_incident_id:
+        source_incident_id = randint(MIN_ID, MAX_ID)
 
     if not description:
         if stateful:
@@ -63,7 +78,7 @@ def create_fake_incident(tags=None, description=None, source=None, stateful=True
     tags = tags_serializer_format
 
     data = {
-        "start_time": timezone.now(),
+        "start_time": start_time or str(timezone.now()),
         "end_time": end_time,
         "source_incident_id": source_incident_id,
         "description": description,
@@ -71,6 +86,18 @@ def create_fake_incident(tags=None, description=None, source=None, stateful=True
         "tags": tags,
         "metadata": metadata,
     }
+
+    # IncidentSerializer expects following input for end_time
+    # stateless: end_time=None
+    # stateful & open: end_time missing
+    # stateful & closed: end_time=timestamp
+    if end_time == INFINITY_REPR:
+        data.pop("end_time")
+
+    if details_url:
+        data["details_url"] = details_url
+    if ticket_url:
+        data["ticket_url"] = ticket_url
 
     serializer = IncidentSerializer(data=data)
     if serializer.is_valid():
