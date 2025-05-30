@@ -47,29 +47,6 @@ class Command(BaseCommand):
             help="List of paths to json-file containing all data needed to find the incidents that should be closed (id or source + source_incident_id) and optional duration",
         )
 
-    def parse_duration_or_raise_error(self, duration: Optional[str] = None, file_name: Optional[str] = None):
-        """
-        Parses the given string duration into timedelta format
-
-        Raises ValueError if the duration is invalid or not well formatted
-        """
-        if not duration:
-            return
-
-        try:
-            parsed_duration = parse_duration(duration)
-        except ValueError as e:
-            error = "Could not parse duration " + duration
-            if file_name:
-                error += " in file " + file_name
-            error += ": " + e
-            raise ValueError(error)
-
-        if not parsed_duration:
-            raise ValueError(f"Could not parse duration {duration}, it was not well formatted")
-
-        return parsed_duration
-
     def get_incident_data_from_arguments(self, options: dict) -> Optional[dict]:
         incident_data = {}
         incident_data["incident_id"] = options.get("id") or None
@@ -77,11 +54,16 @@ class Command(BaseCommand):
         incident_data["source_incident_id"] = options.get("source_incident_id") or None
         incident_data["closing_message"] = options.get("closing_message") or ""
 
-        try:
-            incident_data["duration"] = self.parse_duration_or_raise_error(options.get("duration"))
-        except ValueError as e:
-            self.stderr.write(self.style.ERROR(str(e)))
-            return
+        if duration := options.get("duration"):
+            try:
+                incident_data["duration"] = parse_duration(duration)
+            except ValueError:
+                incident_data["duration"] = None
+            if not incident_data.get("duration"):
+                self.stderr.write(self.style.ERROR(f"Could not parse duration {duration}."))
+                return
+        else:
+            incident_data["duration"] = None
 
         return incident_data
 
@@ -98,13 +80,16 @@ class Command(BaseCommand):
         incident_data["closing_message"] = file_content.get("closing_message", "")
         incident_data["file_path"] = file_path
 
-        try:
-            incident_data["duration"] = self.parse_duration_or_raise_error(
-                file_content.get("duration"), file_name=file_path
-            )
-        except ValueError as e:
-            self.stderr.write(self.style.ERROR(str(e)))
-            return
+        if duration := file_content.get("duration"):
+            try:
+                incident_data["duration"] = parse_duration(duration)
+            except ValueError:
+                incident_data["duration"] = None
+            if not incident_data.get("duration"):
+                self.stderr.write(self.style.ERROR(f"Could not parse duration {duration} from file {file_path}."))
+                return
+        else:
+            incident_data["duration"] = None
 
         return incident_data
 
