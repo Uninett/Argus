@@ -1,10 +1,26 @@
-from datetime import datetime, timedelta
-from urllib.parse import urljoin
 import asyncio
 import itertools
+import json
+from datetime import datetime, timedelta
+from pathlib import Path
 from typing import Any, AnyStr
+from urllib.parse import urljoin
+from typing import Optional
 
-from httpx import AsyncClient, TimeoutException, HTTPStatusError, post
+from httpx import AsyncClient, HTTPStatusError, TimeoutException, post
+from django.core.management.base import BaseCommand
+
+
+def get_json_from_file(base_command: BaseCommand, file_path: Path) -> Optional[dict]:
+    """
+    Opens a json file and returns its content as a dict
+    Catches exceptions and writes them to stderr and returns None in that case
+    """
+    try:
+        with file_path.open() as jsonfile:
+            return json.load(jsonfile)
+    except (OSError, json.JSONDecodeError, UnicodeDecodeError) as e:
+        base_command.stderr.write(base_command.style.ERROR(f"Could not find/open/read file '{file_path}': {e}"))
 
 
 class DatabaseMismatchError(Exception):
