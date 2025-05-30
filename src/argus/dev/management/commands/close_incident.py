@@ -4,6 +4,7 @@ from typing import Optional
 
 from django.core.management import CommandError
 from django.core.management.base import BaseCommand
+from django.db.models.query import QuerySet
 from django.utils import timezone
 from django.utils.dateparse import parse_duration
 
@@ -93,6 +94,18 @@ class Command(BaseCommand):
 
         return incident_data
 
+    def get_incident_qs(self, incident_data: dict) -> QuerySet:
+        """Returns an incident queryset containing one incident described in the given incident data"""
+        incident_qs = None
+        if incident_data["incident_id"]:
+            incident_qs = Incident.objects.filter(id=incident_data["incident_id"])
+        # is not None is important here since 0 is a valid value for source_incident_id
+        elif incident_data["source"] and incident_data["source_incident_id"] is not None:
+            incident_qs = Incident.objects.filter(
+                source__name=incident_data["source"], source_incident_id=incident_data["source_incident_id"]
+            )
+        return incident_qs
+
     def handle(self, *args, **options):
         if (file_paths := options.get("files", [])) and any(options.get(name, None) for name in COMMAND_ARGUMENTS):
             raise CommandError("If argument 'files' is given no other arguments are allowed")
@@ -108,14 +121,7 @@ class Command(BaseCommand):
         incident_list = list(filter(None, incident_list))
 
         for incident_data in incident_list:
-            incident_qs = None
-            if incident_data["incident_id"]:
-                incident_qs = Incident.objects.filter(id=incident_data["incident_id"])
-            # is not None is important here since 0 is a valid value for source_incident_id
-            elif incident_data["source"] and incident_data["source_incident_id"] is not None:
-                incident_qs = Incident.objects.filter(
-                    source__name=incident_data["source"], source_incident_id=incident_data["source_incident_id"]
-                )
+            incident_qs = self.get_incident_qs(incident_data)
 
             if not incident_qs or not incident_qs.exists():
                 error = "Could not find incident"
