@@ -1,4 +1,5 @@
 from datetime import timedelta
+from unittest.mock import patch
 import json
 
 from django.core.files.temp import NamedTemporaryFile
@@ -93,6 +94,17 @@ class CloseIncidentTestsArguments(TestCase):
         call_command("close_incident", source="non-existent", source_incident_id=11111145)
 
     def test_does_not_close_incident_on_badly_formatted_duration(self):
+        incident = StatefulIncidentFactory(source=self.argus_source_system)
+
+        call_command("close_incident", id=incident.id, duration="invalid-format")
+
+        incident.refresh_from_db()
+
+        self.assertTrue(incident.open)
+        self.assertFalse(incident.events.filter(type=Event.Type.CLOSE).exists())
+
+    @patch("django.utils.dateparse.parse_duration", side_effect=ValueError)
+    def test_does_not_close_incident_on_invalid_duration(self, mock_parse_duration):
         incident = StatefulIncidentFactory(source=self.argus_source_system)
 
         call_command("close_incident", id=incident.id, duration="invalid-format")
@@ -202,6 +214,21 @@ class CloseIncidentTestsFiles(TestCase):
         self.assertFalse(incident.events.filter(type=Event.Type.CLOSE).exists())
 
     def test_does_not_close_incident_on_badly_formatted_duration(self):
+        incident = StatefulIncidentFactory(source=self.argus_source_system)
+
+        incident_data = {"id": incident.id, "duration": "invalid-format"}
+
+        file = self.create_file(incident_data)
+
+        call_command("close_incident", files=[file.name])
+
+        incident.refresh_from_db()
+
+        self.assertTrue(incident.open)
+        self.assertFalse(incident.events.filter(type=Event.Type.CLOSE).exists())
+
+    @patch("django.utils.dateparse.parse_duration", side_effect=ValueError)
+    def test_does_not_close_incident_on_invalid_duration(self, mock_parse_duration):
         incident = StatefulIncidentFactory(source=self.argus_source_system)
 
         incident_data = {"id": incident.id, "duration": "invalid-format"}
