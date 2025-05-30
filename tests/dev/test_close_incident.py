@@ -12,7 +12,7 @@ from argus.incident.models import Event, Incident, get_or_create_default_instanc
 from argus.util.testing import connect_signals, disconnect_signals
 
 
-class CloseIncidentTestsArguments(TestCase):
+class CloseIncidentArgumentsTests(TestCase):
     def setUp(self):
         disconnect_signals()
         _, _, self.argus_source_system = get_or_create_default_instances()
@@ -115,7 +115,7 @@ class CloseIncidentTestsArguments(TestCase):
         self.assertFalse(incident.events.filter(type=Event.Type.CLOSE).exists())
 
 
-class CloseIncidentTestsFiles(TestCase):
+class CloseIncidentFilesTests(TestCase):
     def setUp(self):
         disconnect_signals()
         _, _, self.argus_source_system = get_or_create_default_instances()
