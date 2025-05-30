@@ -1,4 +1,3 @@
-import json
 import logging
 from pathlib import Path
 from typing import Optional
@@ -8,6 +7,7 @@ from django.core.management.base import BaseCommand
 from django.utils import timezone
 from django.utils.dateparse import parse_duration
 
+from argus.dev.utils import get_json_from_file
 from argus.incident.models import Incident
 
 COMMAND_ARGUMENTS = ["id", "source", "source_incident_id", "duration", "closing_message"]
@@ -70,6 +70,44 @@ class Command(BaseCommand):
 
         return parsed_duration
 
+    def get_incident_data_from_arguments(self, options: dict) -> Optional[dict]:
+        incident_data = {}
+        incident_data["incident_id"] = options.get("id") or None
+        incident_data["source"] = options.get("source") or None
+        incident_data["source_incident_id"] = options.get("source_incident_id") or None
+        incident_data["closing_message"] = options.get("closing_message") or ""
+
+        try:
+            incident_data["duration"] = self.parse_duration_or_raise_error(options.get("duration"))
+        except ValueError as e:
+            self.stderr.write(self.style.ERROR(str(e)))
+            return
+
+        return incident_data
+
+    def get_incident_data_from_file(self, file_path: str) -> Optional[dict]:
+        file_content = get_json_from_file(base_command=self, file_path=Path(file_path).absolute())
+
+        if not file_content:
+            return None
+
+        incident_data = {}
+        incident_data["incident_id"] = file_content.get("id")
+        incident_data["source"] = file_content.get("source")
+        incident_data["source_incident_id"] = file_content.get("source_incident_id")
+        incident_data["closing_message"] = file_content.get("closing_message", "")
+        incident_data["file_path"] = file_path
+
+        try:
+            incident_data["duration"] = self.parse_duration_or_raise_error(
+                file_content.get("duration"), file_name=file_path
+            )
+        except ValueError as e:
+            self.stderr.write(self.style.ERROR(str(e)))
+            return
+
+        return incident_data
+
     def handle(self, *args, **options):
         if (file_paths := options.get("files", [])) and any(options.get(name, None) for name in COMMAND_ARGUMENTS):
             raise CommandError("If argument 'files' is given no other arguments are allowed")
@@ -77,39 +115,12 @@ class Command(BaseCommand):
         incident_list = []
         if file_paths:
             for file_path in file_paths:
-                try:
-                    with Path(file_path).absolute().open() as jsonfile:
-                        content = json.load(jsonfile)
-                        incident_data = {}
-                        incident_data["incident_id"] = content.get("id")
-                        incident_data["source"] = content.get("source")
-                        incident_data["source_incident_id"] = content.get("source_incident_id")
-                        try:
-                            incident_data["duration"] = self.parse_duration_or_raise_error(
-                                content.get("duration"), file_name=file_path
-                            )
-                        except ValueError as e:
-                            self.stderr.write(self.style.ERROR(str(e)))
-                            continue
-                        incident_data["closing_message"] = content.get("closing_message", "")
-                        incident_data["file_path"] = file_path
-
-                        incident_list.append(incident_data)
-                except Exception:
-                    self.stderr.write(self.style.ERROR(f"Could not open file {file_path}"))
+                incident_list.append(self.get_incident_data_from_file(file_path))
         else:
-            incident_data = {}
-            incident_data["incident_id"] = options.get("id") or None
-            incident_data["source"] = options.get("source") or None
-            incident_data["source_incident_id"] = options.get("source_incident_id") or None
-            try:
-                incident_data["duration"] = self.parse_duration_or_raise_error(options.get("duration"))
-            except ValueError as e:
-                self.stderr.write(self.style.ERROR(str(e)))
-                return
+            incident_list.append(self.get_incident_data_from_arguments(options))
 
-            incident_data["closing_message"] = options.get("closing_message") or ""
-            incident_list.append(incident_data)
+        # Filter out None elements from list (e.g. file could not be found)
+        incident_list = list(filter(None, incident_list))
 
         for incident_data in incident_list:
             incident_qs = None
