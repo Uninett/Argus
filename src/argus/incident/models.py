@@ -58,7 +58,7 @@ def create_fake_incident(
 
     MAX_ID = 2**32 - 1
     MIN_ID = 1
-    if not source_incident_id:
+    if source_incident_id is None:
         source_incident_id = randint(MIN_ID, MAX_ID)
 
     if not description:
@@ -101,6 +101,9 @@ def create_fake_incident(
 
     serializer = IncidentSerializer(data=data)
     if serializer.is_valid():
+        incident_exists = Incident.objects.filter(source=source_system, source_incident_id=source_incident_id).exists()
+        if incident_exists:
+            raise ValidationError("Source incident ids need to be unique for each source.")
         incident = serializer.save(user=source_system.user, source=source_system)
     else:
         raise ValidationError(serializer.errors)
