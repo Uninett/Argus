@@ -6,6 +6,7 @@ from django.core.management import CommandError, call_command
 from django.test import TestCase
 from django.utils.dateparse import parse_datetime
 
+from argus.incident.factories import StatefulIncidentFactory
 from argus.incident.models import Incident, SourceSystem, Tag, get_or_create_default_instances
 from argus.util.testing import connect_signals, disconnect_signals
 
@@ -440,6 +441,31 @@ class CreateFakeIncidentWithFilesTests(TestCase):
 
         self.assertFalse(out)
         self.assertIn("Enter a valid URL.", err)
+
+        self.assertFalse(
+            Incident.objects.exclude(id__in=previous_incidents_pks)
+            .filter(source_incident_id=incident_data["source_incident_id"])
+            .exists()
+        )
+
+    def test_does_not_create_incident_for_same_source_and_source_incident_id_as_existing(self):
+        incident = StatefulIncidentFactory()
+        previous_incidents_pks = [incident.id for incident in Incident.objects.all()]
+
+        incident_data = {
+            "source_incident_id": incident.source_incident_id,
+            "source": incident.source.name,
+            "source_type": incident.source.type.name,
+        }
+
+        data = json.dumps(incident_data).encode("utf-8")
+        file = NamedTemporaryFile(delete=True)
+        file.write(data)
+        file.flush()
+        out, err = self.call_command(f"--files={file.name}")
+
+        self.assertFalse(out)
+        self.assertIn("Source incident ids need to be unique for each source.", err)
 
         self.assertFalse(
             Incident.objects.exclude(id__in=previous_incidents_pks)

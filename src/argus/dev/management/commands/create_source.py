@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 
-from argus.incident.factories import SourceSystemFactory, SourceSystemTypeFactory, SourceUserFactory
+from argus.incident.factories import SourceSystemFactory, SourceSystemTypeFactory
 
 
 class Command(BaseCommand):
@@ -16,5 +16,4 @@ class Command(BaseCommand):
         source = options["source"]
         source_type = options.get("source_type") or "argus"
         sst = SourceSystemTypeFactory(name=source_type.lower())
-        user = SourceUserFactory(username=source)
-        SourceSystemFactory(name=source, type=sst, user=user)
+        SourceSystemFactory(name=source, type=sst)
