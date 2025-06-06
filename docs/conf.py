@@ -190,6 +190,6 @@ todo_include_todos = True
 intersphinx_mapping = {
     "django": (
         "http://docs.djangoproject.com/en/5.2/",
-        "http://docs.djangoproject.com/en/5.2/_objects/",
+        "https://docs.djangoproject.com/en/5.2/objects.inv",
     ),
 }

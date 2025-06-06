@@ -7,7 +7,7 @@ Authentication
 Username/password
 =================
 
-Argus supports API login with username and password, see :ref:`api-auth-endpoints`.
+Argus supports API login with username and password, see :ref:`api-auth-endpoints-v2`.
 This will yield a bearer token.
 
 Also supported is logging in via browser to the admin, at ``/admin/``. This
