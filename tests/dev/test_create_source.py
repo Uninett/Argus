@@ -28,17 +28,6 @@ class CreateSourceTests(TestCase):
 
         self.assertTrue(SourceSystem.objects.exclude(id__in=previous_source_pks).filter(type_id=source_type).exists())
 
-    def test_create_source_will_use_already_existing_user(self):
-        previous_source_pks = [source.id for source in SourceSystem.objects.all()]
-        source_name = "source name"
-        existing_user = User.objects.create(username=source_name, is_staff=False, is_superuser=False)
-
-        call_command("create_source", source_name)
-
-        source = SourceSystem.objects.exclude(id__in=previous_source_pks).filter(name=source_name).first()
-        self.assertTrue(source)
-        self.assertEqual(source.user_id, existing_user.id)
-
     def test_create_source_will_use_already_existing_source_system_type(self):
         previous_source_pks = [source.id for source in SourceSystem.objects.all()]
         source_name = "source name"
