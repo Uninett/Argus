@@ -15,6 +15,6 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         source = options["source"]
         source_type = options.get("source_type") or "argus"
-        sst = SourceSystemTypeFactory(name=source_type)
+        sst = SourceSystemTypeFactory(name=source_type.lower())
         user = SourceUserFactory(username=source)
         SourceSystemFactory(name=source, type=sst, user=user)
