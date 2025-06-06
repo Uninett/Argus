@@ -56,7 +56,7 @@ class CreateSourceTests(TestCase):
         # So we need to test for using the same type with different cases
         previous_source_pks = [source.id for source in SourceSystem.objects.all()]
         source_name = "source name"
-        capitalized_source_type_name = "source type name"
+        capitalized_source_type_name = "Source Type Name"
         lowercase_source_type_name = capitalized_source_type_name.lower()
         existing_source_type = SourceSystemType.objects.create(name=lowercase_source_type_name)
 
