@@ -393,6 +393,12 @@ Incident endpoints
         the incident if it has been closed (either manually or by a
         source system).
 
+      -  ``RES`` - Incident restart
+
+        Only source systems can post an event of this type, which reopens
+        the incident if it has been closed (either manually or by a
+        source system).
+
       -  ``ACK`` - Acknowledge
 
         Use the ``/api/v2/incidents/<int:pk>/acks/`` endpoint.
