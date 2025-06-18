@@ -489,7 +489,7 @@ class EventViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, mixins.Retrie
         if event_type in {Event.Type.INCIDENT_END, Event.Type.CLOSE}:
             incident.end_time = timestamp
             incident.save()
-        elif event_type in {Event.Type.REOPEN, Event.Type.INCIDENT_RESTART} :
+        elif event_type in {Event.Type.REOPEN, Event.Type.INCIDENT_RESTART}:
             incident.end_time = INFINITY_REPR
             incident.save()
 
