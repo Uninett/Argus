@@ -247,6 +247,7 @@ class Event(models.Model):
         INCIDENT_START = "STA", "Incident start"
         INCIDENT_END = "END", "Incident end"
         INCIDENT_CHANGE = "CHI", "Incident change"
+        INCIDENT_RESTART = "RES", "Incident restart"
         CLOSE = "CLO", "Close"
         REOPEN = "REO", "Reopen"
         ACKNOWLEDGE = "ACK", "Acknowledge"
@@ -256,6 +257,7 @@ class Event(models.Model):
     ALLOWED_TYPES_FOR_SOURCE_SYSTEMS = {
         Type.INCIDENT_START,
         Type.INCIDENT_END,
+        Type.INCIDENT_RESTART,
         Type.OTHER,
         Type.INCIDENT_CHANGE,
         Type.STATELESS,
