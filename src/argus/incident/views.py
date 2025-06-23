@@ -463,18 +463,18 @@ class EventViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, mixins.Retrie
                 self._raise_type_validation_error(f"The incident already has a related event of type '{event_type}'.")
 
         if incident.stateful:
-            if event_type in {Event.Type.INCIDENT_START, Event.Type.INCIDENT_END}:
+            if event_type in {Event.Type.INCIDENT_START}:
                 validate_incident_has_no_relation_to_event_type()
             if event_type in {Event.Type.INCIDENT_END, Event.Type.CLOSE} and not incident.open:
                 self._raise_type_validation_error("The incident is already closed.")
-            elif event_type == Event.Type.REOPEN and incident.open:
+            elif event_type in {Event.Type.REOPEN, Event.Type.INCIDENT_RESTART} and incident.open:
                 self._raise_type_validation_error("The incident is already open.")
         else:
             if event_type == Event.Type.STATELESS:
                 validate_incident_has_no_relation_to_event_type()
             elif event_type == Event.Type.INCIDENT_START:
                 self._raise_type_validation_error("Stateless incident cannot have an INCIDENT_START event.")
-            elif event_type in {Event.Type.INCIDENT_END, Event.Type.CLOSE, Event.Type.REOPEN}:
+            elif event_type in {Event.Type.INCIDENT_END, Event.Type.CLOSE, Event.Type.REOPEN, Event.Type.INCIDENT_RESTART}:
                 self._raise_type_validation_error("Cannot change the state of a stateless incident.")
 
         if event_type == Event.Type.ACKNOWLEDGE:
