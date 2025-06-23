@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Event',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.BigAutoField(primary_key=True, serialize=False, verbose_name='ID')),
                 ('timestamp', models.DateTimeField()),
                 ('received', models.DateTimeField(default=django.utils.timezone.now)),
                 ('type', models.TextField(choices=[('STA', 'Incident start'), ('END', 'Incident end'), ('CHI', 'Incident change'), ('CLO', 'Close'), ('REO', 'Reopen'), ('ACK', 'Acknowledge'), ('OTH', 'Other'), ('LES', 'Stateless')])),
@@ -35,7 +35,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Incident',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.BigAutoField(primary_key=True, serialize=False, verbose_name='ID')),
                 ('start_time', models.DateTimeField(help_text='The time the incident was created.')),
                 ('end_time', argus.incident.fields.DateTimeInfinityField(blank=True, help_text="The time the incident was resolved or closed. If not set, the incident is stateless; if 'infinity' is checked, the incident is stateful, but has not yet been resolved or closed - i.e. open.", null=True)),
                 ('source_incident_id', models.TextField(blank=True, default='', verbose_name='source incident ID')),
@@ -79,7 +79,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Tag',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.BigAutoField(primary_key=True, serialize=False, verbose_name='ID')),
                 ('key', models.TextField(validators=[argus.incident.validators.validate_key])),
                 ('value', models.TextField()),
             ],
@@ -100,7 +100,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='IncidentTagRelation',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.BigAutoField(primary_key=True, serialize=False, verbose_name='ID')),
                 ('added_time', models.DateTimeField(auto_now_add=True)),
                 ('added_by', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='tags_added', to=settings.AUTH_USER_MODEL)),
                 ('incident', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='incident_tag_relations', to='argus_incident.incident')),
