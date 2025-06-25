@@ -105,6 +105,39 @@ class EventAPITests(APITestCase, IncidentBasedAPITestCaseHelper):
             reopen_event_dict, set_end_time, self.user1_rest_client
         )
 
+    def test_posting_end_and_restart_events_properly_changes_stateful_incidents(self):
+        self.assertTrue(self.stateful_incident1.stateful)
+        self.assertTrue(self.stateful_incident1.open)
+
+        # Test ending incident
+        end_event_dict = self._create_event_dict(Event.Type.INCIDENT_END)
+        event_timestamp = end_event_dict["timestamp"]
+        response = self.source1_rest_client.post(self.events_url(self.stateful_incident1), end_event_dict)
+        self.assertEqual(parse_datetime(response.data["timestamp"]), event_timestamp)
+        self.stateful_incident1.refresh_from_db()
+        self.assertFalse(self.stateful_incident1.open)
+        set_end_time = self.stateful_incident1.end_time
+        self.assertEqual(set_end_time, event_timestamp)
+
+        # Test restarting incident
+        reopen_event_dict = self._create_event_dict(Event.Type.INCIDENT_RESTART)
+        response = self.source1_rest_client.post(self.events_url(self.stateful_incident1), reopen_event_dict)
+        self.assertEqual(parse_datetime(response.data["timestamp"]), reopen_event_dict["timestamp"])
+        self.stateful_incident1.refresh_from_db()
+        self.assertTrue(self.stateful_incident1.open)
+        set_end_time = self.stateful_incident1.end_time
+        self.assertEqual(datetime_utils.make_naive(set_end_time), datetime.max)
+
+        # Test ending again
+        end_event_dict = self._create_event_dict(Event.Type.INCIDENT_END)
+        event_timestamp = end_event_dict["timestamp"]
+        response = self.source1_rest_client.post(self.events_url(self.stateful_incident1), end_event_dict)
+        self.assertEqual(parse_datetime(response.data["timestamp"]), event_timestamp)
+        self.stateful_incident1.refresh_from_db()
+        self.assertFalse(self.stateful_incident1.open)
+        set_end_time = self.stateful_incident1.end_time
+        self.assertEqual(set_end_time, event_timestamp)
+
     def test_posting_close_and_reopen_events_does_not_change_stateless_incidents(self):
         def assert_incident_stateless():
             self.stateless_incident1.refresh_from_db()
