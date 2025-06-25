@@ -8,6 +8,17 @@ This project uses [*towncrier*](https://towncrier.readthedocs.io/) and the chang
 
 <!-- towncrier release notes start -->
 
+## [2.0.1] - 2025-06-25
+
+This release fixes a problem in the migrations shipped with 2.0.0. Only affects
+development.
+
+### Changed
+
+- Fix fields incorrectly marked as autocreated in squashed migration
+  ([#1506](https://github.com/Uninett/Argus/issues/1506))
+
+
 ## [2.0.0] - 2025-05-26
 
 This release completely removes version 1 of the API. If you have not done so,
