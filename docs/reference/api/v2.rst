@@ -379,8 +379,7 @@ Incident endpoints
       -  ``END`` - Incident end
 
         Only source systems can post an event of this type, which is
-        the standard way of closing an indicent. An incident cannot
-        have more than one event of this type.
+        the standard way of closing an incident.
 
       -  ``CLO`` - Close
 
