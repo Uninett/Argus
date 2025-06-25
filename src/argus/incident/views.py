@@ -474,7 +474,12 @@ class EventViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, mixins.Retrie
                 validate_incident_has_no_relation_to_event_type()
             elif event_type == Event.Type.INCIDENT_START:
                 self._raise_type_validation_error("Stateless incident cannot have an INCIDENT_START event.")
-            elif event_type in {Event.Type.INCIDENT_END, Event.Type.CLOSE, Event.Type.REOPEN, Event.Type.INCIDENT_RESTART}:
+            elif event_type in {
+                Event.Type.INCIDENT_END,
+                Event.Type.CLOSE,
+                Event.Type.REOPEN,
+                Event.Type.INCIDENT_RESTART,
+            }:
                 self._raise_type_validation_error("Cannot change the state of a stateless incident.")
 
         if event_type == Event.Type.ACKNOWLEDGE:
