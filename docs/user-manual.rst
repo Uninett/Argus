@@ -503,7 +503,7 @@ Re-open closed (resolved) incidents
    in the *Update incidents* toolbar that appears above the *Incidents table*.
 
 2. Press ``Reopen now``. Note that you can provide a re-opening comment if
-   needed.
+   needed that will be applied to all selected incidents.
 
 Close (resolve) incidents
 ^^^^^^^^^^^^^^^^^^^^^^^^^
