@@ -853,7 +853,7 @@ Add new destination in settings
 
 3. Select destination’s media type via the *Media* drop-down.
 
-4. Type in a title in the *Name* input field (optional)
+4. Type in a title in the *Name* input field (optional).
 
 5. Type in a destination value in the *Settings* input field (required).
 
