@@ -513,7 +513,7 @@ Close (resolve) incidents
    in the *Update incidents* toolbar that appears above the *Incidents table*.
 
 2. Press ``Close now``. Note that you can provide a closing comment if
-   needed.
+   needed that will be applied to all selected incidents.
 
 Add acknowledgement to incidents
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
