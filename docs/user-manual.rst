@@ -211,7 +211,7 @@ Change how many rows are shown per incidents table page
 
 2. Click on the *Per page* drop-down.
 
-3. Select whether you want 10/25/50/100 incidents per page displayed.
+3. Select how many incidents per page you want displayed.
 
 Navigate incidents table
 ^^^^^^^^^^^^^^^^^^^^^^^^
