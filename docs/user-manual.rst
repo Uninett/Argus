@@ -238,7 +238,7 @@ Change how often incidents table gets refreshed
 
 2. Click on the *Updating every* drop-down.
 
-3. Select whether you want incidents to be updated every 5/30/60 seconds, or Never.
+3. Select how often you want the incidents to be updated.
 
 Decide which incidents are shown in the table
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
