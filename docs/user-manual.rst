@@ -775,7 +775,7 @@ Add new timeslot
 1. `Go to your timeslots <#access-your-timeslots>`_.
 
 2. Go to the *Create New Timeslot* box. It is visible by default at the top of the page
-    and is highlighted with a darker background than existing timeslots.
+    and is highlighted with a darker background than the existing timeslots.
 
 3. Type in a (meaningful) timeslot name.
 
