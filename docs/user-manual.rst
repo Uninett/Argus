@@ -309,8 +309,9 @@ Filter by tags
 
    2. Press *Enter*. The newly added tag will appear in the input field.
 
-   3. Repeat the process if you want to filter by several tags, and remember to separate
-      tags with a comma. For example, ``tag_name1=tag_value1, tag_name2=tag_value2``.
+   3. Repeat the process if you want to filter by several tags, and remember to
+      separate tags with a comma. For example,
+      ``tag_name1=tag_value1, tag_name2=tag_value2``.
 
 -  If you want the table to display incidents with **any tags**, leave
    the *Tags* field empty.
