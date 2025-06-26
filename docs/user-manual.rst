@@ -523,8 +523,9 @@ Add acknowledgement to incidents
    in the *Update incidents* toolbar that appears above the *Incidents table*.
 
 2. Provide an acknowledgement comment in the *Message* input
-   field. Note that you can optionally provide a date when this
-   acknowledgement is no longer relevant.
+   field that will be applied to all selected incidents. Note that you can
+   optionally provide a date when these acknowledgements are no longer
+   relevant.
 
 3. Press ``Submit``.
 
