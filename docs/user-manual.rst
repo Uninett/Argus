@@ -173,7 +173,8 @@ There are three themes available out of the box in Argus: *Argus*, *Dark* and
 *Light*. You can add your own theme by `overriding the default DAISYUI_THEMES
 <https://argus-server.readthedocs.io/en/latest/customization/htmx-frontend.html#themes-and-styling>`_. \
 Talk to your system administrator if you want to add your own theme.
-You can either select from the `available daisyUI themes <https://daisyui.com/docs/themes/#list-of-themes>`_,
+You can either select from the `available daisyUI themes
+<https://daisyui.com/docs/themes/#list-of-themes>`_,
 or create your own. For creating your own theme, we recommend using the
 `daisyUI theme generator <https://v4.daisyui.com/theme-generator/>`_.
 
