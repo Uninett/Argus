@@ -219,8 +219,8 @@ Navigate incidents table
 1. Scroll down to the bottom of the *Incidents* table.
    In the right corner, there is a set of table navigation buttons.
 
-2. Click on the button with a *single right arrow icon* if you want to go to the next table
-   page.
+2. Click on the button with the *single right arrow icon* if you want to go to
+   the next table page.
 
 3. Click on the button with the *single left arrow icon* if you want to go to the
    previous table page.
