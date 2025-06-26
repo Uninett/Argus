@@ -228,8 +228,8 @@ Navigate incidents table
 4. Click on the button with a *double right arrow icon* if you want to go to the last table
    page.
 
-5. Click on the button with a *double left arrow icon* if you want to go to the first table
-   page.
+5. Click on the button with the *double left arrow icon* if you want to go to the
+   first table page.
 
 Change how often incidents table gets refreshed
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
