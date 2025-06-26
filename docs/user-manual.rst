@@ -164,7 +164,7 @@ different sources (monitoring systems).
   :width: 650
 
 You can see all of your monitoring systems that are connected to Argus
-in the *Sources* selector. Click on the *Sources* in the *Filter incidents*
+in the *Sources* selector. Click on *Sources* in the *Filter incidents*
 tab and all available monitoring systems will appear in the drop-down menu.
 
 What is an incident in Argus
