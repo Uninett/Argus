@@ -266,7 +266,7 @@ Filter by open/close status
    table, select ``Closed`` in the *Open State* slider.
 
 -  If you want both *open* and *closed* (resolved) incidents to be
-   displayed in the table, press ``Both`` in the *Open State* slider.
+   displayed in the table, select ``Both`` in the *Open State* slider.
 
 Filter by acknowledgement status
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
