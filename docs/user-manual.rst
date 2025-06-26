@@ -222,8 +222,8 @@ Navigate incidents table
 2. Click on the button with a *single right arrow icon* if you want to go to the next table
    page.
 
-3. Click on the button with a *single left arrow icon* if you want to go to the previous
-   table page.
+3. Click on the button with the *single left arrow icon* if you want to go to the
+   previous table page.
 
 4. Click on the button with a *double right arrow icon* if you want to go to the last table
    page.
