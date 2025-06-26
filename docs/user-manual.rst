@@ -375,7 +375,8 @@ Modify existing filter
 
 2. Click on the *Update filter* button within the *Filter* selector.
 
-3. In the drop-down menu that appears, click on the filter that you want to update.
+3. In the drop-down menu that appears, click on the filter that you want to
+   update.
 
 4. Press ``Yes`` in the confirmation dialog that appears.
 
