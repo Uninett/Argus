@@ -184,8 +184,9 @@ Choose what columns are shown in the incidents table
 It is possible to `add or remove columns
 <https://argus-server.readthedocs.io/en/latest/customization/htmx-frontend.html#incident-table-column-customization>`_
 in the *Incidents* table. Currently it is possible to
-customize columns only globally for all users of the same installation of Argus. Talk to your system
-administrator if you want to contribute to the customization of the *Incidents* table columns.
+customize columns only globally for all users of the same installation of
+Argus. Talk to your system administrator if you want to contribute to the
+customization of the *Incidents* table columns.
 
 Change date and time format
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
