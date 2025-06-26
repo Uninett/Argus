@@ -623,7 +623,7 @@ Add new notification profile
    - Select what alarms you want to receive notifications about in the
      *Filters* drop-down. If the drop-down menu is empty, `create a
      filter <#save-current-filter>`_ first. Note that if no filter is
-     selected no notification will be sent. You can select multiple
+     selected no notifications will be sent. You can select multiple
      filters per notification profile.
 
    - Select what destination(s) you want to receive notifications to in
