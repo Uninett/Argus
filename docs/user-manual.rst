@@ -162,7 +162,7 @@ Select theme
 
 1. `Open user menu`_.
 
-2. Click on the *Theme* drop-down under the *User preferences*.
+2. Click on the *Theme* drop-down in the *User preferences* section.
 
 3. Select the preferred theme from the drop-down menu.
 
