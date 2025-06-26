@@ -201,7 +201,8 @@ Change date and time format
     -  ``LOCALE`` - uses the date format of your browser locale.
     -  ``ISO`` - uses the ISO date format (YYYY-MM-DD HH:MM:SS).
     -  ``RFC`` - uses the RFC date format (Day, DD Mon YYYY HH:MM:SS GMT).
-    -  ``EPOCH`` - uses the Unix epoch date format (seconds since 1970-01-01 00:00:00 UTC).
+    -  ``EPOCH`` - uses the Unix epoch date format (seconds since
+       1970-01-01 00:00:00 UTC).
 
 Work with alarms in Argus
 -------------------------
