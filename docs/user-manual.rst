@@ -325,7 +325,8 @@ displayed in the table. If you select *max severity level* to be **2**,
 only incidents with severity **1** and **2** will be displayed in the
 table.
 
-To change *max severity level*: select the preferred *max severity* option in the *Level* slider.
+To change *max severity level*: select the preferred *max severity* option in
+the *Level* slider.
 
 Filter out older incidents
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
