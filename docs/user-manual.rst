@@ -192,7 +192,7 @@ Change date and time format
 
 1. `Open user menu`_.
 
-2. Click on the *Date format* drop-down under the *User preferences*.
+2. Click on the *Date format* drop-down in the *User preferences* section.
 
 3. Select the preferred date format from the drop-down menu.
    The date format will be applied to all dates in Argus.
