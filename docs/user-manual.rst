@@ -137,7 +137,7 @@ Login using OAuth 2.0 (Feide in the example below)
 
 1. Under "Login with" press ``dataporten_feide``.
 
-2. Select account you want to log in with.
+2. Select the account you want to log in with.
 
 3. Fill out *username* and *password* and press ``Log in``.
 
