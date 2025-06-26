@@ -762,8 +762,9 @@ Delete recurrence
 
 1. `Go to your timeslots <#access-your-timeslots>`_.
 
-2. Check the *Delete* checkbox in the top right corner inside one of the existing
-   recurrences either in the *Create New Timeslot* box, or inside one of your existing timeslots.
+2. Check the *Delete* checkbox in the top right corner inside one of the
+   existing recurrences either in the *Create New Timeslot* box, or inside one
+   of your existing timeslots.
 
 3. Press ``Create`` if it is a new timeslot, or ``Save`` if it is an
    existing timeslot.
