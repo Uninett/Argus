@@ -849,7 +849,7 @@ Add new destination in settings
    details <#access-your-destinations-in-settings>`_.
 
 2. Go to the *Create destination* box. It is visible by default at the top of the page
-   and is highlighted with a darker background than existing destinations.
+   and is highlighted with a darker background than the existing destinations.
 
 3. Select destination’s media type via the *Media* drop-down.
 
