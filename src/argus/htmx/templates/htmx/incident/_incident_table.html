@@ -10,7 +10,7 @@
            hx-include=".incident-list-param"
          {% endif %}
        {% endwith %}
-  class="border border-separate border-spacing-1 border-primary table table-xs">
+  class="border border-separate border-spacing-1 border-primary table {% if preferences.argus_htmx.incidents_table_layout_compact %}table-xs{% endif %}">
   {# djlint:on #}
   <thead>
     <tr class="border-b border-primary">
