@@ -498,7 +498,7 @@ Update several incidents at a time
 Re-open closed (resolved) incidents
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. Select several incidents in the *Incidents table* via checkbox
+1. Select several incidents in the *Incidents table* via checkboxes
    at the start of the row and press ``Reopen``
    in the *Update incidents* toolbar that appears above the *Incidents table*.
 
@@ -508,7 +508,7 @@ Re-open closed (resolved) incidents
 Close (resolve) incidents
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. Select several incidents in the *Incidents table* via checkbox
+1. Select several incidents in the *Incidents table* via checkboxes
    at the start of the row and press ``Close``
    in the *Update incidents* toolbar that appears above the *Incidents table*.
 
@@ -518,7 +518,7 @@ Close (resolve) incidents
 Add acknowledgement to incidents
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. Select several incidents in the *Incidents table* via checkbox
+1. Select several incidents in the *Incidents table* via checkboxes
    at the start of the row and press ``Acknowledge``
    in the *Update incidents* toolbar that appears above the *Incidents table*.
 
@@ -532,7 +532,7 @@ Add acknowledgement to incidents
 Add ticket URL to incidents
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. Select several incidents in the *Incidents table* via checkbox
+1. Select several incidents in the *Incidents table* via checkboxes
    at the start of the row and press ``Change ticket``
    in the *Update incidents* toolbar that appears above the *Incidents table*.
 
@@ -549,7 +549,7 @@ incidents <#add-ticket-url-to-incidents>`_.
 Remove ticket URL from incidents
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. Select several incidents in the *Incidents table* via checkbox
+1. Select several incidents in the *Incidents table* via checkboxes
    at the start of the row and press ``Change ticket``
    in the *Update incidents* toolbar that appears above the *Incidents table*.
 
