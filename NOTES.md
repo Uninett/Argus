@@ -3,6 +3,22 @@
 This file documents changes to Argus that are relevant for operations,
 customizers and end-users.
 
+## [2.1.0] - 2025-06-30
+
+One new user preference.
+
+One new and one changed management command, both for better manipulation of
+incidents via the CLI.
+
+### Added
+
+- Add a preference to change the incidents table layout to compact or standard
+  ([#1399](https://github.com/Uninett/Argus/issues/1399))
+- Add CLI command to close incidents
+  ([#1450](https://github.com/Uninett/Argus/issues/1450))
+- Add option to `create_fake_incident` to generate incidents from json files
+  ([#1451](https://github.com/Uninett/Argus/issues/1451))
+
 ## [2.0.0] - 2025-05-26
 
 This release completely removes version 1 of the API. If you have not done so,

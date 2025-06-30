@@ -8,6 +8,32 @@ This project uses [*towncrier*](https://towncrier.readthedocs.io/) and the chang
 
 <!-- towncrier release notes start -->
 
+## [2.1.0] - 2025-06-30
+
+### Added
+
+- Add a preference to change the incidents table layout to compact or standard
+  ([#1399](https://github.com/Uninett/Argus/issues/1399))
+- Add CLI command to close incidents
+  ([#1450](https://github.com/Uninett/Argus/issues/1450))
+- Add option to `create_fake_incident` to generate incidents from json files
+  ([#1451](https://github.com/Uninett/Argus/issues/1451))
+
+### Changed
+
+- Use DRF's DEFAULT_PERMISSION_CLASSES setting for API endpoints' permission
+  checking ([#1476](https://github.com/Uninett/Argus/issues/1476))
+- Request is now passed to incident update actions to allow for sending
+  messages ([#1497](https://github.com/Uninett/Argus/issues/1497))
+
+### Fixed
+
+- Ensure SourceSystemTypeFactory is called with lowercase name
+  ([#1499](https://github.com/Uninett/Argus/issues/1499))
+- Avoid trying to create incident with same source and source incident id
+  ([#1500](https://github.com/Uninett/Argus/issues/1500))
+
+
 ## [2.0.1] - 2025-06-25
 
 This release fixes a problem in the migrations shipped with 2.0.0. Only affects
