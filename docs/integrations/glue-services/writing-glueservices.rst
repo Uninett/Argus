@@ -84,8 +84,8 @@ Creating a new incident
 -----------------------
 
 Creating a new incident in Argus is done by **POST**-ing a JSON payload to the
-REST API endpoint ``/api/v2/incidents/`` (See the :ref:`api-incident-endpoints`
-documentation).
+REST API endpoint ``/api/v2/incidents/`` (See the
+:ref:`api-incident-endpoints-v2` documentation).
 
 At minimum, you need to provide these incident attributes:
 
@@ -245,7 +245,7 @@ An incident with the id ``27`` can be closed by **POST**-ing a new event to
 
 You should only ever use the ``END`` event type to indicate that the incident
 was resolved from the source system.  The available types of events are
-documented in :ref:`api-incident-endpoints`.
+documented in :ref:`api-incident-endpoints-v2`.
 
 
 On stateful incidents vs. stateless incidents

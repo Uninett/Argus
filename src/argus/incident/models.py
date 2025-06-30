@@ -30,46 +30,81 @@ def get_or_create_default_instances():
     return (argus_user, sst, ss)
 
 
-def create_fake_incident(tags=None, description=None, source=None, stateful=True, level=None, metadata=None):
-    argus_user, _, source_system = get_or_create_default_instances()
-    if source:
+def create_fake_incident(
+    tags=None,
+    description=None,
+    source=None,
+    stateful=True,
+    level=None,
+    metadata={},
+    start_time=None,
+    end_time=INFINITY_REPR,
+    source_incident_id=None,
+    details_url=None,
+    ticket_url=None,
+    **kwargs,
+):
+    from .serializers import IncidentSerializer
+
+    if not source:
+        _, _, source_system = get_or_create_default_instances()
+    else:
         try:
             source_system = SourceSystem.objects.get(name=source)
         except SourceSystem.DoesNotExist:
             raise ValueError(f"No source with the name '{source}' exists.")
-    end_time = INFINITY_REPR if stateful else None
+    if not stateful:
+        end_time = None
 
     MAX_ID = 2**32 - 1
     MIN_ID = 1
-    source_incident_id = randint(MIN_ID, MAX_ID)
+    if source_incident_id is None:
+        source_incident_id = randint(MIN_ID, MAX_ID)
 
     if not description:
         if stateful:
             description = f'Incident #{source_incident_id} created via "create_fake_incident"'
         else:
             description = f'Incident (stateless) #{source_incident_id} created via "create_fake_incident"'
-    incident = Incident.objects.create(
-        start_time=timezone.now(),
-        end_time=end_time,
-        source_incident_id=source_incident_id,
-        source=source_system,
-        description=description,
-        level=level or choice(Level.values),
-        metadata=metadata or {},
-    )
 
-    taglist = [("location", "argus"), ("object", f"{incident.id}"), ("problem_type", "test")]
-    if tags:
-        try:
-            tags = [Tag.split(tag) for tag in tags]
-        except (ValueError, ValidationError) as e:
-            raise ValidationError(str(e))
-        taglist.extend(tags)
-    for k, v in taglist:
-        tag, _ = Tag.objects.get_or_create(key=k, value=v)
-        IncidentTagRelation.objects.create(tag=tag, incident=incident, added_by=argus_user)
-        LOG.debug('Incident: Added tag "%s" on incident %i', str(tag), incident.id)
-    incident.create_first_event()
+    if not tags:
+        tags = [("location=argus"), (f"object={source_incident_id}"), ("problem_type=test")]
+
+    # IncidentSerializer expects following form for tags
+    # [{"tag":"a=b"}, ...]
+    tags_serializer_format = []
+    for tag in tags:
+        tags_serializer_format.append({"tag": tag})
+    tags = tags_serializer_format
+
+    data = {
+        "start_time": start_time or str(timezone.now()),
+        "end_time": end_time,
+        "source_incident_id": source_incident_id,
+        "description": description,
+        "level": level or choice(Level.values),
+        "tags": tags,
+        "metadata": metadata,
+    }
+
+    # IncidentSerializer expects following input for end_time
+    # stateless: end_time=None
+    # stateful & open: end_time missing
+    # stateful & closed: end_time=timestamp
+    if end_time == INFINITY_REPR:
+        data.pop("end_time")
+
+    if details_url:
+        data["details_url"] = details_url
+    if ticket_url:
+        data["ticket_url"] = ticket_url
+
+    serializer = IncidentSerializer(data=data)
+    if serializer.is_valid():
+        incident = serializer.save(user=source_system.user, source=source_system)
+    else:
+        raise ValidationError(serializer.errors)
+
     return incident
 
 
@@ -151,7 +186,7 @@ class TagQuerySet(models.QuerySet):
 class Tag(models.Model):
     TAG_DELIMITER = "="
 
-    id = models.BigAutoField(primary_key=True)
+    id = models.BigAutoField(primary_key=True, verbose_name="ID")
     key = models.TextField(validators=[validate_key])
     value = models.TextField()
 
@@ -189,7 +224,7 @@ class Tag(models.Model):
 
 
 class IncidentTagRelation(models.Model):
-    id = models.BigAutoField(primary_key=True)
+    id = models.BigAutoField(primary_key=True, verbose_name="ID")
     tag = models.ForeignKey(to=Tag, on_delete=models.CASCADE, related_name="incident_tag_relations")
     incident = models.ForeignKey(to="Incident", on_delete=models.CASCADE, related_name="incident_tag_relations")
     added_by = models.ForeignKey(to=User, on_delete=models.PROTECT, related_name="tags_added")
@@ -224,7 +259,7 @@ class Event(models.Model):
     }
     ALLOWED_TYPES_FOR_END_USERS = {Type.CLOSE, Type.REOPEN, Type.ACKNOWLEDGE, Type.OTHER}
 
-    id = models.BigAutoField(primary_key=True)
+    id = models.BigAutoField(primary_key=True, verbose_name="ID")
     incident = models.ForeignKey(to="Incident", on_delete=models.PROTECT, related_name="events")
     actor = models.ForeignKey(to=User, on_delete=models.PROTECT, related_name="caused_events")
     timestamp = models.DateTimeField()
@@ -376,7 +411,7 @@ class IncidentQuerySet(models.QuerySet):
 class Incident(models.Model):
     LEVEL_CHOICES = tuple(zip(Level.values, map(str, Level.values)))
 
-    id = models.BigAutoField(primary_key=True)
+    id = models.BigAutoField(primary_key=True, verbose_name="ID")
     start_time = models.DateTimeField(help_text="The time the incident was created.")
     end_time = DateTimeInfinityField(
         null=True,

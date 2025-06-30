@@ -24,7 +24,7 @@ More information about contributing to Argus can be found in the
 
 * [ ] Added a changelog fragment for [towncrier](https://argus-server.readthedocs.io/en/latest/development/howtos/changelog-entry.html)
 * [ ] Added/amended tests for new/changed code
-* [ ] Added/changed documentation
+* [ ] Added/changed documentation, including updates to the [user manual](https://argus-server.readthedocs.io/en/latest/user-manual.html) if feature flow or UI is considerably changed
 * [ ] Linted/formatted the code with ruff and djLint, easiest by using [pre-commit](https://github.com/Uninett/Argus?tab=readme-ov-file#code-style)
 * [ ] The first line of the commit message continues the sentence "If applied, this commit will ...", starts with a capital letter, does not end with punctuation and is 50 characters or less long. See our [how-to](https://argus-server.readthedocs.io/en/latest/development/howtos/commit-messages.html)
 * [ ] If applicable: Created new issues if this PR does not fix the issue completely/there is further work to be done

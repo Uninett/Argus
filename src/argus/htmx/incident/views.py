@@ -105,7 +105,7 @@ def incident_update(request: HtmxHttpRequest, action: str):
 
     form = get_form(request, formclass)
     if form.is_valid():
-        bulk_change_incidents(request.user, incident_ids, form.cleaned_data, callback_func)
+        bulk_change_incidents(request, incident_ids, form.cleaned_data, callback_func)
     else:
         messages.error(request, form.errors)
     return HttpResponseClientRefresh()

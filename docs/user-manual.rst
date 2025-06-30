@@ -116,7 +116,8 @@ What is Argus?
 
 Argus is an *alert aggregator* designed for storing and managing alerts
 from different monitoring systems at one place. Argus is created for
-**ease of alarm management** via **personalized interface** and **customizable alarm notifications**.
+**ease of alarm management** via a **personalized interface** and **customizable
+alarm notifications**.
 
 Log into Argus
 --------------
@@ -140,7 +141,7 @@ Login using OAuth 2.0 (Feide in the example below)
 
 1. Under "Login with" press ``dataporten_feide``.
 
-2. Select account you want to log in with.
+2. Select the account you want to log in with.
 
 3. Fill out *username* and *password* and press ``Log in``.
 
@@ -262,7 +263,7 @@ Change how many rows are shown per incidents table page
 
 2. Click on the *Per page* drop-down.
 
-3. Select whether you want 10/25/50/100 incidents per page displayed.
+3. Select how many incidents per page you want displayed.
 
 Navigate incidents table
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -270,26 +271,26 @@ Navigate incidents table
 1. Scroll down to the bottom of the *Incidents* table.
    In the right corner, there is a set of table navigation buttons.
 
-2. Click on the button with a *single right arrow icon* if you want to go to the next table
-   page.
+2. Click on the button with the *single right arrow icon* if you want to go to
+   the next table page.
 
-3. Click on the button with a *single left arrow icon* if you want to go to the previous
-   table page.
+3. Click on the button with the *single left arrow icon* if you want to go to the
+   previous table page.
 
 4. Click on the button with a *double right arrow icon* if you want to go to the last table
    page.
 
-5. Click on the button with a *double left arrow icon* if you want to go to the first table
-   page.
+5. Click on the button with the *double left arrow icon* if you want to go to the
+   first table page.
 
-Change how often incidents table gets refreshed
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Change how often the incidents table gets refreshed
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. Scroll down to the bottom of the *Incidents* table.
 
 2. Click on the *Updating every* drop-down.
 
-3. Select whether you want incidents to be updated every 5/30/60 seconds, or Never.
+3. Select how often you want the incidents to be updated.
 
 Decide which incidents are shown in the table
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -317,7 +318,7 @@ Filter by open/close status
    table, select ``Closed`` in the *Open State* slider.
 
 -  If you want both *open* and *closed* (resolved) incidents to be
-   displayed in the table, press ``Both`` in the *Open State* slider.
+   displayed in the table, select ``Both`` in the *Open State* slider.
 
 Filter by acknowledgement status
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -340,8 +341,8 @@ Filter by source monitoring system
    1. Click on the *Sources* selector.
 
    2. In the drop-down that appears, you can see all available source
-      systems. Click on the preferred one. The newly selected *source system* will appear in
-      the input field.
+      systems. Click on the preferred one. The newly selected *source system*
+      will appear in the input field.
 
    3. Repeat the process if you want to filter by several monitoring
       systems.
@@ -360,8 +361,9 @@ Filter by tags
 
    2. Press *Enter*. The newly added tag will appear in the input field.
 
-   3. Repeat the process if you want to filter by several tags, and remember to separate
-      tags with a comma. For example, ``tag_name1=tag_value1, tag_name2=tag_value2``.
+   3. Repeat the process if you want to filter by several tags, and remember to
+      separate tags with a comma. For example,
+      ``tag_name1=tag_value1, tag_name2=tag_value2``.
 
 -  If you want the table to display incidents with **any tags**, leave
    the *Tags* field empty.
@@ -375,7 +377,8 @@ displayed in the table. If you select *max severity level* to be **2**,
 only incidents with severity **1** and **2** will be displayed in the
 table.
 
-To change *max severity level*: select the preferred *max severity* option in the *Level* slider.
+To change *max severity level*: select the preferred *max severity* option in
+the *Level* slider.
 
 Filter out older incidents
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -424,7 +427,8 @@ Modify existing filter
 
 2. Click on the *Update filter* button within the *Filter* selector.
 
-3. In the drop-down menu that appears, click on the filter that you want to update.
+3. In the drop-down menu that appears, click on the filter that you want to
+   update.
 
 4. Press ``Yes`` in the confirmation dialog that appears.
 
@@ -546,40 +550,41 @@ Update several incidents at a time
 Re-open closed (resolved) incidents
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. Select several incidents in the *Incidents table* via checkbox
+1. Select several incidents in the *Incidents table* via checkboxes
    at the start of the row and press ``Reopen``
    in the *Update incidents* toolbar that appears above the *Incidents table*.
 
 2. Press ``Reopen now``. Note that you can provide a re-opening comment if
-   needed.
+   needed that will be applied to all selected incidents.
 
 Close (resolve) incidents
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. Select several incidents in the *Incidents table* via checkbox
+1. Select several incidents in the *Incidents table* via checkboxes
    at the start of the row and press ``Close``
    in the *Update incidents* toolbar that appears above the *Incidents table*.
 
 2. Press ``Close now``. Note that you can provide a closing comment if
-   needed.
+   needed that will be applied to all selected incidents.
 
 Add acknowledgement to incidents
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. Select several incidents in the *Incidents table* via checkbox
+1. Select several incidents in the *Incidents table* via checkboxes
    at the start of the row and press ``Acknowledge``
    in the *Update incidents* toolbar that appears above the *Incidents table*.
 
 2. Provide an acknowledgement comment in the *Message* input
-   field. Note that you can optionally provide a date when this
-   acknowledgement is no longer relevant.
+   field that will be applied to all selected incidents. Note that you can
+   optionally provide a date when these acknowledgements are no longer
+   relevant.
 
 3. Press ``Submit``.
 
 Add ticket URL to incidents
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. Select several incidents in the *Incidents table* via checkbox
+1. Select several incidents in the *Incidents table* via checkboxes
    at the start of the row and press ``Change ticket``
    in the *Update incidents* toolbar that appears above the *Incidents table*.
 
@@ -596,7 +601,7 @@ incidents <#add-ticket-url-to-incidents>`_.
 Remove ticket URL from incidents
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. Select several incidents in the *Incidents table* via checkbox
+1. Select several incidents in the *Incidents table* via checkboxes
    at the start of the row and press ``Change ticket``
    in the *Update incidents* toolbar that appears above the *Incidents table*.
 
@@ -670,7 +675,7 @@ Add new notification profile
    - Select what alarms you want to receive notifications about in the
      *Filters* drop-down. If the drop-down menu is empty, `create a
      filter <#save-current-filter>`_ first. Note that if no filter is
-     selected no notification will be sent. You can select multiple
+     selected no notifications will be sent. You can select multiple
      filters per notification profile.
 
    - Select what destination(s) you want to receive notifications to in
@@ -809,8 +814,9 @@ Delete recurrence
 
 1. `Go to your timeslots <#access-your-timeslots>`_.
 
-2. Check the *Delete* checkbox in the top right corner inside one of the existing
-   recurrences either in the *Create New Timeslot* box, or inside one of your existing timeslots.
+2. Check the *Delete* checkbox in the top right corner inside one of the
+   existing recurrences either in the *Create New Timeslot* box, or inside one
+   of your existing timeslots.
 
 3. Press ``Create`` if it is a new timeslot, or ``Save`` if it is an
    existing timeslot.
@@ -821,7 +827,7 @@ Add new timeslot
 1. `Go to your timeslots <#access-your-timeslots>`_.
 
 2. Go to the *Create New Timeslot* box. It is visible by default at the top of the page
-    and is highlighted with a darker background than existing timeslots.
+    and is highlighted with a darker background than the existing timeslots.
 
 3. Type in a (meaningful) timeslot name.
 
@@ -895,11 +901,11 @@ Add new destination in settings
    details <#access-your-destinations-in-settings>`_.
 
 2. Go to the *Create destination* box. It is visible by default at the top of the page
-   and is highlighted with a darker background than existing destinations.
+   and is highlighted with a darker background than the existing destinations.
 
 3. Select destination’s media type via the *Media* drop-down.
 
-4. Type in a title in the *Name* input field (optional)
+4. Type in a title in the *Name* input field (optional).
 
 5. Type in a destination value in the *Settings* input field (required).
 

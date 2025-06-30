@@ -107,6 +107,13 @@ such:
 
         $ python manage.py create_fake_incident -s "Notargus"
 
+To also set the type of that different source add the `--source-type` flag to
+the command as such:
+
+    .. code:: console
+
+        $ python manage.py create_fake_incident -s "Notargus" --source-type "type"
+
 To set the level of the incident add the `-l` flag to the command as such
 and choose a level between 1 and 5 (1 being the highest severity, 5 the
 lowest):
@@ -122,15 +129,102 @@ tags of the form `key=value` (add multiple separated by a space):
 
         $ python manage.py create_fake_incident -t a=b c=d
 
+To add metadata to the incident either add the `--metadata` flag to the
+command and metadata in JSON format as such:
+
+    .. code:: console
+
+        $ python manage.py create_fake_incident --metadata "{'a':'b'}"
+
+Or to use a JSON file use the `--metadata-file` flag as such:
+
+    .. code:: console
+
+        $ python manage.py create_fake_incident --metadata-file "a.json"
+
 And if the incident should be stateless add the flag `--stateless`:
 
     .. code:: console
 
         $ python manage.py create_fake_incident --stateless
 
+Instead of setting all these arguments on the command line it is also possible
+to use the flag `-f` and give a list of json files that contain all data as
+such:
+
+    .. code:: console
+
+        $ python manage.py create_fake_incident --files "a.json" "b.json"
+
+This gives also a wider range of attributes that can be set, in addition to the
+previously mentioned ones it is possible to set start time, end time, source
+incident id, details url and ticket url.
+
 (The same command is well-suited to manually test the notification system: Make
 a filter that matches fake incidents, for instance by setting `source` to
 `argus`, and create a single fake incident.)
+
+.. _close-incident:
+
+Close incident
+--------------
+
+To close one or more incidents one can use the command `close_incident`:
+
+    .. code:: console
+
+        $ python manage.py close_incident
+
+See the inbuilt help for flags and toggles:
+
+    .. code:: console
+
+        $ python manage.py close_incident --help
+
+This command takes either the id of the incident that should be closed as an
+argument:
+
+    .. code:: console
+
+        $ python manage.py close_incident --id 1234
+
+Or the source and the source incident id that can be used to find the incident:
+
+    .. code:: console
+
+        $ python manage.py close_incident --source "argus" --source-incident-id 1234
+
+To only close the incident if it is older than a given duration add the
+`--duration` flag to the command as such:
+
+    .. code:: console
+
+        $ python manage.py close_incident --id 1234 --duration "01:05:00"
+
+To add a specific message to the closing event add the `--closing-message` flag
+to the command as such:
+
+    .. code:: console
+
+        $ python manage.py close_incident --id 1234 --closing-message "Testing that closing works"
+
+You can also close one or multiple incidents by giving a list of json files
+that contain the information, at least id or source + source incident id need
+to be included. An example file would look as such:
+
+    .. code-block:: JSON
+
+        {
+            "source_incident_id": "1234",
+            "source": "source name",
+            "duration": "01:05:00"
+        }
+
+And the flag `--files` would be used as such:
+
+    .. code:: console
+
+        $ python manage.py close_incident --files path-to-json-file.json path-to-other-json-file.json
 
 
 .. _create-source:

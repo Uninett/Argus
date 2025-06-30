@@ -23,6 +23,9 @@ __all__ = [
 class SourceSystemTypeFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.SourceSystemType
+        # When calling this factory with a potentially not lowercase name make
+        # sure to force the name into lowercase first, since get_or_create
+        # cares about cases, but SourceSystemType.save() makes it lowercase
         django_get_or_create = ("name",)
 
     name = factory.Sequence(lambda s: "SourceSystemType %s" % s)

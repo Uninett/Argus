@@ -37,7 +37,7 @@ defusedxml==0.7.1
     #   social-auth-core
 dj-database-url==2.3.0
     # via argus-server (pyproject.toml)
-django==5.2.1
+django==5.2.2
     # via
     #   -r requirements/django52.txt
     #   argus-server (pyproject.toml)
@@ -127,7 +127,7 @@ referencing==0.36.2
     # via
     #   jsonschema
     #   jsonschema-specifications
-requests==2.32.3
+requests==2.32.4
     # via
     #   requests-oauthlib
     #   social-auth-core
@@ -162,7 +162,7 @@ tzdata==2025.2
     # via faker
 uritemplate==4.1.1
     # via drf-spectacular
-urllib3==2.4.0
+urllib3==2.5.0
     # via
     #   -r constraints.txt
     #   requests

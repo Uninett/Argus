@@ -28,17 +28,6 @@ class CreateSourceTests(TestCase):
 
         self.assertTrue(SourceSystem.objects.exclude(id__in=previous_source_pks).filter(type_id=source_type).exists())
 
-    def test_create_source_will_use_already_existing_user(self):
-        previous_source_pks = [source.id for source in SourceSystem.objects.all()]
-        source_name = "source name"
-        existing_user = User.objects.create(username=source_name, is_staff=False, is_superuser=False)
-
-        call_command("create_source", source_name)
-
-        source = SourceSystem.objects.exclude(id__in=previous_source_pks).filter(name=source_name).first()
-        self.assertTrue(source)
-        self.assertEqual(source.user_id, existing_user.id)
-
     def test_create_source_will_use_already_existing_source_system_type(self):
         previous_source_pks = [source.id for source in SourceSystem.objects.all()]
         source_name = "source name"
@@ -46,6 +35,21 @@ class CreateSourceTests(TestCase):
         existing_source_type = SourceSystemType.objects.create(name=source_type_name)
 
         call_command("create_source", source_name, source_type=source_type_name)
+
+        source = SourceSystem.objects.exclude(id__in=previous_source_pks).filter(name=source_name).first()
+        self.assertTrue(source)
+        self.assertEqual(source.type_id, existing_source_type.name)
+
+    def test_create_source_will_use_already_existing_source_system_type_with_differing_case(self):
+        # Source system types are forced to lowercase when saving
+        # So we need to test for using the same type with different cases
+        previous_source_pks = [source.id for source in SourceSystem.objects.all()]
+        source_name = "source name"
+        capitalized_source_type_name = "Source Type Name"
+        lowercase_source_type_name = capitalized_source_type_name.lower()
+        existing_source_type = SourceSystemType.objects.create(name=lowercase_source_type_name)
+
+        call_command("create_source", source_name, source_type=capitalized_source_type_name)
 
         source = SourceSystem.objects.exclude(id__in=previous_source_pks).filter(name=source_name).first()
         self.assertTrue(source)
