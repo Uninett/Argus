@@ -102,7 +102,7 @@ def create_fake_incident(
     serializer = IncidentSerializer(data=data)
     if serializer.is_valid():
         incident_exists = Incident.objects.filter(source=source_system, source_incident_id=source_incident_id).exists()
-        if incident_exists:
+        if incident_exists and source_incident_id:
             raise ValidationError("Source incident ids need to be unique for each source.")
         incident = serializer.save(user=source_system.user, source=source_system)
     else:

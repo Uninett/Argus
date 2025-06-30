@@ -280,16 +280,14 @@ class CreateFakeIncidentWithFilesTests(TestCase):
             self.call_command(f"--files={file.name}", "--level=3")
 
     def test_does_not_create_incident_for_non_existent_file(self):
-        previous_incidents_count = Incident.objects.count()
         out, err = self.call_command("--files=invalid")
 
         self.assertFalse(out)
         self.assertIn("Could not find/open/read file", err)
 
-        self.assertEqual(Incident.objects.count(), previous_incidents_count)
+        self.assertFalse(Incident.objects.exists())
 
     def test_does_not_create_incident_for_empty_file(self):
-        previous_incidents_count = Incident.objects.count()
         file = NamedTemporaryFile(delete=True)
 
         out, err = self.call_command(f"--files={file.name}")
@@ -297,11 +295,9 @@ class CreateFakeIncidentWithFilesTests(TestCase):
         self.assertFalse(out)
         self.assertIn("Could not find/open/read file", err)
 
-        self.assertEqual(Incident.objects.count(), previous_incidents_count)
+        self.assertFalse(Incident.objects.exists())
 
     def test_creates_single_fake_incident_with_set_data(self):
-        previous_incidents_pks = [incident.id for incident in Incident.objects.all()]
-
         incident_data = {
             "start_time": "2025-05-14T11:14:41.391Z",
             "end_time": "2025-05-16T11:14:41.391Z",
@@ -323,13 +319,8 @@ class CreateFakeIncidentWithFilesTests(TestCase):
         self.assertFalse(out)
         self.assertFalse(err)
 
-        incident = (
-            Incident.objects.exclude(id__in=previous_incidents_pks)
-            .filter(source_incident_id=incident_data["source_incident_id"])
-            .first()
-        )
+        incident = Incident.objects.get(source_incident_id=incident_data["source_incident_id"])
 
-        self.assertTrue(incident)
         self.assertEqual(incident.start_time, parse_datetime(incident_data["start_time"]))
         self.assertEqual(incident.end_time, parse_datetime(incident_data["end_time"]))
         self.assertEqual(incident.source.name, incident_data["source"])
@@ -339,8 +330,6 @@ class CreateFakeIncidentWithFilesTests(TestCase):
         self.assertEqual(incident.ticket_url, incident_data["ticket_url"])
 
     def test_creates_multiple_fake_incidents_with_set_data(self):
-        previous_incidents_pks = [incident.id for incident in Incident.objects.all()]
-
         incident_1_data = {
             "start_time": "2025-05-14T11:14:41.391Z",
             "end_time": "2025-05-16T11:14:41.391Z",
@@ -372,18 +361,7 @@ class CreateFakeIncidentWithFilesTests(TestCase):
         self.assertFalse(out)
         self.assertFalse(err)
 
-        incident_1 = (
-            Incident.objects.exclude(id__in=previous_incidents_pks)
-            .filter(source_incident_id=incident_1_data["source_incident_id"])
-            .first()
-        )
-        incident_2 = (
-            Incident.objects.exclude(id__in=previous_incidents_pks)
-            .filter(source_incident_id=incident_2_data["source_incident_id"])
-            .first()
-        )
-
-        self.assertTrue(incident_1)
+        incident_1 = Incident.objects.get(source_incident_id=incident_1_data["source_incident_id"])
         self.assertEqual(incident_1.start_time, parse_datetime(incident_1_data["start_time"]))
         self.assertEqual(incident_1.end_time, parse_datetime(incident_1_data["end_time"]))
         self.assertEqual(incident_1.source.name, incident_1_data["source"])
@@ -391,7 +369,8 @@ class CreateFakeIncidentWithFilesTests(TestCase):
         self.assertEqual(incident_1.description, incident_1_data["description"])
         self.assertEqual(incident_1.level, incident_1_data["level"])
         self.assertEqual(incident_1.ticket_url, incident_1_data["ticket_url"])
-        self.assertTrue(incident_2)
+
+        incident_2 = Incident.objects.get(source_incident_id=incident_2_data["source_incident_id"])
         self.assertEqual(incident_2.start_time, parse_datetime(incident_2_data["start_time"]))
         self.assertEqual(incident_2.end_time, parse_datetime(incident_2_data["end_time"]))
         self.assertEqual(incident_2.source.name, incident_2_data["source"])
@@ -401,8 +380,6 @@ class CreateFakeIncidentWithFilesTests(TestCase):
         self.assertEqual(incident_2.ticket_url, incident_2_data["ticket_url"])
 
     def test_uses_argus_source_if_none_specified(self):
-        previous_incidents_pks = [incident.id for incident in Incident.objects.all()]
-
         incident_data = {"source_incident_id": "1234"}
 
         data = json.dumps(incident_data).encode("utf-8")
@@ -414,11 +391,7 @@ class CreateFakeIncidentWithFilesTests(TestCase):
         self.assertFalse(out)
         self.assertFalse(err)
 
-        incident = (
-            Incident.objects.exclude(id__in=previous_incidents_pks)
-            .filter(source_incident_id=incident_data["source_incident_id"])
-            .first()
-        )
+        incident = Incident.objects.get(source_incident_id=incident_data["source_incident_id"])
 
         _, _, argus_source_system = get_or_create_default_instances()
 
@@ -426,8 +399,6 @@ class CreateFakeIncidentWithFilesTests(TestCase):
         self.assertEqual(incident.source, argus_source_system)
 
     def test_does_not_create_incident_for_invalid_data(self):
-        previous_incidents_pks = [incident.id for incident in Incident.objects.all()]
-
         incident_data = {
             "source_incident_id": "1234",
             "ticket_url": "invalid-url",
@@ -442,15 +413,11 @@ class CreateFakeIncidentWithFilesTests(TestCase):
         self.assertFalse(out)
         self.assertIn("Enter a valid URL.", err)
 
-        self.assertFalse(
-            Incident.objects.exclude(id__in=previous_incidents_pks)
-            .filter(source_incident_id=incident_data["source_incident_id"])
-            .exists()
-        )
+        with self.assertRaises(Incident.DoesNotExist):
+            Incident.objects.get(source_incident_id=incident_data["source_incident_id"])
 
     def test_does_not_create_incident_for_same_source_and_source_incident_id_as_existing(self):
         incident = StatefulIncidentFactory()
-        previous_incidents_pks = [incident.id for incident in Incident.objects.all()]
 
         incident_data = {
             "source_incident_id": incident.source_incident_id,
@@ -467,8 +434,32 @@ class CreateFakeIncidentWithFilesTests(TestCase):
         self.assertFalse(out)
         self.assertIn("Source incident ids need to be unique for each source.", err)
 
-        self.assertFalse(
-            Incident.objects.exclude(id__in=previous_incidents_pks)
-            .filter(source_incident_id=incident_data["source_incident_id"])
-            .exists()
+        incidents = Incident.objects.filter(
+            source_incident_id=incident_data["source_incident_id"],
+            source=incident.source,
         )
+
+        self.assertEqual(incidents.count(), 1)
+
+    def test_do_create_another_incident_for_same_source_and_source_incident_id_if_source_incident_id_is_empty_string(
+        self,
+    ):
+        incident = StatefulIncidentFactory(source_incident_id="")
+
+        incident_data = {
+            "source_incident_id": incident.source_incident_id,
+            "source": incident.source.name,
+            "source_type": incident.source.type.name,
+        }
+
+        data = json.dumps(incident_data).encode("utf-8")
+        file = NamedTemporaryFile(delete=True)
+        file.write(data)
+        file.flush()
+        out, err = self.call_command(f"--files={file.name}")
+
+        self.assertFalse(out)
+        self.assertFalse(err)
+
+        incidents = Incident.objects.filter(source_incident_id="")
+        self.assertEqual(incidents.count(), 2)
