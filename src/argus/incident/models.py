@@ -58,7 +58,7 @@ def create_fake_incident(
 
     MAX_ID = 2**32 - 1
     MIN_ID = 1
-    if not source_incident_id:
+    if source_incident_id is None:
         source_incident_id = randint(MIN_ID, MAX_ID)
 
     if not description:
