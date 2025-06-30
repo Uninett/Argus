@@ -240,6 +240,17 @@ $ tox
 An [HTML coverage report](htmlcov/index.html) will be generated.
 Refer to the [tox.ini](tox.ini) file for further options.
 
+## Magical branches
+
+Do not ever remove these
+
+* master
+* argus-demo
+* stable/SOMETHING
+
+The last branch-type is for backporting bugfixes and similar to older releases,
+bypassing master if necessary.
+
 
 ## How to do maintenance
 
