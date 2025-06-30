@@ -231,8 +231,8 @@ Navigate incidents table
 5. Click on the button with the *double left arrow icon* if you want to go to the
    first table page.
 
-Change how often incidents table gets refreshed
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Change how often the incidents table gets refreshed
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. Scroll down to the bottom of the *Incidents* table.
 
