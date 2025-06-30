@@ -26,6 +26,7 @@ Glue services maintained by Argus developers
 Network Administration Visualized
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+| Home: https://nav.uninett.no/
 | Source: https://github.com/Uninett/nav-argus-glue.
 | PyPI: `nav-argus-glue <https://pypi.org/project/nav-argus-glue/>`_
 
@@ -35,9 +36,24 @@ files.
 Mist Systems Administration (Juniper)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+| Home: https://www.mist.com/
 | Source: https://gitlab.sikt.no/cnaas/mist-argus
 
 This will be available on PyPI after more polish is done.
+
+Aruba Access points (HP)
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+| Home: https://www.hpe.com/us/en/aruba-access-points.html
+
+This will be available as source and on PyPI after more polish is done.
+
+Prometheus
+~~~~~~~~~~
+
+| Home: https://prometheus.io/
+
+This will be available as source and on PyPI after more polish is done.
 
 Other glue services
 -------------------
@@ -45,12 +61,33 @@ Other glue services
 NAGIOS
 ~~~~~~
 
+| Home: https://www.nagios.org/
+
+Made by SUNET.
+
   * There is a Python script at https://github.com/SUNET/nagios-argus-glue. It
     didn't scale to SUNET's needs.
   * There is code for a tiny rust binary at https://github.com/SUNET/nglue
     that is run by NAGIOS. It sends alerts to
     https://github.com/SUNET/nglue-api, designed to run in a container. The
     ``nglue-api`` pre-filters what to send to Argus.
+
+Géant Correlator
+~~~~~~~~~~~~~~~~
+
+Made by Géant.
+
+Géant already had a correlator service, this was extended to work with Argus.
+
+Example stubs
+~~~~~~~~~~~~~
+
+Open source, the Argus team at Sikt has merge rights.
+
+| Source: https://github.com/Uninett/argus-glueservice-stubs
+
+This repo contains multiple tiny glue services to serve as examples for writing
+your own.
 
 .. include:: ../_note.rst
 
