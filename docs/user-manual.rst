@@ -289,8 +289,8 @@ Filter by source monitoring system
    1. Click on the *Sources* selector.
 
    2. In the drop-down that appears, you can see all available source
-      systems. Click on the preferred one. The newly selected *source system* will appear in
-      the input field.
+      systems. Click on the preferred one. The newly selected *source system*
+      will appear in the input field.
 
    3. Repeat the process if you want to filter by several monitoring
       systems.
