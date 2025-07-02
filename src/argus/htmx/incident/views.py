@@ -117,6 +117,7 @@ def filter_form(request: HtmxHttpRequest):
     incident_list_filter = get_filter_function()
     filter_form, _ = incident_list_filter(request, None)
     context = {"filter_form": filter_form}
+    LOG.debug("filter_form view: GET: %s", request.GET)
     return render(request, "htmx/incident/_incident_filterbox.html", context=context)
 
 
@@ -201,6 +202,7 @@ def filter_select(request: HtmxHttpRequest):
 
 @require_GET
 def incident_list(request: HtmxHttpRequest) -> HttpResponse:
+    LOG.debug("incident_list view: GET at start: %s", request.GET)
     columns = get_incident_table_columns()
 
     # Load incidents
