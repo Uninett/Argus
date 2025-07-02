@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from collections.abc import Iterable
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import Optional, Any
 
 from django import forms
@@ -10,13 +10,13 @@ from django.contrib.auth import get_user_model
 from django.contrib import messages
 from django.utils.timezone import now as tznow
 from django.shortcuts import render, get_object_or_404
-
 from django.views.decorators.http import require_POST, require_GET
 from django.core.paginator import Paginator
 from django.http import HttpResponse, HttpResponseBadRequest, QueryDict
 from django_htmx.http import HttpResponseClientRefresh, retarget
 
 from argus.auth.utils import get_or_update_preference
+from argus.htmx.incident.forms import IncidentListForm
 from argus.incident.models import Incident
 from argus.incident.ticket.utils import get_ticket_plugin_path
 from argus.incident.ticket.base import TicketPluginException
@@ -27,7 +27,7 @@ from ..request import HtmxHttpRequest
 
 from .customization import get_incident_table_columns
 from .utils import get_filter_function
-from .forms import AckForm, DescriptionOptionalForm, EditTicketUrlForm, AddTicketUrlForm, TimeframeForm, PageSizeForm
+from .forms import AckForm, DescriptionOptionalForm, EditTicketUrlForm, AddTicketUrlForm
 from ..utils import (
     single_autocreate_ticket_url_queryset,
     bulk_change_incidents,
@@ -248,36 +248,49 @@ def incident_list(request: HtmxHttpRequest) -> HttpResponse:
     total_count = qs.count()
     last_refreshed = make_aware(datetime.now())
 
-    # make dict from QueryDict
-    params = dict(request.GET.items())
-
     incident_list_filter = get_filter_function()
     filter_form, qs = incident_list_filter(request, qs)
 
-    # Limit by timeframe
-    timeframe = int(request.session.get("timeframe", 0) or 0)
-    # no need to send in timeframe = 0 since that is the default
-    if timeframe:
-        request.GET = add_param_to_querydict(request.GET, "timeframe", timeframe)
-    timeframe_form = TimeframeForm(request.GET)
-    if timeframe_form.is_valid():
-        timeframe = timeframe_form.cleaned_data["timeframe"]
-        request.session["timeframe"] = timeframe
+    GET_params = {}
+    if filter_form.is_bound:
+        GET_params = filter_form.cleaned_data.copy()
 
-    if timeframe:
-        after = tznow() - timedelta(seconds=timeframe * 60)
-        qs = qs.filter(start_time__gte=after)
+    # Fetch timeframe from session since its GET parameter disappears
+    _timeframe = int(request.session.get("timeframe", 0) or 0)
+    if _timeframe:
+        request.GET = add_param_to_querydict(request.GET, "timeframe", _timeframe)
+
+    # non filterbox GET parameters
+    GET_forms = {}
+    for Form in IncidentListForm.__subclasses__():
+        form = Form(request.GET)
+        GET_forms[form.fieldname] = form
+        GET_params[form.fieldname] = form.get_clean_value()
+        qs = form.filter(qs)
 
     filtered_count = qs.count()
 
-    # Standard Django pagination
-    page_size_form = PageSizeForm(request.GET)
-    page_size_form.is_valid()
-    page_size, _ = get_or_update_preference(request, request.GET, "argus_htmx", "page_size")
+    if not request.session["timeframe"]:
+        request.session["timeframe"] = GET_params["timeframe"]
 
+    page_size, _ = get_or_update_preference(request, request.GET, "argus_htmx", "page_size")
+    GET_params["page_size"] = page_size
+
+    qd = QueryDict("").copy()
+    qd.update(GET_params)
+    LOG.debug("incident_list view: Cleaned QueryDict: %s", qd)
+    request.GET = qd
+
+    # Standard Django pagination
     paginator = Paginator(object_list=qs, per_page=page_size)
-    page_num = params.pop("page", "1")
-    page = paginator.get_page(page_num)
+    page = paginator.get_page(GET_params.get("page", 1))
+    last_page_num = page.paginator.num_pages
+
+    refresh_info = {
+        "count": total_count,
+        "filtered_count": filtered_count,
+        "last_refreshed": last_refreshed,
+    }
 
     # The htmx magic - use a different, minimal base template for htmx
     # requests, allowing us to skip rendering the unchanging parts of the
@@ -286,20 +299,17 @@ def incident_list(request: HtmxHttpRequest) -> HttpResponse:
         base_template = "htmx/incident/responses/_incident_list_refresh.html"
     else:
         base_template = "htmx/incident/_base.html"
-    last_page_num = page.paginator.num_pages
+
+    LOG.debug("incident_list view: GET at end: %s", request.GET)
     context = {
         "columns": columns,
-        "filtered_count": filtered_count,
-        "count": total_count,
         "filter_form": filter_form,
-        "timeframe_form": timeframe_form,
-        "page_size_form": page_size_form,
-        "page_size": page_size,
+        "refresh_info": refresh_info,
+        "refresh_info_forms": GET_forms,
         "page_title": "Incidents",
         "base": base_template,
         "page": page,
         "last_page_num": last_page_num,
         "second_to_last_page": last_page_num - 1,
-        "last_refreshed": last_refreshed,
     }
     return render(request, "htmx/incident/incident_list.html", context=context)
