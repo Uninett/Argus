@@ -77,7 +77,14 @@ Géant Correlator
 
 Made by Géant.
 
-Géant already had a correlator service, this was extended to work with Argus.
+| Source: https://github.com/GEANT/geant-argus
+| Documentation: https://swd-documentation.geant.org/geant-argus/develop/
+
+Technically not just a glue service; GÉANT created a custom extension of Argus
+to integrate network details from alarms aggregated by their Correlator into
+the Argus user interface.
+
+The links are to the extension, not the correlator itself.
 
 Example stubs
 ~~~~~~~~~~~~~
