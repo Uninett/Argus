@@ -18,6 +18,15 @@ See also the the [Python client library](https://github.com/Uninett/pyargus).
 > * Support for the REACT frontend was dropped in version 2.0 of
 >   argus-server. Please try out the new built-in one.
 
+## DEMO
+
+Give Argus a test-run!
+
+See `https://argus-demo.uninett.no/`.
+
+The demo has notification sending turned off, and automated ticket creation is
+also turned off. The database is reset every 24 hours. Fake incidents are
+randomly generated and randomly closed.
 
 ## Installation
 
