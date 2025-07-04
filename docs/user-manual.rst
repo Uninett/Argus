@@ -7,8 +7,7 @@ User’s guide to Argus
    -  `Using username and
       password <#login-using-username-and-password>`_
    -  `Using OAuth
-      2.0 <#login-using-oauth-20-feide-in-the-example-below>`_
-   -  `Debugging network errors <#debugging-network-errors-on-login>`_
+      2.0 <#login-using-oauth-2-0-feide-in-the-example-below>`_
 
 -  `Configure user settings`_
     -  `Open user menu`_
