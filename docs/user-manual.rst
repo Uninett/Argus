@@ -74,30 +74,30 @@ User’s guide to Argus
 
 -  `Customize notifications <#customize-alarm-notifications-in-argus>`_
 
-   -  `About components of notification
-      profiles <#about-components-of-notification-profiles>`_
-   -  `About the available notification
-      media <#about-the-available-notification-media>`_
+   -  :ref:`About components of notification
+      profiles <about-components-of-notification-profiles>`
+   -  :ref:`About the available notification
+      media <about-the-available-notification-media>`
    -  `Access your notification
       settings <#access-your-notification-profiles>`_
    -  `Add notification profile <#add-new-notification-profile>`_
    -  `Edit notification
       profile <#edit-existing-notification-profile>`_
-   -  `Disable notification profile <#disable-notification-profile>`_
-   -  `Delete notification profile <#delete-notification-profile>`_
+   -  :ref:`Disable notification profile <disable-notification-profile>`
+   -  :ref:`Delete notification profile <delete-notification-profile>`
 
 -  `Manage notification
    time <#manage-when-to-receive-notifications-in-argus>`_
 
    -  `What is a timeslot <#what-is-a-timeslot-in-argus>`_
    -  `What is a recurrence <#what-is-a-recurrence-in-argus>`_
-   -  `Access your timeslots <#access-your-timeslots>`_
+   -  :ref:`Access your timeslots <access-your-timeslots>`
    -  `Add recurrence <#add-new-recurrence>`_
-   -  `Edit recurrence <#edit-recurrence>`_
-   -  `Delete recurrence <#delete-recurrence>`_
+   -  :ref:`Edit recurrence <edit-recurrence>`
+   -  :ref:`Delete recurrence <delete-recurrence>`
    -  `Add timeslot <#add-new-timeslot>`_
    -  `Edit timeslot <#edit-existing-timeslot>`_
-   -  `Delete timeslot <#delete-timeslot>`_
+   -  :ref:`Delete timeslot <delete-timeslot>`
 
 -  `Manage contact details
    (destinations) <#manage-your-contact-details-destinations-in-argus>`_
@@ -622,6 +622,7 @@ receive by creating, editing and deleting *notification profiles*.
 .. image:: img/notification_profiles.png
   :width: 650
 
+.. _about-components-of-notification-profiles:
 About components of notification profiles
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -639,6 +640,7 @@ About components of notification profiles
    notification profiles. Destinations may be of `different media
    types <#about-the-available-notification-media>`_.
 
+.. _about-the-available-notification-media:
 About the available notification media
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -709,6 +711,7 @@ Edit existing notification profile
 
 6. Press ``Save``.
 
+.. _disable-notification-profile:
 Disable notification profile
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -720,6 +723,7 @@ Disable notification profile
 
 3. Press ``Save``.
 
+.. _delete-notification-profile:
 Delete notification profile
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -771,6 +775,7 @@ all hours on weekends:
 .. image:: img/example_timeslot.png
   :width: 650
 
+.. _access-your-timeslots:
 Access your timeslots
 ~~~~~~~~~~~~~~~~~~~~~
 
@@ -796,6 +801,7 @@ one.
 3. Press ``Create`` if it is a new timeslot, or ``Save`` if it is an
    existing timeslot.
 
+.. _edit-recurrence:
 Edit recurrence
 ~~~~~~~~~~~~~~~
 
@@ -815,6 +821,7 @@ Edit recurrence
 
    -  Select day(s) via corresponding checkboxes.
 
+.. _delete-recurrence:
 Delete recurrence
 ~~~~~~~~~~~~~~~~~
 
@@ -867,6 +874,7 @@ Edit existing timeslot
 
 3. Press ``Save``.
 
+.. _delete-timeslot:
 Delete timeslot
 ~~~~~~~~~~~~~~~
 
