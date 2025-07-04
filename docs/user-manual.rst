@@ -7,8 +7,7 @@ User’s guide to Argus
    -  `Using username and
       password <#login-using-username-and-password>`_
    -  `Using OAuth
-      2.0 <#login-using-oauth-20-feide-in-the-example-below>`_
-   -  `Debugging network errors <#debugging-network-errors-on-login>`_
+      2.0 <#login-using-oauth-2-0-feide-in-the-example-below>`_
 
 -  `Configure user settings`_
     -  `Open user menu`_
@@ -20,35 +19,35 @@ User’s guide to Argus
 -  `Manage alarms <#work-with-alarms-in-argus>`_
 
    -  `What is an incident <#what-is-an-incident-in-argus>`_
-   -  `Access detailed incident view <#access-detailed-incident-view>`_
+   -  :ref:`Access detailed incident view <access-detailed-incident-view>`
    -  `Work with table <#work-with-incidents-table>`_
 
       -  `Change rows per
          page <#change-how-many-rows-are-shown-per-incidents-table-page>`_
       -  `Navigate table <#navigate-incidents-table>`_
       -  `Change refresh
-         interval <#change-how-often-incidents-table-gets-refreshed>`_
+         interval <#change-how-often-the-incidents-table-gets-refreshed>`_
 
    -  `Filter
       incidents <#decide-which-incidents-are-shown-in-the-table>`_
 
-      -  `Filter by open/close <#filter-by-openclose-status>`_
+      -  `Filter by open/close <#filter-by-open-close-status>`_
       -  `Filter by
          acknowledgement <#filter-by-acknowledgement-status>`_
       -  `Filter by sources <#filter-by-source-monitoring-system>`_
-      -  `Filter by tags <#filter-by-tags>`_
-      -  `Filter by severity level <#filter-by-severity-level>`_
+      -  :ref:`Filter by tags <filter-by-tags>`
+      -  :ref:`Filter by severity level <filter-by-severity-level>`
       -  `Filter out old incidents <#filter-out-older-incidents>`_
 
-   -  `Work with stored filters <#work-with-stored-filters>`_
+   -  :ref:`Work with stored filters <work-with-stored-filters>`
 
       -  `Save filter <#save-current-filter>`_
       -  `Modify filter <#modify-existing-filter>`_
       -  `Apply filter <#apply-existing-filter>`_
-      -  `Unselect applied filter <#unselect-applied-filter>`_
+      -  :ref:`Unselect applied filter <unselect-applied-filter>`
       -  `Delete filter <#delete-existing-filter>`_
 
-   -  `Update one incident <#update-one-incident>`_
+   -  :ref:`Update one incident <update-one-incident>`
 
       -  `Re-open closed (resolved)
          incident <#re-open-a-closed-resolved-incident>`_
@@ -58,7 +57,7 @@ User’s guide to Argus
 
          -  `Manually add ticket to
             incident <#manually-add-ticket-url-to-an-incident>`_
-         -  `Edit ticket URL <#edit-ticket-url>`_
+         -  :ref:`Edit ticket URL <edit-ticket-url>`
          -  `Remove ticket from
             incident <#remove-ticket-url-from-an-incident>`_
          -  `Automatically generate ticket from
@@ -75,30 +74,30 @@ User’s guide to Argus
 
 -  `Customize notifications <#customize-alarm-notifications-in-argus>`_
 
-   -  `About components of notification
-      profiles <#about-components-of-notification-profiles>`_
-   -  `About the available notification
-      media <#about-the-available-notification-media>`_
+   -  :ref:`About components of notification
+      profiles <about-components-of-notification-profiles>`
+   -  :ref:`About the available notification
+      media <about-the-available-notification-media>`
    -  `Access your notification
       settings <#access-your-notification-profiles>`_
    -  `Add notification profile <#add-new-notification-profile>`_
    -  `Edit notification
       profile <#edit-existing-notification-profile>`_
-   -  `Disable notification profile <#disable-notification-profile>`_
-   -  `Delete notification profile <#delete-notification-profile>`_
+   -  :ref:`Disable notification profile <disable-notification-profile>`
+   -  :ref:`Delete notification profile <delete-notification-profile>`
 
 -  `Manage notification
    time <#manage-when-to-receive-notifications-in-argus>`_
 
    -  `What is a timeslot <#what-is-a-timeslot-in-argus>`_
    -  `What is a recurrence <#what-is-a-recurrence-in-argus>`_
-   -  `Access your timeslots <#access-your-timeslots>`_
+   -  :ref:`Access your timeslots <access-your-timeslots>`
    -  `Add recurrence <#add-new-recurrence>`_
-   -  `Edit recurrence <#edit-recurrence>`_
-   -  `Delete recurrence <#delete-recurrence>`_
+   -  :ref:`Edit recurrence <edit-recurrence>`
+   -  :ref:`Delete recurrence <delete-recurrence>`
    -  `Add timeslot <#add-new-timeslot>`_
    -  `Edit timeslot <#edit-existing-timeslot>`_
-   -  `Delete timeslot <#delete-timeslot>`_
+   -  :ref:`Delete timeslot <delete-timeslot>`
 
 -  `Manage contact details
    (destinations) <#manage-your-contact-details-destinations-in-argus>`_
@@ -247,6 +246,7 @@ monitoring system the incident came from), *description* (created by the
 monitoring system) and whether the incident has an associated *ticket
 url* (label icon at the very end of the row).
 
+.. _access-detailed-incident-view:
 Access detailed incident view
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -350,6 +350,7 @@ Filter by source monitoring system
 -  If you want the table to display incidents from **any monitoring
    system**, leave the *Sources* field empty.
 
+.. _filter-by-tags:
 Filter by tags
 ^^^^^^^^^^^^^^
 
@@ -368,6 +369,7 @@ Filter by tags
 -  If you want the table to display incidents with **any tags**, leave
    the *Tags* field empty.
 
+.. _filter-by-severity-level:
 Filter by severity level
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -393,6 +395,7 @@ filters <#work-with-stored-filters>`_.
 3. Select the preferred option of *report-time-not-later-than* for the
    incidents in the table.
 
+.. _work-with-stored-filters:
 Work with stored filters
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -439,6 +442,7 @@ Apply existing filter
 
 2. Click on the preferred filter in the drop-down menu.
 
+.. _unselect-applied-filter:
 Unselect applied filter
 ^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -455,6 +459,7 @@ Delete existing filter
 
 3. Confirm deletion.
 
+.. _update-one-incident:
 Update one incident
 ~~~~~~~~~~~~~~~~~~~
 
@@ -506,6 +511,7 @@ Manually add ticket URL to an incident
 
 4. Press ``Add ticket``.
 
+.. _edit-ticket-url:
 Edit ticket URL
 '''''''''''''''
 
@@ -616,6 +622,7 @@ receive by creating, editing and deleting *notification profiles*.
 .. image:: img/notification_profiles.png
   :width: 650
 
+.. _about-components-of-notification-profiles:
 About components of notification profiles
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -633,6 +640,7 @@ About components of notification profiles
    notification profiles. Destinations may be of `different media
    types <#about-the-available-notification-media>`_.
 
+.. _about-the-available-notification-media:
 About the available notification media
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -703,6 +711,7 @@ Edit existing notification profile
 
 6. Press ``Save``.
 
+.. _disable-notification-profile:
 Disable notification profile
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -714,6 +723,7 @@ Disable notification profile
 
 3. Press ``Save``.
 
+.. _delete-notification-profile:
 Delete notification profile
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -765,6 +775,7 @@ all hours on weekends:
 .. image:: img/example_timeslot.png
   :width: 650
 
+.. _access-your-timeslots:
 Access your timeslots
 ~~~~~~~~~~~~~~~~~~~~~
 
@@ -790,6 +801,7 @@ one.
 3. Press ``Create`` if it is a new timeslot, or ``Save`` if it is an
    existing timeslot.
 
+.. _edit-recurrence:
 Edit recurrence
 ~~~~~~~~~~~~~~~
 
@@ -809,6 +821,7 @@ Edit recurrence
 
    -  Select day(s) via corresponding checkboxes.
 
+.. _delete-recurrence:
 Delete recurrence
 ~~~~~~~~~~~~~~~~~
 
@@ -861,6 +874,7 @@ Edit existing timeslot
 
 3. Press ``Save``.
 
+.. _delete-timeslot:
 Delete timeslot
 ~~~~~~~~~~~~~~~
 
