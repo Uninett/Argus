@@ -19,35 +19,35 @@ User’s guide to Argus
 -  `Manage alarms <#work-with-alarms-in-argus>`_
 
    -  `What is an incident <#what-is-an-incident-in-argus>`_
-   -  `Access detailed incident view <#access-detailed-incident-view>`_
+   -  :ref:`Access detailed incident view <access-detailed-incident-view>`
    -  `Work with table <#work-with-incidents-table>`_
 
       -  `Change rows per
          page <#change-how-many-rows-are-shown-per-incidents-table-page>`_
       -  `Navigate table <#navigate-incidents-table>`_
       -  `Change refresh
-         interval <#change-how-often-incidents-table-gets-refreshed>`_
+         interval <#change-how-often-the-incidents-table-gets-refreshed>`_
 
    -  `Filter
       incidents <#decide-which-incidents-are-shown-in-the-table>`_
 
-      -  `Filter by open/close <#filter-by-openclose-status>`_
+      -  `Filter by open/close <#filter-by-open-close-status>`_
       -  `Filter by
          acknowledgement <#filter-by-acknowledgement-status>`_
       -  `Filter by sources <#filter-by-source-monitoring-system>`_
-      -  `Filter by tags <#filter-by-tags>`_
-      -  `Filter by severity level <#filter-by-severity-level>`_
+      -  :ref:`Filter by tags <filter-by-tags>`
+      -  :ref:`Filter by severity level <filter-by-severity-level>`
       -  `Filter out old incidents <#filter-out-older-incidents>`_
 
-   -  `Work with stored filters <#work-with-stored-filters>`_
+   -  :ref:`Work with stored filters <work-with-stored-filters>`
 
       -  `Save filter <#save-current-filter>`_
       -  `Modify filter <#modify-existing-filter>`_
       -  `Apply filter <#apply-existing-filter>`_
-      -  `Unselect applied filter <#unselect-applied-filter>`_
+      -  :ref:`Unselect applied filter <unselect-applied-filter>`
       -  `Delete filter <#delete-existing-filter>`_
 
-   -  `Update one incident <#update-one-incident>`_
+   -  :ref:`Update one incident <update-one-incident>`
 
       -  `Re-open closed (resolved)
          incident <#re-open-a-closed-resolved-incident>`_
@@ -57,7 +57,7 @@ User’s guide to Argus
 
          -  `Manually add ticket to
             incident <#manually-add-ticket-url-to-an-incident>`_
-         -  `Edit ticket URL <#edit-ticket-url>`_
+         -  :ref:`Edit ticket URL <edit-ticket-url>`
          -  `Remove ticket from
             incident <#remove-ticket-url-from-an-incident>`_
          -  `Automatically generate ticket from
@@ -246,6 +246,7 @@ monitoring system the incident came from), *description* (created by the
 monitoring system) and whether the incident has an associated *ticket
 url* (label icon at the very end of the row).
 
+.. _access-detailed-incident-view:
 Access detailed incident view
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -349,6 +350,7 @@ Filter by source monitoring system
 -  If you want the table to display incidents from **any monitoring
    system**, leave the *Sources* field empty.
 
+.. _filter-by-tags:
 Filter by tags
 ^^^^^^^^^^^^^^
 
@@ -367,6 +369,7 @@ Filter by tags
 -  If you want the table to display incidents with **any tags**, leave
    the *Tags* field empty.
 
+.. _filter-by-severity-level:
 Filter by severity level
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -392,6 +395,7 @@ filters <#work-with-stored-filters>`_.
 3. Select the preferred option of *report-time-not-later-than* for the
    incidents in the table.
 
+.. _work-with-stored-filters:
 Work with stored filters
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -438,6 +442,7 @@ Apply existing filter
 
 2. Click on the preferred filter in the drop-down menu.
 
+.. _unselect-applied-filter:
 Unselect applied filter
 ^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -454,6 +459,7 @@ Delete existing filter
 
 3. Confirm deletion.
 
+.. _update-one-incident:
 Update one incident
 ~~~~~~~~~~~~~~~~~~~
 
@@ -505,6 +511,7 @@ Manually add ticket URL to an incident
 
 4. Press ``Add ticket``.
 
+.. _edit-ticket-url:
 Edit ticket URL
 '''''''''''''''
 
