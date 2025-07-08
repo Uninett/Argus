@@ -12,7 +12,7 @@ from django.shortcuts import render, get_object_or_404
 
 from django.views.decorators.http import require_POST, require_GET
 from django.core.paginator import Paginator
-from django.http import HttpResponse, HttpResponseBadRequest
+from django.http import HttpResponse, HttpResponseBadRequest, QueryDict
 from django_htmx.http import HttpResponseClientRefresh, retarget
 
 from argus.auth.utils import get_or_update_preference
@@ -200,9 +200,25 @@ def filter_select(request: HtmxHttpRequest):
             return retarget(HttpResponse(), "#incident-filter-select")
 
 
+def dedupe_GET(request: QueryDict):
+    # if in doubt, use the biggest hammer *sigh*
+    qd = QueryDict(mutable=True)
+    for key, value in request.GET.items():
+        value = request.GET.getlist(key)  # value is always a list of strings
+        value = filter(None, value)  # strip away empty strings
+        value = list(set(value))  # dedupe list of strings
+        if not value:
+            continue
+        qd.setlist(key, value)  # safely add to query dict
+    qd._mutable = False  # make read only
+    return qd
+
+
 @require_GET
 def incident_list(request: HtmxHttpRequest) -> HttpResponse:
     LOG.debug("incident_list view: GET at start: %s", request.GET)
+    request.GET = dedupe_GET(request)
+    LOG.debug("incident_list view after dedupe: %s", request.GET)
     columns = get_incident_table_columns()
 
     # Load incidents
