@@ -6,7 +6,6 @@ from argus.htmx.incident.utils import update_interval_string
 __all__ = [
     "PAGE_SIZE_DEFAULT",
     "PAGE_SIZE_CHOICES",
-    "INCIDENTS_TABLE_LAYOUT_ALLOWED",
     "INCIDENTS_TABLE_LAYOUT_CHOICES",
     "INCIDENTS_TABLE_LAYOUT_DEFAULT",
     "UPDATE_INTERVAL_DEFAULT",
@@ -40,6 +39,6 @@ TIMEFRAME_CHOICES = (
     (_day * 30, "Last 30 days"),
 )
 
-INCIDENTS_TABLE_LAYOUT_ALLOWED = ["standard", "compact"]
-INCIDENTS_TABLE_LAYOUT_CHOICES = tuple((layout, layout) for layout in INCIDENTS_TABLE_LAYOUT_ALLOWED)
+_INCIDENTS_TABLE_LAYOUT_ALLOWED = ["standard", "compact"]
+INCIDENTS_TABLE_LAYOUT_CHOICES = tuple((layout, layout) for layout in _INCIDENTS_TABLE_LAYOUT_ALLOWED)
 INCIDENTS_TABLE_LAYOUT_DEFAULT = getattr(settings, "ARGUS_INCIDENTS_TABLE_LAYOUT_DEFAULT", "compact")

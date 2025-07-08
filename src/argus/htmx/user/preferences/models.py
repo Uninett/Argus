@@ -5,7 +5,6 @@ from argus.htmx.constants import (
     DATETIME_CHOICES,
     DATETIME_DEFAULT,
     DATETIME_FORMATS,
-    INCIDENTS_TABLE_LAYOUT_ALLOWED,
     INCIDENTS_TABLE_LAYOUT_CHOICES,
     INCIDENTS_TABLE_LAYOUT_DEFAULT,
     PAGE_SIZE_DEFAULT,
@@ -58,7 +57,7 @@ class ArgusHtmxPreferences:
             form=UpdateIntervalForm, default=UPDATE_INTERVAL_DEFAULT, choices=UPDATE_INTERVAL_CHOICES
         ),
         "incidents_table_layout": PreferenceField(
-            form=IncidentsTableLayout, default=INCIDENTS_TABLE_LAYOUT_DEFAULT, choices=INCIDENTS_TABLE_LAYOUT_ALLOWED
+            form=IncidentsTableLayout, default=INCIDENTS_TABLE_LAYOUT_DEFAULT, choices=INCIDENTS_TABLE_LAYOUT_CHOICES
         ),
     }
 
