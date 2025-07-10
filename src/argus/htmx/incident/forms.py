@@ -27,6 +27,13 @@ class AddTicketUrlForm(forms.Form):
     ticket_url = forms.URLField(required=True)
 
 
+# incident list filter widgets
+
+
+class IncidentListRefreshInfoSelect(forms.Select):
+    template_name = "htmx/components/incident_list_refresh_info_select.html"
+
+
 # incident filter, not stored
 
 
@@ -36,17 +43,5 @@ class TimeframeForm(forms.Form):
         choices=TIMEFRAME_CHOICES,
         coerce=int,
         initial=TIMEFRAME_DEFAULT,
-        widget=forms.Select(
-            attrs={
-                "class": "border-none select-xs bg-transparent text-base -ml-2",
-                "autocomplete": "off",
-                "hx-get": ".",
-                "hx-trigger": "change",
-                "hx-target": "#table",
-                "hx-swap": "outerHTML",
-                "hx-push-url": "true",
-                "hx-include": ".incident-list-param",
-                "hx-indicator": "#incident-list .htmx-indicator",
-            }
-        ),
+        widget=IncidentListRefreshInfoSelect,
     )
