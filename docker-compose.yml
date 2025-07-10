@@ -6,12 +6,10 @@ services:
       - "8000:8000"
     depends_on:
       - postgres
-      - redis
     environment:
       - TIME_ZONE=Europe/Oslo
       - DJANGO_SETTINGS_MODULE=argus.site.settings.dockerdev
       - DATABASE_URL=postgresql://argus:HahF9araeKoo@postgres/argus
-      - ARGUS_REDIS_SERVER=redis
     volumes:
       - ${PWD}:/argus
     restart: always
@@ -26,11 +24,6 @@ services:
       - POSTGRES_USER=argus
       - POSTGRES_PASSWORD=HahF9araeKoo
       - POSTGRES_DB=argus
-
-
-  redis:
-    image: "redis:latest"
-    restart: always
 
 
 volumes:
