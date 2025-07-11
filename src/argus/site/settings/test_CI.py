@@ -2,14 +2,9 @@ import os
 import subprocess
 import logging.config
 
+from argus.htmx.settings import *  # noqa: F403
+
 from . import get_bool_env, get_str_env
-from .base import *  # noqa: F403
-from ..utils import update_settings
-
-from argus.htmx.appconfig import APP_SETTINGS
-
-update_settings(globals(), APP_SETTINGS)
-ROOT_URLCONF = "argus.htmx.root_urls"
 
 DEBUG = get_bool_env("DEBUG", True)
 TEMPLATES[0]["OPTIONS"]["debug"] = get_bool_env("TEMPLATE_DEBUG", True)  # noqa: F405
