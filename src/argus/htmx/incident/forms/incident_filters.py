@@ -29,6 +29,7 @@ class PageNumberForm(IncidentListForm):
     page = forms.IntegerField(required=False, initial=field_initial, min_value=field_initial)
 
 
+# Stored in preference
 class PageSizeForm(IncidentListForm):
     fieldname = "page_size"
     field_initial = PAGE_SIZE_DEFAULT
@@ -41,10 +42,13 @@ class PageSizeForm(IncidentListForm):
         widget=IncidentListRefreshInfoSelect,
     )
 
+    # page_size is used by a paginator, no need to define ``filter``
 
-## not stored
+    def store(self, request):
+        return self._store_preference("argus_htmx")
 
 
+# Stored in session to ensure it does not go missing
 class TimeframeForm(IncidentListForm):
     fieldname = "timeframe"
     field_initial = TIMEFRAME_DEFAULT
@@ -63,3 +67,6 @@ class TimeframeForm(IncidentListForm):
             after = tznow() - timedelta(minutes=timeframe)
             queryset = queryset.filter(start_time__gte=after)
         return queryset
+
+    def store(self, request):
+        return self._store_in_session(request)

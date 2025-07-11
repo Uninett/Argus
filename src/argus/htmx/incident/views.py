@@ -15,7 +15,6 @@ from django.core.paginator import Paginator
 from django.http import HttpResponse, HttpResponseBadRequest, QueryDict
 from django_htmx.http import HttpResponseClientRefresh, retarget
 
-from argus.auth.utils import get_or_update_preference
 from argus.incident.models import Incident
 from argus.incident.ticket.utils import get_ticket_plugin_path
 from argus.incident.ticket.base import TicketPluginException
@@ -264,17 +263,12 @@ def incident_list(request: HtmxHttpRequest) -> HttpResponse:
     GET_forms = {}
     for Form in IncidentListForm.__subclasses__():
         form = Form(request.GET)
+        form.store()
         GET_forms[form.fieldname] = form
         GET_params[form.fieldname] = form.get_clean_value()
         qs = form.filter(qs)
 
     filtered_count = qs.count()
-
-    if not request.session["timeframe"]:
-        request.session["timeframe"] = GET_params["timeframe"]
-
-    page_size, _ = get_or_update_preference(request, request.GET, "argus_htmx", "page_size")
-    GET_params["page_size"] = page_size
 
     qd = QueryDict("").copy()
     qd.update(GET_params)
@@ -282,6 +276,7 @@ def incident_list(request: HtmxHttpRequest) -> HttpResponse:
     request.GET = qd
 
     # Standard Django pagination
+    page_size = GET_params["page_size"]
     paginator = Paginator(object_list=qs, per_page=page_size)
     page = paginator.get_page(GET_params.get("page", 1))
     last_page_num = page.paginator.num_pages
