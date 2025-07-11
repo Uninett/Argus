@@ -44,8 +44,18 @@ class PageSizeForm(IncidentListForm):
 
     # page_size is used by a paginator, no need to define ``filter``
 
+    def get_clean_value(self, request):
+        # breakpoint()
+        if request.GET.get(self.fieldname, 0):
+            return super().get_clean_value(request)
+        return self.get_initial_value(request)
+
+    @classmethod
+    def get_initial_value(cls, request):
+        return cls._get_initial_preference_value(request, "argus_htmx")
+
     def store(self, request):
-        return self._store_preference("argus_htmx")
+        return self._store_preference(request, "argus_htmx")
 
 
 # Stored in session to ensure it does not go missing
@@ -61,12 +71,16 @@ class TimeframeForm(IncidentListForm):
         widget=IncidentListRefreshInfoSelect,
     )
 
-    def filter(self, queryset):
-        timeframe = self.get_clean_value()
+    def filter(self, queryset, request):
+        timeframe = self.get_clean_value(request)
         if timeframe:
             after = tznow() - timedelta(minutes=timeframe)
             queryset = queryset.filter(start_time__gte=after)
         return queryset
+
+    @classmethod
+    def get_initial_value(cls, request):
+        return request.session.get("timeframe", cls.field_initial) or cls.field_initial
 
     def store(self, request):
         return self._store_in_session(request)

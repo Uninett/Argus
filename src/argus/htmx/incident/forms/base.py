@@ -4,38 +4,54 @@ from urllib.parse import urlencode
 from django import forms
 from django.http import QueryDict
 
-from argus.auth.utils import get_or_update_preference
+from argus.auth.utils import get_or_update_preference, get_preference
 
 
 class IncidentListForm(forms.Form):
     fieldname: str
     field_initial: Any
 
-    def get_clean_value(self):
-        value = self.field_initial
-        if self.is_bound and self.is_valid():
+    def get_clean_value(self, request):
+        value = self.get_initial_value(request)
+        if self.is_valid():
             value = self.cleaned_data[self.fieldname]
         return value
 
-    def get_querydict_for_value(self):
-        data = {self.field_name: self.get_clean_value()}
+    def get_querydict_for_value(self, request):
+        data = {self.fieldname: self.get_clean_value(request)}
         return QueryDict(urlencode(data, doseq=True))
 
-    def filter(self, queryset):
+    def filter(self, queryset, request):
         return queryset
 
-    def _store_preference(self, request, preference):
+    @classmethod
+    def _get_initial_preference_value(cls, request, namespace):
+        return get_preference(request, namespace, cls.fieldname) or cls.field_initial
+
+    @classmethod
+    def _get_initial_session_value(cls, request):
+        return request.session.get(cls.fieldname, cls.field_initial) or cls.field_initial
+
+    @classmethod
+    def get_initial_value(cls, request):
+        return cls.field_initial
+
+    @classmethod
+    def get_initial(cls, request):
+        return {cls.fieldname: cls.get_initial_value(request)}
+
+    def _store_preference(self, request, namespace):
         _, success = get_or_update_preference(
             request,
-            self.get_querydict_for_value(),
-            preference,
+            self.get_querydict_for_value(request),
+            namespace,
             self.fieldname,
         )
         return success
 
     def _store_in_session(self, request):
         if self.is_valid():
-            value = self.get_querydict_for_value()
+            value = self.get_clean_value(request)
             request.session[self.fieldname] = value
             return True
         return False

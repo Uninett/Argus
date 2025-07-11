@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 from collections.abc import Iterable
 from datetime import datetime
+from urllib.parse import urlencode
 from typing import Optional, Any
 
 from django import forms
@@ -25,7 +26,7 @@ from ..request import HtmxHttpRequest
 
 from .customization import get_incident_table_columns
 from .utils import get_filter_function
-from .forms.base import IncidentListForm
+from .forms.incident_filters import IncidentListForm
 from .forms.incident_actions import AckForm, DescriptionOptionalForm, EditTicketUrlForm, AddTicketUrlForm
 from ..utils import (
     single_autocreate_ticket_url_queryset,
@@ -251,8 +252,9 @@ def incident_list(request: HtmxHttpRequest) -> HttpResponse:
     filter_form, qs = incident_list_filter(request, qs)
 
     GET_params = {}
-    if filter_form.is_bound:
-        GET_params = filter_form.cleaned_data.copy()
+    if filter_form.is_valid():
+        # assumes filterbox never sends a zero
+        GET_params = {k: v for k, v in filter_form.cleaned_data.items() if v}
 
     # Fetch timeframe from session since its GET parameter disappears
     _timeframe = int(request.session.get("timeframe", 0) or 0)
@@ -262,24 +264,25 @@ def incident_list(request: HtmxHttpRequest) -> HttpResponse:
     # non filterbox GET parameters
     GET_forms = {}
     for Form in IncidentListForm.__subclasses__():
-        form = Form(request.GET)
-        form.store()
+        form = Form(request.GET, initial=Form.get_initial(request))
+        form.store(request)
         GET_forms[form.fieldname] = form
-        GET_params[form.fieldname] = form.get_clean_value()
-        qs = form.filter(qs)
+        initial_value = Form.get_initial_value(request)
+        GET_params[form.fieldname] = form.get_clean_value(request) or initial_value
+        qs = form.filter(qs, request)
 
     filtered_count = qs.count()
-
-    qd = QueryDict("").copy()
-    qd.update(GET_params)
-    LOG.debug("incident_list view: Cleaned QueryDict: %s", qd)
-    request.GET = qd
+    LOG.debug("___________________: %s", GET_params)
 
     # Standard Django pagination
     page_size = GET_params["page_size"]
     paginator = Paginator(object_list=qs, per_page=page_size)
     page = paginator.get_page(GET_params.get("page", 1))
     last_page_num = page.paginator.num_pages
+
+    qd = QueryDict(urlencode(GET_params, doseq=True))
+    LOG.debug("incident_list view: Cleaned QueryDict: %s", qd)
+    request.GET = qd
 
     refresh_info = {
         "count": total_count,
