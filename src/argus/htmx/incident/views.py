@@ -16,7 +16,6 @@ from django.http import HttpResponse, HttpResponseBadRequest, QueryDict
 from django_htmx.http import HttpResponseClientRefresh, retarget
 
 from argus.auth.utils import get_or_update_preference
-from argus.htmx.incident.forms import IncidentListForm
 from argus.incident.models import Incident
 from argus.incident.ticket.utils import get_ticket_plugin_path
 from argus.incident.ticket.base import TicketPluginException
@@ -27,7 +26,8 @@ from ..request import HtmxHttpRequest
 
 from .customization import get_incident_table_columns
 from .utils import get_filter_function
-from .forms import AckForm, DescriptionOptionalForm, EditTicketUrlForm, AddTicketUrlForm
+from .forms.base import IncidentListForm
+from .forms.incident_actions import AckForm, DescriptionOptionalForm, EditTicketUrlForm, AddTicketUrlForm
 from ..utils import (
     single_autocreate_ticket_url_queryset,
     bulk_change_incidents,

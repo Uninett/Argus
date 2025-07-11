@@ -9,27 +9,7 @@ from argus.htmx.constants import (
     TIMEFRAME_CHOICES,
     TIMEFRAME_DEFAULT,
 )
-
-# modals
-
-
-class AckForm(forms.Form):
-    description = forms.CharField()
-    expiration = forms.DateTimeField(required=False)
-
-
-class DescriptionOptionalForm(forms.Form):
-    "For closing/reopening"
-
-    description = forms.CharField(required=False)
-
-
-class EditTicketUrlForm(forms.Form):
-    ticket_url = forms.URLField(required=False)
-
-
-class AddTicketUrlForm(forms.Form):
-    ticket_url = forms.URLField(required=True)
+from argus.htmx.incident.forms.base import IncidentListForm
 
 
 # incident list filter widgets
@@ -40,17 +20,6 @@ class IncidentListRefreshInfoSelect(forms.Select):
 
 
 # incident filter forms
-
-
-class IncidentListForm(forms.Form):
-    def get_clean_value(self):
-        value = self.initial
-        if self.is_bound and self.is_valid():
-            value = self.cleaned_data[self.fieldname]
-        return value
-
-    def filter(self, queryset):
-        return queryset
 
 
 class PageNumberForm(IncidentListForm):
@@ -91,6 +60,6 @@ class TimeframeForm(IncidentListForm):
     def filter(self, queryset):
         timeframe = self.get_clean_value()
         if timeframe:
-            after = tznow() - timedelta(seconds=timeframe * 60)
+            after = tznow() - timedelta(minutes=timeframe)
             queryset = queryset.filter(start_time__gte=after)
         return queryset
