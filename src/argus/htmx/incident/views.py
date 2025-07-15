@@ -98,7 +98,7 @@ def incident_update(request: HtmxHttpRequest, action: str):
 
     if action == "autocreate-ticket":
         try:
-            single_autocreate_ticket_url_queryset(request.user, incident_ids, {"timestamp": tznow()})
+            single_autocreate_ticket_url_queryset(request, incident_ids, {"timestamp": tznow()})
         except TicketPluginException as e:
             messages.error(request, str(e))
         return HttpResponseClientRefresh()
