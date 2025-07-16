@@ -41,6 +41,11 @@ dependencies = [
     "httpx",
     "pydantic>=2",
     "django-rest-knox",
+    "django-htmx",
+    "django-widget-tweaks==1.5.0",
+    "fontawesomefree~=6.6",
+    "social-auth-core>=4.1",
+    "social-auth-app-django>=5.0",
 ]
 dynamic = ["version"]
 
@@ -49,13 +54,6 @@ dynamic = ["version"]
 
 [project.optional-dependencies]
 docs = ["sphinx>=2.2.0"]
-htmx = [
-    "django-htmx",
-    "django-widget-tweaks==1.5.0",
-    "fontawesomefree~=6.6",
-    "social-auth-core>=4.1",
-    "social-auth-app-django>=5.0",
-]
 dev = [
     "django-debug-toolbar",
     "coverage",
