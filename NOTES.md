@@ -3,6 +3,38 @@
 This file documents changes to Argus that are relevant for operations,
 customizers and end-users.
 
+
+## [2.1.1] - 2025-07-16
+
+Updated the user manual in the docs, added the link to the Argus demo site
+(https://argus-demo.uninett.no) to the README and fixed automatic ticket creation.
+
+### Added
+
+- Added new sections to the user manual: *How to select from existing themes*,
+  *How to add your own theme*,
+  *How to choose what columns are shown in the incidents table*, and *How to
+  change the date and time format*.
+  ([#1491](https://github.com/Uninett/Argus/issues/1491))
+
+### Changed
+
+- Updated the README with a link and info about the publicly accessible
+  demo-site.
+  ([#1510](https://github.com/Uninett/Argus/issues/1510))
+- Updated the content of the user manual (outdated text, screenshots and broken
+  external links). ([#1490](https://github.com/Uninett/Argus/issues/1490))
+
+### Fixed
+
+- Fixed automatic ticket creation, which was broken by
+  [#1497](https://github.com/Uninett/Argus/issues/1497)
+  ([#1516](https://github.com/Uninett/Argus/issues/1516))
+- Fixed broken links in the user manual.
+  ([#1492](https://github.com/Uninett/Argus/issues/1492))
+
+
+
 ## [2.1.0] - 2025-06-30
 
 One new user preference.

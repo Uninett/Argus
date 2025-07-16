@@ -8,6 +8,37 @@ This project uses [*towncrier*](https://towncrier.readthedocs.io/) and the chang
 
 <!-- towncrier release notes start -->
 
+## [2.1.1] - 2025-07-16
+
+### Added
+
+- Added new sections to the user manual: *How to select from existing themes*,
+  *How to add your own theme*,
+  *How to choose what columns are shown in the incidents table*, and *How to
+  change the date and time format*.
+  ([#1491](https://github.com/Uninett/Argus/issues/1491))
+
+### Changed
+
+- Added info about more glue services.
+  ([#1508](https://github.com/Uninett/Argus/issues/1508))
+- Updated the README with a link and info about the publicly accessible
+  demo-site.
+  ([#1510](https://github.com/Uninett/Argus/issues/1510))
+- Updated the content of the user manual (outdated text, screenshots and broken
+  external links). ([#1490](https://github.com/Uninett/Argus/issues/1490))
+
+### Fixed
+
+- Fixed automatic ticket creation, which was broken by
+  [#1497](https://github.com/Uninett/Argus/issues/1497)
+  ([#1516](https://github.com/Uninett/Argus/issues/1516))
+- Made `docker compose up` for development work with Argus 2.1+
+  ([#1513](https://github.com/Uninett/Argus/issues/1513))
+- Fixed broken links in the user manual.
+  ([#1492](https://github.com/Uninett/Argus/issues/1492))
+
+
 ## [2.1.0] - 2025-06-30
 
 ### Added
