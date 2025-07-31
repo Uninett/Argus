@@ -35,6 +35,7 @@ TIMEFRAME_CHOICES = (
     (_hour * 3, "Last 3 hours"),
     (_hour * 12, "Last 12 hours"),
     (_day, "Last 24 hours"),
+    (_day * 3, "Last 3 days"),
     (_day * 7, "Last week"),
     (_day * 30, "Last 30 days"),
 )
