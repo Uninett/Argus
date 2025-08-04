@@ -1,5 +1,5 @@
 ===================================================
-Howto: Mainitaing the contributors file and mailmap
+Howto: Maintaining the contributors file and mailmap
 ===================================================
 
 Maintaining CONTRIBUTORS.md
@@ -23,9 +23,9 @@ As an example, as of the creation of this howto, the first entry for
 
 The format for a contributor in the CONTRIBUTORS.md is::
 
-    * [Name of contributor](link to preferred homepage) \<prefeirred@email.address\>
+    * [Name of contributor](link to preferred homepage) \<preferred@email.address\>
 
-If there is no preferred homepage the contributor name need not be be a link::
+If there is no preferred homepage the contributor name need not be a link::
 
     * Name of contributor \<preferred@email.address\>
 
@@ -37,9 +37,9 @@ contributors that have several. This is useful for ``git blame``.
 
 This happens when the contributor commits from several different computers and
 tools with different configurations for name and email. Github also gives each
-user a github-specific email address that may be used when authoring/comitting.
+user a github-specific email address that may be used when authoring/committing.
 
-.. tip:: To prevent multiple names and addresses for the same author/commiter
+.. tip:: To prevent multiple names and addresses for the same author/committer
     in the first place, make sure to explicitly configure this in every tool
     used to commit.
 
