@@ -4,13 +4,13 @@
 HTMx Frontend
 =============
 
-The new frontend is old-new school and uses HTMx to boost HTML pages. See the
-`Github repo of argus-htmx-frontend <https://github.com/uninett/argus-htmx-frontend>`_
+The new frontend is old-new school and uses HTMx to boost HTML pages.
 
-It is not needed if running headless.
+It uses Tailwind CSS and daisyUI for looks and layout, but you do not need to
+install anything extra for the frontend to work.
 
-It uses Tailwind CSS and daisyUI for looks and layout but you need not install
-anything extra for the frontend to work.
+You *do* need to have both in order to add a new theme or otherwise change the
+looks:
 
 * Tailwind CSS: A utility-first CSS framework for rapidly building custom user interfaces.
 * daisyUI: A component library for Tailwind CSS that provides a set of
@@ -20,16 +20,15 @@ anything extra for the frontend to work.
 Setup
 =====
 
-The app is included in the argus-server codebase.
+The app is included in the argus-server codebase and is installed by default.
 
-The generated requirements-files include the dependencies already.
+Install and build Tailwind CSS and daisyUI for UI tweaks
+--------------------------------------------------------
 
-Install and build Tailwind CSS and daisyUI
-------------------------------------------
-
-If you want to be able to customize the frontend in any way, including changing
-or adding themes, you need to install the support for Tailwind CSS and daisyUI.
-They are not Python packages so it cannot be streamlined much.
+.. attention::
+   If you want to be able to customize the frontend in any way, including
+   changing or adding themes, you need to install the support for Tailwind CSS
+   and daisyUI. They are not Python packages so it cannot be streamlined much.
 
 Recommended but open for tweaks and adaptations steps:
 
@@ -128,7 +127,9 @@ Domain settings
   to incidents in the dashboard, or whenever else an absolute url is needed.
 
 The setting must point to the publicly visible domain where the frontend is
-running. This might be different from where the backend is running.
+running. This might be different from where the backend is running. If the
+backend is running on multiple addresses (for replication/robustness) they must
+share the same :setting:`ARGUS_FRONTEND_URL`.
 
 Depending on how Argus is deployed this is the only surefire way to get hold
 of the externally visible hostname in the code in all cases.
