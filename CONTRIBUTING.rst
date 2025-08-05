@@ -38,7 +38,7 @@ Nuts and bolts
   stuff is linted before you ask for a review.
 * Add yourself to the bottom of the CONTRIBUTORS.md-file if this is your first
   patch.
-* We use a template for the message in PR's, it's good enough that we use it
+* We use a template for the message in PRs, it's good enough that we use it
   ourselves. It helps us review the code faster!
 
   * If there are visible changes to the frontend, add screenshots of before and
