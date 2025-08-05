@@ -16,14 +16,14 @@ looks:
 * daisyUI: A component library for Tailwind CSS that provides a set of
   ready-to-use components as well as color themes.
 
-
 Setup
 =====
 
-The app is included in the argus-server codebase and is installed by default.
+The app is included in the argus-server codebase and is installed and
+configured by default.
 
 Install and build Tailwind CSS and daisyUI for UI tweaks
---------------------------------------------------------
+========================================================
 
 .. attention::
    If you want to be able to customize the frontend in any way, including
@@ -33,7 +33,7 @@ Install and build Tailwind CSS and daisyUI for UI tweaks
 Recommended but open for tweaks and adaptations steps:
 
 Install
-~~~~~~~
+-------
 
 1. Get Tailwind standalone CLI bundled with daisyUI from
    https://github.com/dobicinaitis/tailwind-cli-extra
@@ -52,7 +52,7 @@ Install
 2. (Linux/OsX) Move the tailwindcss file to your $PATH, for instance to ``~/bin/`` or ``.local/bin``.
 
 Build
-~~~~~
+-----
 
 1. Go to the repo directory (parent of ``src/``)
 2. Build main stylesheet file using ``tailwindcss`` executable from step 1 and
@@ -73,50 +73,19 @@ Build
 Configure
 ---------
 
-If *all the settings you need to change* can be set via environment variables,
-use ``argus.htmx.settings`` as your settings-file *for development*.
+See :ref:`customize-htmx-frontend`. You will probably need a separate settings
+file, see :ref:`howto-change-settings`.
 
-For *production* you must set :setting::`ALLOWED_HOSTS`, have a look at
-``argus.site.settings.prod``.
+Settings
+========
 
-If you need to override settings not mirrored by environment variables, read
-on.
+See :ref:`howto-change-settings` for the how, see below for what.
 
-Do this in your workdir, which could be the checked out `argus-server
-<https://github.com/Uninett/Argus>`_ repo.
-
-This assumes that you have a local settings file (we recommend calling it
-"localsettings.py" since that is hidden by .gitignore) as a sibling of
-``src/``.
-
-At the top of this local settings file, copy the contents of
-``argus.htmx.settings``. This will base the settings-file on
-``argus.site.settings.base``.
-
-Example, from the start of the settings-file for production::
-
-   from argus.htmx.settings import *
-
-While developing you will probably prefer to swap out
-``argus.htmx.settings`` with ``argus.site.settings.dev``, as the former
-is almost production-ready while the latter is tuned for development and
-depends on the optional dependencies you can install via ``pip install
-argus-server[dev]``.
-
-Example, top of settings-file for development::
-
-   from argus.site.settings.dev import *
-
-The management command ``print_settings`` (which depends on the app
-``django-extensions``, a ``dev``-dependency) will print out the complete
-settings used.
+These settings are needed for various features in the frontend.
 
 Note especially that :setting:`ROOT_URLCONF` is set to
 ``argus.htmx.root_urls``. If you prefer to make your own root ``urls.py``, the
 frontend-specific urls can be imported from ``argus.htmx.htmx_urls``.
-
-Settings
-========
 
 Domain settings
 ---------------
