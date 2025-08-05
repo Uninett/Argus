@@ -12,7 +12,7 @@ Patches are indeed also welcome, in prioritized order:
 * More integrations (glue services, ticket plugins, notification destinations,
   API clients, especially in other languages..)
 
-  * For integrations in python "all" (ha!) you need is a package on PyPI and
+  * For integrations in Python "all" (ha!) you need is a package on PyPI and
     a patch with updated info about your integration for the docs. We'll check
     that the package installs and do a quick security check.
   * For integrations in other languages you just need a patch with updated info
@@ -36,7 +36,7 @@ Nuts and bolts
 
 * We use pre-commit for linting. We lint the same stuff in CI so make sure your
   stuff is linted before you ask for a review.
-* Add yourself to the bottom of the CONTRIBUTING.md-file if this is your first
+* Add yourself to the bottom of the CONTRIBUTORS.md-file if this is your first
   patch.
 * We use a template for the message in PR's, it's good enough that we use it
   ourselves. It helps us review the code faster!
@@ -46,5 +46,5 @@ Nuts and bolts
 
 * See the docs for
 
-  * How to write a changelog, and when
-  * What we want to see in a commit message
+  * How to write a changelog, and when `(local copy) <./docs/development/howtos/changelog-entry.html>`_, `RTD <https://argus-server.readthedocs.io/en/latest/development/howtos/changelog-entry.html>`_
+  * What we want to see in a commit message `(local copy) <./docs/development/howtos/commit-messages.html>`_, `RTD <https://argus-server.readthedocs.io/en/latest/development/howtos/commit-messages.html>`_
