@@ -13,7 +13,7 @@
       {% if field.name == "name" or field.name == "timeslot" %}
         {% include "htmx/forms/input_field.html" with label=field.label max_width="md" field=field %}
       {% elif field.name == "active" %}
-        {% include "htmx/forms/input_field.html" with label=field.label field=field input_classes="checkbox border-b border-1" %}
+        {% include "htmx/forms/input_field.html" with label=field.label field=field input_classes="checkbox border-b border" %}
       {% else %}
         <div class="form-control">
           <label class="label label-text" for={{ field.auto_id }}><em>{{ field.label }}</em>
