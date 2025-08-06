@@ -1,9 +1,14 @@
-from argus.site.settings.backend import *
-from argus.site.utils import update_settings
-
-from argus.htmx.appconfig import APP_SETTINGS
-
-
-update_settings(globals(), APP_SETTINGS)
+from argus.site.settings.base import *
 
 ROOT_URLCONF = "argus.htmx.root_urls"
+
+PUBLIC_URLS = [
+    "/accounts/login/",
+    "/api/",
+    "/oidc/",
+]
+
+LOGIN_URL = "/accounts/login/"
+LOGOUT_URL = "/accounts/logout/"
+LOGIN_REDIRECT_URL = "/incidents/"
+LOGOUT_REDIRECT_URL = "/incidents/"

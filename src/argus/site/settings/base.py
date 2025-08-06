@@ -29,12 +29,17 @@ INTERNAL_IPS = []
 # fmt: off
 # fsck off, black
 INSTALLED_APPS = [
+    # overrides others. must come first
+    "argus.htmx",
+
+    # Django 1st party apps
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.forms",
 
     # 3rd party apps
     "corsheaders",
@@ -45,6 +50,9 @@ INSTALLED_APPS = [
     "django_filters",
     "phonenumber_field",
     "knox",  # token auth
+    "django_htmx",
+    "widget_tweaks",
+    "fontawesomefree",
 
     # Argus apps
     "argus.auth",
@@ -68,9 +76,14 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "social_django.middleware.SocialAuthExceptionMiddleware",
     "django.contrib.auth.middleware.RemoteUserMiddleware",
+    "django_htmx.middleware.HtmxMiddleware",
+    "argus.htmx.middleware.LoginRequiredMiddleware",
+    "argus.htmx.middleware.HtmxMessageMiddleware",
 ]
 
 ROOT_URLCONF = "argus.site.urls"
+
+FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
 
 TEMPLATES = [
     {
@@ -85,6 +98,8 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "social_django.context_processors.backends",
                 "social_django.context_processors.login_redirect",
+                "argus.auth.context_processors.preferences",
+                "argus.htmx.context_processors.static_paths",
             ],
         },
     }

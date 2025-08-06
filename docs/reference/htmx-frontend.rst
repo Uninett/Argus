@@ -4,44 +4,36 @@
 HTMx Frontend
 =============
 
-The new frontend is old-new school and uses HTMx to boost HTML pages. See the
-`Github repo of argus-htmx-frontend <https://github.com/uninett/argus-htmx-frontend>`_
+The new frontend is old-new school and uses HTMx to boost HTML pages.
 
-It has its own specific settings and currently depends on an app.
+It uses Tailwind CSS and daisyUI for looks and layout, but you do not need to
+install anything extra for the frontend to work.
 
-It is not needed if running headless.
-
-It uses Tailwind CSS and daisyUI for looks and layout.
+You *do* need to have both in order to add a new theme or otherwise change the
+looks:
 
 * Tailwind CSS: A utility-first CSS framework for rapidly building custom user interfaces.
-* daisyUI: A component library for Tailwind CSS that provides a set of ready-to-use components as well as color themes.
-
+* daisyUI: A component library for Tailwind CSS that provides a set of
+  ready-to-use components as well as color themes.
 
 Setup
 =====
 
-The app is included in the argus-server codebase, but it is optional to use.
+The app is included in the argus-server codebase and is installed and
+configured by default.
 
-Install Python dependencies
----------------------------
+Install and build Tailwind CSS and daisyUI for UI tweaks
+========================================================
 
-Install the dependencies::
-
-    pip install argus-server[htmx]
-
-(The generated requirements-files include the dependencies already.)
-
-Install and build Tailwind CSS and daisyUI
-------------------------------------------
-
-If you want to be able to customize the frontend in any way, including changing
-or adding themes, you need to install the support for Tailwind CSS and daisyUI.
-They are not Python packages so it cannot be streamlined much.
+.. attention::
+   If you want to be able to customize the frontend in any way, including
+   changing or adding themes, you need to install the support for Tailwind CSS
+   and daisyUI. They are not Python packages so it cannot be streamlined much.
 
 Recommended but open for tweaks and adaptations steps:
 
 Install
-~~~~~~~
+-------
 
 1. Get Tailwind standalone CLI bundled with daisyUI from
    https://github.com/dobicinaitis/tailwind-cli-extra
@@ -60,7 +52,7 @@ Install
 2. (Linux/OsX) Move the tailwindcss file to your $PATH, for instance to ``~/bin/`` or ``.local/bin``.
 
 Build
-~~~~~
+-----
 
 1. Go to the repo directory (parent of ``src/``)
 2. Build main stylesheet file using ``tailwindcss`` executable from step 1 and
@@ -81,74 +73,19 @@ Build
 Configure
 ---------
 
-If *all the settings you need to change* can be set via environment variables,
-use ``argus.htmx.settings`` as your settings-file. Otherwise, read on.
+See :ref:`customize-htmx-frontend`. You will probably need a separate settings
+file, see :ref:`howto-change-settings`.
 
-Do this in your workdir, which could be the checked out `argus-server
-<https://github.com/Uninett/Argus>`_ repo.
+Settings
+========
 
-This assumes that you have a local settings file (we recommend calling it
-"localsettings.py" since that is hidden by .gitignore) as a sibling of
-``src/``.
+See :ref:`howto-change-settings` for the how, see below for what.
 
-At the top of this local settings file, copy the contents of
-``argus.htmx.settings``. This will base the settings-file on
-``argus.site.settings.backend`` and automatically use
-``argus.site.utils.update_settings`` with
-``argus.htmx.appconfig.APP_SETTINGS`` to set/overwrite some settings and
-mutate others. Note the usage of ``globals()``; due to this, inheriting from
-``argus.htmx.settings`` will probably not work as expected.
-
-Example, top of settings-file for production::
-
-   from argus.site.settings.backend import *
-   from argus.site.utils import update_settings
-   from argus.htmx.appconfig import APP_SETTINGS
-
-   update_settings(globals(), APP_SETTINGS)
-
-   ROOT_URLCONF = "argus.htmx.root_urls"
-
-While developing you will probably prefer to swap out
-``argus.site.settings.backend`` with ``argus.site.settings.dev``, as the former
-is almost production-ready while the latter is tuned for development and
-depends on the optional dependencies you can install via ``pip install
-argus-server[dev]``.
-
-Example, top of settings-file for development::
-
-   from argus.site.settings.dev import *
-   from argus.site.utils import update_settings
-   from argus.htmx.appconfig import APP_SETTINGS
-
-   update_settings(globals(), APP_SETTINGS)
-
-   ROOT_URLCONF = "argus.htmx.root_urls"
-
-The ``argus.site.utils.update_settings`` function will add or change the settings
-
-* INSTALLED_APPS
-* LOGIN_REDIRECT_URL
-* LOGIN_URL
-* LOGOUT_REDIRECT_URL
-* LOGOUT_URL
-* MIDDLEWARE
-* PUBLIC_URLS
-* ROOT_URLCONF
-* TEMPLATES
-
-See ``argus.htmx.appconfig._app_settings`` for what is being set.
-
-The management command ``print_settings`` (which depends on the app
-``django-extensions``, a ``dev``-dependency) will print out the complete
-settings used.
+These settings are needed for various features in the frontend.
 
 Note especially that :setting:`ROOT_URLCONF` is set to
 ``argus.htmx.root_urls``. If you prefer to make your own root ``urls.py``, the
 frontend-specific urls can be imported from ``argus.htmx.htmx_urls``.
-
-Settings
-========
 
 Domain settings
 ---------------
@@ -159,7 +96,9 @@ Domain settings
   to incidents in the dashboard, or whenever else an absolute url is needed.
 
 The setting must point to the publicly visible domain where the frontend is
-running. This might be different from where the backend is running.
+running. This might be different from where the backend is running. If the
+backend is running on multiple addresses (for replication/robustness) they must
+share the same :setting:`ARGUS_FRONTEND_URL`.
 
 Depending on how Argus is deployed this is the only surefire way to get hold
 of the externally visible hostname in the code in all cases.

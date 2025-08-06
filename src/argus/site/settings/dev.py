@@ -1,16 +1,10 @@
 from dotenv import load_dotenv
 
-from argus.htmx.appconfig import APP_SETTINGS
-
 load_dotenv()
 
+from argus.htmx.settings import *  # noqa: E402
 from . import get_bool_env, get_str_env  # noqa: E402
-from .base import *  # noqa: E402, F403
-from ..utils import update_settings  # noqa: E402
 
-
-update_settings(globals(), APP_SETTINGS)
-ROOT_URLCONF = "argus.htmx.root_urls"
 
 DEBUG = get_bool_env("DEBUG", True)
 TEMPLATES[0]["OPTIONS"]["debug"] = get_bool_env("TEMPLATE_DEBUG", True)  # noqa: F405
