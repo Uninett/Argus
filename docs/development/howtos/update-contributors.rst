@@ -1,6 +1,6 @@
-===================================================
+====================================================
 Howto: Maintaining the contributors file and mailmap
-===================================================
+====================================================
 
 Maintaining CONTRIBUTORS.md
 ===========================
@@ -29,11 +29,14 @@ If there is no preferred homepage the contributor name need not be a link::
 
     * Name of contributor \<preferred@email.address\>
 
+.. _maintaining-mailmap:
+
 Maintaining .mailmap
 ====================
 
 ``.mailmap`` exists to combine email addresses and contributor names of
-contributors that have several. This is useful for ``git blame``.
+contributors that have several. This is useful for ``git blame`` and ``git
+log``.
 
 This happens when the contributor commits from several different computers and
 tools with different configurations for name and email. Github also gives each
