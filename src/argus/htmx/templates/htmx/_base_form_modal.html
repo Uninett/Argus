@@ -1,7 +1,7 @@
 <button class="btn {{ button_class|default:"btn-primary" }}"
         onclick="htmx.find('#{{ dialog_id }}').showModal()">{{ button_title }}</button>
 <dialog id="{{ dialog_id }}" class="modal">
-  <div class="modal-box card card-compact shadow-xl loading-box">
+  <div class="modal-box card card-sm shadow-xl loading-box">
     <div class="w-full">
       <div class="divider divider-start">
         <h3 class="card-title">{{ header }}</h3>
