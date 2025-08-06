@@ -67,7 +67,7 @@
                 {% elif field|field_type == "multiplechoicefield" %}
                   {{ field|attr:"size:1"|add_class:"select select-primary" }}
                 {% elif field|field_type == "charfield" %}
-                  {{ field|add_class:"input input-primary input-bordered" }}
+                  {{ field|add_class:"input input-primary" }}
                 {% endif %}
               </label>
             {% endif %}
