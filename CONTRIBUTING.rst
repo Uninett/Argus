@@ -34,6 +34,12 @@ We're not so keen on:
 Nuts and bolts
 ==============
 
+* Please set your name and email address in ``git`` and GitHub before your
+  first commit if you haven't already:
+
+  * How to set name and email address in git `(local copy) <./docs/development/howtos/howtos-for-git.rst>`_, `RTD <https://argus-server.readthedocs.io/en/latest/development/howtos/howtos-for-git.html>`_
+  * How to set email address in GitHub `(local copy) <./docs/development/howtos/howtos-for-github.rst>`_, `RTD <https://argus-server.readthedocs.io/en/latest/development/howtos/howtos-for-github.html>`_
+
 * We use pre-commit for linting. We lint the same stuff in CI so make sure your
   stuff is linted before you ask for a review.
 * Add yourself to the bottom of the CONTRIBUTORS.md-file if this is your first
@@ -46,5 +52,5 @@ Nuts and bolts
 
 * See the docs for
 
-  * How to write a changelog, and when `(local copy) <./docs/development/howtos/changelog-entry.html>`_, `RTD <https://argus-server.readthedocs.io/en/latest/development/howtos/changelog-entry.html>`_
-  * What we want to see in a commit message `(local copy) <./docs/development/howtos/commit-messages.html>`_, `RTD <https://argus-server.readthedocs.io/en/latest/development/howtos/commit-messages.html>`_
+  * How to write a changelog, and when `(local copy) <./docs/development/howtos/changelog-entry.rst>`_, `RTD <https://argus-server.readthedocs.io/en/latest/development/howtos/changelog-entry.html>`_
+  * What we want to see in a commit message `(local copy) <./docs/development/howtos/commit-messages.rst>`_, `RTD <https://argus-server.readthedocs.io/en/latest/development/howtos/commit-messages.html>`_
