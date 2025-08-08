@@ -7,7 +7,7 @@ displayed as clickable.
 <li>
   <a hx-get="{% querystring page=page_number %}"
      href="{% querystring page=page_number %}"
-     hx-indicator="#incident-list .htmx-indicator"
+     hx-indicator="#incident-list-table .htmx-indicator"
      hx-include=".incident-list-param"
      class="join-item btn">{{ page_prefix }}{{ page_name|default:page_number }}{{ page_suffix }}</a>
 </li>

@@ -78,9 +78,9 @@ an extensive list, but can provide entry points or inspiration:
 * ``htmx/incident/cells/*.html``: customize how incident list column cells are rendered
 * ``htmx/incident/incident_detail.html``: customize the indicent details page
 * ``htmx/incident/incident_list.html``: add additional content to the incident list page, outside
-  of the table
-* ``htmx/incident/responses/_incident_list_refresh.html``: add additional content, such as
-  ``hx-swap-oob`` content, to a incident list htmx partial response
+  of the table and tab bar.
+* ``htmx/incident/responses/_incident_list_extra.html``: add additional content, such as
+  ``hx-swap-oob`` content, to an incident list htmx partial response
 * ``htmx/user/_user_menu.html``: add or remove items to the user menu (the menu that appears when
   clicking on the user's initials in the top right)
 * ``htmx/user/preferences.html``: add custom preferences to the preferences page

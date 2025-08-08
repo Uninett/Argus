@@ -42,11 +42,11 @@ class TimeframeForm(forms.Form):
                 "autocomplete": "off",
                 "hx-get": ".",
                 "hx-trigger": "change",
-                "hx-target": "#table",
+                "hx-target": "#incident-list",
                 "hx-swap": "outerHTML",
                 "hx-push-url": "true",
                 "hx-include": ".incident-list-param",
-                "hx-indicator": "#incident-list .htmx-indicator",
+                "hx-indicator": "#incident-list-table .htmx-indicator",
             }
         ),
     )
