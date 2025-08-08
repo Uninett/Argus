@@ -281,9 +281,9 @@ def incident_list(request: HtmxHttpRequest) -> HttpResponse:
     # requests, allowing us to skip rendering the unchanging parts of the
     # template.
     if request.htmx:
-        base_template = "htmx/incident/responses/_incident_list_refresh.html"
+        template_name = "htmx/incident/_incident_list.html"
     else:
-        base_template = "htmx/incident/_base.html"
+        template_name = "htmx/incident/incident_list.html"
     last_page_num = page.paginator.num_pages
     context = {
         "columns": columns,
@@ -292,10 +292,9 @@ def incident_list(request: HtmxHttpRequest) -> HttpResponse:
         "filter_form": filter_form,
         "timeframe_form": timeframe_form,
         "page_title": "Incidents",
-        "base": base_template,
         "page": page,
         "last_page_num": last_page_num,
         "second_to_last_page": last_page_num - 1,
         "last_refreshed": last_refreshed,
     }
-    return render(request, "htmx/incident/incident_list.html", context=context)
+    return render(request, template_name, context=context)

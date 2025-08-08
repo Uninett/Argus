@@ -24,10 +24,10 @@
               hx-get="{% url 'htmx:incident-list' %}"
               hx-trigger="click"
               hx-include=".incident-list-param"
-              hx-target="#table"
+              hx-target="#incident-list"
               hx-swap="outerHTML"
               hx-push-url="true"
-              hx-indicator="#incident-list .htmx-indicator">Filter</button>
+              hx-indicator="#incident-list-table .htmx-indicator">Filter</button>
     </div>
   {% endwith %}
 </div>
