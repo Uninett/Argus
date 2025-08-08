@@ -3,7 +3,7 @@
 django-admin collectstatic --noinput
 django-admin migrate --noinput
 exec gunicorn \
-     argus.spa.ws.asgi:application \
+     argus.site.wsgi:application \
      -k uvicorn.workers.UvicornWorker \
      --forwarded-allow-ips="*" \
      --access-logfile - \

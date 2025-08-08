@@ -1,5 +1,12 @@
 # Defines a production image for the Argus API server
-# Needs the repository root directory as its context
+# Needs the repository root directory as its context:
+#
+# If you're in the same dorectory as this Dockerfile try:
+#   docker build ..
+#
+# If you're in the repository root try:
+#   docker build -f docker/Dockerfile .
+
 FROM python:3.12
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -15,7 +22,7 @@ RUN mkdir -p /static && chown argus /static
 ENV STATIC_ROOT=/static
 
 COPY . /src
-RUN pip install '/src[spa]' && rm -rf /src
+RUN pip install '/src' && rm -rf /src
 
 # Install API backend settings suitable for Docker deployment
 RUN mkdir /extrapython
