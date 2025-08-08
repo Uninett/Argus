@@ -20,11 +20,11 @@
                 name="page_size"
                 hx-get="{% url 'htmx:incident-list' %}"
                 hx-trigger="change"
-                hx-target="#table"
+                hx-target="#incident-list"
                 hx-swap="outerHTML"
                 hx-push-url="true"
                 hx-include=".incident-list-param"
-                hx-indicator="#incident-list .htmx-indicator">
+                hx-indicator="#incident-list-table .htmx-indicator">
           {% for ps, ps_name in preferences_choices.argus_htmx.page_size %}
             <option value="{{ ps }}"
                     {% if ps == preferences.argus_htmx.page_size %}selected{% endif %}>{{ ps_name }}</option>
@@ -45,7 +45,7 @@
                 name="update_interval"
                 hx-post="{% url 'htmx:update-preferences' namespace='argus_htmx' %}"
                 hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
-                hx-indicator="#incident-list .htmx-indicator"
+                hx-indicator="#incident-list-table .htmx-indicator"
                 autocomplete="off">
           {% for interval, interval_name in preferences_choices.argus_htmx.update_interval %}
             <option class="bg-neutral"

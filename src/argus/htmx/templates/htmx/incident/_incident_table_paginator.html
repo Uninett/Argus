@@ -8,7 +8,7 @@ the backwards/forwards buttons to navigate these subpages.
 -->
 {% if page.paginator.num_pages > 1 %}
   <ul class="join"
-      hx-target="#table"
+      hx-target="#incident-list"
       hx-swap="outerHTML"
       hx-push-url="true">
     {% if page.number != 1 %}
