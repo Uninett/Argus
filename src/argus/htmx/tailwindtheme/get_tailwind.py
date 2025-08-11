@@ -4,8 +4,13 @@
 # Allows it to work without an activated virtualenv
 
 
-from .config import FILENAME, VERSION
-from .utils import get_url, get_architecture, map_from_architecture_to_filename_fragment, download_tailwind_cli
+from argus.htmx.tailwindtheme.config import FILENAME, VERSION
+from argus.htmx.tailwindtheme.utils import (
+    get_url,
+    get_architecture,
+    map_from_architecture_to_filename_fragment,
+    download_tailwind_cli,
+)
 
 
 if __name__ == "__main__":

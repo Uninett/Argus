@@ -22,7 +22,7 @@ ARCHITECTURE_MAP = {
 
 TAILWIND_PATH = Path(__file__).resolve()
 
-FILENAME = TAILWIND_PATH / "tailwindcss"
+FILENAME = TAILWIND_PATH.parent / "tailwindcss"
 
 __all__ = [
     "VERSION",
