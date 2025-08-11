@@ -2,10 +2,10 @@ coverage:
   status:
     project:
       default:
-        threshold: 90%
+        threshold: 10%
     patch:
       default:
-        threshold: 90%
+        threshold: 10%
 
 ignore:
   - "manage.py"
