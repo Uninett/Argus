@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Lint Python
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - uses: astral-sh/ruff-action@v3
       with:
         version: "0.12.0"
@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Lint HTML
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
 
     - name: Set up Python
       uses: actions/setup-python@v5
@@ -46,7 +46,7 @@ jobs:
         python-version: ["3.10", "3.11", "3.12", "3.13"]
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
 
     - uses: actions/cache@v4
       id: cache
