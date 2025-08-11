@@ -248,6 +248,9 @@ def incident_list(request: HtmxHttpRequest) -> HttpResponse:
     total_count = qs.count()
     last_refreshed = make_aware(datetime.now())
 
+    # Load filters
+    existing_filters = Filter.objects.all().filter(user=request.user)
+
     # make dict from QueryDict
     params = dict(request.GET.items())
 
@@ -290,6 +293,7 @@ def incident_list(request: HtmxHttpRequest) -> HttpResponse:
         "filtered_count": filtered_count,
         "count": total_count,
         "filter_form": filter_form,
+        "filters": existing_filters,
         "timeframe_form": timeframe_form,
         "page_title": "Incidents",
         "page": page,
