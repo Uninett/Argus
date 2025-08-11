@@ -3,7 +3,7 @@
        {% with preferences.argus_htmx.update_interval as update_interval %}
          {% if update_interval != 'never' %}
            hx-get="{% querystring %}"
-           hx-target="this"
+           hx-target="#incident-list"
            hx-swap="outerHTML"
            hx-trigger="every {{ update_interval }}s"
            hx-push-url="true"
