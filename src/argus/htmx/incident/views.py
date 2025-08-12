@@ -8,6 +8,7 @@ from typing import Optional, Any
 from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib import messages
+from django.core.exceptions import ValidationError
 from django.utils.timezone import now as tznow
 from django.shortcuts import render, get_object_or_404
 
@@ -50,6 +51,20 @@ INCIDENT_UPDATE_ACTIONS = {
     "add-ticket": (AddTicketUrlForm, bulk_change_ticket_url_queryset),
     "autocreate-ticket": (None, single_autocreate_ticket_url_queryset),
 }
+
+
+class FilterNameForm(forms.Form):
+    filter_name = forms.CharField()
+
+    def __init__(self, user, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._user = user
+
+    def clean(self):
+        cleaned_data = super().clean()
+        name = cleaned_data["filter_name"]
+        if Filter.objects.filter(user=self._user, name=name).exists():
+            raise ValidationError("This name is already in use")
 
 
 def prefetch_incident_daughters():
@@ -126,10 +141,20 @@ def filter_form(request: HtmxHttpRequest):
 def create_filter(request: HtmxHttpRequest):
     from argus.htmx.incident.filter import create_named_filter
 
-    filter_name = request.POST.get("filter_name", None)
+    error_message = "Failed to create filter"
+
+    name_form = FilterNameForm(request.user, request.POST)
+    if not name_form.is_valid():
+        errors = [". ".join(list(error)) for error in name_form.errors.values()]
+        error_message = error_message + ": " + ". ".join(errors)
+        # should be close to form, not a popup
+        messages.error(request, error_message)
+        return HttpResponseBadRequest()
+
+    filter_name = name_form.cleaned_data["filter_name"]
     incident_list_filter = get_filter_function()
     filter_form, _ = incident_list_filter(request, None)
-    if filter_name and filter_form.is_valid():
+    if filter_form.is_valid():
         filterblob = filter_form.to_filterblob()
         _, filter_obj = create_named_filter(request, filter_name, filterblob)
         if filter_obj:
