@@ -9,13 +9,15 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib import messages
 from django.core.exceptions import ValidationError
+from django.utils.safestring import mark_safe
 from django.utils.timezone import now as tznow
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 
 from django.views.decorators.http import require_POST, require_GET
 from django.core.paginator import Paginator
 from django.http import HttpResponse, HttpResponseBadRequest, QueryDict
-from django_htmx.http import HttpResponseClientRefresh, retarget
+from django.urls import reverse
+from django_htmx.http import HttpResponseClientRefresh
 
 from argus.auth.utils import get_or_update_preference
 from argus.incident.models import Incident
@@ -65,6 +67,14 @@ class FilterNameForm(forms.Form):
         name = cleaned_data["filter_name"]
         if Filter.objects.filter(user=self._user, name=name).exists():
             raise ValidationError("This name is already in use")
+
+
+class StoredFilterForm(forms.Form):
+    filter = forms.ModelChoiceField(queryset=None, required=False)
+
+    def __init__(self, user, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["filter"].queryset = Filter.objects.filter(user=user)
 
 
 def prefetch_incident_daughters():
@@ -208,22 +218,31 @@ def get_existing_filters(request: HtmxHttpRequest):
 
 @require_GET
 def filter_select(request: HtmxHttpRequest):
-    filter_id = request.GET.get("filter", None)
-    if filter_id and get_object_or_404(Filter, id=filter_id, user=request.user):
-        request.session["selected_filter"] = filter_id
-        incident_list_filter = get_filter_function()
-        filter_form, _ = incident_list_filter(request, None)
-        context = {"filter_form": filter_form}
-        return render(request, "htmx/incident/_incident_filterbox.html", context=context)
-    else:
-        request.session["selected_filter"] = None
-        if request.htmx.trigger:
-            incident_list_filter = get_filter_function()
-            filter_form, _ = incident_list_filter(request, None, use_empty_filter=True)
-            context = {"filter_form": filter_form}
-            return render(request, "htmx/incident/_incident_filterbox.html", context=context)
+    # send in GET, use when no stored filter chosen
+    stored_filter_form = StoredFilterForm(request.user, request.GET)
+    query = {}  # should be "empty filter"
+    if stored_filter_form.is_valid():
+        filter_obj = stored_filter_form.cleaned_data["filter"]
+        if filter_obj:
+            request.session["selected_filter"] = filter_obj.pk
+            query = filter_obj.filter
         else:
-            return retarget(HttpResponse(), "#incident-filter-select")
+            # use empty filter
+            request.session["selected_filter"] = None
+    else:
+        # error, fall back to working filter if any
+        error_message = "Could not switch filters"
+        filter_choice_errors = stored_filter_form.errors.get("filter", "")
+        if filter_choice_errors:
+            error_message = f"{error_message}: {filter_choice_errors}"
+        # should be shown in form instead
+        messages.warning(request, mark_safe(error_message))
+        previous_filter_id = request.session.get("filter", None)
+        if previous_filter_id:
+            filter_obj = Filter.objects.filter(user=request.user, id=previous_filter_id).first()
+            query = filter_obj.filter
+    url = reverse("htmx:incident-list", query=query)
+    return redirect(url)
 
 
 def dedupe_querydict(querydict: QueryDict):
