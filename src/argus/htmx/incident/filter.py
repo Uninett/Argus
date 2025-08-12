@@ -165,7 +165,7 @@ def incident_list_filter(request, qs, use_empty_filter=False):
     LOG.debug("incident_list_filter: GET at start: %s", request.GET)
     filter_pk, filter_obj = request.session.get("selected_filter", None), None
     if filter_pk:
-        filter_obj = Filter.objects.get(pk=filter_pk)
+        filter_obj = Filter.objects.filter(user=request.user, pk=filter_pk).first()
     if filter_obj:
         form = IncidentFilterForm(_convert_filterblob(filter_obj.filter))
         LOG.debug("incident_list_filter: using stored filter: %s", filter_obj.filter)
