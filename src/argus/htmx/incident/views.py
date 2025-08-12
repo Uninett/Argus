@@ -141,7 +141,7 @@ def create_filter(request: HtmxHttpRequest):
 
 @require_POST
 def update_filter(request: HtmxHttpRequest, pk: int):
-    filter_obj = get_object_or_404(Filter, id=pk)
+    filter_obj = get_object_or_404(Filter, id=pk, user=request.user)
     incident_list_filter = get_filter_function()
     filter_form, _ = incident_list_filter(request, None)
     if filter_form.is_valid():
@@ -160,7 +160,7 @@ def update_filter(request: HtmxHttpRequest, pk: int):
 
 @require_POST
 def delete_filter(request: HtmxHttpRequest, pk: int):
-    filter_obj = get_object_or_404(Filter, id=pk)
+    filter_obj = get_object_or_404(Filter, id=pk, user=request.user)
     deleted_id = filter_obj.delete()
     if deleted_id:
         messages.success(request, f"Deleted filter {filter_obj.name}.")
@@ -171,7 +171,7 @@ def delete_filter(request: HtmxHttpRequest, pk: int):
 
 @require_GET
 def get_existing_filters(request: HtmxHttpRequest):
-    existing_filters = Filter.objects.all().filter(user=request.user)
+    existing_filters = Filter.objects.filter(user=request.user)
     if existing_filters:
         context = {"filters": existing_filters}
         if request.htmx.target == "delete-filter-items":
@@ -184,7 +184,7 @@ def get_existing_filters(request: HtmxHttpRequest):
 @require_GET
 def filter_select(request: HtmxHttpRequest):
     filter_id = request.GET.get("filter", None)
-    if filter_id and get_object_or_404(Filter, id=filter_id):
+    if filter_id and get_object_or_404(Filter, id=filter_id, user=request.user):
         request.session["selected_filter"] = filter_id
         incident_list_filter = get_filter_function()
         filter_form, _ = incident_list_filter(request, None)
