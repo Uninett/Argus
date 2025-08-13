@@ -25,10 +25,4 @@ module.exports = {
     safelist: [
         "htmx-request"
     ],
-    daisyui: {
-        themes: {{ daisyuithemes }},
-    },
-    plugins: [
-        require("daisyui"),
-    ]
 }
