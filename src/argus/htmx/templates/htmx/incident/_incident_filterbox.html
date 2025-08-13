@@ -4,12 +4,12 @@
       hx-get="{% url 'htmx:incident-list' %}"
       hx-include=".incident-list-param"
       {% block filter_trigger_control %}
-      hx-trigger="keydown[keyCode==13], change delay:100ms, load once"
+      hx-trigger="keydown[keyCode==13], change delay:100ms"
       {% endblock filter_trigger_control %}
-      hx-target="#table"
+      hx-target="#incident-list"
       hx-swap="outerHTML"
       hx-push-url="true"
-      hx-indicator="#incident-list .htmx-indicator"
+      hx-indicator="#incident-list-table .htmx-indicator"
       onkeydown="if (event.keyCode === 13) event.preventDefault();">
   <fieldset {% block filter_select_custom_control %}
             hx-on:change="htmx.ajax('GET', '{% url 'htmx:select-filter' %}');"

@@ -2,12 +2,10 @@
   {# djlint:off #}
        {% with preferences.argus_htmx.update_interval as update_interval %}
          {% if update_interval != 'never' %}
-           hx-get="?page={{ page.number }}"
-           hx-target="this"
+           hx-get="{% querystring %}"
+           hx-target="#incident-list"
            hx-swap="outerHTML"
            hx-trigger="every {{ update_interval }}s"
-           hx-push-url="true"
-           hx-include=".incident-list-param"
          {% endif %}
        {% endwith %}
   class="border border-separate border-spacing-1 border-primary table {% if preferences.argus_htmx.incidents_table_layout_compact %}table-xs{% endif %}">
