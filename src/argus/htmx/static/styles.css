@@ -5694,30 +5694,6 @@
       padding-block: calc(0.25rem * 2);
     }
   }
-  .menu-xs {
-    :where(li:not(.menu-title) > *:not(ul, details, .menu-title)), :where(li:not(.menu-title) > details > summary:not(.menu-title)) {
-      border-radius: var(--radius-field);
-      padding-inline: calc(0.25rem * 2);
-      padding-block: calc(0.25rem * 1);
-      font-size: 0.6875rem;
-    }
-    .menu-title {
-      padding-inline: calc(0.25rem * 2);
-      padding-block: calc(0.25rem * 1);
-    }
-  }
-  .menu-xs {
-    :where(li:not(.menu-title) > *:not(ul, details, .menu-title)), :where(li:not(.menu-title) > details > summary:not(.menu-title)) {
-      border-radius: var(--radius-field);
-      padding-inline: calc(0.25rem * 2);
-      padding-block: calc(0.25rem * 1);
-      font-size: 0.6875rem;
-    }
-    .menu-title {
-      padding-inline: calc(0.25rem * 2);
-      padding-block: calc(0.25rem * 1);
-    }
-  }
   .rounded-2xl {
     border-radius: var(--radius-2xl);
   }
@@ -5962,15 +5938,15 @@
       padding-block: calc(0.25rem * 1);
     }
   }
-  .badge-xs {
-    --size: calc(var(--size-selector, 0.25rem) * 4);
-    font-size: 0.625rem;
-    padding-inline: calc(0.25rem * 2 - var(--border));
+  .badge-sm {
+    --size: calc(var(--size-selector, 0.25rem) * 5);
+    font-size: 0.75rem;
+    padding-inline: calc(0.25rem * 2.5 - var(--border));
   }
-  .badge-xs {
-    --size: calc(var(--size-selector, 0.25rem) * 4);
-    font-size: 0.625rem;
-    padding-inline: calc(0.25rem * 2 - var(--border));
+  .badge-sm {
+    --size: calc(var(--size-selector, 0.25rem) * 5);
+    font-size: 0.75rem;
+    padding-inline: calc(0.25rem * 2.5 - var(--border));
   }
   .px-1 {
     padding-inline: calc(var(--spacing) * 1);
