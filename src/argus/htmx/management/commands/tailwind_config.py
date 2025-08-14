@@ -15,29 +15,36 @@ from argus.htmx import defaults as argus_htmx_settings
 # Copied from https://github.com/GEANT/geant-argus/pull/15 with minor modifications
 class Command(BaseCommand):
     help = """
-    Uses the template specified in the TAILWIND_CONFIG_TEMPLATE setting
-    (default: tailwind/tailwind.config.js) to dynamically build a tailwind.config.js.
-    This file must be in an app's templates directory. The template may contain:
+    Uses the template specified in the ``TAILWIND_CONFIG_TEMPLATE`` setting
+    (default: ``tailwind/tailwind.config.js, full path:
+    ``src/argus/htmx/templates/tailwind/tailwind.config.js``) to dynamically
+    build a ``tailwind.config.js``. This file must be in an app's templates
+    directory, the default is in this app, ``argus.htmx``.
 
-     - a '{{ projectpaths }} section without square brackets that will be
-        popuplated  with auto discovered template dirs of installed apps
-     - a '{{ daisyuithemes }}' section without square brackets that will be
-        popuplated by the daisyUI theme list specified in the DAISYUI_THEMES
-        setting (default: ["dark", "light", {"argus"": {...}} ])
-     - a '{{ themeoverride }}' section that will be popuplated by a dict containing
-        tailwind theme options specified in TAILWIND_THEME_OVERRIDE setting
-        (default: {})
+    The template may contain:
 
-    This command also generates a `styles.css` that contains the base css file for
-    tailwind to create its final css file. It uses the template specified by the
-    `TAILWIND_CSS_TEMPLATE` setting (default: tailwind/styles.css). This file should
-    also be in an app's templates directory
+     - a ``{{ projectpaths }}`` section without square brackets that will be
+       popuplated  with auto discovered template dirs of installed apps
+     - a ``{{ daisyuithemes }}`` section without square brackets that will be
+       popuplated by the daisyUI theme list specified in the ``DAISYUI_THEMES``
+       setting (default: ``["dark", "light", {"argus"": {...}} ]``)
+     - a ``{{ themeoverride }}`` section that will be populated by a dict
+       containing tailwind theme options specified in TAILWIND_THEME_OVERRIDE
+       setting (default: {})
 
-    The `styles.css` template may iterate over a `cssfiles` context variable that
-    contains css files/snippets that should be included in the final css file. Apps
-    may define a `tailwind_css_files` method that gives the location (as a str or
-    pathlib.Path object) for every css file from this app to include. (see
-    argus.htmx.apps.HtmxFrontendConfig for an example)
+    This command also generates a ``styles.css`` that contains the base css
+    file for tailwind to create its final css file. It uses the template
+    specified by the ``TAILWIND_CSS_TEMPLATE`` setting (default:
+    ``tailwind/styles.css``, full path:
+    ``src/argus/htmx/templates/tailwind/styles.css``). This file should also be
+    in an app's templates directory
+
+    The ``styles.css`` template may iterate over a ``cssfiles`` context
+    variable that contains css files/snippets that should be included in the
+    final css file. Apps may define a ``tailwind_css_files`` method that gives
+    the location (as a ``str`` or ``pathlib.Path`` object) for every css file
+    from this app to include. (see ``argus.htmx.apps.HtmxFrontendConfig`` for
+    an example)
 
     Additional settings that govern the functionality of this command are:
 
