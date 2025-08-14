@@ -15,13 +15,13 @@
       {% elif field.name == "active" %}
         {% include "htmx/forms/input_field.html" with label=field.label field=field input_classes="checkbox border-b border" %}
       {% else %}
-        <div class="form-control">
-          <label class="label label-text" for={{ field.auto_id }}><em>{{ field.label }}</em>
+        <fieldset class="fieldset">
+          <label class="label" for={{ field.auto_id }}><em>{{ field.label }}</em>
           </label>
           {% render_field field %}
           {% if field.help_text %}<div class="helptext text-xs">{{ field.help_text }}</div>{% endif %}
           {{ errors }}
-        </div>
+        </fieldset>
       {% endif %}
       {% if forloop.last %}
         {% for field in hidden_fields %}{{ field }}{% endfor %}

@@ -5,21 +5,21 @@
     {{ form.id }}
     {{ form.timeslot }}
     {% if not form.instance.pk %}<legend class="px-2">Unsaved</legend>{% endif %}
-    <div class="form-control items-start self-end">
+    <fieldset class="fieldset items-start self-end">
       <label class="label cursor-pointer">
-        <span class="label-text mr-2">{{ form.DELETE.label }}:</span>
+        <span class="mr-2">{{ form.DELETE.label }}:</span>
         {% render_field form.DELETE class+="checkbox checkbox-sm" %}
       </label>
-    </div>
+    </fieldset>
     <div class="flex gap-2 w-full flex-nowrap max-sm:flex-wrap">
       {% include "htmx/forms/input_field.html" with label=form.start.label max_width="md" field=form.start %}
       {% include "htmx/forms/input_field.html" with label=form.end.label max_width="md" field=form.end %}
     </div>
-    <div class="form-control w-full self-center">
-      <label class="label label-text" for={{ form.days.auto_id }}><em>{{ form.days.label }}</em>
+    <fieldset class="fieldset w-full self-center">
+      <label class="label" for={{ form.days.auto_id }}><em>{{ form.days.label }}</em>
       </label>
       {{ errors }}
       {% render_field form.days %}
-    </div>
+    </fieldset>
   </fieldset>
 {% endfor %}

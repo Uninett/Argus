@@ -1,8 +1,8 @@
 {% load widget_tweaks %}
-<div class="{{ wrapper_classes|default:"form-control w-full" }} max-w-{{ max_width|default:"xs" }}">
+<fieldset class="{{ wrapper_classes|default:"fieldset w-full" }} max-w-{{ max_width|default:"xs" }}">
   <label class="label"
          {% if field %}for="{{ field.auto_id }}"{% else %}for=""{{ id|default:"id_"|add:name }}""{% endif %}>
-    <span class="label-text"><em>{{ label }}</em></span>
+    <em>{{ label }}</em>
   </label>
   {% block input_rendering %}
     <div class="indicator w-full">
@@ -27,8 +27,8 @@
   {% endblock input_rendering %}
   {% if help_text or errors %}
     <label class="label">
-      {% if help_text %}<span class="label-text-alt">{{ help_text }}</span>{% endif %}
-      {% for error in errors %}<span class="label-text-alt text-error">{{ error }}</span>{% endfor %}
+      {% if help_text %}<span class="helptext">{{ help_text }}</span>{% endif %}
+      {% for error in errors %}<span class="text-error">{{ error }}</span>{% endfor %}
     </label>
   {% endif %}
-</div>
+</fieldset>
