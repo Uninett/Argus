@@ -1,7 +1,5 @@
-<label class="form-control w-full max-w-xs">
-  <span class="block label pt-0 pb-0.5">
-    <span class="label-text">Filter</span>
-  </span>
+<fieldset class="fieldset w-full max-w-xs">
+  <label class="block label pt-0 pb-0.5 label" for="filter">Filter</label>
   <select class="select select-sm join-item w-full max-w-xs"
           id="incident-filter-select"
           name="filter"
@@ -18,7 +16,5 @@
       </option>
     {% endfor %}
   </select>
-  <span class="block label pb-0 pt-0.5">
-    <span class="label-text-alt truncate">Select from your filters</span>
-  </span>
-</label>
+  <label class="block label pb-0 pt-0.5 truncate">Select from your filters</label>
+</fieldset>
