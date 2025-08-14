@@ -18,59 +18,61 @@
     <ul class="menu menu-horizontal menu-xs flex items-center gap-0.5 py-0">
       {% for field in filter_form %}
         {% if not field.field.in_header %}
-          <li class="form-control">
-            {% if field.name == "sourceSystemIds" or field.name == "tags" %}
-              <div class="flex flex-nowrap">
-                <label class="label">
-                  <span class="label-text">{{ field.label }}</span>
-                </label>
-                {{ field }}
-              </div>
-            {% elif field.name == "open" %}
-              <label class="cursor-pointer label">
-                <span class="label-text">{{ field.label }}</span>
-                <div class="pt-4">
-                  {{ field|add_class:"range range-primary range-xs" }}
-                  <div class="flex w-full justify-between gap-2 text-xs">
-                    <span>Open</span>
-                    <span>Both</span>
-                    <span>Closed</span>
-                  </div>
+          <li>
+            <fieldset class="fieldset">
+              {% if field.name == "sourceSystemIds" or field.name == "tags" %}
+                <div class="flex flex-nowrap">
+                  <label class="label">
+                    {{ field.label }}
+                    {{ field }}
+                  </label>
                 </div>
-              </label>
-            {% elif field.name == "acked" %}
-              <label class="cursor-pointer label">
-                <span class="label-text">{{ field.label }}</span>
-                <div class="pt-4">
-                  {{ field|add_class:"range range-primary range-xs" }}
-                  <div class="flex w-full justify-between gap-2 text-xs">
-                    <span>Acked</span>
-                    <span>Both</span>
-                    <span>Unacked</span>
-                  </div>
-                </div>
-              </label>
-            {% else %}
-              <label class="cursor-pointer label">
-                <span class="label-text">{{ field.label }}</span>
-                {% if field|field_type == "booleanfield" %}
-                  {{ field|add_class:"checkbox checkbox-primary" }}
-                {% elif field.name == "maxlevel" %}
+              {% elif field.name == "open" %}
+                <label class="cursor-pointer label">
+                  {{ field.label }}
                   <div class="pt-4">
                     {{ field|add_class:"range range-primary range-xs" }}
-                    <div class="flex w-full justify-around gap-2 text-xs">
-                      {% for tick in "12345" %}<span>{{ tick }}</span>{% endfor %}
+                    <div class="flex w-full justify-between gap-2 text-xs">
+                      <span>Open</span>
+                      <span>Both</span>
+                      <span>Closed</span>
                     </div>
                   </div>
-                {% elif field|field_type == "choicefield" %}
-                  {{ field|add_class:"select select-primary" }}
-                {% elif field|field_type == "multiplechoicefield" %}
-                  {{ field|attr:"size:1"|add_class:"select select-primary" }}
-                {% elif field|field_type == "charfield" %}
-                  {{ field|add_class:"input input-primary" }}
-                {% endif %}
-              </label>
-            {% endif %}
+                </label>
+              {% elif field.name == "acked" %}
+                <label class="cursor-pointer label">
+                  {{ field.label }}
+                  <div class="pt-4">
+                    {{ field|add_class:"range range-primary range-xs" }}
+                    <div class="flex w-full justify-between gap-2 text-xs">
+                      <span>Acked</span>
+                      <span>Both</span>
+                      <span>Unacked</span>
+                    </div>
+                  </div>
+                </label>
+              {% else %}
+                <label class="cursor-pointer label">
+                  {{ field.label }}
+                  {% if field|field_type == "booleanfield" %}
+                    {{ field|add_class:"checkbox checkbox-primary" }}
+                  {% elif field.name == "maxlevel" %}
+                    <div class="pt-4">
+                      {{ field|add_class:"range range-primary range-xs" }}
+                      <div class="flex w-full justify-around gap-2 text-xs">
+                        {% for tick in "12345" %}<span>{{ tick }}</span>{% endfor %}
+                      </div>
+                    </div>
+                  {% elif field|field_type == "choicefield" %}
+                    {{ field|add_class:"select select-primary" }}
+                  {% elif field|field_type == "multiplechoicefield" %}
+                    {{ field|attr:"size:1"|add_class:"select select-primary" }}
+                  {% elif field|field_type == "charfield" %}
+                    {{ field|add_class:"input input-primary" }}
+                  {% endif %}
+                </label>
+              {% endif %}
+            </fieldset>
           </li>
         {% endif %}
       {% empty %}
