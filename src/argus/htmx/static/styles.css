@@ -6163,6 +6163,9 @@
   .text-inherit\/80 {
     color: color-mix(in oklab, inherit 80%, transparent);
   }
+  .text-neutral {
+    color: var(--color-neutral);
+  }
   .text-neutral-content {
     color: var(--color-neutral-content);
   }

@@ -3,20 +3,20 @@
   <dl class="stats stats-horizontal leading-none overflow-x-auto font-medium bg-base-100">
     <div class="stat py-2">
       <dt class="stat-title text-inherit/80">Total, all time</dt>
-      <dd class="stat-value text-base font-medium">
+      <dd class="stat-value text-base text-neutral font-medium">
         {{ count }}
       </dd>
     </div>
     <div class="stat py-2">
       <dt class="stat-title text-inherit/80">After filtering</dt>
-      <dd class="stat-value text-base font-medium">
+      <dd class="stat-value text-base text-neutral font-medium">
         {{ filtered_count }}
       </dd>
     </div>
     <div class="stat py-2">
       <dt class="stat-title text-inherit/80">Per page</dt>
       <dd class="stat-value text-base font-medium">
-        <select class="select bg-transparent text-base border-none -ml-2 incident-list-param"
+        <select class="select bg-transparent text-base text-neutral border-none -ml-2 incident-list-param"
                 name="page_size"
                 hx-get="{% url 'htmx:incident-list' %}"
                 hx-trigger="change"
@@ -34,14 +34,14 @@
     </div>
     <div class="stat py-2">
       <dt class="stat-title text-inherit/80">Last refreshed</dt>
-      <dd class="stat-value text-base font-medium">
+      <dd class="stat-value text-base text-neutral font-medium">
         {{ last_refreshed|date:preferences.argus_htmx.datetime_format|default:"?" }}
       </dd>
     </div>
     <div class="stat py-2">
       <dt class="stat-title text-inherit/80">Updating every</dt>
       <dd class="stat-value text-base font-medium">
-        <select class="select bg-transparent text-base border-none -ml-2"
+        <select class="select bg-transparent text-base text-neutral border-none"
                 name="update_interval"
                 hx-post="{% url 'htmx:update-preferences' namespace='argus_htmx' %}"
                 hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
@@ -59,7 +59,7 @@
     </div>
     <div class="stat py-2">
       <dt class="stat-title text-inherit/80">Timeframe</dt>
-      <dd class="stat-value text-base font-medium">
+      <dd class="stat-value text-base text-neutral font-medium">
         {{ timeframe_form.timeframe }}
       </dd>
     </div>
