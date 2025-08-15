@@ -15,20 +15,20 @@
             hx-on:change="htmx.ajax('GET', '{% url 'htmx:select-filter' %}');"
             {% endblock filter_select_custom_control %}>
     <legend class="sr-only">Filter incidents</legend>
-    <ul class="menu menu-horizontal menu-xs flex items-center gap-0.5 py-0">
+    <ul class="menu menu-horizontal flex items-center gap-1 py-0">
       {% for field in filter_form %}
         {% if not field.field.in_header %}
-          <li class="form-control">
+          <li>
             {% if field.name == "sourceSystemIds" or field.name == "tags" %}
               <div class="flex flex-nowrap">
-                <label class="label">
-                  <span class="label-text">{{ field.label }}</span>
+                <label class="label text-neutral">
+                  {{ field.label }}
+                  {{ field }}
                 </label>
-                {{ field }}
               </div>
             {% elif field.name == "open" %}
-              <label class="cursor-pointer label">
-                <span class="label-text">{{ field.label }}</span>
+              <label class="cursor-pointer label text-neutral">
+                {{ field.label }}
                 <div class="pt-4">
                   {{ field|add_class:"range range-primary range-xs" }}
                   <div class="flex w-full justify-between gap-2 text-xs">
@@ -39,8 +39,8 @@
                 </div>
               </label>
             {% elif field.name == "acked" %}
-              <label class="cursor-pointer label">
-                <span class="label-text">{{ field.label }}</span>
+              <label class="cursor-pointer label text-neutral">
+                {{ field.label }}
                 <div class="pt-4">
                   {{ field|add_class:"range range-primary range-xs" }}
                   <div class="flex w-full justify-between gap-2 text-xs">
@@ -51,8 +51,8 @@
                 </div>
               </label>
             {% else %}
-              <label class="cursor-pointer label">
-                <span class="label-text">{{ field.label }}</span>
+              <label class="cursor-pointer label text-neutral">
+                {{ field.label }}
                 {% if field|field_type == "booleanfield" %}
                   {{ field|add_class:"checkbox checkbox-primary" }}
                 {% elif field.name == "maxlevel" %}
@@ -67,7 +67,7 @@
                 {% elif field|field_type == "multiplechoicefield" %}
                   {{ field|attr:"size:1"|add_class:"select select-primary" }}
                 {% elif field|field_type == "charfield" %}
-                  {{ field|add_class:"input input-primary input-bordered" }}
+                  {{ field|add_class:"input input-primary" }}
                 {% endif %}
               </label>
             {% endif %}
