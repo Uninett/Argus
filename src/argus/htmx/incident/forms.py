@@ -38,7 +38,7 @@ class TimeframeForm(forms.Form):
         initial=TIMEFRAME_DEFAULT,
         widget=forms.Select(
             attrs={
-                "class": "select select-xs bg-transparent text-base border-none -ml-2",
+                "class": "select bg-transparent text-base text-neutral border-none p-0",
                 "autocomplete": "off",
                 "hx-get": ".",
                 "hx-trigger": "change",
