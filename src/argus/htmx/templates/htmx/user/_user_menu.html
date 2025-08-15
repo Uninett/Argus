@@ -10,14 +10,16 @@
     {% block notification_links %}
       {% include "htmx/user/_user_menu_notification_config.html" %}
     {% endblock notification_links %}
-    {% if request.user.is_staff %}
-      <li>
-        <a href="{% url 'admin:index' %}" target="_blank">Admin</a>
-      </li>
-    {% endif %}
-    <li>
-      <div class="divider divider-secondary pl-2 pr-4 my-0 pointer-events-none"></div>
-      {% include "htmx/user/_user_menu_logout.html" %}
+    {% block staff_links %}
+      {% if request.user.is_staff %}
+        <li>
+          <a href="{% url 'admin:index' %}" target="_blank">Admin</a>
+        </li>
+      {% endif %}
+    {% endblock staff_links %}
+    <li class="menu-title">
+      <div class="divider divider-secondary m-0 pointer-events-none"></div>
     </li>
+    <li>{% include "htmx/user/_user_menu_logout.html" %}</li>
   {% endblock items %}
 </ul>
