@@ -21,13 +21,13 @@
           <li>
             {% if field.name == "sourceSystemIds" or field.name == "tags" %}
               <div class="flex flex-nowrap">
-                <label class="label">
+                <label class="label text-neutral">
                   {{ field.label }}
                   {{ field }}
                 </label>
               </div>
             {% elif field.name == "open" %}
-              <label class="cursor-pointer label">
+              <label class="cursor-pointer label text-neutral">
                 {{ field.label }}
                 <div class="pt-4">
                   {{ field|add_class:"range range-primary range-xs" }}
@@ -39,7 +39,7 @@
                 </div>
               </label>
             {% elif field.name == "acked" %}
-              <label class="cursor-pointer label">
+              <label class="cursor-pointer label text-neutral">
                 {{ field.label }}
                 <div class="pt-4">
                   {{ field|add_class:"range range-primary range-xs" }}
@@ -51,7 +51,7 @@
                 </div>
               </label>
             {% else %}
-              <label class="cursor-pointer label">
+              <label class="cursor-pointer label text-neutral">
                 {{ field.label }}
                 {% if field|field_type == "booleanfield" %}
                   {{ field|add_class:"checkbox checkbox-primary" }}
