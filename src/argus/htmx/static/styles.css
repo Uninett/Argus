@@ -5766,6 +5766,10 @@
     border-top-left-radius: 0 !important;
     border-bottom-left-radius: 0 !important;
   }
+  .rounded-b-lg {
+    border-bottom-right-radius: var(--radius-lg);
+    border-bottom-left-radius: var(--radius-lg);
+  }
   .border {
     border-style: var(--tw-border-style);
     border-width: 1px;
