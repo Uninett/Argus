@@ -23,7 +23,7 @@ def get_raw_themes_setting():
     return getattr(settings, "DAISYUI_THEMES", fallbacks.DAISYUI_THEMES)
 
 
-def get_themes_from_setting():
+def get_theme_names_from_setting():
     themes_setting = get_raw_themes_setting()
     theme_names = []
     for theme in themes_setting:
@@ -38,8 +38,8 @@ def get_stylesheet_path():
     return getattr(settings, "STYLESHEET_PATH", fallbacks.STYLESHEET_PATH)
 
 
-def get_themes_from_css():
-    THEME_NAME_RE = r"(?P<theme>[-_\w]+)"
+def get_theme_names_from_css():
+    THEME_NAME_RE = r'"?(?P<theme>[-_\w]+)"?'
     DATA_THEME_RE = rf"\[data-theme={THEME_NAME_RE}\]"
 
     absolute_stylesheet_path = Path(find(get_stylesheet_path()))
@@ -51,12 +51,12 @@ def get_themes_from_css():
 def get_theme_names(quiet=True):
     ERROR_MSG = "Themes in settings are out of sync with themes installed"
 
-    themes_from_setting = set(get_themes_from_setting())
-    themes_from_css = set(get_themes_from_css())
-    installed_themes = themes_from_setting & themes_from_css
+    theme_names_from_setting = set(get_theme_names_from_setting())
+    theme_names_from_css = set(get_theme_names_from_css())
+    installed_themes = theme_names_from_setting & theme_names_from_css
 
-    all_themes = themes_from_setting | themes_from_css
-    if all_themes != installed_themes:
+    all_theme_names = theme_names_from_setting | theme_names_from_css
+    if all_theme_names != installed_themes:
         LOG.warning(ERROR_MSG)
         if not quiet:
             raise ImproperlyConfigured(ERROR_MSG)
