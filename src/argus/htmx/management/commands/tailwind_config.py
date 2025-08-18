@@ -1,11 +1,14 @@
 import json
 import pathlib
-import textwrap
 from django.apps import apps
 from django.core.management.base import BaseCommand
 from django.conf import settings
 
-from argus.htmx.themes.utils import get_raw_themes_setting
+from argus.htmx.themes.utils import (
+    get_theme_names,
+    get_themes_from_setting,
+    generate_theme_from_dict,
+)
 from argus.htmx import defaults as argus_htmx_settings
 from argus.htmx.utils.templates import render_to_string, get_template_dirs
 
@@ -81,24 +84,29 @@ class Command(BaseCommand):
             "TAILWIND_THEME_OVERRIDE",
             argus_htmx_settings.TAILWIND_THEME_OVERRIDE,
         )
-        daisyuithemes = textwrap.indent(
-            json.dumps(get_raw_themes_setting(), indent=2),
-            prefix=10 * " ",
-            predicate=lambda line: line != "[\n",  # this is kinda hacky, but eh
-        )
+        themes_setting = list(get_theme_names())
+        daisyuithemes = (json.dumps(themes_setting, indent=2),)
         projectpaths = "\n".join(f"        '{d}/**/*.html'," for d in get_template_dirs())
         cssfiles = tuple(self.get_css_files(target_dir))
+        themes = self.get_manual_themes()
         return {
             "themeoverride": themeoverride,
             "daisyuithemes": daisyuithemes,
             "projectpaths": projectpaths,
             "cssfiles": cssfiles,
+            "themes": themes,
         }
 
     def write_file(self, template_name, target_path, context, name):
         pathlib.Path(target_path).write_text(render_to_string(template_name=template_name, context=context))
 
         self.stdout.write(f"Wrote {name} to '{target_path}'")
+
+    @staticmethod
+    def get_manual_themes():
+        themes = get_themes_from_setting()
+        wrapped_themes = [generate_theme_from_dict(theme) for _, theme in themes.items()]
+        return wrapped_themes
 
     @classmethod
     def get_css_files(cls, target_dir: pathlib.Path):

@@ -36,11 +36,10 @@ def get_themes_from_setting():
 
 def generate_theme_from_dict(theme: dict):
     template = "tailwind/theme.css"
-    context = {"settings": theme.copy()}
-    context["name"] = context["settings"].pop("name")
-    context["default"] = context["settings"].pop("default")
-    context["prefersdark"] = context["settings"].pop("prefersdark")
-    context["color-scheme"] = context["settings"].pop("color-scheme")
+    context = {
+        "settings": theme.copy(),
+        "values_to_quote": ("name", "color-scheme"),
+    }
     daisy_theme = render_to_string(template, context)
     return daisy_theme
 
