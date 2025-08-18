@@ -69,19 +69,23 @@ class Command(BaseCommand):
         )
 
     def get_context(self, target_dir: pathlib.Path):
+        themeoverride = getattr(
+            settings,
+            "TAILWIND_THEME_OVERRIDE",
+            argus_htmx_settings.TAILWIND_THEME_OVERRIDE,
+        )
+        daisyuithemes = textwrap.indent(
+            json.dumps(get_raw_themes_setting(), indent=2),
+            prefix=10 * " ",
+            predicate=lambda line: line != "[\n",  # this is kinda hacky, but eh
+        )
+        projectpaths = "\n".join(f"        '{d}/**/*.html'," for d in get_template_dirs())
+        cssfiles = tuple(self.get_css_files(target_dir))
         return {
-            "themeoverride": getattr(
-                settings,
-                "TAILWIND_THEME_OVERRIDE",
-                argus_htmx_settings.TAILWIND_THEME_OVERRIDE,
-            ),
-            "daisyuithemes": textwrap.indent(
-                json.dumps(get_raw_themes_setting(), indent=2),
-                prefix=10 * " ",
-                predicate=lambda line: line != "[\n",  # this is kinda hacky, but eh
-            ),
-            "projectpaths": "\n".join(f"        '{d}/**/*.html'," for d in get_template_dirs()),
-            "cssfiles": self.get_css_files(target_dir),
+            "themeoverride": themeoverride,
+            "daisyuithemes": daisyuithemes,
+            "projectpaths": projectpaths,
+            "cssfiles": cssfiles,
         }
 
     def write_file(self, template_name, target_path, context, name):
