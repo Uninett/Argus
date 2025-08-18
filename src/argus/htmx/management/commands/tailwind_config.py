@@ -4,12 +4,10 @@ import textwrap
 from django.apps import apps
 from django.core.management.base import BaseCommand
 from django.conf import settings
-from django.template import engines
-from django.template.context import make_context
-from django.template.loader import get_template
 
 from argus.htmx.themes.utils import get_raw_themes_setting
 from argus.htmx import defaults as argus_htmx_settings
+from argus.htmx.utils.templates import render_to_string, get_template_dirs
 
 
 # Copied from https://github.com/GEANT/geant-argus/pull/15 with minor modifications
@@ -82,24 +80,14 @@ class Command(BaseCommand):
                 prefix=10 * " ",
                 predicate=lambda line: line != "[\n",  # this is kinda hacky, but eh
             ),
-            "projectpaths": "\n".join(f"        '{d}/**/*.html'," for d in self.get_template_dirs()),
+            "projectpaths": "\n".join(f"        '{d}/**/*.html'," for d in get_template_dirs()),
             "cssfiles": self.get_css_files(target_dir),
         }
 
     def write_file(self, template_name, target_path, context, name):
-        pathlib.Path(target_path).write_text(self.render(template_name=template_name, context=context))
+        pathlib.Path(target_path).write_text(render_to_string(template_name=template_name, context=context))
 
         self.stdout.write(f"Wrote {name} to '{target_path}'")
-
-    @staticmethod
-    def render(template_name: str, context):
-        template = get_template(template_name)
-        return template.template.render(make_context(context, autoescape=False))
-
-    @staticmethod
-    def get_template_dirs():
-        for engine in engines.all():
-            yield from getattr(engine, "template_dirs", [])
 
     @classmethod
     def get_css_files(cls, target_dir: pathlib.Path):
