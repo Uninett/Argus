@@ -35,17 +35,19 @@ def get_themes_from_setting():
 
 
 def get_stylesheet_path():
-    return getattr(settings, "STYLESHEET_PATH", fallbacks.STYLESHEET_PATH)
+    path = getattr(settings, "STYLESHEET_PATH", fallbacks.STYLESHEET_PATH)
+    return path
 
 
 def get_themes_from_css():
-    THEME_NAME_RE = r"(?P<theme>[-_\w]+)"
+    THEME_NAME_RE = r'"?(?P<theme>[-_\w]+)"?'
     DATA_THEME_RE = rf"\[data-theme={THEME_NAME_RE}\]"
 
     absolute_stylesheet_path = Path(find(get_stylesheet_path()))
     styles_css = absolute_stylesheet_path.read_text()
 
-    return findall(DATA_THEME_RE, styles_css)
+    theme_names = findall(DATA_THEME_RE, styles_css)
+    return theme_names
 
 
 def get_theme_names(quiet=True):
