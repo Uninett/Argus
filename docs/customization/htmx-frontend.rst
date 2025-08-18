@@ -41,70 +41,174 @@ example.
 Themes and styling
 ==================
 
-How to customize the look:
+How to choose which themes to be made available
+-----------------------------------------------
 
-* Override Argus' Tailwind CSS theme defaults and/or choose which daisyUI color
-  themes to include. You can do so by updating the default
-  :setting:`TAILWIND_THEME_OVERRIDE` and :setting:`DAISYUI_THEMES` settings
-  respectively before running a ``tailwind_config`` management command:
+This is controlled by the setting :setting:`DAISYUI_THEMES`. You need to run
+the ``tailwind_config`` management command afterwards, followed by ``make
+tailwind``.
+
+How to add additional themes
+----------------------------
+
+See the `Daisy UI 5 theme generator <https://daisyui.com/theme-generator/>`_
+for the themes that are shipped with Argus. You can also generate new themes
+there. To add a pre-configured theme just add the name to the
+:setting:`DAISYUI_THEMES` setting and run ``tailwind_config`` + ``make
+tailwind`` as usual.
+
+If generating a new theme:
+
+1. Make sure the browser is in light mode if making a light theme, or dark mode
+   if making a dark theme.
+2. Choose a name that is pure ASCII, and don't reuse any of the names that
+   comes pre-configured. Save the generated CSS to some file.
+
+The ``argus`` theme is included in the file ``argus/htmx/tailwindtheme/snippets/25-theme-argus.css``. The format is::
+
+    @plugin "daisyui/theme" {
+       name: "argus";
+       default: false;
+       prefersdark: false;
+       color-scheme: "light";
+       --color-primary: #006d91;
+       --color-primary-content: #d1e1e9;
+       --color-secondary: #f3b61f;
+       --color-secondary-content: #140c00;
+       --color-accent: #c84700;
+       --color-accent-content: #f8dbd1;
+       --color-neutral: #006d91;
+       --color-neutral-content: #d1e1e9;
+       --color-base-100: #edfaff;
+       --color-base-200: #ced9de;
+       --color-base-300: #b0babd;
+       --color-base-content: #141516;
+       --color-info: #0073e5;
+       --color-info-content: #000512;
+       --color-success: #008700;
+       --color-success-content: #d3e7d1;
+       --color-warning: #ee4900;
+       --color-warning-content: #140200;
+       --color-error: #e5545a;
+       --color-error-content: #120203;
+       /* border radius */
+       --radius-selector: 2rem;
+       --radius-field: 0.25rem;
+       --radius-box: 0.5rem;
+
+       /* base sizes */
+       --size-selector: 0.25rem;
+       --size-field: 0.25rem;
+
+       /* border size */
+       --border: 1px;
+
+       /* effects */
+       --depth: 1;
+       --noise: 0;
+     }
+
+The stuff starting with ``--`` is css-variables.
+
+There are two different methods to install generated themes.
+
+1. Via :setting:`DAISYUI_THEMES`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Instead of adding the name of a theme to the :setting:`DAISYUI_THEMES` setting
+you can add an entire theme instead. Given the example theme above, it needs to
+be converted to Python like so::
+
+    DAISYUI_THEMES = [
+        "light",
+        "dark",
+        {
+            "argus": {
+                "name": "argus",
+                "default": false",
+                "prefersdark": false",
+                "color-scheme": "light"",
+                "--color-primary": "#006d91",
+                "--color-primary-content": "#d1e1e9",
+                "--color-secondary": "#f3b61f",
+                "--color-secondary-content": "#140c00",
+                "--color-accent": "#c84700",
+                "--color-accent-content": "#f8dbd1",
+                "--color-neutral": "#006d91",
+                "--color-neutral-content": "#d1e1e9",
+                "--color-base-100": "#edfaff",
+                "--color-base-200": "#ced9de",
+                "--color-base-300": "#b0babd",
+                "--color-base-content": "#141516",
+                "--color-info": "#0073e5",
+                "--color-info-content": "#000512",
+                "--color-success": "#008700",
+                "--color-success-content": "#d3e7d1",
+                "--color-warning": "#ee4900",
+                "--color-warning-content": "#140200",
+                "--color-error": "#e5545a",
+                "--color-error-content": "#120203",
+                "--radius-selector": "2rem",
+                "--radius-field": "0.25rem",
+                "--radius-box": "0.5rem",
+                "--size-selector": "0.25rem",
+                "--size-field": "0.25rem",
+                "--border": "1px",
+                "--depth": "1",
+                "--noise": "0",
+            },
+        },
+    ]
+
+Make the above one of the entries in the :setting:`DAISYUI_THEMES` setting and
+run ``tailwind_config`` + ``make tailwind`` as usual.
+
+2. Via an app and css snippet
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Create a Django app which has a ``snippets`` directory, see
+``argus.htmx.apps.HtmxFrontendConfig.tailwind_css_files`` for something to
+copy.
+
+In the snippets-directory, make a new file with the theme you generated before.
+We recommend naming the file ``99-theme-THEMENAME.css``, where THEMENAME is the
+name you chose when generating the theme.
+
+Add the app to :setting:`INSTALLED_APPS`, the name to
+:setting:`DAISYUI_THEMES`, and finish with ``tailwind_config`` + ``make
+tailwind`` as usual.
+
+How to customize the look without switching themes
+--------------------------------------------------
+
+* Override Argus' Tailwind CSS theme defaults by updating the setting
+  :setting:`TAILWIND_THEME_OVERRIDE`.
 
   Via environment variables, for example::
 
-    TAILWIND_THEME_OVERRIDE = '
-      {
-        "borderWidth": {
-          "DEFAULT": "1px"
-        },
-        "extend": {
-          "borderRadius": {
-            "4xl": "2rem"
+      TAILWIND_THEME_OVERRIDE = '
+        {
+          "borderWidth": {
+            "DEFAULT": "1px"
+          },
+          "extend": {
+            "borderRadius": {
+              "4xl": "2rem"
+            }
           }
         }
-      }
-    '
-    DAISYUI_THEMES = '
-      [
-        "light",
-        "dark",
-        "cyberpunk",
-        "dim",
-        "autumn",
-        { "mytheme": {
-            "color-scheme": "dark",
-            "primary": "#009eb6",
-            "primary-content": "#00090c",
-            "secondary": "#00ac00",
-            "secondary-content": "#000b00",
-            "accent": "#ff0000",
-            "accent-content": "#160000",
-            "neutral": "#262c0e",
-            "neutral-content": "#cfd1ca",
-            "base-100": "#292129",
-            "base-200": "#221b22",
-            "base-300": "#1c161c",
-            "base-content": "#d0cdd0",
-            "info": "#00feff",
-            "info-content": "#001616",
-            "success": "#b1ea50",
-            "success-content": "#0c1302",
-            "warning": "#d86d00",
-            "warning-content": "#110400",
-            "error": "#ff6280",
-            "error-content": "#160306"
-            }
-        }
-      ]
-    '
+      '
 
-  Or by providing corresponding values in your local settings that star-imports from an `argus-server`_ settings file::
+  Or by providing corresponding values in your local settings.
 
-        TAILWIND_THEME_OVERRIDE = {...}
-        DAISYUI_THEMES = [...]
+  Run ``tailwind_config`` to generate the configuratonm then ``make tailwind`` to
+  generate the final css-file, as usual.
 
   Some links that may be relevant for the customization values mentioned above:
-    * `daisyUI themes`_
-    * `list of daisyUI color names`_
-    * `Tailwind CSS theme customization`_
+
+  * `daisyUI themes`_
+  * `list of daisyUI color names`_
+  * `Tailwind CSS theme customization`_
 
 * Override the default main stylesheet path by setting
   ``ARGUS_STYLESHEET_PATH`` in the environment. The path is under
@@ -112,9 +216,11 @@ How to customize the look:
   ``argus.htmx.context_processors.path_to_stylesheet``.
 * Include additional styles/stylesheets using the ``head`` block in your templates.
 * Generate a Tailwind config file by running the ``tailwind_config`` management
-  command. By default the generated file will be based on
-  ``src/argus/htmx/tailwindtheme/tailwind.config.template.js`` and expected
-  values will be injected with reasonable defaults.
+  command. It will be placed in
+  ``src/argus/htmx/tailwindtheme/tailwind.config.js``. By default the generated
+  file will be based on
+  ``src/argus/htmx/templates/tailwind/tailwind.config.js`` and expected values
+  will be injected with reasonable defaults.
 
 Incident table column customization
 ===================================
