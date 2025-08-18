@@ -7,6 +7,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.contrib.staticfiles.finders import find
 
 from argus.htmx import defaults as fallbacks
+from argus.htmx.utils.templates import render_to_string
 
 
 __all__ = [
@@ -21,6 +22,27 @@ LOG = logging.getLogger(__name__)
 
 def get_raw_themes_setting():
     return getattr(settings, "DAISYUI_THEMES", fallbacks.DAISYUI_THEMES)
+
+
+def get_themes_from_setting():
+    themes_setting = get_raw_themes_setting()
+    themes = {}
+    for entry in themes_setting:
+        if isinstance(entry, dict):
+            for theme_name, theme in entry.items():
+                themes[theme_name] = theme
+    return themes
+
+
+def generate_theme_from_dict(theme: dict):
+    template = "tailwind/theme.css"
+    context = {"settings": theme.copy()}
+    context["name"] = context["settings"].pop("name")
+    context["default"] = context["settings"].pop("default")
+    context["prefersdark"] = context["settings"].pop("prefersdark")
+    context["color-scheme"] = context["settings"].pop("color-scheme")
+    daisy_theme = render_to_string(template, context)
+    return daisy_theme
 
 
 def get_theme_names_from_setting():

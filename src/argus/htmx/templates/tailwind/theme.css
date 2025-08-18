@@ -1,0 +1,9 @@
+@plugin "daisyui/theme" {
+    name: "{{ name }}";
+    default: {{ default }};
+    prefersdark: {{ prefersdark }};
+    color-scheme: "{{ color-scheme }}";,
+    {% for key, value in settings.items %}
+    {{ key }}: value;
+    {% endfor %}
+}
