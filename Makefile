@@ -32,7 +32,7 @@ testclean: coverageclean clean
 nuke: clean docclean distclean testclean cacheclean
 
 tailwind:
-	$(TAILWINDDIR)/tailwindcss -c $(TAILWINDDIR)/tailwind.config.js -i $(TAILWINDDIR)/styles.css -o $(STATICDIR)/styles.css
+	$(TAILWINDDIR)/tailwindcss -i $(TAILWINDDIR)/styles.css -o $(STATICDIR)/styles.css
 
 tailwind-watch:
 	$(TAILWINDDIR)/tailwindcss -c $(TAILWINDDIR)/tailwind.config.js -i $(TAILWINDDIR)/styles.css -o $(STATICDIR)/styles.css --watch
