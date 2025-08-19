@@ -1,0 +1,12 @@
+@theme {
+  --color-severity-primary-1: red;
+  --color-severity-primary-2: orange;
+  --color-severity-primary-3: yellow;
+  --color-severity-primary-4: green;
+  --color-severity-primary-5: blue;
+  --color-severity-secondary-1: white;
+  --color-severity-secondary-2: black;
+  --color-severity-secondary-3: black;
+  --color-severity-secondary-4: white;
+  --color-severity-secondary-5: white;
+}
