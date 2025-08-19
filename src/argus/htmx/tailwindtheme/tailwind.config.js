@@ -21,8 +21,5 @@ module.exports = {
             '8': '8px',
         },
         ...{},
-    },
-    safelist: [
-        "htmx-request"
-    ],
+    }
 }
