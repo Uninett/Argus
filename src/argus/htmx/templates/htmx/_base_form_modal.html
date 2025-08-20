@@ -22,10 +22,12 @@
       <div class="modal-action card-actions">
         <form method="dialog" class="w-full">
           <div class="divider divider-end">
-            <button type="submit" form="{{ dialog_id }}-form" class="btn btn-primary">
+            <button type="submit"
+                    form="{{ dialog_id }}-form"
+                    class="btn btn-primary rounded-lg">
               <span>{{ submit_text }}</span>
             </button>
-            <button class="btn">{{ cancel_text }}</button>
+            <button class="btn rounded-lg">{{ cancel_text }}</button>
           </div>
         </form>
       </div>
