@@ -21,7 +21,7 @@
           {% csrf_token %}
           <div class="divider divider-end">
             <button type="button"
-                    class="btn {{ modal.button_class }}"
+                    class="btn rounded-lg {{ modal.button_class }}"
                     {% block confirm_action_control %}
                     hx-post="{{ modal.endpoint }}"
                     hx-target="body"
@@ -29,7 +29,7 @@
                     {% endblock confirm_action_control %}>
               <span>{{ modal.submit_text }}</span>
             </button>
-            <button class="btn"
+            <button class="btn rounded-lg"
                     type="button"
                     {% block cancel_action_control %}
                     onclick="htmx.find('#{{ modal.dialog_id }}').close()"
