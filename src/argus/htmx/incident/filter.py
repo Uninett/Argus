@@ -46,7 +46,7 @@ class IncidentFilterForm(forms.Form):
         widget=forms.TextInput(
             attrs={
                 "placeholder": "key=value, ...",
-                "class": "input-primary input-sm overflow-y-auto min-h-8 h-auto max-h-16 max-w-xs leading-tight",
+                "class": "input input-primary input-sm overflow-y-auto min-h-8 h-auto max-h-16 max-w-xs leading-tight",
             }
         ),
         required=False,
