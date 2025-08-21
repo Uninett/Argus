@@ -29,14 +29,15 @@ distclean
 Deletes files generated on package build, including the packages. Useful
 *before* making a new release.
 
-docclean:
+docclean
+--------
 
 Deletes the files generated on running the ``Makefile`` in ``docs/``.
 
 coverageclean
 -------------
 
-Deletes files created by ``coverage``, which happens if running tests ``tox``.
+Deletes files created by ``coverage``, which happens if running tests with ``tox``.
 
 testclean
 ---------
@@ -50,7 +51,8 @@ nuke
 ----
 
 Runs all the cleaning jobs. This + ``git stash -u`` should reset the repository
-to a pristine state.
+to a pristine state. If something's wrong, don't call Ghostbusters, ``make
+nuke`` instead.
 
 Rules that generate files
 =========================
@@ -61,7 +63,6 @@ tailwind
 Assumes that the standalone tailwind CLI client is downloaded and uses the
 tailwind configuration in ``src/argus/htmx/tailwindtheme`` to generate
 a stylesheet that is put in ``src/argus/htmx/static/styles.css``.
-
 
 This rule can be used together with the ``tailwind_config`` management command
 when when changing styles or themeing::
