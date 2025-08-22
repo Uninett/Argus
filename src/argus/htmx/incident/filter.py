@@ -155,6 +155,11 @@ class FilterListView(ListView):
     def get_success_url(self):
         return reverse("htmx:filter-list")
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_sdata(**kwargs)
+        context["stored_filters"] = context["object_list"]
+        return context
+
 
 def incident_list_filter(request, qs, use_empty_filter=False):
     filter_pk, filter_obj = request.session.get("selected_filter", None), None
