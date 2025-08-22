@@ -1,7 +1,9 @@
-.PHONY: clean testclean distclean coverageclean cacheclean nuke tailwind docclean
+.PHONY: clean testclean distclean coverageclean cacheclean nuke tailwind docclean upgrade-tailwind
 
 TAILWINDDIR=src/argus/htmx/tailwindtheme
 STATICDIR=src/argus/htmx/static
+PYTHONPATH=./src
+
 
 clean:
 	-find . -name __pycache__ -print0 | xargs -0 rm -rf
@@ -31,3 +33,6 @@ nuke: clean docclean distclean testclean cacheclean
 
 tailwind:
 	tailwindcss -c $(TAILWINDDIR)/tailwind.config.js -i $(TAILWINDDIR)/styles.css -o $(STATICDIR)/styles.css
+
+upgrade-tailwind:
+	PYTHONPATH=$(PYTHONPATH) python3 src/argus/htmx/tailwindtheme/get_tailwind.py

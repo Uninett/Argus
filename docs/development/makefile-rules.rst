@@ -5,7 +5,7 @@ Makefile rules
 ==============
 
 The repo has a ``Makefile`` to help with development. None of the rules depend
-on a virtualenv being activated.
+on a virtualenv being activated, but may depend on having python 3 in the path.
 
 Always run ``make`` from the root of the repository.
 
@@ -29,14 +29,15 @@ distclean
 Deletes files generated on package build, including the packages. Useful
 *before* making a new release.
 
-docclean:
+docclean
+--------
 
 Deletes the files generated on running the ``Makefile`` in ``docs/``.
 
 coverageclean
 -------------
 
-Deletes files created by ``coverage``, which happens if running tests ``tox``.
+Deletes files created by ``coverage``, which happens if running tests with ``tox``.
 
 testclean
 ---------
@@ -50,7 +51,8 @@ nuke
 ----
 
 Runs all the cleaning jobs. This + ``git stash -u`` should reset the repository
-to a pristine state.
+to a pristine state. If something's wrong, don't call Ghostbusters, ``make
+nuke`` instead.
 
 Rules that generate files
 =========================
@@ -62,8 +64,30 @@ Assumes that the standalone tailwind CLI client is downloaded and uses the
 tailwind configuration in ``src/argus/htmx/tailwindtheme`` to generate
 a stylesheet that is put in ``src/argus/htmx/static/styles.css``.
 
-
 This rule can be used together with the ``tailwind_config`` management command
 when when changing styles or themeing::
 
     $ python3 manage.py tailwind_config && make tailwind
+
+upgrade-tailwind
+----------------
+
+Uses the confguration in ``src/argus/htmx/tailwindtheme/config.py`` to download
+a standalone version of the tailwind compiler (the one used by the ``tailwind``
+rule) and the tailwind- and Daisy UI files to be used by that compiler.
+
+This ensures that everybody is using the same version of tailwind and prevents
+generating unnecessary versions of ``src/argus/htmx/static/styles.css`` just
+because there are different patch revisions of tailwind used by different
+developers.
+
+The version in the config is for one of the releases at
+`dobicinaitis' tailwind-cli-extra <https://github.com/dobicinaitis/tailwind-cli-extra/releases/>`_
+
+After a change in version, running ``upgrade-tailwind`` should be followed by
+running::
+
+    $ python3 manage.py tailwind_config && make tailwind
+
+... and a commit so that the correct ``src/argus/htmx/static/styles.css`` is
+available to everyone.
