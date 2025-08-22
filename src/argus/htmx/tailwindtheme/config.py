@@ -14,6 +14,7 @@ ARCHITECTURE_MAP = {
     ("linux", "arm64"): "linux-arm64",
     ("linux", "arm64-musl"): "linux-arm64-musl",
     ("darwin", "x86_64"): "macos-x64",
+    ("darwin", "arm"): "macos-arm64",
     ("darwin", "arm64"): "macos-arm64",
     ("windows", "x86_64"): "windows-x64",
 }
