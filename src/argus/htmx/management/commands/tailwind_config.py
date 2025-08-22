@@ -1,43 +1,51 @@
 import json
 import pathlib
-import textwrap
 from django.apps import apps
 from django.core.management.base import BaseCommand
 from django.conf import settings
-from django.template import engines
-from django.template.context import make_context
-from django.template.loader import get_template
 
-from argus.htmx.themes.utils import get_raw_themes_setting
+from argus.htmx.themes.utils import (
+    get_theme_names,
+    get_themes_from_setting,
+    generate_theme_from_dict,
+)
 from argus.htmx import defaults as argus_htmx_settings
+from argus.htmx.utils.templates import render_to_string, get_template_dirs
 
 
 # Copied from https://github.com/GEANT/geant-argus/pull/15 with minor modifications
 class Command(BaseCommand):
     help = """
-    Uses the template specified in the TAILWIND_CONFIG_TEMPLATE setting
-    (default: tailwind/tailwind.config.js) to dynamically build a tailwind.config.js.
-    This file must be in an app's templates directory. The template may contain:
+    Uses the template specified in the ``TAILWIND_CONFIG_TEMPLATE`` setting
+    (default: ``tailwind/tailwind.config.js, full path:
+    ``src/argus/htmx/templates/tailwind/tailwind.config.js``) to dynamically
+    build a ``tailwind.config.js``. This file must be in an app's templates
+    directory, the default is in this app, ``argus.htmx``.
 
-     - a '{{ projectpaths }} section without square brackets that will be
-        popuplated  with auto discovered template dirs of installed apps
-     - a '{{ daisyuithemes }}' section without square brackets that will be
-        popuplated by the daisyUI theme list specified in the DAISYUI_THEMES
-        setting (default: ["dark", "light", {"argus"": {...}} ])
-     - a '{{ themeoverride }}' section that will be popuplated by a dict containing
-        tailwind theme options specified in TAILWIND_THEME_OVERRIDE setting
-        (default: {})
+    The template may contain:
 
-    This command also generates a `styles.css` that contains the base css file for
-    tailwind to create its final css file. It uses the template specified by the
-    `TAILWIND_CSS_TEMPLATE` setting (default: tailwind/styles.css). This file should
-    also be in an app's templates directory
+     - a ``{{ projectpaths }}`` section without square brackets that will be
+       popuplated  with auto discovered template dirs of installed apps
+     - a ``{{ daisyuithemes }}`` section without square brackets that will be
+       popuplated by the daisyUI theme list specified in the ``DAISYUI_THEMES``
+       setting (default: ``["dark", "light", {"argus"": {...}} ]``)
+     - a ``{{ themeoverride }}`` section that will be populated by a dict
+       containing tailwind theme options specified in TAILWIND_THEME_OVERRIDE
+       setting (default: {})
 
-    The `styles.css` template may iterate over a `cssfiles` context variable that
-    contains css files/snippets that should be included in the final css file. Apps
-    may define a `tailwind_css_files` method that gives the location (as a str or
-    pathlib.Path object) for every css file from this app to include. (see
-    argus.htmx.apps.HtmxFrontendConfig for an example)
+    This command also generates a ``styles.css`` that contains the base css
+    file for tailwind to create its final css file. It uses the template
+    specified by the ``TAILWIND_CSS_TEMPLATE`` setting (default:
+    ``tailwind/styles.css``, full path:
+    ``src/argus/htmx/templates/tailwind/styles.css``). This file should also be
+    in an app's templates directory
+
+    The ``styles.css`` template may iterate over a ``cssfiles`` context
+    variable that contains css files/snippets that should be included in the
+    final css file. Apps may define a ``tailwind_css_files`` method that gives
+    the location (as a ``str`` or ``pathlib.Path`` object) for every css file
+    from this app to include. (see ``argus.htmx.apps.HtmxFrontendConfig`` for
+    an example)
 
     Additional settings that govern the functionality of this command are:
 
@@ -71,35 +79,34 @@ class Command(BaseCommand):
         )
 
     def get_context(self, target_dir: pathlib.Path):
+        themeoverride = getattr(
+            settings,
+            "TAILWIND_THEME_OVERRIDE",
+            argus_htmx_settings.TAILWIND_THEME_OVERRIDE,
+        )
+        themes_setting = list(get_theme_names())
+        daisyuithemes = (json.dumps(themes_setting, indent=2),)
+        projectpaths = "\n".join(f"        '{d}/**/*.html'," for d in get_template_dirs())
+        cssfiles = tuple(self.get_css_files(target_dir))
+        themes = self.get_manual_themes()
         return {
-            "themeoverride": getattr(
-                settings,
-                "TAILWIND_THEME_OVERRIDE",
-                argus_htmx_settings.TAILWIND_THEME_OVERRIDE,
-            ),
-            "daisyuithemes": textwrap.indent(
-                json.dumps(get_raw_themes_setting(), indent=2),
-                prefix=10 * " ",
-                predicate=lambda line: line != "[\n",  # this is kinda hacky, but eh
-            ),
-            "projectpaths": "\n".join(f"        '{d}/**/*.html'," for d in self.get_template_dirs()),
-            "cssfiles": self.get_css_files(target_dir),
+            "themeoverride": themeoverride,
+            "daisyuithemes": daisyuithemes,
+            "projectpaths": projectpaths,
+            "cssfiles": cssfiles,
+            "themes": themes,
         }
 
     def write_file(self, template_name, target_path, context, name):
-        pathlib.Path(target_path).write_text(self.render(template_name=template_name, context=context))
+        pathlib.Path(target_path).write_text(render_to_string(template_name=template_name, context=context))
 
         self.stdout.write(f"Wrote {name} to '{target_path}'")
 
     @staticmethod
-    def render(template_name: str, context):
-        template = get_template(template_name)
-        return template.template.render(make_context(context, autoescape=False))
-
-    @staticmethod
-    def get_template_dirs():
-        for engine in engines.all():
-            yield from getattr(engine, "template_dirs", [])
+    def get_manual_themes():
+        themes = get_themes_from_setting()
+        wrapped_themes = [generate_theme_from_dict(theme) for _, theme in themes.items()]
+        return wrapped_themes
 
     @classmethod
     def get_css_files(cls, target_dir: pathlib.Path):

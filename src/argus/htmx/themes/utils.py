@@ -7,6 +7,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.contrib.staticfiles.finders import find
 
 from argus.htmx import defaults as fallbacks
+from argus.htmx.utils.templates import render_to_string
 
 
 __all__ = [
@@ -25,6 +26,26 @@ def get_raw_themes_setting():
 
 def get_themes_from_setting():
     themes_setting = get_raw_themes_setting()
+    themes = {}
+    for entry in themes_setting:
+        if isinstance(entry, dict):
+            for theme_name, theme in entry.items():
+                themes[theme_name] = theme
+    return themes
+
+
+def generate_theme_from_dict(theme: dict):
+    template = "tailwind/theme.css"
+    context = {
+        "settings": theme.copy(),
+        "values_to_quote": ("name", "color-scheme"),
+    }
+    daisy_theme = render_to_string(template, context)
+    return daisy_theme
+
+
+def get_theme_names_from_setting():
+    themes_setting = get_raw_themes_setting()
     theme_names = []
     for theme in themes_setting:
         if isinstance(theme, str):
@@ -35,28 +56,30 @@ def get_themes_from_setting():
 
 
 def get_stylesheet_path():
-    return getattr(settings, "STYLESHEET_PATH", fallbacks.STYLESHEET_PATH)
+    path = getattr(settings, "STYLESHEET_PATH", fallbacks.STYLESHEET_PATH)
+    return path
 
 
-def get_themes_from_css():
-    THEME_NAME_RE = r"(?P<theme>[-_\w]+)"
+def get_theme_names_from_css():
+    THEME_NAME_RE = r'"?(?P<theme>[-_\w]+)"?'
     DATA_THEME_RE = rf"\[data-theme={THEME_NAME_RE}\]"
 
     absolute_stylesheet_path = Path(find(get_stylesheet_path()))
     styles_css = absolute_stylesheet_path.read_text()
 
-    return findall(DATA_THEME_RE, styles_css)
+    theme_names = findall(DATA_THEME_RE, styles_css)
+    return theme_names
 
 
 def get_theme_names(quiet=True):
     ERROR_MSG = "Themes in settings are out of sync with themes installed"
 
-    themes_from_setting = set(get_themes_from_setting())
-    themes_from_css = set(get_themes_from_css())
-    installed_themes = themes_from_setting & themes_from_css
+    theme_names_from_setting = set(get_theme_names_from_setting())
+    theme_names_from_css = set(get_theme_names_from_css())
+    installed_themes = theme_names_from_setting & theme_names_from_css
 
-    all_themes = themes_from_setting | themes_from_css
-    if all_themes != installed_themes:
+    all_theme_names = theme_names_from_setting | theme_names_from_css
+    if all_theme_names != installed_themes:
         LOG.warning(ERROR_MSG)
         if not quiet:
             raise ImproperlyConfigured(ERROR_MSG)

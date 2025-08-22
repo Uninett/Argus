@@ -1,0 +1,3 @@
+@plugin "daisyui/theme" {{% for key, value in settings.items %}
+    {{ key }}: {% if key in values_to_quote %}"{{ value }}"{% else %}{{value }}{% endif %};{% endfor %}
+}
