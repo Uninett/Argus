@@ -171,7 +171,7 @@ def delete_filter(request: HtmxHttpRequest, pk: int):
 def get_existing_filters(request: HtmxHttpRequest):
     existing_filters = Filter.objects.all().filter(user=request.user)
     if existing_filters:
-        context = {"filters": existing_filters}
+        context = {"stored_filters": existing_filters}
         if request.htmx.target == "delete-filter-items":
             context.update({"action": "delete"})
         return render(request, "htmx/incident/_existing_filters.html", context=context)

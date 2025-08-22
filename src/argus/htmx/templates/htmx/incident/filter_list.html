@@ -10,7 +10,7 @@
           hx-on::after-swap="htmx.trigger('#filter-selector-form', 'unselect')">
     <option {% if not request.session.selected_filter %}selected{% endif %}
             value="">---</option>
-    {% for object in object_list %}
+    {% for object in stored_filters %}
       <option value="{{ object.id }}"
               {% if request.session.selected_filter == object.id|stringformat:"i" %}selected{% endif %}>
         {{ object.name }}
