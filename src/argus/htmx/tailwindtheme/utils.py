@@ -23,6 +23,9 @@ def get_url(version, architecture):
 def get_architecture():
     uname_obj = platform.uname()
     processor = uname_obj.processor.lower() or uname_obj.machine.lower()
+    libc, _ = platform.libc_ver()
+    if libc == "musl":
+        processor += f"-{libc}"
     system = uname_obj.system.lower()
     return (system, processor)
 
