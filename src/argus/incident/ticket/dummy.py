@@ -10,6 +10,11 @@ from __future__ import annotations
 
 from factory import Faker
 import logging
+from urllib.parse import urljoin
+
+from django.conf import settings
+from django.urls import reverse
+
 
 from .base import TicketPlugin
 
@@ -56,8 +61,6 @@ class TicketTestClient:
         global created_tickets
         created_tickets.append((*args, kwargs))
 
-        return _get_fake_url()
-
 
 class DummyPlugin(TicketPlugin):
     """Example of a minimal plugin, can be used for testing"""
@@ -94,11 +97,14 @@ class DummyPlugin(TicketPlugin):
         endpoint, authentication, ticket_information = cls.import_settings()
 
         client = cls.create_client(endpoint=endpoint, authentication=authentication)
-        ticket_url = client.create(
+        client.create(
             {
                 "title": serialized_incident["description"],
                 "description": serialized_incident["description"],
             }
         )
-
-        return ticket_url
+        url = urljoin(
+            getattr(settings, "FRONTEND_URL", ""),
+            reverse("htmx:incident-detail", kwargs={"pk": serialized_incident["pk"]}),
+        )
+        return url
