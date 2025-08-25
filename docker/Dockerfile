@@ -13,7 +13,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends tini build-essential
 
 # Install some dev requirements that aren't part of the minimal dependencies:
-RUN pip install psycopg2-binary django-extensions python-dotenv gunicorn 'uvicorn[standard]'
+RUN pip install psycopg2-binary django-extensions python-dotenv gunicorn
 
 # Make an unprivileged user to run the server
 RUN useradd --system argus
