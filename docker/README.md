@@ -28,10 +28,9 @@ settings](http://argus-server.rtfd.io/en/latest/site-specific-settings.html).
 
 ## Limitations
 
-This is not a complete Argus environment.  This image only defines the backend
-API server component. It still depends on a PostgreSQL to be
-functional. Also, the Argus front-end component is needed to have a functional
-user interface against the API server.
+This is not a complete Argus environment.  This image only defines the web
+server component: API and frontend. It still depends on a PostgreSQL server to
+be functional.
 
 For a full production environment example, take a look at
 https://github.com/Uninett/argus-docker

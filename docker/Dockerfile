@@ -1,12 +1,19 @@
 # Defines a production image for the Argus API server
-# Needs the repository root directory as its context
+# Needs the repository root directory as its context:
+#
+# If you're in the same dorectory as this Dockerfile try:
+#   docker build ..
+#
+# If you're in the repository root try:
+#   docker build -f docker/Dockerfile .
+
 FROM python:3.12
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get install -y --no-install-recommends tini build-essential
 
 # Install some dev requirements that aren't part of the minimal dependencies:
-RUN pip install psycopg2-binary django-extensions python-dotenv gunicorn 'uvicorn[standard]'
+RUN pip install psycopg2-binary django-extensions python-dotenv gunicorn
 
 # Make an unprivileged user to run the server
 RUN useradd --system argus
@@ -15,7 +22,7 @@ RUN mkdir -p /static && chown argus /static
 ENV STATIC_ROOT=/static
 
 COPY . /src
-RUN pip install '/src[spa]' && rm -rf /src
+RUN pip install '/src' && rm -rf /src
 
 # Install API backend settings suitable for Docker deployment
 RUN mkdir /extrapython
