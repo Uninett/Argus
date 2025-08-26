@@ -46,46 +46,43 @@ There are several ways to install Argus.
 * Docker and Docker Compose to run Argus in Docker. This will also run
   a PostgreSQL server for you.
 
-#### Optional: Frontend
-
-You need to have the frontend-specific dependencies installed.
-
-```
-pip install argus-server[htmx]
-```
-
-will do it.
-
 #### Optional: Federated login for frontend
 
 See [Federated Login @ Read The Docs](https://argus-server.rtfd.io/en/latest/development/howtos/federated-logins.html) or [local copy of Federated Login docs](docs/development/howtos/federated-logins.rst).
 
-### Install Argus using pip
+### Install Argus using pip from PyPI
 
-You can also install Argus with `pip` via PyPI. The package name is `argus-server`:
+You can install Argus with `pip` via PyPI. The package name is `argus-server`:
 ```console
 $ pip install argus-server
 ```
 
-If you are using the PyPI package in production, please note: The file
-`requirements.txt` contains the pinned versions of dependencies that the
-release was tested on. The file `constraints.txt` is for controlling versions
-of sub-dependencies so as to not poison the pyproject.toml.
+If you are using the PyPI wheel package in production, please note: It does
+not use pinned dependencies. (There is no single official standard for pinned
+dependencies in Python as of yet.)
 
-To update the dependency lock-files, use `tox`:
+### Install Argus from source
 
+Download the source code first.
 ```console
-$ pip install "tox>=4"
-$ tox run -e upgrade-deps -- -U
+$ git clone https://github.com/Uninett/Argus.git
+$ cd Argus
 ```
 
-To upgrade a single dependency, replace the `-U` flag with `-P PACKAGENAME`.
+PyPI has sdists of the source if you do not want to use git.
+
+The file `requirements.txt` contains the pinned versions of dependencies that
+the release was tested on. The file `constraints.txt` is for controlling
+versions of sub-dependencies so as to not poison the pyproject.toml. The wheel
+package does not contain either of these two files.
 
 To install from the lock-file use pip:
 
 ```console
 $ pip install -c constraints.txt --upgrade -r requirements.txt
 ```
+
+### First run
 
 Now change and adapt [Argus' settings](#settings-in-argus) according to your needs.
 
@@ -107,6 +104,17 @@ Then run the Argus API server:
 ```console
 $ python manage.py runserver
 ```
+
+#### Update pinned dependencies
+
+To update the dependency lock-files, use `tox`:
+
+```console
+$ pip install "tox>=4"
+$ tox run -e upgrade-deps -- -U
+```
+
+To upgrade a single dependency, replace the `-U` flag with `-P PACKAGENAME`.
 
 ### Setup Argus using Docker Compose
 
@@ -163,7 +171,7 @@ $ git clone https://github.com/Uninett/Argus.git
 $ cd Argus
 ```
 
-We recommend using virtualenv or virtaulenvwrapper to create
+We recommend using virtualenv or virtualenvwrapper to create
 a place to stash Argus' dependencies.
 
 Create and activate a Python virtual environment.
