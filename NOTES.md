@@ -4,35 +4,31 @@ This file documents changes to Argus that are relevant for operations,
 customizers and end-users.
 
 
+## [2.2.0] - 2025-08-26
+
+It is no longer necessary to install the frontend with `pip install
+argus-server[htmx]`, just `pip install argus-server` will do. The first method
+will still work but is deprecated.
+
+The included settings files were using the `update_settings` trick to set up
+the frontend, this has now been fixed. If you do not use separate settings
+files you should not need to do anything, but if you *do* use your own
+settings-files you no longer need invoke `update_settings`, just choose what
+settings-file to import/copy from with care.
+
+It is now also possible to look at only the last three days of incidents in the
+frontend.
+
+All other changes are related to maintenance and/or development. The rules in
+the Makefile have been documented. A rule for controlling/upgrading the version
+of Tailwind and Daisy UI has been added to the Makefile, and compiling CSS via
+`make tailwind` will be using the versions downloaded with the new rule.
+
+
 ## [2.1.1] - 2025-07-16
 
 Updated the user manual in the docs, added the link to the Argus demo site
 (https://argus-demo.uninett.no) to the README and fixed automatic ticket creation.
-
-### Added
-
-- Added new sections to the user manual: *How to select from existing themes*,
-  *How to add your own theme*,
-  *How to choose what columns are shown in the incidents table*, and *How to
-  change the date and time format*.
-  ([#1491](https://github.com/Uninett/Argus/issues/1491))
-
-### Changed
-
-- Updated the README with a link and info about the publicly accessible
-  demo-site.
-  ([#1510](https://github.com/Uninett/Argus/issues/1510))
-- Updated the content of the user manual (outdated text, screenshots and broken
-  external links). ([#1490](https://github.com/Uninett/Argus/issues/1490))
-
-### Fixed
-
-- Fixed automatic ticket creation, which was broken by
-  [#1497](https://github.com/Uninett/Argus/issues/1497)
-  ([#1516](https://github.com/Uninett/Argus/issues/1516))
-- Fixed broken links in the user manual.
-  ([#1492](https://github.com/Uninett/Argus/issues/1492))
-
 
 
 ## [2.1.0] - 2025-06-30
@@ -42,14 +38,6 @@ One new user preference.
 One new and one changed management command, both for better manipulation of
 incidents via the CLI.
 
-### Added
-
-- Add a preference to change the incidents table layout to compact or standard
-  ([#1399](https://github.com/Uninett/Argus/issues/1399))
-- Add CLI command to close incidents
-  ([#1450](https://github.com/Uninett/Argus/issues/1450))
-- Add option to `create_fake_incident` to generate incidents from json files
-  ([#1451](https://github.com/Uninett/Argus/issues/1451))
 
 ## [2.0.0] - 2025-05-26
 
@@ -75,25 +63,6 @@ and corresponding imports if you are getting the error
 
 `django.core.exceptions.ImproperlyConfigured: Application labels aren't unique,
 duplicates: django_htmx`.
-
-### Removed
-
-- Deleted API v1, its tests and mentions in the documentation. As well as all
-  support for the old frontend. Any endpoint starting with "/api/v1" replies
-  with "410 Gone". ([#1446](https://github.com/Uninett/Argus/pull/1446),
-  [#1445](https://github.com/Uninett/Argus/pull/1445),
-  [#1428](https://github.com/Uninett/Argus/pull/1428),
-  [#1427](https://github.com/Uninett/Argus/pull/1427),
-  [#1423](https://github.com/Uninett/Argus/pull/1423),
-  [#1422](https://github.com/Uninett/Argus/pull/1422),
-  [#1417](https://github.com/Uninett/Argus/pull/1417),
-  [#1415](https://github.com/Uninett/Argus/pull/1415))
-
-### Added
-
-- Added an optional banner below the navbar that can be filled with text
-  controlled via environment variable/Django setting.
-  ([#1164](https://github.com/Uninett/Argus/issues/1164))
 
 
 ## [1.37.0] - 2025-05-14

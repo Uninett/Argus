@@ -8,6 +8,38 @@ This project uses [*towncrier*](https://towncrier.readthedocs.io/) and the chang
 
 <!-- towncrier release notes start -->
 
+## [2.2.0] - 2025-08-26
+
+The most important bit of this release is the new (old) way to install and set
+up argus-server, including the frontend. Please see the NOTES.
+
+### Added, frontend
+
+- Added option 'Last 3 days' to the Timeframe selector.
+  ([#1440](https://github.com/Uninett/Argus/issues/1440))
+
+### Added
+
+- Added rule to Makefile that downloads standalone tailwind CLI client as per
+  the version configured in `src/argus/htmx/tailwindtheme/config.py`.
+  ([#1531](https://github.com/Uninett/Argus/issues/1531))
+- Add a fledgling CONTRIBUTING.rst for onboarding new developers.
+- Added documentation for the rules in the `Makefile`.
+- Two new development howtos have been added, with tips for using git and
+  GitHub.
+
+### Changed
+
+- Make example production Docker image work properly for Argus 2
+- The settings files have changed, since the HTMx frontend app is now included
+  by default. The frontend settings has been merged in and no longer need the
+  settings overriding machinery. It is no longer necessary to install the
+  frontend with `pip install argus-server[htmx]`, just `pip install
+  argus-server` will do.
+- Updated contributors file with contributors that joined after 2019, and added
+  a howto for how to keep the list updated.
+
+
 ## [2.1.1] - 2025-07-16
 
 ### Added
