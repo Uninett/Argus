@@ -208,6 +208,12 @@ def incident_list(request: HtmxHttpRequest) -> HttpResponse:
     total_count = qs.count()
     last_refreshed = make_aware(datetime.now())
 
+    # Stored filters
+    existing_filters = Filter.objects.filter(user=request.user)
+    stored_filter_pk = request.session.get("selected_filter", None)
+    stored_filter_obj = existing_filters.filter(pk=stored_filter_pk).first()
+    stored_filter_name = stored_filter_obj.name if stored_filter_obj else ""
+
     # make dict from QueryDict
     params = dict(request.GET.items())
 
@@ -242,14 +248,23 @@ def incident_list(request: HtmxHttpRequest) -> HttpResponse:
         base_template = "htmx/incident/_base.html"
     last_page_num = page.paginator.num_pages
     context = {
-        "columns": columns,
-        "filtered_count": filtered_count,
-        "count": total_count,
-        "filter_form": filter_form,
-        "timeframe_form": timeframe_form,
-        "timeframe": timeframe,
         "page_title": "Incidents",
         "base": base_template,
+        # filter box
+        "filter_form": filter_form,
+        # storing filters
+        "stored_filters": existing_filters,
+        "stored_filter_pk": stored_filter_pk,
+        "stored_filter_name": stored_filter_name,
+        "update_stored_filter_button": f"Update {stored_filter_name}",
+        "delete_stored_filter_button": f"Delete {stored_filter_name}",
+        # table
+        "columns": columns,
+        # refresh info
+        "filtered_count": filtered_count,
+        "count": total_count,
+        "timeframe_form": timeframe_form,
+        "timeframe": timeframe,
         "page": page,
         "last_page_num": last_page_num,
         "second_to_last_page": last_page_num - 1,

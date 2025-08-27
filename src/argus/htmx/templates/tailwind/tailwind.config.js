@@ -21,14 +21,5 @@ module.exports = {
             '8': '8px',
         },
         ...{{ themeoverride }},
-    },
-    safelist: [
-        "htmx-request"
-    ],
-    daisyui: {
-        themes: {{ daisyuithemes }},
-    },
-    plugins: [
-        require("daisyui"),
-    ]
+    }
 }
