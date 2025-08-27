@@ -3,11 +3,14 @@ from __future__ import annotations
 import logging
 from datetime import datetime, timedelta
 from typing import Optional
+from urllib.parse import urljoin
 
 from django import forms
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib import messages
 from django.utils.timezone import now as tznow
+from django.urls import reverse
 from django.shortcuts import render, get_object_or_404
 
 from django.views.decorators.http import require_POST, require_GET
@@ -19,6 +22,7 @@ from argus.auth.utils import get_or_update_preference
 from argus.incident.models import Incident
 from argus.incident.ticket.utils import get_ticket_plugin_path
 from argus.incident.ticket.base import TicketPluginException
+from argus.incident.serializers import IncidentSerializer
 from argus.notificationprofile.models import Filter
 from argus.util.datetime_utils import make_aware
 
@@ -257,3 +261,15 @@ def incident_list(request: HtmxHttpRequest) -> HttpResponse:
     }
 
     return render(request, "htmx/incident/incident_list.html", context=context)
+
+
+@require_GET
+def get_fake_ticket(request: HtmxHttpRequest, pk: int) -> HttpResponse:
+    incident = get_object_or_404(Incident.objects.all(), pk=pk)
+    context = IncidentSerializer(incident).data
+    argus_url = urljoin(
+        getattr(settings, "FRONTEND_URL", ""),
+        reverse("htmx:incident-detail", kwargs={"pk": pk}),
+    )
+    context["argus_url"] = argus_url
+    return render(request, "incident/ticket/default_ticket_body.html", context=context)
