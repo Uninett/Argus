@@ -4,12 +4,12 @@
     <span class="badge badge-primary">{{ preferences.argus_htmx.incidents_table_layout }}</span>
   </summary>
   <ul class="max-h-64 overflow-y-scroll">
-    {% for item in preferences_choices.argus_htmx.incidents_table_layout %}
+    {% for layout, layout_name in preferences_choices.argus_htmx.incidents_table_layout %}
       <li>
         <input type="radio"
                class="btn btn-sm btn-block btn-ghost justify-start"
-               value="{{ item }}"
-               aria-label="{{ item }}"
+               value="{{ layout }}"
+               aria-label="{{ layout_name }}"
                name="incidents_table_layout"
                autocomplete="off"
                hx-post="{% url 'htmx:update-preferences' namespace='argus_htmx' %}"
