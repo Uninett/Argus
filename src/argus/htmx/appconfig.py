@@ -34,6 +34,7 @@ _app_settings = [
             "urlpatterns_module": "argus.htmx.urls",
         },
         "context_processors": [
+            "argus.auth.context_processors.authmethods",
             "argus.auth.context_processors.preferences",
             "argus.htmx.context_processors.static_paths",
             "argus.htmx.context_processors.banner_message",

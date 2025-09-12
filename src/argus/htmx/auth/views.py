@@ -3,10 +3,11 @@ from django.contrib.auth.views import LoginView as DjangoLoginView
 from django.urls import reverse
 
 from argus.auth.utils import (
-    has_model_backend,
-    has_remote_user_backend,
-    get_psa_authentication_backends,
     get_authentication_backend_classes,
+    get_model_backend,
+    get_psa_authentication_backends,
+    get_remote_user_backend,
+    pop_auth_backend,
 )
 
 
@@ -15,24 +16,27 @@ OIDC_METHOD_NAME = getattr(settings, "ARGUS_OIDC_METHOD_NAME", "OIDC")
 
 
 def get_htmx_authentication_backend_name_and_type():
-    # Needed for HTMX LoginView
-    backends = get_authentication_backend_classes()
-
+    """Needed for HTMX LoginView"""
     data = {}
-    if has_model_backend(backends):
+    # use safetu copy
+    backends = get_authentication_backend_classes()[:]
+
+    if get_model_backend(backends):
         data["local"] = {
             "url": reverse("htmx:login"),
             "display_name": "Log In",
         }
 
-    if has_remote_user_backend(backends):
+    if get_remote_user_backend(backends):
         remote_user_data = {
             "url": "/",  # Should probably also be a setting
             "display_name": REMOTE_USER_METHOD_NAME,
         }
         data.setdefault("external", []).append(remote_user_data)
 
+    # psa social auth
     for backend in get_psa_authentication_backends(backends):
+        pop_auth_backend(backends, backend)
         display_name = backend.name
         if backend.name == "oidc":
             display_name = OIDC_METHOD_NAME
@@ -41,6 +45,9 @@ def get_htmx_authentication_backend_name_and_type():
             "display_name": display_name,
         }
         data.setdefault("external", []).append(psa_backend_data)
+
+    for backend in tuple(backends):
+        pop_auth_backend(backends, backend)
 
     return data
 

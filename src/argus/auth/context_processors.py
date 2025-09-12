@@ -8,7 +8,9 @@ See django settings for ``TEMPLATES``.
 """
 
 import functools
+
 from argus.auth.models import Preferences
+from argus.auth.utils import get_auth_backend_readiness, is_allauth_mfa_installed_correctly
 
 
 # When ``render`` is called multiple times during a request (such as by HtmxMessageMiddleware),
@@ -33,3 +35,11 @@ def preferences(request):
         for namespace, values in request.session["preferences"].items():
             prefdict[namespace].update(values)
     return {"preferences": prefdict, "preferences_choices": preferences_choices}
+
+
+@functools.cache
+def authmethods(request):
+    return {
+        "authmethods": get_auth_backend_readiness(),
+        "mfa_enabled": is_allauth_mfa_installed_correctly(),
+    }
