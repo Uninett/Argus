@@ -10,6 +10,10 @@ RUN mkdir -p /argus
 COPY requirements.txt /argus
 COPY requirements/*.txt /argus/requirements/
 
+ENV VIRTUAL_ENV=/opt/venv
+RUN python3 -m venv $VIRTUAL_ENV
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
+
 WORKDIR /argus
 RUN pip install gunicorn -r requirements.txt -r /argus/requirements/dev.txt
 
