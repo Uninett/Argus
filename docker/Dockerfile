@@ -2,15 +2,19 @@
 # Needs the repository root directory as its context:
 #
 # If you're in the same dorectory as this Dockerfile try:
-#   docker build ..
+#   docker build -f Dockerfile ..
 #
 # If you're in the repository root try:
 #   docker build -f docker/Dockerfile .
 
-FROM python:3.12
+FROM python:3.13-trixie
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get install -y --no-install-recommends tini build-essential
+
+ENV VIRTUAL_ENV=/opt/venv
+RUN python3 -m venv $VIRTUAL_ENV
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 # Install some dev requirements that aren't part of the minimal dependencies:
 RUN pip install psycopg2-binary django-extensions python-dotenv gunicorn
