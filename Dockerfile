@@ -5,7 +5,7 @@ FROM python:3.13-trixie
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get install -y --no-install-recommends tini \
-    build-essential libpq-dev libffi-dev libssl-dev
+    build-essential libpq-dev libffi-dev libssl-dev git
 RUN mkdir -p /argus
 COPY requirements.txt /argus
 COPY requirements/*.txt /argus/requirements/
