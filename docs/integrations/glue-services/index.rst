@@ -33,6 +33,17 @@ Network Administration Visualized
 This is an extension of NAV, runs on the same server, and uses the NAV config
 files.
 
+Zino
+~~~~
+
+| Home: https://nordu.net/zino/
+| Source: https://github.com/Uninett/zino-argus-glue
+| PyPI: `zino-argus-glue <https://pypi.org/project/zino-argus-glue/>`_
+
+This is a standalone process that connects to both the Zino and Argus APIs and
+exchanges/synchronizes information between them.
+
+
 Mist Systems Administration (Juniper)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
