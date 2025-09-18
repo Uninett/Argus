@@ -8,6 +8,22 @@ This project uses [*towncrier*](https://towncrier.readthedocs.io/) and the chang
 
 <!-- towncrier release notes start -->
 
+## [2.2.1] - 2025-09-18
+
+### Fixed, frontend
+
+* The incident list layout preference selector is no longer buggy
+
+### Fixed
+
+* Some problems with the dockerfile for production was fixed (see /docker), and
+  the README and the comments in the Dockerfile have been improved
+
+### Changed
+
+* Updated the installation instructions in the README, should have ben part of
+  2.2.0
+
 ## [2.2.0] - 2025-08-26
 
 The most important bit of this release is the new (old) way to install and set

@@ -4,6 +4,11 @@ This file documents changes to Argus that are relevant for operations,
 customizers and end-users.
 
 
+## [2.2.1] - 2025-09-18
+
+A bug in the user preference added in 2.1.0 was fixed, otherwise this is just
+a polish this, document that, upgrade some dependencies release.
+
 ## [2.2.0] - 2025-08-26
 
 It is no longer necessary to install the frontend with `pip install
