@@ -80,7 +80,12 @@ artifacts = ["src/argus/version.py"]
 packages = ["src/argus"]
 
 [tool.hatch.build.targets.sdist]
-exclude = ["/.github"]
+exclude = [
+    "/.github",
+    "/*.json",
+    "/*.py",
+    "/*.sh",
+]
 
 [tool.versioningit.write]
 file = "src/argus/version.py"
