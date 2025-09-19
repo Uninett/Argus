@@ -1,7 +1,7 @@
 <button class="btn {{ button_class|default:"btn-primary" }}"
         onclick="htmx.find('#{{ dialog_id }}').showModal()">{{ button_title }}</button>
 <dialog id="{{ dialog_id }}" class="modal">
-  <div class="modal-box card card-compact shadow-xl loading-box">
+  <div class="modal-box card card-sm shadow-xl loading-box">
     <div class="w-full">
       <div class="divider divider-start">
         <h3 class="card-title">{{ header }}</h3>
@@ -22,10 +22,12 @@
       <div class="modal-action card-actions">
         <form method="dialog" class="w-full">
           <div class="divider divider-end">
-            <button type="submit" form="{{ dialog_id }}-form" class="btn btn-primary">
+            <button type="submit"
+                    form="{{ dialog_id }}-form"
+                    class="btn btn-primary rounded-lg">
               <span>{{ submit_text }}</span>
             </button>
-            <button class="btn">{{ cancel_text }}</button>
+            <button class="btn rounded-lg">{{ cancel_text }}</button>
           </div>
         </form>
       </div>
