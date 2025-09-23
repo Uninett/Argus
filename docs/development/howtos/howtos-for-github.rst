@@ -23,4 +23,4 @@ magic address GitHub provides for you, then you need to toggle "Keep my email
 addresses private" on the same page to "On". You can even prevent commits not
 using the magic address from being pushed to GitHub.
 
-See `Setting your commit email address at GitHub<https://docs.github.com/en/account-and-profile/how-tos/setting-up-and-managing-your-personal-account-on-github/managing-email-preferences/setting-your-commit-email-address>`_ for more information.
+See `Setting your commit email address at GitHub <https://docs.github.com/en/account-and-profile/how-tos/setting-up-and-managing-your-personal-account-on-github/managing-email-preferences/setting-your-commit-email-address>`_ for more information.
