@@ -8,8 +8,6 @@ from django.contrib import messages
 from django.http import HttpRequest
 from django.utils.module_loading import import_string
 
-from social_core.backends.oauth import BaseOAuth2
-
 from argus.auth.models import Preferences, SessionPreferences
 
 
@@ -17,7 +15,6 @@ __all__ = [
     "get_authentication_backend_classes",
     "has_model_backend",
     "has_remote_user_backend",
-    "get_psa_authentication_backends",
     "get_preference_obj",
     "get_preference",
     "get_or_update_preference",
@@ -40,11 +37,6 @@ def has_model_backend(backends):
 
 def has_remote_user_backend(backends):
     return RemoteUserBackend in backends
-
-
-def get_psa_authentication_backends(backends=None):
-    backends = backends if backends else get_authentication_backend_classes()
-    return [backend for backend in backends if issubclass(backend, BaseOAuth2)]
 
 
 def get_preference_obj(request, namespace) -> Preferences:

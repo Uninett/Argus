@@ -1,4 +1,5 @@
 from argus.site.settings._serializers import ListAppSetting
+from argus.util.app_utils import is_using_psa
 
 
 __all__ = ["APP_SETTINGS"]
@@ -51,5 +52,25 @@ _app_settings = [
         "app_name": "fontawesomefree",
     },
 ]
+
+if is_using_psa():
+    _app_settings += [
+        {
+            "app_name": "social_django",
+            "middleware": {
+                "social_django.middleware.SocialAuthExceptionMiddleware": "end",
+            },
+            "context_processors": [
+                "social_django.context_processors.backends",
+                "social_django.context_processors.login_redirect",
+            ],
+            "urls": {
+                "path": "oidc/",
+                "urlpatterns_module": "social_django.urls",
+                "namespace": "social",
+            },
+        }
+    ]
+
 
 APP_SETTINGS = ListAppSetting(_app_settings).root

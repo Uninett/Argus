@@ -38,7 +38,7 @@
               {% include "htmx/user/_user_menu.html" %}
             </details>
           {% else %}
-            <a class="btn" href="{% url 'htmx:login' %}">Log in</a>
+            <a class="btn" href="{% url 'login' %}">Log in</a>
           {% endif %}
         {% endblock userlink %}
       </div>
