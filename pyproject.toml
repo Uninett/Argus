@@ -33,9 +33,6 @@ dependencies = [
     "drf-spectacular>=0.17",
     "factory_boy",
     "psycopg2",
-    "python-dataporten-auth",
-    "social-auth-core>=4.1",
-    "social-auth-app-django>=5.0",
     "whitenoise",
     "wheel",
     "httpx",
@@ -44,8 +41,6 @@ dependencies = [
     "django-htmx",
     "django-widget-tweaks==1.5.0",
     "fontawesomefree~=6.6",
-    "social-auth-core>=4.1",
-    "social-auth-app-django>=5.0",
 ]
 dynamic = ["version"]
 
@@ -55,6 +50,11 @@ dynamic = ["version"]
 [project.optional-dependencies]
 htmx = []  # for outdated install procedures
 docs = ["sphinx>=2.2.0"]
+psa = [
+    "social-auth-core>=4.1",
+    "social-auth-app-django>=5.0",
+    "python-dataporten-auth",
+]
 dev = [
     "django-debug-toolbar",
     "coverage",
