@@ -1,0 +1,5 @@
+<input type="{{ widget.type }}"
+       name="{{ widget.name }}"
+       class="input input-bordered border-b {{ widget.attrs.class }}"
+       {% if widget.value != None %}value="{{ widget.value|stringformat:'s' }}"{% endif %}
+       {% include "django/forms/widgets/classless_attrs.html" %}>
