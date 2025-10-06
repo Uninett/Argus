@@ -18,7 +18,6 @@ LOG = logging.getLogger(__name__)
 
 class DaysMultipleChoiceField(forms.MultipleChoiceField):
     widget = forms.CheckboxSelectMultiple
-    widget.option_template_name = "htmx/timeslot/checkbox_option.html"
 
     def to_python(self, value):
         value = super().to_python(value)
