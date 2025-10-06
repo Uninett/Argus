@@ -1,0 +1,5 @@
+<input type="range"
+       name="{{ widget.name }}"
+       class="range range-primary range-xs {{ widget.attrs.class }}"
+       {% if widget.value != None %}value="{{ widget.value|stringformat:'s' }}"{% endif %}
+       {% include "django/forms/widgets/classless_attrs.html" %}>

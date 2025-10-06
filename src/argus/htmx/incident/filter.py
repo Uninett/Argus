@@ -13,18 +13,22 @@ filter_backend = get_filter_backend()
 QuerySetFilter = filter_backend.QuerySetFilter
 
 
+class RangeInput(forms.NumberInput):
+    template_name = "django/forms/widgets/range.html"
+
+
 class IncidentFilterForm(forms.Form):
     open = forms.IntegerField(
-        widget=forms.NumberInput(
-            attrs={"type": "range", "step": "1", "min": min(OpenStatus).value, "max": max(OpenStatus).value}
+        widget=RangeInput(
+            attrs={"class": "range-primary", "step": "1", "min": min(OpenStatus).value, "max": max(OpenStatus).value}
         ),
         label="Open State",
         initial=OpenStatus.BOTH.value,
         required=False,
     )
     acked = forms.IntegerField(
-        widget=forms.NumberInput(
-            attrs={"type": "range", "step": "1", "min": min(AckedStatus).value, "max": max(AckedStatus).value}
+        widget=RangeInput(
+            attrs={"class": "range-primary", "step": "1", "min": min(AckedStatus).value, "max": max(AckedStatus).value}
         ),
         label="Acked",
         initial=AckedStatus.BOTH.value,
@@ -42,7 +46,7 @@ class IncidentFilterForm(forms.Form):
         widget=forms.TextInput(
             attrs={
                 "placeholder": "key=value, ...",
-                "class": "input input-primary input-bordered input-sm overflow-y-auto min-h-8 h-auto max-h-16 max-w-xs leading-tight",
+                "class": "input-primary input-sm overflow-y-auto min-h-8 h-auto max-h-16 max-w-xs leading-tight",
             }
         ),
         required=False,
@@ -50,8 +54,8 @@ class IncidentFilterForm(forms.Form):
         help_text='Press "Enter" after each completed tag',
     )
     maxlevel = forms.IntegerField(
-        widget=forms.NumberInput(
-            attrs={"type": "range", "step": "1", "min": min(Level).value, "max": max(Level).value}
+        widget=RangeInput(
+            attrs={"class": "range-primary", "step": "1", "min": min(Level).value, "max": max(Level).value}
         ),
         label="Level <=",
         initial=max(Level).value,

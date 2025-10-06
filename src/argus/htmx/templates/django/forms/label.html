@@ -1,0 +1,16 @@
+{% if field.widget.type == "checkbox" %}
+<div class="indicator w-full flex">
+  {% endif %}
+{% if use_tag %}
+  <{{ tag }}
+  {% include "django/forms/attrs.html" %}
+  ><strong class="label-text">{{ label }}</strong></{{ tag }}>
+{% else %}
+  <strong class="label-text">{{ label }}</strong>
+{% endif %}
+{% if widget.attrs.required %}
+<span class="indicator-item indicator-top indicator-end badge border-none mask mask-circle text-warning text-base">＊</span>
+  {% endif %}
+{% if field.widget.type == "checkbox" %}
+</div>
+{% endif %}

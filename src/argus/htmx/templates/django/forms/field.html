@@ -1,0 +1,14 @@
+{% if field.use_fieldset %}
+  <fieldset class="flex flex-col gap-2" {% if field.aria_describedby %}aria-describedby="{{ field.aria_describedby }}"{% endif %}>
+    {% if field.label %}{{ field.legend_tag }}{% endif %}
+  {% else %}
+  <div class="flex flex-col gap-2">
+    {% if field.label %}{{ field.label_tag }}{% endif %}
+  {% endif %}
+  {% if field.help_text %}
+    <div class="helptext text-info"
+         {% if field.auto_id %}id="{{ field.auto_id }}_helptext"{% endif %}>{{ field.help_text|safe }}</div>
+  {% endif %}
+  {{ field }}
+  {% if field.errors %}<div class="text-error">{{ field.errors }}</div>{% endif %}
+  {% if field.use_fieldset %}</fieldset>{% else %}</div>{% endif %}

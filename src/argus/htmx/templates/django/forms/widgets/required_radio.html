@@ -1,0 +1,8 @@
+<div class="indicator w-full flex">
+  <span class="indicator-item indicator-top indicator-start badge border-none mask mask-circle text-warning text-base">＊</span>
+  <input type="radio"
+         name="{{ widget.name }}"
+         class="radio radio-sm {{ widget.attrs.class }}"
+         {% if widget.value != None %}value="{{ widget.value|stringformat:'s' }}"{% endif %}
+         {% include "django/forms/widgets/classless_attrs.html" %}>
+</div>

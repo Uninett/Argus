@@ -1,0 +1,10 @@
+<div class="indicator w-full flex">
+  {% if widget.attrs.required %}
+    <span class="indicator-item indicator-top indicator-start badge border-none mask mask-circle text-warning text-base">＊</span>
+  {% endif %}
+  <input type="{{ widget.type }}"
+         name="{{ widget.name }}"
+         class="input input-bordered {{ widget.attrs.class }}"
+         {% if widget.value != None %}value="{{ widget.value|stringformat:'s' }}"{% endif %}
+         {% include "django/forms/widgets/classless_attrs.html" %}>
+</div>

@@ -5,6 +5,14 @@ from django.core.exceptions import ValidationError
 __all__ = ["StyleGuideForm"]
 
 
+class RequiredCheckboxInput(forms.CheckboxInput):
+    template_name = "django/forms/widgets/required_checkbox.html"
+
+
+class RequiredRadioInput(forms.CheckboxInput):
+    template_name = "django/forms/widgets/required_radio.html"
+
+
 class ArgusFormMixin:
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -18,12 +26,8 @@ class StyleGuideForm(ArgusFormMixin, forms.Form):
 
     # field variations:
     required = forms.CharField(required=True)
-    required_checkbox = forms.BooleanField(required=True)
-    required_radioselect = forms.ChoiceField(
-        required=True,
-        choices=CHOICES,
-        widget=forms.RadioSelect,
-    )
+    required_checkbox = forms.BooleanField(required=True, widget=RequiredCheckboxInput)
+    required_radio = forms.BooleanField(required=True, widget=RequiredRadioInput)
     help_text = forms.CharField(
         required=False, help_text="This is the help text for a specific field, should always be shown"
     )
