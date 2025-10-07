@@ -4,9 +4,11 @@
     <div class="divider divider-secondary my-0 pointer-events-none"></div>
   </li>
   {% block items %}
-    <li>
-      <a href="{% url "account_email" %}">Account management</a>
-    </li>
+    {% if authmethods.allauth %}
+      <li>
+        <a href="{% url "account_email" %}">Account management</a>
+      </li>
+    {% endif %}
     {% block user_preferences_links %}
       {% include "htmx/user/_user_menu_user_preferences.html" %}
     {% endblock user_preferences_links %}
