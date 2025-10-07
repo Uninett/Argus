@@ -4,11 +4,11 @@
            name="incident_menus"
            autocomplete="off"
            role="tab"
-           class="tab [--tab-border:var(--border-width)] [--tab-border-color:var(--color-primary)] text-nowrap min-h-fit"
+           class="tab rounded-lg [--tab-border:var(--border-width)] [--tab-border-color:var(--color-primary)] text-nowrap min-h-fit"
            aria-label="Filter Incidents"
            checked="checked" />
     <div role="tabpanel"
-         class="filterbox tab-content border-primary [--tab-border:var(--border-width)] rounded-b-lg p-2">
+         class="filterbox tab-content border border-primary [--tab-border:var(--border-width)] rounded-b-lg p-2">
       <div class="flex flex-wrap items-center">
         {% include "htmx/incident/_incident_filterbox.html" %}
         {% include "htmx/incident/_filter_controls.html" %}
@@ -18,10 +18,10 @@
            name="incident_menus"
            autocomplete="off"
            role="tab"
-           class="tab tab-select [--tab-border:var(--border-width)] [--tab-border-color:var(--color-primary)] text-nowrap min-h-fit"
+           class="tab tab-select [--tab-border:var(--default-border-width)] [--tab-border-color:var(--color-primary)] text-nowrap min-h-fit"
            aria-label="Update Incidents" />
     <div role="tabpanel"
-         class="tab-content border-primary [--tab-border:var(--border-width)] rounded-box p-2">
+         class="tab-content border border-primary [--tab-border:var(--border-width)] rounded-box p-2">
       {% include "htmx/incident/_incident_list_update_menu.html" %}
     </div>
   {% endblock menu_tabs %}
