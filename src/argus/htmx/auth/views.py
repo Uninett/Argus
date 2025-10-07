@@ -7,6 +7,7 @@ from argus.auth.utils import (
     has_remote_user_backend,
     get_authentication_backend_classes,
 )
+from argus.util.app_utils import is_using_allauth
 
 
 REMOTE_USER_METHOD_NAME = getattr(settings, "ARGUS_REMOTE_USER_METHOD_NAME", "REMOTE_USER")
@@ -16,10 +17,11 @@ def get_htmx_authentication_backend_name_and_type():
     # Needed for HTMX LoginView
     backends = get_authentication_backend_classes()
 
+    login_urlname = "account_login" if is_using_allauth() else "login"
     data = {}
     if has_model_backend(backends):
         data["local"] = {
-            "url": reverse("login"),
+            "url": reverse(login_urlname),
             "display_name": "Log In",
         }
 

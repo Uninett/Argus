@@ -8,6 +8,8 @@ See django settings for ``TEMPLATES``.
 """
 
 import functools
+
+from argus.util.app_utils import is_using_psa, is_using_allauth
 from argus.auth.models import Preferences
 
 
@@ -33,3 +35,19 @@ def preferences(request):
         for namespace, values in request.session["preferences"].items():
             prefdict[namespace].update(values)
     return {"preferences": prefdict, "preferences_choices": preferences_choices}
+
+
+@functools.lru_cache(maxsize=10)
+def authentication_methods(request):
+    using_allauth = is_using_allauth()
+    context = {
+        "authmethods": {
+            "local": True,
+            "psa": is_using_psa(),
+            "allauth": using_allauth,
+        },
+        "login_urlname": "account_login" if using_allauth else "login",
+        "logout_urlname": "account_logout" if using_allauth else "logout",
+    }
+
+    return context

@@ -96,6 +96,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "argus.auth.context_processors.preferences",
+                "argus.auth.context_processors.authentication_methods",
                 "argus.htmx.context_processors.static_paths",
             ],
         },
