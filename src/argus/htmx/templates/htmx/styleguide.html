@@ -1,52 +1,64 @@
 {% extends "htmx/base.html" %}
 {% block main %}
-  <h1>Style guide</h1>
-  <section>
-    <h2>Headings</h2>
-    <p>
-      All pages except the incident list (at <a href="{% url "htmx:incident-list" %}">/incidents/</a>) should start with a FOO heading.
-    </p>
-  </section>
-  <section>
-    <h2>Buttons</h2>
-    <h3>Primary color</h3>
-    <input type="button" class="btn btn-primary" value="<input> button">
-    <button class="btn btn-primary">&lt;button&gt; button</button>
-    <a class="btn btn-primary" href="#">&lt;a&gt; button</a>
-    <h3>Secondary color</h3>
-    <input type="button" class="btn btn-secondary" value="<input> button">
-    <button class="btn btn-secondary">&lt;button&gt; button</button>
-    <a class="btn btn-secondary" href="#">&lt;a&gt; button</a>
-    <h3>No extras</h3>
-    <input type="button" class="btn" value="<input> button">
-    <button class="btn">&lt;button&gt; button</button>
-    <a class="btn btn" href="#">&lt;a&gt; button</a>
-    <p>We do not use other button types than these.</p>
-  </section>
-  <section>
-    <h2>Form fields</h2>
-    <h3 id="form-default-rendering">Default rendering</h3>
-    <p>
-      The form blow is for testing the look and feel of forms. Submitting will re-render the form with the submitted values pre-filled. Click "Reset" to empty the fields.
-    </p>
-    {% if request.GET %}
-      <p>The form has been submitted.</p>
-      {% if form.is_valid %}
-        <p>The form is VALID!</p>
-        <div>Cleaned data: {{ form.cleaned_data }}</div>
-        <div>Non field errors: {{ form.non_field_errors }}</div>
-      {% else %}
-        <p>The form is NOT VALID!</p>
-        <div>Cleaned data: {{ form.cleaned_data }}</div>
-        <div>Non field errors: {{ form.non_field_errors }}</div>
-      {% endif %}
-    {% else %}
-      <p>The form has not been submitted yet.</p>
-    {% endif %}
-    <form action="#form-default-rendering" method="get">
-      {{ form }}
-      <input class="btn btn-primary" type="submit">
-      <a class="btn" href="{% url "htmx:styleguide" %}#form-default-rendering">Reset</a>
-    </form>
-  </section>
+  <div class="p-4 space-y-4">
+    <h1 class="text-3xl">Style guide</h1>
+    <section class="space-y-4 border rounded-md p-4">
+      <h2 class="text-2xl">Headings</h2>
+      <p>
+        All pages except the incident list (at <a href="{% url "htmx:incident-list" %}">/incidents/</a>) should start with a FOO heading.
+      </p>
+    </section>
+    <section class="space-y-4 border rounded-md p-4">
+      <h2 class="text-2xl">Buttons</h2>
+      <div class="space-y-2">
+        <h3 class="text-xl">Primary color</h3>
+        <input type="button" class="btn btn-primary" value="<input> button">
+        <button class="btn btn-primary">&lt;button&gt; button</button>
+        <a class="btn btn-primary" href="#">&lt;a&gt; button</a>
+      </div>
+      <div class="space-y-2">
+        <h3 class="text-xl">Secondary color</h3>
+        <input type="button" class="btn btn-secondary" value="<input> button">
+        <button class="btn btn-secondary">&lt;button&gt; button</button>
+        <a class="btn btn-secondary" href="#">&lt;a&gt; button</a>
+      </div>
+      <div class="space-y-2">
+        <h3 class="text-xl">No extras</h3>
+        <input type="button" class="btn" value="<input> button">
+        <button class="btn">&lt;button&gt; button</button>
+        <a class="btn btn" href="#">&lt;a&gt; button</a>
+      </div>
+      <p>We do not use other button types than these.</p>
+    </section>
+    <section class="space-y-4 border rounded-md p-4">
+      <h2 class="text-2xl">Form fields</h2>
+      <div class="space-y-2">
+        <h3 id="form-default-rendering" class="text-xl">Default rendering</h3>
+        <p>
+          The form blow is for testing the look and feel of forms. Submitting will re-render the form with the submitted values pre-filled. Click "Reset" to empty the fields.
+        </p>
+        {% if request.GET %}
+          <p>The form has been submitted.</p>
+          {% if form.is_valid %}
+            <p>The form is VALID!</p>
+            <div>Cleaned data: {{ form.cleaned_data }}</div>
+            <div>Non field errors: {{ form.non_field_errors }}</div>
+          {% else %}
+            <p>The form is NOT VALID!</p>
+            <div>Cleaned data: {{ form.cleaned_data }}</div>
+            <div>Non field errors: {{ form.non_field_errors }}</div>
+          {% endif %}
+        {% else %}
+          <p>The form has not been submitted yet.</p>
+        {% endif %}
+      </div>
+      <form action="#form-default-rendering" method="get">
+        <div class="grid sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-4 flex-wrap mb-4">{{ form }}</div>
+        <div>
+          <input class="btn btn-primary" type="submit">
+          <a class="btn" href="{% url "htmx:styleguide" %}#form-default-rendering">Reset</a>
+        </div>
+      </form>
+    </section>
+  </div>
 {% endblock main %}
