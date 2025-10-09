@@ -10,15 +10,7 @@
                 class="flex flex-col gap-6"
                 action="{{ backends.local.url }}">
             {% csrf_token %}
-            {% for field in form %}
-              <label class="flex flex-row items-center gap-2">
-                <span class="w-24">{{ field.label }}:</span>
-                <div class="indicator">
-                  <span class="indicator-item indicator-top indicator-start badge border-none mask mask-circle text-warning text-base">＊</span>
-                  {{ field|add_class:"input input-bordered grow" }}
-                </div>
-              </label>
-            {% endfor %}
+            {{ form }}
             <button type="submit" class="btn btn-primary">{{ backends.local.display_name }}</button>
           </form>
         {% endif %}
