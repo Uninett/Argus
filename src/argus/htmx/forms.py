@@ -34,7 +34,7 @@ class StyleGuideForm(ArgusFormMixin, forms.Form):
     error = forms.CharField(required=True)
 
     # field types:
-    input = forms.CharField(required=False)
+    input_ = forms.CharField(label="Input", required=False)
     password = forms.Field(required=False, widget=forms.PasswordInput)
     number = forms.IntegerField(required=False)
     date = forms.DateField(required=False)
