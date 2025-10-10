@@ -17,7 +17,7 @@ yet. If you are looking for low hanging fruit:
 
 More work is involved in making sure all form fields use the style guide
 designs for inputs/labels. Another larger task is issue #1557:
-`Restyling the preferences page <https://github.com/Uninett/Argus/issues/1557>_`.
+`Restyling the preferences page <https://github.com/Uninett/Argus/issues/1557>`_.
 
 See also issue #1519:
-`Add styleguide <https://github.com/Uninett/Argus/issues/1519>_`.
+`Add styleguide <https://github.com/Uninett/Argus/issues/1519>`_.
