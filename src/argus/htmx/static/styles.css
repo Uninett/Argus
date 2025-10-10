@@ -3666,6 +3666,16 @@ details.collapse summary::-webkit-details-marker {
   position: relative;
 }
 
+[type="radio"].radio-xs {
+  height: 1rem;
+  width: 1rem;
+}
+
+[type="radio"].radio-sm {
+  height: 1.25rem;
+  width: 1.25rem;
+}
+
 .range-xs {
   height: 1rem;
 }
@@ -4333,10 +4343,6 @@ details.collapse summary::-webkit-details-marker {
 
 .w-2\/3 {
   width: 66.666667%;
-}
-
-.w-24 {
-  width: 6rem;
 }
 
 .w-4 {

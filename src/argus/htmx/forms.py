@@ -11,14 +11,6 @@ __all__ = [
 ]
 
 
-class RequiredCheckboxInput(forms.CheckboxInput):
-    template_name = "django/forms/widgets/required_checkbox.html"
-
-
-class RequiredRadioInput(forms.CheckboxInput):
-    template_name = "django/forms/widgets/required_radio.html"
-
-
 class PredefinedAttrsInputMixin:
     def __init__(self, attrs=None, format=None):
         merged_attrs = self.DEFAULT_ATTRS.copy()
@@ -68,8 +60,6 @@ class StyleGuideForm(ArgusFormMixin, forms.Form):
 
     # field variations:
     required = forms.CharField(required=True)
-    required_checkbox = forms.BooleanField(required=True, widget=RequiredCheckboxInput)
-    required_radio = forms.BooleanField(required=True, widget=RequiredRadioInput)
     help_text = forms.CharField(
         required=False, help_text="This is the help text for a specific field, should always be shown"
     )
