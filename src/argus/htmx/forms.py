@@ -5,13 +5,17 @@ from django.core.exceptions import ValidationError
 __all__ = ["StyleGuideForm"]
 
 
-class ArgusFormMixin:
+class _ArgusBaseForm(forms.Form):
     def __init__(self, *args, **kwargs):
+        kwargs.setdefault("label_suffix", "")
         super().__init__(*args, **kwargs)
-        self.label_suffix = ""
 
 
-class StyleGuideForm(ArgusFormMixin, forms.Form):
+# Turn off colons EVERYWHERE
+forms.Form = _ArgusBaseForm
+
+
+class StyleGuideForm(forms.Form):
     ERROR_INPUT = "MXZ"
     _choices = ("S", "Medium", "Loooooooong", "Multi word long choice")
     CHOICES = tuple(enumerate(_choices, 1))
