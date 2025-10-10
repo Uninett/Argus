@@ -29,7 +29,6 @@ from argus.site.views import index, MetadataView, api_gone
 
 api_v1_gone = partial(api_gone, message="API v1 has been removed")
 
-
 urlpatterns = [
     path("favicon.ico", RedirectView.as_view(url="/static/favicon.svg", permanent=True)),
     # path(".error/", error),  # Only needed when testing error pages and error behavior
