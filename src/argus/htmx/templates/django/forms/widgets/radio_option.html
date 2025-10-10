@@ -1,11 +1,11 @@
-<div class="form-control">
+<span class="flex flex-nowrap items-center">
   <label {% if widget.attrs.id %}for="{{ widget.attrs.id }}"{% endif %}
          class="label cursor-pointer">
     <input type="radio"
            name="{{ widget.name }}"
-           class="radio radio-sm {{ widget.attrs.class }}"
+           class="radio radio-xs {{ widget.attrs.class }}"
            {% if widget.value != None %}value="{{ widget.value|stringformat:'s' }}"{% endif %}
            {% include "django/forms/widgets/classless_attrs.html" %}>
-    <span class="label-text">{{ widget.label }}</span>
+    <span class="label-text pl-2">{{ widget.label }}</span>
   </label>
-</div>
+</span>
