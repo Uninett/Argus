@@ -1,0 +1,12 @@
+<!-- checkbox_option.html -->
+<span class="flex flex-nowrap items-center">
+  <label class="label cursor-pointer"
+         {% if widget.attrs.id %}for="{{ widget.attrs.id }}"{% endif %}>
+    <input type="checkbox"
+           name="{{ widget.name }}"
+           class="checkbox checkbox-sm {{ widget.attrs.class }}"
+           {% if widget.value != None %}value="{{ widget.value|stringformat:'s' }}"{% endif %}
+           {% include "django/forms/widgets/classless_attrs.html" %}>
+    <span class="label-text pl-2">{{ widget.label }}</span>
+  </label>
+</span>
