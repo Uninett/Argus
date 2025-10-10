@@ -2,49 +2,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 
 
-__all__ = [
-    "StyleGuideForm",
-    "PredefinedAttrsInputMixin",
-    "TimeInput",
-    "DateInput",
-    "DateTimeInput",
-]
-
-
-class PredefinedAttrsInputMixin:
-    def __init__(self, attrs=None, format=None):
-        merged_attrs = self.DEFAULT_ATTRS.copy()
-        if attrs:
-            merged_attrs.update(attrs)
-        super().__init__(merged_attrs)
-
-
-class TimeInput(PredefinedAttrsInputMixin, forms.TimeInput):
-    DEFAULT_FORMAT = "%H:%M"
-    DEFAULT_ATTRS = {
-        "type": "text",
-        "pattern": r"[012]\d:[0-5]\d",
-        "class": "input input-bordered",
-        "placeholder": "HH:MM",
-    }
-
-    def __init__(self, attrs=None, format=None):
-        super().__init__(attrs)
-        self.format = format or self.DEFAULT_FORMAT
-
-
-class DateInput(PredefinedAttrsInputMixin, forms.TimeInput):
-    DEFAULT_ATTRS = {
-        "type": "date",
-        "class": "input input-bordered",
-    }
-
-
-class DateTimeInput(PredefinedAttrsInputMixin, forms.TimeInput):
-    DEFAULT_ATTRS = {
-        "type": "datetime",
-        "class": "input input-bordered",
-    }
+__all__ = ["StyleGuideForm"]
 
 
 class ArgusFormMixin:
@@ -69,9 +27,9 @@ class StyleGuideForm(ArgusFormMixin, forms.Form):
     input_ = forms.CharField(label="Input", required=False)
     password = forms.Field(required=False, widget=forms.PasswordInput)
     number = forms.IntegerField(required=False)
-    date = forms.DateField(required=False, widget=DateInput)
-    datetime = forms.DateTimeField(required=False, widget=DateTimeInput)
-    time = forms.TimeField(required=False, widget=TimeInput)
+    date = forms.DateField(required=False)
+    datetime = forms.DateTimeField(required=False)
+    time = forms.TimeField(required=False)
     email = forms.EmailField(required=False)
     url = forms.URLField(required=False)
     checkbox = forms.BooleanField(required=False)

@@ -1,0 +1,8 @@
+<!-- time.html -->
+<input type="text"
+       name="{{ widget.name }}"
+       placeholder="HH:MM"
+       pattern="[012]\d:[0-5]\d"
+       class="input input-bordered {{ widget.attrs.class }}"
+       {% if widget.value != None %}value="{{ widget.value|stringformat:'s' }}"{% endif %}
+       {% include "django/forms/widgets/classless_attrs.html" %}>
