@@ -3671,11 +3671,6 @@ details.collapse summary::-webkit-details-marker {
   width: 1rem;
 }
 
-[type="radio"].radio-sm {
-  height: 1.25rem;
-  width: 1.25rem;
-}
-
 .range-xs {
   height: 1rem;
 }
