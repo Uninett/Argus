@@ -174,7 +174,7 @@
       {% endverbatim %}
     </code> Django template syntax. Below is the field named "Input" from the form above:
   </p>
-  <p>{{ form.input.as_field_group }}</p>
+  <p>{{ form.input_.as_field_group }}</p>
   <p>
     You get just the actual input part of the field via the <code>
     {% verbatim %}
@@ -182,7 +182,7 @@
     {% endverbatim %}
   </code> Django template syntax. Below is just the actual input-part of the field named "Input" from the form above:
 </p>
-<p>{{ form.input }}</p>
+<p>{{ form.input_ }}</p>
 </section>
 </div>
 {% endblock main %}
