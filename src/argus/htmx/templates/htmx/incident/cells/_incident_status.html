@@ -1,5 +1,5 @@
 {% if incident.open %}
-  <span class="badge badge-error">Open</span>
+  <span class="badge badge-error{% if preferences.argus_htmx.incidents_table_layout_compact %} badge-xs{% endif %}">Open</span>
 {% else %}
-  <span class="badge badge-success">Closed</span>
+  <span class="badge badge-success{% if preferences.argus_htmx.incidents_table_layout_compact %} badge-xs{% endif %}">Closed</span>
 {% endif %}

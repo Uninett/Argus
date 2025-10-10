@@ -1,0 +1,41 @@
+@plugin "daisyui/theme" {
+  name: "argus";
+  default: false;
+  prefersdark: false;
+  color-scheme: "light";
+  --color-primary: #006d91;
+  --color-primary-content: #d1e1e9;
+  --color-secondary: #f3b61f;
+  --color-secondary-content: #140c00;
+  --color-accent: #c84700;
+  --color-accent-content: #f8dbd1;
+  --color-neutral: #006d91;
+  --color-neutral-content: #d1e1e9;
+  --color-base-100: #edfaff;
+  --color-base-200: #ced9de;
+  --color-base-300: #b0babd;
+  --color-base-content: #141516;
+  --color-info: #0073e5;
+  --color-info-content: #000512;
+  --color-success: #008700;
+  --color-success-content: #d3e7d1;
+  --color-warning: #ee4900;
+  --color-warning-content: #140200;
+  --color-error: #e5545a;
+  --color-error-content: #120203;
+  /* border radius */
+  --radius-selector: 2rem;
+  --radius-field: 0.25rem;
+  --radius-box: 0.5rem;
+
+  /* base sizes */
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+
+  /* border size */
+  --border: 1px;
+
+  /* effects */
+  --depth: 1;
+  --noise: 0;
+}

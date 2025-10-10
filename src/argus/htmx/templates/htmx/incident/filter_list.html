@@ -1,8 +1,7 @@
-<label class="form-control w-full max-w-xs">
-  <span class="block label pt-0 pb-0.5">
-    <span class="label-text">Filter</span>
-  </span>
-  <select class="select select-bordered select-sm join-item w-full max-w-xs"
+<fieldset class="fieldset w-full max-w-xs">
+  <label class="block menu label pl-0 pt-0 pb-0.5 text-base-content"
+         for="filter">Filter</label>
+  <select class="select select-sm join-item w-full max-w-xs"
           id="incident-filter-select"
           name="filter"
           hx-get="{% url 'htmx:select-filter' %}"
@@ -11,14 +10,13 @@
           hx-on::after-swap="htmx.trigger('#filter-selector-form', 'unselect')">
     <option {% if not request.session.selected_filter %}selected{% endif %}
             value="">---</option>
-    {% for object in object_list %}
+    {% for object in stored_filters %}
       <option value="{{ object.id }}"
               {% if request.session.selected_filter == object.id|stringformat:"i" %}selected{% endif %}>
         {{ object.name }}
       </option>
     {% endfor %}
   </select>
-  <span class="block label pb-0 pt-0.5">
-    <span class="label-text-alt truncate">Select from your filters</span>
-  </span>
-</label>
+  <label class="block label pb-0 pt-0.5 truncate helptext text-base-content"
+         for="filter">Select from your filters</label>
+</fieldset>

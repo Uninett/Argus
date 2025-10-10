@@ -1,5 +1,8 @@
+import re
+
 from django import forms, test
 from django.test.client import RequestFactory
+
 from argus.auth.factories import PersonUserFactory
 from argus.filter.queryset_filters import QuerySetFilter
 from argus.htmx.incident.customization import IncidentTableColumn
@@ -33,7 +36,7 @@ def incident_list_filter_factory(form_cls):
         IncidentTableColumn(
             "description",
             label="Description",
-            cell_template="htmx/incidents/_incident_description.html",
+            cell_template="htmx/incident/cells/_incident_description.html",
         ),
     ],
 )
@@ -49,7 +52,9 @@ class TestRegularColumn(test.TestCase):
         self.assertNotContains(self.response, '_="on click toggle .hidden on next .column-filter"')
 
     def test_add_filter_to_filterbox(self):
-        self.assertContains(self.response, '<span class="label-text">Description</span>')
+        self.assertTrue(
+            re.search('<label class="cursor-pointer label text-neutral">\s+Description\s', self.response.text)
+        )
 
 
 @test.override_settings(
@@ -58,7 +63,7 @@ class TestRegularColumn(test.TestCase):
         IncidentTableColumn(
             "description",
             label="Description",
-            cell_template="htmx/incidents/_incident_description.html",
+            cell_template="htmx/incident/cells/_incident_description.html",
             filter_field="description",
         ),
     ],
@@ -75,4 +80,6 @@ class TestFilterableColumn(test.TestCase):
         self.assertContains(self.response, '_="on click toggle .hidden on next .column-filter"')
 
     def test_doesnt_add_filter_to_filterbox(self):
-        self.assertNotContains(self.response, '<span class="label-text">Description</span>')
+        self.assertFalse(
+            re.search('<label class="cursor-pointer label text-neutral">\s+Description\s', self.response.text)
+        )
