@@ -7,7 +7,7 @@ recipient's phone number. The email body must contain the message text.
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from django import forms
 from django.conf import settings
@@ -86,15 +86,9 @@ class SMSNotification(NotificationMedium):
         return queryset.filter(settings__phone_number=settings["phone_number"]).exists()
 
     @classmethod
-    def get_relevant_addresses(cls, destinations: Iterable[DestinationConfig]) -> set[DestinationConfig]:
-        """Returns a list of phone numbers the message should be sent to"""
-        phone_numbers = [
-            destination.settings["phone_number"]
-            for destination in destinations
-            if destination.media_id == cls.MEDIA_SLUG
-        ]
-
-        return set(phone_numbers)
+    def get_relevant_address(cls, destination: DestinationConfig) -> Any:
+        "Get a single phone number from the destination, as a string"
+        return destination.settings["phone_number"]
 
     @classmethod
     def send(cls, event: Event, destinations: Iterable[DestinationConfig], **_) -> bool:
@@ -108,14 +102,15 @@ class SMSNotification(NotificationMedium):
             LOG.error("SMS_GATEWAY_ADDRESS is not set, cannot dispatch SMS notifications using this plugin")
             return
 
-        phone_numbers = cls.get_relevant_addresses(destinations=destinations)
-        if not phone_numbers:
+        destinations = cls.get_relevant_destinations(destinations)
+        if not destinations:
             return False
 
         # there is only one recipient, so failing to send a single message
         # means something is wrong on the email server
         sent = True
-        for phone_number in phone_numbers:
+        for destination in destinations:
+            phone_number = cls.get_relevant_address(destination)
             sent = send_email_safely(
                 send_mail,
                 subject=f"sms {phone_number}",
@@ -124,7 +119,8 @@ class SMSNotification(NotificationMedium):
                 recipient_list=[recipient],
             )
             if not sent:
-                LOG.error("SMS: Failed to send")
-                break
+                LOG.error("SMS: Failed to send event #%i to destination #%i", event.pk, destination.pk)
+            else:
+                LOG.debug("SMS: Sent event #%i to destination #%i", event.pk, destination.pk)
 
         return sent
