@@ -1,3 +1,5 @@
+import logging
+
 from django.test import TestCase, override_settings
 
 from argus.auth.factories import PersonUserFactory
@@ -73,14 +75,28 @@ class FindDestinationsTest(TestCase):
     def tearDown(self):
         connect_signals()
 
-    def test_find_destinations_for_event(self):
+    def test_find_destinations_for_event_golden_path(self):
         incident = create_fake_incident()
         event = incident.events.get(type=Event.Type.INCIDENT_START)
-        destinations = find_destinations_for_event(event)
+        with self.assertLogs(level=logging.INFO) as logs:
+            destinations = find_destinations_for_event(event)
         self.assertEqual(len(destinations), 1)
-        self.assertIn(self.user1_destination, destinations)
-        self.assertNotIn(self.extra_destination1, destinations)
-        self.assertNotIn(self.extra_destination2, destinations)
+        self.assertEqual(len(logs.records), 1)
+        log_message = logs.records[0].message
+        startswith = "Notification: will send notification for profile"
+        self.assertTrue(
+            log_message.startswith(startswith),
+            f"Full log-line: {log_message}, should start with {startswith}",
+        )
+        destination = destinations.pop()
+        endswith = f"destination ids: [{destination.pk}]"
+        self.assertTrue(
+            log_message.endswith(endswith),
+            f"Full log-line: {log_message}, should end with {endswith}",
+        )
+        self.assertEqual(self.user1_destination, destination)
+        self.assertNotEqual(self.extra_destination1, destination)
+        self.assertNotEqual(self.extra_destination2, destination)
 
     def test_find_destinations_for_ack_event_without_acknowledgement(self):
         ack_profile = factories.NotificationProfileFactory(
