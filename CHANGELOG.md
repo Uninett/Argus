@@ -8,6 +8,28 @@ This project uses [*towncrier*](https://towncrier.readthedocs.io/) and the chang
 
 <!-- towncrier release notes start -->
 
+## [2.2.2] - 2025-11-03
+
+### Added
+
+- Added the beginnings of a style guide at /styleguide/. The look of the form
+  inputs that were not manually laid out have in some cases also changed, for
+  greater consistency. ([#1558](https://github.com/Uninett/Argus/issues/1558))
+- Added `zino-argus-glue` to documented list of known glue services
+
+### Changed
+
+- Increased logging verbosity when finding destinations for notifications and
+  actually sending the notifications, to aid in debugging production systems.
+  Now also logs which destination id's are found and used.
+  ([#1563](https://github.com/Uninett/Argus/issues/1563))
+
+### Fixed
+
+- The development docker compose had stopped working due to changes outside of
+  our control (pip, git, the very distro) and has been updated.
+
+
 ## [2.2.1] - 2025-09-18
 
 ### Fixed, frontend

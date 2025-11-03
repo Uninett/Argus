@@ -3,6 +3,16 @@
 This file documents changes to Argus that are relevant for operations,
 customizers and end-users.
 
+## [2.2.2] - 2025-11-03
+
+To aid in development there a live styleguide for the frontend on
+`/styleguide`.
+
+Logging verbosity has increased for sending notifications.
+
+Otherwise: typos have been fixed, a new glue service has been added to the
+documentation, the development docker-compose setup should be working again.
+
 
 ## [2.2.1] - 2025-09-18
 
