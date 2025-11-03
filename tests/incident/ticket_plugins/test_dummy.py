@@ -1,6 +1,6 @@
 from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
-from django.test import TestCase
+from django.test import TestCase, override_settings
 
 from argus.incident.factories import SourceSystemFactory, SourceUserFactory, StatefulIncidentFactory
 from argus.incident.ticket.dummy import created_tickets
@@ -16,6 +16,9 @@ class DummyTicketSystemTests(TestCase):
     def tearDown(self):
         connect_signals()
 
+    @override_settings(
+        FRONTEND_URL="http://www.fakeurl.com",
+    )
     def test_create_ticket_writes_to_local_variable(self):
         dummy_class = import_class_from_dotted_path("argus.incident.ticket.dummy.DummyPlugin")
 
