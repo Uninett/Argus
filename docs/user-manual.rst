@@ -626,19 +626,43 @@ receive by creating, editing and deleting *notification profiles*.
 About components of notification profiles
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-1. **Timeslot** allows you to customize **when** you want to receive the
-   alarm notifications. You can choose one timeslot per notification
-   profile. Timeslots are reusable across multiple notification
-   profiles.
-2. **Filter** allows you to customize **what** alarms (incidents) you
-   want to receive the notifications about. You can choose multiple
-   filters per notification profile. Filters are reusable across
-   multiple notification profiles.
-3. **Destination** allows you to customize **where** you want to receive
-   the alarm notifications. You can choose multiple destinations per
-   notification profile. Destinations are reusable across multiple
-   notification profiles. Destinations may be of `different media
-   types <#about-the-available-notification-media>`_.
+Timeslot
+^^^^^^^^
+
+**Timeslot** allows you to customize **when** you want to receive
+the alarm notifications. You can choose one timeslot per
+notification profile. Timeslots are reusable across multiple
+notification profiles.
+
+Filter
+^^^^^^
+
+**Filter** allows you to customize **what** alarms (incidents) you
+want to receive the notifications about. Filters are reusable
+across multiple notification profiles.
+
+You can choose multiple filters per notification profile. They are
+*combined to increase precision*. You cannot use *one* profile for
+*sufficiently different types of incidents*.
+
+For instance, if an incident may only ever have one tag that
+starts with ``hostname=``, then having a profile with multiple
+filters, each asking for *different* hostnames, will never be able
+to match anything.
+
+If you need to match multiple hostname tags in a profile, make
+a filter that only matches hostnames and include that filter in
+the profile.
+
+Destination
+^^^^^^^^^^^
+
+**Destination** allows you to customize **where** you want to
+receive the alarm notifications. You can choose multiple
+destinations per notification profile. Destinations are reusable
+across multiple notification profiles. Destinations may be of
+`different media types
+<#about-the-available-notification-media>`_.
 
 .. _about-the-available-notification-media:
 About the available notification media
