@@ -18,9 +18,9 @@
         <div class="form-control">
           <label class="label label-text" for={{ field.auto_id }}><em>{{ field.label }}</em>
           </label>
+          {% render_field field %}
           {% if field.help_text %}<div class="helptext text-xs">{{ field.help_text }}</div>{% endif %}
           {{ errors }}
-          {% render_field field %}
         </div>
       {% endif %}
       {% if forloop.last %}
