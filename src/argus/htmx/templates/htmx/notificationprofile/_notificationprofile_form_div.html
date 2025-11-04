@@ -18,7 +18,7 @@
         <div class="form-control">
           <label class="label label-text" for={{ field.auto_id }}><em>{{ field.label }}</em>
           </label>
-          {% if field.help_text %}<div class="helptext">{{ field.help_text }}</div>{% endif %}
+          {% if field.help_text %}<div class="helptext text-xs">{{ field.help_text }}</div>{% endif %}
           {{ errors }}
           {% render_field field %}
         </div>
