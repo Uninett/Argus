@@ -643,7 +643,7 @@ across multiple notification profiles.
 
 You can choose multiple filters per notification profile. They are
 *combined to increase precision*. You cannot use *one* profile for
-*suffciently different types of incidents*.
+*sufficiently different types of incidents*.
 
 For instance, if an incident may only ever have one tag that
 starts with ``hostname=``, then having a profile with multiple
