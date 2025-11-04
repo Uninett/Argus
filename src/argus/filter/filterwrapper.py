@@ -132,6 +132,10 @@ class ComplexFilterWrapper:
         self.profile = kwargs.pop("profile", None)
 
     def incident_fits(self, incident: Incident) -> bool:
+        """Check against multiple filters
+
+        The filters are AND-ed together for greater precision.
+        """
         if not self.profile.active:
             return False
         is_selected_by_time = self.profile.timeslot.timestamp_is_within_time_recurrences(incident.start_time)
