@@ -10,10 +10,7 @@
            checked="checked" />
     <div role="tabpanel"
          class="filterbox tab-content border border-primary [--tab-border:var(--border-width)] rounded-b-lg p-2">
-      <div class="flex flex-wrap items-center">
-        {% include "htmx/incident/_incident_filterbox.html" %}
-        {% include "htmx/incident/_filter_controls.html" %}
-      </div>
+      {% include "htmx/incident/_incident_list_filter_incidents.html" %}
     </div>
     <input type="radio"
            name="incident_menus"

@@ -1,12 +1,12 @@
 <!-- _filter_controls.html -->
 <div class="join join-horizontal items-center">
   {% include "htmx/incident/_filter_select.html" %}
-  {% include "htmx/incident/_filter_create_modal.html" with dialog_id="create-filter-dialog" button_title="Create filter" button_class="btn-sm text-xs join-item" header="Create new filter" explanation="Create new filter from currently selected filter parameters" cancel_text="Cancel" submit_text="Submit" %}
-  {% if stored_filter_pk %}
-    {% url 'htmx:filter-update' pk=stored_filter_pk as update_filter_url %}
-    {% include "htmx/incident/_filter_confirm_dialog.html" with filter_url=update_filter_url modal_button_name=update_stored_filter_button item_class="btn btn-sm text-xs join-item rounded-l-none! ml-1" dialog_id="filter-update-confirm" item_title=stored_filter_name action="Update filter" item_id=stored_filter_pk confirmation_message="Are you sure you want to override this filter?" %}
-    {% url 'htmx:filter-delete' pk=stored_filter_pk as delete_filter_url %}
-    {% include "htmx/incident/_filter_confirm_dialog.html" with filter_url=delete_filter_url modal_button_name=delete_stored_filter_button item_class="btn btn-sm text-xs join-item rounded-l-none! ml-1" dialog_id="filter-delete-confirm" item_title=stored_filter_name action="Delete filter" item_id=stored_filter_pk confirmation_message="Are you sure you want to delete this filter?" %}
+  {% include "htmx/incident/_filter_create_modal.html" with dialog_id="create-filter-dialog" button_title="Save new" button_class="btn-sm text-xs join-item" header="Create new filter" explanation="Create new filter from currently selected filter parameters" cancel_text="Cancel" submit_text="Submit" %}
+  {% if request.session.selected_filter_pk %}
+    {% url 'htmx:filter-update' pk=request.session.selected_filter_pk as update_filter_url %}
+    {% include "htmx/incident/_filter_confirm_dialog.html" with filter_url=update_filter_url modal_button_name="Update" item_class="btn btn-sm text-xs join-item rounded-l-none! ml-1" dialog_id="filter-update-confirm" item_title=request.session.selected_filter_name action="Update filter" item_id=request.session.selected_filter_pk confirmation_message="Are you sure you want to override this filter?" %}
+    {% url 'htmx:filter-delete' pk=request.session.selected_filter_pk as delete_filter_url %}
+    {% include "htmx/incident/_filter_confirm_dialog.html" with filter_url=delete_filter_url modal_button_name="Delete" item_class="btn btn-sm text-xs join-item rounded-l-none! ml-1" dialog_id="filter-delete-confirm" item_title=request.session.selected_filter_name action="Delete filter" item_id=request.session.selected_filter_pk confirmation_message="Are you sure you want to delete this filter?" %}
   {% else %}
     <button class="btn btn-sm text-xs join-item rounded-l-none! ml-1" disabled>Update</button>
     <button class="btn btn-sm text-xs join-item rounded-l-none! ml-1" disabled>Delete</button>
