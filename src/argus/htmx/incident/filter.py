@@ -156,7 +156,7 @@ class FilterListView(ListView):
         return reverse("htmx:filter-list")
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_sdata(**kwargs)
+        context = super().get_context_data(**kwargs)
         context["stored_filters"] = context["object_list"]
         return context
 
