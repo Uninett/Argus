@@ -1,3 +1,4 @@
+<!-- _base_incident_update_modal.html -->
 {% extends "htmx/_base_form_modal.html" %}
 {% block form_control %}
   hx-post="{% url endpoint|default:'htmx:incident-update' action=action %}"
