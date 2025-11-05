@@ -39,7 +39,7 @@ class PlannedMaintenanceTask(models.Model):
     class Meta:
         constraints = [
             CheckConstraint(
-                check=Q(end_time__gt=F("start_time")),
+                condition=Q(end_time__gt=F("start_time")),
                 name="end_time_after_start_time",
                 violation_error_message="End_time needs to be after start_time",
             ),

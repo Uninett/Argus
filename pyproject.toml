@@ -12,6 +12,7 @@ license = {text = "GPL-3.0-or-later"}
 classifiers = [
     "Framework :: Django",
     "Framework :: Django :: 5.2",
+    "Framework :: Django :: 6.0",
     "Intended Audience :: Information Technology",
     "Intended Audience :: System Administrators",
     "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
@@ -23,7 +24,7 @@ classifiers = [
     "Topic :: System :: Monitoring",
 ]
 dependencies = [
-    "Django>=5.2,<6.0",
+    "Django>=5.2.8,<6.1",
     "dj-database-url>=0.5.0",
     "django-cors-headers>=3.2",
     "django-filter",
