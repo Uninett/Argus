@@ -162,7 +162,7 @@ class FilterListView(ListView):
 
 
 def incident_list_filter(request, qs, use_empty_filter=False):
-    filter_pk, filter_obj = request.session.get("selected_filter", None), None
+    filter_pk, filter_obj = request.session.get("selected_filter_pk", None), None
     if filter_pk:
         filter_obj = Filter.objects.get(pk=filter_pk)
     if filter_obj:

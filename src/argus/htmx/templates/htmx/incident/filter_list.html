@@ -8,11 +8,11 @@
           hx-target="#incident-filter-box"
           hx-swap="outerHTML"
           hx-on::after-swap="htmx.trigger('#filter-selector-form', 'unselect')">
-    <option {% if not request.session.selected_filter %}selected{% endif %}
+    <option {% if not request.session.selected_filter_pk %}selected{% endif %}
             value="">---</option>
     {% for object in stored_filters %}
       <option value="{{ object.id }}"
-              {% if request.session.selected_filter == object.id|stringformat:"i" %}selected{% endif %}>
+              {% if request.session.selected_filter_pk == object.id|stringformat:"i" %}selected{% endif %}>
         {{ object.name }}
       </option>
     {% endfor %}

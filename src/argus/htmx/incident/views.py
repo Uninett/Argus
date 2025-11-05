@@ -113,7 +113,7 @@ def incident_update(request: HtmxHttpRequest, action: str):
 
 @require_GET
 def filter_form(request: HtmxHttpRequest):
-    request.session["selected_filter"] = None
+    request.session["selected_filter_pk"] = None
     incident_list_filter = get_filter_function()
     filter_form, _ = incident_list_filter(request, None)
     context = {"filter_form": filter_form}
@@ -131,7 +131,7 @@ def create_filter(request: HtmxHttpRequest):
         filterblob = filter_form.to_filterblob()
         _, filter_obj = create_named_filter(request, filter_name, filterblob)
         if filter_obj:
-            request.session["selected_filter"] = str(filter_obj.id)
+            request.session["selected_filter_pk"] = str(filter_obj.id)
             return HttpResponseClientRefresh()
     messages.error(request, "Failed to create filter")
     return HttpResponseBadRequest()
@@ -148,7 +148,7 @@ def update_filter(request: HtmxHttpRequest, pk: int):
         filter_obj.save()
 
         # Immediately select the newly updated filter - keep or not?
-        # request.session["selected_filter"] = str(filter_obj.id)
+        # request.session["selected_filter_pk"] = str(filter_obj.id)
 
         messages.success(request, f"Updated filter '{filter_obj.name}'.")
         return HttpResponseClientRefresh()
@@ -162,34 +162,42 @@ def delete_filter(request: HtmxHttpRequest, pk: int):
     deleted_id = filter_obj.delete()
     if deleted_id:
         messages.success(request, f"Deleted filter {filter_obj.name}.")
-        if request.session.get("selected_filter") == str(pk):
-            request.session["selected_filter"] = None
+        if request.session.get("selected_filter_pk") == str(pk):
+            request.session["selected_filter_pk"] = None
         return HttpResponseClientRefresh()
 
 
 @require_GET
 def get_existing_filters(request: HtmxHttpRequest):
+    context = {}
     existing_filters = Filter.objects.all().filter(user=request.user)
+    if "selected_filter_pk" in request.session:
+        filter_id = request.session["selected_filter_pk"]
+        try:
+            context["stored_filter_name"] = existing_filters.get(id=filter_id)
+        except Filter.DoesNotExist:
+            pass
     if existing_filters:
-        context = {"stored_filters": existing_filters}
+        context["stored_filters"] = existing_filters
         if request.htmx.target == "delete-filter-items":
-            context.update({"action": "delete"})
+            context["action"] = "delete"
         return render(request, "htmx/incident/_existing_filters.html", context=context)
     else:
-        return render(request, "htmx/incident/responses/empty_list_item.html", context={"message": "No filters found."})
+        context["message"] = "No filters found."
+        return render(request, "htmx/incident/responses/empty_list_item.html", context=context)
 
 
 @require_GET
 def filter_select(request: HtmxHttpRequest):
     filter_id = request.GET.get("filter", None)
     if filter_id and get_object_or_404(Filter, id=filter_id):
-        request.session["selected_filter"] = filter_id
+        request.session["selected_filter_pk"] = filter_id
         incident_list_filter = get_filter_function()
         filter_form, _ = incident_list_filter(request, None)
         context = {"filter_form": filter_form}
         return render(request, "htmx/incident/_incident_filterbox.html", context=context)
     else:
-        request.session["selected_filter"] = None
+        request.session["selected_filter_pk"] = None
         if request.htmx.trigger:
             incident_list_filter = get_filter_function()
             filter_form, _ = incident_list_filter(request, None, use_empty_filter=True)
@@ -210,7 +218,7 @@ def incident_list(request: HtmxHttpRequest) -> HttpResponse:
 
     # Stored filters
     existing_filters = Filter.objects.filter(user=request.user)
-    stored_filter_pk = request.session.get("selected_filter", None)
+    stored_filter_pk = request.session.get("selected_filter_pk", None)
     stored_filter_obj = existing_filters.filter(pk=stored_filter_pk).first()
     stored_filter_name = stored_filter_obj.name if stored_filter_obj else ""
 
