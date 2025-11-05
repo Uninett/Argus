@@ -1,5 +1,6 @@
+<!-- _incident_filterbox.html -->
 {% load widget_tweaks %}
-<form id="incident-filter-box"
+<form id="incident-filter-form"
       class="incident-list-param"
       hx-get="{% url 'htmx:incident-list' %}"
       hx-include=".incident-list-param"

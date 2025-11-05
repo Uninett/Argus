@@ -1,5 +1,6 @@
+<!-- _filter_confirm_dialog.html -->
 {% extends "htmx/_base_confirm_dialog.html" %}
 {% block confirm_action_control %}
   hx-post="{{ filter_url }}"
-  hx-include="#incident-filter-box fieldset"
+  hx-include="#incident-filter-form fieldset"
 {% endblock confirm_action_control %}
