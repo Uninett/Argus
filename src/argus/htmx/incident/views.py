@@ -117,7 +117,7 @@ def set_selected_filter(request, filter_obj):
         request.session["selected_filter_name"] = filter_obj.name
     else:
         request.session["selected_filter_pk"] = None
-        request.session.pop("selected_filter_name")
+        request.session.pop("selected_filter_name", None)
 
 
 def get_selected_filter(request):
