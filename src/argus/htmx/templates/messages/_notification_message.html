@@ -1,6 +1,6 @@
 {% load argus_htmx %}
 {% with autoclose=message|autoclose_time %}
-  <div class="alert flex justify-between w-fit border-3 bg-base-100 border-opacity-100 {% if message.tags %}{{ message.tags }}{% endif %}"
+  <div class="alert flex justify-between w-fit border-3 bg-base-100 border-opacity-100 {% if message.tags %}alert-{{ message.tags }}{% endif %}"
        {% if autoclose >= 0 %}_="on load wait {{ autoclose }}s then add .autoclosing to me then wait 0.3s then remove me"{% endif %}>
     {% block message-content %}
       <div>{{ message }}</div>
