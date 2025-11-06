@@ -46,7 +46,7 @@ class DestinationFieldMixin:
             partial_get=partial_get,
             attrs={
                 "placeholder": "select destination...",
-                "field_styles": "input input-bordered border-b max-w-xs",
+                "field_styles": "input border-b max-w-xs",
             },
         )
         self.fields["destinations"].choices = self._get_destination_choices(user)
@@ -68,7 +68,7 @@ class FilterFieldMixin:
             partial_get=partial_get,
             attrs={
                 "placeholder": "select filter...",
-                "field_styles": "input input-bordered border-b max-w-xs",
+                "field_styles": "input border-b max-w-xs",
             },
         )
         self.fields["filters"].choices = tuple(qs.values_list("id", "name"))
@@ -79,7 +79,7 @@ class NotificationProfileForm(DestinationFieldMixin, FilterFieldMixin, NoColonMi
         model = NotificationProfile
         fields = ["name", "timeslot", "filters", "active", "destinations"]
         widgets = {
-            "timeslot": forms.Select(attrs={"class": "select input-bordered w-full max-w-xs"}),
+            "timeslot": forms.Select(attrs={"class": "select w-full max-w-xs"}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -92,7 +92,7 @@ class NotificationProfileForm(DestinationFieldMixin, FilterFieldMixin, NoColonMi
         self.fields["timeslot"].queryset = Timeslot.objects.filter(user=self.user)
         self.fields["active"].widget.attrs["class"] = "checkbox checkbox-sm border"
         self.fields["active"].widget.attrs["autocomplete"] = "off"
-        self.fields["name"].widget.attrs["class"] = "input input-bordered"
+        self.fields["name"].widget.attrs["class"] = "input"
 
         self.action = self.get_action()
 

@@ -97,34 +97,34 @@ class TestIncidentListFilter(TestCase):
         connect_signals()
 
     def test_valid_request_should_return_filtered_queryset(self):
-        self.request.session["selected_filter"] = self.valid_filter.pk
+        self.request.session["selected_filter_pk"] = self.valid_filter.pk
         _, qs = incident_list_filter(self.request, self.qs)
         assert self.incident in self.qs
         assert self.incident not in qs
 
     def test_invalid_request_should_return_unfiltered_queryset(self):
-        self.request.session["selected_filter"] = self.invalid_filter.pk
+        self.request.session["selected_filter_pk"] = self.invalid_filter.pk
         _, qs = incident_list_filter(self.request, self.qs)
         assert qs == self.qs
 
     def test_valid_request_should_return_form_with_correct_values(self):
-        self.request.session["selected_filter"] = self.valid_filter.pk
+        self.request.session["selected_filter_pk"] = self.valid_filter.pk
         form, _ = incident_list_filter(self.request, self.qs)
         assert form.to_filterblob()["maxlevel"] == self.valid_filter.filter["maxlevel"]
 
     def test_invalid_request_should_return_form_with_errors(self):
-        self.request.session["selected_filter"] = self.invalid_filter.pk
+        self.request.session["selected_filter_pk"] = self.invalid_filter.pk
         form, _ = incident_list_filter(self.request, self.qs)
         assert form.errors
 
-    def test_get_request_without_selected_filter_should_use_get_parameters_as_form_data(self):
+    def test_get_request_without_selected_filter_pk_should_use_get_parameters_as_form_data(self):
         maxlevel = 3
-        self.request.session["selected_filter"] = None
+        self.request.session["selected_filter_pk"] = None
         self.request.GET = QueryDict(f"tags=&maxlevel={maxlevel}")
         form, _ = incident_list_filter(self.request, self.qs)
         assert form.to_filterblob()["maxlevel"] == maxlevel
 
-    def test_post_request_without_selected_filter_should_use_post_parameters_as_form_data(self):
+    def test_post_request_without_selected_filter_pk_should_use_post_parameters_as_form_data(self):
         maxlevel = 3
         request = self.factory.post("random-url", {}, content_type="application/json")
         request.POST = QueryDict(f"tags=&maxlevel={maxlevel}")

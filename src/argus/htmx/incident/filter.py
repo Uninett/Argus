@@ -46,7 +46,7 @@ class IncidentFilterForm(forms.Form):
         widget=forms.TextInput(
             attrs={
                 "placeholder": "key=value, ...",
-                "class": "input-primary input-sm overflow-y-auto min-h-8 h-auto max-h-16 max-w-xs leading-tight",
+                "class": "input input-primary input-sm overflow-y-auto min-h-8 h-auto max-h-16 max-w-xs leading-tight",
             }
         ),
         required=False,
@@ -155,9 +155,14 @@ class FilterListView(ListView):
     def get_success_url(self):
         return reverse("htmx:filter-list")
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["stored_filters"] = context["object_list"]
+        return context
+
 
 def incident_list_filter(request, qs, use_empty_filter=False):
-    filter_pk, filter_obj = request.session.get("selected_filter", None), None
+    filter_pk, filter_obj = request.session.get("selected_filter_pk", None), None
     if filter_pk:
         filter_obj = Filter.objects.get(pk=filter_pk)
     if filter_obj:

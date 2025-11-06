@@ -111,7 +111,7 @@ Create the following template ``htmx/incident/_my_custom_action_modal.html``::
 
   {% extends "htmx/incident/_base_incident_update_modal.html" %}
   {% block dialogform %}
-    <label class="indicator input input-bordered flex items-center gap-2 w-full">
+    <label class="indicator input flex items-center gap-2 w-full">
       Custom Field
       <span class="indicator-item indicator-top indicator-start badge border-none mask mask-circle text-warning text-base">＊</span>
       <input name="custom_field"

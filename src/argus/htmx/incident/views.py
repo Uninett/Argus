@@ -111,9 +111,25 @@ def incident_update(request: HtmxHttpRequest, action: str):
     return HttpResponseClientRefresh()
 
 
+def set_selected_filter(request, filter_obj):
+    if filter_obj:
+        request.session["selected_filter_pk"] = str(filter_obj.pk)
+        request.session["selected_filter_name"] = filter_obj.name
+    else:
+        request.session["selected_filter_pk"] = None
+        request.session.pop("selected_filter_name", None)
+
+
+def get_selected_filter(request):
+    filter_id = request.session.get("selected_filter_pk", None)
+    if filter_id:
+        return get_object_or_404(Filter, pk=filter_id, user=request.user)
+    return None
+
+
 @require_GET
 def filter_form(request: HtmxHttpRequest):
-    request.session["selected_filter"] = None
+    set_selected_filter(request, None)
     incident_list_filter = get_filter_function()
     filter_form, _ = incident_list_filter(request, None)
     context = {"filter_form": filter_form}
@@ -131,7 +147,7 @@ def create_filter(request: HtmxHttpRequest):
         filterblob = filter_form.to_filterblob()
         _, filter_obj = create_named_filter(request, filter_name, filterblob)
         if filter_obj:
-            request.session["selected_filter"] = str(filter_obj.id)
+            set_selected_filter(request, filter_obj)
             return HttpResponseClientRefresh()
     messages.error(request, "Failed to create filter")
     return HttpResponseBadRequest()
@@ -148,7 +164,7 @@ def update_filter(request: HtmxHttpRequest, pk: int):
         filter_obj.save()
 
         # Immediately select the newly updated filter - keep or not?
-        # request.session["selected_filter"] = str(filter_obj.id)
+        # set_selected_filter(request, filter_obj)
 
         messages.success(request, f"Updated filter '{filter_obj.name}'.")
         return HttpResponseClientRefresh()
@@ -162,41 +178,46 @@ def delete_filter(request: HtmxHttpRequest, pk: int):
     deleted_id = filter_obj.delete()
     if deleted_id:
         messages.success(request, f"Deleted filter {filter_obj.name}.")
-        if request.session.get("selected_filter") == str(pk):
-            request.session["selected_filter"] = None
+        if request.session.get("selected_filter_pk") == str(pk):
+            set_selected_filter(request, None)
         return HttpResponseClientRefresh()
 
 
 @require_GET
 def get_existing_filters(request: HtmxHttpRequest):
+    context = {}
     existing_filters = Filter.objects.all().filter(user=request.user)
     if existing_filters:
-        context = {"filters": existing_filters}
+        context["stored_filters"] = existing_filters
         if request.htmx.target == "delete-filter-items":
-            context.update({"action": "delete"})
+            context["action"] = "delete"
         return render(request, "htmx/incident/_existing_filters.html", context=context)
     else:
-        return render(request, "htmx/incident/responses/empty_list_item.html", context={"message": "No filters found."})
+        context["message"] = "No filters found."
+        return render(request, "htmx/incident/responses/empty_list_item.html", context=context)
 
 
 @require_GET
 def filter_select(request: HtmxHttpRequest):
+    context = {}
+    template_name = "htmx/incident/_incident_list_filter_incidents.html"
+
     filter_id = request.GET.get("filter", None)
-    if filter_id and get_object_or_404(Filter, id=filter_id):
-        request.session["selected_filter"] = filter_id
-        incident_list_filter = get_filter_function()
-        filter_form, _ = incident_list_filter(request, None)
-        context = {"filter_form": filter_form}
-        return render(request, "htmx/incident/_incident_filterbox.html", context=context)
+    if filter_id:
+        use_empty_filter = False
+        filter_obj = get_object_or_404(Filter, id=filter_id)
+        set_selected_filter(request, filter_obj)
     else:
-        request.session["selected_filter"] = None
-        if request.htmx.trigger:
-            incident_list_filter = get_filter_function()
-            filter_form, _ = incident_list_filter(request, None, use_empty_filter=True)
-            context = {"filter_form": filter_form}
-            return render(request, "htmx/incident/_incident_filterbox.html", context=context)
-        else:
-            return retarget(HttpResponse(), "#incident-filter-select")
+        use_empty_filter = True
+        set_selected_filter(request, None)
+
+    if request.htmx.trigger:
+        incident_list_filter = get_filter_function()
+        filter_form, _ = incident_list_filter(request, None, use_empty_filter=use_empty_filter)
+        context["filter_form"] = filter_form
+        return render(request, template_name, context=context)
+
+    return retarget(HttpResponse(), "#incident-filter-select")
 
 
 @require_GET
@@ -207,6 +228,9 @@ def incident_list(request: HtmxHttpRequest) -> HttpResponse:
     qs = prefetch_incident_daughters().order_by("-start_time")
     total_count = qs.count()
     last_refreshed = make_aware(datetime.now())
+
+    # Stored filters
+    existing_filters = Filter.objects.filter(user=request.user)
 
     # make dict from QueryDict
     params = dict(request.GET.items())
@@ -242,14 +266,19 @@ def incident_list(request: HtmxHttpRequest) -> HttpResponse:
         base_template = "htmx/incident/_base.html"
     last_page_num = page.paginator.num_pages
     context = {
-        "columns": columns,
-        "filtered_count": filtered_count,
-        "count": total_count,
-        "filter_form": filter_form,
-        "timeframe_form": timeframe_form,
-        "timeframe": timeframe,
         "page_title": "Incidents",
         "base": base_template,
+        # filter box
+        "filter_form": filter_form,
+        # storing filters
+        "stored_filters": existing_filters,
+        # table
+        "columns": columns,
+        # refresh info
+        "filtered_count": filtered_count,
+        "count": total_count,
+        "timeframe_form": timeframe_form,
+        "timeframe": timeframe,
         "page": page,
         "last_page_num": last_page_num,
         "second_to_last_page": last_page_num - 1,

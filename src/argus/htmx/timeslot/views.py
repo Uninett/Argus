@@ -32,7 +32,6 @@ class TimeRecurrenceForm(forms.ModelForm):
         TIMEINPUT_ATTRS = {
             "type": "text",
             "pattern": r"[012]\d:[0-5]\d",
-            "class": "input-bordered",
             "placeholder": "HH:MM",
         }
 

@@ -1,6 +1,6 @@
 <!-- htmx/incident/cells/_incident_ack.html -->
 {% if incident.acked %}
-  <span class="badge badge-success">Acked</span>
+  <span class="badge badge-success{% if preferences.argus_htmx.incidents_table_layout_compact %} badge-xs{% endif %}"">Acked</span>
 {% else %}
-  <span class="badge badge-error">Unacked</span>
+  <span class="badge badge-error{% if preferences.argus_htmx.incidents_table_layout_compact %} badge-xs{% endif %}"">Unacked</span>
 {% endif %}
