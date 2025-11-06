@@ -57,7 +57,6 @@
     --color-severity-secondary-3: black;
     --color-severity-secondary-4: white;
     --color-severity-secondary-5: white;
-    --default-border-width: 2px;
   }
 }
 @layer base {
@@ -6292,6 +6291,10 @@
     border-style: var(--tw-border-style);
     border-width: 2px;
   }
+  .border-1 {
+    border-style: var(--tw-border-style);
+    border-width: 1px;
+  }
   .border-2 {
     border-style: var(--tw-border-style);
     border-width: 2px;
@@ -7102,9 +7105,6 @@
   }
   .\[--tab-border\:var\(--border-width\)\] {
     --tab-border: var(--border-width);
-  }
-  .\[--tab-border\:var\(--default-border-width\)\] {
-    --tab-border: var(--default-border-width);
   }
   .\[coverage\:report\] {
     coverage: report;
