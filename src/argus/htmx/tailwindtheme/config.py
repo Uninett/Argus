@@ -1,7 +1,7 @@
 from pathlib import Path
 
 
-VERSION = "2.1.37"
+VERSION = "2.5.3"
 
 TAILWIND_EXTRA_URL = (
     "https://github.com/dobicinaitis/tailwind-cli-extra/releases/download/v{version}/tailwindcss-extra-{arch}"
