@@ -1,0 +1,28 @@
+<!-- htmx/incident/cells/_incident_filterable_column_header_content.html -->
+{% load argus_htmx %}
+{% with field=form|get_form_field:fieldname %}
+  <div>
+    {{ column.label }}
+    <span>
+      <button type="button"
+              class="btn btn-xs {% if field.value %} btn-primary {% else %} btn-ghost text-primary {% endif %} min-h-4 h-4"
+              _="on click toggle .hidden on next .column-filter">
+        <i class="fa-solid fa-magnifying-glass"></i>
+      </button>
+    </span>
+  </div>
+  <div class="absolute flex gap-2 column-filter hidden bg-base-100 border-primary border p-2 rounded-lg w-72 top-5 z-10"
+       _="on keyup[key is 'Escape'] from body add .hidden to me">
+    {{ field }}
+    <button type="button"
+            class="btn btn-xs btn-primary"
+            _="on click add .hidden to closest .column-filter"
+            hx-get="{% url 'htmx:incident-list' %}"
+            hx-trigger="click"
+            hx-include=".incident-list-param"
+            hx-target="#table"
+            hx-swap="outerHTML"
+            hx-push-url="true"
+            hx-indicator="#incident-list .htmx-indicator">Filter</button>
+  </div>
+{% endwith %}

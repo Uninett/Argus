@@ -29,6 +29,21 @@ class PageNumberForm(IncidentListForm):
     page = forms.IntegerField(required=False, initial=field_initial, min_value=field_initial)
 
 
+# column search, not stored
+class DescriptionForm(IncidentListForm):
+    widget_template_name = "htmx/incident/cells/search_fields/input_search.html"
+    fieldname = "description"
+    field_initial = ""
+
+    description = forms.CharField(required=False)
+
+    def filter(self, queryset, request):
+        description = self.get_clean_value(request)
+        if description:
+            queryset = queryset.filter(description__contains=description)
+        return queryset
+
+
 # Stored in preference
 class PageSizeForm(IncidentListForm):
     fieldname = "page_size"

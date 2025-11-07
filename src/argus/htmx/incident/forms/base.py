@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Optional
 from urllib.parse import urlencode
 
 from django import forms
@@ -10,6 +10,12 @@ from argus.auth.utils import get_or_update_preference, get_preference
 class IncidentListForm(forms.Form):
     fieldname: str
     field_initial: Any
+    widget_template_name: Optional[str] = None
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.widget_template_name:
+            self.fields[self.fieldname].widget.template_name = self.widget_template_name
 
     def get_clean_value(self, request):
         value = self.get_initial_value(request)
