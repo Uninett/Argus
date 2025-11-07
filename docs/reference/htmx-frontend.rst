@@ -172,12 +172,126 @@ a time), and the user can select a different page size from ``[10, 20, 50,
 :setting:`ARGUS_INCIDENTS_DEFAULT_PAGE_SIZE` (an integer) and
 :setting:`ARGUS_INCIDENTS_PAGE_SIZES` setting respectively.
 
-Incident table column customization
------------------------------------
+Table columns
+-------------
 
-You can customize which columns are shown in the incidents listing table by
-overriding the :setting:`INCIDENT_TABLE_COLUMNS` setting. See
+Argus ships with more possible column types than what are configured by
+default.
+
+The columns to use are set with the :setting:`INCIDENT_TABLE_COLUMNS` setting.
+
+This is the default for the setting as of this version of Argus:
+
+.. code-block:: python3
+
+   INCIDENT_TABLE_COLUMNS = [
+      "color_status",
+      "row_select",
+      "start_time",
+      "combined_status",
+      "level",
+      "source",
+      "description",
+      "ticket",
+   ]
+
+You can define your own columns from scratch, see
 :ref:`customize-htmx-frontend` for examples.
+
+All built-in columns
+~~~~~~~~~~~~~~~~~~~~
+
+ack
+    :From: ack
+    :Name: ack
+    :Description: Show whether the incident is acked or not.
+    :Redundant with: combined_status
+
+color_status
+    :From: ack + status
+    :Name: color_status
+    :Description: A combination of ackedness and openness, shown only as a color.
+
+combined_status
+    :From: ack + status
+    :Name: combined_status
+    :Description: Merges the "open" column and the "ack" column into one.
+
+description
+    :From: description
+    :Name: description
+    :Description: The contents of the description-field of the incident.
+    :Redundant with: search_description
+
+search_description
+    :From: description
+    :Name: search_description
+    :Description: Search for (free text) all tickets that matches and show their
+                  incidents.
+    :Redundant with: description
+
+id
+    :From: id
+    :Name: id
+    :Description: The internal id of the incident in argus.
+
+level
+    :From: level
+    :Name: level
+    :Description: The severity level.
+    :Redundant with: select_levels
+
+select_levels
+    :From: level
+    :Name: select_levels
+    :Description: The severity level. One or more can be selected. Might conflict
+                  with the notification filter field ``maxlevel``. If maxlevel is
+                  set to less than max, you will get no results if searching for
+                  the max via this field.
+    :Redundant with: level
+
+status
+    :From: open
+    :Name: status
+    :Description: Whether the incident is still ongoing or has been closed.
+    :Redundant with: combined_status
+
+row_select
+    :From: depends on incident id
+    :Name: row_select
+    :Description: Checkbox to select the row for bulk changes.
+
+source
+    :From: source
+    :Name: source
+    :Description: The source of the incident.
+
+start_time
+    :From: start_time
+    :Name: start_time
+    :Description: When the incident started.
+
+ticket
+    :From: ticket_url
+    :Name: ticket
+    :Description: A link to a ticket/issue in an external system with more information.
+    :Redundant with: has_ticket_url, search_ticket_url
+
+has_ticket_url
+    :From: ticket_url
+    :Name: has_ticket_url
+    :Description: A link to a ticket/issue in an external system with more information.
+                  Can toggle showing only incidents that has or lacks a ticket url.
+    :Redundant with: ticket, search_ticket_url
+
+search_ticket_url
+    :From: ticket_url
+    :Name: search_ticket_url
+    :Description: A link to a ticket/issue in an external system with more information.
+                  Can search through all the tickets for the term, and only show
+                  the matching incidents.
+    :Redundant with: ticket, has_ticket_url
+
 
 Themes
 ------
