@@ -82,6 +82,13 @@ _BUILTIN_COLUMN_LIST = [
         detail_link=True,
     ),
     IncidentTableColumn(
+        "select_levels",
+        "Severity level",
+        "htmx/incident/cells/_incident_level.html",
+        detail_link=True,
+        filter_field="level",
+    ),
+    IncidentTableColumn(
         "source",
         "Source",
         "htmx/incident/cells/_incident_source.html",
@@ -92,6 +99,13 @@ _BUILTIN_COLUMN_LIST = [
         "Description",
         "htmx/incident/cells/_incident_description.html",
         detail_link=True,
+    ),
+    IncidentTableColumn(
+        "search_description",
+        "Description",
+        "htmx/incident/cells/_incident_description.html",
+        detail_link=True,
+        filter_field="description",
     ),
     IncidentTableColumn(
         "ack",
@@ -109,6 +123,18 @@ _BUILTIN_COLUMN_LIST = [
         "ticket",
         "Ticket",
         "htmx/incident/cells/_incident_ticket.html",
+    ),
+    IncidentTableColumn(
+        "has_ticket_url",
+        "Ticket",
+        "htmx/incident/cells/_incident_ticket.html",
+        filter_field="has_ticket",
+    ),
+    IncidentTableColumn(
+        "search_ticket_url",
+        "Ticket",
+        "htmx/incident/cells/_incident_ticket.html",
+        filter_field="ticket_url",
     ),
     IncidentTableColumn(
         "links",
