@@ -10,12 +10,14 @@ from argus.auth.utils import get_or_update_preference, get_preference
 class IncidentListForm(forms.Form):
     fieldname: str
     field_initial: Any
+    widget_classes: str = ""
     widget_template_name: Optional[str] = None
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if self.widget_template_name:
             self.fields[self.fieldname].widget.template_name = self.widget_template_name
+        self.fields[self.fieldname].widget.attrs["class"] = self.widget_classes
 
     def get_clean_value(self, request):
         value = self.get_initial_value(request)
