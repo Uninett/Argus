@@ -10,6 +10,7 @@ from argus.htmx.constants import (
     TIMEFRAME_DEFAULT,
 )
 from argus.htmx.incident.forms.base import IncidentListForm
+from argus.incident.constants import Level
 
 
 # incident list filter widgets
@@ -41,6 +42,25 @@ class DescriptionForm(IncidentListForm):
         description = self.get_clean_value(request)
         if description:
             queryset = queryset.filter(description__contains=description)
+        return queryset
+
+
+class LevelForm(IncidentListForm):
+    fieldname = "level"
+    field_initial = ""
+    widget_classes = "incident-list-param"
+
+    level = forms.TypedMultipleChoiceField(
+        required=False,
+        choices=Level,
+        coerce=int,
+        empty_value="",
+    )
+
+    def filter(self, queryset, request):
+        levels = self.get_clean_value(request)
+        if levels:
+            queryset = queryset.filter(level__in=levels)
         return queryset
 
 
