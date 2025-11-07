@@ -64,6 +64,40 @@ class LevelForm(IncidentListForm):
         return queryset
 
 
+class HasTicketForm(IncidentListForm):
+    widget_classes = "incident-list-param"
+    fieldname = "has_ticket"
+    field_initial = ""
+
+    has_ticket = forms.ChoiceField(
+        required=False,
+        choices=[("yes", "Yes"), ("no", "No"), ("", "N/A")],
+        widget=forms.RadioSelect,
+    )
+
+    def filter(self, queryset, request):
+        has_ticket = self.get_clean_value(request)
+        if has_ticket == "yes":
+            queryset = queryset.exclude(ticket_url="")
+        elif has_ticket == "no":
+            queryset = queryset.filter(ticket_url="")
+        return queryset
+
+
+class FindTicketForm(IncidentListForm):
+    widget_template_name = "htmx/incident/cells/search_fields/input_search.html"
+    fieldname = "ticket_url"
+    field_initial = ""
+
+    ticket_url = forms.CharField(required=False)
+
+    def filter(self, queryset, request):
+        ticket_url = self.get_clean_value(request)
+        if ticket_url:
+            queryset = queryset.filter(ticket_url__contains=ticket_url)
+        return queryset
+
+
 # Stored in preference
 class PageSizeForm(IncidentListForm):
     fieldname = "page_size"
