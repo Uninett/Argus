@@ -36,6 +36,7 @@ class DescriptionForm(SearchMixin, IncidentListForm):
     fieldname = "description"
     field_initial = ""
     lookup = f"{fieldname}__contains"
+    placeholder = "part of description"
 
     description = forms.CharField(required=False)
 
@@ -72,6 +73,7 @@ class FindTicketForm(SearchMixin, IncidentListForm):
     fieldname = "ticket_url"
     field_initial = ""
     lookup = f"{fieldname}__contains"
+    placeholder = "part of ticket url"
 
     ticket_url = forms.CharField(required=False)
 

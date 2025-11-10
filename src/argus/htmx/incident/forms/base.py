@@ -13,12 +13,14 @@ class IncidentListForm(forms.Form):
     widget_classes: str = ""
     widget_template_name: Optional[str] = None
     lookup: Optional[str] = None  # used by filter method
+    placeholder: str = ""
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if self.widget_template_name:
             self.fields[self.fieldname].widget.template_name = self.widget_template_name
         self.fields[self.fieldname].widget.attrs["class"] = self.widget_classes
+        self.fields[self.fieldname].widget.attrs["placeholder"] = self.placeholder
 
     def get_clean_value(self, request):
         value = self.get_initial_value(request)

@@ -1,6 +1,7 @@
-<!-- htmx/incident/cells/search_field/text_search.html -->
+<!-- htmx/incident/cells/search_field/input_search.html -->
 <input name="{{ widget.name }}"
        type="search"
        autocomplete="off"
        class="input input-xs grow input-primary incident-list-param"
+       {% if widget.attrs.placeholder %}placeholder="{{ widget.attrs.placeholder }}"{% endif %}
        {% if widget.value %}value="{{ widget.value }}"{% endif %}>
