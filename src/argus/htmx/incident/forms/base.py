@@ -12,6 +12,7 @@ class IncidentListForm(forms.Form):
     field_initial: Any
     widget_classes: str = ""
     widget_template_name: Optional[str] = None
+    lookup: Optional[str] = None  # used by filter method
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -78,3 +79,21 @@ class IncidentListForm(forms.Form):
         """
         # Use self.get_clean_value() to get value to store
         return None
+
+
+class SearchMixin:
+    def filter(self, queryset, request):
+        _input = self.get_clean_value(request)
+        if _input:
+            queryset = queryset.filter(**{self.lookup: _input})
+        return queryset
+
+
+class HasTextSearchMixin:
+    def filter(self, queryset, request):
+        _input = self.get_clean_value(request)
+        if _input == "yes":
+            queryset = queryset.exclude(**{self.lookup: ""})
+        elif _input == "no":
+            queryset = queryset.filter(**{self.lookup: ""})
+        return queryset
