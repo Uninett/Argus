@@ -5,16 +5,23 @@ Currently customizable UI elements:
 - table columns: configure what columns to show in the incidents listing
 """
 
+import logging
 from dataclasses import dataclass
 from typing import Optional
 
 from django.conf import settings
 
-from argus.htmx import defaults as argus_htmx_settings
+from argus.htmx.defaults import INCIDENT_TABLE_COLUMNS as BUILTIN_INCIDENT_TABLE_COLUMNS
+
+
+LOG = logging.getLogger(__name__)
 
 # for editor typeahead
 CELL_WRAPPER_TEMPLATE_DEFAULT = "htmx/incident/_incident_table_cell_wrapper_default.html"
 CELL_WRAPPER_TEMPLATE_LINK_TO_DETAILS = "htmx/incident/_incident_table_cell_wrapper_link_to_details.html"
+
+_BUILTIN_COLUMN_LAYOUT_NAME = "built-in"
+_DEFAULT_COLUMN_LAYOUT_NAME = "default"
 
 
 @dataclass
@@ -145,9 +152,48 @@ _BUILTIN_COLUMN_LIST = [
 BUILTIN_COLUMNS = {col.name: col for col in _BUILTIN_COLUMN_LIST}
 
 
-def get_incident_table_columns() -> list[IncidentTableColumn]:
-    columns = getattr(settings, "INCIDENT_TABLE_COLUMNS", argus_htmx_settings.INCIDENT_TABLE_COLUMNS)
+def get_builtin_column_layout():
+    return _BUILTIN_COLUMN_LAYOUT_NAME, BUILTIN_INCIDENT_TABLE_COLUMNS
+
+
+def get_default_column_layout():
+    column_setting = getattr(settings, "INCIDENT_TABLE_COLUMNS", [])
+    LOG.debug("Getting INCIDENT_TABLE_COLUMNS: column_setting: %s", column_setting)
+    return _DEFAULT_COLUMN_LAYOUT_NAME, column_setting
+
+
+def get_available_column_layouts():
+    builtin, builtin_columns = get_builtin_column_layout()
+    layouts = {builtin: builtin_columns}
+
+    default, default_columns = get_default_column_layout()
+    if default_columns:
+        layouts[default] = default_columns
+    LOG.debug("Available column layouts: %s", layouts)
+    return layouts
+
+
+def get_column_choices():
+    _columns = get_available_column_layouts().keys()
+    columns = [(column_name, column_name.title()) for column_name in _columns]
+    return columns
+
+
+def get_incident_table_columns(name: str = _BUILTIN_COLUMN_LAYOUT_NAME) -> list[IncidentTableColumn]:
+    LOG.debug("Getting layouts: get_incident_table_columns")
+    layouts = get_available_column_layouts()
+    if name not in layouts:
+        name = _BUILTIN_COLUMN_LAYOUT_NAME
+    columns = layouts[name]
     return [_resolve_column(col) for col in columns]
+
+
+def get_default_column_layout_name():
+    LOG.debug("Getting layouts: get_default_column_layout_name")
+    layouts = get_available_column_layouts()
+    if _DEFAULT_COLUMN_LAYOUT_NAME in layouts.keys():
+        return _DEFAULT_COLUMN_LAYOUT_NAME
+    return _BUILTIN_COLUMN_LAYOUT_NAME
 
 
 def _resolve_column(col: str | IncidentTableColumn):

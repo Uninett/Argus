@@ -1,0 +1,30 @@
+<details>
+  <summary>
+    Incidents table column setup
+    <span class="badge badge-primary">{{ preferences.argus_htmx.incidents_table_column_name }}</span>
+  </summary>
+  {% if preferences_choices.argus_htmx.incidents_table_column_name.count == 1 %}
+    <p>Only one column layout is defined, {{ preferences.argus_htmx.incidents_table_column_name }}.</p>
+  {% else %}
+    <ul class="max-h-64 overflow-y-scroll">
+      {% for column, column_name in preferences_choices.argus_htmx.incidents_table_column_name %}
+        <li>
+          <input type="radio"
+                 class="btn btn-sm btn-block btn-ghost justify-start"
+                 value="{{ column }}"
+                 aria-label="{{ column_name }}"
+                 name="incidents_table_column_name"
+                 autocomplete="off"
+                 hx-post="{% url 'htmx:update-preferences' namespace='argus_htmx' %}"
+                 hx-trigger="change"
+                 hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' />
+        </li>
+      {% empty %}
+        <li>
+          <p>No incident table columns configured</p>
+        </li>
+      {% endfor %}
+    </ul>
+ 
+  {% endif %}
+</details>
