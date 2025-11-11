@@ -24,7 +24,7 @@ from argus.util.datetime_utils import make_aware
 
 from ..request import HtmxHttpRequest
 
-from .customization import get_incident_table_columns
+from .columns import get_incident_table_columns
 from .utils import get_filter_function
 from .forms.incident_filters import IncidentListForm
 from .forms.incident_actions import AckForm, DescriptionOptionalForm, EditTicketUrlForm, AddTicketUrlForm

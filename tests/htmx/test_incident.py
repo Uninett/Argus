@@ -2,7 +2,7 @@ from django import forms, test
 from django.test.client import RequestFactory
 from argus.auth.factories import PersonUserFactory
 from argus.filter.queryset_filters import QuerySetFilter
-from argus.htmx.incident.customization import IncidentTableColumn
+from argus.htmx.incident.columns import IncidentTableColumn
 from argus.htmx.incident.views import incident_list
 
 
