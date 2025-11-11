@@ -9,7 +9,8 @@ from argus.htmx.constants import (
     TIMEFRAME_CHOICES,
     TIMEFRAME_DEFAULT,
 )
-from argus.htmx.incident.forms.base import IncidentListForm
+from argus.htmx.incident.forms.base import IncidentListForm, SearchMixin, HasTextSearchMixin
+from argus.incident.constants import Level
 
 
 # incident list filter widgets
@@ -27,6 +28,54 @@ class PageNumberForm(IncidentListForm):
     field_initial = 1
 
     page = forms.IntegerField(required=False, initial=field_initial, min_value=field_initial)
+
+
+# column search, not stored
+class DescriptionForm(SearchMixin, IncidentListForm):
+    widget_template_name = "htmx/incident/cells/search_fields/input_search.html"
+    fieldname = "description"
+    field_initial = ""
+    lookup = f"{fieldname}__contains"
+    placeholder = "part of description"
+
+    description = forms.CharField(required=False)
+
+
+class LevelForm(SearchMixin, IncidentListForm):
+    fieldname = "level"
+    field_initial = ""
+    widget_classes = "incident-list-param"
+    lookup = f"{fieldname}__in"
+
+    level = forms.TypedMultipleChoiceField(
+        required=False,
+        choices=Level,
+        coerce=int,
+        empty_value="",
+    )
+
+
+class HasTicketForm(HasTextSearchMixin, IncidentListForm):
+    widget_classes = "incident-list-param"
+    fieldname = "has_ticket"
+    field_initial = ""
+    lookup = "ticket_url"
+
+    has_ticket = forms.ChoiceField(
+        required=False,
+        choices=[("yes", "Yes"), ("no", "No"), ("", "N/A")],
+        widget=forms.RadioSelect,
+    )
+
+
+class FindTicketForm(SearchMixin, IncidentListForm):
+    widget_template_name = "htmx/incident/cells/search_fields/input_search.html"
+    fieldname = "ticket_url"
+    field_initial = ""
+    lookup = f"{fieldname}__contains"
+    placeholder = "part of ticket url"
+
+    ticket_url = forms.CharField(required=False)
 
 
 # Stored in preference

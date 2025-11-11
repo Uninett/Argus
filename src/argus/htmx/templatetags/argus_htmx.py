@@ -46,6 +46,16 @@ def fieldvalue(form, fieldname):
 
 
 @register.filter
+def get_form_field(form, fieldname):
+    return form[fieldname] or None
+
+
+@register.filter
+def dictvalue(dict_, key, default=None):
+    return dict_.get(key, default)
+
+
+@register.filter
 def autoclose_time(message: Message):
     candidates = getattr(
         settings,
