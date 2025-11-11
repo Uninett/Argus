@@ -154,8 +154,7 @@ class FilterListView(ListView):
     template_name = "htmx/incident/filter_list.html"
 
     def get_queryset(self):
-        qs = super().get_queryset()
-        return qs.filter(user_id=self.request.user.id)
+        return super().get_queryset().filter(user_id=self.request.user.id).order_by("name")
 
     def get_success_url(self):
         return reverse("htmx:filter-list")
