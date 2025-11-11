@@ -172,10 +172,20 @@ example::
       a ``<td>``-tag. This makes it possible to add attributes to the
       ``<td>``-tag or skip including the ``cell_template`` altogether.
 
+      Deprecated: see ``detail_link``
+
       Replacing the default with
       ``htmx/incident/_incident_table_cell_wrapper_link_to_details.html`` will
       result in the ``cell_template`` being wrapped in a link (``<a>``) to the
       details page.
+
+   .. py:attribute::detail_link
+
+      :type: bool
+      :value: False
+
+      Setting ``detail_link`` to ``True`` will wrap the contents of the cell
+      with a link (``<a>``) to the details page.
 
    .. py:attribute:: column_classes
 
@@ -243,7 +253,7 @@ You could then create ``path/to/_extra_widget.html`` as following::
 
 
 Toast messages
---------------
+==============
 
 ``argus_htmx`` uses the `Django Messages`_ framework to dynamically display notifications toast
 messages to the user. Some of these messages stay on screen until the user refreshes, while others

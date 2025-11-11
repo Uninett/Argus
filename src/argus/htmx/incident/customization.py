@@ -31,12 +31,13 @@ class IncidentTableColumn:
         as the key
     """
 
-    name: str  # identifier
+    name: str  # unique identifier
     label: str  # display value
     cell_template: str
     header_template: Optional[str] = None
     context: Optional[dict] = None
     filter_field: Optional[str] = None
+    detail_link: bool = False
     cell_wrapper_template: str = CELL_WRAPPER_TEMPLATE_DEFAULT
     column_classes: str = ""
 
@@ -59,45 +60,81 @@ _BUILTIN_COLUMN_LIST = [
         "id",
         "ID",
         "htmx/incident/cells/_incident_pk.html",
-        cell_wrapper_template=CELL_WRAPPER_TEMPLATE_LINK_TO_DETAILS,
+        detail_link=True,
     ),
     IncidentTableColumn(
         "start_time",
         "Timestamp",
         "htmx/incident/cells/_incident_start_time.html",
         header_template="htmx/incident/cells/_incident_start_time_header.html",
-        cell_wrapper_template=CELL_WRAPPER_TEMPLATE_LINK_TO_DETAILS,
+        detail_link=True,
     ),
-    IncidentTableColumn("status", "Status", "htmx/incident/cells/_incident_status.html"),
+    IncidentTableColumn(
+        "status",
+        "Status",
+        "htmx/incident/cells/_incident_status.html",
+        detail_link=True,
+    ),
     IncidentTableColumn(
         "level",
         "Severity level",
         "htmx/incident/cells/_incident_level.html",
-        cell_wrapper_template=CELL_WRAPPER_TEMPLATE_LINK_TO_DETAILS,
+        detail_link=True,
+    ),
+    IncidentTableColumn(
+        "select_levels",
+        "Severity level",
+        "htmx/incident/cells/_incident_level.html",
+        detail_link=True,
+        filter_field="level",
     ),
     IncidentTableColumn(
         "source",
         "Source",
         "htmx/incident/cells/_incident_source.html",
-        cell_wrapper_template=CELL_WRAPPER_TEMPLATE_LINK_TO_DETAILS,
+        detail_link=True,
     ),
     IncidentTableColumn(
         "description",
         "Description",
         "htmx/incident/cells/_incident_description.html",
-        cell_wrapper_template=CELL_WRAPPER_TEMPLATE_LINK_TO_DETAILS,
+        detail_link=True,
     ),
-    IncidentTableColumn("ack", "Ack", "htmx/incident/cells/_incident_ack.html"),
+    IncidentTableColumn(
+        "search_description",
+        "Description",
+        "htmx/incident/cells/_incident_description.html",
+        detail_link=True,
+        filter_field="description",
+    ),
+    IncidentTableColumn(
+        "ack",
+        "Ack",
+        "htmx/incident/cells/_incident_ack.html",
+        detail_link=True,
+    ),
     IncidentTableColumn(
         "combined_status",
         "Status",
         "htmx/incident/cells/_incident_combined_status.html",
-        cell_wrapper_template=CELL_WRAPPER_TEMPLATE_LINK_TO_DETAILS,
+        detail_link=True,
     ),
     IncidentTableColumn(
         "ticket",
         "Ticket",
         "htmx/incident/cells/_incident_ticket.html",
+    ),
+    IncidentTableColumn(
+        "has_ticket_url",
+        "Ticket",
+        "htmx/incident/cells/_incident_ticket.html",
+        filter_field="has_ticket",
+    ),
+    IncidentTableColumn(
+        "search_ticket_url",
+        "Ticket",
+        "htmx/incident/cells/_incident_ticket.html",
+        filter_field="ticket_url",
     ),
     IncidentTableColumn(
         "links",

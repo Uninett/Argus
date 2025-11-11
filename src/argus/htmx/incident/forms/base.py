@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Optional
 from urllib.parse import urlencode
 
 from django import forms
@@ -10,6 +10,17 @@ from argus.auth.utils import get_or_update_preference, get_preference
 class IncidentListForm(forms.Form):
     fieldname: str
     field_initial: Any
+    widget_classes: str = ""
+    widget_template_name: Optional[str] = None
+    lookup: Optional[str] = None  # used by filter method
+    placeholder: str = ""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.widget_template_name:
+            self.fields[self.fieldname].widget.template_name = self.widget_template_name
+        self.fields[self.fieldname].widget.attrs["class"] = self.widget_classes
+        self.fields[self.fieldname].widget.attrs["placeholder"] = self.placeholder
 
     def get_clean_value(self, request):
         value = self.get_initial_value(request)
@@ -70,3 +81,21 @@ class IncidentListForm(forms.Form):
         """
         # Use self.get_clean_value() to get value to store
         return None
+
+
+class SearchMixin:
+    def filter(self, queryset, request):
+        _input = self.get_clean_value(request)
+        if _input:
+            queryset = queryset.filter(**{self.lookup: _input})
+        return queryset
+
+
+class HasTextSearchMixin:
+    def filter(self, queryset, request):
+        _input = self.get_clean_value(request)
+        if _input == "yes":
+            queryset = queryset.exclude(**{self.lookup: ""})
+        elif _input == "no":
+            queryset = queryset.filter(**{self.lookup: ""})
+        return queryset
