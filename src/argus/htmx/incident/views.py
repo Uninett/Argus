@@ -87,6 +87,7 @@ def get_form(request, formclass: Optional[forms.Form]):
 
 @require_POST
 def incident_update(request: HtmxHttpRequest, action: str):
+    LOG = logging.getLogger(__name__ + ".incident_update")
     try:
         formclass, callback_func = INCIDENT_UPDATE_ACTIONS[action]
     except KeyError:
@@ -114,11 +115,12 @@ def incident_update(request: HtmxHttpRequest, action: str):
 
 @require_GET
 def filter_form(request: HtmxHttpRequest):
+    LOG = logging.getLogger(__name__ + ".filter_form")
     request.session["selected_filter"] = None
     incident_list_filter = get_filter_function()
     filter_form, _ = incident_list_filter(request, None)
     context = {"filter_form": filter_form}
-    LOG.debug("filter_form view: GET: %s", request.GET)
+    LOG.debug("GET: %s", request.GET)
     return render(request, "htmx/incident/_incident_filterbox.html", context=context)
 
 
@@ -238,9 +240,10 @@ def add_param_to_querydict(querydict: QueryDict, key: str, value: Any):
 
 @require_GET
 def incident_list(request: HtmxHttpRequest) -> HttpResponse:
-    LOG.debug("incident_list view: GET at start: %s", request.GET)
+    LOG = logging.getLogger(__name__ + ".incident_list")
+    LOG.debug("GET at start: %s", request.GET)
     request.GET = dedupe_querydict(request.GET)
-    LOG.debug("incident_list view after dedupe: %s", request.GET)
+    LOG.debug("after dedupe: %s", request.GET)
     columns = get_incident_table_columns()
 
     # Load incidents
@@ -272,7 +275,6 @@ def incident_list(request: HtmxHttpRequest) -> HttpResponse:
         qs = form.filter(qs, request)
 
     filtered_count = qs.count()
-    LOG.debug("___________________: %s", GET_params)
 
     # Standard Django pagination
     page_size = GET_params["page_size"]
@@ -281,7 +283,7 @@ def incident_list(request: HtmxHttpRequest) -> HttpResponse:
     last_page_num = page.paginator.num_pages
 
     qd = QueryDict(urlencode(GET_params, doseq=True))
-    LOG.debug("incident_list view: Cleaned QueryDict: %s", qd)
+    LOG.debug("Cleaned QueryDict: %s", qd)
     request.GET = qd
 
     refresh_info = {
@@ -298,7 +300,7 @@ def incident_list(request: HtmxHttpRequest) -> HttpResponse:
     else:
         base_template = "htmx/incident/_base.html"
 
-    LOG.debug("incident_list view: GET at end: %s", request.GET)
+    LOG.debug("GET at end: %s", request.GET)
     context = {
         "columns": columns,
         "filter_form": filter_form,
