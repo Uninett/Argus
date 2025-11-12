@@ -1,0 +1,65 @@
+<select id="id_{{ widget.name }}"
+        name="{{ widget.name }}"
+        class="hidden"
+        data-placeholder="Search for {{ widget.name }}..."
+        multiple="true">
+  {% for _, options, _ in widget.optgroups %}
+    {% for option in options %}
+      {% if option.selected %}
+        {% block show_selected %}
+          <option value="{{ option.value }}" selected="selected">{{ option.label }}</option>
+        {% endblock show_selected %}
+      {% endif %}
+    {% endfor %}
+  {% endfor %}
+</select>
+<script>
+(function () {
+    const selectId = '#id_{{ widget.name }}';
+    const parameterName = '{{ widget.name }}';
+    const searchUrl = '{{ widget.partial_get }}';
+
+    const choices = new Choices(selectId, {
+        removeItemButton: true,
+        searchResultLimit: 10,
+        duplicateItemsAllowed: false,
+        shouldSort: false,
+        searchEnabled: true,
+        loadingText: 'Loading...',
+        noResultsText: `No ${parameterName} found`,
+        noChoicesText: `No ${parameterName} to choose from`,
+        itemSelectText: '',
+        searchFloor: 2,
+        removeItemIconText: () => '',
+        classNames: {
+            containerOuter: ['choices', 'dropdown', 'max-w-sm', 'self-center'],
+            containerInner: ['choices__inner'],
+            listDropdown: ['choices-dropdown'],
+            listItems: ['choices-list-items'],
+        }
+    });
+
+    const choicesElement = choices.passedElement.element;
+
+    let searchTimeout;
+    choicesElement.addEventListener('search', (event) => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(async () => {
+            try {
+                const searchTerm = event.detail.value;
+                const response = await fetch(
+                    `${searchUrl}?q=${encodeURIComponent(searchTerm)}`
+                );
+                const options = await response.json();
+                choices.setChoices(options.results, 'id', 'text', true);
+            } catch (error) {
+                choices.setChoices([{value: 'error', label: `Failed to load ${parameterName}`}]);
+            }
+        }, 500);
+    });
+
+    choicesElement.addEventListener('change', function (event) {
+        choices.setChoices([], 'id', 'text', true);
+    });
+})();
+</script>
