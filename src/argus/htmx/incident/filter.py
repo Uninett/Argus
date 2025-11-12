@@ -6,7 +6,7 @@ from django.urls import reverse
 from django.views.generic import ListView
 
 from argus.filter import get_filter_backend
-from argus.htmx.widgets import BadgeDropdownMultiSelect
+from argus.htmx.widgets import BadgeDropdownMultiSelect, SearchDropdownMultiSelect
 from argus.incident.constants import AckedStatus, Level, OpenStatus
 from argus.incident.models import SourceSystem, Tag
 from argus.notificationprofile.models import Filter
@@ -20,7 +20,24 @@ class RangeInput(forms.NumberInput):
     template_name = "django/forms/widgets/range.html"
 
 
-class IncidentFilterForm(forms.Form):
+class TagFieldMixin:
+    def _init_tag_field(self, *args, **kwargs):
+        """
+        Initializes the 'tags' field widget and choices as key=value strings, and dynamically adds submitted tags.
+        """
+        self.fields["tags"].widget.partial_get = reverse("htmx:search-tags")
+        query_dict = args[0] if args else None
+        if not query_dict:
+            self.fields["tags"].choices = []
+            return
+
+        tags = query_dict.get("tags", [])
+
+        choices = [(tag, tag) for tag in tags]
+        self.fields["tags"].choices = choices
+
+
+class IncidentFilterForm(TagFieldMixin, forms.Form):
     open = forms.IntegerField(
         widget=RangeInput(
             attrs={"class": "range-primary", "step": "1", "min": min(OpenStatus).value, "max": max(OpenStatus).value}
@@ -45,12 +62,12 @@ class IncidentFilterForm(forms.Form):
         required=False,
         label="Sources",
     )
-    tags = forms.CharField(
-        widget=forms.TextInput(
+    tags = forms.MultipleChoiceField(
+        widget=SearchDropdownMultiSelect(
             attrs={
-                "placeholder": "key=value, ...",
-                "class": "input-primary input-sm overflow-y-auto min-h-8 h-auto max-h-16 max-w-xs leading-tight",
-            }
+                "placeholder": "search tags...",
+            },
+            partial_get=None,
         ),
         required=False,
         label="Tags",
@@ -69,7 +86,7 @@ class IncidentFilterForm(forms.Form):
         "open": None,
         "acked": None,
         "sourceSystemIds": [],
-        "tags": "",
+        "tags": [],
         "maxlevel": max(Level).value,
     }
 
@@ -79,18 +96,19 @@ class IncidentFilterForm(forms.Form):
         self.fields["sourceSystemIds"].widget.partial_get = reverse("htmx:incident-filter")
         source_choices = SourceSystem.objects.order_by("name").values_list("id", "name")
         self.fields["sourceSystemIds"].choices = tuple(source_choices)
+        self._init_tag_field(*args, **kwargs)
 
     def clean_tags(self):
         tags = self.cleaned_data["tags"]
         if not tags:
-            return None
+            return []
 
         try:
-            for tag in tags.split(","):
-                Tag.split(tag.strip())
+            for tag in tags:
+                tag = tag.strip()
+                Tag.split(tag)
         except ValueError:
             raise forms.ValidationError("Tags need to have the format key=value, key2=value2")
-
         return tags
 
     def _open_tristate(self):
@@ -124,16 +142,16 @@ class IncidentFilterForm(forms.Form):
         filterblob = {}
 
         filterblob["open"] = self._open_tristate()
-
         filterblob["acked"] = self._acked_tristate()
 
         sourceSystemIds = self.cleaned_data.get("sourceSystemIds", [])
         if sourceSystemIds:
             filterblob["sourceSystemIds"] = sourceSystemIds
 
+        # Always store tags as list of key=value strings
         tags = self.cleaned_data.get("tags", [])
         if tags:
-            filterblob["tags"] = [tag.strip() for tag in tags.split(",")]
+            filterblob["tags"] = tags
 
         maxlevel = self.cleaned_data.get("maxlevel", 0)
         if maxlevel:
@@ -171,17 +189,18 @@ def incident_list_filter(request, qs, use_empty_filter=False):
         form = IncidentFilterForm(_convert_filterblob(filter_obj.filter))
         LOG.debug("using stored filter: %s", filter_obj.filter)
     else:
+        form_data = _normalize_form_data(request)
         if request.method == "POST":
-            form = IncidentFilterForm(request.POST)
-            LOG.debug("using POST: %s", request.POST)
+            form = IncidentFilterForm(form_data)
+            LOG.debug("using POST: %s", form_data)
         else:
             if use_empty_filter:
                 filterblob = IncidentFilterForm.EMPTY_FILTERBLOB
                 form = IncidentFilterForm(filterblob)
                 LOG.debug("using empty filter: %s", filterblob)
             else:
-                form = IncidentFilterForm(request.GET or None)
-                LOG.debug("using GET: %s", request.GET)
+                form = IncidentFilterForm(form_data or None)
+                LOG.debug("using GET: %s", form_data)
 
     if form.is_valid():
         LOG.debug("Cleaned data: %s", form.cleaned_data)
@@ -199,8 +218,6 @@ def incident_list_filter(request, qs, use_empty_filter=False):
 
 def _convert_filterblob(filterblob):
     """Converts values in filterblob so it can be used as valid input for IncidentFilterForm"""
-    if "tags" in filterblob.keys():
-        filterblob["tags"] = ", ".join(filterblob["tags"])
 
     if "open" in filterblob.keys():
         open_state = filterblob["open"]
@@ -221,6 +238,39 @@ def _convert_filterblob(filterblob):
             filterblob["acked"] = AckedStatus.BOTH
 
     return filterblob
+
+
+def _normalize_form_data(request):
+    """Normalizes form data from request, especially the 'tags' parameter."""
+
+    raw_data = request.POST if request.method == "POST" else request.GET
+    data = dict(raw_data.items())
+    if "tags" in raw_data:
+        if hasattr(raw_data, "getlist"):
+            raw_tags = raw_data.getlist("tags")
+        else:
+            raw_tags = raw_data.get("tags", [])
+        data["tags"] = _normalize_tags_param(raw_tags)
+    return data
+
+
+def _normalize_tags_param(tags_param):
+    """Normalizes the 'tags' parameter from the form data."""
+
+    if isinstance(tags_param, str):
+        return _split_tag(tags_param)
+    elif isinstance(tags_param, (list, tuple)):
+        tags = []
+        for entry in tags_param:
+            if isinstance(entry, str):
+                tags.extend(_split_tag(entry))
+        return tags
+    return []
+
+
+def _split_tag(tag: str) -> list[str]:
+    """Splits a single tag string by commas and trims whitespace."""
+    return [t.strip() for t in tag.split(",") if t.strip()]
 
 
 def create_named_filter(request, filter_name: str, filterblob: dict):

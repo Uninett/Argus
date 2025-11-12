@@ -15,4 +15,5 @@ urlpatterns = [
     path("filter/delete/<int:pk>/", views.delete_filter, name="filter-delete"),
     path("filter/update/<int:pk>/", views.update_filter, name="filter-update"),
     path("filter/existing/", views.get_existing_filters, name="existing-filters"),
+    path("search-tags/", views.search_tags, name="search-tags"),
 ]
