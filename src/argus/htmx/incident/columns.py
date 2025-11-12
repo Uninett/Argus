@@ -162,6 +162,12 @@ def get_default_column_layout():
     return _DEFAULT_COLUMN_LAYOUT_NAME, column_setting
 
 
+def get_configured_column_layouts():
+    column_settings = getattr(settings, "INCIDENT_TABLE_COLUMN_LAYOUTS", {})
+    LOG.debug("Getting INCIDENT_TABLE_COLUMN_LAYOUTS: column_setting: %s", column_settings)
+    return column_settings
+
+
 def get_available_column_layouts():
     builtin, builtin_columns = get_builtin_column_layout()
     layouts = {builtin: builtin_columns}
@@ -169,6 +175,11 @@ def get_available_column_layouts():
     default, default_columns = get_default_column_layout()
     if default_columns:
         layouts[default] = default_columns
+
+    configured_layouts = get_configured_column_layouts()
+    if configured_layouts:
+        layouts.update(configured_layouts)
+
     LOG.debug("Available column layouts: %s", layouts)
     return layouts
 
