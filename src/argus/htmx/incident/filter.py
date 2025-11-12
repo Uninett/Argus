@@ -77,7 +77,8 @@ class IncidentFilterForm(forms.Form):
         super().__init__(*args, **kwargs)
         # mollify tests
         self.fields["sourceSystemIds"].widget.partial_get = reverse("htmx:incident-filter")
-        self.fields["sourceSystemIds"].choices = tuple(SourceSystem.objects.order_by("name").values_list("id", "name"))
+        source_choices = SourceSystem.objects.order_by("name").values_list("id", "name")
+        self.fields["sourceSystemIds"].choices = tuple(source_choices)
 
     def clean_tags(self):
         tags = self.cleaned_data["tags"]
