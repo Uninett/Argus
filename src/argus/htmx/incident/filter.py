@@ -162,35 +162,36 @@ class FilterListView(ListView):
 
 
 def incident_list_filter(request, qs, use_empty_filter=False):
-    LOG.debug("incident_list_filter: GET at start: %s", request.GET)
+    LOG = logging.getLogger(__name__ + ".incident_list_filter")
+    LOG.debug("GET at start: %s", request.GET)
     filter_pk, filter_obj = request.session.get("selected_filter", None), None
     if filter_pk:
         filter_obj = Filter.objects.get(pk=filter_pk)
     if filter_obj:
         form = IncidentFilterForm(_convert_filterblob(filter_obj.filter))
-        LOG.debug("incident_list_filter: using stored filter: %s", filter_obj.filter)
+        LOG.debug("using stored filter: %s", filter_obj.filter)
     else:
         if request.method == "POST":
             form = IncidentFilterForm(request.POST)
-            LOG.debug("incident_list_filter: using POST: %s", request.POST)
+            LOG.debug("using POST: %s", request.POST)
         else:
             if use_empty_filter:
                 filterblob = IncidentFilterForm.EMPTY_FILTERBLOB
                 form = IncidentFilterForm(filterblob)
-                LOG.debug("incident_list_filter: using empty filter: %s", filterblob)
+                LOG.debug("using empty filter: %s", filterblob)
             else:
                 form = IncidentFilterForm(request.GET or None)
-                LOG.debug("incident_list_filter: using GET: %s", request.GET)
+                LOG.debug("using GET: %s", request.GET)
 
     if form.is_valid():
-        LOG.debug("incident_list_filter: Cleaned data: %s", form.cleaned_data)
+        LOG.debug("Cleaned data: %s", form.cleaned_data)
         filterblob = form.to_filterblob()
         qs = QuerySetFilter.filtered_incidents(filterblob, qs)
     else:
         if not request.GET:
-            LOG.debug("incident_list_filter: empty form")
+            LOG.debug("empty form")
         else:
-            LOG.debug("incident_list_filter: Dirty form: %s", form.errors)
+            LOG.debug("Dirty form: %s", form.errors)
             for field, error_messages in form.errors.items():
                 messages.error(request, f"{field}: {','.join(error_messages)}")
     return form, qs
