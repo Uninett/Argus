@@ -1,0 +1,19 @@
+<!-- htmx/user/preference_field_form.html -->
+{% load argus_htmx %}
+<li>
+  <details>
+    <summary>
+      {{ form.label }}
+      <span class="badge badge-primary">{{ form.preference }}</span>
+    </summary>
+    <ul class="max-h-64 overflow-y-scroll">
+      {% if form.choices|length > 1 %}
+        {{ form|get_form_field:form.fieldname }}
+      {% else %}
+        <li>
+          <p>{{ form.empty_message|default:"None configured" }}</p>
+        </li>
+      {% endif %}
+    </ul>
+  </details>
+</li>
