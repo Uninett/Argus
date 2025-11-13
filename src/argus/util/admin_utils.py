@@ -1,4 +1,4 @@
-from typing import Callable, Sequence, Union
+from typing import Callable, Sequence
 
 from django.contrib import admin
 from django.contrib.admin.utils import quote
@@ -55,7 +55,7 @@ def list_filter_factory(
 
 def add_elements_to_deleted_objects(
     objs: Sequence[Model],
-    to_delete: list[Union[str, list]],
+    to_delete: list[str | list],
     get_elements_func: Callable[[Model], Sequence[Model]],
     admin_site,
 ):

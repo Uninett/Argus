@@ -6,7 +6,7 @@ Currently customizable UI elements:
 """
 
 from dataclasses import dataclass
-from typing import Optional, Union
+from typing import Optional
 
 from django.conf import settings
 
@@ -150,7 +150,7 @@ def get_incident_table_columns() -> list[IncidentTableColumn]:
     return [_resolve_column(col) for col in columns]
 
 
-def _resolve_column(col: Union[str, IncidentTableColumn]):
+def _resolve_column(col: str | IncidentTableColumn):
     if isinstance(col, str):
         try:
             col = BUILTIN_COLUMNS[col]

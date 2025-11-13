@@ -18,7 +18,6 @@ if TYPE_CHECKING:
     from collections.abc import Iterable
 
     from types import NoneType
-    from typing import Union
 
     from django.contrib.auth import get_user_model
     from django.db.models.query import QuerySet
@@ -107,7 +106,7 @@ class EmailNotification(NotificationMedium):
             )
 
     @staticmethod
-    def update(destination: DestinationConfig, validated_data: dict) -> Union[DestinationConfig, NoneType]:
+    def update(destination: DestinationConfig, validated_data: dict) -> DestinationConfig | NoneType:
         """
         Updates the synced email destination by copying its contents to
         a new destination and updating the given destination with the given
