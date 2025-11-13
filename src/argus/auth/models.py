@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import dataclasses
 import functools
-from typing import Any, Optional, Sequence, Union, Protocol
+from typing import Any, Optional, Protocol, Sequence
 
 from django.contrib.auth.models import AbstractUser, Group
 from django.db import models
@@ -80,7 +80,7 @@ class User(AbstractUser):
     def is_end_user(self):
         return not hasattr(self, "source_system")
 
-    def is_member_of_group(self, group: Union[str, Group]):
+    def is_member_of_group(self, group: str | Group):
         if isinstance(group, str):
             try:
                 group = Group.objects.get(name=group)
