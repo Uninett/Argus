@@ -4897,6 +4897,10 @@ details.collapse summary::-webkit-details-marker {
   width: 2rem;
 }
 
+.w-80 {
+  width: 20rem;
+}
+
 .min-w-48 {
   min-width: 12rem;
 }

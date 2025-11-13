@@ -1,0 +1,22 @@
+<tr>
+  <td>
+    <h3 class="text-lg">Page size</h3>
+    <p class="text-base-content/70">Select the number of incidents to display per page</p>
+  </td>
+  <td>
+    <label>
+      <select class="select select-bordered w-full"
+              name="page_size"
+              aria-labelledby="date-format-label">
+        <option disabled>Select page size</option>
+        {% for page_size, page_size_name in preferences_choices.argus_htmx.page_size %}
+          <option value="{{ page_size }}"
+                  {% if preferences.argus_htmx.page_size == page_size %}selected{% endif %}>
+            {{ page_size_name }}
+          </option>
+        {% endfor %}
+      </select>
+    </label>
+  </td>
+  <td></td>
+</tr>

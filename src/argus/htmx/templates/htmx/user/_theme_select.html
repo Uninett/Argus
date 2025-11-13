@@ -1,0 +1,46 @@
+<tr class="space-y-2">
+  <td class="px-4">
+    <h4 class="text-lg">Theme</h4>
+    <p class="text-base-content/70">Select your preferred theme</p>
+  </td>
+  <td>
+    <label>
+      <select class="select select-bordered w-full"
+              name="theme"
+              _="on change set document.documentElement.dataset.theme to my.value">
+        {% for theme in preferences_choices.argus_htmx.theme %}
+          <option value="{{ theme }}"
+                  {% if preferences.argus_htmx.theme == theme %}selected{% endif %}>{{ theme|capfirst }}</option>
+        {% endfor %}
+      </select>
+    </label>
+  </td>
+  <td>
+    <!--
+        <fieldset class="flex items-center gap-4">
+            {% for theme in preferences_choices.argus_htmx.theme %}
+                <label class="cursor-pointer card relative bg-base-100 border p-4 hover:border-primary/80 hover:bg-base-200 {% if preferences.argus_htmx.theme == theme %}border-primary{% else %}border-base-400{% endif %}" data-theme="{{ theme }}">
+                    <input type="radio" name="theme" value="{{ theme }}" aria-label="{{ theme }}" autocomplete="off" {% if preferences.argus_htmx.theme == theme %}checked{% endif %} class="radio radio-primary radio-sm absolute top-2 right-2" _="on change set document.documentElement.dataset.theme to my.value" />
+                    <div class="space-y-2 mx-auto">
+                        <h4 class="text-lg">{{ theme }}</h4>
+                        <div class="flex items-center gap-1">
+                            {% for color_class in theme_colors %}
+                                <div class="h-3 w-3 rounded-box {{ color_class }}" title="{{ color_class }}"></div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </label>
+            {% endfor %}
+        </fieldset>
+        -->
+    <div class="card">
+      <div class="flex items-center gap-1">
+        {% for name, color_class in theme_colors %}
+          <div class="tooltip" data-tip="{{ name }}">
+            <div class="h-8 w-8 rounded-sm {{ color_class }}"></div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </td>
+</tr>

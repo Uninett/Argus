@@ -1,0 +1,25 @@
+<tr>
+  <td>
+    <h3 class="text-lg">Date format</h3>
+    <p id="date-format-label" class="text-base-content/70">Select a date format</p>
+  </td>
+  <td>
+    <label>
+      <select class="select select-bordered w-full"
+              name="datetime_format_name"
+              aria-labelledby="date-format-label">
+        <option disabled>Select date format</option>
+        {% for item in preferences_choices.argus_htmx.datetime_format_name %}
+          <option value="{{ item }}"
+                  {% if item == preferences.argus_htmx.datetime_format_name %}selected{% endif %}>{{ item }}</option>
+        {% endfor %}
+      </select>
+    </label>
+  </td>
+  <td>
+    <div>
+      <p class="font-semibold">Preview:</p>
+      <p class="text-primary text-base">{{ current_time|date:preferences.argus_htmx.datetime_format }}</p>
+    </div>
+  </td>
+</tr>

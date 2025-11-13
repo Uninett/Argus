@@ -1,0 +1,52 @@
+<tr class="space-y-2">
+  <td class="px-4 align-top">
+    <h4 class="text-lg">Incidents table layout</h4>
+    <p id="table-layout-label" class="text-base-content/70">Select your preferred incident table layout</p>
+  </td>
+  <td class="align-top">
+    <label>
+      <select class="select select-bordered w-full"
+              name="incidents_table_layout"
+              aria-labelledby="table-layout-label"
+              _="on change if my value is 'compact' add .table-xs to #layout-preview else remove .table-xs from #layout-preview ">
+        <option disabled>Select table layout</option>
+        {% for layout, layout_name in preferences_choices.argus_htmx.incidents_table_layout %}
+          <option value="{{ layout }}"
+                  {% if layout == preferences.argus_htmx.incidents_table_layout %}selected{% endif %}>
+            {{ layout_name|capfirst }}
+          </option>
+        {% endfor %}
+      </select>
+    </label>
+  </td>
+  <td>
+    <table id="layout-preview"
+           class="border border-separate border-spacing-1 border-primary table w-max {% if preferences.argus_htmx.incidents_table_layout_compact %}table-xs{% endif %}">
+      <thead>
+        <tr>
+          <th class="border-b border-primary">Header 1</th>
+          <th class="border-b border-primary">Header 2</th>
+          <th class="border-b border-primary">Header 3</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="border-b border-neutral">
+          <td>Preview text 1</td>
+          <td>Preview text 2</td>
+          <td>Preview text 3</td>
+        </tr>
+        <tr class="border-b border-neutral">
+          <td>Preview text 1</td>
+          <td>Preview text 2</td>
+          <td>Preview text 3</td>
+        </tr>
+      </tbody>
+    </table>
+  </td>
+</tr>
+<script>
+    document.querySelector('select[name="incidents_table_layout"]').addEventListener('change', function (e) {
+        const previewTable = document.getElementById('layout-preview');
+        console.log(e.target.value, previewTable);
+    });
+</script>

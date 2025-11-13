@@ -1,0 +1,22 @@
+<tr>
+  <td>
+    <h3 class="text-lg">Update interval</h3>
+    <p class="text-base-content/70">Select how often the incident list should refresh automatically</p>
+  </td>
+  <td>
+    <label>
+      <select class="select select-bordered w-full"
+              name="update_interval"
+              aria-label="Update interval">
+        <option disabled>Select page size</option>
+        {% for interval, interval_name in preferences_choices.argus_htmx.update_interval %}
+          <option value="{{ interval }}"
+                  {% if preferences.argus_htmx.update_interval == interval %}selected{% endif %}>
+            {{ interval_name }}
+          </option>
+        {% endfor %}
+      </select>
+    </label>
+  </td>
+  <td></td>
+</tr>

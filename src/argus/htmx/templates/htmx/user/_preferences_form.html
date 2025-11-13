@@ -1,0 +1,27 @@
+<form hx-post="{% url 'htmx:update-preferences' namespace='argus_htmx' %}"
+      hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+  <div class="overflow-x-auto">
+    <table class="table table-fixed w-full">
+      <colgroup>
+        <col class="w-64">
+        <col class="w-64">
+        <col>
+      </colgroup>
+      <tbody>
+        {% include "./_theme_select.html" %}
+        {% include "./_dateformat_select.html" %}
+        {% include "./_page_size_select.html" %}
+        {% include "./_update_interval_select.html" %}
+        {% include "./_incidents_table_layout_select.html" %}
+      </tbody>
+    </table>
+  </div>
+  <div class="flex items-center justify-end gap-2 mt-2">
+    <button class="btn btn-primary" type="submit">Save preferences</button>
+    <button class="btn"
+            type="reset"
+            _="on click set document.documentElement.dataset.theme to '{{ preferences.argus_htmx.theme }}'">
+      Reset
+    </button>
+  </div>
+</form>
