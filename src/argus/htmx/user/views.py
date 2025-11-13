@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.conf import settings
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
@@ -13,6 +15,17 @@ def user_preferences(request) -> HttpResponse:
     """Renders the main preferences page for a user"""
     context = {
         "page_title": "User preferences",
+        "current_time": datetime.now(),
+        "theme_colors": [
+            ("primary", "bg-primary"),
+            ("secondary", "bg-secondary"),
+            ("accent", "bg-accent"),
+            ("neutral", "bg-neutral"),
+            ("info", "bg-info"),
+            ("success", "bg-success"),
+            ("warning", "bg-warning"),
+            ("error", "bg-error"),
+        ],
     }
     return render(request, "htmx/user/preferences.html", context=context)
 
@@ -32,7 +45,8 @@ def update_preferences(request: HtmxHttpRequest, namespace: str) -> HttpResponse
 
     # special case if we're only updating a single preference that has a partial template
     # defined
-    if len(saved) == 1 and not failed and (template := prefs.FIELDS[saved[0]].partial_response_template) is not None:
-        return render(request, template)
+    # if len(saved) == 1 and not failed and (template := prefs.FIELDS[saved[0]].partial_response_template) is not None:
+    #    print("Special case for single preference partial response with template: ", template)
+    #    return render(request, template)
 
     return HttpResponseClientRefresh()

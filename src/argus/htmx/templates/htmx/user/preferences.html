@@ -1,22 +1,16 @@
 {% extends "htmx/base.html" %}
 {% block main %}
-  <div class="w-1/2 m-4">
+  <div class="m-4 max-w-screen-lg">
     <h1 class="sr-only">{{ page_title }}</h1>
     <section id="user-settings" class="card">
       <h2 class="card-title">User preferences</h2>
-      <ul class="menu card-body">
-        <li class="menu-title">
+      <div class="card-body px-0">
+        <div class="menu-title">
           Logged in as: <span class="text-info">{{ request.user }}</span>
           <div class="divider divider-secondary my-0"></div>
-        </li>
-        {% block preferences %}
-          <li>{% include "./_theme_dropdown.html" %}</li>
-          <li>{% include "./_dateformat_dropdown.html" %}</li>
-          <li>{% include "./_page_size_dropdown.html" %}</li>
-          <li>{% include "./_update_interval_dropdown.html" %}</li>
-          <li>{% include "./_incidents_table_layout_dropdown.html" %}</li>
-        {% endblock preferences %}
-      </ul>
+        </div>
+        {% include "./_preferences_form.html" %}
+      </div>
     </section>
   </div>
 {% endblock main %}
