@@ -1,5 +1,5 @@
 import importlib
-from typing import Union, Literal
+from typing import Literal
 
 from django.conf import settings
 from django.utils.module_loading import import_string
@@ -9,7 +9,7 @@ from argus.htmx import defaults
 FUNCTION_NAME_DEFAULT = "incident_list_filter"
 
 
-def update_interval_string(value: Union[int, Literal["never"]]):
+def update_interval_string(value: int | Literal["never"]):
     if value == "never":
         return "Never"
     return f"{value}s"

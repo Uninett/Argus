@@ -1,6 +1,6 @@
 from copy import deepcopy
 import logging
-from typing import Mapping, Union
+from typing import Mapping
 
 from django.conf import settings
 from django.contrib.auth.backends import ModelBackend, RemoteUserBackend
@@ -62,7 +62,7 @@ def get_preference(request, namespace, preference):
     return prefs.get_preference(preference)
 
 
-def save_preferences(request, data, namespace_or_prefs: Union[str, Preferences]):
+def save_preferences(request, data, namespace_or_prefs: str | Preferences):
     prefs = (
         namespace_or_prefs
         if isinstance(namespace_or_prefs, Preferences)

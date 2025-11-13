@@ -1,4 +1,4 @@
-from typing import Literal, Union
+from typing import Literal
 from django import template
 from django.contrib.messages.storage.base import Message
 from django.conf import settings
@@ -69,7 +69,7 @@ def autoclose_time(message: Message):
 
 
 @register.filter
-def update_interval_string(value: Union[int, Literal["never"]]):
+def update_interval_string(value: int | Literal["never"]):
     if value == "never":
         return "Never"
     return f"{value}s"
