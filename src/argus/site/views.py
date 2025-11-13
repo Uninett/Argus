@@ -3,13 +3,12 @@ from importlib.metadata import version, PackageNotFoundError
 
 from django.conf import settings
 from django.http import (
+    Http404,
     HttpResponseBadRequest,
-    HttpResponseForbidden,
-    HttpResponseGone,
-    HttpResponseNotFound,
-    HttpResponseServerError,
 )
 from django.shortcuts import render, reverse
+from django.views.decorators.http import require_GET
+from django.utils.html import escape
 
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.views import APIView
@@ -19,13 +18,6 @@ from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema, extend_schema_view
 
 from .serializers import MetadataSerializer
-
-
-ERROR_TEMPLATE = """<html>
-<head><title>{code} {reason}</title></head>
-<body><h1>{code} {reason}</h1></body>
-</html>
-"""
 
 LOG = logging.getLogger(__name__)
 
@@ -55,48 +47,32 @@ api_gone.login_required = False
 
 
 # fmt: off
+@require_GET
 def error(request):
-    def render_error_page(code, reason) -> bytes:
-        return ERROR_TEMPLATE.format(code=code, reason=reason).encode("utf-8")
-
-    ERROR_MAP = {
-        400: HttpResponseBadRequest,
-        403: HttpResponseForbidden,
-        404: HttpResponseNotFound,
-        410: HttpResponseGone,
-        500: HttpResponseServerError,
-    }
-    pp_errors = ", ".join([str(code) for code in sorted(ERROR_MAP.keys())])
-    status_code = request.GET.get("status-code", None)
+    error_codes = [400, 401, 403, 404, 410, 500]
+    errors = ", ".join(map(str, error_codes))
+    status_code = (request.GET.get("status-code", None))
     if status_code is None:
-        errormsg = f'Status code "{status_code}" not in {pp_errors}'
-        content = render_error_page(400, errormsg)
-        LOG.error(f"{status_code} {errormsg}")
-        return HttpResponseBadRequest(content=content, reason=errormsg)
-    try:
-        status_code = int(status_code)
-    except ValueError:
-        errormsg = f'Status code "{status_code}" is not an integer'
-        content = render_error_page(400, errormsg)
-        LOG.error(f"{status_code} {errormsg}")
-        return HttpResponseBadRequest(content=content, reason=errormsg)
-    if status_code not in ERROR_MAP.keys():
-        errormsg = f'Status code "{status_code}" not in {pp_errors}'
-        content = render_error_page(400, errormsg)
-        LOG.error(f"{status_code} {errormsg}")
-        return HttpResponseBadRequest(content=content, reason=errormsg)
-
-    errormsg = f"{status_code} Generated error"
-    if status_code == 500:
-        try:
-            assert False, status_code
-        except AssertionError:
-            LOG.exception(errormsg)
-    else:
+        errormsg = "No status code provided"
         LOG.error(errormsg)
-    content = render_error_page(status_code, "Generated error page")
-    return ERROR_MAP[status_code](content=content)
-error.login_required = False
+        return HttpResponseBadRequest(errormsg)
+
+    if str(status_code).isdigit():
+        status_code = int(status_code)
+
+    if status_code not in error_codes:
+        errormsg = f'Status code {escape(status_code)} not in {errors}'
+        LOG.error(f"{status_code} {errormsg}")
+        return HttpResponseBadRequest(errormsg)
+
+    errormsg = f'This is a test {status_code} error, please ignore'
+    LOG.error(f"{status_code} {errormsg}")
+    if status_code == 404:
+        raise Http404(errormsg)
+    elif status_code == 500:
+        raise Exception(errormsg)
+    else:
+        return render(request, f'{status_code}.html', status=status_code)
 # fmt: on
 
 
