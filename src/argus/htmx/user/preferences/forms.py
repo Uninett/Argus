@@ -40,7 +40,9 @@ class SimplePreferenceForm(forms.Form):
     widget = forms.RadioSelect
     template_name: str = "htmx/user/preference_field_form.html"
     widget_option_template_name: str = "htmx/user/radio_option.html"
+    partial_response_template: Optional[str] = None
     widget_template_name: Optional[str] = None
+    empty_message: Optional[str] = None
 
     def __init__(self, *args, **kwargs):
         """Configure field Form
@@ -178,7 +180,6 @@ class UpdateIntervalForm(SimplePreferenceForm):
 
 class ThemeForm(SimplePreferenceForm):
     label = "Theme"
-    partial_response_template = "htmx/user/_current_theme.html"
 
     theme = forms.ChoiceField()
 
