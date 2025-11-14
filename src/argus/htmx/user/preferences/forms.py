@@ -145,7 +145,7 @@ class IncidentsTableLayout(SimplePreferenceForm):
 class IncidentsTableColumnForm(SimplePreferenceForm):
     "Preference for named column layout"
 
-    label = "Incidents table column setup"
+    label = "Table column preset"
 
     incidents_table_column_name = forms.ChoiceField(required=False)
 
