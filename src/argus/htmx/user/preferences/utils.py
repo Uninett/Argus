@@ -3,7 +3,9 @@ from typing import Dict
 from .forms import SimplePreferenceForm
 
 
-def prep_preference_forms(request) -> Dict[str, SimplePreferenceForm]:
+def setup_preference_forms(request) -> Dict[str, SimplePreferenceForm]:
+    "Prepare the preference forms for rendering"
+
     forms = {}
     for form_class in SimplePreferenceForm.__subclasses__():
         form = form_class(request=request)
