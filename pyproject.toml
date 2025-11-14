@@ -55,19 +55,39 @@ dynamic = ["version"]
 [project.optional-dependencies]
 htmx = []  # for outdated install procedures
 docs = ["sphinx>=2.2.0"]
+
+[dependency-groups]
 dev = [
     "django-debug-toolbar",
-    "coverage",
     "django-extensions",
+    "ipython",
+    "python-dotenv",
+    "werkzeug",
+    {include-group = "build"},
+    {include-group = "docs"},
+    {include-group = "test"},
+    {include-group = "lint"},
+]
+lint = [
+    "pre-commit",
     "ruff",
     "djlint",
-    "ipython",
-    "pre-commit",
-    "python-dotenv",
-    "towncrier",
-    "werkzeug",
-    "tox>=4",
+]
+coverage = [
+    "coverage",
+    "unittest-xml-reporting",
+]
+test = [
+    "tox>=4.22",
+    {include-group = "coverage"},
+]
+build = [
+    "towncrier",  # for generating changelog
     "build",  # for debugging builds/installs
+    "pip-tools",  # for creating frozen requirements files
+]
+docs = [
+    "sphinx>=2.2.0",
 ]
 
 [tool.hatch.version]
