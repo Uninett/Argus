@@ -13,7 +13,7 @@ from argus.htmx.constants import (
     UPDATE_INTERVAL_DEFAULT,
     UPDATE_INTERVAL_CHOICES,
 )
-from argus.htmx.incident.columns import get_default_column_layout_name, get_column_choices
+from argus.htmx.incident.columns import get_column_choices, get_default_column_layout_name
 from argus.htmx.incident.utils import update_interval_string
 
 
