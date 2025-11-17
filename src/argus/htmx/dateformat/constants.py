@@ -2,10 +2,8 @@ import dataclasses
 from django.conf import settings
 
 __all__ = [
-    "DATETIME_FALLBACK",
     "DATETIME_FORMATS",
-    "DATETIME_DEFAULT",
-    "DATETIME_CHOICES",
+    "get_datetime_format_default",
 ]
 
 
@@ -26,10 +24,12 @@ DATETIME_FORMATS = {
     "RFC5322": DateTimeFormat("r", "r", "r"),
     "EPOCH": DateTimeFormat("U", "U", "U"),
 }
-DATETIME_CHOICES = tuple((format, format) for format in DATETIME_FORMATS)
 
-_datetime_setting = getattr(settings, "ARGUS_FRONTEND_DATETIME_FORMAT", DATETIME_FALLBACK)
 
-DATETIME_DEFAULT = DATETIME_FALLBACK
-if _datetime_setting in DATETIME_FORMATS:
-    DATETIME_DEFAULT = _datetime_setting
+def get_datetime_format_default():
+    _datetime_setting = getattr(settings, "ARGUS_FRONTEND_DATETIME_FORMAT", DATETIME_FALLBACK)
+
+    datetime_default = DATETIME_FALLBACK
+    if _datetime_setting in DATETIME_FORMATS:
+        datetime_default = _datetime_setting
+    return datetime_default
