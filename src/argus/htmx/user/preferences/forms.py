@@ -1,8 +1,12 @@
+import copy
 import logging
-from typing import Any, Optional
+from typing import Any, Optional, Dict
 
 from django import forms
 from django.middleware import csrf
+from django.template.loader import render_to_string
+from django.utils.safestring import mark_safe
+from django.utils.timezone import now as tznow
 
 from argus.auth.models import PreferenceField
 from argus.auth.utils import get_preference
@@ -22,6 +26,28 @@ from argus.htmx.incident.columns import get_default_column_layout_name, get_colu
 LOG = logging.getLogger(__name__)
 
 
+class PreviewRadioSelect(forms.RadioSelect):
+    option_template_name: str = "htmx/user/radio_option.html"
+
+    def __init__(self, attrs=None, choices=(), previews=None):
+        super().__init__(attrs)
+        self.choices = choices
+        self.previews = previews or dict()
+
+    def __deepcopy__(self, memo):
+        obj = copy.copy(self)
+        obj.attrs = self.attrs.copy()
+        obj.choices = copy.copy(self.choices)
+        obj.previews = copy.deepcopy(self.previews)
+        memo[id(self)] = obj
+        return obj
+
+    def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
+        option = super().create_option(name, value, label, selected, index, subindex, attrs)
+        option["preview"] = self.previews.get(value, "")
+        return option
+
+
 class ClassicPreferenceFormMixin:
     def __init__(self, *args, **kwargs):
         """Configure field Form
@@ -37,12 +63,13 @@ class SimplePreferenceForm(forms.Form):
     choices: list
     default: Any
     label: str
-    widget = forms.RadioSelect
+    widget = PreviewRadioSelect
     template_name: str = "htmx/user/preference_field_form.html"
     widget_option_template_name: str = "htmx/user/radio_option.html"
     partial_response_template: Optional[str] = None
     widget_template_name: Optional[str] = None
     empty_message: Optional[str] = None
+    preview_template_name = "htmx/user/_preference_choice_nopreview.html"
 
     def __init__(self, *args, **kwargs):
         """Configure field Form
@@ -68,15 +95,28 @@ class SimplePreferenceForm(forms.Form):
         self.field = self.fields[self.fieldname]
         self.fields[self.fieldname].choices = self.choices
 
-        if self.widget_template_name:
-            self.widget.template_name = self.widget_template_name
-        self.widget.option_template_name = self.widget_option_template_name
-
         widget = self.widget(
             attrs={"csrf_token": self.csrf_token},
             choices=self.choices,
+            previews=self.get_all_previews(),
         )
         self.fields[self.fieldname].widget = widget
+
+    def get_preview_context(self, choice: str) -> Dict[str, Any]:
+        return {}
+
+    def get_preview(self, choice: str) -> str:
+        context = self.get_preview_context(choice)
+        if not context:
+            return ""
+        preview = render_to_string(self.preview_template_name, context)
+        return mark_safe(preview)
+
+    def get_all_previews(self):
+        previews = {}
+        for choice, _ in self.choices:
+            previews[choice] = self.get_preview(choice)
+        return previews
 
     @classmethod
     def get_preference(cls, request):
@@ -117,6 +157,8 @@ class SimplePreferenceForm(forms.Form):
 class DateTimeFormatForm(SimplePreferenceForm):
     label = "Date format"
     empty_message = "No datetime formats configured"
+    preview_template_name = "htmx/user/_preference_choice_preview_datetime.html"
+    empty_message = "No datetime formats configured!?"
 
     datetime_format_name = forms.ChoiceField(required=False)
 
@@ -130,6 +172,15 @@ class DateTimeFormatForm(SimplePreferenceForm):
     def get_default(cls):
         cls.default = get_datetime_format_default()
         return cls.default
+
+    @classmethod
+    def get_preview_context(cls, choice: str) -> Dict[str, Any]:
+        format = DATETIME_FORMATS.get(choice, None)
+        context = {
+            "timestamp": tznow(),
+            "format": format,
+        }
+        return context
 
 
 class IncidentsTableLayout(SimplePreferenceForm):
