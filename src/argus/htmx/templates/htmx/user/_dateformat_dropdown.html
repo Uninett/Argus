@@ -4,12 +4,12 @@
     <span class="badge badge-primary">{{ preferences.argus_htmx.datetime_format_name }}</span>
   </summary>
   <ul class="max-h-64 overflow-y-scroll">
-    {% for item in preferences_choices.argus_htmx.datetime_format_name %}
+    {% for key, name in preferences_choices.argus_htmx.datetime_format_name %}
       <li>
         <input type="radio"
                class="btn btn-sm btn-block btn-ghost justify-start"
-               value="{{ item }}"
-               aria-label="{{ item }}"
+               value="{{ key }}"
+               aria-label="{{ name }}"
                name="datetime_format_name"
                autocomplete="off"
                hx-post="{% url 'htmx:update-preferences' namespace='argus_htmx' %}"
