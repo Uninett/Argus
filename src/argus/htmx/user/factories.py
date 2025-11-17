@@ -8,6 +8,6 @@ class ArgusHtmxPreferencesFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = ArgusHtmxPreferences
 
-    user = PersonUserFactory()
+    user = factory.Subfactory(PersonUserFactory)
     namespace = "argus_htmx"
     preferences = dict()
