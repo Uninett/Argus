@@ -7,7 +7,6 @@ if TYPE_CHECKING:
     from collections.abc import Iterable
 
     from types import NoneType
-    from typing import Union
 
     from django.contrib.auth import get_user_model
     from django.db.models.query import QuerySet
@@ -116,7 +115,7 @@ class NotificationMedium(ABC):
             )
 
     @staticmethod
-    def update(destination: DestinationConfig, validated_data: dict) -> Union[DestinationConfig, NoneType]:
+    def update(destination: DestinationConfig, validated_data: dict) -> DestinationConfig | NoneType:
         """
         Updates a destination in case the normal update function is not
         sufficient and returns the updated destination in that case,

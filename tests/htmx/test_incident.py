@@ -46,7 +46,7 @@ class TestRegularColumn(test.TestCase):
         self.response = incident_list(request)
 
     def test_doesnt_add_filter_button_to_header(self):
-        self.assertNotContains(self.response, '_="on click toggle .hidden on next .column-filter"')
+        self.assertNotContains(self.response, "filter-btn")
 
     def test_add_filter_to_filterbox(self):
         self.assertContains(self.response, '<span class="label-text">Description</span>')
@@ -72,7 +72,7 @@ class TestFilterableColumn(test.TestCase):
         self.response = incident_list(request)
 
     def test_adds_filter_button_to_header(self):
-        self.assertContains(self.response, '_="on click toggle .hidden on next .column-filter"')
+        self.assertContains(self.response, "filter-btn")
 
     def test_doesnt_add_filter_to_filterbox(self):
         self.assertNotContains(self.response, '<span class="label-text">Description</span>')
