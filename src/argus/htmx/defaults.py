@@ -1,7 +1,7 @@
 # customize the displayed columns in the incident table
 # items in INCIDENT_TABLE_COLUMNS can be either a `str` referring to a key in
-# argus.htmx.incident.customization.BUILTIN_COLUMNS or an instance of
-# argus.htmx.incident.customization.IncidentTableColumn
+# argus.htmx.incident.columns.BUILTIN_COLUMNS or an instance of
+# argus.htmx.incident.columns.IncidentTableColumn
 from argus.site.settings import get_json_env, get_str_env
 
 

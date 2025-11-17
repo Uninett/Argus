@@ -5,16 +5,23 @@ Currently customizable UI elements:
 - table columns: configure what columns to show in the incidents listing
 """
 
+import logging
 from dataclasses import dataclass
 from typing import Optional
 
 from django.conf import settings
 
-from argus.htmx import defaults as argus_htmx_settings
+from argus.htmx.defaults import INCIDENT_TABLE_COLUMNS as BUILTIN_INCIDENT_TABLE_COLUMNS
+
+
+LOG = logging.getLogger(__name__)
 
 # for editor typeahead
 CELL_WRAPPER_TEMPLATE_DEFAULT = "htmx/incident/_incident_table_cell_wrapper_default.html"
 CELL_WRAPPER_TEMPLATE_LINK_TO_DETAILS = "htmx/incident/_incident_table_cell_wrapper_link_to_details.html"
+
+_BUILTIN_COLUMN_LAYOUT_NAME = "built-in"
+_DEFAULT_COLUMN_LAYOUT_NAME = "default"
 
 
 @dataclass
@@ -145,12 +152,90 @@ _BUILTIN_COLUMN_LIST = [
 BUILTIN_COLUMNS = {col.name: col for col in _BUILTIN_COLUMN_LIST}
 
 
-def get_incident_table_columns() -> list[IncidentTableColumn]:
-    columns = getattr(settings, "INCIDENT_TABLE_COLUMNS", argus_htmx_settings.INCIDENT_TABLE_COLUMNS)
+def get_builtin_column_layout():
+    "Return the column layout defined in `argus.htmx.defaults`"
+
+    return _BUILTIN_COLUMN_LAYOUT_NAME, BUILTIN_INCIDENT_TABLE_COLUMNS
+
+
+def get_default_column_layout():
+    """Return the column layout defined in the setting INCIDENT_TABLE_COLUMNS
+
+    This is to support existing installations of Argus without change and may
+    be removed in the future.
+    """
+    column_setting = getattr(settings, "INCIDENT_TABLE_COLUMNS", [])
+    LOG.debug("Getting INCIDENT_TABLE_COLUMNS: column_setting: %s", column_setting)
+    return _DEFAULT_COLUMN_LAYOUT_NAME, column_setting
+
+
+def get_configured_column_layouts():
+    """Return the column layout defined in the setting INCIDENT_TABLE_COLUMN_LAYOUTS
+
+    This is the current best way to define columns and supports more than one
+    layout. Layouts defined here can replace the layouts defined in
+    argus.htmx.defaults and INCIDENT_TABLE_COLUMNS.
+    """
+    column_settings = getattr(settings, "INCIDENT_TABLE_COLUMN_LAYOUTS", {})
+    LOG.debug("Getting INCIDENT_TABLE_COLUMN_LAYOUTS: column_setting: %s", column_settings)
+    return column_settings
+
+
+def get_available_column_layouts():
+    "Combine all found column layouts into a single collection"
+
+    builtin, builtin_columns = get_builtin_column_layout()
+    layouts = {builtin: builtin_columns}
+
+    default, default_columns = get_default_column_layout()
+    if default_columns:
+        layouts[default] = default_columns
+
+    configured_layouts = get_configured_column_layouts()
+    if configured_layouts:
+        layouts.update(configured_layouts)
+
+    LOG.debug("Available column layouts: %s", layouts)
+    return layouts
+
+
+def get_column_choices():
+    "Make found column layouts compatible with form.Field ``choices`` attribute"
+
+    _columns = get_available_column_layouts().keys()
+    columns = [(column_name, column_name.title()) for column_name in _columns]
+    return columns
+
+
+def get_incident_table_columns(name: str = _BUILTIN_COLUMN_LAYOUT_NAME) -> list[IncidentTableColumn]:
+    """Return the named incident column layout
+
+    Falls back to the built-in layout if the name is unknown."""
+
+    LOG.debug("Getting layouts: get_incident_table_columns")
+    layouts = get_available_column_layouts()
+    if name not in layouts:
+        name = _BUILTIN_COLUMN_LAYOUT_NAME
+    columns = layouts[name]
     return [_resolve_column(col) for col in columns]
 
 
+def get_default_column_layout_name():
+    """Get the fallback for the column preference
+
+    If a layout named "default" is found in the layouts, use that as the
+    fallback, otherwise fall back to the built-in layout."""
+
+    LOG.debug("Getting layouts: get_default_column_layout_name")
+    layouts = get_available_column_layouts()
+    if _DEFAULT_COLUMN_LAYOUT_NAME in layouts.keys():
+        return _DEFAULT_COLUMN_LAYOUT_NAME
+    return _BUILTIN_COLUMN_LAYOUT_NAME
+
+
 def _resolve_column(col: str | IncidentTableColumn):
+    "Translate named columns to IncidentTableColumn instances"
+
     if isinstance(col, str):
         try:
             col = BUILTIN_COLUMNS[col]

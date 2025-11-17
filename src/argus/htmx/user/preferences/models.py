@@ -13,6 +13,7 @@ from argus.htmx.constants import (
     UPDATE_INTERVAL_DEFAULT,
     UPDATE_INTERVAL_CHOICES,
 )
+from argus.htmx.incident.columns import get_column_choices, get_default_column_layout_name
 from argus.htmx.incident.utils import update_interval_string
 
 
@@ -74,10 +75,28 @@ class DateTimeFormatForm(SimplePreferenceForm):
 
 
 class IncidentsTableLayout(SimplePreferenceForm):
+    "Preference for compactness of layout"
+
     choices = INCIDENTS_TABLE_LAYOUT_CHOICES
     default = INCIDENTS_TABLE_LAYOUT_DEFAULT
 
     incidents_table_layout = forms.ChoiceField(required=False)
+
+
+class IncidentsTableColumnForm(SimplePreferenceForm):
+    "Preference for named column layout"
+
+    incidents_table_column_name = forms.ChoiceField(required=False)
+
+    @classmethod
+    def get_choices(cls):
+        cls.choices = get_column_choices()
+        return cls.choices
+
+    @classmethod
+    def get_default(cls):
+        cls.default = get_default_column_layout_name()
+        return cls.default
 
 
 class PageSizeForm(SimplePreferenceForm):
@@ -120,6 +139,7 @@ class ArgusHtmxPreferences:
         "theme": ThemeForm.get_preference_field(),
         "update_interval": UpdateIntervalForm.get_preference_field(),
         "incidents_table_layout": IncidentsTableLayout.get_preference_field(),
+        "incidents_table_column_name": IncidentsTableColumnForm.get_preference_field(),
     }
 
     def update_context(self, context):
