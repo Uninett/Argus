@@ -24,7 +24,7 @@ from argus.util.datetime_utils import make_aware
 
 from ..request import HtmxHttpRequest
 
-from .customization import get_incident_table_columns
+from .columns import get_incident_table_columns
 from .utils import get_filter_function
 from .forms.incident_filters import IncidentListForm
 from .forms.incident_actions import AckForm, DescriptionOptionalForm, EditTicketUrlForm, AddTicketUrlForm
@@ -244,7 +244,10 @@ def incident_list(request: HtmxHttpRequest) -> HttpResponse:
     LOG.debug("GET at start: %s", request.GET)
     request.GET = dedupe_querydict(request.GET)
     LOG.debug("after dedupe: %s", request.GET)
-    columns = get_incident_table_columns()
+
+    preferences = request.user.get_preferences_context()
+    column_layout_name = preferences["argus_htmx"]["incidents_table_column_name"]
+    columns = get_incident_table_columns(column_layout_name)
 
     # Load incidents
     qs = prefetch_incident_daughters().order_by("-start_time")

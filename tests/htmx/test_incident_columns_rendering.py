@@ -2,8 +2,9 @@ from django import forms, test
 from django.test.client import RequestFactory
 from argus.auth.factories import PersonUserFactory
 from argus.filter.queryset_filters import QuerySetFilter
-from argus.htmx.incident.customization import IncidentTableColumn
+from argus.htmx.incident.columns import IncidentTableColumn
 from argus.htmx.incident.views import incident_list
+from argus.htmx.user.factories import ArgusHtmxPreferencesFactory
 
 
 class IncidentRegularFilterForm(forms.Form):
@@ -43,6 +44,9 @@ class TestRegularColumn(test.TestCase):
         request.session = {}
         request.user = PersonUserFactory()
         request.htmx = False
+        preferences = ArgusHtmxPreferencesFactory(user=request.user)
+        preferences.preferences["incidents_table_column_name"] = "default"
+        preferences.save()
         self.response = incident_list(request)
 
     def test_doesnt_add_filter_button_to_header(self):
@@ -56,7 +60,7 @@ class TestRegularColumn(test.TestCase):
     ARGUS_HTMX_FILTER_FUNCTION=incident_list_filter_factory(IncidentColumnFilterForm),
     INCIDENT_TABLE_COLUMNS=[
         IncidentTableColumn(
-            "description",
+            "search_description",
             label="Description",
             cell_template="htmx/incidents/_incident_description.html",
             filter_field="description",
@@ -69,6 +73,9 @@ class TestFilterableColumn(test.TestCase):
         request.session = {}
         request.user = PersonUserFactory()
         request.htmx = False
+        preferences = ArgusHtmxPreferencesFactory(user=request.user)
+        preferences.preferences["incidents_table_column_name"] = "default"
+        preferences.save()
         self.response = incident_list(request)
 
     def test_adds_filter_button_to_header(self):
