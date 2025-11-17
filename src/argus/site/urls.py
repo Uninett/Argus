@@ -32,7 +32,7 @@ api_v1_gone = partial(api_gone, message="API v1 has been removed")
 
 urlpatterns = [
     path("favicon.ico", RedirectView.as_view(url="/static/favicon.svg", permanent=True)),
-    path(".error/", error),
+    path(".error/", error, name="error"),
     path("admin/", admin.site.urls),
     path("api/schema/", SpectacularAPIView.as_view(api_version="v2"), name="schema-v2"),
     path("api/schema/swagger-ui/", SpectacularSwaggerView.as_view(url_name="schema-v2"), name="swagger-ui-v2"),
