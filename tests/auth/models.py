@@ -1,9 +1,10 @@
 from django import forms
 
 from argus.auth.models import PreferenceField, preferences
+from argus.htmx.user.preferences.forms import ClassicPreferenceFormMixin
 
 
-class MagicNumberForm(forms.Form):
+class MagicNumberForm(ClassicPreferenceFormMixin, forms.Form):
     magic_number = forms.IntegerField()
 
 

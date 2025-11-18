@@ -1,0 +1,14 @@
+<!-- htmx/user/preferences_list.html -->
+{% extends "htmx/base.html" %}
+{% block main %}
+  <div class="p-4 space-y-4">
+    <h1 class="text-3xl">{{ page_title }}</h1>
+    <section id="user-settings" class="card">
+      <ul class="menu card-body">
+        {% block preferences %}
+          {% for form in forms.values %}{{ form }}{% endfor %}
+        {% endblock preferences %}
+      </ul>
+    </section>
+  </div>
+{% endblock main %}

@@ -83,7 +83,7 @@ an extensive list, but can provide entry points or inspiration:
   ``hx-swap-oob`` content, to a incident list htmx partial response
 * ``htmx/user/_user_menu.html``: add or remove items to the user menu (the menu that appears when
   clicking on the user's initials in the top right)
-* ``htmx/user/preferences.html``: add custom preferences to the preferences page
+* ``htmx/user/preferences_list.html``: add custom preferences to the preferences page
 * ``registration/login.html``: show additional information to a user prior to logging in, such as
   a link to a privacy policy or other terms
 
