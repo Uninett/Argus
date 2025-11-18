@@ -86,6 +86,7 @@ class SimplePreferenceForm(forms.Form):
         self.fieldname = self.get_fieldname()
         self.preference = self.get_preference(request)
         self.initial = {self.fieldname: self.preference}
+        self.previews = self.get_all_previews()
         if not self.choices:
             LOG.error("Preference choices for %s is malconfigured!", self.fieldname)
 
@@ -98,7 +99,7 @@ class SimplePreferenceForm(forms.Form):
         widget = self.widget(
             attrs={"csrf_token": self.csrf_token},
             choices=self.choices,
-            previews=self.get_all_previews(),
+            previews=self.previews,
         )
         if self.widget_template_name:
             widget.template_name = self.widget_template_name
