@@ -4417,15 +4417,14 @@ details.collapse summary::-webkit-details-marker {
    */
 
 .loading-box {
-  display: grid;
-  place-items: center;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0%;
+  min-height: 0;
 }
 
-/* Stacks direct children on top of each other */
-
 .loading-box > * {
-  grid-column-start: 1;
-  grid-row-start: 1;
+  flex-shrink: 0;
 }
 
 /* Adds overlay */
@@ -5099,6 +5098,14 @@ details.collapse summary::-webkit-details-marker {
   position: sticky;
 }
 
+.bottom-0 {
+  bottom: 0px;
+}
+
+.left-1\/2 {
+  left: 50%;
+}
+
 .left-\[max\(-7rem\2c calc\(50\%-52rem\)\)\] {
   left: max(-7rem,calc(50% - 52rem));
 }
@@ -5265,6 +5272,10 @@ details.collapse summary::-webkit-details-marker {
   height: fit-content;
 }
 
+.h-screen {
+  height: 100vh;
+}
+
 .max-h-16 {
   max-height: 4rem;
 }
@@ -5279,6 +5290,10 @@ details.collapse summary::-webkit-details-marker {
 
 .max-h-svh {
   max-height: 100svh;
+}
+
+.min-h-0 {
+  min-height: 0px;
 }
 
 .min-h-4 {

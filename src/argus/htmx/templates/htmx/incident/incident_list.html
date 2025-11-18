@@ -10,10 +10,10 @@
       {% include "htmx/incident/_incident_list_menubar.html" %}
     {% endif %}
   </section>
-  <section id="incident-list" class="loading-box overflow-x-auto">
+  <section id="incident-list" class="loading-box overflow-x-auto relative">
     {% block table %}
       {% include "htmx/incident/_incident_table.html" %}
     {% endblock table %}
-    <div class="htmx-indicator loading loading-spinner loading-lg text-primary"></div>
+    <div class="htmx-indicator loading loading-spinner loading-lg text-primary absolute top-1/2 left-1/2"></div>
   </section>
 {% endblock main %}
