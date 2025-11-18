@@ -1,10 +1,10 @@
 from django.http import Http404
-from django.test import TestCase, RequestFactory
+from django.test import RequestFactory, TestCase
 from django.urls import reverse
-from argus.auth.factories import PersonUserFactory
 
 from rest_framework import status
 
+from argus.auth.factories import PersonUserFactory
 from argus.site.views import error
 
 
@@ -20,27 +20,26 @@ class TestErrorView(TestCase):
         self.user = PersonUserFactory()
         self.factory = RequestFactory()
 
-    def test_error_view_bad_requests(self):
-        # No status code provided
+    def test_error_view_no_code_returns_bad_request(self):
         request = self.factory.get(reverse("error"))
         request.user = self.user
         response = error(request)
         self.assertEqual(response.status_code, 400)
 
-        # Status code is not a valid int
+    def test_error_view_invalid_input_returns_bad_request(self):
         request = self.factory.get(reverse("error"), {"status-code": "not-a-number"})
         request.user = self.user
         response = error(request)
         self.assertEqual(response.status_code, 400)
 
-        # Status code not supported
+    def test_error_view_unsupported_code_returns_bad_request(self):
         request = self.factory.get(reverse("error"), {"status-code": "666"})
         request.user = self.user
         response = error(request)
         self.assertEqual(response.status_code, 400)
 
     def test_error_view_valid_status_codes(self):
-        status_codes = [400, 403, 410]
+        status_codes = [400, 401, 403, 410]
 
         for status_code in status_codes:
             with self.subTest(status_code=status_code):

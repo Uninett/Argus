@@ -49,22 +49,19 @@ api_gone.login_required = False
 # fmt: off
 @require_GET
 def error(request):
-    error_codes = [400, 403, 404, 410, 500]
+    error_codes = [400, 401, 403, 404, 410, 500]
     errors = ", ".join(map(str, error_codes))
-    status_code = request.GET.get("status-code", None)
+    status_code = (request.GET.get("status-code", None))
     if status_code is None:
         errormsg = "No status code provided"
         LOG.error(errormsg)
         return HttpResponseBadRequest(errormsg)
-    try:
+
+    if str(status_code).isdigit():
         status_code = int(status_code)
-    except ValueError:
-        errormsg = f'Status code "{escape(status_code)}" is not an integer'
-        LOG.error(f"{status_code} {errormsg}")
-        return HttpResponseBadRequest(errormsg)
 
     if status_code not in error_codes:
-        errormsg = f'Status code "{escape(status_code)}" not in {errors}'
+        errormsg = f'Status code {escape(status_code)} not in {errors}'
         LOG.error(f"{status_code} {errormsg}")
         return HttpResponseBadRequest(errormsg)
 
