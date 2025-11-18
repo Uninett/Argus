@@ -3,7 +3,7 @@
 {% with field=form|get_form_field:fieldname %}
   <div>
     {{ column.label }}
-    <div class="dropdown dropdown-end">
+    <div id="{{ column.name }}-dropdown" class="dropdown">
       <button type="button"
               tabindex="0"
               class="filter-btn btn btn-xs {% if field.value %} btn-primary {% else %} btn-ghost text-primary {% endif %} min-h-4 h-4">
@@ -25,3 +25,16 @@
     </div>
   </div>
 {% endwith %}
+<script>
+document.querySelector('#{{ column.name }}-dropdown .filter-btn').addEventListener('focus', function() {
+  const dropdown = this.closest('.dropdown');
+  const content = dropdown.querySelector('.dropdown-content');
+  const rect = content.getBoundingClientRect();
+
+  if (rect.right > window.innerWidth) {
+    dropdown.classList.add('dropdown-end');
+  } else if (rect.left < 0) {
+    dropdown.classList.remove('dropdown-end');
+  }
+});
+</script>
