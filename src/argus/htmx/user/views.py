@@ -6,15 +6,21 @@ from django_htmx.http import HttpResponseClientRefresh
 
 from argus.auth.utils import get_preference_obj, save_preferences
 from argus.htmx.incident.views import HtmxHttpRequest
+from argus.htmx.user.preferences.utils import setup_preference_forms
 
 
 @require_GET
 def user_preferences(request) -> HttpResponse:
     """Renders the main preferences page for a user"""
+
+    forms = setup_preference_forms(request)
+
     context = {
         "page_title": "User preferences",
+        "forms": forms,
     }
-    return render(request, "htmx/user/preferences.html", context=context)
+
+    return render(request, "htmx/user/preferences_list.html", context=context)
 
 
 @require_POST

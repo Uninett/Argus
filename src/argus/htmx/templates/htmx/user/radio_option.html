@@ -1,0 +1,10 @@
+<!-- htmx/user/radio_option.html -->
+<input type="radio"
+       class="btn btn-sm btn-block btn-ghost justify-start"
+       {% if widget.value != None %}value="{{ widget.value|stringformat:'s' }}"{% endif %}
+       aria-label="{{ widget.label }}"
+       name="{{ widget.name }}"
+       autocomplete="off"
+       hx-post="{% url 'htmx:update-preferences' namespace='argus_htmx' %}"
+       hx-trigger="change"
+       hx-headers='{"X-CSRFToken": "{{ widget.attrs.csrf_token }}"}' />

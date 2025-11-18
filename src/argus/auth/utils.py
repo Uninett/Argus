@@ -98,7 +98,7 @@ def _save_preference(request: HttpRequest, prefs: Preferences, preference: str, 
         LOG.debug("Failed to change %s, not in input: %s", preference, data)
         return value, False
 
-    form = prefs.get_forms()[preference](data)
+    form = prefs.get_forms()[preference](data, request=request)
 
     if not form.is_valid():
         messages.warning(request, f"Failed to change {preference}, invalid input")
