@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     "argus.filter",
     "argus.notificationprofile",
     "argus.dev",
+    "argus.plannedmaintenance",
 ]
 
 MEDIA_PLUGINS = []
