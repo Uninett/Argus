@@ -65,7 +65,7 @@ class SimplePreferenceForm(forms.Form):
     label: str
     widget = PreviewRadioSelect
     template_name: str = "htmx/user/preference_field_form.html"
-    widget_option_template_name: str = "htmx/user/radio_option.html"
+    widget_option_template_name: Optional[str] = None
     partial_response_template: Optional[str] = None
     widget_template_name: Optional[str] = None
     empty_message: Optional[str] = None
@@ -100,6 +100,10 @@ class SimplePreferenceForm(forms.Form):
             choices=self.choices,
             previews=self.get_all_previews(),
         )
+        if self.widget_template_name:
+            widget.template_name = self.widget_template_name
+        if self.widget_option_template_name:
+            widget.option_template_name = self.widget_option_template_name
         self.fields[self.fieldname].widget = widget
 
     def get_preview_context(self, choice: str) -> Dict[str, Any]:
