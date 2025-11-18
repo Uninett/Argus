@@ -269,7 +269,12 @@ source
 start_time
     :From: start_time
     :Name: start_time
-    :Description: When the incident started.
+    :Description: When the incident started, fixed width.
+
+narrow_start_time
+    :From: start_time
+    :Name: start_time
+    :Description: When the incident started, width depends on date format.
 
 ticket
     :From: ticket_url

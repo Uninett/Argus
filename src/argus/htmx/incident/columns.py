@@ -77,6 +77,12 @@ _BUILTIN_COLUMN_LIST = [
         detail_link=True,
     ),
     IncidentTableColumn(
+        "narrow_start_time",
+        "Timestamp",
+        "htmx/incident/cells/_incident_start_time.html",
+        detail_link=True,
+    ),
+    IncidentTableColumn(
         "status",
         "Status",
         "htmx/incident/cells/_incident_status.html",
