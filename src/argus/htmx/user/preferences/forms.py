@@ -116,7 +116,7 @@ class SimplePreferenceForm(forms.Form):
 
 class DateTimeFormatForm(SimplePreferenceForm):
     label = "Date format"
-    empty_message = "No datetime formats configured!?"
+    empty_message = "No datetime formats configured"
 
     datetime_format_name = forms.ChoiceField(required=False)
 

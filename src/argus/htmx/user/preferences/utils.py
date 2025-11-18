@@ -1,9 +1,7 @@
-from typing import Dict
-
 from .forms import SimplePreferenceForm
 
 
-def setup_preference_forms(request) -> Dict[str, SimplePreferenceForm]:
+def setup_preference_forms(request) -> dict[str, SimplePreferenceForm]:
     "Prepare the preference forms for rendering"
 
     forms = {}
