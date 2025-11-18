@@ -7,7 +7,7 @@ from django.contrib.auth import get_user_model
 from django.db.utils import ProgrammingError
 
 from argus.notificationprofile.media import send_notifications_to_users
-from argus.notificationprofile.media import background_send_notification
+from argus.notificationprofile.tasks import task_check_for_notifications
 from argus.plannedmaintenance.utils import event_covered_by_planned_maintenance
 
 from .models import DestinationConfig, TimeRecurrence, Timeslot
@@ -124,4 +124,4 @@ def task_send_notification(sender, instance: Event, *args, **kwargs):
 def task_background_send_notification(sender, instance: Event, *args, **kwargs):
     if event_covered_by_planned_maintenance(event=instance):
         return
-    send_notifications_to_users(instance, send=background_send_notification)
+    task_check_for_notifications.enqueue(instance.id)
