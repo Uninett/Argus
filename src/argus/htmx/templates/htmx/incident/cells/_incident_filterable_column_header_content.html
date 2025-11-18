@@ -11,8 +11,9 @@
       </button>
       <div class="dropdown-content bg-base-100 p-2 mt-1 rounded-lg shadow border border-primary z-10"
            tabindex="-1">
-        <form class="flex gap-2"
+        <form class="flex gap-2 incident-list-param"
               hx-get="{% url 'htmx:incident-list' %}"
+              hx-include=".incident-list-param"
               hx-target="#table"
               hx-swap="outerHTML"
               hx-push-url="true"
