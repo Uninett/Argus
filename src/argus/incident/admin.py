@@ -80,6 +80,7 @@ class TagAdmin(TextWidgetsOverrideModelAdmin):
     list_display = ("get_str",)
     search_fields = ("key", "value")
     ordering = [Concat("key", "value")]
+    list_filter = ("key",)
 
     text_input_form_fields = ("key", "value")
 
