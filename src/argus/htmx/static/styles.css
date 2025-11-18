@@ -4436,6 +4436,11 @@ details.collapse summary::-webkit-details-marker {
   margin-bottom: 1rem;
 }
 
+.my-3 {
+  margin-top: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
 .-ml-2 {
   margin-left: -0.5rem;
 }
@@ -4541,6 +4546,10 @@ details.collapse summary::-webkit-details-marker {
 .h-fit {
   height: -moz-fit-content;
   height: fit-content;
+}
+
+.h-screen {
+  height: 100vh;
 }
 
 .max-h-16 {
@@ -4928,6 +4937,11 @@ details.collapse summary::-webkit-details-marker {
   border-color: rgb(0 0 255 / var(--tw-border-opacity, 1));
 }
 
+.border-base-200 {
+  --tw-border-opacity: 1;
+  border-color: var(--fallback-b2,oklch(var(--b2)/var(--tw-border-opacity, 1)));
+}
+
 .border-opacity-100 {
   --tw-border-opacity: 1;
 }
@@ -4993,6 +5007,20 @@ details.collapse summary::-webkit-details-marker {
 
 .bg-transparent {
   background-color: transparent;
+}
+
+.bg-white {
+  --tw-bg-opacity: 1;
+  background-color: rgb(255 255 255 / var(--tw-bg-opacity, 1));
+}
+
+.bg-base-300 {
+  --tw-bg-opacity: 1;
+  background-color: var(--fallback-b3,oklch(var(--b3)/var(--tw-bg-opacity, 1)));
+}
+
+.bg-base-200\/60 {
+  background-color: var(--fallback-b2,oklch(var(--b2)/0.6));
 }
 
 .bg-gradient-to-r {
