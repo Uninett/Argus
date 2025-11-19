@@ -212,6 +212,36 @@ A common value in development would be::
 
   DATABASE_URL=postgresql://argus_user:superSecretPassword@localhost:5432/argus_db
 
+Task queue settings
+-------------------
+
+.. setting:: TASKS
+
+* By default, :setting:`TASKS` is set to::
+
+     TASKS = {
+         "default": {
+             "BACKEND": "django_tasks_db.DatabaseBackend",
+         }
+     }
+
+This uses the new database backed queue, and you will need to run a database
+worker, see the production :ref:`task_queue` documentation.
+
+Bypass the use of the database backed queue by changing to::
+
+   TASKS = {
+       "default": {
+           "BACKEND": "django_tasks.backends.immediate.ImmediateBackend",
+       }
+   }
+
+This is currently relevant if :setting:`SEND_NOTIFICATIONS` is set to False, or
+during development.
+
+You will not need to run a worker for this, but as there are features planned
+that depend on a task queue, please try to stick to the default.
+
 Incident settings
 -----------------
 
