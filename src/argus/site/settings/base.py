@@ -43,6 +43,7 @@ INSTALLED_APPS = [
 
     # 3rd party apps
     "django_tasks",
+    "django_tasks.backends.database",
     "corsheaders",
     "social_django",
     "rest_framework",
@@ -248,7 +249,7 @@ SEND_NOTIFICATIONS = get_bool_env("ARGUS_SEND_NOTIFICATIONS", default=False)
 
 TASKS = {
     "default": {
-        "BACKEND": "django_tasks.backends.immediate.ImmediateBackend",
+        "BACKEND": "django_tasks.backends.database.DatabaseBackend",
     }
 }
 
