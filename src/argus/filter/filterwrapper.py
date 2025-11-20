@@ -32,6 +32,7 @@ class FilterKey(StrEnum):
     ACKED = "acked"
     STATEFUL = "stateful"
     SOURCE_SYSTEM_IDS = "sourceSystemIds"
+    SOURCE_SYSTEM_TYPES = "source_types"
     TAGS = "tags"
     EVENT_TYPES = "event_types"
     MAXLEVEL = "maxlevel"
@@ -39,7 +40,7 @@ class FilterKey(StrEnum):
 
 class FilterWrapper:
     TRINARY_FILTERS = (FilterKey.OPEN, FilterKey.ACKED, FilterKey.STATEFUL)
-    LIST_FILTERS = (FilterKey.SOURCE_SYSTEM_IDS, FilterKey.TAGS, FilterKey.EVENT_TYPES)
+    LIST_FILTERS = (FilterKey.SOURCE_SYSTEM_IDS, FilterKey.SOURCE_SYSTEM_TYPES, FilterKey.TAGS, FilterKey.EVENT_TYPES)
     INT_FILTERS = (FilterKey.MAXLEVEL,)
     FILTER_KEYS = TRINARY_FILTERS + LIST_FILTERS + INT_FILTERS
 
@@ -71,6 +72,12 @@ class FilterWrapper:
             return None
         return incident.source.id in filter_
 
+    def _incident_fits_source_system_type(self, incident: Incident) -> TriState:
+        filter_, ignored = self._get_filter_value_and_ignored_status(FilterKey.SOURCE_SYSTEM_TYPES)
+        if ignored:
+            return None
+        return incident.source.type.name in filter_
+
     def _incident_fits_tags(self, incident: Incident) -> TriState:
         filter_, ignored = self._get_filter_value_and_ignored_status(FilterKey.TAGS)
         if ignored:
@@ -100,6 +107,7 @@ class FilterWrapper:
             return False  # Filter is empty!
         checks = {}
         checks["source"] = self._incident_fits_source_system(incident)
+        checks["source_type"] = self._incident_fits_source_system_type(incident)
         checks["tags"] = self._incident_fits_tags(incident)
         checks["max_level"] = self._incident_fits_maxlevel(incident)
         for tristate in self.TRINARY_FILTERS:
