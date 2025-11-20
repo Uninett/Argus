@@ -23,6 +23,7 @@ class TestIncidentFilterForm(TestCase):
             "open": OpenStatus.OPEN,
             "acked": AckedStatus.ACKED,
             "sourceSystemIds": [source.id],
+            "source_types": [source.type.name],
             "tags": "tag1=value1, tag2=value2",
             "maxlevel": 1,
         }
@@ -44,6 +45,10 @@ class TestIncidentFilterForm(TestCase):
         assert len(filterblob["sourceSystemIds"]) == 1
         # sourceSystemIds seem to be represented as a list of strings sometimes
         assert int(filterblob["sourceSystemIds"][0]) == int(self.valid_field_values["sourceSystemIds"][0])
+
+    def test_if_form_is_valid_then_filterblob_should_contain_correct_sourcesystem_types_value(self):
+        filterblob = self.valid_form.to_filterblob()
+        assert len(filterblob["source_types"]) == 1
 
     def test_if_form_is_valid_then_filterblob_should_contain_correct_tags_value(self):
         filterblob = self.valid_form.to_filterblob()
