@@ -22,17 +22,13 @@ class RangeInput(forms.NumberInput):
 
 class IncidentFilterForm(forms.Form):
     open = forms.IntegerField(
-        widget=RangeInput(
-            attrs={"class": "range-primary", "step": "1", "min": min(OpenStatus).value, "max": max(OpenStatus).value}
-        ),
+        widget=RangeInput(attrs={"step": "1", "min": min(OpenStatus).value, "max": max(OpenStatus).value}),
         label="Open State",
         initial=OpenStatus.BOTH.value,
         required=False,
     )
     acked = forms.IntegerField(
-        widget=RangeInput(
-            attrs={"class": "range-primary", "step": "1", "min": min(AckedStatus).value, "max": max(AckedStatus).value}
-        ),
+        widget=RangeInput(attrs={"step": "1", "min": min(AckedStatus).value, "max": max(AckedStatus).value}),
         label="Acked",
         initial=AckedStatus.BOTH.value,
         required=False,
@@ -57,9 +53,7 @@ class IncidentFilterForm(forms.Form):
         help_text='Press "Enter" after each completed tag',
     )
     maxlevel = forms.IntegerField(
-        widget=RangeInput(
-            attrs={"class": "range-primary", "step": "1", "min": min(Level).value, "max": max(Level).value}
-        ),
+        widget=RangeInput(attrs={"step": "1", "min": min(Level).value, "max": max(Level).value}),
         label="Level <=",
         initial=max(Level).value,
         required=False,
