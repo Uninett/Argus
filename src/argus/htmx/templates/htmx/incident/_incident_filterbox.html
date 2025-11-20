@@ -30,7 +30,7 @@
               <label class="cursor-pointer label">
                 <span class="label-text">{{ field.label }}</span>
                 <div class="pt-4">
-                  {{ field|add_class:"range range-primary range-xs" }}
+                  {{ field }}
                   <div class="flex w-full justify-between gap-2 text-xs">
                     <span>Open</span>
                     <span>Both</span>
@@ -42,7 +42,7 @@
               <label class="cursor-pointer label">
                 <span class="label-text">{{ field.label }}</span>
                 <div class="pt-4">
-                  {{ field|add_class:"range range-primary range-xs" }}
+                  {{ field }}
                   <div class="flex w-full justify-between gap-2 text-xs">
                     <span>Acked</span>
                     <span>Both</span>
@@ -50,24 +50,27 @@
                   </div>
                 </div>
               </label>
+            {% elif field.name == "maxlevel" %}
+              <label class="cursor-pointer label">
+                <span class="label-text">{{ field.label }}</span>
+                <div class="pt-4">
+                  {{ field }}
+                  <div class="flex w-full justify-around gap-2 text-xs">
+                    {% for tick in "12345" %}<span>{{ tick }}</span>{% endfor %}
+                  </div>
+                </div>
+              </label>
             {% else %}
               <label class="cursor-pointer label">
                 <span class="label-text">{{ field.label }}</span>
                 {% if field|field_type == "booleanfield" %}
-                  {{ field|add_class:"checkbox checkbox-primary" }}
-                {% elif field.name == "maxlevel" %}
-                  <div class="pt-4">
-                    {{ field|add_class:"range range-primary range-xs" }}
-                    <div class="flex w-full justify-around gap-2 text-xs">
-                      {% for tick in "12345" %}<span>{{ tick }}</span>{% endfor %}
-                    </div>
-                  </div>
-                {% elif field|field_type == "choicefield" %}
-                  {{ field|add_class:"select select-primary" }}
+                  {{ field|add_class:"checkbox-primary" }}
                 {% elif field|field_type == "multiplechoicefield" %}
-                  {{ field|attr:"size:1"|add_class:"select select-primary" }}
+                  {{ field|attr:"size:1"|add_class:"select-primary" }}
                 {% elif field|field_type == "charfield" %}
                   {{ field|add_class:"input input-primary input-bordered" }}
+                {% else %}
+                  {{ field }}
                 {% endif %}
               </label>
             {% endif %}
