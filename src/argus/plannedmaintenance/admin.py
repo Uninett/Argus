@@ -1,6 +1,9 @@
 import logging
 
 from django.contrib import admin
+from django.utils import timezone
+
+from argus.util.admin_utils import list_filter_factory
 
 from .models import PlannedMaintenanceTask
 
@@ -22,6 +25,15 @@ class PlannedMaintenanceTaskAdmin(admin.ModelAdmin):
         "owner__last_name",
         "owner__username",
     )
+    list_filter = [
+        ("owner", admin.RelatedOnlyFieldListFilter),
+        list_filter_factory(
+            "open",
+            lambda qs, yes_filter: qs.filter(end_time__gt=timezone.now())
+            if yes_filter
+            else qs.filter(end_time__lte=timezone.now()),
+        ),
+    ]
 
     list_select_related = ("owner",)
     raw_id_fields = ("owner",)
