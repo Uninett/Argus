@@ -8,6 +8,80 @@ This project uses [*towncrier*](https://towncrier.readthedocs.io/) and the chang
 
 <!-- towncrier release notes start -->
 
+## [2.3.0] - 2025-11-20
+
+This release has numerous improvements to the frontend. The various
+widgets on the incident list page now work better together, and where
+there are more than one to choose from the choices are now sorted
+alphabetically. No user preferences are left in the user menu. The
+preference page has had a slight rework though more is planned.
+
+The big new thing is the possibility to select more than one column
+layout. You can now choose a preferred layout on the user preferences
+page if any have been configured in addition to the standard one.
+A nice looking preview of each configured layout is planned for the
+next release.
+
+Due to the possibility of choosing between multiple column layouts,
+several new types of columns have been added. There's also a new
+section in the reference documentation explaining and naming all the
+built-in column types.
+
+See NOTES.md for how to convert an existing column layout to the new format.
+
+### Added
+
+- Sort list of filters in filter dropdown alphabetically
+  ([#1553](https://github.com/Uninett/Argus/issues/1553))
+- Sort list of sources in filter dropdown alphabetically
+  ([#1554](https://github.com/Uninett/Argus/issues/1554))
+- [#1576](https://github.com/Uninett/Argus/issues/1576)
+- Added and documented more searchable columns for the incident list:
+  `search_description`, `select_levels`, `has_ticket_url`,
+  `search_ticket_url`, and a way to mass-produce single-field forms to
+  add even more searchable columns and eventually systematize the
+  incident filter forms in the topmost box.
+- Make it possible to define more than one column layout, and make it
+  possible to switch between them via a user preference. Fixes #1581,
+  #1582.
+- Added the column `narrow_start_time`.
+
+### Changed
+
+- Remove user preferences from global header dropdown
+  ([#1567](https://github.com/Uninett/Argus/issues/1567))
+- Use DaisyUI dropdowns in searchable columns
+  ([#1574](https://github.com/Uninett/Argus/issues/1574))
+- Sort filter dropdowns for update / delete filter alphabetically
+  ([#1592](https://github.com/Uninett/Argus/issues/1592))
+- Add consistent title to notification config pages
+  ([#1606](https://github.com/Uninett/Argus/issues/1606))
+- Auto-align filterable column dropdown if it extends beyond the screen
+  ([#1607](https://github.com/Uninett/Argus/issues/1607))
+- Fixed several problems with filtering the incident list in the
+  frontend: the various widgets were stepping on each others toes.
+  Made much easier by turning all GET-abble filters into Django forms.
+- Improved documentation of how notificationprofiles with multiple
+  filters work, with changes to the user manual, new tests, and a help
+  text added to the field in question in the frontend.
+- Preferences are all now properly backed by forms, inheriting from
+  `SimplePreferenceForm` which is a perfect fit for preferences where
+  you choose one of several options. Using `PreferenceField` directly
+  will still work, but the form used now receives the request on
+  `__init__`. It is therefore necessary to upgrade the old forms by
+  either mixing in the `ClassicPreferenceFormMixin`, which will
+  discard the passed-in `request`, or writing your own `__init__` that
+  will prevent passing in the `request` via `super().__init__(*args,
+  **kwargs)`.
+- User preferences were refactored. This is to increase consistency,
+  cut down on copypasta, and eventually use Django forms on the user
+  preference page, but more importantly: Django settings are no longer
+  read on import. Turns out, preferences that depend on Django
+  settings *sometimes* read the settings too soon, before the
+  settings-file was complete, and therefore getting the wrong or no
+  setting.
+
+
 ## [2.2.2] - 2025-11-03
 
 ### Added

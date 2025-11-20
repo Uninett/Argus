@@ -3,6 +3,60 @@
 This file documents changes to Argus that are relevant for operations,
 customizers and end-users.
 
+## [2.3.0] - 2025-11-20
+
+This release has numerous improvements to the frontend. The various
+widgets on the incident list page now work better together, and where
+there are more than one to choose from the choices are now sorted
+alphabetically. No user preferences are left in the user menu. The
+preference page has had a slight rework though more is planned.
+
+The big new thing is the possibility to select more than one column
+layout. You can now choose a preferred layout on the user preferences
+page if any have been configured in addition to the standard one.
+A nice looking preview of each configured layout is planned for the
+next release.
+
+Due to the possibility of choosing between multiple column layouts,
+several new types of columns have been added. There's also a new
+section in the reference documentation explaining and naming all the
+built-in column types.
+
+As of this release, please convert the setting `INCIDENT_TABLE_COLUMNS` to the
+new `INCIDENT_TABLE_COLUMN_LAYOUTS` setting. Usage of `INCIDENT_TABLE_COLUMNS`
+is deprecated and support will eventually be removed.
+
+If your current `INCIDENT_TABLE_COLUMNS` looks like this:
+
+```
+INCIDENT_TABLE_COLUMNS = [
+    "row_select",
+    "combined_status",
+    "source",
+    "description",
+]
+```
+
+then the equivalent new setting looks like:
+
+```
+INCIDENT_TABLE_COLUMN_LAYOUTS = {
+    "default": [
+        "row_select",
+        "combined_status",
+        "source",
+        "description",
+    ]
+}
+```
+
+This will make it possible to select between two different layouts: "built-in"
+and "default". If you wish to hide the built-in layout, use the name
+"built-in" for one of the layouts in `INCIDENT_TABLE_COLUMN_LAYOUTS`.
+
+If you do not convert the setting, the layout defined in the old setting will
+be available as "default" together with the built-in layout as "built-in".
+
 ## [2.2.2] - 2025-11-03
 
 To aid in development there a live styleguide for the frontend on
