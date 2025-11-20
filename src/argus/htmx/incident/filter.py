@@ -8,7 +8,7 @@ from django.views.generic import ListView
 from argus.filter import get_filter_backend
 from argus.htmx.widgets import BadgeDropdownMultiSelect
 from argus.incident.constants import AckedStatus, Level, OpenStatus
-from argus.incident.models import SourceSystem, Tag
+from argus.incident.models import SourceSystem, SourceSystemType, Tag
 from argus.notificationprofile.models import Filter
 
 filter_backend = get_filter_backend()
@@ -32,6 +32,14 @@ class IncidentFilterForm(forms.Form):
         label="Acked",
         initial=AckedStatus.BOTH.value,
         required=False,
+    )
+    source_types = forms.MultipleChoiceField(
+        widget=BadgeDropdownMultiSelect(
+            attrs={"placeholder": "select source types..."},
+            partial_get=None,
+        ),
+        required=False,
+        label="Source Types",
     )
     sourceSystemIds = forms.MultipleChoiceField(
         widget=BadgeDropdownMultiSelect(
@@ -63,6 +71,7 @@ class IncidentFilterForm(forms.Form):
         "open": None,
         "acked": None,
         "sourceSystemIds": [],
+        "source_types": [],
         "tags": "",
         "maxlevel": max(Level).value,
     }
@@ -73,6 +82,10 @@ class IncidentFilterForm(forms.Form):
         self.fields["sourceSystemIds"].widget.partial_get = reverse("htmx:incident-filter")
         source_choices = SourceSystem.objects.order_by("name").values_list("id", "name")
         self.fields["sourceSystemIds"].choices = tuple(source_choices)
+
+        self.fields["source_types"].widget.partial_get = reverse("htmx:incident-filter")
+        source_type_choices = SourceSystemType.objects.order_by("name").values_list("name", "name")
+        self.fields["source_types"].choices = tuple(source_type_choices)
 
     def clean_tags(self):
         tags = self.cleaned_data["tags"]
@@ -124,6 +137,10 @@ class IncidentFilterForm(forms.Form):
         sourceSystemIds = self.cleaned_data.get("sourceSystemIds", [])
         if sourceSystemIds:
             filterblob["sourceSystemIds"] = sourceSystemIds
+
+        source_types = self.cleaned_data.get("source_types", [])
+        if source_types:
+            filterblob["source_types"] = source_types
 
         tags = self.cleaned_data.get("tags", [])
         if tags:
