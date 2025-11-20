@@ -169,6 +169,44 @@ class FallbackFilterWrapperIncidentFitsSourceSystemTests(unittest.TestCase):
 
 
 @tag("unittest")
+class FallbackFilterWrapperIncidentFitsSourceSystemTypeTests(unittest.TestCase):
+    # Validation is handled before the data gets to FallbackFilterWrapper
+
+    def test_incident_fits_source_system_type_is_None_if_not_mentioned_in_filter(self):
+        incident = Mock()
+        incident.source = True
+        empty_filter = FallbackFilterWrapper({})
+        result = empty_filter._incident_fits_source_system_type(incident)
+        self.assertIsNone(result)
+
+    def test_incident_fits_source_system_type_is_True_if_incident_source_system_type_is_the_same_as_filter_source_system_type(
+        self,
+    ):
+        incident = Mock()
+        source = Mock()
+        source_type = Mock()
+        source_type.name = "foo"
+        source.type = source_type
+        incident.source = source
+        filter = FallbackFilterWrapper({FilterKey.SOURCE_SYSTEM_TYPES: [source_type.name, "bar"]})
+        result = filter._incident_fits_source_system_type(incident)
+        self.assertTrue(result)
+
+    def test_incident_fits_source_system_type_is_False_if_incident_source_system_type_is_not_in_filter_source_system_type(
+        self,
+    ):
+        incident = Mock()
+        source = Mock()
+        source_type = Mock()
+        source_type.name = "foo"
+        source.type = source_type
+        incident.source = source
+        filter = FallbackFilterWrapper({FilterKey.SOURCE_SYSTEM_TYPES: ["bar"]})
+        result = filter._incident_fits_source_system_type(incident)
+        self.assertFalse(result)
+
+
+@tag("unittest")
 class FallbackFilterWrapperIncidentFitsTagsTests(unittest.TestCase):
     # Validation is handled before the data gets to FallbackFilterWrapper
 
