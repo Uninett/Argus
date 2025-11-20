@@ -1,10 +1,10 @@
+import json
 from unittest.mock import Mock
 
 from django.contrib.messages.middleware import MessageMiddleware
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.http import QueryDict
 from django.test import RequestFactory, TestCase
-import json
 
 from argus.auth.factories import PersonUserFactory
 from argus.filter.factories import FilterFactory
@@ -39,7 +39,6 @@ class TestIncidentFilterForm(TestCase):
 
     def test_if_form_is_valid_then_filterblob_should_contain_correct_acked_value(self):
         filterblob = self.valid_form.to_filterblob()
-        print("Filterblob")
         assert filterblob["acked"] is True
 
     def test_if_form_is_valid_then_filterblob_should_contain_correct_sourcesystemids_value(self):
