@@ -35,7 +35,6 @@ See NOTES.md for how to convert an existing column layout to the new format.
   ([#1553](https://github.com/Uninett/Argus/issues/1553))
 - Sort list of sources in filter dropdown alphabetically
   ([#1554](https://github.com/Uninett/Argus/issues/1554))
-- [#1576](https://github.com/Uninett/Argus/issues/1576)
 - Added and documented more searchable columns for the incident list:
   `search_description`, `select_levels`, `has_ticket_url`,
   `search_ticket_url`, and a way to mass-produce single-field forms to
