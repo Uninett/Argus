@@ -119,8 +119,9 @@ How to customize the look:
 Incident table column customization
 ===================================
 
-The :setting:`INCIDENT_TABLE_COLUMNS` setting controls which columns are shown
-in the incident table. This setting takes a list of ``str`` or
+The :setting:`INCIDENT_TABLE_COLUMN_LAYOUTS` setting controls which columns are
+shown in the incident table. This setting takes a dictionary where the key is
+the name of a layout and the value is a list of ``str`` or
 ``argus.htmx.incidents.customization.IncidentTableColumn`` instances. when
 given a ``str``, this key must be available in the
 ``argus.htmx.incidents.customization.BUILTIN_COLUMNS`` dictionary. For
@@ -128,17 +129,21 @@ example::
 
     from argus.htmx.incidents.customization import BUILTIN_COLUMNS, IncidentTableColumn
 
-    INCIDENT_TABLE_COLUMNS = [
-        "id",
-        "start_time",
-        BUILTIN_COLUMNS["description"], # equivalent to just "description"
-        IncidentTableColumn( # a new column definition
-            name="name",
-            label="Custom",
-            cell_template="/path/to/template.html",  # contents of cell
-        ),
+    INCIDENT_TABLE_COLUMN_LAYOUTS = {
+        "default": [
+            "id",
+            "start_time",
+            BUILTIN_COLUMNS["description"], # equivalent to just "description"
+            IncidentTableColumn( # a new column definition
+                name="name",
+                label="Custom",
+                cell_template="/path/to/template.html",  # contents of cell
+            ),
+        ]
+    }
 
-    ]
+The settings :setting:`INCIDENT_TABLE_COLUMNS` took a single list and is
+deprecated. If it exists it is interpreted as a layout named "default".
 
 
 .. py:class:: IncidentTableColumn

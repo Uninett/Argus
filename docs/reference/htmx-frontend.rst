@@ -172,28 +172,33 @@ a time), and the user can select a different page size from ``[10, 20, 50,
 :setting:`ARGUS_INCIDENTS_DEFAULT_PAGE_SIZE` (an integer) and
 :setting:`ARGUS_INCIDENTS_PAGE_SIZES` setting respectively.
 
+.. _table-column-reference:
+
 Table columns
 -------------
 
 Argus ships with more possible column types than what are configured by
 default.
 
-The columns to use are set with the :setting:`INCIDENT_TABLE_COLUMNS` setting.
+The columns to use are set with the :setting:`INCIDENT_TABLE_COLUMN_LAYOUTS`
+setting.
 
 This is the default for the setting as of this version of Argus:
 
 .. code-block:: python3
 
-   INCIDENT_TABLE_COLUMNS = [
-      "color_status",
-      "row_select",
-      "start_time",
-      "combined_status",
-      "level",
-      "source",
-      "description",
-      "ticket",
-   ]
+   INCIDENT_TABLE_COLUMN_LAYOUTS = {
+      "built-in": [
+          "color_status",
+          "row_select",
+          "start_time",
+          "combined_status",
+          "level",
+          "source",
+          "description",
+          "ticket",
+       ]
+   }
 
 You can define your own columns from scratch, see
 :ref:`customize-htmx-frontend` for examples.
