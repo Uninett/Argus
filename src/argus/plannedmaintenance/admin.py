@@ -1,6 +1,7 @@
 import logging
 
 from django.contrib import admin
+from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.urls import path
 from django.utils import timezone
@@ -37,10 +38,18 @@ class PlannedMaintenanceTaskAdmin(admin.ModelAdmin):
     list_filter = [
         ("owner", admin.RelatedOnlyFieldListFilter),
         list_filter_factory(
-            "open",
-            lambda qs, yes_filter: qs.filter(end_time__gt=timezone.now())
+            "future",
+            lambda qs, yes_filter: qs.future() if yes_filter else qs.filter(start_time__lte=timezone.now()),
+        ),
+        list_filter_factory(
+            "past",
+            lambda qs, yes_filter: qs.past() if yes_filter else qs.filter(end_time__gte=timezone.now()),
+        ),
+        list_filter_factory(
+            "current",
+            lambda qs, yes_filter: qs.current()
             if yes_filter
-            else qs.filter(end_time__lte=timezone.now()),
+            else qs.filter(Q(start_time__gt=timezone.now()) | Q(end_time__lt=timezone.now())),
         ),
     ]
 
