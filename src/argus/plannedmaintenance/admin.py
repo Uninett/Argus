@@ -13,8 +13,8 @@ from .models import PlannedMaintenanceTask
 LOG = logging.getLogger(__name__)
 
 
-@admin.action(description="End selected planned maintenance tasks now")
-def end_pms(modeladmin, request, queryset):
+@admin.action(description="Cancel selected planned maintenance tasks")
+def cancel_pms(modeladmin, request, queryset):
     for pm in queryset:
         pm.end_time = timezone.now()
         pm.save()
@@ -57,7 +57,7 @@ class PlannedMaintenanceTaskAdmin(admin.ModelAdmin):
     raw_id_fields = ("owner",)
     ordering = ("start_time",)
 
-    actions = [end_pms]
+    actions = [cancel_pms]
 
     # Planned maintenance adding/editing
     filter_horizontal = ("filters",)
