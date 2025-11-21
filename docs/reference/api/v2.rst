@@ -962,7 +962,7 @@ Notification profile endpoints
                       1
                   ],
                   "source_types": [
-                      "argus",
+                      "argus"
                   ],
                   "tags": [
                       "key1=value1"
