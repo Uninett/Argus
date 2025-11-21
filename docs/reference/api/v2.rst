@@ -607,6 +607,9 @@ Notification profile endpoints
                     "sourceSystemIds": [
                       2
                     ],
+                    "source_types": [
+                      "argus"
+                    ],
                     "open": null,
                     "acked": null,
                     "stateful": null,
@@ -931,6 +934,9 @@ Notification profile endpoints
                 "sourceSystemIds": [
                   1
                 ],
+                "source_types": [
+                  "argus"
+                ],
                 "tags": [
                   "key1=value1"
                 ],
@@ -954,6 +960,9 @@ Notification profile endpoints
               "filter": {
                   "sourceSystemIds": [
                       1
+                  ],
+                  "source_types": [
+                      "argus"
                   ],
                   "tags": [
                       "key1=value1"
