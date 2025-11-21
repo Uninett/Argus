@@ -1,22 +1,29 @@
 version: '3.5'
+
+x-api: &argus-service
+  build: .
+  depends_on:
+    - postgres
+  environment:
+    - TIME_ZONE=Europe/Oslo
+    - DJANGO_SETTINGS_MODULE=argus.site.settings.dockerdev
+    - DATABASE_URL=postgresql://argus:HahF9araeKoo@postgres/argus
+  volumes:
+    - ${PWD}:/argus
+  restart: always
+
 services:
-  api:
-    build: .
+  argus:
+    <<: *argus-service
     ports:
       - "8000:8000"
-    depends_on:
-      - postgres
-    environment:
-      - TIME_ZONE=Europe/Oslo
-      - DJANGO_SETTINGS_MODULE=argus.site.settings.dockerdev
-      - DATABASE_URL=postgresql://argus:HahF9araeKoo@postgres/argus
-    volumes:
-      - ${PWD}:/argus
-    restart: always
 
+  dbqueue:
+    <<: *argus-service
+    command: /cmd-dbqueue.sh
 
   postgres:
-    image: "postgres:14"
+    image: "postgres:15"
     volumes:
       - postgres:/var/lib/postgresql/data:Z
     restart: always
