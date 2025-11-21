@@ -12,6 +12,7 @@ from argus.filter import get_filter_backend
 from argus.util.utils import import_class_from_dotted_path
 
 from ..models import DestinationConfig, Media, NotificationProfile
+from ...plannedmaintenance.models import PlannedMaintenanceTask
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -89,6 +90,11 @@ def background_send_notification(destinations: Iterable[DestinationConfig], *eve
 def find_destinations_for_event(event: Event):
     destinations = set()
     incident = event.incident
+
+    # Suppress notifications for incidents covered by a planned maintenance task
+    if any(t.covers_incident(incident) for t in PlannedMaintenanceTask.objects.all()):
+        return destinations
+
     qs = NotificationProfile.objects.filter(active=True)
     for profile in qs.prefetch_related("destinations").select_related("user"):
         fw = ComplexFallbackFilterWrapper(profile=profile)
