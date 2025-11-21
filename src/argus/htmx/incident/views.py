@@ -13,10 +13,10 @@ from django.utils.timezone import now as tznow
 from django.shortcuts import render, get_object_or_404
 from django.views.decorators.http import require_POST, require_GET
 from django.core.paginator import Paginator
-from django.http import HttpResponse, HttpResponseBadRequest, QueryDict
+from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse, QueryDict
 from django_htmx.http import HttpResponseClientRefresh, retarget
 
-from argus.incident.models import Incident
+from argus.incident.models import Incident, Tag
 from argus.incident.ticket.utils import get_ticket_plugin_path
 from argus.incident.ticket.base import TicketPluginException
 from argus.notificationprofile.models import Filter
@@ -236,6 +236,28 @@ def add_param_to_querydict(querydict: QueryDict, key: str, value: Any):
         qd._mutable = False
         return qd
     return querydict
+
+
+class SearchForm(forms.Form):
+    search = forms.CharField(required=False)
+
+
+@require_GET
+def search_tags(request):
+    query = request.GET.get("q")
+
+    if not query:
+        return JsonResponse({"results": []})
+
+    if Tag.TAG_DELIMITER in query:
+        key, value = Tag.split(query)
+        tags = Tag.objects.filter(key=key, value__icontains=value)[:20]
+    else:
+        tags = Tag.objects.filter(key__icontains=query)[:20]
+
+    options = [{"id": str(tag), "text": str(tag)} for tag in tags]
+
+    return JsonResponse({"results": options})
 
 
 @require_GET
