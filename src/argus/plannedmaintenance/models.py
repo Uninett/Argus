@@ -9,7 +9,7 @@ from django.db.models import CheckConstraint, Q, F
 from django.utils import timezone
 
 from argus.notificationprofile.models import Filter
-from argus.util.datetime_utils import INFINITY, INFINITY_REPR
+from argus.util.datetime_utils import LOCAL_INFINITY, INFINITY_REPR
 
 
 LOG = logging.getLogger(__name__)
@@ -31,13 +31,13 @@ class PlannedMaintenanceTask(models.Model):
     owner = models.ForeignKey(to=User, on_delete=models.CASCADE, related_name="planned_maintenance_tasks")
     created = models.DateTimeField(default=timezone.now, blank=True)
     start_time = models.DateTimeField(default=timezone.now, blank=True)
-    end_time = models.DateTimeField(default=INFINITY, blank=True, null=True)
+    end_time = models.DateTimeField(default=LOCAL_INFINITY, blank=True, null=True)
     description = models.CharField(blank=True, max_length=255)
     filters = models.ManyToManyField(to=Filter, related_name="planned_maintenance_tasks", blank=True)
 
     @property
     def modifiable(self) -> bool:
-        return self.end_time == INFINITY or timezone.now() < self.end_time + MODIFICATION_WINDOW_PM
+        return self.end_time > timezone.now() - MODIFICATION_WINDOW_PM
 
     def __str__(self):
-        return f"Planned maintenance from {self.start_time} to {self.end_time if self.end_time != INFINITY else INFINITY_REPR} owned by {self.owner} - {self.description}"
+        return f"Planned maintenance from {self.start_time} to {self.end_time if self.end_time != LOCAL_INFINITY else INFINITY_REPR} owned by {self.owner} - {self.description}"
