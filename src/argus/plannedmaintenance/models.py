@@ -52,5 +52,9 @@ class PlannedMaintenanceTask(models.Model):
     def modifiable(self) -> bool:
         return self.end_time > timezone.now() - MODIFICATION_WINDOW_PM
 
+    @property
+    def current(self) -> bool:
+        return self.start_time <= timezone.now() and self.end_time >= timezone.now()
+
     def __str__(self):
         return f"Planned maintenance from {self.start_time} to {self.end_time if self.end_time != LOCAL_INFINITY else INFINITY_REPR} owned by {self.owner} - {self.description}"
