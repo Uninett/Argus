@@ -18,6 +18,18 @@ Or, from the top level directory:
 docker build -t argus -f docker/Dockerfile .
 ```
 
+## Services
+
+While this image provides the necessary environment for the backend processes,
+it defaults to running only the argus server itself. In addition to an argus
+container, a second container is needed to process notifications
+asynchronously. The second container needs to run from this same image, but you
+should swap out the `docker-entrypoint-argus.sh` shell script with the
+`docker-entrypoint-dbqueue.sh`
+
+The "db_worker" command used in that script comes from django-tasks, and is
+used to process a message queue of tasks to complete in the background.
+
 ## Configuration of the running container
 
 This image runs with default production settings, with a few tweaks from

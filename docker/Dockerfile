@@ -36,6 +36,6 @@ ENV DJANGO_SETTINGS_MODULE=dockersettings
 
 ENV PORT=8000
 EXPOSE 8000
-COPY docker/docker-entrypoint.sh /api-entrypoint.sh
+COPY docker/docker-entrypoint-argus.sh /argus-entrypoint.sh
 USER argus
-ENTRYPOINT ["/usr/bin/tini", "-v", "--", "/api-entrypoint.sh"]
+ENTRYPOINT ["/usr/bin/tini", "-v", "--", "/argus-entrypoint.sh"]
