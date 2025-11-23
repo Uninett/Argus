@@ -4,7 +4,7 @@
            name="incident_menus"
            autocomplete="off"
            role="tab"
-           class="tab [--tab-border:theme(borderWidth.DEFAULT)] [--tab-border-color:theme(colors.primary)] text-nowrap min-h-fit"
+           class="tab tab-select [--tab-border:theme(borderWidth.DEFAULT)] [--tab-border-color:theme(colors.primary)] text-nowrap min-h-fit"
            aria-label="Filter Incidents"
            checked="checked" />
     <div role="tabpanel"
@@ -24,5 +24,11 @@
          class="tab-content border-primary [--tab-border:theme(borderWidth.DEFAULT)] rounded-box p-2">
       {% include "htmx/incident/_incident_list_update_menu.html" %}
     </div>
+    <input type="radio"
+           name="incident_menus"
+           role="tab"
+           class="tab tab-select [--tab-border:theme(borderWidth.DEFAULT)] [--tab-border-color:theme(colors.primary)] text-nowrap min-h-fit"
+           aria-label="Kiosk" />
+    <div role="tabpanel" class="tab-content"></div>
   {% endblock menu_tabs %}
 </div>
