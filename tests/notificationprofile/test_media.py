@@ -1,6 +1,8 @@
 import logging
+from datetime import timedelta
 
 from django.test import TestCase, override_settings
+from django.utils import timezone
 
 from argus.auth.factories import PersonUserFactory
 from argus.filter.factories import FilterFactory
@@ -12,6 +14,7 @@ from argus.notificationprofile.media import find_destinations_for_many_events
 from argus.notificationprofile.media import get_notification_media
 from argus.notificationprofile.media.email import modelinstance_to_dict
 from argus.notificationprofile.models import Media
+from argus.plannedmaintenance.models import PlannedMaintenanceTask
 from argus.util.testing import disconnect_signals, connect_signals
 
 
@@ -71,6 +74,9 @@ class FindDestinationsTest(TestCase):
         self.np2.filters.add(filter2)
         self.np2.destinations.add(self.user2_destination)
         self.np2.destinations.add(self.extra_destination2)
+
+        self.zero_filter = FilterFactory(user=self.user1, filter={"sourceSystemIds": [0]})
+        self.tag_filter = FilterFactory(user=self.user1, filter={"tags": ["a=b", "c=d"]})
 
     def tearDown(self):
         connect_signals()
@@ -181,6 +187,63 @@ class FindDestinationsTest(TestCase):
         self.assertIn(self.user2_destination, destinations[event3])
         self.assertNotIn(self.extra_destination1, destinations[event3])
         self.assertIn(self.extra_destination2, destinations[event3])
+
+    def test_find_destinations_planned_maintenance_suppression(self):
+        pm_task = PlannedMaintenanceTask(
+            owner=self.user1,
+            start_time=timezone.now() - timedelta(hours=1),
+            end_time=timezone.now() + timedelta(hours=1),
+        )
+        pm_task.save()
+        pm_task.filters.add(self.tag_filter)
+
+        tags = ["a=b", "c=d"]
+        incident = create_fake_incident(
+            start_time=timezone.now() - timedelta(minutes=30),
+            end_time=timezone.now() + timedelta(minutes=30),
+            tags=tags,
+        )
+        event = incident.events.get(type=Event.Type.INCIDENT_START)
+        destinations = find_destinations_for_event(event)
+        self.assertEqual(len(destinations), 0)
+
+    def test_find_destinations_not_suppressed_if_pm_chronologically_irrelevant(self):
+        pm_task = PlannedMaintenanceTask(
+            owner=self.user1,
+            start_time=timezone.now() - timedelta(hours=2),
+            end_time=timezone.now() - timedelta(hours=1),
+        )
+        pm_task.save()
+        pm_task.filters.add(self.tag_filter)
+
+        tags = ["a=b", "c=d"]
+        incident = create_fake_incident(
+            start_time=timezone.now() - timedelta(minutes=30),
+            end_time=timezone.now() + timedelta(minutes=30),
+            tags=tags,
+        )
+        event = incident.events.get(type=Event.Type.INCIDENT_START)
+
+        destinations = find_destinations_for_event(event)
+        self.assertGreater(len(destinations), 0)
+
+    def test_find_destinations_not_suppressed_by_irrelevant_pm_filter(self):
+        pm_task = PlannedMaintenanceTask(
+            owner=self.user1,
+            start_time=timezone.now() - timedelta(hours=1),
+            end_time=timezone.now() + timedelta(hours=1),
+        )
+        pm_task.save()
+        pm_task.filters.add(self.zero_filter)
+
+        incident = create_fake_incident(
+            start_time=timezone.now() - timedelta(minutes=30),
+            end_time=timezone.now() + timedelta(minutes=30),
+        )
+        event = incident.events.get(type=Event.Type.INCIDENT_START)
+
+        destinations = find_destinations_for_event(event)
+        self.assertGreater(len(destinations), 0)
 
 
 class GetNotificationMediaTests(TestCase):
