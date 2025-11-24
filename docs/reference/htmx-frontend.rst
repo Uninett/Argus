@@ -310,7 +310,7 @@ on DNS.
 The following are in use:
 
 * `htmx <https://htmx.org/>`_ for updating parts of a page smoothly
-* `hyperscript <https://hyperscript.org/>`_ when htmx is not enough
+* `hyperscript <https://hyperscript.org/>`_ for adding client-side interactivity, used for cases where htmx alone is not sufficient
 * `choices.js <https://choices-js.github.io/Choices/>`_ for typeahead search,
   multi select
 
