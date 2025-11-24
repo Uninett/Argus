@@ -44,7 +44,7 @@ class PlannedMaintenanceTask(models.Model):
     def covers_incident(self, incident: Incident) -> bool:
         if self.start_time > incident.end_time or self.end_time < incident.start_time:
             return False
-        return any(FilterWrapper(f.filter).incident_fits(incident) for f in self.filters.only("filter"))
+        return all(FilterWrapper(f.filter).incident_fits(incident) for f in self.filters.only("filter"))
 
     def __str__(self):
         return f"Planned maintenance from {self.start_time} to {self.end_time if self.end_time != INFINITY else INFINITY_REPR} owned by {self.owner} - {self.description}"
