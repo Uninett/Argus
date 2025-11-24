@@ -197,40 +197,45 @@ class FilterListView(ListView):
         return reverse("htmx:filter-list")
 
 
+# Not a view!
 def incident_list_filter(request, qs, use_empty_filter=False):
     LOG = logging.getLogger(__name__ + ".incident_list_filter")
-    LOG.debug("GET at start: %s", request.GET)
-    filter_pk, filter_obj = request.session.get("selected_filter", None), None
+    LOG.debug("GET: %s", request.GET)
+
+    filter_pk = request.session.get("selected_filter_pk", None)
+    converted_filterblob = {}
     if filter_pk:
         filter_obj = Filter.objects.get(pk=filter_pk)
-    if filter_obj:
-        form = IncidentFilterForm(_convert_filterblob(filter_obj.filter))
-        LOG.debug("using stored filter: %s", filter_obj.filter)
-    else:
-        raw_data = request.POST if request.method == "POST" else request.GET
-        form_data = _normalize_form_data(raw_data)
-        if request.method == "POST":
-            form = IncidentFilterForm(form_data)
-            LOG.debug("using POST: %s", form_data)
-        else:
-            if use_empty_filter:
-                filterblob = IncidentFilterForm.EMPTY_FILTERBLOB
-                form = IncidentFilterForm(filterblob)
-                LOG.debug("using empty filter: %s", filterblob)
-            else:
-                form = IncidentFilterForm(form_data or None)
-                LOG.debug("using GET: %s", form_data)
+        LOG.debug('found stored filter "%s": %s', filter_obj.name, filter_obj.filter)
+        converted_filterblob = _convert_filterblob(filter_obj.filter)
+
+    if converted_filterblob:
+        form_data = converted_filterblob
+        LOG.debug("using converted stored filter: %s", form_data)
+    elif request.POST:
+        form_data = _normalize_form_data(request.POST)
+        LOG.debug("using POST: %s", form_data)
+    elif use_empty_filter:
+        form_data = IncidentFilterForm.EMPTY_FILTERBLOB
+        LOG.debug("using empty filter: %s", form_data)
+    else:  # request.GET
+        form_data = _normalize_form_data(request.GET) or None
+        LOG.debug("using GET: %s", form_data)
+
+    form = IncidentFilterForm(form_data)
+    form.is_valid()  # fill cleaned_data
+    if use_empty_filter:
+        return form, qs
+
     if form.is_valid():
-        LOG.debug("Cleaned data: %s", form.cleaned_data)
+        LOG.debug("Cleaned data: %s, getting query set", form.cleaned_data)
         filterblob = form.to_filterblob()
+        LOG.debug("using filterblob: %s", filterblob)
         qs = QuerySetFilter.filtered_incidents(filterblob, qs)
     else:
-        if not request.GET:
-            LOG.debug("empty form")
-        else:
-            LOG.debug("Dirty form: %s", form.errors)
-            for field, error_messages in form.errors.items():
-                messages.error(request, f"{field}: {','.join(error_messages)}")
+        LOG.debug("Dirty form: %s", form.errors)
+        for field, error_messages in form.errors.items():
+            messages.error(request, f"{field}: {','.join(error_messages)}")
     return form, qs
 
 
