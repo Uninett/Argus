@@ -133,6 +133,7 @@ def get_selected_filter(request):
 def filter_form(request: HtmxHttpRequest):
     set_selected_filter(request, None)
     LOG = logging.getLogger(__name__ + ".filter_form")
+    LOG.debug("filter_form calling incident_list_filter")
     incident_list_filter = get_filter_function()
     filter_form, _ = incident_list_filter(request, None)
     context = {"filter_form": filter_form}
@@ -145,6 +146,7 @@ def create_filter(request: HtmxHttpRequest):
     from argus.htmx.incident.filter import create_named_filter
 
     filter_name = request.POST.get("filter_name", None)
+    LOG.debug("create_filter calling incident_list_filter")
     incident_list_filter = get_filter_function()
     filter_form, _ = incident_list_filter(request, None)
     if filter_name and filter_form.is_valid():
@@ -160,6 +162,7 @@ def create_filter(request: HtmxHttpRequest):
 @require_POST
 def update_filter(request: HtmxHttpRequest, pk: int):
     filter_obj = get_object_or_404(Filter, id=pk)
+    LOG.debug("update_filter calling incident_list_filter")
     incident_list_filter = get_filter_function()
     filter_form, _ = incident_list_filter(request, None)
     if filter_form.is_valid():
@@ -202,24 +205,32 @@ def get_existing_filters(request: HtmxHttpRequest):
 
 @require_GET
 def filter_select(request: HtmxHttpRequest):
+    LOG = logging.getLogger(__name__ + ".filter_select")
     context = {}
     template_name = "htmx/incident/_incident_list_filter_incidents.html"
 
+    LOG.debug("GET when selecting filter: %s", request.GET)
     filter_id = request.GET.get("filter", None)
     if filter_id:
         use_empty_filter = False
         filter_obj = get_object_or_404(Filter, id=filter_id)
         set_selected_filter(request, filter_obj)
+        LOG.debug("Selecting filter: %s", filter_obj.name)
     else:
         use_empty_filter = True
         set_selected_filter(request, None)
+        LOG.debug("Selecting empty filter")
 
     if request.htmx.trigger:
+        LOG.debug("filter_select calling incident_list_filter")
         incident_list_filter = get_filter_function()
+        LOG.debug("nao 1 %s", request.GET)
         filter_form, _ = incident_list_filter(request, None, use_empty_filter=use_empty_filter)
         context["filter_form"] = filter_form
+        LOG.debug("nao 2 %s", request.GET)
         return render(request, template_name, context=context)
 
+    LOG.debug("boo %s", request.GET)
     return retarget(HttpResponse(), "#incident-filter-select")
 
 
@@ -239,12 +250,16 @@ def dedupe_querydict(querydict: QueryDict):
 
 def add_param_to_querydict(querydict: QueryDict, key: str, value: Any):
     "Set key to value if missing from querydict"
+    LOG = logging.getLogger(__name__ + ".add_param_to_querydict")
     qd = querydict.copy()
+    LOG.debug("Current QueryDict: %s, about to alter %s", qd, key)
     if value is None:
+        LOG.debug("Unchanged QueryDict: %s, value is None", querydict)
         return querydict
     if key not in qd:
         if isinstance(value, Iterable):
             if not value:
+                LOG.debug("Unchanged QueryDict: %s, value is falsey Iterable", querydict)
                 return querydict
             if isinstance(value, str):
                 value = [value]
@@ -254,7 +269,9 @@ def add_param_to_querydict(querydict: QueryDict, key: str, value: Any):
             value = [str(value)]
         qd.setlist(key, value)
         qd._mutable = False
+        LOG.debug("Altered QueryDict: %s", qd)
         return qd
+    LOG.debug("Unchanged QueryDict: %s, key not found", querydict)
     return querydict
 
 
@@ -283,6 +300,7 @@ def search_tags(request):
 @require_GET
 def incident_list(request: HtmxHttpRequest) -> HttpResponse:
     LOG = logging.getLogger(__name__ + ".incident_list")
+    LOG.debug("<=====VIEW=====<")
     LOG.debug("GET at start: %s", request.GET)
     request.GET = dedupe_querydict(request.GET)
     LOG.debug("after dedupe: %s", request.GET)
@@ -300,6 +318,7 @@ def incident_list(request: HtmxHttpRequest) -> HttpResponse:
     existing_filters = Filter.objects.filter(user=request.user)
 
     # Get filters storable in Filter.filter
+    LOG.debug("calling incident_list_filter")
     incident_list_filter = get_filter_function()
     filter_form, qs = incident_list_filter(request, qs)
 
@@ -368,4 +387,5 @@ def incident_list(request: HtmxHttpRequest) -> HttpResponse:
         "last_page_num": last_page_num,
         "second_to_last_page": last_page_num - 1,
     }
+    LOG.debug(">=====VIEW=====>")
     return render(request, "htmx/incident/incident_list.html", context=context)

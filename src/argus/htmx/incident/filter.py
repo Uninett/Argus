@@ -201,6 +201,7 @@ class FilterListView(ListView):
 # Not a view!
 def incident_list_filter(request, qs, use_empty_filter=False):
     LOG = logging.getLogger(__name__ + ".incident_list_filter")
+    LOG.debug("<<<<FORM<<<<")
     LOG.debug("GET: %s", request.GET)
 
     filter_pk = request.session.get("selected_filter_pk", None)
@@ -226,6 +227,7 @@ def incident_list_filter(request, qs, use_empty_filter=False):
     form = IncidentFilterForm(form_data)
     form.is_valid()  # fill cleaned_data
     if use_empty_filter:
+        LOG.debug(">>>>FORM>>>> early return")
         return form, qs
 
     if form.is_valid():
@@ -237,6 +239,7 @@ def incident_list_filter(request, qs, use_empty_filter=False):
         LOG.debug("Dirty form: %s", form.errors)
         for field, error_messages in form.errors.items():
             messages.error(request, f"{field}: {','.join(error_messages)}")
+    LOG.debug(">>>>FORM>>>>")
     return form, qs
 
 
