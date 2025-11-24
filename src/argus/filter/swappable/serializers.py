@@ -16,6 +16,11 @@ class FilterBlobSerializer(serializers.Serializer):
         allow_empty=True,
         required=False,
     )
+    source_types = serializers.ListField(
+        child=serializers.CharField(),
+        allow_empty=True,
+        required=False,
+    )
     tags = serializers.ListField(
         child=serializers.CharField(min_length=3),
         allow_empty=True,
