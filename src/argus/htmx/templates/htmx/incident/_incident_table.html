@@ -1,51 +1,10 @@
-<table id="table"
-  {# djlint:off #}
-       {% with preferences.argus_htmx.update_interval as update_interval %}
-         {% if update_interval != 'never' %}
-           hx-get="{% querystring page=page.number %}"
-           hx-target="this"
-           hx-swap="outerHTML"
-           hx-trigger="every {{ update_interval }}s"
-           hx-push-url="true"
-           hx-include=".incident-list-param"
-         {% endif %}
-       {% endwith %}
-  class="border border-separate border-spacing-1 border-primary table {% if preferences.argus_htmx.incidents_table_layout_compact %}table-xs{% endif %}">
-  {# djlint:on #}
-  <thead>
-    <tr class="border-b border-primary">
-      {% block columns %}
-        {% for col in columns %}
-          <th class="border-b border-primary {{ col.column_classes }}">
-            {% if col.header_template %}
-              {% include col.header_template with label=col.label %}
-            {% elif col.filter_field %}
-              {% include "htmx/incident/cells/_incident_filterable_column_header.html" with column=col %}
-            {% else %}
-              {{ col.label }}
-            {% endif %}
-          </th>
-        {% empty %}
-          <th class="border-b border-primary">No columns configured</th>
-        {% endfor %}
-      {% endblock columns %}
-    </tr>
-  </thead>
-  <tbody id="table-body">
-    {% block incident_rows %}
-      {% include "htmx/incident/_incident_table_rows.html" with incident_list=page.object_list %}
-    {% endblock incident_rows %}
-  </tbody>
-  <tfoot>
-    <tr>
-      <td colspan="{{ columns|length }}" class="border-t border-primary">
-        <div class="flex justify-between items-center">
-          {% block refresh_info %}
-            {% include "htmx/incident/_incident_list_refresh_info.html" %}
-          {% endblock refresh_info %}
-          {% include "./_incident_table_paginator.html" %}
-        </div>
-      </td>
-    </tr>
-  </tfoot>
-</table>
+{% extends "./_base_incident_table.html" %}
+{% block incident_list_table_autorefresh %}
+  {% include "htmx/incident/_incident_table_autorefresh.html" %}
+{% endblock incident_list_table_autorefresh %}
+{% block incident_rows %}
+  {% include "htmx/incident/_incident_table_rows.html" with incident_list=page.object_list %}
+{% endblock incident_rows %}
+{% block incident_list_footer %}
+  {% include "./_incident_table_footer.html" %}
+{% endblock incident_list_footer %}
