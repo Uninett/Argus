@@ -1,3 +1,4 @@
+import json
 from unittest.mock import Mock
 
 from django.contrib.messages.middleware import MessageMiddleware
@@ -8,9 +9,10 @@ from django.test import RequestFactory, TestCase
 from argus.auth.factories import PersonUserFactory
 from argus.filter.factories import FilterFactory
 from argus.htmx.incident.filter import IncidentFilterForm, NamedFilterForm, create_named_filter, incident_list_filter
+from argus.htmx.incident.views import search_tags
 from argus.incident.constants import AckedStatus, OpenStatus
 from argus.incident.factories import IncidentFactory, SourceSystemFactory
-from argus.incident.models import Incident
+from argus.incident.models import Incident, Tag
 from argus.notificationprofile.models import Filter
 from argus.util.testing import connect_signals, disconnect_signals
 
@@ -24,7 +26,7 @@ class TestIncidentFilterForm(TestCase):
             "acked": AckedStatus.ACKED,
             "sourceSystemIds": [source.id],
             "source_types": [source.type.name],
-            "tags": "tag1=value1, tag2=value2",
+            "tags": ["tag1=value1", "tag2=value2"],
             "maxlevel": 1,
         }
         self.valid_form = IncidentFilterForm(self.valid_field_values)
@@ -52,7 +54,7 @@ class TestIncidentFilterForm(TestCase):
 
     def test_if_form_is_valid_then_filterblob_should_contain_correct_tags_value(self):
         filterblob = self.valid_form.to_filterblob()
-        assert filterblob["tags"] == [tag.strip() for tag in self.valid_field_values["tags"].split(",")]
+        assert filterblob["tags"] == self.valid_field_values["tags"]
 
     def test_if_form_is_not_valid_then_to_filterblob_should_return_an_empty_dict(self):
         form = IncidentFilterForm({"tags": "invalidtags"})
@@ -166,3 +168,85 @@ class TestCreateNamedFilter(TestCase):
         filter_name = "myfilter"
         form, _ = create_named_filter(self.request, filter_name, self.filterblob)
         assert isinstance(form, NamedFilterForm)
+
+
+class TestSearchTagsFilter(TestCase):
+    def setUp(self) -> None:
+        disconnect_signals()
+        self.factory = RequestFactory()
+
+    def tearDown(self):
+        connect_signals()
+
+    def test_search_tags_without_query_returns_empty_results(self):
+        request = self.factory.get("/search-tags/")
+        response = search_tags(request)
+
+        assert response.status_code == 200
+        data = json.loads(response.content)
+        assert data == {"results": []}
+
+    def test_search_tags_with_key_value_query_filters_by_key_and_value(self):
+        # Create test tags
+        tag1 = Tag.objects.create(key="environment", value="production")
+        _tag2 = Tag.objects.create(key="environment", value="staging")
+        _tag3 = Tag.objects.create(key="service", value="api")
+
+        query = f"environment{Tag.TAG_DELIMITER}prod"
+        request = self.factory.get("/search-tags/", {"q": query})
+        response = search_tags(request)
+
+        assert response.status_code == 200
+        data = json.loads(response.content)
+        assert len(data["results"]) == 1
+        assert data["results"][0]["id"] == str(tag1)
+        assert data["results"][0]["text"] == str(tag1)
+
+    def test_search_tags_with_key_only_query_filters_by_key(self):
+        from argus.incident.models import Tag
+
+        # Create test tags
+        tag1 = Tag.objects.create(key="environment", value="production")
+        tag2 = Tag.objects.create(key="environment", value="staging")
+        _tag3 = Tag.objects.create(key="service", value="api")
+
+        request = self.factory.get("/search-tags/", {"q": "env"})
+        response = search_tags(request)
+
+        assert response.status_code == 200
+        data = json.loads(response.content)
+        assert len(data["results"]) == 2
+        tag_ids = [result["id"] for result in data["results"]]
+        assert str(tag1) in tag_ids
+        assert str(tag2) in tag_ids
+
+    def test_search_tags_limits_results_to_20(self):
+        from argus.incident.models import Tag
+
+        # Create 25 test tags
+        for i in range(25):
+            Tag.objects.create(key=f"test{i}", value="value")
+
+        request = self.factory.get("/search-tags/", {"q": "test"})
+        response = search_tags(request)
+
+        assert response.status_code == 200
+        data = json.loads(response.content)
+        assert len(data["results"]) == 20
+
+    def test_search_tags_returns_correct_json_format(self):
+        from argus.incident.models import Tag
+
+        tag = Tag.objects.create(key="service", value="web")
+        request = self.factory.get("/search-tags/", {"q": "service"})
+        response = search_tags(request)
+
+        assert response.status_code == 200
+        data = json.loads(response.content)
+        assert "results" in data
+        assert len(data["results"]) == 1
+        result = data["results"][0]
+        assert "id" in result
+        assert "text" in result
+        assert result["id"] == str(tag)
+        assert result["text"] == str(tag)
