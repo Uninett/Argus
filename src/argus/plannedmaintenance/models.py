@@ -27,7 +27,12 @@ class PlannedMaintenanceQuerySet(models.QuerySet):
         return self.filter(end_time__lt=timezone.now())
 
     def current(self):
-        return self.filter(start_time__lte=timezone.now(), end_time__gte=timezone.now())
+        return self.active_at_time(timezone.now())
+
+    def active_at_time(self, time: Optional[datetime] = None):
+        if not time:
+            time = timezone.now()
+        return self.filter(start_time__lte=time, end_time__gte=time)
 
 
 class PlannedMaintenanceTask(models.Model):
