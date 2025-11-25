@@ -16,13 +16,19 @@ def tagvalues(incident, key) -> list:
 
     There can be multiple tags with the same key
     """
-    tags = incident.deprecated_tags
-    return [str(tag.value) for tag in tags if tag.key == key]
+    fallback = []
+    if incident and key:
+        tags = incident.deprecated_tags
+        return [str(tag.value) for tag in tags if tag.key == key]
+    return fallback
 
 
 @register.filter
 def is_acked_by(incident, group: str) -> bool:
-    return incident.is_acked_by(group)
+    fallback = False
+    if incident is not None and group:
+        return incident.is_acked_by(group)
+    return fallback
 
 
 @register.filter
@@ -35,24 +41,33 @@ def pp_level(level: int) -> str:
         "4": "Low",
         "5": "Information",
     }
+    fallback = mapping["5"]
     if level not in mapping:
-        return mapping["5"]
+        return fallback
     return mapping[level]
 
 
 @register.filter
 def fieldvalue(form, fieldname):
-    return form[fieldname].value() or ""
+    fallback = ""
+    if form is not None:
+        return form[fieldname].value() or fallback
+    return fallback
 
 
 @register.filter
 def get_form_field(form, fieldname):
-    return form[fieldname] or None
+    fallback = None
+    if form is not None:
+        return form[fieldname] or fallback
+    return fallback
 
 
 @register.filter
 def dictvalue(dict_, key, default=None):
-    return dict_.get(key, default)
+    if dict_:
+        return dict_.get(key, default)
+    return default
 
 
 @register.filter
