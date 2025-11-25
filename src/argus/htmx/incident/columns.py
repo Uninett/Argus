@@ -77,6 +77,18 @@ _BUILTIN_COLUMN_LIST = [
         detail_link=True,
     ),
     IncidentTableColumn(
+        "age",
+        "Age",
+        "htmx/incident/cells/_incident_age.html",
+        detail_link=True,
+    ),
+    IncidentTableColumn(
+        "start_time_and_age",
+        "Timestamp",
+        "htmx/incident/cells/_incident_start_time_and_age.html",
+        detail_link=True,
+    ),
+    IncidentTableColumn(
         "narrow_start_time",
         "Timestamp",
         "htmx/incident/cells/_incident_start_time.html",

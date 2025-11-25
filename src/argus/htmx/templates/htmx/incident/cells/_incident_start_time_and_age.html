@@ -1,0 +1,5 @@
+<time datetime="{{ incident.start_time }}">{{ incident.start_time|date:preferences.argus_htmx.datetime_format }}</time>
+<div class="text-base-content/60">
+  <i class="fa-solid fa-clock"></i>
+  <span>{{ incident.humanize_age }}</span>
+</div>

@@ -1449,18 +1449,6 @@ html {
     }
   }
 
-  .btn-outline.btn-accent:hover {
-    --tw-text-opacity: 1;
-    color: var(--fallback-ac,oklch(var(--ac)/var(--tw-text-opacity)));
-  }
-
-  @supports (color: color-mix(in oklab, black, black)) {
-    .btn-outline.btn-accent:hover {
-      background-color: color-mix(in oklab, var(--fallback-a,oklch(var(--a)/1)) 90%, black);
-      border-color: color-mix(in oklab, var(--fallback-a,oklch(var(--a)/1)) 90%, black);
-    }
-  }
-
   .btn-outline.btn-success:hover {
     --tw-text-opacity: 1;
     color: var(--fallback-suc,oklch(var(--suc)/var(--tw-text-opacity)));
@@ -2328,10 +2316,6 @@ input.tab:checked + .tab-content,
     --btn-color: var(--fallback-s);
   }
 
-  .btn-accent {
-    --btn-color: var(--fallback-a);
-  }
-
   .btn-info {
     --btn-color: var(--fallback-in);
   }
@@ -2412,10 +2396,6 @@ input.tab:checked + .tab-content,
     --btn-color: var(--s);
   }
 
-  .btn-accent {
-    --btn-color: var(--a);
-  }
-
   .btn-info {
     --btn-color: var(--in);
   }
@@ -2429,12 +2409,6 @@ input.tab:checked + .tab-content,
   --tw-text-opacity: 1;
   color: var(--fallback-sc,oklch(var(--sc)/var(--tw-text-opacity)));
   outline-color: var(--fallback-s,oklch(var(--s)/1));
-}
-
-.btn-accent {
-  --tw-text-opacity: 1;
-  color: var(--fallback-ac,oklch(var(--ac)/var(--tw-text-opacity)));
-  outline-color: var(--fallback-a,oklch(var(--a)/1));
 }
 
 .btn-info {
@@ -2510,11 +2484,6 @@ input.tab:checked + .tab-content,
 .btn-outline.btn-secondary.btn-active {
   --tw-text-opacity: 1;
   color: var(--fallback-sc,oklch(var(--sc)/var(--tw-text-opacity)));
-}
-
-.btn-outline.btn-accent {
-  --tw-text-opacity: 1;
-  color: var(--fallback-a,oklch(var(--a)/var(--tw-text-opacity)));
 }
 
 .btn-outline.btn-accent.btn-active {
@@ -4078,6 +4047,28 @@ details.collapse summary::-webkit-details-marker {
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
 
+.tooltip {
+  position: relative;
+  display: inline-block;
+  --tooltip-offset: calc(100% + 1px + var(--tooltip-tail, 0px));
+}
+
+.tooltip:before {
+  position: absolute;
+  pointer-events: none;
+  z-index: 1;
+  content: var(--tw-content);
+  --tw-content: attr(data-tip);
+}
+
+.tooltip:before, .tooltip-top:before {
+  transform: translateX(-50%);
+  top: auto;
+  left: 50%;
+  right: auto;
+  bottom: var(--tooltip-offset);
+}
+
 .avatar.online:before {
   content: "";
   position: absolute;
@@ -4296,6 +4287,94 @@ details.collapse summary::-webkit-details-marker {
   padding-right: 0.5rem;
   padding-top: 0.25rem;
   padding-bottom: 0.25rem;
+}
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+  text-align: center;
+  --tooltip-tail: 0.1875rem;
+  --tooltip-color: var(--fallback-n,oklch(var(--n)/1));
+  --tooltip-text-color: var(--fallback-nc,oklch(var(--nc)/1));
+  --tooltip-tail-offset: calc(100% + 0.0625rem - var(--tooltip-tail));
+}
+
+.tooltip:before,
+.tooltip:after {
+  opacity: 0;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-backdrop-filter;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-backdrop-filter;
+  transition-delay: 100ms;
+  transition-duration: 200ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.tooltip:after {
+  position: absolute;
+  content: "";
+  border-style: solid;
+  border-width: var(--tooltip-tail, 0);
+  width: 0;
+  height: 0;
+  display: block;
+}
+
+.tooltip:before {
+  max-width: 20rem;
+  white-space: normal;
+  border-radius: 0.25rem;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  background-color: var(--tooltip-color);
+  color: var(--tooltip-text-color);
+  width: -moz-max-content;
+  width: max-content;
+}
+
+.tooltip.tooltip-open:before {
+  opacity: 1;
+  transition-delay: 75ms;
+}
+
+.tooltip.tooltip-open:after {
+  opacity: 1;
+  transition-delay: 75ms;
+}
+
+.tooltip:hover:before {
+  opacity: 1;
+  transition-delay: 75ms;
+}
+
+.tooltip:hover:after {
+  opacity: 1;
+  transition-delay: 75ms;
+}
+
+.tooltip:has(:focus-visible):after,
+.tooltip:has(:focus-visible):before {
+  opacity: 1;
+  transition-delay: 75ms;
+}
+
+.tooltip:not([data-tip]):hover:before,
+.tooltip:not([data-tip]):hover:after {
+  visibility: hidden;
+  opacity: 0;
+}
+
+.tooltip:after, .tooltip-top:after {
+  transform: translateX(-50%);
+  border-color: var(--tooltip-color) transparent transparent transparent;
+  top: auto;
+  left: 50%;
+  right: auto;
+  bottom: var(--tooltip-tail-offset);
 }
 
 .alert.info {
@@ -4996,10 +5075,6 @@ details.collapse summary::-webkit-details-marker {
   visibility: visible;
 }
 
-.invisible {
-  visibility: hidden;
-}
-
 .collapse {
   visibility: collapse;
 }
@@ -5042,14 +5117,6 @@ details.collapse summary::-webkit-details-marker {
 
 .top-10 {
   top: 2.5rem;
-}
-
-.right-1 {
-  right: 0.25rem;
-}
-
-.right-0 {
-  right: 0px;
 }
 
 .isolate {
@@ -5141,10 +5208,6 @@ details.collapse summary::-webkit-details-marker {
 
 .block {
   display: block;
-}
-
-.inline-block {
-  display: inline-block;
 }
 
 .inline {
@@ -5697,10 +5760,6 @@ details.collapse summary::-webkit-details-marker {
   padding: 1.5rem;
 }
 
-.p-3 {
-  padding: 0.75rem;
-}
-
 .px-1 {
   padding-left: 0.25rem;
   padding-right: 0.25rem;
@@ -5747,6 +5806,10 @@ details.collapse summary::-webkit-details-marker {
   padding-left: 2rem;
 }
 
+.pr-0 {
+  padding-right: 0px;
+}
+
 .pr-4 {
   padding-right: 1rem;
 }
@@ -5761,10 +5824,6 @@ details.collapse summary::-webkit-details-marker {
 
 .pt-4 {
   padding-top: 1rem;
-}
-
-.pr-0 {
-  padding-right: 0px;
 }
 
 .text-center {
@@ -5850,6 +5909,10 @@ details.collapse summary::-webkit-details-marker {
   color: var(--fallback-bc,oklch(var(--bc)/0.5));
 }
 
+.text-base-content\/60 {
+  color: var(--fallback-bc,oklch(var(--bc)/0.6));
+}
+
 .text-error {
   --tw-text-opacity: 1;
   color: var(--fallback-er,oklch(var(--er)/var(--tw-text-opacity, 1)));
@@ -5910,20 +5973,12 @@ details.collapse summary::-webkit-details-marker {
   -moz-osx-font-smoothing: grayscale;
 }
 
-.opacity-30 {
-  opacity: 0.3;
-}
-
-.opacity-50 {
-  opacity: 0.5;
-}
-
-.opacity-100 {
-  opacity: 1;
-}
-
 .opacity-0 {
   opacity: 0;
+}
+
+.opacity-30 {
+  opacity: 0.3;
 }
 
 .shadow {
@@ -5998,12 +6053,6 @@ details.collapse summary::-webkit-details-marker {
   transition-duration: 150ms;
 }
 
-.transition-opacity {
-  transition-property: opacity;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 150ms;
-}
-
 .duration-300 {
   transition-duration: 300ms;
 }
@@ -6026,18 +6075,10 @@ details.collapse summary::-webkit-details-marker {
   background-color: rgb(243 244 246 / 0.1);
 }
 
-.hover\:opacity-100:hover {
-  opacity: 1;
-}
-
 .hover\:ring-1:hover {
   --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
   --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color);
   box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
-}
-
-.focus\:visible:focus {
-  visibility: visible;
 }
 
 .focus\:opacity-100:focus {
@@ -6059,40 +6100,12 @@ details.collapse summary::-webkit-details-marker {
   border-bottom-width: 0;
 }
 
-.group:hover .group-hover\:visible {
-  visibility: visible;
-}
-
-.group:hover .group-hover\:block {
-  display: block;
-}
-
 .group:hover .group-hover\:opacity-100 {
   opacity: 1;
 }
 
-.group:focus .group-focus\:visible {
-  visibility: visible;
-}
-
-.group:focus .group-focus\:block {
-  display: block;
-}
-
-.group:active .group-active\:visible {
-  visibility: visible;
-}
-
-.peer:focus ~ .peer-focus\:visible {
-  visibility: visible;
-}
-
 .peer:focus ~ .peer-focus\:opacity-100 {
   opacity: 1;
-}
-
-.peer:focus ~ .peer-focus\:opacity-50 {
-  opacity: 0.5;
 }
 
 @media not all and (min-width: 640px) {
