@@ -29,11 +29,11 @@ class PlannedMaintenanceTask(models.Model):
         ]
 
     owner = models.ForeignKey(to=User, on_delete=models.CASCADE, related_name="planned_maintenance_tasks")
-    created = models.DateTimeField(default=timezone.now, blank=True)
-    start_time = models.DateTimeField(default=timezone.now, blank=True)
-    end_time = models.DateTimeField(default=LOCAL_INFINITY, blank=True, null=True)
+    created = models.DateTimeField(default=timezone.now)
+    start_time = models.DateTimeField(default=timezone.now)
+    end_time = models.DateTimeField(default=LOCAL_INFINITY)
     description = models.CharField(blank=True, max_length=255)
-    filters = models.ManyToManyField(to=Filter, related_name="planned_maintenance_tasks", blank=True)
+    filters = models.ManyToManyField(to=Filter, related_name="planned_maintenance_tasks")
 
     @property
     def modifiable(self) -> bool:
