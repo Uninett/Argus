@@ -3,7 +3,7 @@
 {% with field=form|get_form_field:fieldname %}
   <div>
     {{ column.label }}
-    <div id="{{ column.name }}-dropdown" class="dropdown">
+    <div id="{{ column.name }}-dropdown" class="dropdown dropdown-end">
       <button type="button"
               tabindex="0"
               class="filter-btn btn btn-xs {% if field.value %} btn-primary {% else %} btn-ghost text-primary {% endif %} min-h-4 h-4">
