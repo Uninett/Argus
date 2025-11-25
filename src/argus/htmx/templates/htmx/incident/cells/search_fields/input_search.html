@@ -1,5 +1,5 @@
 <!-- htmx/incident/cells/search_field/input_search.html -->
-<label class="flex gap-1 input input-xs grow input-primary pr-0 group">
+<div class="flex gap-1 input input-xs grow input-primary pr-0 group">
   <input name="{{ widget.name }}"
          type="text"
          autocomplete="off"
@@ -9,8 +9,8 @@
   <button id="{{ widget.name }}-clear-btn"
           type="button"
           class="btn btn-xs btn-ghost opacity-0 peer-focus:opacity-100 focus:opacity-100 group-hover:opacity-100"
-          aria-label="Clear search field"
+          aria-label="Clear {{ widget.name }} search field"
           _="on click set value of <input[name='{{ widget.name }}']/> to ''">
   <i class="fa-solid fa-xmark"></i>
 </button>
-</label>
+</div>
