@@ -270,11 +270,13 @@ start_time
     :From: start_time
     :Name: start_time
     :Description: When the incident started, fixed width.
+    :Redundant with: narrow_start_time
 
 narrow_start_time
     :From: start_time
     :Name: start_time
     :Description: When the incident started, width depends on date format.
+    :Redundant with: start_time
 
 ticket
     :From: ticket_url
