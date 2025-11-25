@@ -1,10 +1,13 @@
+from typing import Optional
+
 from argus.filter import get_filter_backend
-from argus.incident.models import IncidentQuerySet
-from argus.plannedmaintenance.models import PlannedMaintenanceTask
+from argus.incident.models import Event, IncidentQuerySet
+from argus.plannedmaintenance.models import PlannedMaintenanceQuerySet, PlannedMaintenanceTask
 
 
 filter_backend = get_filter_backend()
 QuerySetFilter = filter_backend.QuerySetFilter
+FilterWrapper = filter_backend.FilterWrapper
 
 
 def incidents_covered_by_planned_maintenance_task(
@@ -26,3 +29,24 @@ def incidents_covered_by_planned_maintenance_task(
         queryset = QuerySetFilter.filtered_incidents(filter.filter, queryset)
 
     return queryset
+
+
+def event_covered_by_planned_maintenance(event: Event, pm_tasks: Optional[PlannedMaintenanceQuerySet] = None) -> bool:
+    """
+    Returns true if the given event is covered by at least one of the given planned
+    maintenance tasks
+    """
+    if not pm_tasks:
+        pm_tasks = PlannedMaintenanceTask.objects.all()
+
+    pm_tasks = pm_tasks.active_at_time(event.timestamp)
+
+    for pm in pm_tasks:
+        # Return true if all filters match that event
+        covered = set()
+        for filter in pm.filters.all():
+            filter_wrapper = FilterWrapper(filterblob=filter.filter)
+            covered.add(filter_wrapper.event_fits(event) and filter_wrapper.incident_fits(event.incident))
+        if all(covered):
+            return True
+    return False
