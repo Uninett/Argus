@@ -1,5 +1,4 @@
 import logging
-from copy import deepcopy
 
 from django import forms
 from django.contrib import messages
@@ -212,7 +211,6 @@ def incident_list_filter(request, qs, use_empty_filter=False):
             else:
                 form = IncidentFilterForm(form_data or None)
                 LOG.debug("using GET: %s", form_data)
-    LOG.debug(vars(form))
     if form.is_valid():
         LOG.debug("Cleaned data: %s", form.cleaned_data)
         filterblob = form.to_filterblob()
@@ -255,13 +253,14 @@ def _normalize_form_data(request):
     """Normalizes form data from request, especially the 'tags' parameter."""
 
     raw_data = request.POST if request.method == "POST" else request.GET
-    data = deepcopy(raw_data)
-    if "tags" in raw_data:
-        if hasattr(raw_data, "getlist"):
-            raw_tags = raw_data.getlist("tags")
-        else:
-            raw_tags = raw_data.get("tags", [])
-        data["tags"] = _normalize_tags_param(raw_tags)
+    data = dict(raw_data.items())
+    for key in raw_data:
+        value = raw_data.getlist(key, [])
+        if key == "tags":
+            value = _normalize_tags_param(value)
+        elif key not in ["source_types", "sourceSystemIds"]:
+            value = value[0]
+        data[key] = value
     return data
 
 
@@ -274,7 +273,8 @@ def _normalize_tags_param(tags_param):
         tags = []
         for entry in tags_param:
             if isinstance(entry, str):
-                tags.extend(_split_tag(entry))
+                entry = _split_tag(entry)
+                tags.extend(entry)
         return tags
     return []
 
