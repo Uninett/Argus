@@ -1,0 +1,32 @@
+<table id="table"
+       class="border border-separate border-spacing-1 border-primary table {% if preferences.argus_htmx.incidents_table_layout_compact %}table-xs{% endif %}"
+       {% block incident_list_table_autorefresh %}
+       {% endblock incident_list_table_autorefresh %}>
+  <!-- htmx/incident/_incident_table.html, including table tag above -->
+  <thead>
+    <tr class="border-b border-primary">
+      {% block columns %}
+        {% for col in columns %}
+          <th class="border-b border-primary {{ col.column_classes }}">
+            {% if col.header_template %}
+              {% include col.header_template with label=col.label %}
+            {% elif col.filter_field %}
+              {% include "htmx/incident/cells/_incident_filterable_column_header.html" with column=col %}
+            {% else %}
+              {{ col.label }}
+            {% endif %}
+          </th>
+        {% empty %}
+          <th class="border-b border-primary">No columns configured</th>
+        {% endfor %}
+      {% endblock columns %}
+    </tr>
+  </thead>
+  <tbody id="table-body">
+    {% block incident_rows %}
+      {% include "htmx/incident/_incident_table_rows.html" %}
+    {% endblock incident_rows %}
+  </tbody>
+  {% block incident_list_footer %}
+  {% endblock incident_list_footer %}
+</table>

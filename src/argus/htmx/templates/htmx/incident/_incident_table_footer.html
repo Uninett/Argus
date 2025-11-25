@@ -1,0 +1,13 @@
+<!-- htmx/incident/_incident_table_footer.html -->
+<tfoot>
+  <tr>
+    <td colspan="{{ columns|length }}" class="border-t border-primary">
+      <div class="flex justify-between items-center">
+        {% block refresh_info %}
+          {% include "htmx/incident/_incident_list_refresh_info.html" %}
+        {% endblock refresh_info %}
+        {% include "./_incident_table_paginator.html" %}
+      </div>
+    </td>
+  </tr>
+</tfoot>
