@@ -2,18 +2,30 @@
 {% load argus_htmx %}
 {% with field=form|get_form_field:fieldname %}
   <div>
-    {{ column.label }}
+    <span id="{{ field.name }}-label">{{ column.label }}</span>
     <div id="{{ column.name }}-dropdown" class="dropdown dropdown-end">
       <button type="button"
               tabindex="0"
+              aria-label="Filter by {{ column.label|lower }}"
+              aria-controls="{{ column.name }}-dropdown-content"
               class="filter-btn btn btn-xs {% if field.value %} btn-primary {% else %} btn-ghost text-primary {% endif %} min-h-4 h-4">
         <i class="fa-solid fa-magnifying-glass"></i>
       </button>
-      <div class="dropdown-content bg-base-100 p-2 mt-1 rounded-lg shadow border border-primary z-10"
+      <div id="{{ column.name }}-dropdown-content"
+           class="dropdown-content bg-base-100 p-2 mt-1 rounded-lg shadow border border-primary z-10"
            tabindex="-1">
         <form class="flex gap-2 incident-list-param"
-              {% if not dummy_column %} hx-get="{% url 'htmx:incident-list' %}" hx-include=".incident-list-param" hx-target="#table" hx-swap="outerHTML" hx-push-url="true" hx-indicator="#incident-list .htmx-indicator" {% endif %}>
-          {{ field }}
+              {# djlint:off #}
+              {% if not dummy_column %}
+              hx-get="{% url 'htmx:incident-list' %}"
+              hx-include=".incident-list-param"
+              hx-target="#table"
+              hx-swap="outerHTML"
+              hx-push-url="true"
+              hx-indicator="#incident-list .htmx-indicator"
+              {% endif %}>
+              {# djlint:on #}
+          <div aria-labelledby="{{ field.name }}-label">{{ field }}</div>
           <button type="submit" class="btn btn-xs btn-primary">Filter</button>
         </form>
       </div>
