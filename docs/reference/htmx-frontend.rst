@@ -305,6 +305,20 @@ If you wish to change the available themes, first make sure the support for
 Tailwind CSS and daisyUI has been installed, then see
 :ref:`customize-htmx-frontend`.
 
+Usage of Javascript
+===================
+
+The amount of javascript libraries is deliberately being kept to a minimum. The
+ones in use are vendored to avoid a build step and stored locally to not depend
+on DNS.
+
+The following are in use:
+
+* `htmx <https://htmx.org/>`_ for updating parts of a page smoothly
+* `hyperscript <https://hyperscript.org/>`_ for adding client-side interactivity, used for cases where htmx alone is not sufficient
+* `choices.js <https://choices-js.github.io/Choices/>`_ for typeahead search,
+  multi select
+
 Customization
 =============
 
