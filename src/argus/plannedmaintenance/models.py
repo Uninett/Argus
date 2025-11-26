@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import logging
-from datetime import timedelta
+from datetime import datetime, timedelta
+from typing import Optional
 
 from django.contrib.auth import get_user_model
 from django.db import models
@@ -51,6 +52,25 @@ class PlannedMaintenanceTask(models.Model):
     @property
     def modifiable(self) -> bool:
         return self.end_time > timezone.now() - MODIFICATION_WINDOW_PM
+
+    def cancel(self, end_time: Optional[datetime] = None):
+        """
+        Sets the end time to the given time, if it is before the current end time
+
+        If the start time is later than the given time, delete the task instead
+        """
+        if not end_time:
+            end_time = timezone.now()
+
+        if self.end_time <= end_time:
+            return
+
+        if self.start_time > end_time:
+            self.delete()
+            return
+
+        self.end_time = end_time
+        self.save()
 
     def __str__(self):
         return f"Planned maintenance from {self.start_time} to {self.end_time if self.end_time != LOCAL_INFINITY else INFINITY_REPR} owned by {self.owner} - {self.description}"
