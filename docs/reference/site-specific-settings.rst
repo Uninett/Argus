@@ -212,6 +212,31 @@ A common value in development would be::
 
   DATABASE_URL=postgresql://argus_user:superSecretPassword@localhost:5432/argus_db
 
+Task queue settings
+-------------------
+
+.. setting:: TASKS
+
+* By default, :setting:`TASKS` is set to::
+
+      TASKS = {
+          "default": {
+          "BACKEND": "django_tasks.backends.immediate.ImmediateBackend",
+          }
+      }
+
+This, in effect, bypasses the use of a task queue.
+
+Turn on a database backed queue by changing to::
+
+   TASKS = {
+       "default": {
+           "BACKEND": "django_tasks.backends.database.DatabaseBackend",
+       }
+   }
+
+In addition to this you will need to run a databse worker, see `task_queue`
+
 Incident settings
 -----------------
 
@@ -344,4 +369,3 @@ Debugging settings
 
 * :setting:`TEMPLATE_DEBUG` (optional) provides a convenient way to turn debugging on and off
   for templates. If undefined it will default to the value of :setting:`DEBUG`.
-
