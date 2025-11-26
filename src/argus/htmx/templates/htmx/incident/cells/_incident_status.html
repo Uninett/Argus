@@ -1,6 +1,10 @@
 <!-- htmx/templates/htmx/incident/cells/_incident_status.html -->
 {% if incident.open %}
-  <span class="badge badge-error">Open</span>
+  <span class="text-error text-lg tooltip w-5" data-tip="Open">
+    <i class="fa-solid fa-circle-exclamation"></i>
+  </span>
 {% else %}
-  <span class="badge badge-success">Closed</span>
+  <span class="text-success text-lg tooltip w-5" data-tip="Closed">
+    <i class="fa-solid fa-circle-check"></i>
+  </span>
 {% endif %}
