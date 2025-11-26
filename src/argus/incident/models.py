@@ -12,6 +12,7 @@ from django.core.validators import URLValidator
 from django.db import models
 from django.db.models import F, Q
 from django.utils import timezone
+from django.utils.timesince import timesince
 
 from argus.util.datetime_utils import INFINITY_REPR, get_infinity_repr
 from .constants import Level
@@ -465,6 +466,22 @@ class Incident(models.Model):
     @property
     def end_time_str(self):
         return get_infinity_repr(self.end_time, str_repr=True) or self.end_time
+
+    @property
+    def age(self):
+        """Return the age of the incident as a timedelta
+
+        If the incident is open, the age is calculated up to the current time.
+        If the incident is closed, the age is calculated up to the end_time.
+        """
+        end_time = self.end_time if not self.open else timezone.now()
+        return end_time - self.start_time
+
+    @property
+    def humanize_age(self):
+        """Return the age of the incident as a human-readable string"""
+        comparison_date = timezone.now() - self.age
+        return timesince(comparison_date)
 
     @property
     def stateful(self):

@@ -283,6 +283,18 @@ narrow_start_time
     :Description: When the incident started, width depends on date format.
     :Redundant with: start_time
 
+start_time_and_age
+    :From: start_time + age
+    :Name: start_time_and_age
+    :Description: When the incident started, and how long it has been ongoing.
+    :Redundant with: start_time
+
+age
+    :From: age
+    :Name: age
+    :Description: How long the incident has been ongoing.
+    :Redundant with: start_time_and_age
+
 ticket
     :From: ticket_url
     :Name: ticket
