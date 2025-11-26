@@ -8,6 +8,7 @@ from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 from django.utils.timezone import now as tznow
 
+from argus.auth.context_processors import preferences
 from argus.auth.models import PreferenceField
 from argus.auth.utils import get_preference
 from argus.htmx.themes.utils import get_theme_default, get_theme_names
@@ -20,7 +21,8 @@ from argus.htmx.constants import (
     UPDATE_INTERVAL_DEFAULT,
     UPDATE_INTERVAL_CHOICES,
 )
-from argus.htmx.incident.columns import get_default_column_layout_name, get_column_choices
+from argus.htmx.incident.columns import get_default_column_layout_name, get_column_choices, get_incident_table_columns
+from argus.incident.models import Incident
 
 
 LOG = logging.getLogger(__name__)
@@ -77,14 +79,14 @@ class SimplePreferenceForm(forms.Form):
         Set choices, initial and default lazily to ensure settings have loaded.
         Sends in CSRF token to the widget via "request".
         """
-        request = kwargs.pop("request")
+        self.request = kwargs.pop("request")
         super().__init__(*args, **kwargs)
 
-        self.csrf_token = csrf.get_token(request)
+        self.csrf_token = csrf.get_token(self.request)
         self.choices = self.get_choices()
         self.default = self.get_default()
         self.fieldname = self.get_fieldname()
-        self.preference = self.get_preference(request)
+        self.preference = self.get_preference(self.request)
         self.initial = {self.fieldname: self.preference}
         self.previews = self.get_all_previews()
         if not self.choices:
@@ -178,8 +180,7 @@ class DateTimeFormatForm(SimplePreferenceForm):
         cls.default = get_datetime_format_default()
         return cls.default
 
-    @classmethod
-    def get_preview_context(cls, choice: str) -> Dict[str, Any]:
+    def get_preview_context(self, choice: str) -> Dict[str, Any]:
         format = DATETIME_FORMATS.get(choice, None)
         context = {
             "timestamp": tznow(),
@@ -202,6 +203,7 @@ class IncidentsTableColumnForm(SimplePreferenceForm):
     "Preference for named column layout"
 
     label = "Table column preset"
+    preview_template_name = "htmx/incident/_unpaged_incident_table.html"
 
     incidents_table_column_name = forms.ChoiceField(required=False)
 
@@ -214,6 +216,19 @@ class IncidentsTableColumnForm(SimplePreferenceForm):
     def get_default(cls):
         cls.default = get_default_column_layout_name()
         return cls.default
+
+    def get_preview_context(self, choice: str) -> Dict[str, Any]:
+        columns = get_incident_table_columns(choice)
+        pref_context = preferences(self.request)
+        prefs = pref_context["preferences"]
+        context = {
+            "preferences": prefs,
+            "incident_list": Incident.objects.all()[:1],
+            "columns": columns,
+            "dummy_column": True,
+            "refresh_info_forms": {},
+        }
+        return context
 
 
 class PageSizeForm(SimplePreferenceForm):
