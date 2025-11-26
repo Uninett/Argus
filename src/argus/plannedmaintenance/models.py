@@ -18,6 +18,17 @@ User = get_user_model()
 MODIFICATION_WINDOW_PM = timedelta(hours=12)
 
 
+class PlannedMaintenanceQuerySet(models.QuerySet):
+    def future(self):
+        return self.filter(start_time__gt=timezone.now())
+
+    def past(self):
+        return self.filter(end_time__lt=timezone.now())
+
+    def current(self):
+        return self.filter(start_time__lte=timezone.now(), end_time__gte=timezone.now())
+
+
 class PlannedMaintenanceTask(models.Model):
     class Meta:
         constraints = [
@@ -34,6 +45,8 @@ class PlannedMaintenanceTask(models.Model):
     end_time = models.DateTimeField(default=LOCAL_INFINITY)
     description = models.CharField(blank=True, max_length=255)
     filters = models.ManyToManyField(to=Filter, related_name="planned_maintenance_tasks")
+
+    objects = PlannedMaintenanceQuerySet.as_manager()
 
     @property
     def modifiable(self) -> bool:
