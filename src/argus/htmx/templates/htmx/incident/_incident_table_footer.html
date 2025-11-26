@@ -11,3 +11,20 @@
     </td>
   </tr>
 </tfoot>
+<!-- Include in footer of incident table to add scroll shadows to header and footer -->
+<script>
+(() => {
+  const table = document.querySelector("#table");
+  const elements = [table.querySelector("thead tr"), table.querySelector("tfoot tr")]
+
+  elements.forEach((el) => {
+    const intercept = document.createElement("div");
+    intercept.dataset.observerIntercept = "";
+    el.before(intercept);
+
+    new IntersectionObserver(([entry]) => {
+      el.classList.toggle("scroll-shadow", !entry.isIntersecting);
+    }).observe(intercept);
+  });
+})();
+</script>

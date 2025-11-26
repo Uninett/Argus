@@ -5054,6 +5054,28 @@ details.collapse summary::-webkit-details-marker {
   background-color: var(--fallback-b2,oklch(var(--b2)/var(--tw-bg-opacity, 1)));
 }
 
+#table thead [data-observer-intercept] {
+  position: absolute;
+  top: 50px;
+}
+
+#table thead tr.scroll-shadow {
+  box-shadow: 0 4px 6px -2px var(--tw-shadow-color, var(--scroll-shadow-default));
+  --tw-shadow-color: var(--fallback-bc,oklch(var(--bc)/1));
+  --tw-shadow: var(--tw-shadow-colored);
+}
+
+#table tfoot [data-observer-intercept] {
+  position: absolute;
+  bottom: 50px;
+}
+
+#table tfoot tr.scroll-shadow {
+  box-shadow: 0 -3px 6px -2px var(--tw-shadow-color, var(--scroll-shadow-default));
+  --tw-shadow-color: var(--fallback-bc,oklch(var(--bc)/1));
+  --tw-shadow: var(--tw-shadow-colored);
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
@@ -6085,6 +6107,10 @@ details.collapse summary::-webkit-details-marker {
 }
 
 /* use color-mix to give the illusion of transparency while not actually being transparent */
+
+:root {
+  --scroll-shadow-default: rgba(0, 0, 0, 0.15);
+}
 
 .hover\:bg-gray-100\/10:hover {
   background-color: rgb(243 244 246 / 0.1);
