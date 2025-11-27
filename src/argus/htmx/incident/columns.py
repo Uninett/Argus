@@ -101,6 +101,12 @@ _BUILTIN_COLUMN_LIST = [
         detail_link=True,
     ),
     IncidentTableColumn(
+        "status_icon",
+        "Status",
+        "htmx/incident/cells/_incident_status_icon.html",
+        detail_link=True,
+    ),
+    IncidentTableColumn(
         "level",
         "Severity level",
         "htmx/incident/cells/_incident_level.html",
@@ -145,9 +151,21 @@ _BUILTIN_COLUMN_LIST = [
         detail_link=True,
     ),
     IncidentTableColumn(
+        "ack_icon",
+        "Ack",
+        "htmx/incident/cells/_incident_ack_icon.html",
+        detail_link=True,
+    ),
+    IncidentTableColumn(
         "combined_status",
         "Status",
         "htmx/incident/cells/_incident_combined_status.html",
+        detail_link=True,
+    ),
+    IncidentTableColumn(
+        "combined_status_icon",
+        "Status",
+        "htmx/incident/cells/_incident_combined_status_icon.html",
         detail_link=True,
     ),
     IncidentTableColumn(

@@ -1,10 +1,6 @@
 <!-- htmx/incident/cells/_incident_ack.html -->
 {% if incident.acked %}
-  <span class="text-success text-lg tooltip w-5" data-tip="Acked">
-    <i class="fa-solid fa-eye"></i>
-  </span>
+  <span class="badge badge-success">Acked</span>
 {% else %}
-  <span class="text-warning text-lg tooltip w-5" data-tip="Unacked">
-    <i class="fa-solid fa-eye-slash"></i>
-  </span>
+  <span class="badge badge-error">Unacked</span>
 {% endif %}
