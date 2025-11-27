@@ -4,7 +4,7 @@
        {% endblock incident_list_table_autorefresh %}>
   <!-- htmx/incident/_incident_table.html, including table tag above -->
   <thead>
-    <tr class="border-b border-primary">
+    <tr class="border-b border-primary bg-base-100 sticky top-0">
       {% block columns %}
         {% for col in columns %}
           <th class="border-b border-primary {{ col.column_classes }}">

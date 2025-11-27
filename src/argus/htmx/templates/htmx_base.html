@@ -26,7 +26,7 @@
     {% endblock head %}
   </head>
   <body {% block body_overrides %}
-        class="override bg-base-100"
+        class="override bg-base-100 h-screen flex flex-col"
         {% endblock body_overrides %}>
     {% block header %}
       <h1>Argus Server: {{ page_title }}</h1>
@@ -52,7 +52,7 @@
       </div>
       {# djlint:on H021 #}
     {% endif %}
-    <main class="space-y-2 p-1">
+    <main class="flex flex-col flex-1 min-h-0 space-y-2 p-1">
       {% block main %}
       {% endblock main %}
     </main>
