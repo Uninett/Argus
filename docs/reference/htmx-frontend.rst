@@ -230,7 +230,7 @@ combined_status
 
 combined_status_icon
     :From: ack + status
-    :Name: combined_status
+    :Name: combined_status_icons
     :Description: Merges the "open" column and the "ack" column into one, using icons instead of text.
 
 description
