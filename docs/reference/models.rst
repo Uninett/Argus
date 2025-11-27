@@ -89,6 +89,18 @@ Handling notifications
       Holds a ``DestinationConfig``'s type. The ``installed``-field is updated
       on startup to keep track of which ``notification plugin``\s are installed.
 
+Handling maintenance work
+=========================
+
+.. glossary::
+
+   PlannedMaintenanceTask
+      Holds who created the task and when (not editable), the start and end time
+      of such a task, and a description of what this maintenance work entails and/or
+      why it is happening.
+
+      It also holds a collection of ``Filter``\s that describe what kind of events are
+      covered by that planned maintenance.
 
 ER diagram
 ==========
