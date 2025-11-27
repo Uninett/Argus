@@ -120,6 +120,12 @@ _BUILTIN_COLUMN_LIST = [
         detail_link=True,
     ),
     IncidentTableColumn(
+        "source_type",
+        "Source Type",
+        "htmx/incident/cells/_incident_source_type.html",
+        detail_link=True,
+    ),
+    IncidentTableColumn(
         "description",
         "Description",
         "htmx/incident/cells/_incident_description.html",

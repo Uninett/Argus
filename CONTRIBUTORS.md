@@ -34,3 +34,5 @@
 ## 2025
 
 * [James Ladd](https://github.com/jladd-geant) \<james.ladd@geant.org\>
+* [Simen Abelsen](https://github.com/Simrayz) \<simen@abelweb.no\>
+* [Aleksander Fløtten](https://github.com/aleksfl) \<aleksander.flotten@sikt.no\>

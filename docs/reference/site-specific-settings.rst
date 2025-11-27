@@ -315,8 +315,35 @@ Ticket system settings
 ``TICKET_PLUGIN``, ``TICKET_ENDPOINT``, ``TICKET_AUTHENTICATION_SECRET``,
 ``TICKET_INFORMATION`` are all described in :ref:`ticket-systems-settings`.
 
+Frontend settings
+-----------------
+
+.. setting:: INCIDENT_TABLE_COLUMN_LAYOUTS
+
+* :setting:`INCIDENT_TABLE_COLUMN_LAYOUTS` allows adding one or more choosable
+  incident list column layouts in addition to the built-in layout. Format::
+
+    INCIDENT_TABLE_COLUMN_LAYOUTS = {
+        "default": [
+            "row_select",
+            "combined_status",
+            "source",
+            "description",
+        ]
+    }
+
+  See :ref:`table-column-reference` for the built-in layout and a list of all
+  available built-in column types.
+
+.. setting:: INCIDENT_TABLE_COLUMNS
+
+* :setting:`INCIDENT_TABLE_COLUMNS`
+
+The old, deprecated variant of :setting:`INCIDENT_TABLE_COLUMN_LAYOUTS`, it
+only supported a single column layout.
+
 Special environment settings
-----------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. setting:: BANNER_MESSAGE
 
@@ -344,4 +371,3 @@ Debugging settings
 
 * :setting:`TEMPLATE_DEBUG` (optional) provides a convenient way to turn debugging on and off
   for templates. If undefined it will default to the value of :setting:`DEBUG`.
-
