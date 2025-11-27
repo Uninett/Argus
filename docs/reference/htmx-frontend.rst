@@ -214,7 +214,7 @@ ack
 
 ack_icon
     :From: ack
-    :Name: ack
+    :Name: ack_icon
     :Description: Show whether the incident is acked or not, using an icon instead of text.
     :Redundant with: combined_status, combined_status_icon
 
