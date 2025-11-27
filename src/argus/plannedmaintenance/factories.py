@@ -16,7 +16,7 @@ class PlannedMaintenanceFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.PlannedMaintenanceTask
 
-    owner = factory.SubFactory(PersonUserFactory)
+    created_by = factory.SubFactory(PersonUserFactory)
     start_time = factory.Faker("date_time_between", start_date="-2d", end_date="-1d", tzinfo=ZoneInfo("UTC"))
     end_time = LOCAL_INFINITY
     description = factory.Faker("sentence")
