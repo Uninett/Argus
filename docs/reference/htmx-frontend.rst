@@ -210,7 +210,13 @@ ack
     :From: ack
     :Name: ack
     :Description: Show whether the incident is acked or not.
-    :Redundant with: combined_status
+    :Redundant with: combined_status, combined_status_icons
+
+ack_icon
+    :From: ack
+    :Name: ack_icon
+    :Description: Show whether the incident is acked or not, using an icon instead of text.
+    :Redundant with: combined_status, combined_status_icons
 
 color_status
     :From: ack + status
@@ -221,6 +227,11 @@ combined_status
     :From: ack + status
     :Name: combined_status
     :Description: Merges the "open" column and the "ack" column into one.
+
+combined_status_icons
+    :From: ack + status
+    :Name: combined_status_icons
+    :Description: Merges the "open" column and the "ack" column into one, using icons instead of text.
 
 description
     :From: description
@@ -259,7 +270,13 @@ status
     :From: open
     :Name: status
     :Description: Whether the incident is still ongoing or has been closed.
-    :Redundant with: combined_status
+    :Redundant with: combined_status, combined_status_icons
+
+status_icon
+    :From: open
+    :Name: status_icon
+    :Description: Whether the incident is still ongoing or has been closed, using an icon instead of text.
+    :Redundant with: combined_status, combined_status_icons
 
 row_select
     :From: depends on incident id

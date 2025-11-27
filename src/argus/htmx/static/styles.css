@@ -5343,6 +5343,10 @@ details.collapse summary::-webkit-details-marker {
   width: 1rem;
 }
 
+.w-5 {
+  width: 1.25rem;
+}
+
 .w-52 {
   width: 13rem;
 }
@@ -5886,6 +5890,11 @@ details.collapse summary::-webkit-details-marker {
   line-height: 1.5rem;
 }
 
+.text-lg {
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+}
+
 .text-sm {
   font-size: 0.875rem;
   line-height: 1.25rem;
@@ -5993,6 +6002,11 @@ details.collapse summary::-webkit-details-marker {
 .text-severity-secondary-5 {
   --tw-text-opacity: 1;
   color: rgb(255 255 255 / var(--tw-text-opacity, 1));
+}
+
+.text-success {
+  --tw-text-opacity: 1;
+  color: var(--fallback-su,oklch(var(--su)/var(--tw-text-opacity, 1)));
 }
 
 .text-warning {
