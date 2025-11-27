@@ -10,11 +10,11 @@ from argus.auth.factories import PersonUserFactory
 from argus.filter.factories import FilterFactory
 from argus.filter.filterwrapper import FilterKey
 from argus.filter.filterwrapper import FallbackFilterWrapper
-from argus.filter.filterwrapper import ComplexFilterWrapper
 from argus.incident.factories import SourceSystemFactory
 from argus.incident.factories import StatefulIncidentFactory
 from argus.incident.models import Event
 from argus.notificationprofile.factories import NotificationProfileFactory
+from argus.notificationprofile.media import NotificationProfileFilterWrapper
 
 
 @tag("unittest")
@@ -272,7 +272,7 @@ class FallbackFilterWrapperEventFitsEventTypeTests(unittest.TestCase):
 
 
 @tag("unittest")
-class ComplexFilterWrapperIncidentFitsTagsTests(DjangoTestCase):
+class NotificationProfileFilterWrapperIncidentFitsTagsTests(DjangoTestCase):
     def setUp(self):
         self.source = SourceSystemFactory(name="vfdgtnhj")
         self.incident = StatefulIncidentFactory(start_time=tznow(), source=self.source)
@@ -284,8 +284,8 @@ class ComplexFilterWrapperIncidentFitsTagsTests(DjangoTestCase):
         filtr = FilterFactory(user=self.user, filter={"sourceSystemIds": [self.source.id]})
         self.profile.filters.add(filtr)
 
-        cfw = ComplexFilterWrapper(profile=self.profile)
-        self.assertTrue(cfw.incident_fits(self.incident))
+        npfw = NotificationProfileFilterWrapper(profile=self.profile)
+        self.assertTrue(npfw.incident_fits(self.incident))
 
     def test_incident_fits_fails_on_multiple_conflicting_filters(self):
         filtr = FilterFactory(user=self.user, filter={"sourceSystemIds": [self.source.id]})
@@ -293,8 +293,8 @@ class ComplexFilterWrapperIncidentFitsTagsTests(DjangoTestCase):
         other_filter = FilterFactory(user=self.user, filter={"sourceSystemIds": [0]})
         self.profile.filters.add(other_filter)
 
-        cfw = ComplexFilterWrapper(profile=self.profile)
-        self.assertFalse(cfw.incident_fits(self.incident))
+        npfw = NotificationProfileFilterWrapper(profile=self.profile)
+        self.assertFalse(npfw.incident_fits(self.incident))
 
     def test_incident_fits_succeeds_on_multiple_compatible_filters(self):
         filtr = FilterFactory(user=self.user, filter={"sourceSystemIds": [self.source.id]})
@@ -302,5 +302,5 @@ class ComplexFilterWrapperIncidentFitsTagsTests(DjangoTestCase):
         other_filter = FilterFactory(user=self.user, filter={"maxlevel": self.incident.level})
         self.profile.filters.add(other_filter)
 
-        cfw = ComplexFilterWrapper(profile=self.profile)
-        self.assertTrue(cfw.incident_fits(self.incident))
+        npfw = NotificationProfileFilterWrapper(profile=self.profile)
+        self.assertTrue(npfw.incident_fits(self.incident))

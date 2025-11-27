@@ -9,14 +9,15 @@ from argus.compat import StrEnum
 
 
 if TYPE_CHECKING:
+    from django.db.models import Model
+    from django.db.models.query import QuerySet
     from argus.incident.models import Event, Incident
 
 
 __all__ = [
     "FilterWrapper",
     "FallbackFilterWrapper",
-    "ComplexFilterWrapper",
-    "ComplexFallbackFilterWrapper",
+    "PrecisionFilterWrapper",
 ]
 
 
@@ -120,6 +121,13 @@ class FilterWrapper:
             LOG.debug("Filter: %s: HIT!", self)
         return not any_failed
 
+    def filter_fits(self, event) -> bool:
+        event_fits = self.event_fits(event)
+        incident_fits = self.incident_fits(event.incident)
+        if event_fits and incident_fits:
+            return True
+        return False
+
 
 class FallbackFilterWrapper(FilterWrapper):
     "Changed by ARGUS_FALLBACK_FILTER setting"
@@ -133,36 +141,37 @@ class FallbackFilterWrapper(FilterWrapper):
         return value if value else self.fallback_filter.get(key, None)
 
 
-class ComplexFilterWrapper:
+class PrecisionFilterWrapper:
+    "Combine several filters together via Boolean AND for higher precision"
+
     filterwrapper = FilterWrapper
 
-    def __init__(self, **kwargs):
-        self.profile = kwargs.pop("profile", None)
+    def __init__(self, model_or_queryset: Model | QuerySet, filterwrapper: Optional[FilterWrapper] = None):
+        # subclasses accepting model needs to pass on the manager in super()
+        self.queryset = model_or_queryset
+        if filterwrapper:
+            self.filterwrapper = filterwrapper
 
     def incident_fits(self, incident: Incident) -> bool:
         """Check against multiple filters
 
         The filters are AND-ed together for greater precision.
         """
-        if not self.profile.active:
-            return False
-        is_selected_by_time = self.profile.timeslot.timestamp_is_within_time_recurrences(incident.start_time)
-        if not is_selected_by_time:
-            return False
-        for f in self.profile.filters.only("filter"):
+        for f in self.queryset.only("filter"):
             if not self.filterwrapper(f.filter).incident_fits(incident):
                 return False
         return True
 
     def event_fits(self, event: Event) -> bool:
-        if not self.profile.active:
-            return False
         # return as early as possible
-        for f in self.profile.filters.only("filter"):
+        for f in self.queryset.only("filter"):
             if FilterWrapper(f.filter).event_fits(event):
                 return True
         return False
 
-
-class ComplexFallbackFilterWrapper(ComplexFilterWrapper):
-    filterwrapper = FallbackFilterWrapper
+    def filter_fits(self, event: Event) -> bool:
+        event_fits = self.event_fits(event)
+        incident_fits = self.incident_fits(event.incident)
+        if event_fits and incident_fits:
+            return True
+        return False
