@@ -274,7 +274,7 @@ status
 
 status_icon
     :From: open
-    :Name: status
+    :Name: status_icon
     :Description: Whether the incident is still ongoing or has been closed, using an icon instead of text.
     :Redundant with: combined_status, combined_status_icon
 
