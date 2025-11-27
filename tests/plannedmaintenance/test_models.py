@@ -19,13 +19,13 @@ class PlannedMaintenanceTaskTests(TestCase):
         connect_signals()
 
     def test_given_open_pm_task_modifiable_is_true(self):
-        open_pm_task = PlannedMaintenanceTask(owner=self.user)
+        open_pm_task = PlannedMaintenanceTask(created_by=self.user)
 
         self.assertTrue(open_pm_task.modifiable)
 
     def test_given_recently_ended_pm_task_modifiable_is_true(self):
         open_pm_task = PlannedMaintenanceTask(
-            owner=self.user,
+            created_by=self.user,
             start_time=timezone.now() - timedelta(hours=1),
             end_time=timezone.now(),
         )
@@ -34,7 +34,7 @@ class PlannedMaintenanceTaskTests(TestCase):
 
     def test_given_long_ago_ended_pm_task_modifiable_is_false(self):
         open_pm_task = PlannedMaintenanceTask(
-            owner=self.user,
+            created_by=self.user,
             start_time=timezone.now() - MODIFICATION_WINDOW_PM - timedelta(hours=2),
             end_time=timezone.now() - MODIFICATION_WINDOW_PM - timedelta(hours=1),
         )
