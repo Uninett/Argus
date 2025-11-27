@@ -1,0 +1,21 @@
+:root {
+    --scroll-shadow-default: rgba(0, 0, 0, 0.15);
+}
+@layer components {
+    #table thead [data-observer-intercept] {
+        position: absolute;
+        top: 50px;
+    }
+    #table thead tr.scroll-shadow {
+        box-shadow: 0 4px 6px -2px var(--tw-shadow-color, var(--scroll-shadow-default));
+        @apply shadow-base-content;
+    }
+    #table tfoot [data-observer-intercept] {
+        position: absolute;
+        bottom: 50px;
+    }
+    #table tfoot tr.scroll-shadow {
+        box-shadow: 0 -3px 6px -2px var(--tw-shadow-color, var(--scroll-shadow-default));
+        @apply shadow-base-content;
+    }
+}
