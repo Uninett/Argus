@@ -1,0 +1,10 @@
+{% extends "htmx/user/preference_form/_base_form.html" %}
+{% block section_id %}
+  theme-settings
+{% endblock section_id %}
+{% block section_title %}
+  Theme and Format
+{% endblock section_title %}
+{% block section_forms %}
+  {% for form in theme_forms %}{{ form }}{% endfor %}
+{% endblock section_forms %}
