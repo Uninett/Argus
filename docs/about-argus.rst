@@ -67,6 +67,7 @@ server, such as:
 * Administration of Argus user accounts
 * Creating API authentication tokens for users
 * Defining new source systems to collect incidents from
+* Creating and updating planned maintenance tasks
 
 Pick and choose
 ---------------
