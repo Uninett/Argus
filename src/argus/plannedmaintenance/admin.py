@@ -24,7 +24,7 @@ def cancel_pms(modeladmin, request, queryset):
 class PlannedMaintenanceTaskAdmin(admin.ModelAdmin):
     # Planned maintenance list
     list_display = (
-        "owner",
+        "created_by",
         "created",
         "start_time",
         "end_time",
@@ -32,16 +32,16 @@ class PlannedMaintenanceTaskAdmin(admin.ModelAdmin):
     )
     search_fields = (
         "description",
-        "owner__first_name",
-        "owner__last_name",
-        "owner__username",
+        "created_by__first_name",
+        "created_by__last_name",
+        "created_by__username",
         "filters__name",
         "filters__user__first_name",
         "filters__user__last_name",
         "filters__user__username",
     )
     list_filter = [
-        ("owner", admin.RelatedOnlyFieldListFilter),
+        ("created_by", admin.RelatedOnlyFieldListFilter),
         list_filter_factory(
             "future",
             lambda qs, yes_filter: qs.future() if yes_filter else qs.filter(start_time__lte=timezone.now()),
@@ -58,8 +58,8 @@ class PlannedMaintenanceTaskAdmin(admin.ModelAdmin):
         ),
     ]
 
-    list_select_related = ("owner",)
-    raw_id_fields = ("owner",)
+    list_select_related = ("created_by",)
+    raw_id_fields = ("created_by",)
     ordering = ("start_time",)
 
     actions = [cancel_pms]

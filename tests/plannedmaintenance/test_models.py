@@ -70,6 +70,7 @@ class PlannedMaintenanceTaskTests(TestCase):
 
     def test_given_open_pm_task_modifiable_is_true(self):
         open_pm_task = PlannedMaintenanceTask(created_by=self.user)
+
         self.assertTrue(open_pm_task.modifiable)
 
     def test_given_recently_ended_pm_task_modifiable_is_true(self):
@@ -87,7 +88,7 @@ class PlannedMaintenanceTaskTests(TestCase):
             start_time=timezone.now() - MODIFICATION_WINDOW_PM - timedelta(hours=2),
             end_time=timezone.now() - MODIFICATION_WINDOW_PM - timedelta(hours=1),
         )
-        self.assertFalse(self.past_pm.modifiable)
+        self.assertFalse(open_pm_task.modifiable)
 
     def test_given_active_pm_current_is_true(self):
         pm = PlannedMaintenanceFactory(start_time=timezone.now() - timedelta(minutes=5))

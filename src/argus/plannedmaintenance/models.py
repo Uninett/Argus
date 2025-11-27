@@ -45,7 +45,7 @@ class PlannedMaintenanceTask(models.Model):
             ),
         ]
 
-    owner = models.ForeignKey(to=User, on_delete=models.CASCADE, related_name="planned_maintenance_tasks")
+    created_by = models.ForeignKey(to=User, on_delete=models.CASCADE, related_name="planned_maintenance_tasks")
     created = models.DateTimeField(default=timezone.now)
     start_time = models.DateTimeField(default=timezone.now)
     end_time = models.DateTimeField(default=LOCAL_INFINITY)
@@ -78,4 +78,4 @@ class PlannedMaintenanceTask(models.Model):
         self.save()
 
     def __str__(self):
-        return f"Planned maintenance from {self.start_time} to {self.end_time if self.end_time != LOCAL_INFINITY else INFINITY_REPR} owned by {self.owner} - {self.description}"
+        return f"Planned maintenance from {self.start_time} to {self.end_time if self.end_time != LOCAL_INFINITY else INFINITY_REPR} created by {self.created_by} - {self.description}"
