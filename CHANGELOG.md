@@ -8,6 +8,44 @@ This project uses [*towncrier*](https://towncrier.readthedocs.io/) and the chang
 
 <!-- towncrier release notes start -->
 
+## [2.4.0] - 2025-11-28
+
+The most important feature this release is being able to filter on source
+system type. If you have multiple source systems in a filter, all of them of
+the same type, it might pay off to switch over to using the source system type
+instead.
+
+The rest is frontend improvements: The tags filter now has typeahead find. The
+header and footer of the incident list never scroll off screen. The status
+columns have variants with icons instead of text, and there's new columns
+showing an incident's age (time since it happened).
+
+See NOTES.md for further detail.
+
+### Added
+
+- Added test error page ([#1024](https://github.com/Uninett/Argus/issues/1024))
+- Add age columns to incident table
+  ([#1552](https://github.com/Uninett/Argus/issues/1552))
+- Made it possible to filter on a source's type in the incident list, API, and
+  for sending notifications. Also added a new built-in column "source type" for
+  the incident list. When there are very many sources of the same type, the
+  filter and column become useful.
+  ([#1556](https://github.com/Uninett/Argus/issues/1556))
+- Add status columns that use icons instead of text
+  ([#1635](https://github.com/Uninett/Argus/issues/1635))
+- Made a system for rendering previews of preference choices.
+
+### Changed
+
+- Change incident table header and footer to always be visible
+  ([#1548](https://github.com/Uninett/Argus/issues/1548))
+- Add clear button to search column header
+  ([#1573](https://github.com/Uninett/Argus/issues/1573))
+- Change tags input to use searchable multiselect
+  ([#1604](https://github.com/Uninett/Argus/issues/1604))
+
+
 ## [2.3.0] - 2025-11-20
 
 This release has numerous improvements to the frontend. The various

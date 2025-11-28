@@ -3,6 +3,23 @@
 This file documents changes to Argus that are relevant for operations,
 customizers and end-users.
 
+## [2.4.0] - 2025-11-28
+
+The most important feature this release is being able to filter on source
+system type. If you have multiple source systems in a filter, all of them of
+the same type, it might pay off to switch over to using the source system type
+instead.
+
+The rest is frontend improvements: The tags filter now has typeahead find. The
+header and footer of the incident list never scroll off screen. The status
+columns have variants with icons instead of text, and there's new columns
+showing an incident's age (time since it happened).
+
+The new columns are called `age`, `start_time_and_age`, `status_icon`,
+`ack_icon` and `combined_status_icons`. The last takes up the least horizontal
+space in the table.
+
+
 ## [2.3.0] - 2025-11-20
 
 This release has numerous improvements to the frontend. The various
