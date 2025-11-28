@@ -1,0 +1,10 @@
+{% extends "htmx/user/preference_form/_base_form.html" %}
+{% block section_id %}
+  user-settings
+{% endblock section_id %}
+{% block section_title %}
+  Incident Table
+{% endblock section_title %}
+{% block section_forms %}
+  {% for form in incident_forms %}{{ form }}{% endfor %}
+{% endblock section_forms %}

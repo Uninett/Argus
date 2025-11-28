@@ -1,0 +1,19 @@
+<section id="{% block section_id %}{% endblock section_id %}"
+         class="card card-base border border-base-200 p-4 max-w-screen-md mx-auto space-y-2">
+  <h3 class="card-title text-xl">
+    {% block section_title %}
+    {% endblock section_title %}
+  </h3>
+  <form hx-post="{% url 'htmx:update-preferences' namespace='argus_htmx' %}"
+        hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+        class="space-y-2">
+    <ul class="card-body menu">
+      {% block section_forms %}
+      {% endblock section_forms %}
+    </ul>
+    <div class="preference-form-actions flex justify-end gap-2 px-2">
+      <button class="btn btn-primary btn-sm">Save preferences</button>
+      <button type="reset" class="btn btn-sm">Reset</button>
+    </div>
+  </form>
+</section>
