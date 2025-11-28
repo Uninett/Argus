@@ -65,9 +65,11 @@ class TestIncidentsCoveredByPlannedMaintenanceTask(TestCase):
 class TestEventCoveredByPlannedMaintenanceTasks(TestCase):
     def setUp(self):
         disconnect_signals()
-        self.start_event = EventFactory(type=Event.Type.INCIDENT_START)
+        self.default_level = 5
+        self.incident = StatefulIncidentFactory(level=self.default_level)
+        self.start_event = EventFactory(incident=self.incident, type=Event.Type.INCIDENT_START)
         self.current_pm = PlannedMaintenanceFactory()
-        self.maxlevel_filter = FilterFactory(filter={"maxlevel": 5})
+        self.maxlevel_filter = FilterFactory(filter={"maxlevel": self.default_level})
 
     def teardown(self):
         connect_signals()
