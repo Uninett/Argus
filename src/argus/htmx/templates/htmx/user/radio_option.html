@@ -1,8 +1,13 @@
 <!-- htmx/user/radio_option.html -->
-<input type="radio"
-       class="btn btn-sm btn-block btn-ghost justify-start"
-       {% if widget.value != None %}value="{{ widget.value|stringformat:'s' }}"{% endif %}
-       {% if widget.attrs.checked %}checked="checked"{% endif %}
-       aria-label="{{ widget.label }}"
-       name="{{ widget.name }}"
-       autocomplete="off" />
+<label class="btn btn-sm flex btn-ghost justify-between">
+  <div class="flex gap-2">
+    <input type="radio"
+           {% if widget.value != None %}value="{{ widget.value|stringformat:'s' }}"{% endif %}
+           {% if widget.attrs.checked %}checked="checked"{% endif %}
+           aria-label="{{ widget.label }}"
+           name="{{ widget.name }}"
+           autocomplete="off" />
+    <span class="font-bold">{{ widget.value|stringformat:'s' }}</span>
+  </div>
+  {% if widget.preview %}<span>{{ widget.preview }}</span>{% endif %}
+</label>
