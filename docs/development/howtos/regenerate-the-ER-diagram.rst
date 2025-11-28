@@ -20,7 +20,7 @@ Test by making a .dot-file
 
 To test if everything is installed correctly, run::
 
-    python manage.py graph_models argus_auth argus_incident argus_notificationprofile \
+    python manage.py graph_models argus_auth argus_incident argus_notificationprofile argus_plannedmaintenance \
     --group-models -X Permission,AbstractUser,AbstractBaseUser,PermissionsMixin
 
 This will dump a `.dot-file <https://graphviz.org/doc/info/lang.html>`_, the
@@ -42,7 +42,7 @@ We need to have one more dependency installed: one of ``pygraphviz`` or
 
 To generate the final PNG in the correct location, run::
 
-    python manage.py graph_models argus_auth argus_incident argus_notificationprofile \
+    python manage.py graph_models argus_auth argus_incident argus_notificationprofile argus_plannedmaintenance \
     --group-models -X Permission,AbstractUser,AbstractBaseUser,PermissionsMixin \
     -o docs/reference/img/ER_model.png
 
@@ -52,7 +52,7 @@ Use ``graphviz`` directly on a .dot-file
 1. Make sure you have graphviz installed, how is OS/distro dependent
 2. Generate the dot-file with::
 
-    python manage.py graph_models argus_auth argus_incident argus_notificationprofile \
+    python manage.py graph_models argus_auth argus_incident argus_notificationprofile argus_plannedmaintenance \
     --group-models -X Permission,AbstractUser,AbstractBaseUser,PermissionsMixin \
     -o ER_model.dot
 3. Generate the PNG with ``dot``::
