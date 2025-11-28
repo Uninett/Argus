@@ -5164,12 +5164,21 @@ details.collapse summary::-webkit-details-marker {
   z-index: 1;
 }
 
+.z-20 {
+  z-index: 20;
+}
+
 .m-1 {
   margin: 0.25rem;
 }
 
 .m-4 {
   margin: 1rem;
+}
+
+.mx-auto {
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .my-0 {
@@ -5383,6 +5392,10 @@ details.collapse summary::-webkit-details-marker {
 
 .max-w-\[30\%\] {
   max-width: 30%;
+}
+
+.max-w-screen-md {
+  max-width: 768px;
 }
 
 .max-w-sm {
@@ -5654,6 +5667,11 @@ details.collapse summary::-webkit-details-marker {
 
 .border-none {
   border-style: none;
+}
+
+.border-base-200 {
+  --tw-border-opacity: 1;
+  border-color: var(--fallback-b2,oklch(var(--b2)/var(--tw-border-opacity, 1)));
 }
 
 .border-neutral-content {
