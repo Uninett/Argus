@@ -15,7 +15,7 @@
            class="dropdown-content bg-base-100 p-2 mt-1 rounded-lg shadow border border-primary z-10"
            tabindex="-1">
         <form class="flex gap-2 incident-list-param"
-              {# djlint:off #}
+          {# djlint:off #}
               {% if not dummy_column %}
               hx-get="{% url 'htmx:incident-list' %}"
               hx-include=".incident-list-param"
@@ -24,7 +24,7 @@
               hx-push-url="true"
               hx-indicator="#incident-list .htmx-indicator"
               {% endif %}>
-              {# djlint:on #}
+          {# djlint:on #}
           <div aria-labelledby="{{ field.name }}-label">{{ field }}</div>
           <button type="submit" class="btn btn-xs btn-primary">Filter</button>
         </form>

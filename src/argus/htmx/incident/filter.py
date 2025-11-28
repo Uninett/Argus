@@ -159,6 +159,7 @@ class IncidentFilterForm(TagFieldMixin, forms.Form):
         if source_types:
             filterblob["source_types"] = source_types
 
+        # Always store tags as list of key=value strings
         tags = self.cleaned_data.get("tags", [])
         if tags:
             filterblob["tags"] = tags

@@ -4,6 +4,7 @@ from rest_framework.authtoken.models import Token
 from argus.notificationprofile.media import send_notifications_to_users
 from argus.notificationprofile.media import background_send_notification
 from argus.notificationprofile.media import send_notification
+from argus.plannedmaintenance.utils import event_covered_by_planned_maintenance
 from .models import (
     Acknowledgement,
     Event,
@@ -28,10 +29,14 @@ def delete_associated_user(sender, instance: SourceSystem, *args, **kwargs):
 
 
 def task_send_notification(sender, instance: Event, *args, **kwargs):
+    if event_covered_by_planned_maintenance(event=instance):
+        return
     send_notifications_to_users(instance)
 
 
 def task_background_send_notification(sender, instance: Event, *args, **kwargs):
+    if event_covered_by_planned_maintenance(event=instance):
+        return
     send_notifications_to_users(instance, send=background_send_notification)
 
 
