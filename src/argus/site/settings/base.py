@@ -101,6 +101,7 @@ TEMPLATES = [
                 "social_django.context_processors.login_redirect",
                 "argus.auth.context_processors.preferences",
                 "argus.htmx.context_processors.static_paths",
+                "argus.htmx.context_processors.metadata",
             ],
         },
     }
