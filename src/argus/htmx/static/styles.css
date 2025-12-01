@@ -6185,6 +6185,8 @@ details.collapse summary::-webkit-details-marker {
 .card-base .card-title {
   padding: 1.25rem;
   padding-bottom: 0px;
+  font-size: 1.25rem;
+  line-height: 1.75rem;
 }
 
 .card-base .card-body {
