@@ -26,5 +26,5 @@ def banner_message(request):
     return {"banner_message": getattr(settings, "BANNER_MESSAGE", None)}
 
 
-def metadata(_request):
+def metadata(request):
     return {"version": get_version()}
