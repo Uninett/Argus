@@ -3,16 +3,16 @@
 {% block main %}
   <div class="flex flex-col items-center gap-4 m-4">
     {% block incident_detail %}
-      <h1 class="text-xl font-bold text-center">{{ incident.pk }}: {{ incident.description }}</h1>
+      <h1 class="text-3xl font-semibold text-center">{{ incident.pk }}: {{ incident.description }}</h1>
       <div class="flex gap-4 justify-center">
         <section id="incident-detail"
                  class="flex flex-col gap-4 basis-1/4 shrink-0 max-w-[30%]">
-          <section id="level" class="card shadow-md">
+          <section id="level" class="card card-base">
             <h2 class="card-title pl-8">Level</h2>
             <p class="card-body">{{ incident.level }}</p>
           </section>
-          <section id="status" class="card shadow-md">
-            <h2 class="card-title pl-8">Status</h2>
+          <section id="status" class="card card-base">
+            <h2 class="card-title">Status</h2>
             <p class="card-body flex-row flex-wrap gap-0.5">
               {% if incident.open %}
                 <span class="badge badge-error">Open</span>
@@ -31,8 +31,8 @@
               {% endif %}
             </p>
           </section>
-          <section id="tags" class="card shadow-md">
-            <h2 class="card-title pl-8">Tags</h2>
+          <section id="tags" class="card card-base">
+            <h2 class="card-title">Tags</h2>
             <p class="card-body flex-row flex-wrap gap-0.5">
               {% for tag in incident.deprecated_tags %}
                 <span class="badge badge-neutral-content badge-outline  h-auto text-wrap break-all text-center text-xs">
@@ -43,8 +43,8 @@
               {% endfor %}
             </p>
           </section>
-          <section id="primary-details" class="card shadow-md">
-            <h2 class="card-title pl-8">Primary details (#{{ incident.pk }})</h2>
+          <section id="primary-details" class="card card-base">
+            <h2 class="card-title">Primary details (#{{ incident.pk }})</h2>
             <div class="card-body">
               <section>
                 <h3 class="font-bold">Description</h3>
@@ -130,9 +130,9 @@
           </section>
         </section>
         <section id="acknowledgements"
-                 class="flex flex-col basis-1/4 max-w-[30%] card shadow-md">
+                 class="flex flex-col basis-1/4 max-w-[30%] card card-base">
           <div class="basis-0 grow overflow-y-scroll">
-            <h2 class="card-title pl-8 sticky top-0">Acknowledgements</h2>
+            <h2 class="card-title sticky top-0">Acknowledgements</h2>
             <div class="card-body gap-4 grow-0">
               <div class="card-actions grow-0 sticky top-10">
                 {% include "htmx/incident/_incident_acknowledge_modal.html" with action="ack" dialog_id="create-acknowledgment-dialog" button_title="Create acknowledgment" header="Submit acknowledgment" explanation="Write a message describing why this incident was acknowledged" cancel_text="Cancel" submit_text="Submit" %}
@@ -153,9 +153,9 @@
           </div>
         </section>
         <section id="events"
-                 class="flex flex-col basis-1/4 max-w-[30%] card shadow-md">
+                 class="flex flex-col basis-1/4 max-w-[30%] card card-base">
           <div class="basis-0 grow overflow-y-scroll">
-            <h2 class="card-title pl-8 sticky top-0">Related events</h2>
+            <h2 class="card-title sticky top-0">Related events</h2>
             <div class="gap-4 card-body flex-none">
               <div class="card-actions grow-0 sticky top-10">
                 {% if incident.stateful %}

@@ -1,12 +1,12 @@
 {% extends "./base.html" %}
 {% block profile_main %}
   <div>
-    <div class="card mt-4 mb-8 bg-base-200/40 shadow-2xl"
+    <div class="card card-base card-gray mt-4 mb-8"
          hx-get="{% url "htmx:notificationprofile-create" %}"
          hx-swap="innerHTML"
          hx-trigger="load once"></div>
     {% for form in form_list %}
-      <div class="card my-4 bg-base-100 shadow-2xl">{% include "./_notificationprofile_form.html" %}</div>
+      <div class="card card-base card-border my-4">{% include "./_notificationprofile_form.html" %}</div>
     {% endfor %}
   </div>
 {% endblock profile_main %}
