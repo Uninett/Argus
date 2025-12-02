@@ -204,5 +204,26 @@
 </p>
 <p>{{ form.input_ }}</p>
 </section>
+<section class="space-y-4 border rounded-md p-4">
+  <h2 class="text-2xl">Colors</h2>
+  <p>
+    These are the available color names and colors as set by the current
+    selected theme.
+  </p>
+  {% comment %}Also useful for making sure tailwind finds all used colors.{% endcomment %}
+  <div class="flex items-center gap-1 p-1 bg-transparent">
+    <div class="badge badge-base-100 bg-base-100">base-100</div>
+    <div class="badge badge-base-200 bg-base-200">base-200</div>
+    <div class="badge badge-base-300 bg-base-300">base-300</div>
+    <div class="badge badge-primary bg-primary">primary</div>
+    <div class="badge badge-secondary bg-secondary">secondary</div>
+    <div class="badge badge-accent bg-accent">accent</div>
+    <div class="badge badge-neutral bg-neutral">neutral</div>
+    <div class="badge badge-info bg-info">info</div>
+    <div class="badge badge-success bg-success">success</div>
+    <div class="badge badge-warning bg-warning">warning</div>
+    <div class="badge badge-error bg-error">error</div>
+  </div>
+</section>
 </div>
 {% endblock main %}
