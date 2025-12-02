@@ -1,0 +1,26 @@
+<script>
+const BUTTON_SELECTOR = '.preference-form-actions button';
+document.querySelectorAll('form').forEach(form => {
+    const getFormData = f => JSON.stringify(Object.fromEntries(new FormData(f)));
+    const initial = getFormData(form);
+
+    // Disable all preference buttons on initialization
+    form.querySelectorAll(BUTTON_SELECTOR).forEach(btn => {
+        btn.disabled = true;
+    });
+
+    const updateButtons = () => {
+        const current = getFormData(form);
+        const dirty = current !== initial;
+        form.querySelectorAll(BUTTON_SELECTOR).forEach(btn => {
+            btn.disabled = !dirty;
+        });
+    };
+
+    form.addEventListener('input', updateButtons);
+    form.addEventListener('change', updateButtons);
+    form.addEventListener('reset', () => {
+        setTimeout(updateButtons, 0);
+    });
+});
+</script>

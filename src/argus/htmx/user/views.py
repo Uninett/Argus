@@ -9,15 +9,22 @@ from argus.htmx.incident.views import HtmxHttpRequest
 from argus.htmx.user.preferences.utils import setup_preference_forms
 
 
+THEME_PREFERENCES = ["theme", "datetime_format_name"]
+
+
 @require_GET
 def user_preferences(request) -> HttpResponse:
     """Renders the main preferences page for a user"""
 
     forms = setup_preference_forms(request)
+    theme_forms = [form for name, form in forms.items() if name in THEME_PREFERENCES]
+    incident_forms = [form for name, form in forms.items() if name not in THEME_PREFERENCES]
 
     context = {
         "page_title": "User preferences",
         "forms": forms,
+        "theme_forms": theme_forms,
+        "incident_forms": incident_forms,
     }
 
     return render(request, "htmx/user/preferences_list.html", context=context)
