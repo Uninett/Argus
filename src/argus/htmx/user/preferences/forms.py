@@ -203,8 +203,7 @@ class IncidentsTableColumnForm(SimplePreferenceForm):
     "Preference for named column layout"
 
     label = "Table column preset"
-    preview_template_name = "htmx/incident/_unpaged_incident_table.html"
-
+    # preview_template_name = "htmx/incident/_unpaged_incident_table.html"
     incidents_table_column_name = forms.ChoiceField(required=False)
 
     @classmethod
@@ -251,6 +250,8 @@ class UpdateIntervalForm(SimplePreferenceForm):
 
 class ThemeForm(SimplePreferenceForm):
     label = "Theme"
+    empty_message = "No themes configured"
+    preview_template_name = "htmx/user/_preference_choice_preview_theme.html"
 
     theme = forms.ChoiceField()
 
@@ -264,3 +265,22 @@ class ThemeForm(SimplePreferenceForm):
     def get_default(cls):
         cls.default = get_theme_default()
         return cls.default
+
+    def get_preview_context(self, choice: str) -> Dict[str, Any]:
+        context = {
+            "current_theme": choice,
+            "theme_colors": [
+                "bg-base-100",
+                "bg-base-200",
+                "bg-base-300",
+                "bg-primary",
+                "bg-secondary",
+                "bg-accent",
+                "bg-neutral",
+                "bg-info",
+                "bg-success",
+                "bg-warning",
+                "bg-error",
+            ],
+        }
+        return context
