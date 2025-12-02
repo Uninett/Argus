@@ -284,7 +284,7 @@ class NotificationProfileFilterWrapperIncidentFitsTagsTests(DjangoTestCase):
         filtr = FilterFactory(user=self.user, filter={"sourceSystemIds": [self.source.id]})
         self.profile.filters.add(filtr)
 
-        npfw = NotificationProfileFilterWrapper(profile=self.profile)
+        npfw = NotificationProfileFilterWrapper(self.profile)
         self.assertTrue(npfw.incident_fits(self.incident))
 
     def test_incident_fits_fails_on_multiple_conflicting_filters(self):
@@ -293,7 +293,7 @@ class NotificationProfileFilterWrapperIncidentFitsTagsTests(DjangoTestCase):
         other_filter = FilterFactory(user=self.user, filter={"sourceSystemIds": [0]})
         self.profile.filters.add(other_filter)
 
-        npfw = NotificationProfileFilterWrapper(profile=self.profile)
+        npfw = NotificationProfileFilterWrapper(self.profile)
         self.assertFalse(npfw.incident_fits(self.incident))
 
     def test_incident_fits_succeeds_on_multiple_compatible_filters(self):
@@ -302,5 +302,5 @@ class NotificationProfileFilterWrapperIncidentFitsTagsTests(DjangoTestCase):
         other_filter = FilterFactory(user=self.user, filter={"maxlevel": self.incident.level})
         self.profile.filters.add(other_filter)
 
-        npfw = NotificationProfileFilterWrapper(profile=self.profile)
+        npfw = NotificationProfileFilterWrapper(self.profile)
         self.assertTrue(npfw.incident_fits(self.incident))
