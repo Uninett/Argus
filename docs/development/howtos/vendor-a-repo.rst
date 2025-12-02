@@ -55,7 +55,7 @@ Prep the ORIGIN repo
 
         git fetch TARGET
 
-9. Merge ORIGIN-clone's "main" into feceiving's "master"::
+9. Merge ORIGIN-clone's "main" into receiving's "master"::
 
         git merge --allow-unrelated-histories TARGET/master
 
