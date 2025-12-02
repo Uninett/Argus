@@ -16,14 +16,14 @@
            tabindex="-1">
         <form class="flex gap-2 incident-list-param"
           {# djlint:off #}
-              {% if not dummy_column %}
-              hx-get="{% url 'htmx:incident-list' %}"
-              hx-include=".incident-list-param"
-              hx-target="#table"
-              hx-swap="outerHTML"
-              hx-push-url="true"
-              hx-indicator="#incident-list .htmx-indicator"
-              {% endif %}>
+            {% if not dummy_column %}
+            hx-get="{% url 'htmx:incident-list' %}"
+            hx-include=".incident-list-param"
+            hx-target="#table"
+            hx-swap="outerHTML"
+            hx-push-url="true"
+            hx-indicator="#incident-list .htmx-indicator"
+            {% endif %}>
           {# djlint:on #}
           <div aria-labelledby="{{ field.name }}-label">{{ field }}</div>
           <button type="submit" class="btn btn-xs btn-primary">Filter</button>
