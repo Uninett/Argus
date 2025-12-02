@@ -22,9 +22,11 @@
   {% endblock items %}
   <li>
     <div class="divider divider-secondary pl-2 pr-4 my-0 pointer-events-none"></div>
-    <button class="text-xs"
+    <button class="text-xs tooltip flex"
+            aria-label="Copy Argus version to clipboard"
+            data-tip="Copy version to clipboard"
             onclick="navigator.clipboard.writeText('{{ version }}')">
-      <div class="space-y-2">
+      <div class="space-y-2 text-left">
         <span>Argus version:</span>
         <span class="truncate">{{ version }}</span>
       </div>
