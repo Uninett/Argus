@@ -22,8 +22,9 @@
         {% endif %}
       </section>
       <div class="w-full flex justify-start mt-2">
-        <button type="button"
-                class="btn btn-ghost btn-sm text-xs font-normal opacity-70 hover:opacity-100 transition flex items-center gap-1"
+        <button class="btn btn-ghost btn-sm text-xs font-normal opacity-70 hover:opacity-100 transition tooltip flex items-center gap-1"
+                aria-label="Copy Argus version to clipboard"
+                data-tip="Copy version to clipboard"
                 onclick="navigator.clipboard.writeText('{{ version }}')">
           <span>Argus version:</span>
           <span class="truncate">{{ version }}</span>
