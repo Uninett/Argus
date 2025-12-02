@@ -678,6 +678,13 @@ class IncidentRelation(models.Model):
     type = models.ForeignKey(to=IncidentRelationType, on_delete=models.PROTECT, related_name="incident_relations")
     description = models.TextField(blank=True)
 
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                check=~models.Q(incident1=models.F("incident2")), name="incidentrelation_prevent_loop"
+            ),
+        ]
+
     def __str__(self):
         return f"Incident #{self.incident1.pk} {self.type} #{self.incident2.pk}"
 
