@@ -21,6 +21,15 @@
           {% endfor %}
         {% endif %}
       </section>
+      <div class="w-full flex justify-start mt-2">
+        <button type="button"
+                class="btn btn-ghost text-s font-normal px-2 py-1 rounded opacity-70 hover:opacity-100 transition flex items-center gap-1"
+                onclick="navigator.clipboard.writeText('{{ version }}')">
+          <span>Argus version:</span>
+          <span class="truncate">{{ version }}</span>
+          <i class="fa-solid fa-copy"></i>
+        </button>
+      </div>
     </div>
     <div class="w-full sm:w-96">
       {% for message in messages %}

@@ -9,5 +9,4 @@ class MetadataContextProcessorTest(unittest.TestCase):
     def test_metadata_returns_str_version(self):
         request = RequestFactory().get("/foo")
         version = metadata(request)["version"]
-        version_type = type(version)
-        self.assertTrue(isinstance(version, str), f'"{version}" is not str but {version_type}')
+        self.assertIsInstance(version, str)
