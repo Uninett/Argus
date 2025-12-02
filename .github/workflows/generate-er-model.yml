@@ -51,7 +51,7 @@ jobs:
 
       - name: Create pull request
         run: |
-          gh pr create -B master -H update-er-model-${{ github.run_number }} \
+          gh pr create -B main -H update-er-model-${{ github.run_number }} \
           --title 'Update ER model' \
           --body 'Created by GitHub action, triggered manually by @${{ github.actor }}'
         env:

@@ -21,4 +21,4 @@ jobs:
         sudo apt-get install -y pipx
         pipx install towncrier
     - name: Check for changelog file
-      run: towncrier check --compare-with origin/master
+      run: towncrier check

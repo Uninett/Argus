@@ -43,11 +43,11 @@ not needed to do this yet.
 Checklist
 ---------
 
-#. Ensure you're on the correct branch to be released. Either ``master`` or
+#. Ensure you're on the correct branch to be released. Either ``main`` or
    newest stable, which has a name of the form ``stable/1.5.x``. Release from
    the stable branch only under exceptional circumstances. For instance:
    there's a critical bugfix for production and there's a lot of new stuff on
-   master that is not ready to go.
+   main that is not ready to go.
 
 #. Check that there are no files that have not been commited:
 

@@ -4,7 +4,7 @@ Writing your own notification plugin
 ====================================
 
 When writing a new notification plugin the plugins for
-`SMS-as-Email <https://github.com/Uninett/Argus/blob/master/src/argus/notificationprofile/media/sms_as_email.py>`_
+`SMS-as-Email <https://github.com/Uninett/Argus/blob/main/src/argus/notificationprofile/media/sms_as_email.py>`_
 and
 `Teams <https://github.com/Uninett/argus_notification_msteams/blob/main/src/argus_notification_msteams.py>`_
 can be used as guides.
