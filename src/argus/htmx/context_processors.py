@@ -10,6 +10,7 @@ See django settings for ``TEMPLATES``.
 from django.conf import settings
 
 from . import defaults
+from argus.site.views import get_version
 
 
 def static_paths(request):
@@ -23,3 +24,7 @@ def static_paths(request):
 
 def banner_message(request):
     return {"banner_message": getattr(settings, "BANNER_MESSAGE", None)}
+
+
+def metadata(request):
+    return {"version": get_version()}

@@ -1,4 +1,4 @@
-<ul class="z-20 menu menu-md dropdown-content bg-base-200 text-base-content rounded-box z-[1] mt-3 w-52 p-2 shadow max-h-svh">
+<ul class="z-20 menu menu-md dropdown-content bg-base-200 text-base-content rounded-box mt-3 w-52 p-2 shadow max-h-svh">
   <li class="menu-title">
     Logged in as: <span class="text-info">{{ request.user }}</span>
     <div class="divider divider-secondary my-0 pointer-events-none"></div>
@@ -20,4 +20,17 @@
       {% include "htmx/user/_user_menu_logout.html" %}
     </li>
   {% endblock items %}
+  <li>
+    <div class="divider divider-secondary pl-2 pr-4 my-0 pointer-events-none"></div>
+    <button class="text-xs tooltip flex"
+            aria-label="Copy Argus version to clipboard"
+            data-tip="Copy version to clipboard"
+            onclick="navigator.clipboard.writeText('{{ version }}')">
+      <div class="space-y-2 text-left">
+        <span>Argus version:</span>
+        <span class="truncate">{{ version }}</span>
+      </div>
+      <i class="fa-solid fa-copy"></i>
+    </button>
+  </li>
 </ul>
