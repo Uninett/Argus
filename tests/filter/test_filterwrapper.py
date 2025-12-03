@@ -271,6 +271,48 @@ class FallbackFilterWrapperEventFitsEventTypeTests(unittest.TestCase):
         self.assertFalse(filter.event_fits(event))
 
 
+class DummyEvent:
+    def __init__(self, event_fits: bool, incident_fits: bool):
+        self.event_fits = event_fits
+        self.incident_fits = incident_fits
+        self.incident = Mock()
+        self.incident.event = None
+
+
+class DummyFilterWrapper(FallbackFilterWrapper):
+    def __init__(self, fake_event: DummyEvent):
+        self.event = fake_event
+
+    def event_fits(self, _) -> bool:
+        return self.event.event_fits
+
+    def incident_fits(self, _) -> bool:
+        return self.event.incident_fits
+
+
+@tag("unittest")
+class FilterFitsTest(unittest.TestCase):
+    # The methods incident_fits and event_fits are tested elsewhere
+
+    def test_when_both_event_and_incident_fits_then_filter_fits_is_True(self):
+        event = DummyEvent(event_fits=True, incident_fits=True)
+        filter = DummyFilterWrapper(event)
+        self.assertTrue(filter.filter_fits(event))
+
+    def test_when_at_least_one_of_event_and_incident_fits_return_False_then_filter_fits_is_False(self):
+        event = DummyEvent(event_fits=True, incident_fits=False)
+        filter = DummyFilterWrapper(event)
+        self.assertFalse(filter.filter_fits(event))
+
+        event = DummyEvent(event_fits=False, incident_fits=False)
+        filter = DummyFilterWrapper(event)
+        self.assertFalse(filter.filter_fits(event))
+
+        event = DummyEvent(event_fits=False, incident_fits=True)
+        filter = DummyFilterWrapper(event)
+        self.assertFalse(filter.filter_fits(event))
+
+
 @tag("unittest")
 class NotificationProfileFilterWrapperIncidentFitsTagsTests(DjangoTestCase):
     def setUp(self):
