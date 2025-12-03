@@ -20,6 +20,13 @@ class CreateSourceTests(TestCase):
 
         self.assertTrue(SourceSystem.objects.exclude(id__in=previous_source_pks).filter(type_id="argus").exists())
 
+    def test_create_source_will_create_a_user_with_the_source_as_username(self):
+        source_name = "source name"
+        call_command("create_source", source_name)
+
+        ss = SourceSystem.objects.get(name=source_name)
+        self.assertEqual(ss.name, ss.user.username)
+
     def test_create_source_will_create_source_with_set_type(self):
         previous_source_pks = [source.id for source in SourceSystem.objects.all()]
         source_name = "source name"

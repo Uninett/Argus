@@ -1,5 +1,7 @@
 from django.core.management.base import BaseCommand
+from django.db import transaction
 
+from argus.auth.factories import SourceUserFactory
 from argus.incident.factories import SourceSystemFactory, SourceSystemTypeFactory
 
 
@@ -15,5 +17,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         source = options["source"]
         source_type = options.get("source_type") or "argus"
-        sst = SourceSystemTypeFactory(name=source_type.lower())
-        SourceSystemFactory(name=source, type=sst)
+        with transaction.atomic():
+            user = SourceUserFactory(username=source)
+            sst = SourceSystemTypeFactory(name=source_type.lower())
+            SourceSystemFactory(user=user, name=source, type=sst)
