@@ -8,6 +8,7 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.core.management import CommandError, call_command
 from django.core.management.base import BaseCommand
+from django.db.utils import IntegrityError
 
 from argus.dev.utils import get_json_from_file
 from argus.incident.constants import Level
@@ -125,5 +126,5 @@ class Command(BaseCommand):
 
             try:
                 create_fake_incident(**incident)
-            except (ValueError, ValidationError) as e:
+            except (IntegrityError, ValueError, ValidationError) as e:
                 self.stderr.write(self.style.ERROR(str(e)))

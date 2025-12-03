@@ -18,7 +18,9 @@ class JsonAuthenticationTests(APITestCase):
 
     def test_authenticate_golden_path(self):
         password = "cvbfghcfgvdhyu"
-        user = BaseUserFactory(username="user", password=password)
+        user = BaseUserFactory(username="user")
+        user.set_password(password)
+        user.save()
         jsonblob = {
             "username": user.username,
             "password": password,

@@ -16,7 +16,6 @@ class BaseUserFactory(factory.django.DjangoModelFactory):
 
     is_staff = False
     is_superuser = False
-    password = factory.PostGenerationMethodCall("set_password", "defaultpassword")
 
 
 class PersonUserFactory(BaseUserFactory):
@@ -30,6 +29,7 @@ class PersonUserFactory(BaseUserFactory):
         lambda o: "%s.%s@%s" % (o.first_name.lower(), o.last_name.lower(), factory.Faker("safe_domain_name"))
     )
     username = email
+    password = factory.django.Password("very SECRET P455w0rD")
 
 
 class SourceUserFactory(BaseUserFactory):
@@ -40,6 +40,7 @@ class SourceUserFactory(BaseUserFactory):
     username = factory.Sequence(lambda n: "source_%d" % n)
     is_staff = False
     is_superuser = False
+    password = factory.django.Password(None)
 
 
 class AdminUserFactory(PersonUserFactory):

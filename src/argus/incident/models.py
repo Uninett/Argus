@@ -81,7 +81,7 @@ def create_fake_incident(
     data = {
         "start_time": start_time or str(timezone.now()),
         "end_time": end_time,
-        "source_incident_id": source_incident_id,
+        "source_incident_id": str(source_incident_id),
         "description": description,
         "level": level or choice(Level.values),
         "tags": tags,
