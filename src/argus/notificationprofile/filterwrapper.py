@@ -29,10 +29,14 @@ class NotificationProfileFilterWrapper(PrecisionFilterWrapper):
         self.model = model
         super().__init__(model.filters, filterwrapper)
 
+    def timeslot_fits(self, timestamp):
+        is_selected_by_time = self.model.timeslot.timestamp_is_within_time_recurrences(timestamp)
+        return is_selected_by_time
+
     def incident_fits(self, incident: Incident) -> bool:
         if not self.model.active:
             return False
-        is_selected_by_time = self.model.timeslot.timestamp_is_within_time_recurrences(incident.start_time)
+        is_selected_by_time = self.timeslot_fits(incident.start_time)
         if not is_selected_by_time:
             return False
         return super().incident_fits(incident)
