@@ -16,21 +16,17 @@ from argus.util.testing import disconnect_signals, connect_signals
 
 @tag("unittest")
 class NotificationProfileFilterWrapperIncidentFitsTagsTests(DjangoTestCase):
-    @classmethod
-    def setupClass(cls):
-        disconnect_signals()
-
-    @classmethod
-    def tearDownClass(cls):
-        connect_signals()
-
     def setUp(self):
+        disconnect_signals()
         self.source = SourceSystemFactory(name="vfdgtnhj")
         self.incident = StatefulIncidentFactory(start_time=tznow(), source=self.source)
         self.incident.create_first_event()
         self.user = PersonUserFactory()
         timeslot = self.user.timeslots.first()  # all the time-timeslot!
         self.profile = NotificationProfileFactory(user=self.user, timeslot=timeslot, active=True)
+
+    def tearDown(self):
+        connect_signals()
 
     def test_incident_fits_single_filter(self):
         filtr = FilterFactory(user=self.user, filter={"sourceSystemIds": [self.source.id]})
