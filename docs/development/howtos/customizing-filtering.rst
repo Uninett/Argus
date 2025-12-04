@@ -28,7 +28,7 @@ FilterWrapper
 -------------
 
 Base class, the important methods are ``incident_fits``, ``event_fits`` and
-``filter_fits``. The latter two takes a single event. ``filter_fits`` checks
+``filter_fits``. The latter two take a single event. ``filter_fits`` checks
 both ``event_fits`` and ``incident_fits``, in that order.
 
 FallbackFilterWrapper

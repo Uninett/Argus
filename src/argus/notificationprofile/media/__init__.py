@@ -20,7 +20,7 @@ PrecisionFilterWrapper = filter_backend.PrecisionFilterWrapper
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
-    from dajngo.db.models import Model
+    from django.db.models import Model
 
     from argus.incident.models import Event, Incident
 
