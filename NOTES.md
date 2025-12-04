@@ -3,6 +3,21 @@
 This file documents changes to Argus that are relevant for operations,
 customizers and end-users.
 
+## [2.5.0] - 2025-12-04
+
+This release adds a new app, "argus.plannedmaintenance", which uses a new
+database table, so remember to migrate.
+
+The new table is to store planned maintenance tasks, which are used to exclude
+some notifications from being sent. A notification is only sent *iff* an
+incident and its events are not found by any filter during a currently ongoing
+planned maintenance task.
+
+Customizers: We have started work on adding previews to all the preferences;
+first out is previews of themes and date formats. If you have added your own
+preferences or otherwise customized the preferences page you need to take extra
+care when upgrading.
+
 ## [2.4.0] - 2025-11-28
 
 The most important feature this release is being able to filter on source
