@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from multiprocessing import Process
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from django.conf import settings
 from django.db import connections
@@ -12,6 +12,7 @@ from argus.filter import get_filter_backend
 from argus.util.utils import import_class_from_dotted_path
 
 from ..models import DestinationConfig, Media, NotificationProfile
+from ..filterwrapper import NotificationProfileFilterWrapper
 
 filter_backend = get_filter_backend()
 FallbackFilterWrapper = filter_backend.FallbackFilterWrapper
@@ -20,11 +21,7 @@ PrecisionFilterWrapper = filter_backend.PrecisionFilterWrapper
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
-    from django.db.models import Model
-
-    from argus.incident.models import Event, Incident
-
-    FilterWrapper = filter_backend.FilterWrapper
+    from argus.incident.models import Event
 
 
 LOG = logging.getLogger(__name__)
@@ -45,27 +42,6 @@ __all__ = [
 MEDIA_PLUGINS = getattr(settings, "MEDIA_PLUGINS")
 _media_classes = [import_class_from_dotted_path(media_plugin) for media_plugin in MEDIA_PLUGINS]
 MEDIA_CLASSES_DICT = {media_class.MEDIA_SLUG: media_class for media_class in _media_classes}
-
-
-class NotificationProfileFilterWrapper(PrecisionFilterWrapper):
-    filterwrapper = FallbackFilterWrapper
-
-    def __init__(self, model: Model, filterwrapper: Optional[FilterWrapper] = None):
-        self.model = model
-        super().__init__(model.filters, filterwrapper)
-
-    def incident_fits(self, incident: Incident) -> bool:
-        if not self.model.active:
-            return False
-        is_selected_by_time = self.model.timeslot.timestamp_is_within_time_recurrences(incident.start_time)
-        if not is_selected_by_time:
-            return False
-        return super().incident_fits(incident)
-
-    def event_fits(self, event: Event) -> bool:
-        if not self.model.active:
-            return False
-        return super().event_fits(event)
 
 
 def api_safely_get_medium_object(media_slug):
