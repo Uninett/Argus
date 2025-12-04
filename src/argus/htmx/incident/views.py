@@ -91,7 +91,7 @@ def incident_update(request: HtmxHttpRequest, action: str):
     try:
         formclass, callback_func = INCIDENT_UPDATE_ACTIONS[action]
     except KeyError:
-        LOG.error("Unrecognized action name %s when updating incidents.", action)
+        LOG.error("Unrecognized action name when updating incidents.")
         return HttpResponseBadRequest("Invalid update action")
     incident_ids = get_incident_ids_to_update(request)
     if not incident_ids:
