@@ -102,6 +102,7 @@ TEMPLATES = [
                 "argus.auth.context_processors.preferences",
                 "argus.htmx.context_processors.static_paths",
                 "argus.htmx.context_processors.metadata",
+                "argus.htmx.context_processors.banner_message",
             ],
         },
     }
