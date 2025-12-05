@@ -1,13 +1,49 @@
-from typing import Optional
+from __future__ import annotations
+
+from typing import Optional, TYPE_CHECKING
 
 from argus.filter import get_filter_backend
 from argus.incident.models import Event, IncidentQuerySet
 from argus.plannedmaintenance.models import PlannedMaintenanceQuerySet, PlannedMaintenanceTask
 
-
 filter_backend = get_filter_backend()
+
+if TYPE_CHECKING:
+    from datetime import datetime
+
+    from argus.incident.models import Incident
+
+    FilterWrapper = filter_backend.FilterWrapper
+
+
 QuerySetFilter = filter_backend.QuerySetFilter
-FilterWrapper = filter_backend.FilterWrapper
+PrecisionFilterWrapper = filter_backend.PrecisionFilterWrapper
+
+
+class PlannedMaintenanceFilterWrapper(PrecisionFilterWrapper):
+    def __init__(
+        self,
+        model: PlannedMaintenanceTask,
+        filterwrapper: Optional[FilterWrapper] = None,
+        timestamp: Optional[datetime] = None,
+    ):
+        self.model = model
+        self.timestamp = timestamp
+        super().__init__(model.filters, filterwrapper)
+
+    def is_ongoing(self, timestamp: datetime):
+        return self.model.active_at_time(timestamp)
+
+    def incident_fits(self, incident: Incident) -> bool:
+        is_ongoing = self.is_ongoing(self.timestamp)
+        if not is_ongoing:
+            return False
+        return super().incident_fits(incident)
+
+    def event_fits(self, event: Event) -> bool:
+        is_ongoing = self.is_ongoing(self.timestamp)
+        event_fits = self.is_ongoing(event.timestamp)
+        return is_ongoing and event_fits
 
 
 def incidents_covered_by_planned_maintenance_task(
@@ -31,7 +67,9 @@ def incidents_covered_by_planned_maintenance_task(
     return queryset
 
 
-def event_covered_by_planned_maintenance(event: Event, pm_tasks: Optional[PlannedMaintenanceQuerySet] = None) -> bool:
+def event_covered_by_planned_maintenance(
+    event: Event, pm_tasks: Optional[PlannedMaintenanceQuerySet] = None, timestamp: Optional[datetime] = None
+) -> bool:
     """
     Returns true if the given event is covered by at least one of the given planned
     maintenance tasks
@@ -39,14 +77,10 @@ def event_covered_by_planned_maintenance(event: Event, pm_tasks: Optional[Planne
     if not pm_tasks:
         pm_tasks = PlannedMaintenanceTask.objects.all()
 
-    pm_tasks = pm_tasks.active_at_time(event.timestamp)
-
     for pm in pm_tasks:
-        # Return true if all filters match that event
-        covered = set()
-        for filter in pm.filters.all():
-            filter_wrapper = FilterWrapper(filterblob=filter.filter)
-            covered.add(filter_wrapper.event_fits(event) and filter_wrapper.incident_fits(event.incident))
-        if all(covered):
+        pmfw = PlannedMaintenanceFilterWrapper(pm, timestamp=timestamp)
+        filter_fits = pmfw.filter_fits(event)
+        # Abort early on first filter fit
+        if filter_fits:
             return True
     return False
