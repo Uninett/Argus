@@ -12,15 +12,17 @@ from argus.filter import get_filter_backend
 from argus.util.utils import import_class_from_dotted_path
 
 from ..models import DestinationConfig, Media, NotificationProfile
+from ..filterwrapper import NotificationProfileFilterWrapper
+
+filter_backend = get_filter_backend()
+FallbackFilterWrapper = filter_backend.FallbackFilterWrapper
+PrecisionFilterWrapper = filter_backend.PrecisionFilterWrapper
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
-    from argus.incident.models import Event  # noqa: Break circular import
+    from argus.incident.models import Event
 
-
-filter_backend = get_filter_backend()
-ComplexFallbackFilterWrapper = filter_backend.ComplexFallbackFilterWrapper
 
 LOG = logging.getLogger(__name__)
 
@@ -91,7 +93,7 @@ def find_destinations_for_event(event: Event):
     incident = event.incident
     qs = NotificationProfile.objects.filter(active=True)
     for profile in qs.prefetch_related("destinations").select_related("user"):
-        fw = ComplexFallbackFilterWrapper(profile=profile)
+        fw = NotificationProfileFilterWrapper(profile)
         LOG.debug('Notification: checking profile "%s" (%s) for event "%s"', profile, profile.user.username, event)
         if fw.incident_fits(incident) and fw.event_fits(event):
             profile_destinations = profile.destinations.all()

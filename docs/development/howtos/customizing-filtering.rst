@@ -27,24 +27,29 @@ changed incidents.
 FilterWrapper
 -------------
 
-Base class, the important methods are ``incident_fits`` and ``event_fits``.
+Base class, the important methods are ``incident_fits``, ``event_fits`` and
+``filter_fits``. The latter two take a single event. ``filter_fits`` checks
+both ``event_fits`` and ``incident_fits``, in that order.
 
 FallbackFilterWrapper
 ---------------------
 
 Subclass of ``FilterWrapper``. Merges a filter with the filter in the setting
-``ARGUS_FALLBACK_FILTER``.
+:setting:`ARGUS_FALLBACK_FILTER`.
 
-ComplexFilterWrapper
---------------------
+PrecisionFilterWrapper
+----------------------
 
-OR's together multiple simple FilterWrappers, used by NotificationProfile.
+AND's together multiple simple filters, using ``FilterWrapper`` by default. Not
+used directly.
 
-ComplexFallbackFilterWrapper
-----------------------------
+Has the methods ``incident_fits`` and ``event_fits``, and ``filter_fits`` which
+takes an event and checks both ``event_fits`` and ``incident_fits``, in that
+order.
 
-Subclass of ``FilterWrapper``. Takes the setting ``ARGUS_FALLBACK_FILTER`` into
-account for each filter.
+``NotificationProfile`` has the subclass ``NotificationProfileFilterWrapper``,
+which combines a ``PrecisionFilterWrapper`` with a ``FallbackFilterWrapper``.
+It is thus affected by the setting :setting:`ARGUS_FALLBACK_FILTER`.
 
 ---------------------------------------
 Matching a filter to multiple incidents

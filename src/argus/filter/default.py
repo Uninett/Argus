@@ -1,8 +1,7 @@
 from .filterwrapper import (  # noqa: F401
     FilterWrapper,
     FallbackFilterWrapper,
-    ComplexFilterWrapper,
-    ComplexFallbackFilterWrapper,
+    PrecisionFilterWrapper,
 )
 from .queryset_filters import QuerySetFilter  # noqa: F401
 from .filters import (  # noqa: F401
