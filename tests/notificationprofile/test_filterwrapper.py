@@ -15,7 +15,7 @@ from argus.util.testing import disconnect_signals, connect_signals
 
 
 @tag("unittest")
-class NotificationProfileFilterWrapperIncidentFitsTagsTests(DjangoTestCase):
+class NotificationProfileFilterWrapperTests(DjangoTestCase):
     def setUp(self):
         disconnect_signals()
         self.source = SourceSystemFactory(name="vfdgtnhj")
