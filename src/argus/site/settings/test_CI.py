@@ -20,6 +20,17 @@ ALLOWED_HOSTS = [
     "localhost",
 ]
 
+# Control authentication backends when settings
+AUTHENTICATION_BACKENDS = ["django.contrib.auth.backends.ModelBackend"]
+
+# Never test with remote user turned on implicitly
+middleware = MIDDLEWARE[:]
+try:
+    middleware.remove("django.contrib.auth.middleware.RemoteUserMiddleware")
+except ValueError:
+    pass
+MIDDLEWARE = middleware
+
 # Paths to plugins
 MEDIA_PLUGINS = [
     "argus.notificationprofile.media.email.EmailNotification",
