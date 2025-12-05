@@ -18,4 +18,8 @@
         box-shadow: 0 -3px 6px -2px var(--tw-shadow-color, var(--scroll-shadow-default));
         @apply shadow-base-content;
     }
+
+    #preview-table td a {
+        @apply w-max;
+    }
 }

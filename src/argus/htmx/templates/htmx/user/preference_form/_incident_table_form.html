@@ -1,10 +1,13 @@
 {% extends "htmx/user/preference_form/_base_form.html" %}
-{% block section_id %}
-  user-settings
-{% endblock section_id %}
+{# djlint:off #}
+{% block section_id %}incident-table-settings{% endblock section_id %}
+{# djlint:on #}
 {% block section_title %}
   Incident Table
 {% endblock section_title %}
 {% block section_forms %}
   {% for form in incident_forms %}{{ form }}{% endfor %}
 {% endblock section_forms %}
+{% block preview %}
+  {% include "./_incident_table_preview.html" %}
+{% endblock preview %}
