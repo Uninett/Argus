@@ -59,8 +59,13 @@ class PlannedMaintenanceTask(models.Model):
         return self.end_time > timezone.now() - MODIFICATION_WINDOW_PM
 
     @property
-    def current(self) -> bool:
-        return self.start_time <= timezone.now() <= self.end_time
+    def current(self):
+        return self.active_at_time(timezone.now())
+
+    def active_at_time(self, time: Optional[datetime] = None):
+        if not time:
+            time = timezone.now()
+        return self.start_time <= time <= self.end_time
 
     def cancel(self, end_time: Optional[datetime] = None):
         """
