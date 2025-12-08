@@ -5,7 +5,7 @@ from argus.auth.factories import PersonUserFactory
 
 
 class TestUserPreferencesView(TestCase):
-    def test_user_preferences_full_coverage(self):
+    def test_renders_user_preferences_with_expected_context(self):
         user = PersonUserFactory()
         self.client.force_login(user=user)
         response = self.client.get(reverse("htmx:user-preferences"))
@@ -20,7 +20,7 @@ class TestUserPreferencesView(TestCase):
 
 
 class TestIncidentTablePreviewView(TestCase):
-    def test_incident_table_preview_full_coverage(self):
+    def test_incident_table_preview_uses_compact_layout_and_expected_context(self):
         user = PersonUserFactory()
         self.client.force_login(user=user)
         response = self.client.get(reverse("htmx:incident-table-preview"), {"incidents_table_layout": "compact"})
