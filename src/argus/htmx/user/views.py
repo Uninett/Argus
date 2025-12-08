@@ -5,7 +5,7 @@ from django.views.decorators.http import require_GET, require_POST
 from django_htmx.http import HttpResponseClientRefresh
 
 from argus.auth.utils import get_preference_obj, save_preferences
-from argus.htmx.incident.columns import get_incident_table_columns
+from argus.htmx.incident.columns import BUILTIN_COLUMN_LAYOUT_NAME, get_incident_table_columns
 from argus.htmx.incident.views import HtmxHttpRequest
 from argus.htmx.user.preferences.utils import setup_preference_forms
 from argus.incident.models import Incident
@@ -53,7 +53,7 @@ def _get_incident_table_context(preferences_data: dict) -> dict:
     """Extract common logic for incident table rendering."""
     selected_layout = preferences_data.get("incidents_table_layout", "standard")
     preferences_data["incidents_table_layout_compact"] = selected_layout == "compact"
-    column_layout_name = preferences_data.get("incidents_table_column_name", "built-in")
+    column_layout_name = preferences_data.get("incidents_table_column_name", BUILTIN_COLUMN_LAYOUT_NAME)
     columns = get_incident_table_columns(column_layout_name)
 
     return {

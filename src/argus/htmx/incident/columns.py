@@ -20,7 +20,7 @@ LOG = logging.getLogger(__name__)
 CELL_WRAPPER_TEMPLATE_DEFAULT = "htmx/incident/_incident_table_cell_wrapper_default.html"
 CELL_WRAPPER_TEMPLATE_LINK_TO_DETAILS = "htmx/incident/_incident_table_cell_wrapper_link_to_details.html"
 
-_BUILTIN_COLUMN_LAYOUT_NAME = "built-in"
+BUILTIN_COLUMN_LAYOUT_NAME = "built-in"
 _DEFAULT_COLUMN_LAYOUT_NAME = "default"
 
 
@@ -197,7 +197,7 @@ BUILTIN_COLUMNS = {col.name: col for col in _BUILTIN_COLUMN_LIST}
 def get_builtin_column_layout():
     "Return the column layout defined in `argus.htmx.defaults`"
 
-    return _BUILTIN_COLUMN_LAYOUT_NAME, BUILTIN_INCIDENT_TABLE_COLUMNS
+    return BUILTIN_COLUMN_LAYOUT_NAME, BUILTIN_INCIDENT_TABLE_COLUMNS
 
 
 def get_default_column_layout():
@@ -249,7 +249,7 @@ def get_column_choices():
     return columns
 
 
-def get_incident_table_columns(name: str = _BUILTIN_COLUMN_LAYOUT_NAME) -> list[IncidentTableColumn]:
+def get_incident_table_columns(name: str = BUILTIN_COLUMN_LAYOUT_NAME) -> list[IncidentTableColumn]:
     """Return the named incident column layout
 
     Falls back to the built-in layout if the name is unknown."""
@@ -257,7 +257,7 @@ def get_incident_table_columns(name: str = _BUILTIN_COLUMN_LAYOUT_NAME) -> list[
     LOG.debug("Getting layouts: get_incident_table_columns")
     layouts = get_available_column_layouts()
     if name not in layouts:
-        name = _BUILTIN_COLUMN_LAYOUT_NAME
+        name = BUILTIN_COLUMN_LAYOUT_NAME
     columns = layouts[name]
     return [_resolve_column(col) for col in columns]
 
@@ -272,7 +272,7 @@ def get_default_column_layout_name():
     layouts = get_available_column_layouts()
     if _DEFAULT_COLUMN_LAYOUT_NAME in layouts.keys():
         return _DEFAULT_COLUMN_LAYOUT_NAME
-    return _BUILTIN_COLUMN_LAYOUT_NAME
+    return BUILTIN_COLUMN_LAYOUT_NAME
 
 
 def _resolve_column(col: str | IncidentTableColumn):
