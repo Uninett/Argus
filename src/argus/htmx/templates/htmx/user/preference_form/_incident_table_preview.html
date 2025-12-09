@@ -1,0 +1,30 @@
+<div id="preview-table" class="py-5 max-w-full overflow-x-auto">
+  {% include "htmx/incident/_unpaged_incident_table.html" %}
+</div>
+<script>
+    (() => {
+        const url = '{% url "htmx:incident-table-preview" %}';
+        const previewTable = document.getElementById('preview-table');
+        const tableForm = document.querySelector('#incident-table-settings form');
+
+        if (!previewTable || !tableForm) return;
+
+        const loadPreview = () => {
+            htmx.ajax('GET', url, {
+                target: previewTable,
+                values: htmx.values(tableForm),
+                swap: 'innerHTML'
+            });
+        }
+
+        tableForm.addEventListener('change', (e) => {
+            if (e.target.name?.startsWith('incidents_table_')) {
+                loadPreview();
+            }
+        });
+        // Add timeout to allow reset to complete before loading preview
+        tableForm.addEventListener('reset', () => {
+            setTimeout(loadPreview, 0);
+        });
+    })();
+</script>
