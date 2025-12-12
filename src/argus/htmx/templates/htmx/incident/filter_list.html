@@ -1,19 +1,21 @@
+<!-- htmx/incident/filter_list.html -->
 <label class="form-control w-full max-w-xs">
   <span class="block label pt-0 pb-0.5">
     <span class="label-text">Filter</span>
   </span>
-  <select class="select select-bordered select-sm join-item w-full max-w-xs"
+  <select class="incident-list-param select select-bordered select-sm join-item w-full max-w-xs"
           id="incident-filter-select"
           name="filter"
           hx-get="{% url 'htmx:select-filter' %}"
+          hx-include=".incident-list-param"
           hx-target="#incident-filter-box"
           hx-swap="outerHTML"
           hx-on::after-swap="htmx.trigger('#filter-selector-form', 'unselect')">
-    <option {% if not request.session.selected_filter %}selected{% endif %}
+    <option {% if not request.session.selected_filter_pk %}selected{% endif %}
             value="">---</option>
     {% for object in object_list %}
       <option value="{{ object.id }}"
-              {% if request.session.selected_filter == object.id|stringformat:"i" %}selected{% endif %}>
+              {% if request.session.selected_filter_pk == object.id|stringformat:"i" %}selected{% endif %}>
         {{ object.name }}
       </option>
     {% endfor %}
