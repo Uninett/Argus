@@ -83,7 +83,8 @@ jobs:
         postgresql db: $POSTGRES_DB
         postgresql user: $POSTGRES_USER
         postgresql password: $POSTGRES_PASSWORD
-
+    - name: "Check for Django warnings"
+      run: python3 -m tox -e django-warnings
     - name: Run Tests with PostgreSQL
       env:
         DATABASE_URL: "postgresql://${{ env.POSTGRES_USER }}:${{ env.POSTGRES_PASSWORD }}@localhost/${{ env.POSTGRES_DB }}"
