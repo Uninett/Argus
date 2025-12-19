@@ -31,6 +31,16 @@ class PageNumberForm(IncidentListForm):
 
 
 # column search, not stored
+class IdForm(SearchMixin, IncidentListForm):
+    widget_template_name = "htmx/incident/cells/search_fields/input_search.html"
+    fieldname = "id"
+    field_initial = ""
+    lookup = fieldname
+    placeholder = "ID"
+
+    id = forms.IntegerField(required=False)
+
+
 class DescriptionForm(SearchMixin, IncidentListForm):
     widget_template_name = "htmx/incident/cells/search_fields/input_search.html"
     fieldname = "description"
