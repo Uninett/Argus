@@ -251,6 +251,12 @@ id
     :Name: id
     :Description: The internal id of the incident in argus.
 
+search_id
+    :From: id
+    :Name: search_id
+    :Description: Search for incidents with a given id.
+    :Redundant with: id
+
 level
     :From: level
     :Name: level
