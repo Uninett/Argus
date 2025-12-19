@@ -3,7 +3,55 @@ from django.test import TestCase
 
 from argus.incident.models import Incident
 from argus.incident.factories import IncidentFactory
-from argus.htmx.incident.forms.incident_filters import DescriptionForm, HasTicketForm
+from argus.htmx.incident.forms.incident_filters import DescriptionForm, HasTicketForm, IdForm
+
+
+class IdFormTest(TestCase):
+    class obj:
+        pass
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.incident = IncidentFactory(id=95)
+        IncidentFactory()
+
+    def test_form_without_input_returns_every_incident(self):
+        qs = Incident.objects.all()
+        request = self.obj()
+
+        request.GET = QueryDict(query_string="")
+        form = IdForm(data=request.GET)
+        result_qs = form.filter(qs, request)
+        self.assertEqual(qs, result_qs)
+
+    def test_form_with_unfound_input_returns_empty_queryset(self):
+        qs = Incident.objects.all()
+        request = self.obj()
+
+        request.GET = QueryDict(query_string="id=14063")
+        form = IdForm(data=request.GET)
+        result_qs = form.filter(qs, request)
+        self.assertFalse(result_qs.exists())
+
+    def test_form_with_irrelevant_input_returns_every_incident(self):
+        qs = Incident.objects.all()
+        request = self.obj()
+
+        request.GET = QueryDict(query_string="otherkey=1234")
+        form = IdForm(data=request.GET)
+        result_qs = form.filter(qs, request)
+        self.assertEqual(qs, result_qs)
+
+    def test_form_with_found_input_returns_specific_incident(self):
+        qs = Incident.objects.all()
+        request = self.obj()
+
+        request.GET = QueryDict(query_string="id=95")
+        form = IdForm(data=request.GET)
+        result_qs = form.filter(qs, request)
+        self.assertEqual(result_qs.count(), 1)
+        self.assertEqual(result_qs[0], self.incident)
 
 
 class DescriptionFormTest(TestCase):

@@ -70,6 +70,13 @@ _BUILTIN_COLUMN_LIST = [
         detail_link=True,
     ),
     IncidentTableColumn(
+        "search_id",
+        "ID",
+        "htmx/incident/cells/_incident_pk.html",
+        detail_link=True,
+        filter_field="id",
+    ),
+    IncidentTableColumn(
         "start_time",
         "Timestamp",
         "htmx/incident/cells/_incident_start_time.html",
