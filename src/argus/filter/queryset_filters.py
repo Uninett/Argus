@@ -12,6 +12,14 @@ if TYPE_CHECKING:
 __all__ = ["QuerySetFilter"]
 
 
+def _incidents_with_source_system_types(incident_queryset, filterblob: FilterBlobType):
+    source_list = filterblob.get("source_types", [])
+    if source_list:
+        incident_queryset.prefetch_related("source")
+        return incident_queryset.filter(source__type_id__in=source_list).distinct()
+    return incident_queryset.distinct()
+
+
 def _incidents_with_source_systems(incident_queryset, filterblob: FilterBlobType):
     source_list = filterblob.get("sourceSystemIds", [])
     if source_list:
@@ -63,12 +71,19 @@ class QuerySetFilter:
         fw = FilterWrapper(filterblob)
         if fw.is_empty:
             return Incident.objects.none().distinct()
+        filtered_by_source_type = _incidents_with_source_system_types(incident_queryset, filterblob)
         filtered_by_source = _incidents_with_source_systems(incident_queryset, filterblob)
         filtered_by_tags = _incidents_with_tags(incident_queryset, filterblob)
         filtered_by_tristates = _incidents_fitting_tristates(incident_queryset, filterblob)
         filtered_by_maxlevel = _incidents_fitting_maxlevel(incident_queryset, filterblob)
 
-        return filtered_by_source & filtered_by_tags & filtered_by_tristates & filtered_by_maxlevel
+        return (
+            filtered_by_source_type
+            & filtered_by_source
+            & filtered_by_tags
+            & filtered_by_tristates
+            & filtered_by_maxlevel
+        )
 
     @classmethod
     def incidents_by_filter(cls, incident_queryset, filter: Filter):
