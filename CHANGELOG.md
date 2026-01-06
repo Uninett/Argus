@@ -8,6 +8,23 @@ This project uses [*towncrier*](https://towncrier.readthedocs.io/) and the chang
 
 <!-- towncrier release notes start -->
 
+## [2.6.0] - 2026-01-06
+
+This is a tiny release to finish up what was started at the end of 2025.
+
+### Added
+
+- Add preview for incident table preferences
+  ([#1658](https://github.com/Uninett/Argus/issues/1658))
+
+### Fixed
+
+- Filter on source type in dashboard. The previous release made it work for
+  notifications but not in the incident list in the frontend.
+- Fix bug where the incident table overlaps filter dropdowns
+  ([#1669](https://github.com/Uninett/Argus/issues/1669))
+
+
 ## [2.5.0] - 2025-12-04
 
 The big new thing this time around is a way to prevent notifications from

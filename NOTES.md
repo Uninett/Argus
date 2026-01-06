@@ -3,6 +3,19 @@
 This file documents changes to Argus that are relevant for operations,
 customizers and end-users.
 
+
+## [2.6.0] - 2026-01-06
+
+This is a tiny release to finish up what was started at the end of 2025.
+
+The feature for having mutiple column presets for the incident list is now
+finished. Please make add issue if you have a column-type you would like
+added.
+
+Also, there were some bugs with the typeahead for the tag filter and the new
+source system type filter that was introduced in 2.4.0, the ones we know of
+have been fixed.
+
 ## [2.5.0] - 2025-12-04
 
 This release adds a new app, "argus.plannedmaintenance", which uses a new
