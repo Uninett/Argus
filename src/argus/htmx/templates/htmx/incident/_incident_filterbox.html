@@ -11,6 +11,9 @@
       hx-push-url="true"
       hx-indicator="#incident-list .htmx-indicator"
       onkeydown="if (event.keyCode === 13) event.preventDefault();">
+  {# Hidden inputs to preserve sort state across filter submissions #}
+  <input type="hidden" name="sort" value="{{ current_sort }}">
+  <input type="hidden" name="sort_order" value="{{ current_sort_order }}">
   <fieldset {% block filter_select_custom_control %}
             hx-on:change="htmx.ajax('GET', '{% url 'htmx:select-filter' %}');"
             {% endblock filter_select_custom_control %}>
