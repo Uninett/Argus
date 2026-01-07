@@ -13,6 +13,14 @@ from argus.htmx.incident.forms.base import IncidentListForm, SearchMixin, HasTex
 from argus.incident.constants import Level
 
 
+SORT_ORDER_CHOICES = [
+    ("asc", "Ascending"),
+    ("desc", "Descending"),
+]
+SORT_ORDER_DEFAULT = "desc"
+SORT_DEFAULT = "start_time"
+
+
 # incident list filter widgets
 
 
@@ -143,3 +151,54 @@ class TimeframeForm(IncidentListForm):
 
     def store(self, request):
         return self._store_in_session(request)
+
+
+class SortForm(forms.Form):
+    """Form for handling column sorting parameters.
+
+    Manages two fields:
+    - sort: the column/field to sort by
+    - sort_order: ascending or descending
+    """
+
+    # Allowlist of valid sort fields to prevent arbitrary field access
+    ALLOWED_SORT_FIELDS = {
+        "pk",
+        "start_time",
+        "end_time",
+        "level",
+        "source__name",
+        "source__type__name",
+        "description",
+        "ticket_url",
+    }
+
+    sort = forms.CharField(required=False, initial=SORT_DEFAULT)
+    sort_order = forms.ChoiceField(
+        required=False,
+        choices=SORT_ORDER_CHOICES,
+        initial=SORT_ORDER_DEFAULT,
+    )
+
+    def get_sort_field(self):
+        """Return the field to sort by, validated against allowlist."""
+        if self.is_valid():
+            sort_field = self.cleaned_data.get("sort") or SORT_DEFAULT
+            # Validate against allowlist to ignore unsupported fields
+            if sort_field in self.ALLOWED_SORT_FIELDS:
+                return sort_field
+        return SORT_DEFAULT
+
+    def get_sort_order(self):
+        """Return the sort order (asc/desc)."""
+        if self.is_valid():
+            return self.cleaned_data.get("sort_order") or SORT_ORDER_DEFAULT
+        return SORT_ORDER_DEFAULT
+
+    def get_ordering(self):
+        """Return the Django ORM ordering string (e.g., '-start_time')."""
+        sort_field = self.get_sort_field()
+        sort_order = self.get_sort_order()
+        if sort_order == "desc":
+            return f"-{sort_field}"
+        return sort_field
