@@ -5,6 +5,6 @@
        type="checkbox"
        autocomplete="off"
        class="row-select checkbox checkbox-sm checkbox-primary border"
-       hx-on:change="event.target.checked ? htmx.find('.tab-select').checked = event.target.checked : null;"
+       _="on change if event.target.checked remove .invisible from #bulk-actions else if htmx.findAll('.row-select:checked').length == 0 add .invisible to #bulk-actions "
        name="incident_ids"
        value="{{ incident.pk }}">
