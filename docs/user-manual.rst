@@ -275,6 +275,61 @@ table.
 To change *max severity level*: select the preferred *max severity* option in
 the *Level* slider.
 
+Filter by event types
+^^^^^^^^^^^^^^^^^^^^^
+
+Not all types of events are of of equal relevance. For instance: You might want
+to receive notfications for new incidents but don't need to know when they are
+resolved, or you might want to ignore wthether it has been connected to
+a ticket. You might be curious to know which incidents were resolved
+automatically, and which needed to be handled by people.
+
+-  If you want the table to display only incidents that have one or more
+   **specific event types**:
+
+   1. Click on the *Event Types* selector.
+
+   2. In the drop-down that appears, you can see all available event types.
+      Click on the preferred one. The newly selected *event type* will appear
+      in the input field.
+
+   3. Repeat the process if you want to filter by several event types.
+
+-  If you want the table to display incidents from **any any
+   event type**, leave the *Event types* field empty.
+
+The event types to choose from:
+
+Incident start
+
+   When an incident started.
+
+Incident end
+
+   Incidents that were solved without human intervention.
+
+Close
+
+   Incidents that were marked as closed manually by a human.
+
+Reopen
+
+   Incidents that were manually reopened by a human after either being
+   automatically ended or manually marked closed.
+
+Acknowledge
+
+   A human has seen the incident and has marked it as such.
+
+Other
+
+   Currently used for any other tracked change to an incident: for instance
+   if it is connected to a ticket.
+
+Stateless
+
+   These are incidents without duration. They cannot be open or closed.
+
 Filter out older incidents
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
