@@ -62,6 +62,14 @@ def _incidents_fitting_maxlevel(incident_queryset, filterblob: FilterBlobType):
     return incident_queryset.filter(level__lte=maxlevel).distinct()
 
 
+def _incidents_fitting_event_types(incident_queryset, filterblob):
+    event_types = filterblob.get("event_types", [])
+    if not event_types:
+        return incident_queryset.distinct()
+    incident_queryset = incident_queryset.prefetch_related("events")
+    return incident_queryset.filter(events__type__in=event_types).distinct()
+
+
 class QuerySetFilter:
     @staticmethod
     def filtered_incidents(filterblob: FilterBlobType, incident_queryset=None):
@@ -76,6 +84,7 @@ class QuerySetFilter:
         filtered_by_tags = _incidents_with_tags(incident_queryset, filterblob)
         filtered_by_tristates = _incidents_fitting_tristates(incident_queryset, filterblob)
         filtered_by_maxlevel = _incidents_fitting_maxlevel(incident_queryset, filterblob)
+        filtered_by_event_types = _incidents_fitting_event_types(incident_queryset, filterblob)
 
         return (
             filtered_by_source_type
@@ -83,6 +92,7 @@ class QuerySetFilter:
             & filtered_by_tags
             & filtered_by_tristates
             & filtered_by_maxlevel
+            & filtered_by_event_types
         )
 
     @classmethod
