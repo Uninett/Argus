@@ -19,7 +19,7 @@
       {% for field in filter_form %}
         {% if not field.field.in_header %}
           <li class="form-control">
-            {% if field.name == "sourceSystemIds" or field.name == "tags" %}
+            {% if "dropdownmultiselect" in field|widget_type %}
               <div class="flex flex-nowrap">
                 <label class="label">
                   <span class="label-text">{{ field.label }}</span>
