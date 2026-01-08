@@ -190,9 +190,8 @@ Change how often the incidents table gets refreshed
 Decide which incidents are shown in the table
 ---------------------------------------------
 
-For ease of alarm management you can filter incidents so that only
-incidents that match all preferred parameters are shown in the
-*Incidents* table.
+You can filter incidents so that only incidents that match all preferred
+parameters are shown in the *Incidents* table.
 
 Apply the preferred filter by using the *Filter incidents* toolbar. Argus will
 remember your filter settings from the last login session, and will use
@@ -230,6 +229,9 @@ Filter by acknowledgement status
 Filter by source monitoring system
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Every incident has a source, and different sources report on different things.
+You might not need to keep an eye on all incidents from all sources.
+
 -  If you want the table to display only incidents that came from a
    **specific monitoring system(s)**:
 
@@ -244,6 +246,38 @@ Filter by source monitoring system
 
 -  If you want the table to display incidents from **any monitoring
    system**, leave the *Sources* field empty.
+
+.. note::
+
+   It is better to filter on either source types or sources, not both, as they
+   affect each other.
+
+Filter by source monitoring system type
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Every source has a type. Many types have only one source, but Argus can handle
+types with many sources too. For instance: sensors of the same type all
+reporting independetly of each other.
+
+-  If you want the table to display only incidents that came from
+   **specific source types**:
+
+   1. Click on the *Source Typess* selector.
+
+   2. In the drop-down that appears, you can see all available source system
+      types. Click on the preferred one. The newly selected *source system
+      type* will appear in the input field.
+
+   3. Repeat the process if you want to filter by several monitoring
+      system types.
+
+-  If you want the table to display incidents from **any monitoring
+   system type**, leave the *Source types* field empty.
+
+.. note::
+
+   It is better to filter on either source types or sources, not both, as they
+   affect each other.
 
 Filter by tags
 ^^^^^^^^^^^^^^
@@ -308,6 +342,11 @@ Incident end
 
    Incidents that were solved without human intervention.
 
+Incident change
+
+   Currently used for any other tracked change to an incident: for instance
+   if it is connected to a ticket.
+
 Close
 
    Incidents that were marked as closed manually by a human.
@@ -323,8 +362,7 @@ Acknowledge
 
 Other
 
-   Currently used for any other tracked change to an incident: for instance
-   if it is connected to a ticket.
+   Only used for testing at the moment.
 
 Stateless
 
