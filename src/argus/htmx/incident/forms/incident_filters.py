@@ -202,3 +202,7 @@ class SortForm(forms.Form):
         if sort_order == "desc":
             return f"-{sort_field}"
         return sort_field
+
+    def is_default_sort_field(self):
+        """Check if the current sort field is the default."""
+        return self.get_sort_field() == SORT_DEFAULT

@@ -26,7 +26,7 @@ from ..request import HtmxHttpRequest
 
 from .columns import get_incident_table_columns
 from .utils import get_filter_function
-from .forms.incident_filters import IncidentListForm, SortForm
+from .forms.incident_filters import IncidentListForm, SortForm, SORT_DEFAULT
 from .forms.incident_actions import AckForm, DescriptionOptionalForm, EditTicketUrlForm, AddTicketUrlForm
 from ..utils import (
     single_autocreate_ticket_url_queryset,
@@ -276,7 +276,14 @@ def incident_list(request: HtmxHttpRequest) -> HttpResponse:
     ordering = sort_form.get_ordering()
 
     # Load incidents with sorting
-    qs = prefetch_incident_daughters().order_by(ordering)
+    qs = prefetch_incident_daughters()
+    if sort_form.is_default_sort_field():
+        qs = qs.order_by(ordering)
+    else:
+        # Ensure a consistent secondary sort to avoid random ordering when primary sort field
+        # has a lot of identical values
+        qs = qs.order_by(ordering, f"-{SORT_DEFAULT}")
+
     total_count = qs.count()
     last_refreshed = make_aware(datetime.now())
 
