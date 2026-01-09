@@ -314,7 +314,7 @@ start_time_and_age
     :Redundant with: start_time, age
 
 age
-    :From: start_time
+    :From: age (calculated)
     :Name: age
     :Description: How long the incident has been ongoing.
     :Redundant with: start_time_and_age
