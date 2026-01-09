@@ -25,35 +25,31 @@ from argus.util.testing import disconnect_signals, connect_signals
 
 @tag("database", "queryset-filter")
 class FilteredIncidentsHelpersTests(TestCase):
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        cls.source_type1 = SourceSystemTypeFactory(name="type1")
-        cls.source1_user = SourceUserFactory(username="system_1")
-        cls.source1 = SourceSystemFactory(name="System 1", type=cls.source_type1, user=cls.source1_user)
-
-        cls.user1 = AdminUserFactory(username="user1")
-
-        cls.source_type2 = SourceSystemTypeFactory(name="type2")
-        cls.source2_user = SourceUserFactory(username="system_2")
-        cls.source2 = SourceSystemFactory(name="System 2", type=cls.source_type2, user=cls.source2_user)
-
-        cls.incident1 = StatelessIncidentFactory(source=cls.source1)
-        EventFactory(incident=cls.incident1, type=Event.Type.STATELESS)
-        cls.incident2 = StatelessIncidentFactory(source=cls.source2)
-        EventFactory(incident=cls.incident2, type=Event.Type.STATELESS)
-
-        cls.tag1 = TagFactory(key="object", value="1")
-        cls.tag2 = TagFactory(key="object", value="2")
-        cls.tag3 = TagFactory(key="location", value="Oslo")
-
-        IncidentTagRelationFactory(tag=cls.tag1, incident=cls.incident1, added_by=cls.user1)
-        IncidentTagRelationFactory(tag=cls.tag3, incident=cls.incident1, added_by=cls.user1)
-        IncidentTagRelationFactory(tag=cls.tag2, incident=cls.incident2, added_by=cls.user1)
-        IncidentTagRelationFactory(tag=cls.tag3, incident=cls.incident2, added_by=cls.user1)
-
     def setUp(self):
         disconnect_signals()
+        self.source_type1 = SourceSystemTypeFactory(name="type1")
+        self.source1_user = SourceUserFactory(username="system_1")
+        self.source1 = SourceSystemFactory(name="System 1", type=self.source_type1, user=self.source1_user)
+
+        self.user1 = AdminUserFactory(username="user1")
+
+        self.source_type2 = SourceSystemTypeFactory(name="type2")
+        self.source2_user = SourceUserFactory(username="system_2")
+        self.source2 = SourceSystemFactory(name="System 2", type=self.source_type2, user=self.source2_user)
+
+        self.incident1 = StatelessIncidentFactory(source=self.source1)
+        EventFactory(incident=self.incident1, type=Event.Type.STATELESS)
+        self.incident2 = StatelessIncidentFactory(source=self.source2)
+        EventFactory(incident=self.incident2, type=Event.Type.STATELESS)
+
+        self.tag1 = TagFactory(key="object", value="1")
+        self.tag2 = TagFactory(key="object", value="2")
+        self.tag3 = TagFactory(key="location", value="Oslo")
+
+        IncidentTagRelationFactory(tag=self.tag1, incident=self.incident1, added_by=self.user1)
+        IncidentTagRelationFactory(tag=self.tag3, incident=self.incident1, added_by=self.user1)
+        IncidentTagRelationFactory(tag=self.tag2, incident=self.incident2, added_by=self.user1)
+        IncidentTagRelationFactory(tag=self.tag3, incident=self.incident2, added_by=self.user1)
         self.all_incidents = Incident.objects.all()
 
     def teardown(self):
@@ -132,33 +128,29 @@ class FilteredIncidentsHelpersTests(TestCase):
 
 @tag("database", "queryset-filter")
 class FilteredIncidentsTests(TestCase):
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        cls.source_type1 = SourceSystemTypeFactory(name="type1")
-        cls.source1_user = SourceUserFactory(username="system_1")
-        cls.source1 = SourceSystemFactory(name="System 1", type=cls.source_type1, user=cls.source1_user)
-
-        cls.user1 = AdminUserFactory(username="user1")
-
-        cls.source_type2 = SourceSystemTypeFactory(name="type2")
-        cls.source2_user = SourceUserFactory(username="system_2")
-        cls.source2 = SourceSystemFactory(name="System 2", type=cls.source_type2, user=cls.source2_user)
-
-        cls.incident1 = StatelessIncidentFactory(source=cls.source1)
-        cls.incident2 = StatelessIncidentFactory(source=cls.source2)
-
-        cls.tag1 = TagFactory(key="object", value="1")
-        cls.tag2 = TagFactory(key="object", value="2")
-        cls.tag3 = TagFactory(key="location", value="Oslo")
-
-        IncidentTagRelationFactory(tag=cls.tag1, incident=cls.incident1, added_by=cls.user1)
-        IncidentTagRelationFactory(tag=cls.tag3, incident=cls.incident1, added_by=cls.user1)
-        IncidentTagRelationFactory(tag=cls.tag2, incident=cls.incident2, added_by=cls.user1)
-        IncidentTagRelationFactory(tag=cls.tag3, incident=cls.incident2, added_by=cls.user1)
-
     def setUp(self):
         disconnect_signals()
+        self.source_type1 = SourceSystemTypeFactory(name="type1")
+        self.source1_user = SourceUserFactory(username="system_1")
+        self.source1 = SourceSystemFactory(name="System 1", type=self.source_type1, user=self.source1_user)
+
+        self.user1 = AdminUserFactory(username="user1")
+
+        self.source_type2 = SourceSystemTypeFactory(name="type2")
+        self.source2_user = SourceUserFactory(username="system_2")
+        self.source2 = SourceSystemFactory(name="System 2", type=self.source_type2, user=self.source2_user)
+
+        self.incident1 = StatelessIncidentFactory(source=self.source1)
+        self.incident2 = StatelessIncidentFactory(source=self.source2)
+
+        self.tag1 = TagFactory(key="object", value="1")
+        self.tag2 = TagFactory(key="object", value="2")
+        self.tag3 = TagFactory(key="location", value="Oslo")
+
+        IncidentTagRelationFactory(tag=self.tag1, incident=self.incident1, added_by=self.user1)
+        IncidentTagRelationFactory(tag=self.tag3, incident=self.incident1, added_by=self.user1)
+        IncidentTagRelationFactory(tag=self.tag2, incident=self.incident2, added_by=self.user1)
+        IncidentTagRelationFactory(tag=self.tag3, incident=self.incident2, added_by=self.user1)
 
     def teardown(self):
         connect_signals()
