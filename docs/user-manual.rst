@@ -142,6 +142,7 @@ monitoring system) and whether the incident has an associated *ticket
 url* (label icon at the very end of the row).
 
 .. _access-detailed-incident-view:
+
 Access detailed incident view
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -245,7 +246,6 @@ Filter by source monitoring system
 -  If you want the table to display incidents from **any monitoring
    system**, leave the *Sources* field empty.
 
-.. _filter-by-tags:
 Filter by tags
 ^^^^^^^^^^^^^^
 
@@ -264,7 +264,6 @@ Filter by tags
 -  If you want the table to display incidents with **any tags**, leave
    the *Tags* field empty.
 
-.. _filter-by-severity-level:
 Filter by severity level
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -291,6 +290,7 @@ filters <#work-with-stored-filters>`_.
    incidents in the table.
 
 .. _work-with-stored-filters:
+
 Work with stored filters
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -337,7 +337,6 @@ Apply existing filter
 
 2. Click on the preferred filter in the drop-down menu.
 
-.. _unselect-applied-filter:
 Unselect applied filter
 ^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -354,7 +353,6 @@ Delete existing filter
 
 3. Confirm deletion.
 
-.. _update-one-incident:
 Update one incident
 ~~~~~~~~~~~~~~~~~~~
 
@@ -406,7 +404,6 @@ Manually add ticket URL to an incident
 
 4. Press ``Add ticket``.
 
-.. _edit-ticket-url:
 Edit ticket URL
 '''''''''''''''
 
@@ -517,7 +514,6 @@ receive by creating, editing and deleting *notification profiles*.
 .. image:: img/notification_profiles.png
   :width: 650
 
-.. _about-components-of-notification-profiles:
 About components of notification profiles
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -560,6 +556,7 @@ across multiple notification profiles. Destinations may be of
 <#about-the-available-notification-media>`_.
 
 .. _about-the-available-notification-media:
+
 About the available notification media
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -630,7 +627,6 @@ Edit existing notification profile
 
 6. Press ``Save``.
 
-.. _disable-notification-profile:
 Disable notification profile
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -642,7 +638,6 @@ Disable notification profile
 
 3. Press ``Save``.
 
-.. _delete-notification-profile:
 Delete notification profile
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -695,6 +690,7 @@ all hours on weekends:
   :width: 650
 
 .. _access-your-timeslots:
+
 Access your timeslots
 ~~~~~~~~~~~~~~~~~~~~~
 
@@ -721,6 +717,7 @@ one.
    existing timeslot.
 
 .. _edit-recurrence:
+
 Edit recurrence
 ~~~~~~~~~~~~~~~
 
@@ -741,6 +738,7 @@ Edit recurrence
    -  Select day(s) via corresponding checkboxes.
 
 .. _delete-recurrence:
+
 Delete recurrence
 ~~~~~~~~~~~~~~~~~
 
@@ -793,7 +791,6 @@ Edit existing timeslot
 
 3. Press ``Save``.
 
-.. _delete-timeslot:
 Delete timeslot
 ~~~~~~~~~~~~~~~
 
