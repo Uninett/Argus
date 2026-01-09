@@ -545,6 +545,21 @@ class Incident(models.Model):
 
         return self.events.filter((acks_query & acks_not_expired_query) | ack_is_just_being_created).exists()
 
+    @property
+    def is_on_maintenance(self):
+        from argus.plannedmaintenance.models import PlannedMaintenanceTask
+        from argus.plannedmaintenance.utils import PlannedMaintenanceFilterWrapper
+
+        pm_tasks = PlannedMaintenanceTask.objects.current()
+
+        for pm in pm_tasks:
+            pmfw = PlannedMaintenanceFilterWrapper(pm)
+            filter_fits = pmfw.incident_fits(self)
+            # Abort early on first filter fit
+            if filter_fits:
+                return True
+        return False
+
     def is_acked_by(self, group: str) -> bool:
         return group in self.acks.active().group_names()
 
