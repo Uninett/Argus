@@ -257,12 +257,12 @@ Filter by source monitoring system type
 
 Every source has a type. Many types have only one source, but Argus can handle
 types with many sources too. For instance: sensors of the same type all
-reporting independetly of each other.
+reporting independently of each other.
 
 -  If you want the table to display only incidents that came from
    **specific source types**:
 
-   1. Click on the *Source Typess* selector.
+   1. Click on the *Source Types* selector.
 
    2. In the drop-down that appears, you can see all available source system
       types. Click on the preferred one. The newly selected *source system
@@ -272,7 +272,7 @@ reporting independetly of each other.
       system types.
 
 -  If you want the table to display incidents from **any monitoring
-   system type**, leave the *Source types* field empty.
+   system type**, leave the *Source Types* field empty.
 
 .. note::
 
@@ -314,9 +314,9 @@ Filter by event types
 
 Not all types of events are of of equal relevance. For instance: You might want
 to receive notfications for new incidents but don't need to know when they are
-resolved, or you might want to ignore wthether it has been connected to
-a ticket. You might be curious to know which incidents were resolved
-automatically, and which needed to be handled by people.
+resolved, or you might want to ignore that it has been connected to a ticket.
+You might be curious to know which incidents were resolved automatically, and
+which needed to be handled by people.
 
 -  If you want the table to display only incidents that have one or more
    **specific event types**:
@@ -340,7 +340,7 @@ Incident start
 
 Incident end
 
-   Incidents that were solved without human intervention.
+   Incidents that were resolved without human intervention.
 
 Incident change
 
