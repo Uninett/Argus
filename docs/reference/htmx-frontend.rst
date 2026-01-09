@@ -333,6 +333,14 @@ search_ticket_url
                   the matching incidents.
     :Redundant with: ticket, has_ticket_url
 
+is_on_maintenance
+    :From: calculated
+    :Name: is_on_maintenance
+    :Description: An icon indicating if there exists a planned maintenance task that
+                  covers the incident, meaning no notifications are being sent for that
+                  incident. Can toggle showing only incidents that are on maintenance
+                  or not.
+
 
 Themes
 ------
