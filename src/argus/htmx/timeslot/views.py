@@ -154,26 +154,18 @@ class FormsetMixin:
         self.object = form.save(commit=False)
         self.object.user = self.request.user
         self.object.save()
-        old_trs = self.object.time_recurrences.all()
         trs = formset.save(commit=False)
         for tr in trs:
             tr.timeslot = self.object
             tr.save()
 
         message_list = []
-        timeslot_message = f"Set timeslot name to {self.object.name}."
         changed_message = f"Saved timeslot {self.object}."
 
         # bail out early if the only change is timeslot name
         if form.has_changed():
             if not (formset.changed_objects or formset.new_objects or formset.deleted_objects):
-                messages.success(self.request, timeslot_message)
                 return HttpResponseRedirect(self.get_success_url())
-
-        if not old_trs.exists() and not len(trs):
-            no_forms_msg = f'There are no time recurrences in timeslot "{self.object}". Click the "Delete"-button if you wish to delete the entire timeslot.'
-            messages.warning(self.request, no_forms_msg)
-            return HttpResponseRedirect(self.get_success_url())
 
         deleted = []
         for tr in formset.deleted_objects:
@@ -195,10 +187,15 @@ class FormsetMixin:
             for changed_tr, changed in formset.changed_objects:
                 LOG.debug("Update %s (%s), %s", changed_tr, changed_tr.id, changed)
 
+        # Warn if timeslot ends up with no recurrences after all changes
+        self.object.refresh_from_db()
+        if not self.object.time_recurrences.exists():
+            no_forms_msg = f'There are no time recurrences in timeslot "{self.object}". Click the "Delete"-button if you wish to delete the entire timeslot.'
+            messages.warning(self.request, no_forms_msg)
+
         if message_list:
             message = " ".join(message_list)
             LOG.info(message)
-            messages.success(self.request, message)
         return HttpResponseRedirect(self.get_success_url())
 
 

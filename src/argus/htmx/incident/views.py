@@ -95,7 +95,6 @@ def incident_update(request: HtmxHttpRequest, action: str):
         return HttpResponseBadRequest("Invalid update action")
     incident_ids = get_incident_ids_to_update(request)
     if not incident_ids:
-        messages.warning(request, "No incidents selected, nothing to change")
         return HttpResponseClientRefresh()
 
     if action == "autocreate-ticket":
