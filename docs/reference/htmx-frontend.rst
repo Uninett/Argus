@@ -212,8 +212,8 @@ ack
     :Description: Show whether the incident is acked or not.
     :Redundant with: combined_status, combined_status_icons
 
-.. image:: img/columns/ack.png
-   :width: 200
+    .. image:: img/columns/ack.png
+       :width: 200
 
 ack_icon
     :From: ack
@@ -221,32 +221,32 @@ ack_icon
     :Description: Show whether the incident is acked or not, using an icon instead of text.
     :Redundant with: combined_status, combined_status_icons
 
-.. image:: img/columns/ack_icon.png
-   :width: 200
+    .. image:: img/columns/ack_icon.png
+       :width: 200
 
 color_status
     :From: ack + status
     :Name: color_status
     :Description: A combination of ackedness and openness, shown only as a color.
 
-.. image:: img/columns/color_status.png
-   :width: 200
+    .. image:: img/columns/color_status.png
+       :width: 200
 
 combined_status
     :From: ack + status
     :Name: combined_status
     :Description: Merges the "open" column and the "ack" column into one.
 
-.. image:: img/columns/combined_status.png
-   :width: 200
+    .. image:: img/columns/combined_status.png
+       :width: 200
 
 combined_status_icons
     :From: ack + status
     :Name: combined_status_icons
     :Description: Merges the "open" column and the "ack" column into one, using icons instead of text.
 
-.. image:: img/columns/combined_status_icons.png
-   :width: 200
+    .. image:: img/columns/combined_status_icons.png
+       :width: 200
 
 description
     :From: description
@@ -254,8 +254,8 @@ description
     :Description: The contents of the description-field of the incident.
     :Redundant with: search_description
 
-.. image:: img/columns/description.png
-   :width: 200
+    .. image:: img/columns/description.png
+       :width: 200
 
 search_description
     :From: description
@@ -264,8 +264,8 @@ search_description
                   incidents.
     :Redundant with: description
 
-.. image:: img/columns/search_description.png
-   :width: 200
+    .. image:: img/columns/search_description.png
+       :width: 200
 
 id
     :From: id
@@ -279,8 +279,8 @@ search_id
     :Description: Search for incidents with a given id.
     :Redundant with: id
 
-.. image:: img/columns/id.png
-   :width: 200
+    .. image:: img/columns/id.png
+       :width: 200
 
 level
     :From: level
@@ -288,8 +288,8 @@ level
     :Description: The severity level.
     :Redundant with: select_levels
 
-.. image:: img/columns/level.png
-   :width: 200
+    .. image:: img/columns/level.png
+       :width: 200
 
 select_levels
     :From: level
@@ -300,8 +300,8 @@ select_levels
                   the max via this field.
     :Redundant with: level
 
-.. image:: img/columns/select_levels.png
-   :width: 200
+    .. image:: img/columns/select_levels.png
+       :width: 200
 
 status
     :From: open
@@ -309,8 +309,8 @@ status
     :Description: Whether the incident is still ongoing or has been closed.
     :Redundant with: combined_status, combined_status_icons
 
-.. image:: img/columns/status.png
-   :width: 200
+    .. image:: img/columns/status.png
+       :width: 200
 
 status_icon
     :From: open
@@ -318,24 +318,24 @@ status_icon
     :Description: Whether the incident is still ongoing or has been closed, using an icon instead of text.
     :Redundant with: combined_status, combined_status_icons
 
-.. image:: img/columns/status_icon.png
-   :width: 200
+    .. image:: img/columns/status_icon.png
+       :width: 200
 
 row_select
     :From: depends on incident id
     :Name: row_select
     :Description: Checkbox to select the row for bulk changes.
 
-.. image:: img/columns/row_select.png
-   :width: 200
+    .. image:: img/columns/row_select.png
+       :width: 200
 
 source
     :From: source
     :Name: source
     :Description: The source of the incident.
 
-.. image:: img/columns/source.png
-   :width: 200
+    .. image:: img/columns/source.png
+       :width: 200
 
 start_time
     :From: start_time
@@ -343,8 +343,8 @@ start_time
     :Description: When the incident started, fixed width.
     :Redundant with: narrow_start_time
 
-.. image:: img/columns/start_time.png
-   :width: 200
+    .. image:: img/columns/start_time.png
+       :width: 200
 
 narrow_start_time
     :From: start_time
@@ -352,8 +352,8 @@ narrow_start_time
     :Description: When the incident started, width depends on date format.
     :Redundant with: start_time
 
-.. image:: img/columns/narrow_start_time.png
-   :width: 200
+    .. image:: img/columns/narrow_start_time.png
+       :width: 200
 
 start_time_and_age
     :From: start_time + age
@@ -361,8 +361,8 @@ start_time_and_age
     :Description: When the incident started, and how long it has been ongoing.
     :Redundant with: start_time, age
 
-.. image:: img/columns/start_time_and_age.png
-   :width: 200
+    .. image:: img/columns/start_time_and_age.png
+       :width: 200
 
 age
     :From: age (calculated)
@@ -370,8 +370,8 @@ age
     :Description: How long the incident has been ongoing.
     :Redundant with: start_time_and_age
 
-.. image:: img/columns/age.png
-   :width: 200
+    .. image:: img/columns/age.png
+       :width: 200
 
 tags
     :From: calculated
@@ -385,8 +385,8 @@ ticket
     :Description: A link to a ticket/issue in an external system with more information.
     :Redundant with: has_ticket_url, search_ticket_url
 
-.. image:: img/columns/ticket.png
-   :width: 200
+    .. image:: img/columns/ticket.png
+       :width: 200
 
 has_ticket_url
     :From: ticket_url
@@ -395,8 +395,8 @@ has_ticket_url
                   Can toggle showing only incidents that has or lacks a ticket url.
     :Redundant with: ticket, search_ticket_url
 
-.. image:: img/columns/has_ticket_url.png
-   :width: 200
+    .. image:: img/columns/has_ticket_url.png
+       :width: 200
 
 search_ticket_url
     :From: ticket_url
@@ -406,8 +406,8 @@ search_ticket_url
                   the matching incidents.
     :Redundant with: ticket, has_ticket_url
 
-.. image:: img/columns/search_ticket_url.png
-   :width: 200
+    .. image:: img/columns/search_ticket_url.png
+       :width: 200
 
 Themes
 ------
