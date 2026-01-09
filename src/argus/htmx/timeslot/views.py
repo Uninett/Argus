@@ -148,12 +148,6 @@ class FormsetMixin:
             return self.form_invalid(form, formset)
 
     def form_invalid(self, form, formset):
-        errors = []
-        for error in [form.errors] + formset.errors:
-            if error:
-                errors.append(error.as_text())
-        if errors:
-            messages.warning(self.request, f"Couldn't save timeslot: {errors}")
         return self.render_to_response(self.get_context_data(form=form, formset=formset))
 
     def form_valid(self, form, formset):
