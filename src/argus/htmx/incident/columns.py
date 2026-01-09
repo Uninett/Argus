@@ -205,7 +205,7 @@ _BUILTIN_COLUMN_LIST = [
     ),
     IncidentTableColumn(
         "tags",
-        "All tags",
+        "Tags",
         "htmx/incident/cells/_incident_tags.html",
         detail_link=True,
     ),
