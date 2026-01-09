@@ -1,0 +1,31 @@
+{% comment %}
+Accessible inline banner. Uses role="alert" for error/warning, role="status" for success/info.
+Parameters: message (required), level (error|warning|success|info), dismissible (default: true), id
+{% endcomment %}
+{% with level=level|default:"info" dismissible=dismissible|default:True %}
+  <div {% if id %}id="{{ id }}"{% endif %}
+       class="alert {% if level == 'error' %}alert-error{% elif level == 'warning' %}alert-warning{% elif level == 'success' %}alert-success{% else %}alert-info{% endif %} flex justify-between w-full"
+       role="{% if level == 'error' or level == 'warning' %}alert{% else %}status{% endif %}"
+       {% if level != 'error' and level != 'warning' %}aria-live="polite"{% endif %}>
+    <div class="flex items-center gap-2">
+      {% if level == "error" %}
+        <i class="fa-solid fa-circle-xmark" aria-hidden="true"></i>
+      {% elif level == "warning" %}
+        <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+      {% elif level == "success" %}
+        <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+      {% else %}
+        <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+      {% endif %}
+      <span>{{ message }}</span>
+    </div>
+    {% if dismissible %}
+      <button type="button"
+              class="btn btn-ghost btn-sm btn-circle"
+              aria-label="Dismiss message"
+              _="on click remove closest .alert">
+        <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+      </button>
+    {% endif %}
+  </div>
+{% endwith %}
