@@ -314,10 +314,16 @@ start_time_and_age
     :Redundant with: start_time, age
 
 age
-    :From: age
+    :From: age (calculated)
     :Name: age
     :Description: How long the incident has been ongoing.
     :Redundant with: start_time_and_age
+
+tags
+    :From: calculated
+    :Name: tags
+    :Description: All the tags of the incident. Most useful when making
+                  a notification filter.
 
 ticket
     :From: ticket_url

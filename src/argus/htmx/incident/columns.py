@@ -203,6 +203,12 @@ _BUILTIN_COLUMN_LIST = [
         "htmx/incident/cells/_incident_events.html",
         detail_link=True,
     ),
+    IncidentTableColumn(
+        "tags",
+        "Tags",
+        "htmx/incident/cells/_incident_tags.html",
+        detail_link=True,
+    ),
 ]
 BUILTIN_COLUMNS = {col.name: col for col in _BUILTIN_COLUMN_LIST}
 
