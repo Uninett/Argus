@@ -112,6 +112,5 @@ def _save_preference(request: HttpRequest, prefs: Preferences, preference: str, 
         return value, True
 
     prefs.save_preference(preference, value)
-    messages.success(request, f"Changed {preference}: {old_value} → {value}")
     LOG.info("Changed %s: %s → %s", preference, old_value, value)
     return value, True

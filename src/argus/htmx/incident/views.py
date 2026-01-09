@@ -154,7 +154,6 @@ def update_filter(request: HtmxHttpRequest, pk: int):
         # Immediately select the newly updated filter - keep or not?
         # request.session["selected_filter"] = str(filter_obj.id)
 
-        messages.success(request, f"Updated filter '{filter_obj.name}'.")
         return HttpResponseClientRefresh()
     messages.error(request, f"Failed to update filter '{filter_obj.name}'.")
     return HttpResponseBadRequest()
@@ -165,7 +164,6 @@ def delete_filter(request: HtmxHttpRequest, pk: int):
     filter_obj = get_object_or_404(Filter, id=pk)
     deleted_id = filter_obj.delete()
     if deleted_id:
-        messages.success(request, f"Deleted filter {filter_obj.name}.")
         if request.session.get("selected_filter") == str(pk):
             request.session["selected_filter"] = None
         return HttpResponseClientRefresh()

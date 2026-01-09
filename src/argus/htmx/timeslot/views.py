@@ -264,5 +264,4 @@ class TimeslotDeleteView(TimeslotMixin, DeleteView):
         self.object = self.get_object()
         success_url = self.get_success_url()
         self.object.delete()
-        messages.success(request, f'Successfully deleted timeslot "{self.object}"')
         return HttpResponseRedirect(success_url)
