@@ -1,33 +1,20 @@
 <!-- htmx/incident/cells/_incident_sort_button.html -->
 {# Reusable sort button for column headers. Requires: column, current_sort, current_sort_order #}
+{# Cycling order: inactive -> desc -> asc -> inactive (default) #}
 {% if column.sort_field %}
   {% if current_sort == column.sort_field %}
-    {# Active: show directional icon, click toggles order #}
-    <button type="button"
-            class="btn btn-xs btn-ghost text-primary p-0 min-h-4 h-4"
-            aria-label="Sort by {{ column.label|lower }} {% if current_sort_order == 'asc' %}descending{% else %}ascending{% endif %}"
-            hx-get="{% url 'htmx:incident-list' %}"
-            hx-vals='{"sort": "{{ column.sort_field }}", "sort_order": "{% if current_sort_order == 'asc' %}desc{% else %}asc{% endif %}"}'
-            hx-include=".incident-list-param"
-            hx-target="#table"
-            hx-swap="outerHTML"
-            hx-push-url="true"
-            hx-indicator="#incident-list .htmx-indicator">
-      <i class="fa-solid {% if current_sort_order == 'asc' %}fa-sort-up{% else %}fa-sort-down{% endif %}"></i>
-    </button>
+    {% if current_sort_order == "desc" %}
+      {% with icon="fa-sort-down" next_sort=column.sort_field next_order="asc" label="Sort by "|add:column.label|lower|add:" ascending" active=True %}
+        {% include "htmx/incident/cells/_incident_sort_button_element.html" %}
+      {% endwith %}
+    {% else %}
+      {% with icon="fa-sort-up" next_sort="" next_order="" label="Reset sort order" active=True %}
+        {% include "htmx/incident/cells/_incident_sort_button_element.html" %}
+      {% endwith %}
+    {% endif %}
   {% else %}
-    {# Inactive: show neutral icon, click sorts descending #}
-    <button type="button"
-            class="btn btn-xs btn-ghost text-base-content/50 p-0 min-h-4 h-4 hover:text-primary"
-            aria-label="Sort by {{ column.label|lower }}"
-            hx-get="{% url 'htmx:incident-list' %}"
-            hx-vals='{"sort": "{{ column.sort_field }}", "sort_order": "desc"}'
-            hx-include=".incident-list-param"
-            hx-target="#table"
-            hx-swap="outerHTML"
-            hx-push-url="true"
-            hx-indicator="#incident-list .htmx-indicator">
-      <i class="fa-solid fa-sort"></i>
-    </button>
+    {% with icon="fa-sort" next_sort=column.sort_field next_order="desc" label="Sort by "|add:column.label|lower active=False %}
+      {% include "htmx/incident/cells/_incident_sort_button_element.html" %}
+    {% endwith %}
   {% endif %}
 {% endif %}
