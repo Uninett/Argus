@@ -8,7 +8,7 @@ from django.views.generic import ListView
 from argus.filter import get_filter_backend
 from argus.htmx.widgets import BadgeDropdownMultiSelect, SearchDropdownMultiSelect
 from argus.incident.constants import AckedStatus, Level, OpenStatus
-from argus.incident.models import SourceSystem, SourceSystemType, Tag, Event
+from argus.incident.models import Event, SourceSystem, SourceSystemType, Tag
 from argus.notificationprofile.models import Filter
 
 filter_backend = get_filter_backend()
@@ -89,7 +89,7 @@ class IncidentFilterForm(TagFieldMixin, forms.Form):
             partial_get=None,
         ),
         required=False,
-        label="Event types",
+        label="Event Types",
     )
 
     DEFAULT_VALUES = {
