@@ -18,7 +18,7 @@
     <div class="form-control w-full self-center">
       <label class="label label-text" for={{ form.days.auto_id }}><em>{{ form.days.label }}</em>
       </label>
-      {{ errors }}
+      {% for error in form.days.errors %}<span class="label-text-alt text-error">{{ error }}</span>{% endfor %}
       {% render_field form.days %}
     </div>
   </fieldset>

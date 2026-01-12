@@ -223,7 +223,8 @@ class TimeslotCreateView(FormsetMixin, TimeslotMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["formset"] = make_timerecurrence_formset()
+        if "formset" not in context:
+            context["formset"] = make_timerecurrence_formset()
         return context
 
     def post(self, request, *args, **kwargs):
@@ -236,7 +237,8 @@ class TimeslotUpdateView(FormsetMixin, TimeslotMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["formset"] = make_timerecurrence_formset(timeslot=self.object)
+        if "formset" not in context:
+            context["formset"] = make_timerecurrence_formset(timeslot=self.object)
         form = context["form"]
         form = self._set_delete_modal(form, self.object)
         context["form"] = form
