@@ -1,4 +1,9 @@
 <!-- htmx/incident/cells/_incident_events.html -->
 <div class="flex gap-1">
-  {% for event in incident.events.all %}<div class="badge badge-sm badge-neutral">{{ event.type }}</div>{% endfor %}
+  {% for event in incident.events.all %}
+    <div class="badge badge-sm badge-neutral tooltip tooltip-bottom"
+         data-tip="{{ event.get_type_display }}{% if event.description %}: {{ event.description }}{% endif %}">
+      {{ event.type }}
+    </div>
+  {% endfor %}
 </div>
