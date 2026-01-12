@@ -9,7 +9,7 @@ from django.test import RequestFactory, TestCase
 from argus.auth.factories import PersonUserFactory
 from argus.filter.factories import FilterFactory
 from argus.htmx.incident.filter import IncidentFilterForm, NamedFilterForm, create_named_filter, incident_list_filter
-from argus.htmx.incident.views import search_tags
+from argus.htmx.incident.views import search_tags, set_selected_filter
 from argus.incident.constants import AckedStatus, OpenStatus
 from argus.incident.factories import IncidentFactory, SourceSystemFactory
 from argus.incident.models import Incident, Tag
@@ -104,29 +104,29 @@ class TestIncidentListFilter(TestCase):
         connect_signals()
 
     def test_valid_request_should_return_filtered_queryset(self):
-        self.request.session["selected_filter"] = self.valid_filter.pk
+        set_selected_filter(self.request, self.valid_filter)
         _, qs = incident_list_filter(self.request, self.qs)
         assert self.incident in self.qs
         assert self.incident not in qs
 
     def test_invalid_request_should_return_unfiltered_queryset(self):
-        self.request.session["selected_filter"] = self.invalid_filter.pk
+        set_selected_filter(self.request, self.invalid_filter)
         _, qs = incident_list_filter(self.request, self.qs)
         assert qs == self.qs
 
     def test_valid_request_should_return_form_with_correct_values(self):
-        self.request.session["selected_filter"] = self.valid_filter.pk
+        set_selected_filter(self.request, self.valid_filter)
         form, _ = incident_list_filter(self.request, self.qs)
         assert form.to_filterblob()["maxlevel"] == self.valid_filter.filter["maxlevel"]
 
     def test_invalid_request_should_return_form_with_errors(self):
-        self.request.session["selected_filter"] = self.invalid_filter.pk
+        set_selected_filter(self.request, self.invalid_filter)
         form, _ = incident_list_filter(self.request, self.qs)
         assert form.errors
 
     def test_get_request_without_selected_filter_should_use_get_parameters_as_form_data(self):
         maxlevel = 3
-        self.request.session["selected_filter"] = None
+        set_selected_filter(self.request, None)
         self.request.GET = QueryDict(f"tags=&maxlevel={maxlevel}")
         form, _ = incident_list_filter(self.request, self.qs)
         assert form.to_filterblob()["maxlevel"] == maxlevel

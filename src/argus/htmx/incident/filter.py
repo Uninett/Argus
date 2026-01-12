@@ -15,6 +15,9 @@ filter_backend = get_filter_backend()
 QuerySetFilter = filter_backend.QuerySetFilter
 LOG = logging.getLogger(__name__)
 
+MIN_LEVEL = min(Level).value
+MAX_LEVEL = max(Level).value
+
 
 class RangeInput(forms.NumberInput):
     template_name = "django/forms/widgets/range.html"
@@ -78,9 +81,9 @@ class IncidentFilterForm(TagFieldMixin, forms.Form):
         help_text='Press "Enter" after each completed tag',
     )
     maxlevel = forms.IntegerField(
-        widget=RangeInput(attrs={"step": "1", "min": min(Level).value, "max": max(Level).value}),
+        widget=RangeInput(attrs={"step": "1", "min": MIN_LEVEL, "max": MAX_LEVEL}),
         label="Level <=",
-        initial=max(Level).value,
+        initial=MAX_LEVEL,
         required=False,
     )
 
@@ -90,7 +93,7 @@ class IncidentFilterForm(TagFieldMixin, forms.Form):
         "sourceSystemIds": [],
         "source_types": [],
         "tags": [],
-        "maxlevel": max(Level).value,
+        "maxlevel": MAX_LEVEL,
     }
 
     def __init__(self, *args, **kwargs):
@@ -148,8 +151,13 @@ class IncidentFilterForm(TagFieldMixin, forms.Form):
 
         filterblob = {}
 
-        filterblob["open"] = self._open_tristate()
-        filterblob["acked"] = self._acked_tristate()
+        open = self._open_tristate()
+        if open is not None:
+            filterblob["open"] = open
+
+        acked = self._acked_tristate()
+        if acked is not None:
+            filterblob["acked"] = acked
 
         sourceSystemIds = self.cleaned_data.get("sourceSystemIds", [])
         if sourceSystemIds:
@@ -189,44 +197,54 @@ class FilterListView(ListView):
         return reverse("htmx:filter-list")
 
 
+# Not a view!
 def incident_list_filter(request, qs, use_empty_filter=False):
     LOG = logging.getLogger(__name__ + ".incident_list_filter")
-    LOG.debug("GET at start: %s", request.GET)
-    filter_pk, filter_obj = request.session.get("selected_filter", None), None
+    LOG.debug("<<<<FORM<<<<")
+    LOG.debug("GET: %s", request.GET)
+
+    filter_pk = request.session.get("selected_filter_pk", None)
+    converted_filterblob = {}
     if filter_pk:
         filter_obj = Filter.objects.get(pk=filter_pk)
-    if filter_obj:
-        form = IncidentFilterForm(_convert_filterblob(filter_obj.filter))
-        LOG.debug("using stored filter: %s", filter_obj.filter)
-    else:
-        form_data = _normalize_form_data(request)
-        if request.method == "POST":
-            form = IncidentFilterForm(form_data)
-            LOG.debug("using POST: %s", form_data)
-        else:
-            if use_empty_filter:
-                filterblob = IncidentFilterForm.EMPTY_FILTERBLOB
-                form = IncidentFilterForm(filterblob)
-                LOG.debug("using empty filter: %s", filterblob)
-            else:
-                form = IncidentFilterForm(form_data or None)
-                LOG.debug("using GET: %s", form_data)
+        LOG.debug('found stored filter "%s": %s', filter_obj.name, filter_obj.filter)
+        converted_filterblob = _convert_filterblob(filter_obj.filter)
+
+    if converted_filterblob:
+        form_data = converted_filterblob
+        LOG.debug("using converted stored filter: %s", form_data)
+    elif request.POST:
+        form_data = _normalize_form_data(request.POST)
+        LOG.debug("using POST: %s", form_data)
+    elif use_empty_filter:
+        form_data = IncidentFilterForm.EMPTY_FILTERBLOB
+        LOG.debug("using empty filter: %s", form_data)
+    else:  # request.GET
+        form_data = _normalize_form_data(request.GET) or None
+        LOG.debug("using GET: %s", form_data)
+
+    form = IncidentFilterForm(form_data)
+    form.is_valid()  # fill cleaned_data
+    if use_empty_filter:
+        LOG.debug(">>>>FORM>>>> early return")
+        return form, qs
+
     if form.is_valid():
-        LOG.debug("Cleaned data: %s", form.cleaned_data)
+        LOG.debug("Cleaned data: %s, getting query set", form.cleaned_data)
         filterblob = form.to_filterblob()
+        LOG.debug("using filterblob: %s", filterblob)
         qs = QuerySetFilter.filtered_incidents(filterblob, qs)
     else:
-        if not request.GET:
-            LOG.debug("empty form")
-        else:
-            LOG.debug("Dirty form: %s", form.errors)
-            for field, error_messages in form.errors.items():
-                messages.error(request, f"{field}: {','.join(error_messages)}")
+        LOG.debug("Dirty form: %s", form.errors)
+        for field, error_messages in form.errors.items():
+            messages.error(request, f"{field}: {','.join(error_messages)}")
+    LOG.debug(">>>>FORM>>>>")
     return form, qs
 
 
 def _convert_filterblob(filterblob):
     """Converts values in filterblob so it can be used as valid input for IncidentFilterForm"""
+    filterblob = filterblob.copy()
 
     if "open" in filterblob.keys():
         open_state = filterblob["open"]
@@ -249,10 +267,9 @@ def _convert_filterblob(filterblob):
     return filterblob
 
 
-def _normalize_form_data(request):
+def _normalize_form_data(raw_data):
     """Normalizes form data from request, especially the 'tags' parameter."""
 
-    raw_data = request.POST if request.method == "POST" else request.GET
     data = dict(raw_data.items())
     for key in raw_data:
         value = raw_data.getlist(key, [])
