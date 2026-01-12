@@ -8,7 +8,7 @@ from django.views.generic import ListView
 from argus.filter import get_filter_backend
 from argus.htmx.widgets import BadgeDropdownMultiSelect, SearchDropdownMultiSelect
 from argus.incident.constants import AckedStatus, Level, OpenStatus
-from argus.incident.models import SourceSystem, SourceSystemType, Tag
+from argus.incident.models import Event, SourceSystem, SourceSystemType, Tag
 from argus.notificationprofile.models import Filter
 
 filter_backend = get_filter_backend()
@@ -83,27 +83,42 @@ class IncidentFilterForm(TagFieldMixin, forms.Form):
         initial=max(Level).value,
         required=False,
     )
+    event_types = forms.MultipleChoiceField(
+        widget=BadgeDropdownMultiSelect(
+            attrs={"placeholder": "select event types..."},
+            partial_get=None,
+        ),
+        required=False,
+        label="Event Types",
+    )
 
-    EMPTY_FILTERBLOB = {
+    DEFAULT_VALUES = {
         "open": None,
         "acked": None,
         "sourceSystemIds": [],
         "source_types": [],
         "tags": [],
         "maxlevel": max(Level).value,
+        "event_types": [],
     }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # mollify tests
-        self.fields["sourceSystemIds"].widget.partial_get = reverse("htmx:incident-filter")
+        partial_get = reverse("htmx:incident-filter")
+
+        self.fields["sourceSystemIds"].widget.partial_get = partial_get
         source_choices = SourceSystem.objects.order_by("name").values_list("id", "name")
         self.fields["sourceSystemIds"].choices = tuple(source_choices)
         self._init_tag_field(*args, **kwargs)
 
-        self.fields["source_types"].widget.partial_get = reverse("htmx:incident-filter")
+        self.fields["source_types"].widget.partial_get = partial_get
         source_type_choices = SourceSystemType.objects.order_by("name").values_list("name", "name")
         self.fields["source_types"].choices = tuple(source_type_choices)
+
+        self.fields["event_types"].widget.partial_get = partial_get
+        event_type_choices = Event.Type.choices
+        self.fields["event_types"].choices = event_type_choices
 
     def clean_tags(self):
         tags = self.cleaned_data["tags"]
@@ -167,6 +182,10 @@ class IncidentFilterForm(TagFieldMixin, forms.Form):
         if maxlevel:
             filterblob["maxlevel"] = maxlevel
 
+        event_types = self.cleaned_data.get("event_types", [])
+        if event_types:
+            filterblob["event_types"] = event_types
+
         return filterblob
 
 
@@ -205,9 +224,9 @@ def incident_list_filter(request, qs, use_empty_filter=False):
             LOG.debug("using POST: %s", form_data)
         else:
             if use_empty_filter:
-                filterblob = IncidentFilterForm.EMPTY_FILTERBLOB
-                form = IncidentFilterForm(filterblob)
-                LOG.debug("using empty filter: %s", filterblob)
+                form_data = IncidentFilterForm.DEFAULT_VALUES
+                form = IncidentFilterForm(form_data)
+                LOG.debug("using empty filter: %s", form_data)
             else:
                 form = IncidentFilterForm(form_data or None)
                 LOG.debug("using GET: %s", form_data)
@@ -258,7 +277,7 @@ def _normalize_form_data(request):
         value = raw_data.getlist(key, [])
         if key == "tags":
             value = _normalize_tags_param(value)
-        elif key not in ["source_types", "sourceSystemIds"]:
+        elif key not in ["source_types", "sourceSystemIds", "event_types"]:
             value = value[0]
         data[key] = value
     return data
