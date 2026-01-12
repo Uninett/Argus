@@ -10,7 +10,7 @@ from argus.incident.factories import (
     StatelessIncidentFactory,
     TagFactory,
 )
-from argus.incident.models import Incident, Event
+from argus.incident.models import Event, Incident
 from argus.filter.queryset_filters import (
     QuerySetFilter,
     _incidents_fitting_event_types,

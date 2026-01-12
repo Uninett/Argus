@@ -329,8 +329,8 @@ which needed to be handled by people.
 
    3. Repeat the process if you want to filter by several event types.
 
--  If you want the table to display incidents from **any any
-   event type**, leave the *Event types* field empty.
+-  If you want the table to display incidents from **any event type**, leave
+   the *Event Types* field empty.
 
 The event types to choose from:
 
