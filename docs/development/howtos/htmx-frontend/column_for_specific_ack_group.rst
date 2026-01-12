@@ -2,20 +2,48 @@
 How to make a column for an ack with a known group
 ==================================================
 
-You need a template for the cell, in ``src/argus/htmx/templates/htmx/incidents/_incident_ack_by_group.html``::
+You need a new template for the cell, for instance containing::
 
     {% load argus_htmx %}
     {% if incident|is_acked_by:column.context.group %}X{% endif %}
 
-You also need to add the column to the column config::
+Our recommended filename for the template file is::
 
-    INCIDENT_TABLE_COLUMNS = [
+    ``htmx/incident/cells/_incident_ack_by_group.html``
+
+It is *necessary* to use a specialized settings-file for this, since you
+need to both set where to look for the additional temnplate, and to set
+up the actual column.
+
+Tell Argus where the template is
+================================
+
+Pick one:
+
+1. Add an app at the start of :setting:`INSTALLED_APPS` that has a directory
+   ``templates/`` that contains the new template file. You can use the same app
+   for any other overrides.
+2. Add a directory to the :setting:`DIRS` list in the :setting:`TEMPLATES`
+   setting, see `Django settings: TEMPLATES
+   <https://docs.djangoproject.com/en/5.2/ref/settings/#templates>`_ in the
+   official Django documentation. Templates here will override any template
+   from any app, provided the relative path matches.
+
+Set up the column
+=================
+
+You need to add the column to a column config::
+
+    INCIDENT_TABLE_COLUMN_LAYOUTS = {
+        "mylayout":[
+            ..
+            IncidentTableColumn(
+                "mygroup_ack",
+                "MYGROUP",
+                "htmx/incident/cells/_incident_ack_by_group.html",
+                context={"group": "MYGROUP"},
+            )
+            ..
+        ],
         ..
-        IncidentTableColumn(
-            "mygroup_ack",
-            "MYGROUP",
-            "htmx/incidents/_incident_ack_by_group.html",
-            context={"group": "MYGROUP"},
-        )
-        ..
-    ]
+    }
