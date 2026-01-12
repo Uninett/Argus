@@ -11,7 +11,7 @@ from typing import Optional
 
 from django.conf import settings
 
-from argus.htmx.defaults import INCIDENT_TABLE_COLUMNS as BUILTIN_INCIDENT_TABLE_COLUMNS
+from argus.htmx.defaults import DEFAULT_INCIDENT_TABLE_COLUMN_LAYOUTS
 
 
 LOG = logging.getLogger(__name__)
@@ -213,12 +213,6 @@ _BUILTIN_COLUMN_LIST = [
 BUILTIN_COLUMNS = {col.name: col for col in _BUILTIN_COLUMN_LIST}
 
 
-def get_builtin_column_layout():
-    "Return the column layout defined in `argus.htmx.defaults`"
-
-    return BUILTIN_COLUMN_LAYOUT_NAME, BUILTIN_INCIDENT_TABLE_COLUMNS
-
-
 def get_default_column_layout():
     """Return the column layout defined in the setting INCIDENT_TABLE_COLUMNS
 
@@ -245,13 +239,13 @@ def get_configured_column_layouts():
 def get_available_column_layouts():
     "Combine all found column layouts into a single collection"
 
-    builtin, builtin_columns = get_builtin_column_layout()
-    layouts = {builtin: builtin_columns}
+    layouts = DEFAULT_INCIDENT_TABLE_COLUMN_LAYOUTS.copy()
 
     default, default_columns = get_default_column_layout()
     if default_columns:
         layouts[default] = default_columns
 
+    # Layouts configured in settings can replace previously found layouts
     configured_layouts = get_configured_column_layouts()
     if configured_layouts:
         layouts.update(configured_layouts)
