@@ -1,6 +1,4 @@
-import json
 import pathlib
-import textwrap
 from django.apps import apps
 from django.core.management.base import BaseCommand
 from django.conf import settings
@@ -9,60 +7,44 @@ from django.template.context import make_context
 from django.template.loader import get_template
 
 from argus.htmx.themes.utils import get_raw_themes_setting
-from argus.htmx import defaults as argus_htmx_settings
 
 
 # Copied from https://github.com/GEANT/geant-argus/pull/15 with minor modifications
 class Command(BaseCommand):
     help = """
-    Uses the template specified in the TAILWIND_CONFIG_TEMPLATE setting
-    (default: tailwind/tailwind.config.js) to dynamically build a tailwind.config.js.
-    This file must be in an app's templates directory. The template may contain:
+    Generates CSS configuration files for Tailwind CSS v4 and DaisyUI v5.
 
-     - a '{{ projectpaths }} section without square brackets that will be
-        popuplated  with auto discovered template dirs of installed apps
-     - a '{{ daisyuithemes }}' section without square brackets that will be
-        popuplated by the daisyUI theme list specified in the DAISYUI_THEMES
-        setting (default: ["dark", "light", {"argus"": {...}} ])
-     - a '{{ themeoverride }}' section that will be popuplated by a dict containing
-        tailwind theme options specified in TAILWIND_THEME_OVERRIDE setting
-        (default: {})
+    This command generates:
 
-    This command also generates a `styles.css` that contains the base css file for
-    tailwind to create its final css file. It uses the template specified by the
-    `TAILWIND_CSS_TEMPLATE` setting (default: tailwind/styles.css). This file should
-    also be in an app's templates directory
+    1. A `styles.css` file that imports all CSS snippets from installed apps.
+       Apps may define a `tailwind_css_files` method that returns paths to CSS
+       files to include. (see argus.htmx.apps.HtmxFrontendConfig for an example)
 
-    The `styles.css` template may iterate over a `cssfiles` context variable that
-    contains css files/snippets that should be included in the final css file. Apps
-    may define a `tailwind_css_files` method that gives the location (as a str or
-    pathlib.Path object) for every css file from this app to include. (see
-    argus.htmx.apps.HtmxFrontendConfig for an example)
+    2. CSS theme files for custom themes defined in the DAISYUI_THEMES setting.
+       Custom themes are defined as dicts with CSS variables, e.g.:
+       DAISYUI_THEMES = ["dark", "light", {"mytheme": {"--color-primary": "#006d91", ...}}]
+       Built-in themes (strings like "dark", "light") are handled by DaisyUI directly.
 
-    Additional settings that govern the functionality of this command are:
-
-     - TAILWIND_CONFIG_TARGET: the target location for writing the tailwind.config.js
-     - TAILWIND_CSS_TARGET: override the base tailwind css file location
-
-    These target locations are relative to the working directory where this command is
-    executed
+    Settings:
+     - TAILWIND_CSS_TARGET: target location for the base styles.css file
+       (default: src/argus/htmx/tailwindtheme/styles.css)
+     - TAILWIND_CSS_TEMPLATE: template for generating styles.css
+       (default: tailwind/styles.css)
+     - DAISYUI_THEMES: list of themes to enable (strings for built-in, dicts for custom)
     """
-    DEFAULT_CONFIG_TEMPLATE_NAME = "tailwind/tailwind.config.js"
     DEFAULT_CSS_TEMPLATE_NAME = "tailwind/styles.css"
-    DEFAULT_CONFIG_TARGET = "src/argus/htmx/tailwindtheme/tailwind.config.js"
     DEFAULT_CSS_TARGET = "src/argus/htmx/tailwindtheme/styles.css"
 
     def handle(self, *args, **options):
-        config_template_name = getattr(settings, "TAILWIND_CONFIG_TEMPLATE", self.DEFAULT_CONFIG_TEMPLATE_NAME)
-        config_target_path = pathlib.Path(getattr(settings, "TAILWIND_CONFIG_TARGET", self.DEFAULT_CONFIG_TARGET))
         css_template_name = getattr(settings, "TAILWIND_CSS_TEMPLATE", self.DEFAULT_CSS_TEMPLATE_NAME)
         css_target_path = pathlib.Path(getattr(settings, "TAILWIND_CSS_TARGET", self.DEFAULT_CSS_TARGET))
-        self.write_file(
-            config_template_name,
-            config_target_path,
-            context=self.get_context(target_dir=config_target_path.parent),
-            name="tailwind config",
-        )
+
+        # Generate theme CSS files from DAISYUI_THEMES setting
+        themes_dir = css_target_path.parent / "themes"
+        themes_dir.mkdir(exist_ok=True)
+        self.generate_theme_files(themes_dir)
+
+        # Generate main styles.css
         self.write_file(
             css_template_name,
             css_target_path,
@@ -70,19 +52,48 @@ class Command(BaseCommand):
             name="tailwind base css",
         )
 
+    def generate_theme_files(self, snippets_dir: pathlib.Path):
+        """Generate CSS theme files from DAISYUI_THEMES setting."""
+        themes_setting = get_raw_themes_setting()
+
+        for theme in themes_setting:
+            if isinstance(theme, dict):
+                for theme_name, theme_config in theme.items():
+                    self.write_theme_file(snippets_dir, theme_name, theme_config)
+
+    def write_theme_file(self, themes_dir: pathlib.Path, theme_name: str, theme_config: dict):
+        """Write a single theme CSS file."""
+        css_content = self.generate_theme_css(theme_name, theme_config)
+        target_path = themes_dir / f"{theme_name}.css"
+        target_path.write_text(css_content)
+        self.stdout.write(f"Wrote theme '{theme_name}' to '{target_path}'")
+
+    def generate_theme_css(self, theme_name: str, theme_config: dict) -> str:
+        """Generate CSS content for a DaisyUI v5 theme.
+
+        Theme config keys are passed through directly as CSS properties.
+        Keys starting with '--' are written as-is, other keys are written
+        without the '--' prefix (for DaisyUI plugin options like color-scheme).
+        """
+        lines = [
+            '@plugin "daisyui/theme" {',
+            f'  name: "{theme_name}";',
+        ]
+
+        for key, value in theme_config.items():
+            if key.startswith("--"):
+                lines.append(f"  {key}: {value};")
+            else:
+                # Non-variable keys like color-scheme, default, prefersdark
+                lines.append(f'  {key}: "{value}";')
+
+        lines.append("}")
+        lines.append("")  # trailing newline
+
+        return "\n".join(lines)
+
     def get_context(self, target_dir: pathlib.Path):
         return {
-            "themeoverride": getattr(
-                settings,
-                "TAILWIND_THEME_OVERRIDE",
-                argus_htmx_settings.TAILWIND_THEME_OVERRIDE,
-            ),
-            "daisyuithemes": textwrap.indent(
-                json.dumps(get_raw_themes_setting(), indent=2),
-                prefix=10 * " ",
-                predicate=lambda line: line != "[\n",  # this is kinda hacky, but eh
-            ),
-            "projectpaths": "\n".join(f"        '{d}/**/*.html'," for d in self.get_template_dirs()),
             "cssfiles": self.get_css_files(target_dir),
         }
 

@@ -1,0 +1,103 @@
+/* DaisyUI v4 compatibility classes */
+@layer components {
+  /* Restore label-text styling from DaisyUI v4 */
+  .label-text {
+    @apply text-sm text-base-content;
+  }
+
+  /* Restore label-text-alt styling from DaisyUI v4 */
+  .label-text-alt {
+    @apply text-xs text-base-content;
+  }
+
+  /* Restore select-sm sizing from DaisyUI v4 (matches btn-sm height) */
+  .select-sm {
+    font-size: 0.875rem !important;
+  }
+
+  /* Hide default disclosure triangle on details dropdowns */
+  details.dropdown > summary {
+    list-style: none;
+  }
+  details.dropdown > summary::-webkit-details-marker {
+    display: none;
+  }
+
+  /* Badges should be fully rounded */
+  .badge {
+    border-radius: 9999px !important;
+  }
+
+  /* Restore table-xs font sizes from DaisyUI v4 (12px instead of 11px) */
+  .table-xs :not(thead, tfoot) tr {
+    font-size: 0.75rem !important;
+  }
+  .table-xs thead tr {
+    font-size: 0.75rem !important;
+  }
+
+  /* Restore stat-value to use default text color instead of gray */
+  .stat-value {
+    color: var(--color-base-content) !important;
+  }
+
+  /* Restore select-xs font size to 16px and ensure content is visible */
+  .select-xs {
+    font-size: 1rem !important;
+    width: fit-content !important;
+  }
+
+}
+
+/* Fix input focus outline to use gray instead of black */
+.input:focus, .input:focus-within {
+  --input-color: var(--color-base-300);
+  outline-color: var(--color-base-300);
+}
+
+/* Restore form label color from DaisyUI v4 (not faded) */
+label.label, form label {
+  color: var(--color-base-content);
+}
+
+/* Tooltip aligned to end (right) instead of center */
+.tooltip-bottom.tooltip-end[data-tip]:before {
+  left: auto;
+  right: 0;
+  transform: translateY(var(--tt-pos, -0.25rem));
+}
+.tooltip-bottom.tooltip-end:after {
+  left: auto;
+  right: 0.5rem;
+  transform: translateY(var(--tt-pos, -0.25rem)) rotate(180deg);
+}
+
+/* Ensure select[multiple] shows all options in column filter dropdowns */
+.dropdown-content select[multiple] {
+  height: auto !important;
+}
+
+/* Remove borders from filter control buttons */
+.filterbox .join .btn {
+  border: none;
+}
+
+/* Restore 1px border on filterbox selects and dropdown inputs */
+.filterbox select,
+.show-selected-box.input {
+  border-width: 1px;
+}
+
+/* Restore pagination button height to 48px (DaisyUI v4 default) */
+#table-footer .join .btn,
+#table-footer > .btn {
+  height: 3rem;
+}
+
+/* Custom tabs-border-primary modifier for primary colored tab borders with 2px width */
+.tabs.tabs-border-primary {
+  --border: 2px;
+}
+.tabs.tabs-border-primary > .tab {
+  --tab-border-color: var(--color-primary);
+}
