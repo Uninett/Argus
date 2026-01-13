@@ -103,6 +103,14 @@ _BUILTIN_COLUMN_LIST = [
         sort_field="start_time",
     ),
     IncidentTableColumn(
+        "start_time_and_age",
+        "Timestamp",
+        "htmx/incident/cells/_incident_start_time_and_age.html",
+        detail_link=True,
+        column_classes="min-w-48",
+        sort_field="start_time",
+    ),
+    IncidentTableColumn(
         "narrow_start_time",
         "Timestamp",
         "htmx/incident/cells/_incident_start_time.html",
