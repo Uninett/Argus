@@ -1,0 +1,20 @@
+<!-- htmx/incident/cells/_incident_sort_button.html -->
+{# Reusable sort button for column headers. Requires: column, current_sort, current_sort_order #}
+{# Cycling order: inactive -> desc -> asc -> inactive (default) #}
+{% if column.sort_field %}
+  {% if current_sort == column.sort_field %}
+    {% if current_sort_order == "desc" %}
+      {% with icon="fa-sort-down" next_sort=column.sort_field next_order="asc" label="Sort by "|add:column.label|lower|add:" ascending" active=True %}
+        {% include "htmx/incident/cells/_incident_sort_button_element.html" %}
+      {% endwith %}
+    {% else %}
+      {% with icon="fa-sort-up" next_sort="" next_order="" label="Reset sort order" active=True %}
+        {% include "htmx/incident/cells/_incident_sort_button_element.html" %}
+      {% endwith %}
+    {% endif %}
+  {% else %}
+    {% with icon="fa-sort" next_sort=column.sort_field next_order="desc" label="Sort by "|add:column.label|lower active=False %}
+      {% include "htmx/incident/cells/_incident_sort_button_element.html" %}
+    {% endwith %}
+  {% endif %}
+{% endif %}

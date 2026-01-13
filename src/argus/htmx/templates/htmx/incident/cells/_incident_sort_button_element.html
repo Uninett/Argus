@@ -1,0 +1,14 @@
+<!-- htmx/incident/cells/_incident_sort_button_element.html -->
+{# Sort button element. Requires: icon, next_sort, next_order, label, active #}
+<button type="button"
+        class="btn btn-xs btn-ghost p-0 aspect-square min-h-4 h-4 {% if active %}text-primary{% else %}text-base-content/50 hover:text-primary{% endif %}"
+        aria-label="{{ label }}"
+        hx-get="{% url 'htmx:incident-list' %}"
+        hx-vals='{"sort": "{{ next_sort }}", "sort_order": "{{ next_order }}"}'
+        hx-include=".incident-list-param"
+        hx-target="#table"
+        hx-swap="outerHTML"
+        hx-push-url="true"
+        hx-indicator="#incident-list .htmx-indicator">
+  <i class="fa-solid {{ icon }}"></i>
+</button>

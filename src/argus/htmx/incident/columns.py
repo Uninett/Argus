@@ -36,6 +36,8 @@ class IncidentTableColumn:
     :param filter_field: when given, this column is considered filterable and a filter
         input is attached to the column header that can provide a query param with `filter_field`
         as the key
+    :param sort_field: the model field to use for sorting. When set, the column header
+        will include a sort button. Must be a valid field name for Django's order_by().
     """
 
     name: str  # unique identifier
@@ -47,6 +49,7 @@ class IncidentTableColumn:
     detail_link: bool = False
     cell_wrapper_template: str = CELL_WRAPPER_TEMPLATE_DEFAULT
     column_classes: str = ""
+    sort_field: Optional[str] = None
 
 
 _BUILTIN_COLUMN_LIST = [
@@ -68,6 +71,7 @@ _BUILTIN_COLUMN_LIST = [
         "ID",
         "htmx/incident/cells/_incident_pk.html",
         detail_link=True,
+        sort_field="pk",
     ),
     IncidentTableColumn(
         "search_id",
@@ -80,44 +84,51 @@ _BUILTIN_COLUMN_LIST = [
         "start_time",
         "Timestamp",
         "htmx/incident/cells/_incident_start_time.html",
-        header_template="htmx/incident/cells/_incident_start_time_header.html",
         detail_link=True,
+        column_classes="min-w-48",
+        sort_field="start_time",
     ),
     IncidentTableColumn(
         "age",
         "Age",
         "htmx/incident/cells/_incident_age.html",
         detail_link=True,
+        sort_field="start_time",
     ),
     IncidentTableColumn(
         "start_time_and_age",
         "Timestamp",
         "htmx/incident/cells/_incident_start_time_and_age.html",
         detail_link=True,
+        sort_field="start_time",
     ),
     IncidentTableColumn(
         "narrow_start_time",
         "Timestamp",
         "htmx/incident/cells/_incident_start_time.html",
         detail_link=True,
+        sort_field="start_time",
     ),
     IncidentTableColumn(
         "status",
         "Status",
         "htmx/incident/cells/_incident_status.html",
         detail_link=True,
+        sort_field="end_time",
     ),
     IncidentTableColumn(
         "status_icon",
         "Status",
         "htmx/incident/cells/_incident_status_icon.html",
         detail_link=True,
+        sort_field="end_time",
     ),
     IncidentTableColumn(
         "level",
         "Severity level",
         "htmx/incident/cells/_incident_level.html",
         detail_link=True,
+        sort_field="level",
     ),
     IncidentTableColumn(
         "select_levels",
@@ -125,24 +136,28 @@ _BUILTIN_COLUMN_LIST = [
         "htmx/incident/cells/_incident_level.html",
         detail_link=True,
         filter_field="level",
+        sort_field="level",
     ),
     IncidentTableColumn(
         "source",
         "Source",
         "htmx/incident/cells/_incident_source.html",
         detail_link=True,
+        sort_field="source__name",
     ),
     IncidentTableColumn(
         "source_type",
         "Source Type",
         "htmx/incident/cells/_incident_source_type.html",
         detail_link=True,
+        sort_field="source__type__name",
     ),
     IncidentTableColumn(
         "description",
         "Description",
         "htmx/incident/cells/_incident_description.html",
         detail_link=True,
+        sort_field="description",
     ),
     IncidentTableColumn(
         "search_description",
@@ -150,6 +165,7 @@ _BUILTIN_COLUMN_LIST = [
         "htmx/incident/cells/_incident_description.html",
         detail_link=True,
         filter_field="description",
+        sort_field="description",
     ),
     IncidentTableColumn(
         "ack",
@@ -168,12 +184,14 @@ _BUILTIN_COLUMN_LIST = [
         "Status",
         "htmx/incident/cells/_incident_combined_status.html",
         detail_link=True,
+        sort_field="end_time",
     ),
     IncidentTableColumn(
         "combined_status_icons",
         "Status",
         "htmx/incident/cells/_incident_combined_status_icons.html",
         detail_link=True,
+        sort_field="end_time",
     ),
     IncidentTableColumn(
         "ticket",

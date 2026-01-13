@@ -1,8 +1,10 @@
 <!-- htmx/incident/cells/_incident_filterable_column_header_content.html -->
 {% load argus_htmx %}
 {% with field=form|get_form_field:fieldname %}
-  <div>
+  <div class="flex items-center gap-1">
     <span id="{{ field.name }}-label">{{ column.label }}</span>
+    {% include "htmx/incident/cells/_incident_sort_button.html" %}
+    {# Filter dropdown #}
     <div id="{{ column.name }}-dropdown" class="dropdown dropdown-end">
       <button type="button"
               tabindex="0"

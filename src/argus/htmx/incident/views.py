@@ -26,7 +26,7 @@ from ..request import HtmxHttpRequest
 
 from .columns import get_incident_table_columns
 from .utils import get_filter_function
-from .forms.incident_filters import IncidentListForm
+from .forms.incident_filters import IncidentListForm, SortForm, SORT_DEFAULT
 from .forms.incident_actions import AckForm, DescriptionOptionalForm, EditTicketUrlForm, AddTicketUrlForm
 from ..utils import (
     single_autocreate_ticket_url_queryset,
@@ -271,8 +271,19 @@ def incident_list(request: HtmxHttpRequest) -> HttpResponse:
     column_layout_name = preferences["argus_htmx"]["incidents_table_column_name"]
     columns = get_incident_table_columns(column_layout_name)
 
-    # Load incidents
-    qs = prefetch_incident_daughters().order_by("-start_time")
+    # Handle sorting
+    sort_form = SortForm(request.GET)
+    ordering = sort_form.get_ordering()
+
+    # Load incidents with sorting
+    qs = prefetch_incident_daughters()
+    if sort_form.is_default_sort_field():
+        qs = qs.order_by(ordering)
+    else:
+        # Ensure a consistent secondary sort to avoid random ordering when primary sort field
+        # has a lot of identical values
+        qs = qs.order_by(ordering, f"-{SORT_DEFAULT}")
+
     total_count = qs.count()
     last_refreshed = make_aware(datetime.now())
 
@@ -298,6 +309,10 @@ def incident_list(request: HtmxHttpRequest) -> HttpResponse:
         initial_value = Form.get_initial_value(request)
         GET_params[form.fieldname] = form.get_clean_value(request) or initial_value
         qs = form.filter(qs, request)
+
+    # Add sort parameters to GET_params for URL preservation
+    GET_params["sort"] = sort_form.get_sort_field()
+    GET_params["sort_order"] = sort_form.get_sort_order()
 
     filtered_count = qs.count()
 
@@ -331,6 +346,8 @@ def incident_list(request: HtmxHttpRequest) -> HttpResponse:
         "filter_form": filter_form,
         "refresh_info": refresh_info,
         "refresh_info_forms": GET_forms,
+        "current_sort": sort_form.get_sort_field(),
+        "current_sort_order": sort_form.get_sort_order(),
         "page_title": "Incidents",
         "base": base_template,
         "page": page,
