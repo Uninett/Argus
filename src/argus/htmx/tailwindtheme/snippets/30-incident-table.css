@@ -7,16 +7,14 @@
         top: 50px;
     }
     #table thead tr.scroll-shadow {
-        box-shadow: 0 4px 6px -2px var(--tw-shadow-color, var(--scroll-shadow-default));
-        @apply shadow-base-content;
+        box-shadow: 0 4px 6px -2px var(--color-base-content, var(--scroll-shadow-default));
     }
     #table tfoot [data-observer-intercept] {
         position: absolute;
         bottom: 50px;
     }
     #table tfoot tr.scroll-shadow {
-        box-shadow: 0 -3px 6px -2px var(--tw-shadow-color, var(--scroll-shadow-default));
-        @apply shadow-base-content;
+        box-shadow: 0 -3px 6px -2px var(--color-base-content, var(--scroll-shadow-default));
     }
 
     #preview-table td a {

@@ -7,7 +7,7 @@
   <form hx-post="{% url 'htmx:update-preferences' namespace='argus_htmx' %}"
         hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
         class="space-y-2">
-    <ul class="card-body menu">
+    <ul class="card-body menu w-full">
       {% block section_forms %}
       {% endblock section_forms %}
     </ul>

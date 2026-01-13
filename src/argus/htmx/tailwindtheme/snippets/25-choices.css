@@ -1,6 +1,8 @@
 @layer components {
     .choices {
-        @apply dropdown max-w-sm self-center;
+        @apply max-w-sm self-center;
+        position: relative;
+        display: inline-block;
     }
     .choices__button {
         text-indent: -9999px;
@@ -36,21 +38,37 @@
     }
 
     .choices__inner .choices__item--selectable {
-        @apply badge badge-primary text-xs;
+        @apply text-xs;
+        display: inline-flex;
+        align-items: center;
+        padding: 0.25rem 0.5rem;
+        border-radius: var(--radius-badge, 1rem);
+        background-color: var(--color-primary);
+        color: var(--color-primary-content);
     }
 
     .choices__input--cloned {
         display: inline-block;
-        font-size: 14px;
+        font-size: 0.875rem;
         border: 0;
         border-radius: 0;
         max-width: 100%;
         padding: 4px 0 4px 2px;
         line-height: normal;
+        background-color: transparent;
+        outline: none;
+    }
+
+    .choices__inner:focus-within {
+        outline: none;
     }
 
     .choices__inner {
-        @apply w-full break-words input input-primary input-sm inline-block overflow-hidden space-x-1 h-auto;
+        @apply w-full break-words inline-block overflow-hidden space-x-1 h-auto;
+        padding: 0.25rem 0.75rem;
+        border: 1px solid var(--color-primary);
+        border-radius: var(--radius-field, 0.5rem);
+        background-color: var(--color-base-100);
     }
 
     .choices-list-items {
@@ -61,20 +79,36 @@
         @apply flex space-x-0.5 items-center;
     }
 
+    /* Dropdown hidden by default */
     .choices-dropdown {
-        @apply dropdown-content dropdown-bottom menu z-50 bg-base-100 rounded-btn shadow min-w-full;
+        @apply z-50 shadow-sm min-w-full;
+        display: none;
+        position: absolute;
+        top: 100%;
+        background-color: var(--color-base-100);
+        border-radius: var(--radius-field, 0.5rem);
+        padding: 0.5rem;
+    }
+
+    /* Show dropdown when Choices.js adds is-active class */
+    .choices.is-open .choices-dropdown {
+        display: block;
     }
 
     .choices-dropdown .choices__list[role="listbox"] {
         display: flex;
         flex-direction: column;
+        width: 100%;
     }
 
     .choices-dropdown .choices__item {
-        @apply py-1 px-2 rounded;
+        @apply py-1 px-2 rounded text-sm text-left w-full;
     }
 
     .choices-dropdown .choices__item--selectable {
-        @apply hover:cursor-pointer hover:bg-base-200;
+        @apply hover:cursor-pointer;
+    }
+    .choices-dropdown .choices__item--selectable:hover {
+        background-color: var(--color-base-200);
     }
 }
