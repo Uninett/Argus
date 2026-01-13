@@ -1,5 +1,5 @@
 <table id="table"
-       class="border border-separate border-spacing-1 border-primary table {% if compact or preferences.argus_htmx.incidents_table_layout_compact %}table-xs{% endif %}"
+       class="border-2 border-separate border-spacing-1 border-primary table {% if compact or preferences.argus_htmx.incidents_table_layout_compact %}table-xs{% endif %}"
        {% block incident_list_table_autorefresh %}
        {% endblock incident_list_table_autorefresh %}>
   <!-- htmx/incident/_incident_table.html, including table tag above -->

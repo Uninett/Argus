@@ -1,3 +1,14 @@
+/*
+ * Override DaisyUI v5 built-in theme colors to match v4 values.
+ * These must be outside @layer to have higher specificity than DaisyUI's definitions.
+ */
+[data-theme=dark] {
+  --color-neutral: oklch(0.314 0.021 254.139);
+}
+[data-theme=light] {
+  --color-neutral: oklch(0.321785 0.02476 255.702);
+}
+
 /* DaisyUI v4 compatibility classes */
 @layer components {
   /* Restore label-text styling from DaisyUI v4 */
@@ -100,4 +111,11 @@ label.label, form label {
 }
 .tabs.tabs-border-primary > .tab {
   --tab-border-color: var(--color-primary);
+}
+
+/* Menu divider - reset the grid styling that menu applies to li children */
+.menu li > .divider {
+  display: flex;
+  gap: 0;
+  padding: 0 0.75rem;
 }

@@ -40,7 +40,7 @@ def get_stylesheet_path():
 
 def get_themes_from_css():
     THEME_NAME_RE = r"(?P<theme>[-_\w]+)"
-    DATA_THEME_RE = rf"\[data-theme={THEME_NAME_RE}\]"
+    DATA_THEME_RE = rf'\[data-theme="?{THEME_NAME_RE}"?\]'
 
     stylesheet = find(get_stylesheet_path())
     if stylesheet is None:
