@@ -10,6 +10,8 @@
 !.sonarcloud.properties
 !.mailmap
 
+src/argus/htmx/static/styles.css
+
 # local config files
 cmd.sh
 localsettings.py

@@ -1,5 +1,5 @@
 [build-system]
-requires = ["hatchling", "versioningit>=3.0.0"]
+requires = ["hatchling", "hatch-build-scripts", "versioningit>=3.0.0"]
 build-backend = "hatchling.build"
 
 [project]
@@ -86,6 +86,15 @@ exclude = [
     "/*.json",
     "/*.py",
     "/*.sh",
+]
+
+[[tool.hatch.build.hooks.build-scripts.scripts]]
+# build css
+commands = [
+    "make tailwind"
+]
+artifacts = [
+    "src/argus/htmx/static/styles.css",
 ]
 
 [tool.versioningit.write]

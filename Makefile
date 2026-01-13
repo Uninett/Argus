@@ -1,14 +1,16 @@
-.PHONY: clean testclean distclean coverageclean cacheclean nuke tailwind docclean upgrade-tailwind tailwind-watch
+.PHONY: clean build testclean distclean docclean coverageclean cacheclean nuke tailwindcli tailwind tailwind-watch upgrade-tailwind
 
-TAILWINDDIR=src/argus/htmx/tailwindtheme
-STATICDIR=src/argus/htmx/static
-PYTHONPATH=./src
-
+STYLE_SOURCES := $(shell find src/argus -name '*.html')
+TAILWINDDIR:=src/argus/htmx/tailwindtheme
+STATICDIR:=src/argus/htmx/static
+PYTHONPATH:=./src
 
 clean:
 	-find . -name __pycache__ -print0 | xargs -0 rm -rf
 	-find . -name "*.pyc" -print0 | xargs -0 rm -rf
 	-find . -name "*.egg-info" -print0 | xargs -0 rm -rf
+
+build: tailwind
 
 cacheclean:
 	-find . -name ".ruff_cache" -print0 | xargs -0 rm -rf
@@ -31,8 +33,11 @@ testclean: coverageclean clean
 
 nuke: clean docclean distclean testclean cacheclean
 
-tailwind:
-	$(TAILWINDDIR)/tailwindcss -c $(TAILWINDDIR)/tailwind.config.js -i $(TAILWINDDIR)/styles.css -o $(STATICDIR)/styles.css
+tailwindcli:
+	@which tailwind || echo "tailwindcss not in path"
+
+tailwind: tailwindcli
+	tailwindcss -c $(TAILWINDDIR)/tailwind.config.js -i $(TAILWINDDIR)/styles.css -o $(STATICDIR)/styles.css
 
 tailwind-watch:
 	$(TAILWINDDIR)/tailwindcss -c $(TAILWINDDIR)/tailwind.config.js -i $(TAILWINDDIR)/styles.css -o $(STATICDIR)/styles.css --watch
