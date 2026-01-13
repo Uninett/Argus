@@ -9,7 +9,9 @@
          {% if widget.value %}value="{{ widget.value }}"{% endif %}
          hx-get="{{ incident_list_url }}"
          hx-include=".incident-list-param"
-         hx-target="#table"
+         hx-target="#table-body"
+         hx-select="#table-body"
+         hx-select-oob="#table-footer"
          hx-swap="outerHTML"
          hx-push-url="true"
          hx-indicator="#incident-list .htmx-indicator"
