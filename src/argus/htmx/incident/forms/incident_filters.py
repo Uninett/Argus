@@ -111,6 +111,14 @@ class PageSizeForm(IncidentListForm):
 
     # page_size is used by a paginator, no need to define ``filter``
 
+    def __init__(self, data=None, *args, **kwargs):
+        # Only bind the form if page_size is actually in the data.
+        # This ensures the stored preference is used for rendering when
+        # page_size is not in the URL.
+        if data is not None and self.fieldname not in data:
+            data = None
+        super().__init__(data, *args, **kwargs)
+
     def get_clean_value(self, request):
         # breakpoint()
         if request.GET.get(self.fieldname, 0):
@@ -122,6 +130,9 @@ class PageSizeForm(IncidentListForm):
         return cls._get_initial_preference_value(request, "argus_htmx")
 
     def store(self, request):
+        # Only store the preference if page_size was explicitly provided in the request
+        if not request.GET.get(self.fieldname):
+            return None
         return self._store_preference(request, "argus_htmx")
 
 
