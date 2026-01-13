@@ -1,16 +1,26 @@
-<!-- htmx/incident/cells/search_field/input_search.html -->
+<!-- htmx/incident/cells/search_fields/input_search.html -->
+{% url 'htmx:incident-list' as incident_list_url %}
 <div class="flex gap-1 input input-xs grow input-primary pr-0 group">
   <input name="{{ widget.name }}"
          type="text"
          autocomplete="off"
          class="incident-list-param flex-1 peer"
          {% if widget.attrs.placeholder %}placeholder="{{ widget.attrs.placeholder }}"{% endif %}
-         {% if widget.value %}value="{{ widget.value }}"{% endif %}>
+         {% if widget.value %}value="{{ widget.value }}"{% endif %}
+         hx-get="{{ incident_list_url }}"
+         hx-include=".incident-list-param"
+         hx-target="#table-body"
+         hx-select="#table-body"
+         hx-select-oob="#table-footer"
+         hx-swap="outerHTML"
+         hx-push-url="true"
+         hx-indicator="#incident-list .htmx-indicator"
+         hx-trigger="input changed delay:500ms, keydown[keyCode==13]">
   <button id="{{ widget.name }}-clear-btn"
           type="button"
           class="btn btn-xs btn-ghost opacity-0 peer-focus:opacity-100 focus:opacity-100 group-hover:opacity-100"
           aria-label="Clear {{ widget.name }} search field"
-          _="on click set value of <input[name='{{ widget.name }}']/> to ''">
+          _="on click set value of <input[name='{{ widget.name }}']/> to '' then send input to <input[name='{{ widget.name }}']/>">
   <i class="fa-solid fa-xmark"></i>
 </button>
 </div>
