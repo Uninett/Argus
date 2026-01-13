@@ -17,6 +17,23 @@ INCIDENT_TABLE_COLUMNS = [
     "description",
     "ticket",
 ]
+DEFAULT_INCIDENT_TABLE_COLUMN_LAYOUTS = {
+    "built-in": INCIDENT_TABLE_COLUMNS,
+    "notifications": [
+        "status_icon",
+        "ack_icon",
+        "level",
+        "source_type",
+        "source",
+        "tags",
+        "events",
+    ],
+    "on maintenance": [
+        "source_type",
+        "source",
+        "tags",
+    ],
+}
 ARGUS_HTMX_FILTER_FUNCTION = "argus.htmx.incident.filter.incident_list_filter"
 
 # These templates are auto-discovered by the templating engine and are relative
