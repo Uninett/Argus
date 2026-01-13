@@ -1,6 +1,9 @@
-@import 'snippets/10-tailwind.css';
-@import 'snippets/15-alert-message.css';
-@import 'snippets/20-loading-box.css';
-@import 'snippets/25-choices.css';
-@import 'snippets/30-incident-table.css';
-@import 'snippets/35-cards.css';
+@import './snippets/10-tailwind.css';
+@import './snippets/11-extensions.css';
+@import './snippets/12-daisy-compat.css';
+@import './snippets/15-alert-message.css';
+@import './snippets/20-loading-box.css';
+@import './snippets/25-choices.css';
+@import './snippets/30-incident-table.css';
+@import './snippets/35-cards.css';
+@import './themes/argus.css';

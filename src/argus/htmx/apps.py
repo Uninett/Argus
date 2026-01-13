@@ -9,7 +9,9 @@ class HtmxFrontendConfig(AppConfig):
     name = "argus.htmx"
 
     def tailwind_css_files(self):
-        yield from pathlib.Path(__file__).parent.glob("tailwindtheme/snippets/*.css")
+        tailwindtheme_dir = pathlib.Path(__file__).parent / "tailwindtheme"
+        yield from tailwindtheme_dir.glob("snippets/*.css")
+        yield from tailwindtheme_dir.glob("themes/*.css")
 
     def ready(self):
         # Register checks
