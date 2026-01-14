@@ -54,3 +54,21 @@ Nuts and bolts
 
   * How to write a changelog, and when `(local copy) <./docs/development/howtos/changelog-entry.rst>`_, `RTD <https://argus-server.readthedocs.io/en/latest/development/howtos/changelog-entry.html>`_
   * What we want to see in a commit message `(local copy) <./docs/development/howtos/commit-messages.rst>`_, `RTD <https://argus-server.readthedocs.io/en/latest/development/howtos/commit-messages.html>`_
+
+Contributor License Agreement
+=============================
+
+To contribute code to Argus, you need to sign our contributor license
+agreement, based on The Free Software Foundation's `Fiduciary License
+Agreement 2.0 <https://fsfe.org/activities/ftf/fla.en.html>`_.
+
+We use `CLA assistant`_ to streamline the process. When you create a pull
+request against the Argus repository and have not previously signed our
+agreement, the assistant will automatically post a comment on your pull
+request with instructions on how to sign it digitally using your GitHub
+account.
+
+`The full agreement text can be read at the CLA Assistant site.
+<https://cla-assistant.io/Uninett/Argus>`_
+
+.. _CLA assistant: https://cla-assistant.io/
