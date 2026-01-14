@@ -20,7 +20,7 @@ def get_url(version, architecture):
     return base_url
 
 
-def get_architecture():  # pragma: no cover
+def get_architecture():
     uname_obj = platform.uname()
     processor = uname_obj.processor.lower() or uname_obj.machine.lower()
     libc, _ = platform.libc_ver()
