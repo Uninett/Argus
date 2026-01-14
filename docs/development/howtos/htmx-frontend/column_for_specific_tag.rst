@@ -2,15 +2,18 @@
 How to make a column for a specific tag
 =======================================
 
-You only need to add the column to the column config::
+You can add the column to a named column config::
 
-    INCIDENT_TABLE_COLUMNS = [
+    INCIDENT_TABLE_COLUMN_LAYOUTS = {
+        "mylayout": [
+            ..
+            IncidentTableColumn(
+                "mytag",
+                "MYTAG",
+                "htmx/incidents/cells/_incident_tag.html",
+                context={"tag": "MYTAG"},
+            )
+            ..
+        ]
         ..
-        IncidentTableColumn(
-            "mytag",
-            "MYTAG",
-            "htmx/incidents/cells/_incident_tag.html",
-            context={"tag": "MYTAG"},
-        )
-        ..
-    ]
+    }

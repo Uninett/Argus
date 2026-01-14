@@ -127,7 +127,7 @@ given a ``str``, this key must be available in the
 ``argus.htmx.incidents.customization.BUILTIN_COLUMNS`` dictionary. For
 example::
 
-    from argus.htmx.incidents.customization import BUILTIN_COLUMNS, IncidentTableColumn
+    from argus.htmx.incident.columns import BUILTIN_COLUMNS, IncidentTableColumn
 
     INCIDENT_TABLE_COLUMN_LAYOUTS = {
         "default": [
