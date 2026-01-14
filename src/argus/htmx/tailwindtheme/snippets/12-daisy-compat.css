@@ -113,9 +113,7 @@ label.label, form label {
   --tab-border-color: var(--color-primary);
 }
 
-/* Menu divider - reset the grid styling that menu applies to li children */
-.menu li > .divider {
-  display: flex;
-  gap: 0;
+/* Menu divider - non-interactive separator line (used with menu-title) */
+.menu li.menu-divider {
   padding: 0 0.75rem;
 }
