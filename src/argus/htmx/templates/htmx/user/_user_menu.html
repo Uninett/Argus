@@ -18,12 +18,12 @@
         <a href="{% url 'admin:index' %}" target="_blank">Admin</a>
       </li>
     {% endif %}
-    <li aria-hidden="true">
+    <li class="menu-title menu-divider" aria-hidden="true">
       <div class="divider divider-secondary my-0"></div>
     </li>
     <li>{% include "htmx/user/_user_menu_logout.html" %}</li>
   {% endblock items %}
-  <li aria-hidden="true">
+  <li class="menu-title menu-divider" aria-hidden="true">
     <div class="divider divider-secondary my-0"></div>
   </li>
   <li class="overflow-hidden">
