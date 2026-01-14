@@ -41,70 +41,82 @@ example.
 Themes and styling
 ==================
 
-How to customize the look:
+In order to customize the CSS you need to have ``tailwindcss`` in the shell
+``$PATH``. Running ``make upgrade-tailwind`` will download a binary to
+``src/argus/htmx/tailwindtheme/tailwindcss`` which can then be copied or linked
+to a directory in $PATH, or you can add the absolute path to the parent
+directory of ``tailwindcss`` to your ``$PATH`` by changing the environment
+variable as per your shell.
 
-* Override Argus' Tailwind CSS theme defaults and/or choose which daisyUI color
-  themes to include. You can do so by updating the default
-  :setting:`TAILWIND_THEME_OVERRIDE` and :setting:`DAISYUI_THEMES` settings
-  respectively before running a ``tailwind_config`` management command:
+Alter themes
+------------
 
-  Via environment variables, for example::
+Override Argus' Tailwind CSS theme defaults and/or choose which daisyUI color
+themes to include. You can do so by updating the default
+:setting:`TAILWIND_THEME_OVERRIDE` and :setting:`DAISYUI_THEMES` settings
+respectively before running a ``tailwind_config`` management command:
 
-    TAILWIND_THEME_OVERRIDE = '
-      {
-        "borderWidth": {
-          "DEFAULT": "1px"
-        },
-        "extend": {
-          "borderRadius": {
-            "4xl": "2rem"
-          }
-        }
-      }
-    '
-    DAISYUI_THEMES = '
-      [
-        "light",
-        "dark",
-        "cyberpunk",
-        "dim",
-        "autumn",
-        { "mytheme": {
-            "color-scheme": "dark",
-            "primary": "#009eb6",
-            "primary-content": "#00090c",
-            "secondary": "#00ac00",
-            "secondary-content": "#000b00",
-            "accent": "#ff0000",
-            "accent-content": "#160000",
-            "neutral": "#262c0e",
-            "neutral-content": "#cfd1ca",
-            "base-100": "#292129",
-            "base-200": "#221b22",
-            "base-300": "#1c161c",
-            "base-content": "#d0cdd0",
-            "info": "#00feff",
-            "info-content": "#001616",
-            "success": "#b1ea50",
-            "success-content": "#0c1302",
-            "warning": "#d86d00",
-            "warning-content": "#110400",
-            "error": "#ff6280",
-            "error-content": "#160306"
-            }
-        }
-      ]
-    '
+Via environment variables, for example::
 
-  Or by providing corresponding values in your local settings that star-imports from an `argus-server`_ settings file::
+TAILWIND_THEME_OVERRIDE = '
+{
+"borderWidth": {
+  "DEFAULT": "1px"
+},
+"extend": {
+  "borderRadius": {
+    "4xl": "2rem"
+  }
+}
+}
+'
+DAISYUI_THEMES = '
+[
+"light",
+"dark",
+"cyberpunk",
+"dim",
+"autumn",
+{ "mytheme": {
+    "color-scheme": "dark",
+    "primary": "#009eb6",
+    "primary-content": "#00090c",
+    "secondary": "#00ac00",
+    "secondary-content": "#000b00",
+    "accent": "#ff0000",
+    "accent-content": "#160000",
+    "neutral": "#262c0e",
+    "neutral-content": "#cfd1ca",
+    "base-100": "#292129",
+    "base-200": "#221b22",
+    "base-300": "#1c161c",
+    "base-content": "#d0cdd0",
+    "info": "#00feff",
+    "info-content": "#001616",
+    "success": "#b1ea50",
+    "success-content": "#0c1302",
+    "warning": "#d86d00",
+    "warning-content": "#110400",
+    "error": "#ff6280",
+    "error-content": "#160306"
+    }
+}
+]
+'
 
-        TAILWIND_THEME_OVERRIDE = {...}
-        DAISYUI_THEMES = [...]
+Or by providing corresponding values in your local settings that star-imports from an `argus-server`_ settings file::
 
-  Some links that may be relevant for the customization values mentioned above:
-    * `daisyUI themes`_
-    * `list of daisyUI color names`_
-    * `Tailwind CSS theme customization`_
+   TAILWIND_THEME_OVERRIDE = {...}
+   DAISYUI_THEMES = [...]
+
+Some links that may be relevant for the customization values mentioned above:
+
+* `daisyUI themes`_
+* `list of daisyUI color names`_
+* `Tailwind CSS theme customization`_
+
+Alter CSS and stylesheets
+-------------------------
 
 * Override the default main stylesheet path by setting
   ``ARGUS_STYLESHEET_PATH`` in the environment. The path is under
