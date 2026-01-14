@@ -267,6 +267,12 @@ search_description
     .. image:: img/columns/search_description.png
        :width: 200
 
+end_time
+    :From: end_time
+    :Name: end_time
+    :Description: When the incident was resolved/closed. Empty for open and
+                  stateless incidents.
+
 id
     :From: id
     :Name: id

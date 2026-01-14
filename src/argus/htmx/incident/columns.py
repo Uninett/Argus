@@ -118,6 +118,13 @@ _BUILTIN_COLUMN_LIST = [
         sort_field="start_time",
     ),
     IncidentTableColumn(
+        "end_time",
+        "End Time",
+        "htmx/incident/cells/_incident_end_time.html",
+        detail_link=True,
+        sort_field="end_time",
+    ),
+    IncidentTableColumn(
         "status",
         "Status",
         "htmx/incident/cells/_incident_status.html",
