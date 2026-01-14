@@ -9003,9 +9003,7 @@ label.label, form label {
 .tabs.tabs-border-primary > .tab {
   --tab-border-color: var(--color-primary);
 }
-.menu li > .divider {
-  display: flex;
-  gap: 0;
+.menu li.menu-divider {
   padding: 0 0.75rem;
 }
 .alert.info {
