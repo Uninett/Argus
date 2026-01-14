@@ -12,17 +12,19 @@ Our recommended filename for the template file is::
     ``htmx/incident/cells/_incident_ack_by_group.html``
 
 It is *necessary* to use a specialized settings-file for this, since you
-need to both set where to look for the additional temnplate, and to set
+need to both set where to look for the additional template, and to set
 up the actual column.
 
 Tell Argus where the template is
 ================================
 
-Pick one:
+There are two available methods to tell Argus where the template is. They can
+be combined, but then the template in the hardcoded directory name (option 2)
+always takes precedence.
 
-1. Add an app at the start of :setting:`INSTALLED_APPS` that has a directory
-   ``templates/`` that contains the new template file. You can use the same app
-   for any other overrides.
+1. Add a Django app at the start of :setting:`INSTALLED_APPS` that has
+   a directory ``templates/`` that contains the new template file. You can use
+   the same app for any other overrides.
 2. Add a directory to the :setting:`DIRS` list in the :setting:`TEMPLATES`
    setting, see `Django settings: TEMPLATES
    <https://docs.djangoproject.com/en/5.2/ref/settings/#templates>`_ in the
