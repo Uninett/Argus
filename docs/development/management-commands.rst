@@ -480,6 +480,17 @@ there.
 This field will be used to show in the dashboard which incidents are covered by an
 ongoing planned maintenance task.
 
+Remove covered incidents from recently closed planned maintenance tasks
+-----------------------------------------------------------------------
+
+There is a command ``check_ended_maintenance``. It takes an argument ``--minutes``
+(default 5 min) and will find all planned maintenance tasks that have ended within the
+last x minutes. For each of these tasks it clears the ``incidents`` field of that task.
+
+This field is be used to show in the dashboard which incidents are covered by an
+ongoing planned maintenance task. Since the task has ended these incidents are not
+covered by it anymore.
+
 Deprecated/overlapping commands
 ===============================
 
