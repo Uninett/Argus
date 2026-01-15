@@ -10,7 +10,8 @@
               tabindex="0"
               aria-label="Filter by {{ column.label|lower }}"
               aria-controls="{{ column.name }}-dropdown-content"
-              class="filter-btn btn btn-xs {% if field.value %} btn-primary {% else %} btn-ghost text-primary {% endif %} min-h-4 h-4">
+              class="filter-btn btn btn-xs {% if field.value %} btn-primary {% else %} btn-ghost text-primary {% endif %} min-h-4 h-4"
+              {% if dummy_column %}disabled{% endif %}>
         <i class="fa-solid fa-magnifying-glass"></i>
       </button>
       <div id="{{ column.name }}-dropdown-content"
