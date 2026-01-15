@@ -147,7 +147,7 @@ _BUILTIN_COLUMN_LIST = [
         sort_field="level",
     ),
     IncidentTableColumn(
-        "compact_severity",
+        "compact_level",
         "Severity",
         "htmx/incident/cells/_incident_level_compact.html",
         header_template="htmx/incident/cells/_incident_compact_severity_header.html",
