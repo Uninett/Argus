@@ -7,7 +7,7 @@
         {% block logo %}
           <a class="link" {% if logo.url %} href="{% url logo.url %}">
           {% else %}
-            href="{% url 'htmx:incident-list' %}{% querystring page_size=preferences.argus_htmx.page_size %}"
+            href="{% url 'htmx:incident-list' %}"
           {% endif %}
           >
           <img class="object-scale-down h-14"

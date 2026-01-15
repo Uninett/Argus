@@ -1,4 +1,4 @@
-from argus.auth.models import preferences
+from argus.auth.models import preferences, PreferenceField
 from argus.htmx.dateformat.constants import DATETIME_FORMATS
 from argus.htmx.constants import (
     INCIDENTS_TABLE_LAYOUT_DEFAULT,
@@ -7,6 +7,7 @@ from argus.htmx.constants import (
 from argus.htmx.incident.utils import update_interval_string
 from .forms import (
     DateTimeFormatForm,
+    IncidentFilterPreferenceForm,
     IncidentsTableLayout,
     IncidentsTableColumnForm,
     PageSizeForm,
@@ -24,6 +25,10 @@ class ArgusHtmxPreferences:
         "update_interval": UpdateIntervalForm.get_preference_field(),
         "incidents_table_layout": IncidentsTableLayout.get_preference_field(),
         "incidents_table_column_name": IncidentsTableColumnForm.get_preference_field(),
+        "incident_filter": PreferenceField(
+            form=IncidentFilterPreferenceForm,
+            default={},
+        ),
     }
 
     def update_context(self, context):

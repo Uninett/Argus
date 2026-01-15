@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.urls import reverse
 from django.views.generic import ListView
 
+from argus.auth.utils import get_preference, get_preference_obj
 from argus.filter import get_filter_backend
 from argus.htmx.widgets import BadgeDropdownMultiSelect, SearchDropdownMultiSelect
 from argus.incident.constants import AckedStatus, Level, OpenStatus
@@ -14,6 +15,9 @@ from argus.notificationprofile.models import Filter
 filter_backend = get_filter_backend()
 QuerySetFilter = filter_backend.QuerySetFilter
 LOG = logging.getLogger(__name__)
+
+INCIDENT_FILTER_PREFERENCE_NAMESPACE = "argus_htmx"
+INCIDENT_FILTER_PREFERENCE_NAME = "incident_filter"
 
 
 class RangeInput(forms.NumberInput):
@@ -231,9 +235,21 @@ def incident_list_filter(request, qs, use_empty_filter=False):
                 form_data = IncidentFilterForm.DEFAULT_VALUES
                 form = IncidentFilterForm(form_data)
                 LOG.debug("using empty filter: %s", form_data)
-            else:
-                form = IncidentFilterForm(form_data or None)
+            elif form_data:
+                # User has explicitly set filter params in URL
+                form = IncidentFilterForm(form_data)
                 LOG.debug("using GET: %s", form_data)
+            else:
+                # No filter params - try to load from user preference
+                stored_filter = _get_filter_preference(request)
+                if stored_filter:
+                    form = IncidentFilterForm(_convert_filterblob(stored_filter.copy()))
+                    LOG.debug("using stored preference filter: %s", stored_filter)
+                else:
+                    form = IncidentFilterForm(None)
+                    LOG.debug("using empty form (no preference)")
+
+    filterblob = {}
     if form.is_valid():
         LOG.debug("Cleaned data: %s", form.cleaned_data)
         filterblob = form.to_filterblob()
@@ -245,7 +261,31 @@ def incident_list_filter(request, qs, use_empty_filter=False):
             LOG.debug("Dirty form: %s", form.errors)
             for field, error_messages in form.errors.items():
                 messages.error(request, f"{field}: {','.join(error_messages)}")
+
+    # Auto-save the current filter to user preference (only when not using a named filter)
+    if not filter_obj and form.is_valid():
+        _save_filter_preference(request, filterblob)
+
     return form, qs
+
+
+def _get_filter_preference(request):
+    """Get the stored filter preference for the user."""
+    return get_preference(request, INCIDENT_FILTER_PREFERENCE_NAMESPACE, INCIDENT_FILTER_PREFERENCE_NAME) or {}
+
+
+def _save_filter_preference(request, filterblob):
+    """Save the current filter as the user's preference."""
+    LOG = logging.getLogger(__name__ + "._save_filter_preference")
+    try:
+        preferences = get_preference_obj(request, INCIDENT_FILTER_PREFERENCE_NAMESPACE)
+        current = preferences.get_preference(INCIDENT_FILTER_PREFERENCE_NAME) or {}
+
+        if filterblob != current:
+            preferences.save_preference(INCIDENT_FILTER_PREFERENCE_NAME, filterblob)
+            LOG.debug("Saved filter preference: %s", filterblob)
+    except Exception as e:
+        LOG.warning("Failed to save filter preference: %s", e)
 
 
 def _convert_filterblob(filterblob):

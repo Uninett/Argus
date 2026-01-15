@@ -284,3 +284,12 @@ class ThemeForm(SimplePreferenceForm):
             ],
         }
         return context
+
+
+class IncidentFilterPreferenceForm(ClassicPreferenceFormMixin, forms.Form):
+    """Form for storing the current incident filter as a user preference.
+
+    Filter is stored as a JSON object.
+    """
+
+    incident_filter = forms.JSONField(required=False, initial=dict)
