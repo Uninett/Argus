@@ -1,0 +1,40 @@
+<form action="{% url "htmx:plannedmaintenance-create" %}" method="post">
+  {% csrf_token %}
+  <dl class="grid grid-cols-2">
+    <dt class="font-bold">Created by</dt>
+    <dd>
+      {{ object.created_by }}
+    </dd>
+    <dt class="font-bold">Created at</dt>
+    <dd>
+      {{ object.created|date:preferences.argus_htmx.datetime_format }}
+    </dd>
+    {% if not form.start_time %}
+      <dt class="font-bold">Starts at</dt>
+      <dd>
+        {{ object.start_time|date:preferences.argus_htmx.datetime_format }}
+      </dd>
+    {% endif %}
+    {% if not form.end_time %}
+      <dt class="font-bold">Ends at</dt>
+      <dd>
+        {{ object.end_time|date:preferences.argus_htmx.datetime_format }}
+      </dd>
+    {% endif %}
+    <dt class="font-bold"></dt>
+    <dd>
+      {{ form.as_div }}
+      {% if object.modifiable %}
+        <input class="btn btn-primary" type="submit" value="Update">
+      {% else %}
+        <input class="btn btn-primary" type="submit" value="Create">
+      {% endif %}
+      {% if not form.filters %}
+        <dt class="font-bold">Filters</dt>
+        <dd>
+          {% include "./_plannedmaintenance_filter_list.html" %}
+        </dd>
+      {% endif %}
+    </dd>
+  </dl>
+</form>

@@ -1,0 +1,8 @@
+{% extends "./base.html" %}
+{% block plannedmaintenance_main %}
+  <a class="btn btn-primary"
+     href="{% url "htmx:plannedmaintenance-create" %}">Create new</a>
+  {% include "./_plannedmaintenance_sublist.html" with object_list=object_list.current list_title="Ongoing" %}
+  {% include "./_plannedmaintenance_sublist.html" with object_list=object_list.future list_title="Future" %}
+  {% include "./_plannedmaintenance_sublist.html" with object_list=object_list.past list_title="Past" %}
+{% endblock plannedmaintenance_main %}

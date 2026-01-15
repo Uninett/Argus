@@ -12,6 +12,9 @@
     {% endblock notification_links %}
     {% if request.user.is_staff %}
       <li>
+        <a href="{% url 'htmx:plannedmaintenance-list' %}">Planned Maintenance</a>
+      </li>
+      <li>
         <a href="{% url 'admin:index' %}" target="_blank">Admin</a>
       </li>
     {% endif %}
