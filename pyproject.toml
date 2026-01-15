@@ -91,7 +91,7 @@ exclude = [
 [[tool.hatch.build.hooks.build-scripts.scripts]]
 # build css
 commands = [
-    "make tailwind"
+    "make upgrade-tailwind tailwind"
 ]
 artifacts = [
     "src/argus/htmx/static/styles.css",

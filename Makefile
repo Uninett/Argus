@@ -34,7 +34,7 @@ testclean: coverageclean clean
 nuke: clean docclean distclean testclean cacheclean
 
 tailwindcli:
-	@which tailwind || echo "tailwindcss not in path"
+	@which tailwindcss || echo "tailwindcss not in path"
 
 tailwind: tailwindcli
 	tailwindcss -c $(TAILWINDDIR)/tailwind.config.js -i $(TAILWINDDIR)/styles.css -o $(STATICDIR)/styles.css
