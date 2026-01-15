@@ -119,7 +119,7 @@ _BUILTIN_COLUMN_LIST = [
     ),
     IncidentTableColumn(
         "end_time",
-        "End Time",
+        "End time",
         "htmx/incident/cells/_incident_end_time.html",
         detail_link=True,
         sort_field="end_time",
