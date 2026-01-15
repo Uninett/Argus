@@ -1,0 +1,61 @@
+<section>
+  <h3 class="text-xl">{{ object.id }}</h3>
+  <div>
+    <dl class="grid grid-cols-2">
+      <dt class="font-bold">Created</dt>
+      <dd>
+        {{ object.created|date:preferences.argus_htmx.datetime_format }}
+      </dd>
+      <dt class="font-bold">Created by</dt>
+      <dd>
+        {{ object.created_by }}
+      </dd>
+      <dt class="font-bold">Starts</dt>
+      <dd>
+        {{ object.start_time|date:preferences.argus_htmx.datetime_format }}
+      </dd>
+      <dt class="font-bold">Done by (hopefully)</dt>
+      <dd>
+        {{ object.end_time|date:preferences.argus_htmx.datetime_format }}
+      </dd>
+      <dt class="font-bold">Description</dt>
+      <dd>
+        {{ object.description }}
+      </dd>
+      <dt class="font-bold">Filters</dt>
+      <dd>
+        {% include "./_plannedmaintenance_filter_list.html" %}
+      </dd>
+      {% if request.user.is_staff and object.modifiable %}
+        <dt class="font-bold">Actions</dt>
+        <dd>
+          <a class="btn btn-primary"
+             href="{% url "htmx:plannedmaintenance-update" pk=object.pk %}">Update</a>
+          {% if object.current %}
+            <form method="post"
+                  action="{% url "htmx:plannedmaintenance-cancel" pk=object.pk %}">
+              {% csrf_token %}
+              <input class="btn btn-primary" type="submit" value="Cancel" />
+            </form>
+          {% elif object.future %}
+            <form method="post"
+                  action="{% url "htmx:plannedmaintenance-delete" pk=object.pk %}">
+              {% csrf_token %}
+              <input class="btn btn-primary" type="submit" value="Delete" />
+            </form>
+          {% endif %}
+        </dd>
+      {% endif %}
+    </dl>
+    {% comment %}
+    {% if show_buttons %}
+      <p>
+        <a class="btn btn-primary" href="{% url "htmx:plannedmaintenance-update" pk=object.pk %}">Update</a>
+      </p>
+      <p>
+        <a class="btn btn-primary" href="{% url "htmx:plannedmaintenance-delete" pk=object.pk %}">Delete</a>
+      </p>
+    {% endif %}
+    {% endcomment %}
+  </div>
+</section>
