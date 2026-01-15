@@ -9,6 +9,7 @@ from django.db import models
 from django.db.models import CheckConstraint, Q, F
 from django.utils import timezone
 
+from argus.incident.models import Incident
 from argus.notificationprofile.models import Filter
 from argus.util.datetime_utils import LOCAL_INFINITY, INFINITY_REPR
 
@@ -51,6 +52,7 @@ class PlannedMaintenanceTask(models.Model):
     end_time = models.DateTimeField(default=LOCAL_INFINITY)
     description = models.CharField(blank=True, max_length=255)
     filters = models.ManyToManyField(to=Filter, related_name="planned_maintenance_tasks")
+    incidents = models.ManyToManyField(to=Incident, related_name="planned_maintenance_tasks", blank=True)
 
     objects = PlannedMaintenanceQuerySet.as_manager()
 
