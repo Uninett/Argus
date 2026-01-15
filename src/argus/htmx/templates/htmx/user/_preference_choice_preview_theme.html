@@ -8,7 +8,9 @@
   {% endcomment %}
   {% for color_class in theme_colors %}
     <div class="tooltip tooltip-left" data-tip="{{ color_class|slice:"3:" }}">
-      <div class="flex items-center justify-center h-5 w-5 rounded-sm border-1 border-base-300 {{ color_class }} badge-{{ color_class|slice:"3:" }}">T</div>
+      <div class="flex items-center justify-center h-5 w-5 rounded-sm border-1 border-base-300 {{ color_class }} badge-{{ color_class|slice:"3:" }}">
+        T
+      </div>
     </div>
   {% endfor %}
 </div>
