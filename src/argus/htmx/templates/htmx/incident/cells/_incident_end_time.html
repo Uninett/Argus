@@ -1,0 +1,4 @@
+<!-- htmx/incident/cells/_incident_end_time.html -->
+{% if incident.end_time and not incident.open %}
+  {{ incident.end_time|date:preferences.argus_htmx.datetime_format }}
+{% endif %}
