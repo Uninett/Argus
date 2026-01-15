@@ -34,4 +34,4 @@ jobs:
     - name: Format HTML
       run: |
         djlint --version
-        djlint . --check
+        djlint . --check --configuration pyproject.toml
