@@ -36,6 +36,13 @@ class PlannedMaintenanceQuerySet(models.QuerySet):
             time = timezone.now()
         return self.filter(start_time__lte=time, end_time__gte=time)
 
+    def started_after_time(self, time: datetime):
+        """
+        Returns all tasks that were started since the given time and are still active
+        """
+        now = timezone.now()
+        return self.filter(start_time__gte=time, start_time__lte=now, end_time__gte=now)
+
 
 class PlannedMaintenanceTask(models.Model):
     class Meta:
@@ -88,6 +95,17 @@ class PlannedMaintenanceTask(models.Model):
 
         self.end_time = end_time
         self.save()
+
+    def connect_covered_incidents(self):
+        """Adds all incidents that are covered by the task to the incidents field"""
+
+        from .utils import incidents_covered_by_planned_maintenance_task
+
+        queryset = Incident.objects.exclude(planned_maintenance_tasks__pk=self.pk)
+
+        covered_incidents = incidents_covered_by_planned_maintenance_task(queryset=queryset, pm_task=self)
+
+        self.incidents.add(*covered_incidents)
 
     def clean(self):
         super().clean()

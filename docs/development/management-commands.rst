@@ -466,6 +466,20 @@ whether the user is a superuser (superuser) or not (nosuperuser). Superusers
 have by default access to the admin, but this can be turned off with
 ``--nostaff``.
 
+Planned maintenance handling
+============================
+Connect new planned maintenance tasks with their covered incidents
+------------------------------------------------------------------
+
+There is a command ``check_started_maintenance``. It takes an argument ``--minutes``
+(default 5 min) and will find all planned maintenance tasks that have started within
+the last x minutes. For each of these tasks it finds all open incidents that are
+covered by it and adds them to the ``incidents`` list of that task if it isn't already
+there.
+
+This field will be used to show in the dashboard which incidents are covered by an
+ongoing planned maintenance task.
+
 Deprecated/overlapping commands
 ===============================
 
