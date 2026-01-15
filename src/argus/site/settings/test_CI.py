@@ -37,6 +37,9 @@ MEDIA_PLUGINS = [
     "argus.notificationprofile.media.sms_as_email.SMSNotification",
 ]
 
+# Faster tests
+PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]
+
 # Tests
 
 TEST_RUNNER = "xmlrunner.extra.djangotestrunner.XMLTestRunner"
