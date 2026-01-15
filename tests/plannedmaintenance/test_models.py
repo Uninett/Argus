@@ -1,5 +1,6 @@
 from datetime import timedelta
 
+from django.core.exceptions import ValidationError
 from django.test import TestCase, tag
 from django.utils import timezone
 
@@ -81,6 +82,24 @@ class PlannedMaintenanceTaskTests(TestCase):
 
     def test_given_long_ago_ended_pm_task_modifiable_is_false(self):
         self.assertFalse(self.past_pm.modifiable)
+
+    def test_unmodifiable_pm_cannot_be_edited(self):
+        pm = self.past_pm
+        original_description = pm.description
+        pm.description = "New description"
+        with self.assertRaises(ValidationError):
+            pm.save()
+
+        pm.refresh_from_db()
+        self.assertEqual(pm.description, original_description)
+
+    def test_modifiable_pm_can_be_edited(self):
+        pm = self.current_pm
+        pm.description = "Updated description"
+        pm.save()
+
+        pm.refresh_from_db()
+        self.assertEqual(pm.description, "Updated description")
 
     def test_given_active_pm_current_is_true(self):
         pm = PlannedMaintenanceFactory(start_time=timezone.now() - timedelta(minutes=5))

@@ -4,6 +4,7 @@ import logging
 from datetime import datetime, timedelta
 from typing import Optional
 
+from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.db.models import CheckConstraint, Q, F
@@ -87,6 +88,14 @@ class PlannedMaintenanceTask(models.Model):
 
         self.end_time = end_time
         self.save()
+
+    def save(self, *args, **kwargs):
+        if self.pk is not None:
+            old = type(self).objects.get(pk=self.pk)
+            if not old.modifiable:
+                raise ValidationError("Planned maintenance task no longer modifiable")
+
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"Planned maintenance from {self.start_time} to {self.end_time if self.end_time != LOCAL_INFINITY else INFINITY_REPR} created by {self.created_by} - {self.description}"
