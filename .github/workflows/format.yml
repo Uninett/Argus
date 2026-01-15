@@ -32,4 +32,6 @@ jobs:
         pip install djlint
 
     - name: Format HTML
-      run: djlint . --check
+      run: |
+        djlint --version
+        djlint . --check --configuration pyproject.toml
