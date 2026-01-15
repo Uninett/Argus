@@ -43,6 +43,12 @@ class PlannedMaintenanceQuerySet(models.QuerySet):
         now = timezone.now()
         return self.filter(start_time__gte=time, start_time__lte=now, end_time__gte=now)
 
+    def ended_after_time(self, time: datetime):
+        """
+        Returns all tasks that were ended after the given time and now
+        """
+        return self.filter(end_time__gte=time, end_time__lte=timezone.now())
+
 
 class PlannedMaintenanceTask(models.Model):
     class Meta:

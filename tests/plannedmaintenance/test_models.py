@@ -65,6 +65,19 @@ class PlannedMaintenanceQuerySetTests(TestCase):
         self.assertNotIn(self.future_pm, started_after_time_pms)
         self.assertNotIn(recently_started_closed_pm, started_after_time_pms)
 
+    def ended_after_time_returns_only_closed_pms_with_end_time_after_time(self):
+        recently_started_closed_pm = PlannedMaintenanceFactory(
+            start_time=self.current_pm.start_time, end_time=self.current_pm.start_time + timedelta(seconds=15)
+        )
+        ended_after_time_pms = PlannedMaintenanceTask.objects.ended_after_time(
+            self.current_pm.start_time - timedelta(minutes=1)
+        )
+
+        self.assertNotIn(self.past_pm, ended_after_time_pms)
+        self.assertNotIn(self.current_pm, ended_after_time_pms)
+        self.assertIn(self.future_pm, ended_after_time_pms)
+        self.assertNotIn(recently_started_closed_pm, ended_after_time_pms)
+
 
 @tag("database")
 class PlannedMaintenanceTaskTests(TestCase):
