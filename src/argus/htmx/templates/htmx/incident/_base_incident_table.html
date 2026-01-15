@@ -7,9 +7,10 @@
     <tr class="border-b border-primary bg-base-100 sticky top-0 z-10">
       {% block columns %}
         {% for col in columns %}
-          <th class="border-b border-primary {{ col.column_classes }}">
+          <th id="col-{{ col.name }}"
+              class="border-b border-primary {{ col.column_classes }}">
             {% if col.header_template %}
-              {% include col.header_template with label=col.label %}
+              {% include col.header_template with column=col %}
             {% elif col.filter_field %}
               {% include "htmx/incident/cells/_incident_filterable_column_header.html" with column=col %}
             {% elif col.sort_field %}

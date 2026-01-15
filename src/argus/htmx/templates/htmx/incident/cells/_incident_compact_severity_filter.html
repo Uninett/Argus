@@ -1,0 +1,55 @@
+<!-- htmx/incident/cells/_incident_compact_severity_filter.html -->
+{% load argus_htmx widget_tweaks %}
+<div id="{{ column.name }}-dropdown" class="dropdown dropdown-end">
+  <button type="button"
+          tabindex="0"
+          aria-label="Filter by severity"
+          aria-controls="{{ column.name }}-dropdown-content"
+          class="filter-btn btn btn-xs {% if field.value %} btn-primary {% else %} btn-ghost text-primary {% endif %} min-h-4 h-4">
+    <i class="fa-solid fa-magnifying-glass text-xs"></i>
+  </button>
+  <div id="{{ column.name }}-dropdown-content"
+       class="dropdown-content bg-base-100 p-2 mt-1 rounded-lg shadow border border-primary z-10"
+       tabindex="-1">
+    <form class="incident-list-param">
+      <div aria-labelledby="{{ field.name }}-label">
+        {# djlint:off #}
+        {% if not dummy_column %}
+          {% url 'htmx:incident-list' as incident_list_url %}
+          {% render_field field hx-get=incident_list_url hx-include=".incident-list-param" hx-target="#table-body" hx-select="#table-body" hx-select-oob="#table-footer" hx-swap="outerHTML" hx-push-url="true" hx-indicator="#incident-list .htmx-indicator" hx-trigger="change delay:500ms" %}
+        {% else %}
+          {{ field }}
+        {% endif %}
+        {# djlint:on #}
+      </div>
+    </form>
+  </div>
+</div>
+<script>
+(function() {
+  const dropdown = document.querySelector('#{{ column.name }}-dropdown');
+  const filterBtn = dropdown.querySelector('.filter-btn');
+
+  filterBtn.addEventListener('focus', function() {
+    const content = dropdown.querySelector('.dropdown-content');
+    const rect = content.getBoundingClientRect();
+
+    if (rect.right > window.innerWidth) {
+      dropdown.classList.add('dropdown-end');
+    } else if (rect.left < 0) {
+      dropdown.classList.remove('dropdown-end');
+    }
+  });
+
+  dropdown.addEventListener('htmx:afterRequest', function() {
+    const field = dropdown.querySelector('input:not([type="hidden"]), select');
+    if (field?.value) {
+      filterBtn.classList.add('btn-primary');
+      filterBtn.classList.remove('btn-ghost', 'text-primary');
+    } else {
+      filterBtn.classList.remove('btn-primary');
+      filterBtn.classList.add('btn-ghost', 'text-primary');
+    }
+  });
+})();
+</script>

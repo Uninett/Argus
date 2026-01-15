@@ -1,0 +1,6 @@
+<!-- htmx/templates/htmx/incident/cells/_incident_level_compact.html -->
+{% load argus_htmx %}
+<div class="flex justify-center">
+  <span class="badge text-nowrap tooltip tooltip-bottom bg-severity-primary-{{ incident.level }} border-severity-primary-{{ incident.level }} text-severity-secondary-{{ incident.level }}"
+        data-tip="{{ incident.level|pp_level }}">{{ incident.level }}</span>
+</div>
