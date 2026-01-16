@@ -210,12 +210,10 @@ How to customize the look without switching themes
   ``STATIC_URL``. This depends on the context processor
   ``argus.htmx.context_processors.path_to_stylesheet``.
 * Include additional styles/stylesheets using the ``head`` block in your templates.
-* Generate a Tailwind config file by running the ``tailwind_config`` management
-  command. It will be placed in
-  ``src/argus/htmx/tailwindtheme/tailwind.config.js``. By default the generated
-  file will be based on
-  ``src/argus/htmx/templates/tailwind/tailwind.config.js`` and expected values
-  will be injected with reasonable defaults.
+* Run the ``tailwind_config`` management command to generate the CSS configuration.
+  This generates ``src/argus/htmx/tailwindtheme/styles.css`` which imports all
+  CSS snippets from installed apps and theme files from settings. Tailwind v4 uses
+  CSS-based configuration, so no separate JavaScript config file is needed.
 
 Incident table column customization
 ===================================
