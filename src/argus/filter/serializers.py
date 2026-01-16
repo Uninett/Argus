@@ -21,4 +21,5 @@ class FilterSerializer(serializers.ModelSerializer):
             "pk",
             "name",
             "filter",
+            "public",
         ]
