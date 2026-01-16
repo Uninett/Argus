@@ -94,8 +94,9 @@ class PlannedMaintenanceTask(models.Model):
         if self.pk is not None:
             old = type(self).objects.get(pk=self.pk)
             if not old.modifiable:
+                hours = int(MODIFICATION_WINDOW_PM.total_seconds() // 3600)
                 raise ValidationError(
-                    "This planned maintenance task is no longer modifiable as it ended more than 12 hours ago."
+                    f"This planned maintenance task is no longer modifiable as it ended more than {hours} hours ago."
                 )
 
     def save(self, *args, **kwargs):
