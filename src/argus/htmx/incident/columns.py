@@ -82,7 +82,7 @@ _BUILTIN_COLUMN_LIST = [
     ),
     IncidentTableColumn(
         "start_time",
-        "Timestamp",
+        "Start time",
         "htmx/incident/cells/_incident_start_time.html",
         detail_link=True,
         column_classes="min-w-48",
@@ -97,14 +97,14 @@ _BUILTIN_COLUMN_LIST = [
     ),
     IncidentTableColumn(
         "narrow_start_time_and_age",
-        "Timestamp",
+        "Start time",
         "htmx/incident/cells/_incident_start_time_and_age.html",
         detail_link=True,
         sort_field="start_time",
     ),
     IncidentTableColumn(
         "start_time_and_age",
-        "Timestamp",
+        "Start time",
         "htmx/incident/cells/_incident_start_time_and_age.html",
         detail_link=True,
         column_classes="min-w-48",
@@ -112,7 +112,7 @@ _BUILTIN_COLUMN_LIST = [
     ),
     IncidentTableColumn(
         "narrow_start_time",
-        "Timestamp",
+        "Start time",
         "htmx/incident/cells/_incident_start_time.html",
         detail_link=True,
         sort_field="start_time",
