@@ -39,14 +39,12 @@ DEFAULT_INCIDENT_TABLE_COLUMN_LAYOUTS = {
 }
 ARGUS_HTMX_FILTER_FUNCTION = "argus.htmx.incident.filter.incident_list_filter"
 
-# These templates are auto-discovered by the templating engine and are relative
+# This template is auto-discovered by the templating engine and is relative
 # to the argus.htmx's `templates/` directory
-TAILWIND_CONFIG_TEMPLATE = "tailwind/tailwind.config.js"
 TAILWIND_CSS_TEMPLATE = "tailwind/styles.css"
 
-# These targets are relative to the working directory when running the `tailwind_config`
-# management command, which should be done from the repostitory root
-TAILWIND_CONFIG_TARGET = "src/argus/htmx/tailwindtheme/tailwind.config.js"
+# This target is relative to the working directory when running the `tailwind_config`
+# management command, which should be done from the repository root
 TAILWIND_CSS_TARGET = "src/argus/htmx/tailwindtheme/styles.css"
 
 STYLESHEET_PATH_DEFAULT = "styles.css"
