@@ -103,6 +103,12 @@ class TestIncidentListFilter(TestCase):
     def teardown(self):
         connect_signals()
 
+    def test_nonexistent_filter_should_return_unfiltered_queryset_and_repair_session(self):
+        self.request.session["selected_filter"] = -1
+        _, qs = incident_list_filter(self.request, self.qs)
+        self.assertEqual(qs, self.qs)
+        self.assertNotIn("selected_filter", self.request.session)
+
     def test_valid_request_should_return_filtered_queryset(self):
         self.request.session["selected_filter"] = self.valid_filter.pk
         _, qs = incident_list_filter(self.request, self.qs)

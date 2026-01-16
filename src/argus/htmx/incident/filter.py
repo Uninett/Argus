@@ -213,7 +213,11 @@ def incident_list_filter(request, qs, use_empty_filter=False):
     LOG.debug("GET at start: %s", request.GET)
     filter_pk, filter_obj = request.session.get("selected_filter", None), None
     if filter_pk:
-        filter_obj = Filter.objects.get(pk=filter_pk)
+        try:
+            filter_obj = Filter.objects.get(pk=filter_pk)
+        except Filter.DoesNotExist:  # never existed/has been deleted!
+            del request.session["selected_filter"]
+            filter_pk, filter_obj = None, None
     if filter_obj:
         form = IncidentFilterForm(_convert_filterblob(filter_obj.filter))
         LOG.debug("using stored filter: %s", filter_obj.filter)
