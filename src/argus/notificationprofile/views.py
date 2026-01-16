@@ -224,13 +224,28 @@ class FilterViewSet(viewsets.ModelViewSet):
     queryset = Filter.objects.none()
 
     def get_queryset(self):
-        return self.request.user.filters.all()
+        return Filter.objects.usable_by_user(self.request.user)
+
+    def get_editable_queryset(self):
+        return Filter.objects.editable_by_user(self.request.user)
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
+    def get_kwargs(self):
+        lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
+        filter_kwargs = {self.lookup_field: self.kwargs[lookup_url_kwarg]}
+        return filter_kwargs
+
+    def get_object(self):
+        queryset = self.filter_queryset(self.get_editable_queryset())
+        filter_kwargs = self.get_kwargs()
+        obj = get_object_or_404(queryset, **filter_kwargs)
+        self.check_object_permissions(self.request, obj)
+        return obj
+
     def destroy(self, request, *args, **kwargs):
-        filter = get_object_or_404(self.get_queryset(), pk=self.kwargs["pk"])
+        filter = self.get_object()
         connected_profiles = filter.notification_profiles.all()
         if connected_profiles:
             profiles = ", ".join([str(profile) for profile in connected_profiles])
@@ -246,6 +261,11 @@ class FilterViewSet(viewsets.ModelViewSet):
             )
         self.perform_destroy(filter)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+    def retrieve(self, request, *args, **kwargs):
+        obj = super().get_object()
+        serializer = self.get_serializer(obj)
+        return Response(serializer.data)
 
 
 # TODO: change HTTP method to GET, and get query data from URL
