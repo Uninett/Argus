@@ -4,8 +4,8 @@ import logging
 from datetime import datetime, timedelta
 from typing import Optional
 
-from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import CheckConstraint, Q, F
 from django.utils import timezone
@@ -89,12 +89,17 @@ class PlannedMaintenanceTask(models.Model):
         self.end_time = end_time
         self.save()
 
-    def save(self, *args, **kwargs):
+    def clean(self):
+        super().clean()
         if self.pk is not None:
             old = type(self).objects.get(pk=self.pk)
             if not old.modifiable:
-                raise ValidationError("Planned maintenance task no longer modifiable")
+                raise ValidationError(
+                    "This planned maintenance task is no longer modifiable as it ended more than 12 hours ago."
+                )
 
+    def save(self, *args, **kwargs):
+        self.full_clean()
         super().save(*args, **kwargs)
 
     def __str__(self):
