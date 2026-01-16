@@ -300,7 +300,7 @@ level
     :From: level
     :Name: level
     :Description: The severity level.
-    :Redundant with: select_levels
+    :Redundant with: select_levels, compact_level, compact_select_levels
 
     .. image:: img/columns/level.png
        :width: 200
@@ -312,10 +312,25 @@ select_levels
                   with the notification filter field ``maxlevel``. If maxlevel is
                   set to less than max, you will get no results if searching for
                   the max via this field.
-    :Redundant with: level
+    :Redundant with: level, compact_level, compact_select_levels
 
     .. image:: img/columns/select_levels.png
        :width: 200
+
+compact_level
+    :From: level
+    :Name: compact_level
+    :Description: Compact severity level showing only the number with color.
+                  Full description shown on hover.
+    :Redundant with: level, select_levels, compact_select_levels
+
+compact_select_levels
+    :From: level
+    :Name: compact_select_levels
+    :Description: Compact severity level with filtering. Shows only the number
+                  with color, full description on hover. One or more levels can
+                  be selected.
+    :Redundant with: level, select_levels, compact_level
 
 status
     :From: open

@@ -39,7 +39,12 @@ module.exports = {
         },
     },
     safelist: [
-        "htmx-request"
+        "htmx-request",
+        "w-[1%]",
+        // Severity classes use string interpolation in templates, so must be safelisted
+        {
+            pattern: /^(bg|border|text)-severity-(primary|secondary)-[1-5]$/,
+        },
     ],
     daisyui: {
         themes: [

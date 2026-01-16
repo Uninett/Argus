@@ -1,0 +1,21 @@
+<!-- htmx/incident/cells/_incident_compact_severity_header.html -->
+{% load argus_htmx widget_tweaks %}
+<div class="flex flex-col gap-0">
+  <span class="text-xs leading-tight whitespace-nowrap">Severity</span>
+  <div class="flex items-center gap-0.5">
+    {% include "htmx/incident/cells/_incident_sort_button.html" %}
+    {% if column.filter_field %}
+      {% with fieldname=column.filter_field %}
+        {% if fieldname in filter_form.fields %}
+          {% with field=filter_form|get_form_field:fieldname %}
+            {% include "htmx/incident/cells/_incident_compact_severity_filter.html" %}
+          {% endwith %}
+        {% else %}
+          {% with form=refresh_info_forms|dictvalue:fieldname field=refresh_info_forms|dictvalue:fieldname|get_form_field:fieldname %}
+            {% include "htmx/incident/cells/_incident_compact_severity_filter.html" %}
+          {% endwith %}
+        {% endif %}
+      {% endwith %}
+    {% endif %}
+  </div>
+</div>
