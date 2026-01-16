@@ -15,7 +15,7 @@ jobs:
     - uses: actions/checkout@v6
     - uses: astral-sh/ruff-action@v3
       with:
-        version: "0.12.0"
+        version: "0.14.13"
 
   djlint:
     runs-on: ubuntu-latest
