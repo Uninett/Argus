@@ -1,11 +1,17 @@
+from datetime import timedelta
+
+from django import forms
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.forms import modelform_factory
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+from django.utils import timezone
 from django.views.generic import CreateView, DeleteView, ListView, UpdateView
 
 from argus.htmx.utils import TemplateNameViewMixin
 from argus.plannedmaintenance.models import PlannedMaintenanceTask
+
+DATETIME_LOCAL_FORMAT = "%Y-%m-%dT%H:%M"
 
 
 class UserIsStaffMixin(UserPassesTestMixin):
@@ -23,12 +29,25 @@ class PlannedMaintenanceMixin(TemplateNameViewMixin):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["page_title"] = "Planned Maintenance Tasks"
+        context["page_title"] = "Planned Maintenance"
         return context
 
 
 class PlannedMaintenanceListView(PlannedMaintenanceMixin, ListView):
-    pass
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        tab = self.request.GET.get("tab", "upcoming")
+        context["current_tab"] = tab
+        return context
+
+    def get_queryset(self):
+        tab = self.request.GET.get("tab", "upcoming")
+        qs = PlannedMaintenanceTask.objects.all()
+        if tab == "past":
+            return qs.past().order_by("-end_time")
+        else:
+            # Upcoming = ongoing + future, ordered by start_time
+            return (qs.current() | qs.future()).order_by("start_time")
 
 
 class PlannedMaintenanceDeleteView(UserIsStaffMixin, PlannedMaintenanceMixin, DeleteView):
@@ -48,10 +67,26 @@ class PlannedMaintenanceCancelView(UserIsStaffMixin, PlannedMaintenanceMixin, De
 class PlannedMaintenanceCreateView(UserIsStaffMixin, PlannedMaintenanceMixin, CreateView):
     fields = ["start_time", "end_time", "description", "filters"]
 
+    def get_form_class(self):
+        return modelform_factory(
+            self.model,
+            fields=self.fields,
+            widgets={
+                "start_time": forms.DateTimeInput(attrs={"type": "datetime-local"}, format=DATETIME_LOCAL_FORMAT),
+                "end_time": forms.DateTimeInput(attrs={"type": "datetime-local"}, format=DATETIME_LOCAL_FORMAT),
+                "filters": forms.SelectMultiple(attrs={"size": 5}),
+            },
+        )
+
+    def get_initial(self):
+        initial = super().get_initial()
+        now = timezone.now()
+        initial["start_time"] = now
+        initial["end_time"] = now + timedelta(hours=1)
+        return initial
+
     def form_valid(self, form):
-        self.object = form.save(commit=False)
-        self.object.created_by = self.request.user
-        self.object.save()
+        form.instance.created_by = self.request.user
         return super().form_valid(form)
 
 
@@ -62,12 +97,20 @@ class PlannedMaintenanceUpdateView(UserIsStaffMixin, PlannedMaintenanceMixin, Up
     past_fields = ["description"]
 
     def get_form_class(self):
-        object = self.get_object()
-        if object.past:
+        obj = self.get_object()
+        if obj.past:
             fields = self.past_fields
-        elif object.current:
+        elif obj.current:
             fields = self.ongoing_fields
         else:
             fields = self.future_fields
-        form_class = modelform_factory(self.model, fields=fields)
-        return form_class
+
+        widgets = {}
+        if "start_time" in fields:
+            widgets["start_time"] = forms.DateTimeInput(attrs={"type": "datetime-local"}, format=DATETIME_LOCAL_FORMAT)
+        if "end_time" in fields:
+            widgets["end_time"] = forms.DateTimeInput(attrs={"type": "datetime-local"}, format=DATETIME_LOCAL_FORMAT)
+        if "filters" in fields:
+            widgets["filters"] = forms.SelectMultiple(attrs={"size": 5})
+
+        return modelform_factory(self.model, fields=fields, widgets=widgets)
