@@ -173,6 +173,40 @@ Add the app to :setting:`INSTALLED_APPS`, the name to
 :setting:`DAISYUI_THEMES`, and finish with ``tailwind_config`` + ``make
 tailwind`` as usual.
 
+How to customize severity colors
+--------------------------------
+
+The incident severity column uses color-coded badges. The default colors are
+defined in ``argus/htmx/tailwindtheme/snippets/11-extensions.css``::
+
+    @theme {
+      --color-severity-primary-1: red;
+      --color-severity-primary-2: orange;
+      --color-severity-primary-3: yellow;
+      --color-severity-primary-4: green;
+      --color-severity-primary-5: blue;
+      --color-severity-secondary-1: white;
+      --color-severity-secondary-2: black;
+      --color-severity-secondary-3: black;
+      --color-severity-secondary-4: white;
+      --color-severity-secondary-5: white;
+    }
+
+The ``severity-primary`` colors are used for background and border, while
+``severity-secondary`` colors are used for text.
+
+To override these colors, add the variables to your custom theme definition.
+For example, in a theme CSS file or via :setting:`DAISYUI_THEMES`::
+
+    @plugin "daisyui/theme" {
+      name: "mytheme";
+      color-scheme: "dark";
+      /* ... other theme colors ... */
+      --color-severity-primary-1: #dc2626;
+      --color-severity-secondary-1: #fef2f2;
+      /* ... etc ... */
+    }
+
 How to customize the look without switching themes
 --------------------------------------------------
 
