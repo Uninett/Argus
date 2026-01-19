@@ -289,7 +289,20 @@ class ThemeForm(SimplePreferenceForm):
 class IncidentFilterPreferenceForm(ClassicPreferenceFormMixin, forms.Form):
     """Form for storing the current incident filter as a user preference.
 
-    Filter is stored as a JSON object.
+    Filter is stored as a JSON object. This is not a choice-based preference,
+    so get_choices() returns None.
     """
 
     incident_filter = forms.JSONField(required=False, initial=dict)
+
+    @classmethod
+    def get_choices(cls):
+        return None
+
+    @classmethod
+    def get_default(cls):
+        return {}
+
+    @classmethod
+    def get_preference_field(cls):
+        return PreferenceField(form=cls, default=cls.get_default())
