@@ -332,6 +332,13 @@ compact_select_levels
                   be selected.
     :Redundant with: level, select_levels, compact_level
 
+under_maintenance
+    :From: planned_maintenance_tasks
+    :Name: under_maintenance
+    :Description: An icon indicating if there exists a planned maintenance task that
+                  covers the incident, meaning no notifications are being sent for that
+                  incident.
+
 status
     :From: open
     :Name: status
