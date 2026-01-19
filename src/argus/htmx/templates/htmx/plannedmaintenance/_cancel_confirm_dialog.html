@@ -1,0 +1,22 @@
+<button class="btn btn-sm btn-outline w-[84px]"
+        type="button"
+        onclick="document.getElementById('end-dialog-{{ task.pk }}').showModal()">End now</button>
+<dialog id="end-dialog-{{ task.pk }}" class="modal">
+  <div class="modal-box">
+    <h3 class="font-bold text-xl text-left">End Maintenance Task</h3>
+    <p class="py-4 text-base text-left">Are you sure you want to end this maintenance task now?</p>
+    <div class="modal-action">
+      <form method="post"
+            action="{% url 'htmx:plannedmaintenance-cancel' pk=task.pk %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary">Yes, end now</button>
+      </form>
+      <form method="dialog">
+        <button class="btn">No, keep it</button>
+      </form>
+    </div>
+  </div>
+  <form method="dialog" class="modal-backdrop">
+    <button>close</button>
+  </form>
+</dialog>
