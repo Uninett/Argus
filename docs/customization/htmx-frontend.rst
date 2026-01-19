@@ -210,44 +210,38 @@ For example, in a theme CSS file or via :setting:`DAISYUI_THEMES`::
 How to customize the look without switching themes
 --------------------------------------------------
 
-* Override Argus' Tailwind CSS theme defaults by updating the setting
-  :setting:`TAILWIND_THEME_OVERRIDE`.
+Tailwind v4 uses CSS-based configuration via ``@theme`` blocks. To extend or
+override Tailwind's default theme values, create a CSS file in your app's
+``themes`` directory (see "Via an app and css snippet" above for setup).
 
-  Via environment variables, for example::
+For example, to add custom border radius values::
 
-      TAILWIND_THEME_OVERRIDE = '
-        {
-          "borderWidth": {
-            "DEFAULT": "1px"
-          },
-          "extend": {
-            "borderRadius": {
-              "4xl": "2rem"
-            }
-          }
-        }
-      '
+    /* myapp/tailwindtheme/themes/override.css */
+    @theme {
+      --radius-4xl: 2rem;
+    }
 
-  Or by providing corresponding values in your local settings.
+Or to override default values::
 
-  Run ``tailwind_config`` to generate the configuration, then ``make tailwind`` to
-  generate the final css-file, as usual.
+    @theme {
+      --default-border-width: 1px;
+    }
 
-  Some links that may be relevant for the customization values mentioned above:
+After adding your theme overrides, run ``tailwind_config`` + ``make tailwind`` as usual.
 
-  * `daisyUI themes`_
-  * `list of daisyUI color names`_
-  * `Tailwind CSS theme customization`_
+Some links that may be relevant for customization:
+
+* `daisyUI themes`_
+* `list of daisyUI color names`_
+* `Tailwind CSS theme customization`_
+
+Other customization options:
 
 * Override the default main stylesheet path by setting
   ``ARGUS_STYLESHEET_PATH`` in the environment. The path is under
   ``STATIC_URL``. This depends on the context processor
   ``argus.htmx.context_processors.path_to_stylesheet``.
 * Include additional styles/stylesheets using the ``head`` block in your templates.
-* Run the ``tailwind_config`` management command to generate the CSS configuration.
-  This generates ``src/argus/htmx/tailwindtheme/styles.css`` which imports all
-  CSS snippets from installed apps and theme files from settings. Tailwind v4 uses
-  CSS-based configuration, so no separate JavaScript config file is needed.
 
 Incident table column customization
 ===================================
