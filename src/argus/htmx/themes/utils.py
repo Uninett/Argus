@@ -58,8 +58,7 @@ def get_theme_names(quiet=True):
     theme_names_from_css = set(get_theme_names_from_css())
     installed_themes = theme_names_from_setting & theme_names_from_css
 
-    all_theme_names = theme_names_from_setting | theme_names_from_css
-    if all_theme_names != installed_themes:
+    if theme_names_from_setting != installed_themes:
         LOG.warning(ERROR_MSG)
         if not quiet:
             raise ImproperlyConfigured(ERROR_MSG)
