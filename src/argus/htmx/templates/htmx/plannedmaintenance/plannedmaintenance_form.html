@@ -1,4 +1,154 @@
 {% extends "./base.html" %}
+{% load widget_tweaks %}
 {% block plannedmaintenance_main %}
-  {% include "./_plannedmaintenance_form.html" %}
+  <div class="max-w-2xl w-full">
+    <div class="card card-compact bg-base-100 shadow-sm border border-base-300">
+      <div class="card-body">
+        <h2 class="card-title">
+          {% if object.pk %}
+            {% if object.past %}
+              View Maintenance Task
+            {% else %}
+              Edit Maintenance Task
+            {% endif %}
+          {% else %}
+            Create Maintenance Task
+          {% endif %}
+        </h2>
+        {% if object.pk %}
+          <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-sm mb-4 p-3 bg-base-200 rounded">
+            <span class="text-base-content/60">Created by</span>
+            <span>{{ object.created_by }}</span>
+            <span class="text-base-content/60">Created at</span>
+            <span>{{ object.created|date:preferences.argus_htmx.datetime_format }}</span>
+          </div>
+        {% endif %}
+        <form method="post"
+              action="{% if object.pk %}{% url 'htmx:plannedmaintenance-update' pk=object.pk %}{% else %}{% url 'htmx:plannedmaintenance-create' %}{% endif %}">
+          {% csrf_token %}
+          {% if form.non_field_errors %}
+            <div class="alert alert-error mb-4">
+              {% for error in form.non_field_errors %}<span>{{ error }}</span>{% endfor %}
+            </div>
+          {% endif %}
+          <div class="flex flex-col gap-4">
+            {# Start time field #}
+            <div class="form-control w-full">
+              {% if form.start_time %}
+                <label class="label" for="{{ form.start_time.auto_id }}">
+                  <span class="label-text"><em>Start time</em></span>
+                </label>
+                {% render_field form.start_time class+="input input-bordered w-full" %}
+                {% if form.start_time.errors %}
+                  <div class="label">
+                    {% for error in form.start_time.errors %}<span class="label-text-alt text-error">{{ error }}</span>{% endfor %}
+                  </div>
+                {% endif %}
+              {% else %}
+                <label class="label" for="disabled-start-time">
+                  <span class="label-text"><em>Start time</em></span>
+                </label>
+                <input type="text"
+                       id="disabled-start-time"
+                       disabled
+                       value="{{ object.start_time|date:preferences.argus_htmx.datetime_format }}"
+                       class="input input-bordered w-full input-disabled" />
+                {% if object.current %}
+                  <div class="label">
+                    <span class="label-text-alt">Cannot be changed for ongoing tasks</span>
+                  </div>
+                {% endif %}
+              {% endif %}
+            </div>
+            {# End time field #}
+            <div class="form-control w-full">
+              {% if form.end_time %}
+                <label class="label" for="{{ form.end_time.auto_id }}">
+                  <span class="label-text"><em>End time</em></span>
+                </label>
+                {% render_field form.end_time class+="input input-bordered w-full" %}
+                {% if form.end_time.errors %}
+                  <div class="label">
+                    {% for error in form.end_time.errors %}<span class="label-text-alt text-error">{{ error }}</span>{% endfor %}
+                  </div>
+                {% endif %}
+              {% else %}
+                <label class="label" for="disabled-end-time">
+                  <span class="label-text"><em>End time</em></span>
+                </label>
+                <input type="text"
+                       id="disabled-end-time"
+                       disabled
+                       value="{{ object.end_time|date:preferences.argus_htmx.datetime_format }}"
+                       class="input input-bordered w-full input-disabled" />
+              {% endif %}
+            </div>
+            {# Description field #}
+            <div class="form-control w-full">
+              {% if form.description %}
+                <label class="label" for="{{ form.description.auto_id }}">
+                  <span class="label-text"><em>Description</em></span>
+                </label>
+                {% render_field form.description class+="input input-bordered w-full" %}
+                {% if form.description.errors %}
+                  <div class="label">
+                    {% for error in form.description.errors %}<span class="label-text-alt text-error">{{ error }}</span>{% endfor %}
+                  </div>
+                {% endif %}
+              {% else %}
+                <label class="label" for="disabled-description">
+                  <span class="label-text"><em>Description</em></span>
+                </label>
+                <input type="text"
+                       id="disabled-description"
+                       disabled
+                       value="{{ object.description|default:'-' }}"
+                       class="input input-bordered w-full input-disabled" />
+              {% endif %}
+            </div>
+            {# Filters field #}
+            {% if form.filters %}
+              <div class="form-control w-full">
+                <label class="label" for="{{ form.filters.auto_id }}">
+                  <span class="label-text"><em>Filters</em></span>
+                </label>
+                {{ form.filters }}
+                <div class="label">
+                  <span class="label-text-alt">Select which filters define incidents covered by this maintenance</span>
+                </div>
+                {% if form.filters.errors %}
+                  <div class="label">
+                    {% for error in form.filters.errors %}<span class="label-text-alt text-error">{{ error }}</span>{% endfor %}
+                  </div>
+                {% endif %}
+              </div>
+            {% elif object.filters.exists %}
+              <div class="form-control w-full">
+                <span class="label">
+                  <span class="label-text"><em>Filters</em></span>
+                </span>
+                <div class="p-3 bg-base-200 rounded flex flex-wrap gap-1">
+                  {% for filter in object.filters.all %}<span class="badge badge-outline badge-sm">{{ filter.name }}</span>{% endfor %}
+                </div>
+              </div>
+            {% endif %}
+          </div>
+          <div class="card-actions justify-end mt-6">
+            {% if object.past %}
+              <a href="{% url 'htmx:plannedmaintenance-list' %}?tab=past" class="btn">Back</a>
+            {% else %}
+              <button type="submit" class="btn btn-primary">
+                {% if object.pk %}
+                  Save changes
+                {% else %}
+                  Create
+                {% endif %}
+              </button>
+              <a href="{% url 'htmx:plannedmaintenance-list' %}" class="btn">Cancel</a>
+            {% endif %}
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 {% endblock plannedmaintenance_main %}

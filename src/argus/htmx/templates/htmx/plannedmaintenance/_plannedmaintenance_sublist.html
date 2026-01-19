@@ -1,9 +1,0 @@
-<section class="max-w-4xl w-full">
-  <h2 class="text-2xl">{{ list_title }} ({{ object_list.count }})</h2>
-  {% comment %}
-	  <div class="card card-base card-gray mt-4 mb-8" hx-get="{% url "htmx:plannedmaintenance-create" %}" hx-swap="innerHTML" hx-trigger="load once" hx-select="section>section"></div>
-  {% endcomment %}
-  {% for object in object_list %}
-    <div class="card card-base my-4">{% include "./_plannedmaintenance_detail.html" %}</div>
-  {% endfor %}
-</section>

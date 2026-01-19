@@ -1,8 +1,87 @@
 {% extends "./base.html" %}
 {% block plannedmaintenance_main %}
-  <a class="btn btn-primary"
-     href="{% url "htmx:plannedmaintenance-create" %}">Create new</a>
-  {% include "./_plannedmaintenance_sublist.html" with object_list=object_list.current list_title="Ongoing" %}
-  {% include "./_plannedmaintenance_sublist.html" with object_list=object_list.future list_title="Future" %}
-  {% include "./_plannedmaintenance_sublist.html" with object_list=object_list.past list_title="Past" %}
+  <div class="flex flex-col gap-4 max-w-6xl w-full">
+    <div class="flex justify-between items-center">
+      <div role="tablist" class="tabs tabs-boxed">
+        <a role="tab"
+           class="tab {% if current_tab == 'upcoming' %}tab-active{% endif %}"
+           href="?tab=upcoming">Upcoming</a>
+        <a role="tab"
+           class="tab {% if current_tab == 'past' %}tab-active{% endif %}"
+           href="?tab=past">Past</a>
+      </div>
+      <a class="btn btn-primary"
+         href="{% url 'htmx:plannedmaintenance-create' %}">Create new</a>
+    </div>
+    <table class="border border-separate border-spacing-1 border-primary table {% if preferences.argus_htmx.incidents_table_layout_compact %}table-xs{% endif %}">
+      <thead>
+        <tr class="border-b border-primary bg-base-100">
+          <th class="border-b border-primary">Status</th>
+          <th class="border-b border-primary">Time Window</th>
+          <th class="border-b border-primary">Description</th>
+          <th class="border-b border-primary">Filters</th>
+          <th class="border-b border-primary">Created by</th>
+          <th class="border-b border-primary text-right">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for task in object_list %}
+          <tr class="group">
+            <td class="border-b border-neutral-content group-last:border-b-0 whitespace-nowrap">
+              {% if task.current %}
+                <span class="badge badge-success">Ongoing</span>
+              {% elif task.future %}
+                <span class="badge badge-info">Scheduled</span>
+              {% else %}
+                <span class="badge badge-ghost">Completed</span>
+              {% endif %}
+            </td>
+            <td class="border-b border-neutral-content group-last:border-b-0 whitespace-nowrap">
+              <div class="flex flex-col">
+                <span>{{ task.start_time|date:preferences.argus_htmx.datetime_format }}</span>
+                <span class="text-base-content/60">to {{ task.end_time|date:preferences.argus_htmx.datetime_format }}</span>
+              </div>
+            </td>
+            <td class="border-b border-neutral-content group-last:border-b-0">{{ task.description|default:"-" }}</td>
+            <td class="border-b border-neutral-content group-last:border-b-0">
+              <div class="flex flex-wrap gap-1">
+                {% for filter in task.filters.all %}
+                  <span class="badge badge-primary text-xs">{{ filter.name }}</span>
+                {% empty %}
+                  <span class="text-base-content/60">None</span>
+                {% endfor %}
+              </div>
+            </td>
+            <td class="border-b border-neutral-content group-last:border-b-0">{{ task.created_by }}</td>
+            <td class="border-b border-neutral-content group-last:border-b-0 text-right">
+              <div class="flex gap-1 justify-end">
+                {% if task.modifiable %}
+                  <a href="{% url 'htmx:plannedmaintenance-update' pk=task.pk %}"
+                     class="btn btn-sm btn-ghost">Edit</a>
+                  {% if task.current %}
+                    {% include "./_cancel_confirm_dialog.html" with task=task %}
+                  {% elif task.future %}
+                    {% include "./_delete_confirm_dialog.html" with task=task %}
+                  {% endif %}
+                {% else %}
+                  <a href="{% url 'htmx:plannedmaintenance-update' pk=task.pk %}"
+                     class="btn btn-sm btn-ghost">View</a>
+                {% endif %}
+              </div>
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="6" class="text-center text-base-content/60 py-4">
+              {% if current_tab == 'past' %}
+                No past maintenance tasks
+              {% else %}
+                No upcoming maintenance tasks
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
 {% endblock plannedmaintenance_main %}
