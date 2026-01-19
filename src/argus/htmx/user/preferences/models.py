@@ -7,6 +7,7 @@ from argus.htmx.constants import (
 from argus.htmx.incident.utils import update_interval_string
 from .forms import (
     DateTimeFormatForm,
+    IncidentFilterPreferenceForm,
     IncidentsTableLayout,
     IncidentsTableColumnForm,
     PageSizeForm,
@@ -24,6 +25,7 @@ class ArgusHtmxPreferences:
         "update_interval": UpdateIntervalForm.get_preference_field(),
         "incidents_table_layout": IncidentsTableLayout.get_preference_field(),
         "incidents_table_column_name": IncidentsTableColumnForm.get_preference_field(),
+        "incident_filter": IncidentFilterPreferenceForm.get_preference_field(),
     }
 
     def update_context(self, context):

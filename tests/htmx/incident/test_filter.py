@@ -7,6 +7,7 @@ from django.http import QueryDict
 from django.test import RequestFactory, TestCase
 
 from argus.auth.factories import PersonUserFactory
+from argus.auth.utils import get_preference_obj
 from argus.filter.factories import FilterFactory
 from argus.htmx.incident.filter import IncidentFilterForm, NamedFilterForm, create_named_filter, incident_list_filter
 from argus.htmx.incident.views import search_tags
@@ -174,6 +175,72 @@ class TestCreateNamedFilter(TestCase):
         filter_name = "myfilter"
         form, _ = create_named_filter(self.request, filter_name, self.filterblob)
         assert isinstance(form, NamedFilterForm)
+
+
+class TestFilterPreference(TestCase):
+    def setUp(self):
+        disconnect_signals()
+        self.source = SourceSystemFactory(name="testsource")
+        self.qs = Incident.objects.filter(source=self.source)
+        self.factory = RequestFactory()
+        self.user = PersonUserFactory()
+
+    def tearDown(self):
+        connect_signals()
+
+    def _setup_request(self, request):
+        request.user = self.user
+        SessionMiddleware(lambda x: x).process_request(request)
+        MessageMiddleware(lambda x: x).process_request(request)
+        request.session["selected_filter"] = None
+
+    def test_use_empty_filter_uses_default_values(self):
+        """use_empty_filter=True should use DEFAULT_VALUES"""
+        request = self.factory.get("/incidents/")
+        self._setup_request(request)
+
+        form, _ = incident_list_filter(request, self.qs, use_empty_filter=True)
+
+        assert form.is_valid()
+        filterblob = form.to_filterblob()
+        assert filterblob.get("maxlevel") == IncidentFilterForm.DEFAULT_VALUES["maxlevel"]
+
+    def test_stored_preference_is_loaded_when_no_url_params(self):
+        """When no URL filter params, stored preference should be loaded"""
+        request = self.factory.get("/incidents/")
+        self._setup_request(request)
+
+        # Store a preference
+        prefs = get_preference_obj(request, "argus_htmx")
+        prefs.save_preference("incident_filter", {"maxlevel": 2, "open": True, "acked": None})
+
+        form, _ = incident_list_filter(request, self.qs)
+
+        assert form.to_filterblob().get("maxlevel") == 2
+
+    def test_empty_form_when_no_preference_and_no_url_params(self):
+        """When no stored preference and no URL params, unbound empty form is used"""
+        request = self.factory.get("/incidents/")
+        self._setup_request(request)
+
+        # Ensure no preference is stored
+        prefs = get_preference_obj(request, "argus_htmx")
+        prefs.save_preference("incident_filter", {})
+
+        form, _ = incident_list_filter(request, self.qs)
+
+        # An unbound form (None passed to constructor) is not bound
+        assert not form.is_bound
+
+    def test_invalid_form_with_get_params_shows_error_messages(self):
+        """Invalid filter with GET params should add error messages"""
+        request = self.factory.get("/incidents/", {"tags": "invalid-no-equals"})
+        self._setup_request(request)
+
+        form, _ = incident_list_filter(request, self.qs)
+
+        assert not form.is_valid()
+        assert "tags" in form.errors
 
 
 class TestSearchTagsFilter(TestCase):
