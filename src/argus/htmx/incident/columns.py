@@ -269,6 +269,11 @@ _BUILTIN_COLUMN_LIST = [
         "htmx/incident/cells/_incident_tags.html",
         detail_link=True,
     ),
+    IncidentTableColumn(
+        "under_maintenance",
+        "Maintenance",
+        "htmx/incident/cells/_incident_maintenance.html",
+    ),
 ]
 BUILTIN_COLUMNS = {col.name: col for col in _BUILTIN_COLUMN_LIST}
 
