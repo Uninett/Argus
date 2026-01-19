@@ -134,12 +134,12 @@ class TimeRecurrence(models.Model):
 
 
 class FilterQuerySet(models.QuerySet):
-    def usable_by_user(self, user):
+    def usable_by(self, user: User):
         public = models.Q(public=True)
         owned = models.Q(user=user)
         return self.filter(public | owned)
 
-    def editable_by_user(self, user):
+    def editable_by(self, user: User):
         return self.filter(user=user)
 
 
@@ -157,7 +157,7 @@ class Filter(models.Model):
     def __str__(self):
         return f"{self.name} [{self.filter}]"
 
-    def editable_by_user(self, user):
+    def editable_by(self, user: User):
         if self.user == user:
             return True
         return False

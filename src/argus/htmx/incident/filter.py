@@ -202,7 +202,7 @@ class FilterListView(ListView):
     template_name = "htmx/incident/filter_list.html"
 
     def get_queryset(self):
-        return super().get_queryset().usable_by_user(self.request.user)
+        return super().get_queryset().usable_by(self.request.user)
 
     def get_success_url(self):
         return reverse("htmx:filter-list")

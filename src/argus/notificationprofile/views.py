@@ -224,10 +224,10 @@ class FilterViewSet(viewsets.ModelViewSet):
     queryset = Filter.objects.none()
 
     def get_queryset(self):
-        return Filter.objects.usable_by_user(self.request.user)
+        return Filter.objects.usable_by(self.request.user)
 
     def get_editable_queryset(self):
-        return Filter.objects.editable_by_user(self.request.user)
+        return Filter.objects.editable_by(self.request.user)
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)

@@ -150,7 +150,7 @@ def create_filter(request: HtmxHttpRequest):
 @require_POST
 def update_filter(request: HtmxHttpRequest, pk: int):
     filter_obj = get_object_or_404(Filter, id=pk)
-    if not filter_obj.editable_by_user(request.user):
+    if not filter_obj.editable_by(request.user):
         return HttpResponseForbidden(f"{request.user} may not alter this filter")
     incident_list_filter = get_filter_function()
     filter_form, _ = incident_list_filter(request, None)
@@ -171,7 +171,7 @@ def update_filter(request: HtmxHttpRequest, pk: int):
 @require_POST
 def delete_filter(request: HtmxHttpRequest, pk: int):
     filter_obj = get_object_or_404(Filter, id=pk)
-    if not filter_obj.editable_by_user(request.user):
+    if not filter_obj.editable_by(request.user):
         return HttpResponseForbidden(f"{request.user} may not alter this filter")
     deleted_id = filter_obj.delete()
     if deleted_id:
