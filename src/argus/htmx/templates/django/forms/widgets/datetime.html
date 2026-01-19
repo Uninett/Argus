@@ -1,5 +1,5 @@
 <!-- datetime.html -->
-<input type="datetime"
+<input type="{{ widget.type }}"
        name="{{ widget.name }}"
        class="input input-bordered {{ widget.attrs.class }}"
        {% if widget.value != None %}value="{{ widget.value|stringformat:'s' }}"{% endif %}
