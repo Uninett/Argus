@@ -1,11 +1,16 @@
+from django.contrib.auth.mixins import UserPassesTestMixin
 from django.forms import modelform_factory
+from django.http import HttpResponseRedirect
 from django.urls import reverse
-from django.shortcuts import get_object_or_404, redirect
-from django.views.decorators.http import require_http_methods
 from django.views.generic import CreateView, DeleteView, ListView, UpdateView
 
 from argus.htmx.utils import TemplateNameViewMixin
 from argus.plannedmaintenance.models import PlannedMaintenanceTask
+
+
+class UserIsStaffMixin(UserPassesTestMixin):
+    def test_func(self):
+        return self.request.user.is_staff
 
 
 class PlannedMaintenanceMixin(TemplateNameViewMixin):
@@ -26,11 +31,21 @@ class PlannedMaintenanceListView(PlannedMaintenanceMixin, ListView):
     pass
 
 
-class PlannedMaintenanceDeleteView(PlannedMaintenanceMixin, DeleteView):
+class PlannedMaintenanceDeleteView(UserIsStaffMixin, PlannedMaintenanceMixin, DeleteView):
     pass
 
 
-class PlannedMaintenanceCreateView(PlannedMaintenanceMixin, CreateView):
+class PlannedMaintenanceCancelView(UserIsStaffMixin, PlannedMaintenanceMixin, DeleteView):
+    http_method_names = ["post", "delete"]
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        success_url = self.get_success_url()
+        self.object.cancel()
+        return HttpResponseRedirect(success_url)
+
+
+class PlannedMaintenanceCreateView(UserIsStaffMixin, PlannedMaintenanceMixin, CreateView):
     fields = ["start_time", "end_time", "description", "filters"]
 
     def form_valid(self, form):
@@ -40,7 +55,7 @@ class PlannedMaintenanceCreateView(PlannedMaintenanceMixin, CreateView):
         return super().form_valid(form)
 
 
-class PlannedMaintenanceUpdateView(PlannedMaintenanceMixin, UpdateView):
+class PlannedMaintenanceUpdateView(UserIsStaffMixin, PlannedMaintenanceMixin, UpdateView):
     fields = ["start_time", "end_time", "description", "filters"]
     future_fields = fields
     ongoing_fields = ["end_time", "description", "filters"]
@@ -56,10 +71,3 @@ class PlannedMaintenanceUpdateView(PlannedMaintenanceMixin, UpdateView):
             fields = self.future_fields
         form_class = modelform_factory(self.model, fields=fields)
         return form_class
-
-
-@require_http_methods(["POST"])
-def cancel_planned_maintenance(request, pk: int):
-    pm = get_object_or_404(PlannedMaintenanceTask, pk=pk)
-    pm.cancel()
-    return redirect(reverse("htmx:plannedmaintenance-list"))
