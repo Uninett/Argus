@@ -6,7 +6,7 @@ from django.forms import modelform_factory
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils import timezone
-from django.views.generic import CreateView, DeleteView, ListView, UpdateView
+from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
 from argus.htmx.utils import TemplateNameViewMixin
 from argus.plannedmaintenance.models import PlannedMaintenanceTask
@@ -90,17 +90,20 @@ class PlannedMaintenanceCreateView(UserIsStaffMixin, PlannedMaintenanceMixin, Cr
         return super().form_valid(form)
 
 
+class PlannedMaintenanceDetailView(PlannedMaintenanceMixin, DetailView):
+    """Read-only view for viewing maintenance tasks."""
+
+    template_name = "htmx/plannedmaintenance/plannedmaintenance_form.html"
+
+
 class PlannedMaintenanceUpdateView(UserIsStaffMixin, PlannedMaintenanceMixin, UpdateView):
     fields = ["start_time", "end_time", "description", "filters"]
     future_fields = fields
     ongoing_fields = ["end_time", "description", "filters"]
-    past_fields = ["description"]
 
     def get_form_class(self):
         obj = self.get_object()
-        if obj.past:
-            fields = self.past_fields
-        elif obj.current:
+        if obj.current:
             fields = self.ongoing_fields
         else:
             fields = self.future_fields
