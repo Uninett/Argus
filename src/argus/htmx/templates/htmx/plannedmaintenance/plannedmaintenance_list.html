@@ -10,8 +10,10 @@
            class="tab {% if current_tab == 'past' %}tab-active{% endif %}"
            href="?tab=past">Past</a>
       </div>
-      <a class="btn btn-primary"
-         href="{% url 'htmx:plannedmaintenance-create' %}">Create new</a>
+      {% if request.user.is_staff %}
+        <a class="btn btn-primary"
+           href="{% url 'htmx:plannedmaintenance-create' %}">Create new</a>
+      {% endif %}
     </div>
     <table class="border border-separate border-spacing-1 border-primary table {% if preferences.argus_htmx.incidents_table_layout_compact %}table-xs{% endif %}">
       <thead>
@@ -55,7 +57,7 @@
             <td class="border-b border-neutral-content group-last:border-b-0">{{ task.created_by }}</td>
             <td class="border-b border-neutral-content group-last:border-b-0 text-right">
               <div class="flex gap-1 justify-end">
-                {% if task.modifiable %}
+                {% if request.user.is_staff and task.modifiable %}
                   <a href="{% url 'htmx:plannedmaintenance-update' pk=task.pk %}"
                      class="btn btn-sm btn-ghost">Edit</a>
                   {% if task.current %}
@@ -64,7 +66,7 @@
                     {% include "./_delete_confirm_dialog.html" with task=task %}
                   {% endif %}
                 {% else %}
-                  <a href="{% url 'htmx:plannedmaintenance-update' pk=task.pk %}"
+                  <a href="{% url 'htmx:plannedmaintenance-detail' pk=task.pk %}"
                      class="btn btn-sm btn-ghost">View</a>
                 {% endif %}
               </div>

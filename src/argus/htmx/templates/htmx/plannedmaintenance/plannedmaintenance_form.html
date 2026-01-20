@@ -5,12 +5,10 @@
     <div class="card card-compact bg-base-100 shadow-sm border border-base-300">
       <div class="card-body">
         <h2 class="card-title">
-          {% if object.pk %}
-            {% if object.past %}
-              View Maintenance Task
-            {% else %}
-              Edit Maintenance Task
-            {% endif %}
+          {% if object.pk and object.modifiable and request.user.is_staff %}
+            Edit Maintenance Task
+          {% elif object.pk %}
+            Maintenance Task
           {% else %}
             Create Maintenance Task
           {% endif %}
@@ -53,7 +51,7 @@
                        disabled
                        value="{{ object.start_time|date:preferences.argus_htmx.datetime_format }}"
                        class="input input-bordered w-full input-disabled" />
-                {% if object.current %}
+                {% if object.modifiable and object.current %}
                   <div class="label">
                     <span class="label-text-alt">Cannot be changed for ongoing tasks</span>
                   </div>
@@ -128,14 +126,15 @@
                   <span class="label-text"><em>Filters</em></span>
                 </span>
                 <div class="p-3 bg-base-200 rounded flex flex-wrap gap-1">
-                  {% for filter in object.filters.all %}<span class="badge badge-outline badge-sm">{{ filter.name }}</span>{% endfor %}
+                  {% for filter in object.filters.all %}<span class="badge badge-primary text-xs">{{ filter.name }}</span>{% endfor %}
                 </div>
               </div>
             {% endif %}
           </div>
           <div class="card-actions justify-end mt-6">
-            {% if object.past %}
-              <a href="{% url 'htmx:plannedmaintenance-list' %}?tab=past" class="btn">Back</a>
+            {% if object.pk and not object.modifiable or not request.user.is_staff %}
+              <a href="{% if object.past %}{% url 'htmx:plannedmaintenance-list' tab='past' %}{% else %}{% url 'htmx:plannedmaintenance-list' %}{% endif %}"
+                 class="btn">Back</a>
             {% else %}
               <button type="submit" class="btn btn-primary">
                 {% if object.pk %}

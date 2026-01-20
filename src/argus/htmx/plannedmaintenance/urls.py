@@ -10,5 +10,5 @@ urlpatterns = [
     path("<pk>/delete/", views.PlannedMaintenanceDeleteView.as_view(), name="plannedmaintenance-delete"),
     path("<pk>/update/", views.PlannedMaintenanceUpdateView.as_view(), name="plannedmaintenance-update"),
     path("", views.PlannedMaintenanceListView.as_view(), name="plannedmaintenance-list"),
-    # path("<pk>/", views.PlannedMaintenanceDetailView.as_view(), name="plannedmaintenance-detail"),
+    path("<pk>/", views.PlannedMaintenanceDetailView.as_view(), name="plannedmaintenance-detail"),
 ]
