@@ -4,7 +4,10 @@ from rest_framework.authtoken.models import Token
 from argus.notificationprofile.media import send_notifications_to_users
 from argus.notificationprofile.media import background_send_notification
 from argus.notificationprofile.media import send_notification
-from argus.plannedmaintenance.utils import event_covered_by_planned_maintenance
+from argus.plannedmaintenance.utils import (
+    connect_incident_with_planned_maintenance_tasks,
+    event_covered_by_planned_maintenance,
+)
 from .models import (
     Acknowledgement,
     Event,
@@ -65,3 +68,7 @@ def close_token_incident(instance: Token, **kwargs):
         return
 
     token_expiry_incident.set_end(actor=argus_user)
+
+
+def add_planned_maintenance_tasks_covering_incident(instance: Incident, **kwargs):
+    connect_incident_with_planned_maintenance_tasks(incident=instance)

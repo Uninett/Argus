@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Optional, TYPE_CHECKING
 
 from argus.filter import get_filter_backend
-from argus.incident.models import Event, IncidentQuerySet
+from argus.incident.models import Event, Incident, IncidentQuerySet
 from argus.plannedmaintenance.models import PlannedMaintenanceQuerySet, PlannedMaintenanceTask
 
 filter_backend = get_filter_backend()
@@ -86,3 +86,26 @@ def event_covered_by_planned_maintenance(
         if filter_fits:
             return True
     return False
+
+
+def connect_incident_with_planned_maintenance_tasks(
+    incident: Incident, pm_tasks: Optional[PlannedMaintenanceQuerySet] = None
+):
+    """
+    Connects the given incident with all open planned maintenance tasks that are
+    covering it
+
+    Does nothing for closed incidents
+    """
+    if not incident.open:
+        return
+
+    if not pm_tasks:
+        pm_tasks = PlannedMaintenanceTask.objects.all()
+
+    pm_tasks = pm_tasks.current().exclude(incidents__pk=incident.pk)
+
+    for pm in pm_tasks:
+        pmfw = PlannedMaintenanceFilterWrapper(pm)
+        if pmfw.incident_fits(incident):
+            pm.incidents.add(incident)

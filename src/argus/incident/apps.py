@@ -8,6 +8,7 @@ class IncidentConfig(AppConfig):
 
     def ready(self):
         from .signals import (
+            add_planned_maintenance_tasks_covering_incident,
             close_token_incident,
             delete_associated_user,
             delete_associated_event,
@@ -20,3 +21,4 @@ class IncidentConfig(AppConfig):
         post_delete.connect(close_token_incident, "authtoken.Token")
         post_save.connect(close_token_incident, "authtoken.Token")
         post_save.connect(task_background_send_notification, "argus_incident.Event", dispatch_uid="send_notification")
+        post_save.connect(add_planned_maintenance_tasks_covering_incident, "argus_incident.Incident")

@@ -9,6 +9,7 @@ from argus.incident.models import Event, Incident
 from argus.plannedmaintenance.factories import PlannedMaintenanceFactory
 from argus.plannedmaintenance.models import PlannedMaintenanceTask
 from argus.plannedmaintenance.utils import (
+    connect_incident_with_planned_maintenance_tasks,
     event_covered_by_planned_maintenance,
     incidents_covered_by_planned_maintenance_task,
 )
@@ -113,3 +114,48 @@ class TestEventCoveredByPlannedMaintenanceTasks(TestCase):
         )
 
         self.assertFalse(covered)
+
+
+@tag("database")
+class TestConnectIncidentWithPlannedMaintenanceTasks(TestCase):
+    def setUp(self):
+        disconnect_signals()
+
+        default_level = 3
+        self.incident = StatefulIncidentFactory(level=default_level)
+
+        self.hitting_filter = FilterFactory(filter={"maxlevel": default_level})
+        self.covering_pm = PlannedMaintenanceFactory()
+        self.covering_pm.filters.add(self.hitting_filter)
+
+        self.not_hitting_filter = FilterFactory(filter={"maxlevel": 1})
+        self.not_covering_pm = PlannedMaintenanceFactory()
+        self.not_covering_pm.filters.add(self.not_hitting_filter)
+
+    def teardown(self):
+        connect_signals()
+
+    def test_given_incident_with_fitting_pms_connects_them(self):
+        connect_incident_with_planned_maintenance_tasks(incident=self.incident)
+
+        ids = self.incident.planned_maintenance_tasks.values_list("id", flat=True)
+
+        self.assertIn(self.covering_pm.id, ids)
+        self.assertNotIn(self.not_covering_pm.id, ids)
+
+    def test_given_closed_incident_does_nothing(self):
+        closed_incident = StatefulIncidentFactory(end_time=timezone.now())
+
+        connect_incident_with_planned_maintenance_tasks(incident=closed_incident)
+
+        self.assertFalse(closed_incident.planned_maintenance_tasks.exists())
+
+    def test_given_past_planned_maintenance_tasks_does_nothing(self):
+        now = timezone.now()
+        past_pm = PlannedMaintenanceFactory(start_time=now - timedelta(days=5), end_time=now - timedelta(days=4))
+
+        connect_incident_with_planned_maintenance_tasks(
+            incident=self.incident, pm_tasks=PlannedMaintenanceTask.objects.filter(id=past_pm.id)
+        )
+
+        self.assertFalse(self.incident.planned_maintenance_tasks.exists())
