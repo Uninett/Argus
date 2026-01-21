@@ -5,10 +5,10 @@
       <div role="tablist" class="tabs tabs-boxed">
         <a role="tab"
            class="tab {% if current_tab == 'upcoming' %}tab-active{% endif %}"
-           href="?tab=upcoming">Upcoming</a>
+           href="{% url 'htmx:plannedmaintenance-list' tab='upcoming' %}">Upcoming</a>
         <a role="tab"
            class="tab {% if current_tab == 'past' %}tab-active{% endif %}"
-           href="?tab=past">Past</a>
+           href="{% url 'htmx:plannedmaintenance-list' tab='past' %}">Past</a>
       </div>
       {% if request.user.is_staff %}
         <a class="btn btn-primary"
