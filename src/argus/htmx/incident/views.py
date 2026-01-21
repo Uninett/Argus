@@ -9,10 +9,8 @@ from typing import Optional, Any
 from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib import messages
-from django.utils.timezone import now as tznow
-from django.shortcuts import render, get_object_or_404
-from django.views.decorators.http import require_POST, require_GET
 from django.core.paginator import Paginator
+from django.db.models import Q
 from django.http import (
     HttpResponse,
     HttpResponseBadRequest,
@@ -21,6 +19,9 @@ from django.http import (
     QueryDict,
 )
 from django_htmx.http import HttpResponseClientRefresh, retarget
+from django.utils.timezone import now as tznow
+from django.shortcuts import render, get_object_or_404
+from django.views.decorators.http import require_POST, require_GET
 
 from argus.incident.models import Incident, Tag
 from argus.incident.ticket.utils import get_ticket_plugin_path
@@ -264,6 +265,20 @@ def search_tags(request):
         tags = Tag.objects.filter(key__icontains=query)[:20]
 
     options = [{"id": str(tag), "text": str(tag)} for tag in tags]
+
+    return JsonResponse({"results": options})
+
+
+@require_GET
+def search_filters(request):
+    query = request.GET.get("q", "")
+
+    filters = Filter.objects.select_related("user")
+    if query:
+        filters = filters.filter(Q(name__icontains=query) | Q(user__username__icontains=query))
+    filters = sorted(filters, key=lambda f: (f.user != request.user, f.name))[:20]
+
+    options = [{"id": f.pk, "text": f"{f.name} ({f.user.username})"} for f in filters]
 
     return JsonResponse({"results": options})
 

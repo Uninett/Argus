@@ -2,7 +2,7 @@
 <select id="id_{{ widget.name }}"
         name="{{ widget.name }}"
         class="hidden"
-        data-placeholder="Search for {{ widget.name }}..."
+        data-placeholder="{% if widget.attrs.placeholder %}{{ widget.attrs.placeholder }}{% else %}Search for {{ widget.name }}...{% endif %}"
         multiple="true">
   {% for _, options, _ in widget.optgroups %}
     {% for option in options %}

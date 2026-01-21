@@ -106,13 +106,13 @@
             </div>
             {# Filters field #}
             {% if form.filters %}
-              <div class="form-control w-full">
+              <div class="form-control w-full [&_.choices]:w-full [&_.choices]:max-w-none">
                 <label class="label" for="{{ form.filters.auto_id }}">
                   <span class="label-text"><em>Filters</em></span>
                 </label>
                 {{ form.filters }}
                 <div class="label">
-                  <span class="label-text-alt">Select which filters define incidents covered by this maintenance</span>
+                  <span class="label-text-alt">Select filters that define incidents covered by this maintenance. Filters should include source system IDs, source types, or tags to be effective.</span>
                 </div>
                 {% if form.filters.errors %}
                   <div class="label">
