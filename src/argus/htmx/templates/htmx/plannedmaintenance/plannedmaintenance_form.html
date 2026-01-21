@@ -63,8 +63,9 @@
               {% if form.end_time %}
                 <label class="label" for="{{ form.end_time.auto_id }}">
                   <span class="label-text"><em>End time</em></span>
+                  <button type="button" class="btn btn-link btn-xs" onclick="setEndTimeToNow()">Set to current time</button>
                 </label>
-                {% render_field form.end_time class+="input input-bordered w-full" %}
+                {% render_field form.end_time class+="input input-bordered w-full" placeholder="Infinite" %}
                 {% if form.end_time.errors %}
                   <div class="label">
                     {% for error in form.end_time.errors %}<span class="label-text-alt text-error">{{ error }}</span>{% endfor %}
@@ -77,7 +78,7 @@
                 <input type="text"
                        id="disabled-end-time"
                        disabled
-                       value="{{ object.end_time|date:preferences.argus_htmx.datetime_format }}"
+                       value="{% if object.end_time.year >= 9999 %}Infinite{% else %}{{ object.end_time|date:preferences.argus_htmx.datetime_format }}{% endif %}"
                        class="input input-bordered w-full input-disabled" />
               {% endif %}
             </div>
@@ -153,10 +154,30 @@
 {% endblock plannedmaintenance_main %}
 {% block tail %}
   <script>
-    flatpickr('.flatpickr-datetime', {
+    const flatpickrInstances = flatpickr('.flatpickr-datetime', {
       enableTime: true,
       dateFormat: 'Y-m-d H:i',
       time_24hr: true,
     });
+
+    // Clear infinite dates (year 9999) from end_time field to show placeholder
+    const endTimeInput = document.getElementById('id_end_time');
+    if (endTimeInput && endTimeInput.value.startsWith('9999')) {
+      const endTimeInstance = Array.isArray(flatpickrInstances)
+        ? flatpickrInstances.find(fp => fp.element === endTimeInput)
+        : flatpickrInstances;
+      if (endTimeInstance) {
+        endTimeInstance.clear();
+      }
+    }
+
+    function setEndTimeToNow() {
+      const endTimeInstance = Array.isArray(flatpickrInstances)
+        ? flatpickrInstances.find(fp => fp.element.id === 'id_end_time')
+        : flatpickrInstances;
+      if (endTimeInstance) {
+        endTimeInstance.setDate(new Date());
+      }
+    }
   </script>
 {% endblock tail %}

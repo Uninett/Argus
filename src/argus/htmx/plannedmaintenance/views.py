@@ -1,5 +1,3 @@
-from datetime import timedelta
-
 from django import forms
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
@@ -13,6 +11,7 @@ from argus.htmx.utils import TemplateNameViewMixin
 from argus.htmx.widgets import SearchDropdownMultiSelect
 from argus.notificationprofile.models import Filter
 from argus.plannedmaintenance.models import PlannedMaintenanceTask
+from argus.util.datetime_utils import LOCAL_INFINITY
 
 FLATPICKR_DATETIME_FORMAT = "%Y-%m-%d %H:%M"
 
@@ -93,6 +92,8 @@ class FilterWidgetMixin:
         if "filters" in form.fields:
             form.fields["filters"].queryset = Filter.objects.select_related("user")
             form.fields["filters"].label_from_instance = lambda obj: f"{obj.name} ({obj.user.username})"
+        if "end_time" in form.fields:
+            form.fields["end_time"].required = False
         return form
 
 
@@ -116,13 +117,14 @@ class PlannedMaintenanceCreateView(UserIsStaffMixin, FilterWidgetMixin, PlannedM
 
     def get_initial(self):
         initial = super().get_initial()
-        now = timezone.now()
-        initial["start_time"] = now
-        initial["end_time"] = now + timedelta(hours=1)
+        initial["start_time"] = timezone.now()
+        # end_time defaults to infinite (no initial value)
         return initial
 
     def form_valid(self, form):
         form.instance.created_by = self.request.user
+        if not form.instance.end_time:
+            form.instance.end_time = LOCAL_INFINITY
         return super().form_valid(form)
 
 
@@ -159,3 +161,8 @@ class PlannedMaintenanceUpdateView(
             widgets["filters"] = self.get_filter_widget()
 
         return modelform_factory(self.model, fields=fields, widgets=widgets)
+
+    def form_valid(self, form):
+        if not form.instance.end_time:
+            form.instance.end_time = LOCAL_INFINITY
+        return super().form_valid(form)

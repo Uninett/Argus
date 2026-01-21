@@ -8,6 +8,7 @@ from argus.auth.factories import AdminUserFactory, PersonUserFactory
 from argus.filter.factories import FilterFactory
 from argus.plannedmaintenance.factories import PlannedMaintenanceFactory
 from argus.plannedmaintenance.models import MODIFICATION_WINDOW_PM, PlannedMaintenanceTask
+from argus.util.datetime_utils import LOCAL_INFINITY
 
 
 @tag("integration")
@@ -19,11 +20,11 @@ class PlannedMaintenanceListViewTests(TestCase):
         now = timezone.now()
         self.future_pm = PlannedMaintenanceFactory(
             start_time=now + timedelta(days=1),
-            end_time=now + timedelta(days=2),
+            end_time=LOCAL_INFINITY,
         )
         self.current_pm = PlannedMaintenanceFactory(
             start_time=now - timedelta(hours=1),
-            end_time=now + timedelta(hours=1),
+            end_time=LOCAL_INFINITY,
         )
         self.past_pm = PlannedMaintenanceFactory(
             start_time=now - timedelta(days=2),
@@ -82,12 +83,11 @@ class PlannedMaintenanceCreateViewTests(TestCase):
         response = self.client.get(reverse("htmx:plannedmaintenance-create"))
         self.assertEqual(response.status_code, 200)
 
-    def test_create_view_has_initial_values(self):
+    def test_create_view_has_initial_start_time(self):
         self.client.force_login(self.staff_user)
         response = self.client.get(reverse("htmx:plannedmaintenance-create"))
         form = response.context["form"]
         self.assertIn("start_time", form.initial)
-        self.assertIn("end_time", form.initial)
 
     def test_create_view_sets_created_by(self):
         self.client.force_login(self.staff_user)
@@ -134,11 +134,11 @@ class PlannedMaintenanceUpdateViewTests(TestCase):
         now = timezone.now()
         self.future_pm = PlannedMaintenanceFactory(
             start_time=now + timedelta(days=1),
-            end_time=now + timedelta(days=2),
+            end_time=LOCAL_INFINITY,
         )
         self.current_pm = PlannedMaintenanceFactory(
             start_time=now - timedelta(days=1),
-            end_time=now + timedelta(days=1),
+            end_time=LOCAL_INFINITY,
         )
         self.non_modifiable_pm = PlannedMaintenanceFactory(
             start_time=now - MODIFICATION_WINDOW_PM - timedelta(hours=2),
@@ -182,7 +182,7 @@ class PlannedMaintenanceDeleteViewTests(TestCase):
         now = timezone.now()
         self.future_pm = PlannedMaintenanceFactory(
             start_time=now + timedelta(days=1),
-            end_time=now + timedelta(days=2),
+            end_time=LOCAL_INFINITY,
         )
         self.non_modifiable_pm = PlannedMaintenanceFactory(
             start_time=now - MODIFICATION_WINDOW_PM - timedelta(hours=2),
