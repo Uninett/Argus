@@ -22,7 +22,7 @@ def check_for_valid_themes_list(app_configs, **kwargs):
         return [
             Error(
                 "no themes installed",
-                hint=f'Check the settings "DAISYUI_THEMES" and "TAILWIND_THEME_OVERRIDE" and regenerate {styles_path}',
+                hint=f'Check the setting "DAISYUI_THEMES" and regenerate {styles_path}',
                 id="argus_htmx.T002",
             )
         ]
