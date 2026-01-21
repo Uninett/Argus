@@ -2,6 +2,7 @@ from datetime import timedelta
 
 from django import forms
 from django.contrib.auth.mixins import UserPassesTestMixin
+from django.core.exceptions import PermissionDenied
 from django.forms import modelform_factory
 from django.http import HttpResponseRedirect
 from django.urls import reverse
@@ -54,11 +55,21 @@ class PlannedMaintenanceListView(PlannedMaintenanceMixin, ListView):
             return (qs.current() | qs.future()).order_by("start_time")
 
 
-class PlannedMaintenanceDeleteView(UserIsStaffMixin, PlannedMaintenanceMixin, DeleteView):
+class ModifiableObjectMixin:
+    """Mixin that raises PermissionDenied if the object is no longer modifiable."""
+
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset)
+        if not obj.modifiable:
+            raise PermissionDenied("This maintenance task can no longer be modified.")
+        return obj
+
+
+class PlannedMaintenanceDeleteView(UserIsStaffMixin, ModifiableObjectMixin, PlannedMaintenanceMixin, DeleteView):
     pass
 
 
-class PlannedMaintenanceCancelView(UserIsStaffMixin, PlannedMaintenanceMixin, DeleteView):
+class PlannedMaintenanceCancelView(UserIsStaffMixin, ModifiableObjectMixin, PlannedMaintenanceMixin, DeleteView):
     http_method_names = ["post", "delete"]
 
     def delete(self, request, *args, **kwargs):
@@ -121,7 +132,9 @@ class PlannedMaintenanceDetailView(PlannedMaintenanceMixin, DetailView):
     template_name = "htmx/plannedmaintenance/plannedmaintenance_form.html"
 
 
-class PlannedMaintenanceUpdateView(UserIsStaffMixin, FilterWidgetMixin, PlannedMaintenanceMixin, UpdateView):
+class PlannedMaintenanceUpdateView(
+    UserIsStaffMixin, ModifiableObjectMixin, FilterWidgetMixin, PlannedMaintenanceMixin, UpdateView
+):
     fields = ["start_time", "end_time", "description", "filters"]
     future_fields = fields
     ongoing_fields = ["end_time", "description", "filters"]
