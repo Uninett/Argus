@@ -1,4 +1,9 @@
 {% extends "htmx/base.html" %}
+{% load static %}
+{% block head %}
+  <script src="{% static flatpickr_js_path %}"></script>
+  <link rel="stylesheet" href="{% static flatpickr_css_path %}">
+{% endblock head %}
 {% block main %}
   {% include "htmx/components/_page_title.html" %}
   <div class="flex flex-col items-center px-4">
