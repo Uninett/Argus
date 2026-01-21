@@ -13,7 +13,7 @@ from argus.htmx.widgets import SearchDropdownMultiSelect
 from argus.notificationprofile.models import Filter
 from argus.plannedmaintenance.models import PlannedMaintenanceTask
 
-DATETIME_LOCAL_FORMAT = "%Y-%m-%dT%H:%M"
+FLATPICKR_DATETIME_FORMAT = "%Y-%m-%d %H:%M"
 
 
 class UserIsStaffMixin(UserPassesTestMixin):
@@ -93,8 +93,12 @@ class PlannedMaintenanceCreateView(UserIsStaffMixin, FilterWidgetMixin, PlannedM
             self.model,
             fields=self.fields,
             widgets={
-                "start_time": forms.DateTimeInput(attrs={"type": "datetime-local"}, format=DATETIME_LOCAL_FORMAT),
-                "end_time": forms.DateTimeInput(attrs={"type": "datetime-local"}, format=DATETIME_LOCAL_FORMAT),
+                "start_time": forms.DateTimeInput(
+                    attrs={"class": "flatpickr-datetime"}, format=FLATPICKR_DATETIME_FORMAT
+                ),
+                "end_time": forms.DateTimeInput(
+                    attrs={"class": "flatpickr-datetime"}, format=FLATPICKR_DATETIME_FORMAT
+                ),
                 "filters": self.get_filter_widget(),
             },
         )
@@ -131,9 +135,13 @@ class PlannedMaintenanceUpdateView(UserIsStaffMixin, FilterWidgetMixin, PlannedM
 
         widgets = {}
         if "start_time" in fields:
-            widgets["start_time"] = forms.DateTimeInput(attrs={"type": "datetime-local"}, format=DATETIME_LOCAL_FORMAT)
+            widgets["start_time"] = forms.DateTimeInput(
+                attrs={"class": "flatpickr-datetime"}, format=FLATPICKR_DATETIME_FORMAT
+            )
         if "end_time" in fields:
-            widgets["end_time"] = forms.DateTimeInput(attrs={"type": "datetime-local"}, format=DATETIME_LOCAL_FORMAT)
+            widgets["end_time"] = forms.DateTimeInput(
+                attrs={"class": "flatpickr-datetime"}, format=FLATPICKR_DATETIME_FORMAT
+            )
         if "filters" in fields:
             widgets["filters"] = self.get_filter_widget()
 

@@ -151,3 +151,12 @@
     </div>
   </div>
 {% endblock plannedmaintenance_main %}
+{% block tail %}
+  <script>
+    flatpickr('.flatpickr-datetime', {
+      enableTime: true,
+      dateFormat: 'Y-m-d H:i',
+      time_24hr: true,
+    });
+  </script>
+{% endblock tail %}
