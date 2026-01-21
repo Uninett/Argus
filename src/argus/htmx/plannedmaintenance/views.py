@@ -9,6 +9,8 @@ from django.utils import timezone
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
 from argus.htmx.utils import TemplateNameViewMixin
+from argus.htmx.widgets import SearchDropdownMultiSelect
+from argus.notificationprofile.models import Filter
 from argus.plannedmaintenance.models import PlannedMaintenanceTask
 
 DATETIME_LOCAL_FORMAT = "%Y-%m-%dT%H:%M"
@@ -22,7 +24,6 @@ class UserIsStaffMixin(UserPassesTestMixin):
 class PlannedMaintenanceMixin(TemplateNameViewMixin):
     model = PlannedMaintenanceTask
     template_name_piece = "plannedmaintenance"
-    prefix = template_name_piece
 
     def get_success_url(self):
         return reverse("htmx:plannedmaintenance-list")
@@ -67,7 +68,24 @@ class PlannedMaintenanceCancelView(UserIsStaffMixin, PlannedMaintenanceMixin, De
         return HttpResponseRedirect(success_url)
 
 
-class PlannedMaintenanceCreateView(UserIsStaffMixin, PlannedMaintenanceMixin, CreateView):
+class FilterWidgetMixin:
+    """Mixin to configure the filters field with SearchDropdownMultiSelect widget."""
+
+    def get_filter_widget(self):
+        return SearchDropdownMultiSelect(
+            partial_get=reverse("htmx:search-filters"),
+            attrs={"placeholder": "Search by filter name or username..."},
+        )
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        if "filters" in form.fields:
+            form.fields["filters"].queryset = Filter.objects.select_related("user")
+            form.fields["filters"].label_from_instance = lambda obj: f"{obj.name} ({obj.user.username})"
+        return form
+
+
+class PlannedMaintenanceCreateView(UserIsStaffMixin, FilterWidgetMixin, PlannedMaintenanceMixin, CreateView):
     fields = ["start_time", "end_time", "description", "filters"]
 
     def get_form_class(self):
@@ -77,7 +95,7 @@ class PlannedMaintenanceCreateView(UserIsStaffMixin, PlannedMaintenanceMixin, Cr
             widgets={
                 "start_time": forms.DateTimeInput(attrs={"type": "datetime-local"}, format=DATETIME_LOCAL_FORMAT),
                 "end_time": forms.DateTimeInput(attrs={"type": "datetime-local"}, format=DATETIME_LOCAL_FORMAT),
-                "filters": forms.SelectMultiple(attrs={"size": 5}),
+                "filters": self.get_filter_widget(),
             },
         )
 
@@ -99,7 +117,7 @@ class PlannedMaintenanceDetailView(PlannedMaintenanceMixin, DetailView):
     template_name = "htmx/plannedmaintenance/plannedmaintenance_form.html"
 
 
-class PlannedMaintenanceUpdateView(UserIsStaffMixin, PlannedMaintenanceMixin, UpdateView):
+class PlannedMaintenanceUpdateView(UserIsStaffMixin, FilterWidgetMixin, PlannedMaintenanceMixin, UpdateView):
     fields = ["start_time", "end_time", "description", "filters"]
     future_fields = fields
     ongoing_fields = ["end_time", "description", "filters"]
@@ -117,6 +135,6 @@ class PlannedMaintenanceUpdateView(UserIsStaffMixin, PlannedMaintenanceMixin, Up
         if "end_time" in fields:
             widgets["end_time"] = forms.DateTimeInput(attrs={"type": "datetime-local"}, format=DATETIME_LOCAL_FORMAT)
         if "filters" in fields:
-            widgets["filters"] = forms.SelectMultiple(attrs={"size": 5})
+            widgets["filters"] = self.get_filter_widget()
 
         return modelform_factory(self.model, fields=fields, widgets=widgets)
