@@ -34,16 +34,19 @@ class PlannedMaintenanceMixin(TemplateNameViewMixin):
 
 
 class PlannedMaintenanceListView(PlannedMaintenanceMixin, ListView):
+    tab = "upcoming"
+
+    def get_tab(self):
+        return self.kwargs.get("tab") or self.tab
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        tab = self.request.GET.get("tab", "upcoming")
-        context["current_tab"] = tab
+        context["current_tab"] = self.get_tab()
         return context
 
     def get_queryset(self):
-        tab = self.request.GET.get("tab", "upcoming")
         qs = PlannedMaintenanceTask.objects.all()
-        if tab == "past":
+        if self.get_tab() == "past":
             return qs.past().order_by("-end_time")
         else:
             # Upcoming = ongoing + future, ordered by start_time
