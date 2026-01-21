@@ -133,16 +133,34 @@ class TimeRecurrence(models.Model):
         super().save(*args, **kwargs)
 
 
+class FilterQuerySet(models.QuerySet):
+    def usable_by(self, user: User):
+        public = models.Q(public=True)
+        owned = models.Q(user=user)
+        return self.filter(public | owned)
+
+    def editable_by(self, user: User):
+        return self.filter(user=user)
+
+
 class Filter(models.Model):
     user = models.ForeignKey(to=User, on_delete=models.CASCADE, related_name="filters")
     name = models.CharField(max_length=40)
     filter = models.JSONField(default=dict)
+    public = models.BooleanField(default=False)
+
+    objects = FilterQuerySet.as_manager()
 
     class Meta:
         constraints = [models.UniqueConstraint(fields=["name", "user"], name="%(class)s_unique_name_per_user")]
 
     def __str__(self):
         return f"{self.name} [{self.filter}]"
+
+    def editable_by(self, user: User):
+        if self.user == user:
+            return True
+        return False
 
 
 class Media(models.Model):

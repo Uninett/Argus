@@ -13,7 +13,13 @@ from django.utils.timezone import now as tznow
 from django.shortcuts import render, get_object_or_404
 from django.views.decorators.http import require_POST, require_GET
 from django.core.paginator import Paginator
-from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse, QueryDict
+from django.http import (
+    HttpResponse,
+    HttpResponseBadRequest,
+    HttpResponseForbidden,
+    JsonResponse,
+    QueryDict,
+)
 from django_htmx.http import HttpResponseClientRefresh, retarget
 
 from argus.incident.models import Incident, Tag
@@ -145,6 +151,8 @@ def create_filter(request: HtmxHttpRequest):
 @require_POST
 def update_filter(request: HtmxHttpRequest, pk: int):
     filter_obj = get_object_or_404(Filter, id=pk)
+    if not filter_obj.editable_by(request.user):
+        return HttpResponseForbidden(f"{request.user} may not alter this filter")
     incident_list_filter = get_filter_function()
     filter_form, _ = incident_list_filter(request, None)
     if filter_form.is_valid():
@@ -164,6 +172,8 @@ def update_filter(request: HtmxHttpRequest, pk: int):
 @require_POST
 def delete_filter(request: HtmxHttpRequest, pk: int):
     filter_obj = get_object_or_404(Filter, id=pk)
+    if not filter_obj.editable_by(request.user):
+        return HttpResponseForbidden(f"{request.user} may not alter this filter")
     deleted_id = filter_obj.delete()
     if deleted_id:
         messages.success(request, f"Deleted filter {filter_obj.name}.")
