@@ -7,7 +7,7 @@
      hx-target="find .show-selected-box"
      hx-select="#dropdown-{{ widget.attrs.id }} .show-selected-box"
      hx-get="{{ widget.partial_get }}"
-     hx-include="find #{{ widget.attrs.id }}"
+     hx-include="find .dropdown-content"
      {% endblock field_control %}>
   <div tabindex="0"
        role="button"
@@ -28,6 +28,8 @@
   <div tabindex="0"
        class="dropdown-content bg-base-100 rounded-box z-20 min-w-fit w-full max-h-80 overflow-y-auto p-2 mt-0.5 shadow">
     {% block field_template %}
+      {# Hidden input to ensure that a value always is included in the form submission, even when no options are selected #}
+      <input type="hidden" name="{{ widget.name }}" value="">
       {% include "django/forms/widgets/multiple_input.html" %}
     {% endblock field_template %}
   </div>

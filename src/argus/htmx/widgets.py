@@ -46,6 +46,13 @@ class DropdownMultiSelect(ExtraWidgetMixin, forms.CheckboxSelectMultiple):
                     return option.get("selected", False)
         return False
 
+    def value_from_datadict(self, data, files, name):
+        # Filter out falsy values (like empty strings) from submitted values
+        values = super().value_from_datadict(data, files, name)
+        if values:
+            return [v for v in values if v]
+        return values
+
 
 class SearchDropdownMultiSelect(DropdownMultiSelect):
     template_name = "htmx/forms/search_select_multiple.html"
