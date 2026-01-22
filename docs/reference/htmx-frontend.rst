@@ -274,6 +274,9 @@ end_time
                   stateless incidents.
     :Redundant with: narrow_end_time
 
+    .. image:: img/columns/end_time.png
+       :width: 200
+
 narrow_end_time
     :From: end_time
     :Name: end_time
@@ -281,11 +284,17 @@ narrow_end_time
                   Empty for open and stateless incidents.
     :Redundant with: end_time
 
+    .. image:: img/columns/narrow_end_time.png
+       :width: 200
+
 id
     :From: id
     :Name: id
     :Description: The internal id of the incident in argus.
     :Redundant with: search_id
+
+    .. image:: img/columns/id.png
+       :width: 200
 
 search_id
     :From: id
@@ -293,7 +302,7 @@ search_id
     :Description: Search for incidents with a given id.
     :Redundant with: id
 
-    .. image:: img/columns/id.png
+    .. image:: img/columns/search_id.png
        :width: 200
 
 level
@@ -324,6 +333,9 @@ compact_level
                   Full description shown on hover.
     :Redundant with: level, select_levels, compact_select_levels
 
+    .. image:: img/columns/compact_level.png
+       :width: 200
+
 compact_select_levels
     :From: level
     :Name: compact_select_levels
@@ -332,12 +344,18 @@ compact_select_levels
                   be selected.
     :Redundant with: level, select_levels, compact_level
 
+    .. image:: img/columns/compact_select_levels.png
+           :width: 200
+
 under_maintenance
     :From: planned_maintenance_tasks
     :Name: under_maintenance
     :Description: An icon indicating if there exists a planned maintenance task that
                   covers the incident, meaning no notifications are being sent for that
                   incident.
+
+    .. image:: img/columns/under_maintenance.png
+           :width: 200
 
 status
     :From: open
@@ -414,6 +432,9 @@ tags
     :Name: tags
     :Description: All the tags of the incident. Most useful when making
                   a notification filter.
+
+    .. image:: img/columns/tags.png
+       :width: 200
 
 ticket
     :From: ticket_url
