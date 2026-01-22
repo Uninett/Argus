@@ -56,6 +56,80 @@ class TestTimeslotUpdateView(TestCase):
         self.assertIn("formset", response.context)
         self.assertTrue(response.context["formset"].errors)
 
+    def test_start_time_must_be_before_end_time(self):
+        user = PersonUserFactory()
+        timeslot = TimeslotFactory(user=user)
+        recurrence = TimeRecurrenceFactory(timeslot=timeslot)
+        self.client.force_login(user=user)
+
+        post_data = _build_timeslot_post_data(timeslot, [recurrence])
+        formset_prefix = f"timerecurrenceform-{timeslot.pk}"
+        post_data[f"{formset_prefix}-0-start"] = "17:00"
+        post_data[f"{formset_prefix}-0-end"] = "08:00"
+
+        response = self.client.post(
+            reverse("htmx:timeslot-update", kwargs={"pk": timeslot.pk}),
+            data=post_data,
+        )
+
+        self.assertEqual(response.status_code, 200)
+        formset = response.context["formset"]
+        self.assertTrue(formset.errors)
+        self.assertIn("start", formset.errors[0])
+        self.assertIn("before", str(formset.errors[0]["start"]))
+
+    def test_htmx_get_returns_partial_template(self):
+        user = PersonUserFactory()
+        timeslot = TimeslotFactory(user=user)
+        self.client.force_login(user=user)
+
+        response = self.client.get(
+            reverse("htmx:timeslot-update", kwargs={"pk": timeslot.pk}),
+            HTTP_HX_REQUEST="true",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "htmx/timeslot/_timeslot_form.html")
+
+    def test_htmx_valid_post_returns_updated_form(self):
+        user = PersonUserFactory()
+        timeslot = TimeslotFactory(user=user)
+        recurrence = TimeRecurrenceFactory(timeslot=timeslot)
+        self.client.force_login(user=user)
+
+        post_data = _build_timeslot_post_data(timeslot, [recurrence])
+        post_data[f"timeslot-{timeslot.pk}-name"] = "Updated Name"
+
+        response = self.client.post(
+            reverse("htmx:timeslot-update", kwargs={"pk": timeslot.pk}),
+            data=post_data,
+            HTTP_HX_REQUEST="true",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "htmx/timeslot/_timeslot_form.html")
+        self.assertEqual(response.context["form"].instance.pk, timeslot.pk)
+
+    def test_htmx_invalid_post_returns_form_with_errors(self):
+        user = PersonUserFactory()
+        timeslot = TimeslotFactory(user=user)
+        recurrence = TimeRecurrenceFactory(timeslot=timeslot)
+        self.client.force_login(user=user)
+
+        post_data = _build_timeslot_post_data(timeslot, [recurrence])
+        formset_prefix = f"timerecurrenceform-{timeslot.pk}"
+        post_data[f"{formset_prefix}-0-start"] = ""
+
+        response = self.client.post(
+            reverse("htmx:timeslot-update", kwargs={"pk": timeslot.pk}),
+            data=post_data,
+            HTTP_HX_REQUEST="true",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "htmx/timeslot/_timeslot_form.html")
+        self.assertTrue(response.context["formset"].errors)
+
 
 class TestTimeslotCreateView(TestCase):
     def test_get_renders_form_with_formset(self):
@@ -67,27 +141,75 @@ class TestTimeslotCreateView(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("formset", response.context)
 
-    def test_invalid_formset_preserves_errors(self):
+    def test_htmx_get_returns_partial_template(self):
         user = PersonUserFactory()
         self.client.force_login(user=user)
 
-        # Submit with missing required fields
-        post_data = {
-            "name": "Test Timeslot",
-            "time_recurrences-TOTAL_FORMS": "1",
-            "time_recurrences-INITIAL_FORMS": "0",
-            "time_recurrences-MIN_NUM_FORMS": "1",
-            "time_recurrences-MAX_NUM_FORMS": "1000",
-            "time_recurrences-0-start": "",
-            "time_recurrences-0-end": "",
-            "time_recurrences-0-days": [],
-        }
-
-        response = self.client.post(reverse("htmx:timeslot-create"), data=post_data)
+        response = self.client.get(
+            reverse("htmx:timeslot-create"),
+            HTTP_HX_REQUEST="true",
+        )
 
         self.assertEqual(response.status_code, 200)
-        self.assertIn("formset", response.context)
-        self.assertTrue(response.context["formset"].errors)
+        self.assertTemplateUsed(response, "htmx/timeslot/_timeslot_form.html")
+        self.assertTrue(response.context["is_create"])
+
+    def test_htmx_valid_post_returns_fresh_form(self):
+        user = PersonUserFactory()
+        self.client.force_login(user=user)
+
+        post_data = _build_create_post_data(
+            name="New Timeslot",
+            start="08:00",
+            end="17:00",
+            days=[1, 2, 3, 4, 5],
+        )
+
+        response = self.client.post(
+            reverse("htmx:timeslot-create"),
+            data=post_data,
+            HTTP_HX_REQUEST="true",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "htmx/timeslot/_timeslot_form.html")
+        self.assertIsNone(response.context["form"].instance.pk)
+        self.assertTrue(response.context["is_create"])
+
+    def test_htmx_invalid_post_returns_partial_template(self):
+        user = PersonUserFactory()
+        self.client.force_login(user=user)
+
+        post_data = _build_create_post_data(
+            name="New Timeslot",
+            start="",
+            end="17:00",
+            days=[1, 2, 3],
+        )
+
+        response = self.client.post(
+            reverse("htmx:timeslot-create"),
+            data=post_data,
+            HTTP_HX_REQUEST="true",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "htmx/timeslot/_timeslot_form.html")
+        self.assertGreater(response.context["formset"].total_error_count(), 0)
+
+
+def _build_create_post_data(name, start, end, days):
+    """Build POST data for creating a new timeslot."""
+    return {
+        "name": name,
+        "TOTAL_FORMS": "1",
+        "INITIAL_FORMS": "0",
+        "MIN_NUM_FORMS": "1",
+        "MAX_NUM_FORMS": "1000",
+        "0-start": start,
+        "0-end": end,
+        "0-days": [str(d) for d in days],
+    }
 
 
 def _build_timeslot_post_data(timeslot, recurrences, delete_indices=None):
