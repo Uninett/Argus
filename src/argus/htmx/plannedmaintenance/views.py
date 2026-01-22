@@ -70,10 +70,10 @@ class PlannedMaintenanceDeleteView(UserIsStaffMixin, ModifiableObjectMixin, Plan
     pass
 
 
-class PlannedMaintenanceCancelView(UserIsStaffMixin, ModifiableObjectMixin, PlannedMaintenanceMixin, DeleteView):
-    http_method_names = ["post", "delete"]
+class PlannedMaintenanceCancelView(UserIsStaffMixin, ModifiableObjectMixin, PlannedMaintenanceMixin, DetailView):
+    http_method_names = ["post", "head", "options"]
 
-    def delete(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         self.object = self.get_object()
         success_url = self.get_success_url()
         self.object.cancel()
