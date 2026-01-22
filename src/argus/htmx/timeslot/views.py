@@ -204,7 +204,8 @@ class FormsetMixin:
         if message_list:
             message = " ".join(message_list)
             LOG.info(message)
-        return HttpResponseRedirect(self.get_success_url())
+
+        return self.form_valid_response()
 
 
 class TimeslotListView(TimeslotMixin, ListView):
@@ -229,19 +230,37 @@ class TimeslotDetailView(TimeslotMixin, DetailView):
 class TimeslotCreateView(FormsetMixin, TimeslotMixin, CreateView):
     fields = ["name"]
 
+    def get_template_names(self):
+        if self.request.headers.get("HX-Request"):
+            return ["htmx/timeslot/_timeslot_form.html"]
+        return super().get_template_names()
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         if "formset" not in context:
             context["formset"] = make_timerecurrence_formset()
+        context["is_create"] = True
         return context
 
     def post(self, request, *args, **kwargs):
         self.object = None
         return super().post(request, *args, **kwargs)
 
+    def form_valid_response(self):
+        if self.request.headers.get("HX-Request"):
+            # Reset to fresh create form
+            self.object = None
+            return self.render_to_response(self.get_context_data())
+        return HttpResponseRedirect(self.get_success_url())
+
 
 class TimeslotUpdateView(FormsetMixin, TimeslotMixin, UpdateView):
     fields = ["name"]
+
+    def get_template_names(self):
+        if self.request.headers.get("HX-Request"):
+            return ["htmx/timeslot/_timeslot_form.html"]
+        return super().get_template_names()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -255,6 +274,11 @@ class TimeslotUpdateView(FormsetMixin, TimeslotMixin, UpdateView):
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
         return super().post(request, *args, **kwargs)
+
+    def form_valid_response(self):
+        if self.request.headers.get("HX-Request"):
+            return self.render_to_response(self.get_context_data())
+        return HttpResponseRedirect(self.get_success_url())
 
 
 class TimeslotDeleteView(TimeslotMixin, DeleteView):

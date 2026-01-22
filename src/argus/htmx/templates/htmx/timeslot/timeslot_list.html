@@ -1,13 +1,12 @@
 {% extends "./base.html" %}
 {% block timeslot_main %}
   <div class="max-w-4xl w-full">
-    <div class="card card-base card-gray mt-4 mb-8"
-         hx-get="{% url "htmx:timeslot-create" %}"
-         hx-swap="innerHTML"
+    <div hx-get="{% url "htmx:timeslot-create" %}"
+         hx-swap="outerHTML"
          hx-trigger="load once"
-         hx-select="section>section"></div>
+         hx-select="#timeslot-form-create"></div>
     {% for entry in form_list %}
-      <div class="card card-base my-4">{% include "./_timeslot_form.html" with form=entry.form formset=entry.formset %}</div>
+      {% include "./_timeslot_form.html" with form=entry.form formset=entry.formset %}
     {% endfor %}
   </div>
 {% endblock timeslot_main %}
