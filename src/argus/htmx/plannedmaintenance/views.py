@@ -70,10 +70,11 @@ class PlannedMaintenanceDeleteView(UserIsStaffMixin, ModifiableObjectMixin, Plan
     pass
 
 
-class PlannedMaintenanceCancelView(UserIsStaffMixin, ModifiableObjectMixin, PlannedMaintenanceMixin, UpdateView):
+class PlannedMaintenanceCancelView(UserIsStaffMixin, ModifiableObjectMixin, PlannedMaintenanceMixin, DetailView):
     http_method_names = ["post", "head", "options", "trace"]
 
-    def form_valid(self, form):
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
         success_url = self.get_success_url()
         self.object.cancel()
         return HttpResponseRedirect(success_url)
