@@ -1,12 +1,14 @@
 <div class="flex items-center gap-1">
   {% include "htmx/incident/_filter_select.html" %}
-  <div class="join join-horizontal items-center">
-    {% include "htmx/incident/_filter_create_modal.html" with dialog_id="create-filter-dialog" button_title="Create filter" button_class="btn-sm text-xs join-item" header="Create new filter" explanation="Create new filter from currently selected filter parameters" cancel_text="Cancel" submit_text="Submit" %}
-    {% include "htmx/incident/_filter_update_dropdown.html" %}
-    {% include "htmx/incident/_filter_delete_dropdown.html" %}
+  <div id="filter-actions" class="hidden">
+    <div class="join join-horizontal items-center">
+      {% include "htmx/incident/_filter_create_modal.html" with dialog_id="create-filter-dialog" button_title="Create filter" button_class="btn-sm text-xs join-item" header="Create new filter" explanation="Create new filter from currently selected filter parameters" cancel_text="Cancel" submit_text="Submit" %}
+      {% include "htmx/incident/_filter_update_dropdown.html" %}
+      {% include "htmx/incident/_filter_delete_dropdown.html" %}
+    </div>
   </div>
   <button class="btn btn-sm btn-primary"
-          _="on click toggle .hidden on #filterbox toggle .hidden on .filter-toggle-label">
+          _="on click toggle .hidden on #filterbox toggle .hidden on .filter-toggle-label toggle .hidden on #filter-actions">
     <i class="fa-solid fa-filter"></i>
     <span class="filter-toggle-label">Show filters</span>
     <span class="filter-toggle-label hidden">Hide filters</span>
