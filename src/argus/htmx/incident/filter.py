@@ -321,7 +321,10 @@ def _normalize_form_data(request):
         value = raw_data.getlist(key, [])
         if key == "tags":
             value = _normalize_tags_param(value)
-        elif key not in ["source_types", "sourceSystemIds", "event_types"]:
+        elif key in ["source_types", "sourceSystemIds", "event_types"]:
+            # Filter out empty strings to support empty selection in multi-selects
+            value = [v for v in value if v]
+        else:
             value = value[0]
         data[key] = value
     return data
