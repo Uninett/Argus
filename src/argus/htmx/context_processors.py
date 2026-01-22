@@ -19,6 +19,8 @@ def static_paths(request):
         "htmx_path": getattr(settings, "HTMX_PATH", defaults.HTMX_PATH),
         "hyperscript_path": getattr(settings, "HYPERSCRIPT_PATH", defaults.HYPERSCRIPT_PATH),
         "choices_path": getattr(settings, "CHOICES_PATH", defaults.CHOICES_PATH),
+        "flatpickr_js_path": getattr(settings, "FLATPICKR_JS_PATH", defaults.FLATPICKR_JS_PATH),
+        "flatpickr_css_path": getattr(settings, "FLATPICKR_CSS_PATH", defaults.FLATPICKR_CSS_PATH),
     }
 
 

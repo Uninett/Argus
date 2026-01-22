@@ -7,11 +7,8 @@ from urllib.parse import urlencode
 from typing import Optional, Any
 
 from django import forms
-from django.contrib.auth import get_user_model
 from django.contrib import messages
-from django.utils.timezone import now as tznow
-from django.shortcuts import render, get_object_or_404
-from django.views.decorators.http import require_POST, require_GET
+from django.contrib.auth import get_user_model
 from django.core.paginator import Paginator
 from django.http import (
     HttpResponse,
@@ -20,6 +17,10 @@ from django.http import (
     JsonResponse,
     QueryDict,
 )
+from django.shortcuts import render, get_object_or_404
+from django.utils.timezone import now as tznow
+from django.views.decorators.http import require_POST, require_GET
+
 from django_htmx.http import HttpResponseClientRefresh, retarget
 
 from argus.incident.models import Incident, Tag

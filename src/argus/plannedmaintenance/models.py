@@ -83,6 +83,16 @@ class PlannedMaintenanceTask(models.Model):
             time = timezone.now()
         return self.start_time <= time <= self.end_time
 
+    @property
+    def past(self):
+        now = timezone.now()
+        return self.end_time < now
+
+    @property
+    def future(self):
+        now = timezone.now()
+        return self.start_time > now
+
     def cancel(self, end_time: Optional[datetime] = None):
         """
         Sets the end time to the given time, if it is before the current end time

@@ -12,6 +12,20 @@ from argus.incident.models import Incident
 from argus.incident.ticket.utils import autocreate_ticket
 
 
+class TemplateNameViewMixin:
+    template_name_piece: str
+
+    def get_template_names(self):
+        orig_app_label = self.model._meta.app_label
+        orig_model_name = self.model._meta.model_name
+        self.model._meta.app_label = f"htmx/{self.template_name_piece}"
+        self.model._meta.model_name = self.template_name_piece
+        templates = super().get_template_names()
+        self.model._meta.app_label = orig_app_label
+        self.model._meta.model_name = orig_model_name
+        return templates
+
+
 def get_qs_for_incident_ids(incident_ids: list[int], qs=None):
     # setup
     if qs is None:
