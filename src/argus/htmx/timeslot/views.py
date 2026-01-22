@@ -68,6 +68,14 @@ class TimeRecurrenceForm(forms.ModelForm):
             timeobj = timeobj.replace(second=0, microsecond=0)
         return timeobj
 
+    def clean(self):
+        cleaned_data = super().clean()
+        start = cleaned_data.get("start")
+        end = cleaned_data.get("end")
+        if start and end and start >= end:
+            self.add_error("start", "Start time must be before end time.")
+        return cleaned_data
+
 
 class TimeslotForm(forms.ModelForm):
     class Meta:
