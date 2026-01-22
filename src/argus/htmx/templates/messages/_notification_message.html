@@ -1,21 +1,29 @@
 {% load argus_htmx %}
 {% with autoclose=message|autoclose_time %}
   <div class="alert flex justify-between w-fit border-3 bg-base-100 border-opacity-100 {% if message.tags %}{{ message.tags }}{% endif %}"
-       {% if autoclose >= 0 %}_="on load wait {{ autoclose }}s then add .autoclosing to me then wait 0.3s then remove me"{% endif %}>
+       role="{% if 'error' in message.tags or 'warning' in message.tags %}alert{% else %}status{% endif %}"
+       {% if 'error' not in message.tags and 'warning' not in message.tags %}aria-live="polite"{% endif %}
+       _="on load focus() me then {% if autoclose >= 0 %}wait {{ autoclose }}s then add .autoclosing to me then wait 0.3s then remove me{% endif %}"
+       tabindex="-1">
     {% block message-content %}
-      <div>{{ message }}</div>
+      <div class="flex items-center gap-2">
+        {% if "error" in message.tags %}
+          <i class="fa-solid fa-circle-xmark" aria-hidden="true"></i>
+        {% elif "warning" in message.tags %}
+          <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+        {% elif "success" in message.tags %}
+          <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+        {% else %}
+          <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+        {% endif %}
+        <span>{{ message }}</span>
+      </div>
     {% endblock message-content %}
     <button type="button"
-            class="rounded-full p-2 hover:bg-gray-100/10 ring-gray-500/50 ring-inset hover:ring-1 focus:outline-none focus:ring-2"
+            class="btn btn-ghost btn-sm btn-circle"
+            aria-label="Dismiss message"
             _="on click remove closest .alert">
-      <svg class="h-6 w-6"
-           xmlns="http://www.w3.org/2000/svg"
-           fill="none"
-           viewBox="0 0 24 24"
-           stroke="currentColor"
-           aria-hidden="true">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-      </svg>
+      <i class="fa-solid fa-xmark" aria-hidden="true"></i>
     </button>
   </div>
 {% endwith %}

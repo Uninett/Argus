@@ -102,7 +102,6 @@ def incident_update(request: HtmxHttpRequest, action: str):
         return HttpResponseBadRequest("Invalid update action")
     incident_ids = get_incident_ids_to_update(request)
     if not incident_ids:
-        messages.warning(request, "No incidents selected, nothing to change")
         return HttpResponseClientRefresh()
 
     if action == "autocreate-ticket":
@@ -163,7 +162,6 @@ def update_filter(request: HtmxHttpRequest, pk: int):
         # Immediately select the newly updated filter - keep or not?
         # request.session["selected_filter"] = str(filter_obj.id)
 
-        messages.success(request, f"Updated filter '{filter_obj.name}'.")
         return HttpResponseClientRefresh()
     messages.error(request, f"Failed to update filter '{filter_obj.name}'.")
     return HttpResponseBadRequest()
@@ -176,7 +174,6 @@ def delete_filter(request: HtmxHttpRequest, pk: int):
         return HttpResponseForbidden(f"{request.user} may not alter this filter")
     deleted_id = filter_obj.delete()
     if deleted_id:
-        messages.success(request, f"Deleted filter {filter_obj.name}.")
         if request.session.get("selected_filter") == str(pk):
             request.session["selected_filter"] = None
         return HttpResponseClientRefresh()

@@ -4,7 +4,6 @@ from typing import Mapping
 
 from django.conf import settings
 from django.contrib.auth.backends import ModelBackend, RemoteUserBackend
-from django.contrib import messages
 from django.http import HttpRequest
 from django.utils.module_loading import import_string
 
@@ -101,7 +100,6 @@ def _save_preference(request: HttpRequest, prefs: Preferences, preference: str, 
     form = prefs.get_forms()[preference](data, request=request)
 
     if not form.is_valid():
-        messages.warning(request, f"Failed to change {preference}, invalid input")
         LOG.warning("Failed to change %s, invalid input: %s", preference, data)
         return value, False
 
@@ -112,6 +110,5 @@ def _save_preference(request: HttpRequest, prefs: Preferences, preference: str, 
         return value, True
 
     prefs.save_preference(preference, value)
-    messages.success(request, f"Changed {preference}: {old_value} → {value}")
     LOG.info("Changed %s: %s → %s", preference, old_value, value)
     return value, True
