@@ -1,35 +1,40 @@
 {% load widget_tweaks %}
-<section class="card-body max-w-4xl w-full">
-  <form method="post"
-        novalidate
-        action="{% if form.instance.pk %}{% url "htmx:timeslot-update" pk=form.instance.pk %}{% else %}{% url "htmx:timeslot-create" %}{% endif %}">
-    {% csrf_token %}
-    {% if form.errors or formset.total_error_count %}
-      <div class="alert alert-error flex flex-col items-start gap-2 w-full mb-4"
-           role="alert">
-        <div class="flex items-center gap-2 font-semibold">
-          <i class="fa-solid fa-circle-xmark" aria-hidden="true"></i>
-          <span>Please correct the errors below</span>
+<div class="card card-base {% if is_create %}card-gray mt-4 mb-8{% else %}my-4{% endif %}"
+     id="timeslot-form-{{ form.instance.pk|default:'create' }}">
+  <section class="card-body max-w-4xl w-full">
+    <form method="post"
+          novalidate
+          hx-post="{% if form.instance.pk %}{% url "htmx:timeslot-update" pk=form.instance.pk %}{% else %}{% url "htmx:timeslot-create" %}{% endif %}"
+          hx-target="#timeslot-form-{{ form.instance.pk|default:'create' }}"
+          hx-swap="outerHTML">
+      {% csrf_token %}
+      {% if form.errors or formset.total_error_count %}
+        <div class="alert alert-error flex flex-col items-start gap-2 w-full mb-4"
+             role="alert">
+          <div class="flex items-center gap-2 font-semibold">
+            <i class="fa-solid fa-circle-xmark" aria-hidden="true"></i>
+            <span>Please correct the errors below</span>
+          </div>
         </div>
+      {% endif %}
+      <div class="flex flex-col gap-4 w-full">
+        <div class="flex gap-16 justify-between">
+          <div>
+            {% with form.name as field %}
+              {% include "htmx/forms/input_field.html" with label=field.label max_width="md" field=field %}
+            {% endwith %}
+          </div>
+          <div class="card-actions flex items-end">
+            {% if form.instance.pk %}
+              <input type="submit" class="btn btn-primary" value="Save">
+              {% include form.modal.template_name with modal=form.modal %}
+            {% else %}
+              <input type="submit" class="btn btn-primary" value="Create">
+            {% endif %}
+          </div>
+        </div>
+        <div class="flex flex-col gap-4">{{ formset.as_div }}</div>
       </div>
-    {% endif %}
-    <div class="flex flex-col gap-4 w-full">
-      <div class="flex gap-16 justify-between">
-        <div>
-          {% with form.name as field %}
-            {% include "htmx/forms/input_field.html" with label=field.label max_width="md" field=field %}
-          {% endwith %}
-        </div>
-        <div class="card-actions flex items-end">
-          {% if form.instance.pk %}
-            <input type="submit" class="btn btn-primary" value="Save">
-            {% include form.modal.template_name with modal=form.modal %}
-          {% else %}
-            <input type="submit" class="btn btn-primary" value="Create">
-          {% endif %}
-        </div>
-      </div>
-      <div class="flex flex-col gap-4">{{ formset.as_div }}</div>
-    </div>
-  </form>
-</section>
+    </form>
+  </section>
+</div>
