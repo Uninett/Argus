@@ -1,10 +1,12 @@
 from django import forms
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
+from django.db.models import Q
 from django.forms import modelform_factory
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.urls import reverse
 from django.utils import timezone
+from django.views.decorators.http import require_GET
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
 from argus.htmx.utils import TemplateNameViewMixin
@@ -37,18 +39,17 @@ class PlannedMaintenanceMixin(TemplateNameViewMixin):
 class PlannedMaintenanceListView(PlannedMaintenanceMixin, ListView):
     tab = "upcoming"
 
-    def setup(self):
-        super().setup()
-        self.tab = self.kwargs.get("tab", self.tab)
+    def get_tab(self):
+        return self.kwargs.get("tab", self.tab)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["current_tab"] = self.tab
+        context["current_tab"] = self.get_tab()
         return context
 
     def get_queryset(self):
         qs = PlannedMaintenanceTask.objects.all()
-        if self.tab == "past":
+        if self.get_tab() == "past":
             return qs.past().order_by("-end_time")
         else:
             # Upcoming = ongoing + future, ordered by start_time
@@ -167,3 +168,17 @@ class PlannedMaintenanceUpdateView(
         if not form.instance.end_time:
             form.instance.end_time = LOCAL_INFINITY
         return super().form_valid(form)
+
+
+@require_GET
+def search_filters(request):
+    query = request.GET.get("q", "")
+
+    filters = Filter.objects.select_related("user")
+    if query:
+        filters = filters.filter(Q(name__icontains=query) | Q(user__username__icontains=query))
+    filters = sorted(filters, key=lambda f: (f.user != request.user, f.name))[:20]
+
+    options = [{"id": f.pk, "text": f"{f.name} ({f.user.username})"} for f in filters]
+
+    return JsonResponse({"results": options})
