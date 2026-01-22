@@ -73,10 +73,13 @@ class PlannedMaintenanceDeleteView(UserIsStaffMixin, ModifiableObjectMixin, Plan
 class PlannedMaintenanceCancelView(UserIsStaffMixin, ModifiableObjectMixin, PlannedMaintenanceMixin, DeleteView):
     http_method_names = ["post", "delete"]
 
-    def form_valid(self, form):
+    def delete(self, form):
+        self.object = self.get_object()
         success_url = self.get_success_url()
         self.object.cancel()
         return HttpResponseRedirect(success_url)
+
+    post = delete
 
 
 class FilterWidgetMixin:
