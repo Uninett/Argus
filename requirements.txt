@@ -166,7 +166,7 @@ urllib3==2.6.3
     # via
     #   -r constraints.txt
     #   requests
-wheel==0.45.1
+wheel==0.46.2
     # via argus-server (pyproject.toml)
 whitenoise==6.9.0
     # via argus-server (pyproject.toml)
