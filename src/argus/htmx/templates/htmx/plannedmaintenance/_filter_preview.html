@@ -1,0 +1,21 @@
+{% if no_filters %}
+  <p class="text-base-content/60 text-sm italic">Select filters to see which open incidents would be covered.</p>
+{% elif matching_count == 0 %}
+  <p class="text-base-content/60 text-sm">No open incidents match the selected filters.</p>
+{% else %}
+  <div class="text-sm">
+    <p class="font-medium mb-2">
+      Covers {{ matching_count }} open incident{{ matching_count|pluralize }} ({{ matching_percent }}%)
+    </p>
+    {% if incident_list %}
+      <div class="overflow-x-auto">
+        <div class="min-w-max">{% include "htmx/incident/_unpaged_incident_table.html" %}</div>
+      </div>
+      {% if matching_count > incident_list|length %}
+        <p class="text-base-content/60 text-xs mt-1">
+          Showing {{ incident_list|length }} of {{ matching_count }} matching incidents
+        </p>
+      {% endif %}
+    {% endif %}
+  </div>
+{% endif %}

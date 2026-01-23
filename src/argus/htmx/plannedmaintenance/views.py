@@ -4,18 +4,25 @@ from django.core.exceptions import PermissionDenied
 from django.db.models import Q
 from django.forms import modelform_factory
 from django.http import HttpResponseRedirect, JsonResponse
+from django.shortcuts import render
 from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.http import require_GET
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
+from argus.filter.queryset_filters import QuerySetFilter
+from argus.htmx.incident.columns import BUILTIN_COLUMNS
 from argus.htmx.utils import TemplateNameViewMixin
 from argus.htmx.widgets import SearchDropdownMultiSelect
+from argus.incident.models import Incident
 from argus.notificationprofile.models import Filter
 from argus.plannedmaintenance.models import PlannedMaintenanceTask
 from argus.util.datetime_utils import LOCAL_INFINITY
 
 FLATPICKR_DATETIME_FORMAT = "%Y-%m-%d %H:%M"
+FILTER_PREVIEW_TEMPLATE = "htmx/plannedmaintenance/_filter_preview.html"
+FILTER_PREVIEW_COLUMNS = ["start_time", "level", "source_type", "source", "description", "tags"]
+FILTER_PREVIEW_LIMIT = 5
 
 
 class UserIsStaffMixin(UserPassesTestMixin):
@@ -187,3 +194,39 @@ def search_filters(request):
     options = [{"id": f.pk, "text": f"{f.name} ({f.user.username})"} for f in filters]
 
     return JsonResponse({"results": options})
+
+
+@require_GET
+def filter_preview(request):
+    """Return a preview of open incidents that match the selected filters."""
+    filter_ids = [id for id in request.GET.getlist("filters") if id.isdigit()]
+
+    if not filter_ids:
+        return render(request, FILTER_PREVIEW_TEMPLATE, {"no_filters": True})
+
+    open_incidents = Incident.objects.open()
+    total_open = open_incidents.count()
+
+    # All filters must match (AND logic), same as actual PM coverage in utils.py
+    filters = Filter.objects.filter(pk__in=filter_ids)
+    matching_qs = open_incidents
+    for filter_obj in filters:
+        matching_qs = QuerySetFilter.filtered_incidents(filter_obj.filter, matching_qs)
+
+    matching_count = matching_qs.count()
+    matching_percent = round(100 * matching_count / total_open) if total_open else 0
+    incident_list = matching_qs.select_related("source").order_by("-start_time")[:FILTER_PREVIEW_LIMIT]
+
+    return render(
+        request,
+        FILTER_PREVIEW_TEMPLATE,
+        {
+            "matching_count": matching_count,
+            "matching_percent": matching_percent,
+            "total_open": total_open,
+            "incident_list": incident_list,
+            "columns": [BUILTIN_COLUMNS[name] for name in FILTER_PREVIEW_COLUMNS],
+            "compact": True,
+            "dummy_column": True,
+        },
+    )
