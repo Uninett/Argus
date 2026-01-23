@@ -1,7 +1,7 @@
 {% extends "./base.html" %}
 {% load widget_tweaks %}
 {% block plannedmaintenance_main %}
-  <div class="max-w-2xl w-full">
+  <div class="max-w-2xl w-full pb-8">
     <div class="card card-compact bg-base-100 shadow-sm border border-base-300">
       <div class="card-body">
         <h2 class="card-title">
@@ -121,6 +121,15 @@
                   </div>
                 {% endif %}
               </div>
+              {# Filter preview #}
+              <div class="form-control w-full">
+                <label class="label">
+                  <span class="label-text"><em>Preview</em></span>
+                </label>
+                <div id="filter-preview" class="px-1 py-3 min-h-[3rem]">
+                  {% include "htmx/plannedmaintenance/_filter_preview.html" with no_filters=True %}
+                </div>
+              </div>
             {% elif object.filters.exists %}
               <div class="form-control w-full">
                 <span class="label">
@@ -179,5 +188,38 @@
         endTimeInstance.setDate(new Date());
       }
     }
+
+    // Filter preview functionality
+    (() => {
+      const filterPreview = document.getElementById('filter-preview');
+      const filtersSelect = document.getElementById('id_filters');
+      if (!filterPreview || !filtersSelect) return;
+
+      const previewUrl = '{% url "htmx:plannedmaintenance-filter-preview" %}';
+      let debounceTimer = null;
+
+      const loadPreview = () => {
+        const filterIds = Array.from(filtersSelect.selectedOptions).map(opt => opt.value);
+
+        const params = new URLSearchParams();
+        filterIds.forEach(id => params.append('filters', id));
+
+        htmx.ajax('GET', `${previewUrl}?${params.toString()}`, {
+          target: filterPreview,
+          swap: 'innerHTML'
+        });
+      };
+
+      // Listen for changes on the select element (Choices.js triggers change events)
+      filtersSelect.addEventListener('change', () => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(loadPreview, 500);
+      });
+
+      // Load initial preview if filters are already selected
+      if (filtersSelect.selectedOptions.length > 0) {
+        loadPreview();
+      }
+    })();
   </script>
 {% endblock tail %}
