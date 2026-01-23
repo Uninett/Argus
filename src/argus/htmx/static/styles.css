@@ -5616,8 +5616,8 @@ details.collapse summary::-webkit-details-marker {
   width: 13rem;
 }
 
-.w-64 {
-  width: 16rem;
+.w-72 {
+  width: 18rem;
 }
 
 .w-\[1\%\] {
@@ -5635,6 +5635,14 @@ details.collapse summary::-webkit-details-marker {
 
 .w-full {
   width: 100%;
+}
+
+.w-80 {
+  width: 20rem;
+}
+
+.\!w-full {
+  width: 100% !important;
 }
 
 .min-w-48 {
@@ -6512,6 +6520,12 @@ details.collapse summary::-webkit-details-marker {
   transition-duration: 150ms;
 }
 
+.transition-colors {
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
 .duration-300 {
   transition-duration: 300ms;
 }
@@ -6555,6 +6569,11 @@ details.collapse summary::-webkit-details-marker {
 
 .card-gray {
   background-color: var(--fallback-b2,oklch(var(--b2)/0.4));
+}
+
+.hover\:bg-base-200:hover {
+  --tw-bg-opacity: 1;
+  background-color: var(--fallback-b2,oklch(var(--b2)/var(--tw-bg-opacity, 1)));
 }
 
 .hover\:text-primary:hover {
