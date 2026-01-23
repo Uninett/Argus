@@ -360,22 +360,19 @@ class IncidentQuerySet(models.QuerySet):
         """
         Create events of type ``event_type``, does not change dependent objects
 
-        This means that no signals are sent. On CLOSE, INCIDENT_END or REOPEN,
-        the incident for the event keeps its original end_time. Also, it is not
-        possible to set an expiration time for an ack.
+        Signals are sent. On CLOSE, INCIDENT_END or REOPEN, the incident for
+        the event keeps its original end_time. Also, it is not possible to set
+        an expiration time for an ack.
         """
         timestamp = timestamp if timestamp else timezone.now()
-        event_objs = [
-            Event(
-                incident=i,
+        for incident in self:
+            Event.objects.create(
+                incident=incident,
                 actor=actor,
                 timestamp=timestamp,
                 type=event_type,
                 description=description,
             )
-            for i in self
-        ]
-        Event.objects.bulk_create(event_objs)
         qs = Event.objects.filter(
             incident__in=self,
             actor=actor,
