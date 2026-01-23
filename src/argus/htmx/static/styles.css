@@ -5616,6 +5616,10 @@ details.collapse summary::-webkit-details-marker {
   width: 13rem;
 }
 
+.w-64 {
+  width: 16rem;
+}
+
 .w-\[1\%\] {
   width: 1%;
 }
@@ -6437,6 +6441,10 @@ details.collapse summary::-webkit-details-marker {
 
 .opacity-0 {
   opacity: 0;
+}
+
+.opacity-60 {
+  opacity: 0.6;
 }
 
 .opacity-70 {

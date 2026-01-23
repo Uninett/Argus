@@ -1,4 +1,32 @@
 <!-- htmx/templates/htmx/incident/cells/_incident_maintenance.html -->
-{% if incident.planned_maintenance_tasks.exists %}
-  <i class="text-primary text-lg fa-solid fa-person-digging"></i>
-{% endif %}
+{% with tasks=incident.planned_maintenance_tasks.all %}
+  {% if tasks %}
+    <div class="dropdown dropdown-hover dropdown-bottom dropdown-end">
+      <button tabindex="0"
+              class="btn btn-ghost btn-sm cursor-pointer flex items-center gap-1 text-primary">
+        <i class="fa-solid fa-person-digging"></i>
+        <span class="text-xs">{{ tasks|length }} task{{ tasks|length|pluralize }}</span>
+      </button>
+      <ul tabindex="0"
+          class="dropdown-content menu bg-base-100 rounded-box z-20 w-64 p-2 shadow-lg">
+        <li class="menu-title text-xs">Planned Maintenance</li>
+        {% for task in tasks %}
+          <li>
+            <a href="{% url 'htmx:plannedmaintenance-detail' pk=task.pk %}">
+              <div class="flex flex-col overflow-hidden">
+                <span class="font-medium truncate" title="{{ task.description }}">{{ task.description|default:"No description" }}</span>
+                <span class="text-xs opacity-60">{{ task.start_time|date:"M d, H:i" }}
+                  {% if task.end_time.year >= 9999 %}
+                    - ongoing
+                  {% else %}
+                    - {{ task.end_time|date:"M d, H:i" }}
+                  {% endif %}
+                </span>
+              </div>
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+{% endwith %}
