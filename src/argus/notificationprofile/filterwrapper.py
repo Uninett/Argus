@@ -36,12 +36,12 @@ class NotificationProfileFilterWrapper(PrecisionFilterWrapper):
     def incident_fits(self, incident: Incident) -> bool:
         if not self.model.active:
             return False
-        is_selected_by_time = self.timeslot_fits(incident.start_time)
-        if not is_selected_by_time:
-            return False
         return super().incident_fits(incident)
 
     def event_fits(self, event: Event) -> bool:
         if not self.model.active:
+            return False
+        is_selected_by_time = self.timeslot_fits(event.timestamp)
+        if not is_selected_by_time:
             return False
         return super().event_fits(event)

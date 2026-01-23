@@ -81,4 +81,4 @@ class NotificationProfileFilterWrapperTests(DjangoTestCase):
 
         npfw = NotificationProfileFilterWrapper(profile)
         self.assertFalse(npfw.timeslot_fits(today))
-        self.assertFalse(npfw.incident_fits(self.incident))
+        self.assertFalse(npfw.filter_fits(self.incident.events.first()))
