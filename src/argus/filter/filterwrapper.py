@@ -116,9 +116,9 @@ class FilterWrapper:
 
         any_failed = False in checks.values()
         if any_failed:
-            LOG.debug("Filter: %s: MISS! checks: %r", self, checks)
+            LOG.debug("Filter: %s: MISS! checks: %r", self.filter, checks)
         else:
-            LOG.debug("Filter: %s: HIT!", self)
+            LOG.debug("Filter: %s: HIT!", self.filter)
         return not any_failed
 
     def filter_fits(self, event) -> bool:
