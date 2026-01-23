@@ -3,6 +3,52 @@
 This file documents changes to Argus that are relevant for operations,
 customizers and end-users.
 
+## [2.7.0] - 2026-01-23
+
+### Planned maintenance
+
+This release improves the UX for creating planned maintenance tasks, by having
+dedicated pages for it and allowing all logged in users to see the list of
+future, ongoing and past planned maintenance periods. There is also a new
+column `under_plannedmaintenance`. This column depends on two new management commands:
+
+- `check_started_maintenance`
+- `check_ended_maintenance`
+
+Both takes an argument `--minutes` which defaults to 5. These commands connects
+and disconnects incidents to a planned maintenance task if they fit the
+criteria set in the filter(s).
+
+The commands are designed to be run via cron or similar repetitive scheduler.
+
+### Public filters
+
+Filters can now be public. At the moment they can only be created by admins in
+the admin. The idea is to make it easy to have a little library of the most
+useful, most used or just default filters, allowing you to get started quicker.
+
+### New columns
+
+- `id` and `search_id`
+- `under_maintenance`
+- `end_time` and `narrow_end_time`
+- `narrow_start_time_and_age` is the old `start_time_and_age`, a new
+  `start_time_and_age` is wider.
+- `compact_level` and `compact_select_levels`, only showing the number.
+- `events`, to help with making filters for sending notifications
+
+### New column layouts
+
+There are two new column presets, one for making notification filters and
+another for making planned maintenance tasks. With the classic built-in layout
+that means there are always a minimum of three column layouts available.
+
+### Expect more notification sent
+
+A long-standing bug has been fixed that prevented the sending of notifications
+of events that happened if the start of the incident was not covered by
+a notification timeslot. This might mean more notifications! Please set the
+`event types` filter to only the types of events desired.
 
 ## [2.6.0] - 2026-01-06
 

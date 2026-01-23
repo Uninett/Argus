@@ -8,6 +8,111 @@ This project uses [*towncrier*](https://towncrier.readthedocs.io/) and the chang
 
 <!-- towncrier release notes start -->
 
+## [2.7.0] - 2026-01-23
+
+This release improves the UX for creating planned maintenance tasks, by having
+dedicated pages for it and allowing all logged in users to see the list of
+future, ongoing and past planned maintenance periods. To take full advantage of
+thisi column, see NOTES.md.
+
+Furthermore, admins can create filters that can be used (but not edited) by
+everyone.
+
+The sorting of the incident list can now be controlled via relevant columns,
+but only one column at a time.
+
+There are lots and lots of new columns! See NOTES.md
+
+There are two new column presets, one for making notification filters and
+another for making planned maintenance tasks.
+
+A long-standing bug has been fixed that prevented the sending of notifications,
+see NOTES.md.
+
+### Added
+
+- Added searchable `id` column
+  ([#1288](https://github.com/Uninett/Argus/issues/1288))
+- Made it possible to filter on event types
+  ([#1455](https://github.com/Uninett/Argus/issues/1455))
+- Added column for marking incidents as under maintenance
+  ([#1589](https://github.com/Uninett/Argus/issues/1589))
+- Prohibited editing planned maintenance task closed for longer than 12 hours
+  ([#1648](https://github.com/Uninett/Argus/issues/1648))
+- Added pictures of each column type to docs
+  ([#1653](https://github.com/Uninett/Argus/issues/1653))
+- Save current incident filters as a user preference and restore on page load
+  ([#1682](https://github.com/Uninett/Argus/issues/1682))
+- Added a new column showing all tags of an incident.
+  ([#1698](https://github.com/Uninett/Argus/issues/1698))
+- Add new `end_time` and `narrow_end_time` columns to display the `end_time` of
+  an incident ([#1715](https://github.com/Uninett/Argus/issues/1715))
+- Add compact severity columns with filtering and sorting
+  ([#1717](https://github.com/Uninett/Argus/issues/1717))
+- Added management command to connect incidents to new planned maintenance
+  tasks ([#1734](https://github.com/Uninett/Argus/issues/1734))
+- Added first version of pages for CRUD-ing planned maintenance tasks. Everyone
+  can see them but only admins can alter anything
+  ([#1735](https://github.com/Uninett/Argus/issues/1735))
+- Added management command to remove incidents from ended planned maintenance
+  tasks ([#1736](https://github.com/Uninett/Argus/issues/1736))
+- Made it possible to mark a filter as "public". This means that anyone can use
+  it in the incident list, for notification profiles or for making planned
+  maintenance tasks. The flag can currently only be set via the admin
+  interface, and is thus limited to administrators.
+  ([#1742](https://github.com/Uninett/Argus/issues/1742))
+- Add sortable columns to incident table
+  ([#1980](https://github.com/Uninett/Argus/issues/1980))
+- Added a very rough and ready column to show an incident's events.
+- Added two new column presets:
+
+  * "notifications" with columns useful for making notification profiles
+  * "on maintenance" with columns useful for finding things that will be on
+    planned maintenance
+- Argus now supports Django 6.0
+
+### Changed
+
+- Implemented a Contributor License Agreement for Argus, based on the Free
+  Software Foundation's Fiduciary License Agreement
+  ([#956](https://github.com/Uninett/Argus/issues/956))
+- Replace column filter button with debounced auto-submit
+  ([#1575](https://github.com/Uninett/Argus/issues/1575))
+- Improve toast notification accessibility with ARIA attributes and screen
+  reader support ([#1711](https://github.com/Uninett/Argus/issues/1711))
+- Changed label of start time column to 'Start time'
+  ([#1718](https://github.com/Uninett/Argus/issues/1718))
+- Renamed column `start_time_and_age` to `narrow_start_time_and_age` and added
+  wider column named `start_time_and_age`
+  ([#1719](https://github.com/Uninett/Argus/issues/1719))
+- The buttons in the column layout preview were disabled.
+- The theme chooser on the user preferences page now shows the text color for
+  each color palette in addition to the background color.
+
+### Fixed
+
+- Added key requirements to error message in tag validation
+  ([#511](https://github.com/Uninett/Argus/issues/511))
+- Fixed dropdown multi-select fields (e.g. Source Types) selecting first item
+  when clicked ([#1697](https://github.com/Uninett/Argus/issues/1697))
+- Show meaningful error messages in UI and log full tracebacks for HTMX errors
+  instead of generic "500 Internal Server Error" and HTML content
+  ([#1702](https://github.com/Uninett/Argus/issues/1702))
+- Fixed page size preference being reset to default when visiting the incidents
+  page without a `page_size` URL parameter
+  ([#1704](https://github.com/Uninett/Argus/issues/1704))
+- Fix bug where multiselect is not cleared when de-selecting all options
+  ([#1751](https://github.com/Uninett/Argus/issues/1751))
+- Fixed longstanding bug that led to fewer notifications than expected. Instead
+  of checking when an *event* happened in order to decide whether to send
+  a notification, we only checked when the incident *started*. So, no
+  notifications could be sent for long-lasting incidents if they started
+  outside of all active timeslots.
+- Missing filters are now handled better. If a filter was deleted while it was
+  in use by the incident list page, the page would get stuck with a "500 Server
+  Error" until the filter was manually removed from the session.
+
+
 ## [2.6.0] - 2026-01-06
 
 This is a tiny release to finish up what was started at the end of 2025.
