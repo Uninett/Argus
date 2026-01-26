@@ -5637,14 +5637,6 @@ details.collapse summary::-webkit-details-marker {
   width: 100%;
 }
 
-.w-80 {
-  width: 20rem;
-}
-
-.\!w-full {
-  width: 100% !important;
-}
-
 .min-w-48 {
   min-width: 12rem;
 }
