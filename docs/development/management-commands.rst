@@ -550,3 +550,30 @@ Django ships with a command ``changepassword`` but you might as well use
 
 Instead of using the ``-p``-flag you can set the environment variable
 ``DJANGO_USER_PASSWORD``.
+
+Task queue workers
+==================
+
+.. _db_worker:
+
+db_worker
+---------
+
+To run the queue worker that reads tasks from the database one can use
+the command `db_worker`:
+
+    .. code:: console
+
+        $ python manage.py db_worker
+
+.. _rqworker:
+
+rqworker
+--------
+
+To run the queue worker that reads tasks from redis one can use
+the command `rqworker`:
+
+    .. code:: console
+
+        $ python manage.py rqworker
