@@ -86,7 +86,7 @@ class FilterWidgetMixin:
     def get_filter_widget(self):
         return SearchDropdownMultiSelect(
             partial_get=reverse("htmx:search-filters"),
-            attrs={"placeholder": "Search by filter name or username..."},
+            attrs={"placeholder": "Search by filter name or user..."},
         )
 
     def get_form(self, form_class=None):
@@ -176,7 +176,12 @@ def search_filters(request):
 
     filters = Filter.objects.select_related("user")
     if query:
-        filters = filters.filter(Q(name__icontains=query) | Q(user__username__icontains=query))
+        filters = filters.filter(
+            Q(name__icontains=query)
+            | Q(user__username__icontains=query)
+            | Q(user__first_name__icontains=query)
+            | Q(user__last_name__icontains=query)
+        )
     filters = sorted(filters, key=lambda f: (f.user != request.user, f.name))[:20]
 
     options = [{"id": f.pk, "text": f"{f.name} ({f.user.username})"} for f in filters]
