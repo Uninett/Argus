@@ -6,6 +6,8 @@ from django.utils import timezone
 
 from argus.auth.factories import AdminUserFactory, PersonUserFactory
 from argus.filter.factories import FilterFactory
+from argus.htmx.plannedmaintenance.views import FILTER_PREVIEW_LIMIT
+from argus.incident.factories import StatefulIncidentFactory, SourceSystemFactory
 from argus.plannedmaintenance.factories import PlannedMaintenanceFactory
 from argus.plannedmaintenance.models import MODIFICATION_WINDOW_PM, PlannedMaintenanceTask
 from argus.util.datetime_utils import LOCAL_INFINITY
@@ -284,3 +286,114 @@ class SearchFiltersViewTests(TestCase):
         response = self.client.get(reverse("htmx:search-filters"))
         data = response.json()
         self.assertEqual(data["results"][0]["id"], self.user_filter.pk)
+
+
+@tag("integration")
+class FilterPreviewViewTests(TestCase):
+    def setUp(self):
+        self.user = PersonUserFactory()
+
+    def test_filter_preview_requires_login(self):
+        response = self.client.get(reverse("htmx:plannedmaintenance-filter-preview"))
+        self.assertEqual(response.status_code, 302)
+
+    def test_filter_preview_without_filters_shows_no_filters(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse("htmx:plannedmaintenance-filter-preview"))
+        self.assertTrue(response.context["no_filters"])
+
+    def test_filter_preview_with_filters_shows_counts(self):
+        self.client.force_login(self.user)
+        # Create an open incident
+        incident = StatefulIncidentFactory()
+
+        # Create a filter that matches by source
+        filter_with_match = FilterFactory(
+            user=self.user,
+            filter={"sourceSystemIds": [incident.source.pk]},
+        )
+
+        response = self.client.get(
+            reverse("htmx:plannedmaintenance-filter-preview"),
+            {"filters": [filter_with_match.pk]},
+        )
+
+        self.assertIn("matching_count", response.context)
+        self.assertIn("matching_percent", response.context)
+        self.assertIn("total_open", response.context)
+        self.assertEqual(response.context["matching_count"], 1)
+
+    def test_filter_preview_with_no_matching_incidents(self):
+        self.client.force_login(self.user)
+        # Create an open incident
+        StatefulIncidentFactory()
+
+        # Create a filter that matches nothing (non-existent source ID)
+        filter_no_match = FilterFactory(
+            user=self.user,
+            filter={"sourceSystemIds": [99999]},
+        )
+
+        response = self.client.get(
+            reverse("htmx:plannedmaintenance-filter-preview"),
+            {"filters": [filter_no_match.pk]},
+        )
+
+        self.assertEqual(response.context["matching_count"], 0)
+
+    def test_filter_preview_with_no_open_incidents(self):
+        self.client.force_login(self.user)
+        # Don't create any incidents - tests division by zero guard
+        filter_obj = FilterFactory(user=self.user)
+
+        response = self.client.get(
+            reverse("htmx:plannedmaintenance-filter-preview"),
+            {"filters": [filter_obj.pk]},
+        )
+
+        self.assertEqual(response.context["matching_count"], 0)
+        self.assertEqual(response.context["matching_percent"], 0)
+
+    def test_filter_preview_intersects_multiple_filters(self):
+        self.client.force_login(self.user)
+        # Create two incidents with different sources
+        incident1 = StatefulIncidentFactory()
+        StatefulIncidentFactory()
+
+        # Create two filters: one matching incident1's source, one matching a non-existent source
+        filter1 = FilterFactory(
+            user=self.user,
+            filter={"sourceSystemIds": [incident1.source.pk]},
+        )
+        filter2 = FilterFactory(
+            user=self.user,
+            filter={"sourceSystemIds": [99999]},
+        )
+
+        response = self.client.get(
+            reverse("htmx:plannedmaintenance-filter-preview"),
+            {"filters": [filter1.pk, filter2.pk]},
+        )
+
+        # AND logic: no incident matches both filters
+        self.assertEqual(response.context["matching_count"], 0)
+
+    def test_filter_preview_limits_incident_list(self):
+        self.client.force_login(self.user)
+        source = SourceSystemFactory()
+        # Create more incidents than the limit
+        for _ in range(FILTER_PREVIEW_LIMIT + 1):
+            StatefulIncidentFactory(source=source)
+
+        filter_obj = FilterFactory(
+            user=self.user,
+            filter={"sourceSystemIds": [source.pk]},
+        )
+
+        response = self.client.get(
+            reverse("htmx:plannedmaintenance-filter-preview"),
+            {"filters": [filter_obj.pk]},
+        )
+
+        self.assertEqual(response.context["matching_count"], FILTER_PREVIEW_LIMIT + 1)
+        self.assertEqual(len(response.context["incident_list"]), FILTER_PREVIEW_LIMIT)
