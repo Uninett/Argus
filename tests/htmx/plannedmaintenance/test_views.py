@@ -243,8 +243,8 @@ class PlannedMaintenanceCancelViewTests(TestCase):
 @tag("integration")
 class SearchFiltersViewTests(TestCase):
     def setUp(self):
-        self.user = PersonUserFactory()
-        self.other_user = PersonUserFactory()
+        self.user = PersonUserFactory(username="felaali", first_name="Ferrari", last_name="Testarossa")
+        self.other_user = PersonUserFactory(username="lambo", first_name="Lamborghini", last_name="Countach")
 
         self.user_filter = FilterFactory(user=self.user, name="My Filter")
         self.other_filter = FilterFactory(user=self.other_user, name="Other Filter")
