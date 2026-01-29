@@ -2,12 +2,12 @@ from django.db.models import Q
 from rest_framework.authtoken.models import Token
 
 from argus.notificationprofile.media import send_notifications_to_users
-from argus.notificationprofile.media import background_send_notification
 from argus.notificationprofile.media import send_notification
 from argus.plannedmaintenance.utils import (
     connect_incident_with_planned_maintenance_tasks,
     event_covered_by_planned_maintenance,
 )
+from argus.notificationprofile.media.tasks import task_check_for_notifications
 from .models import (
     Acknowledgement,
     Event,
@@ -40,7 +40,7 @@ def task_send_notification(sender, instance: Event, *args, **kwargs):
 def task_background_send_notification(sender, instance: Event, *args, **kwargs):
     if event_covered_by_planned_maintenance(event=instance):
         return
-    send_notifications_to_users(instance, send=background_send_notification)
+    task_check_for_notifications.enqueue(instance.id)
 
 
 def delete_associated_event(sender, instance: Acknowledgement, *args, **kwargs):
