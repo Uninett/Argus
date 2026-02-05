@@ -180,3 +180,12 @@ Checklist
    #. Copy the changelog into the box below, dedent the headers once.
 
    #. Finally, click the "Publish release"-button. Done!
+
+Post-release clean up
+---------------------
+
+The packaging will have generated package files in ``dist/``, these can be
+removed by running ``make distclean``.
+
+The file ``src/argus/htmx/static/styles.css`` will also have been regenerated,
+don't commit it so as to keep merge conflicts down.
