@@ -146,7 +146,7 @@ social-auth-core==4.8.3
     #   argus-server (pyproject.toml)
     #   python-dataporten-auth
     #   social-auth-app-django
-sqlparse==0.5.5
+sqlparse==0.5.4
     # via django
 typing-extensions==4.15.0
     # via
