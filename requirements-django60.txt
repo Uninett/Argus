@@ -27,7 +27,7 @@ cffi==2.0.0
     # via cryptography
 charset-normalizer==3.4.4
     # via requests
-cryptography==46.0.3
+cryptography==46.0.5
     # via
     #   -r constraints.txt
     #   pyjwt
@@ -100,7 +100,9 @@ oauthlib==3.3.1
     #   requests-oauthlib
     #   social-auth-core
 packaging==25.0
-    # via -r constraints.txt
+    # via
+    #   -r constraints.txt
+    #   wheel
 phonenumberslite==9.0.22
     # via django-phonenumber-field
 psycopg2==2.9.11
@@ -163,7 +165,7 @@ urllib3==2.6.3
     # via
     #   -r constraints.txt
     #   requests
-wheel==0.45.1
+wheel==0.46.3
     # via argus-server (pyproject.toml)
 whitenoise==6.11.0
     # via argus-server (pyproject.toml)
