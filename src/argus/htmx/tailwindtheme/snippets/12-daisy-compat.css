@@ -113,6 +113,18 @@ label.label, form label {
   --tab-border-color: var(--color-primary);
 }
 
+/* Restore solid stat dividers with better contrast (DaisyUI v5 uses dashed at 10% opacity) */
+.stats .stat:not(:last-child) {
+  border-inline-end-style: solid !important;
+  border-inline-end-color: color-mix(in oklab, currentColor 25%, transparent) !important;
+}
+
+/* Restore disabled btn-primary to keep primary color (DaisyUI v5 turns all disabled buttons gray) */
+.btn-primary:is(:disabled, [disabled], .btn-disabled) {
+  background-color: color-mix(in oklab, var(--color-primary) 40%, transparent) !important;
+  color: color-mix(in oklab, var(--color-primary-content) 40%, transparent) !important;
+}
+
 /* Menu divider - non-interactive separator line (used with menu-title) */
 .menu li.menu-divider {
   padding: 0 0.75rem;
