@@ -1,7 +1,7 @@
 {% load widget_tweaks %}
 {{ formset.management_form }}
 {% for form in formset %}
-  <fieldset class="flex flex-col gap-2 p-4 border rounded-box {% if form.instance.pk %}border-primary{% endif %}">
+  <fieldset class="flex flex-col gap-2 p-4 border border-base-content/10 rounded-box {% if form.instance.pk %}border-primary{% endif %}">
     {{ form.id }}
     {{ form.timeslot }}
     {% if not form.instance.pk %}<legend class="px-2">Unsaved</legend>{% endif %}
