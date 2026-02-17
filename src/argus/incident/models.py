@@ -11,6 +11,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
 from django.db import models
 from django.db.models import F, Q
+from django.db.models.signals import post_save
 from django.utils import timezone
 from django.utils.timesince import timesince
 
@@ -243,6 +244,15 @@ class IncidentTagRelation(models.Model):
         return f"Tag <{self.tag}> on incident #{self.incident.pk} added by {self.added_by}"
 
 
+class EventQuerySet(models.QuerySet):
+    def bulk_create(self, objs, **kwargs):
+        objlist = super().bulk_create(objs, **kwargs)
+        for event in objlist:
+            LOG.debug("Sending signal for %s", event)
+            post_save.send(event.__class__, instance=event, created=True)
+        return objlist
+
+
 class Event(models.Model):
     class Type(models.TextChoices):
         INCIDENT_START = "STA", "Incident start"
@@ -270,6 +280,8 @@ class Event(models.Model):
     received = models.DateTimeField(default=timezone.now)
     type = models.TextField(choices=Type.choices)
     description = models.TextField(blank=True)
+
+    objects = EventQuerySet.as_manager()
 
     class Meta:
         ordering = ["-timestamp"]
