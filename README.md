@@ -38,7 +38,7 @@ There are several ways to install Argus.
 
 * Python 3.10+
 * Django 5.2
-* pip
+* [uv](https://docs.astral.sh/uv/)
 * PostgreSQL 14+
 
 #### Optional requirements
@@ -76,10 +76,10 @@ the release was tested on. The file `constraints.txt` is for controlling
 versions of sub-dependencies so as to not poison the pyproject.toml. The wheel
 package does not contain either of these two files.
 
-To install from the lock-file use pip:
+To install from the lock-file use uv:
 
 ```console
-$ pip install -c constraints.txt --upgrade -r requirements.txt
+$ uv pip install -c constraints.txt --upgrade -r requirements.txt
 ```
 
 ### First run
@@ -110,7 +110,7 @@ $ python manage.py runserver
 To update the dependency lock-files, use `tox`:
 
 ```console
-$ pip install "tox>=4"
+$ uv pip install "tox>=4" tox-uv
 $ tox run -e upgrade-deps -- -U
 ```
 
@@ -171,31 +171,26 @@ $ git clone https://github.com/Uninett/Argus.git
 $ cd Argus
 ```
 
-We recommend using virtualenv or virtualenvwrapper to create
-a place to stash Argus' dependencies.
-
 Create and activate a Python virtual environment.
 ```console
-$ python -m venv venv
-$ source venv/bin/activate
+$ uv venv
+$ source .venv/bin/activate
 ```
 
 Install Argus' requirements into the virtual env.
 ```console
-$ pip install -r requirements-django52.txt
-$ pip install -r requirements/dev.txt
+$ uv pip install -r requirements-django52.txt
+$ uv pip install -r requirements/dev.txt
 ```
 
 ### Step 2: Setting environment variables and Django settings
 
-Copy the `cmd.sh-template` to `cmd.sh` and make it executable
+Copy `.env.template` to `.env` and fill in the values.
 ```console
-$ cp cmd.sh-template cmd.sh
-$ chmod u+x cmd.sh
+$ cp .env.template .env
 ```
-Now set the environment variables in the file using an editor.
 
-Required settings in `cmd.sh` are
+Required settings in `.env` are
 
 - `DATABASE_URL`,
 - `DJANGO_SETTINGS_MODULE` and
@@ -203,7 +198,7 @@ Required settings in `cmd.sh` are
 
 `DJANGO_SETTINGS_MODULE` can be set to `argus.site.settings.dev`.
 
-If you need more complex settings than environment variables and ``cmd.sh`` can provide,
+If you need more complex settings than environment variables can provide,
 we recommend having a `localsettings.py` in the same directory as `manage.py` with any
 overrides.
 
@@ -217,10 +212,10 @@ See https://argus-server.readthedocs.io/en/latest/reference/htmx-frontend.html.
 
 ### Step 3: Run Argus in development
 
-Afterwards, run the initial Argus setup and start the server.
+`uv run` automatically loads the `.env` file. Run the initial Argus setup and start the server.
 ```console
-$ python manage.py initial_setup
-$ python manage.py runserver
+$ uv run manage.py initial_setup
+$ uv run manage.py runserver
 ```
 
 You will find Argus running at http://localhost:8000/.
