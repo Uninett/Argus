@@ -207,6 +207,9 @@ def filter_preview(request):
     open_incidents = Incident.objects.open()
     total_open = open_incidents.count()
 
+    if not total_open:
+        return render(request, "htmx/plannedmaintenance/_filter_preview.html", {"no_open_incidents": True})
+
     # All filters must match (AND logic), same as actual PM coverage in utils.py
     filters = Filter.objects.filter(pk__in=filter_ids)
     matching_qs = open_incidents

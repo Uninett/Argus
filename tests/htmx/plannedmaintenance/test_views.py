@@ -343,7 +343,7 @@ class FilterPreviewViewTests(TestCase):
 
     def test_filter_preview_with_no_open_incidents(self):
         self.client.force_login(self.user)
-        # Don't create any incidents - tests division by zero guard
+        # Don't create any incidents - should return early
         filter_obj = FilterFactory(user=self.user)
 
         response = self.client.get(
@@ -351,8 +351,7 @@ class FilterPreviewViewTests(TestCase):
             {"filters": [filter_obj.pk]},
         )
 
-        self.assertEqual(response.context["matching_count"], 0)
-        self.assertEqual(response.context["matching_percent"], 0)
+        self.assertTrue(response.context["no_open_incidents"])
 
     def test_filter_preview_intersects_multiple_filters(self):
         self.client.force_login(self.user)

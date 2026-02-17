@@ -1,5 +1,7 @@
 {% if no_filters %}
   <p class="text-base-content/60 text-sm italic">Select filters to see which open incidents would be covered.</p>
+{% elif no_open_incidents %}
+  <p class="text-base-content/60 text-sm">There are currently no open incidents.</p>
 {% elif matching_count == 0 %}
   <p class="text-base-content/60 text-sm">No open incidents match the selected filters.</p>
 {% else %}
