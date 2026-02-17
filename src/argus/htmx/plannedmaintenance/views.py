@@ -11,7 +11,7 @@ from django.views.decorators.http import require_GET
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
 from argus.filter.queryset_filters import QuerySetFilter
-from argus.htmx.incident.columns import BUILTIN_COLUMNS
+from argus.htmx.incident.columns import get_incident_table_columns, MAINTENANCE_COLUMN_LAYOUT_NAME
 from argus.htmx.utils import TemplateNameViewMixin
 from argus.htmx.widgets import SearchDropdownMultiSelect
 from argus.incident.models import Incident
@@ -21,7 +21,6 @@ from argus.util.datetime_utils import LOCAL_INFINITY
 
 FLATPICKR_DATETIME_FORMAT = "%Y-%m-%d %H:%M"
 FILTER_PREVIEW_TEMPLATE = "htmx/plannedmaintenance/_filter_preview.html"
-FILTER_PREVIEW_COLUMNS = ["start_time", "level", "source_type", "source", "description", "tags"]
 FILTER_PREVIEW_LIMIT = 5
 
 
@@ -218,7 +217,12 @@ def filter_preview(request):
 
     matching_count = matching_qs.count()
     matching_percent = round(100 * matching_count / total_open) if total_open else 0
-    incident_list = matching_qs.select_related("source").order_by("-start_time")[:FILTER_PREVIEW_LIMIT]
+    incident_list = (
+        matching_qs.select_related("source")
+        .prefetch_related("incident_tag_relations", "incident_tag_relations__tag")
+        .order_by("-start_time")[:FILTER_PREVIEW_LIMIT]
+    )
+    columns = get_incident_table_columns(MAINTENANCE_COLUMN_LAYOUT_NAME)
 
     return render(
         request,
@@ -228,7 +232,7 @@ def filter_preview(request):
             "matching_percent": matching_percent,
             "total_open": total_open,
             "incident_list": incident_list,
-            "columns": [BUILTIN_COLUMNS[name] for name in FILTER_PREVIEW_COLUMNS],
+            "columns": columns,
             "compact": True,
             "dummy_column": True,
         },
