@@ -17,10 +17,12 @@ jobs:
         with:
           python-version: 3.11
 
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v6
+
       - name: Install dependencies
         run: |
-          pip install -U pip
-          pip install tox
+          uv pip install --system tox tox-uv
           sudo apt-get install -y --no-install-recommends graphviz
 
       - name: Create and switch to new branch

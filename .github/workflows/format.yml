@@ -23,15 +23,10 @@ jobs:
     steps:
     - uses: actions/checkout@v6
 
-    - name: Set up Python
-      uses: actions/setup-python@v6
-
-    - name: Install dependencies
-      run: |
-        pip install -U pip
-        pip install djlint
+    - name: Set up uv
+      uses: astral-sh/setup-uv@v6
 
     - name: Format HTML
       run: |
-        djlint --version
-        djlint . --check --configuration pyproject.toml
+        uvx djlint --version
+        uvx djlint . --check --configuration pyproject.toml
