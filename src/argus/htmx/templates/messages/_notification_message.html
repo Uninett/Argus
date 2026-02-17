@@ -1,10 +1,7 @@
 {% load argus_htmx %}
 {% with autoclose=message|autoclose_time %}
-  <div class="alert flex justify-between w-fit border-3 bg-base-100 border-opacity-100 {% if message.tags %}{{ message.tags }}{% endif %}"
-       role="{% if 'error' in message.tags or 'warning' in message.tags %}alert{% else %}status{% endif %}"
-       {% if 'error' not in message.tags and 'warning' not in message.tags %}aria-live="polite"{% endif %}
-       _="on load focus() me then {% if autoclose >= 0 %}wait {{ autoclose }}s then add .autoclosing to me then wait 0.3s then remove me{% endif %}"
-       tabindex="-1">
+  <div class="alert flex justify-between w-fit border-3 {% if message.tags %}{{ message.tags }}{% endif %}"
+       {% if autoclose >= 0 %}_="on load wait {{ autoclose }}s then add .autoclosing to me then wait 0.3s then remove me"{% endif %}>
     {% block message-content %}
       <div class="flex items-center gap-2">
         {% if "error" in message.tags %}

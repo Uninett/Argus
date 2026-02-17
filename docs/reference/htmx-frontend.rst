@@ -55,15 +55,16 @@ Build
 -----
 
 1. Go to the repo directory (parent of ``src/``)
-2. Build main stylesheet file using ``tailwindcss`` executable from step 1 and
-   pointing to the included config file:
+2. Build the main stylesheet file using the ``tailwindcss`` executable from step 1.
+
+   Tailwind v4 uses CSS-based configuration, so no separate config file is needed.
+   The input CSS file (``styles.css``) contains all imports and configuration.
 
    Manually::
 
-        tailwindcss -c src/argus/htmx/tailwindtheme/tailwind.config.js -i src/argus/htmx/tailwindtheme/styles.css --output src/argus/htmx/static/styles.css
+        tailwindcss -i src/argus/htmx/tailwindtheme/styles.css -o src/argus/htmx/static/styles.css
 
-   Running with the ``--watch`` flag for automatic update on change seems
-   error-prone so we've made it very easy to run the command, with ``make`` or ``tox``::
+   We've made it easy to run this command with ``make`` or ``tox``::
 
         make tailwind
         tox -e tailwind
