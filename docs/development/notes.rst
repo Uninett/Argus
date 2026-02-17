@@ -17,14 +17,9 @@ in Argus:
 2. using a ``settings.py`` file.
 
 For development, a simple and good practice is to define environment variables in a
-``cmd.sh`` file.
-This file serves as a "wrapper" to call ``manage.py`` with a defined set of environment
-variables, and simplifies the development process.
-
-You may find it useful to have several ``cmd.sh`` files for different purposes, for
-instance to invoke different databases.
-The files can be named ``cmd-local.sh``, ``cmd-prod.sh`` and ``cmd-demo.sh`` or
-similar.
+``.env`` file. Copy ``.env.template`` to ``.env`` and fill in the values. The dev
+settings (``argus.site.settings.dev``) will automatically load ``.env`` via
+``python-dotenv``.
 
 The limitation of environment variables is that they can only contain numbers, Boolean
 values (``0``/``1``) and strings.
@@ -44,5 +39,5 @@ files later.
         ``True``.
         Otherwise, logentries will appear twice.
 
-.. warning:: Do not check your ``cmd.sh`` or ``settings.py`` files into version control,
+.. warning:: Do not check your ``.env`` or ``settings.py`` files into version control,
         since they contain passwords and sensitive data.

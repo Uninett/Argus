@@ -2,7 +2,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-from argus.htmx.settings import *  # noqa: E402
+from argus.htmx.settings import *  # noqa: E402, F403
 from . import get_bool_env, get_str_env  # noqa: E402
 
 

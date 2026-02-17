@@ -1,8 +1,15 @@
-.PHONY: clean testclean distclean coverageclean cacheclean nuke tailwind docclean upgrade-tailwind tailwind-watch
+.PHONY: clean testclean distclean coverageclean cacheclean nuke tailwind docclean upgrade-tailwind tailwind-watch install run
 
 TAILWINDDIR=src/argus/htmx/tailwindtheme
 STATICDIR=src/argus/htmx/static
 PYTHONPATH=./src
+
+
+install:
+	uv sync --extra dev
+
+run:
+	uv run manage.py runserver
 
 
 clean:

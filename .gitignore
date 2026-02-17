@@ -9,6 +9,7 @@
 !.readthedocs.yaml
 !.sonarcloud.properties
 !.mailmap
+!.env.template
 
 # local config files
 cmd.sh

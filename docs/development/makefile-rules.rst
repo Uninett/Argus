@@ -4,10 +4,24 @@
 Makefile rules
 ==============
 
-The repo has a ``Makefile`` to help with development. None of the rules depend
-on a virtualenv being activated, but may depend on having python 3 in the path.
+The repo has a ``Makefile`` to help with development. The rules depend on having
+``uv`` installed.
 
 Always run ``make`` from the root of the repository.
+
+Rules for development setup
+===========================
+
+install
+-------
+
+Runs ``uv sync --extra dev`` to create a virtual environment and install all
+dependencies including dev extras.
+
+run
+---
+
+Runs the Django development server via ``uv run manage.py runserver``.
 
 Rules that delete files
 =======================
