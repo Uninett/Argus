@@ -4,6 +4,7 @@ import logging
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any
 
+from argus.constants import API_STABLE_VERSION
 from argus.notificationprofile.utils import are_notifications_enabled
 
 if TYPE_CHECKING:
@@ -31,6 +32,9 @@ class NotificationMedium(ABC):
         Custom exception class that is raised when a destination cannot be
         deleted
         """
+
+    def __init__(self, version: str = API_STABLE_VERSION):
+        self.version = version
 
     @classmethod
     @abstractmethod

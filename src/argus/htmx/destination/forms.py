@@ -1,9 +1,9 @@
 from django import forms
 from django.forms import ModelForm
 
-from argus.notificationprofile.models import DestinationConfig, Media
-from argus.notificationprofile.serializers import RequestDestinationConfigSerializer
 from argus.notificationprofile.media import api_safely_get_medium_object
+from argus.notificationprofile.models import DestinationConfig, Media
+from argus.notificationprofile.v2.serializers import RequestDestinationConfigSerializer
 
 
 class DestinationFormCreate(ModelForm):

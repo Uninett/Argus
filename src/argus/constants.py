@@ -1,0 +1,4 @@
+# Absolutely no imports
+
+API_STABLE_VERSION = "v2"
+API_STABLE_SCHEMA_VIEWNAME = f"schema-{API_STABLE_VERSION}"
