@@ -9,7 +9,7 @@ from rest_framework.test import APIRequestFactory
 from argus.auth.factories import PersonUserFactory
 from argus.notificationprofile.factories import TimeslotFactory
 from argus.notificationprofile.models import Timeslot
-from argus.notificationprofile.serializers import TimeslotSerializer
+from argus.notificationprofile.v2.serializers import TimeslotSerializer
 
 
 @tag("integration")
