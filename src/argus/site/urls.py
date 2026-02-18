@@ -23,7 +23,7 @@ from django.views.generic.base import RedirectView
 
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
-from argus.notificationprofile.views import SchemaView
+from argus.notificationprofile.v2.views import SchemaView
 from argus.site.utils import get_urlpatterns
 from argus.site.views import index, MetadataView, api_gone, error
 

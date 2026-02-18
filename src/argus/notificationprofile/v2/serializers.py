@@ -1,8 +1,8 @@
 from rest_framework import fields, serializers
 
 from argus.filter.serializers import FilterSerializer
-from .media import api_safely_get_medium_object
-from .models import DestinationConfig, Media, NotificationProfile, TimeRecurrence, Timeslot
+from argus.notificationprofile.media import api_safely_get_medium_object
+from argus.notificationprofile.models import DestinationConfig, Media, NotificationProfile, TimeRecurrence, Timeslot
 
 
 class TimeRecurrenceSerializer(serializers.ModelSerializer):
