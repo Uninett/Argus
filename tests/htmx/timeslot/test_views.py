@@ -197,7 +197,7 @@ class TestTimeslotCreateView(TimeslotViewTestCase):
 
 def _build_create_post_data(name, start, end, days):
     """Build POST data for creating a new timeslot."""
-    formset_prefix = "time_recurrences"
+    formset_prefix = "timerecurrenceform"
     return {
         "timeslot-name": name,
         f"{formset_prefix}-TOTAL_FORMS": "1",

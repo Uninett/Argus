@@ -1,4 +1,4 @@
-from datetime import datetime, time
+from datetime import time
 import logging
 from typing import Optional
 
@@ -8,6 +8,7 @@ from django.shortcuts import redirect
 from django.http import HttpResponseRedirect
 from django.template.response import TemplateResponse
 from django.urls import reverse
+from django.utils import timezone
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 from django_htmx.http import HttpResponseClientRedirect
 
@@ -98,7 +99,7 @@ def make_timerecurrence_formset(data: Optional[dict] = None, timeslot: Optional[
         can_delete=True,
         min_num=1,
     )
-    prefix = f"timerecurrenceform-{timeslot.pk}" if timeslot else ""
+    prefix = f"timerecurrenceform-{timeslot.pk}" if timeslot else "timerecurrenceform"
     TimeRecurrenceFormSet.template_name_div = "htmx/timeslot/timerecurrence_div.html"
     return TimeRecurrenceFormSet(data=data, instance=timeslot, prefix=prefix)
 
@@ -112,27 +113,23 @@ class TimeslotMixin:
             return self.prefix + f"-{pk}"
         return self.prefix
 
-    def _set_delete_modal(self, form, obj):
-        form.modal = DeleteModal(
+    def _make_delete_modal(self, obj, **kwargs):
+        return DeleteModal(
             header="Delete timeslot",
             button_title="Delete",
             button_class="btn-sm btn-outline btn-error",
             explanation=f'Delete the timeslot "{obj}"?',
             dialog_id=f"timeslot-delete-confirm-{obj.pk}",
             endpoint=reverse("htmx:timeslot-delete", kwargs={"pk": obj.pk}),
+            **kwargs,
         )
+
+    def _set_delete_modal(self, form, obj):
+        form.modal = self._make_delete_modal(obj)
         return form
 
     def _attach_card_delete_modal(self, obj):
-        obj.delete_modal = DeleteModal(
-            header="Delete timeslot",
-            button_title="Delete",
-            button_class="btn-sm btn-outline btn-error",
-            explanation=f'Delete the timeslot "{obj}"?',
-            dialog_id=f"timeslot-delete-confirm-{obj.pk}",
-            endpoint=reverse("htmx:timeslot-delete", kwargs={"pk": obj.pk}),
-            opener_button_template_name="htmx/_blank.html",
-        )
+        obj.delete_modal = self._make_delete_modal(obj, opener_button_template_name="htmx/_blank.html")
 
     def get_prefix(self):
         return self._get_prefix(getattr(self.object, "pk", None))
