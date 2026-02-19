@@ -197,6 +197,7 @@ class DestinationConfig(models.Model):
     )
     label = models.CharField(max_length=50, blank=True, null=True)
     settings = models.JSONField()
+    managed = models.BooleanField(null=True)
 
     def __str__(self):
         if self.label:
