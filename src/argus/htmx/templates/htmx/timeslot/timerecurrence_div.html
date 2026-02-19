@@ -1,25 +1,55 @@
 {% load widget_tweaks %}
 {{ formset.management_form }}
-{% for form in formset %}
-  <fieldset class="flex flex-col gap-2 p-4 border rounded-box {% if form.instance.pk %}border-primary{% endif %}">
-    {{ form.id }}
-    {{ form.timeslot }}
-    {% if not form.instance.pk %}<legend class="px-2">Unsaved</legend>{% endif %}
-    <div class="form-control items-start self-end">
-      <label class="label cursor-pointer">
-        <span class="label-text mr-2">{{ form.DELETE.label }}:</span>
-        {% render_field form.DELETE class+="checkbox checkbox-sm" %}
-      </label>
-    </div>
-    <div class="flex gap-2 w-full flex-nowrap max-sm:flex-wrap">
-      {% include "htmx/forms/input_field.html" with label=form.start.label max_width="md" field=form.start %}
-      {% include "htmx/forms/input_field.html" with label=form.end.label max_width="md" field=form.end %}
-    </div>
-    <div class="form-control w-full self-center">
-      <label class="label label-text" for={{ form.days.auto_id }}><em>{{ form.days.label }}</em>
-      </label>
-      {% for error in form.days.errors %}<span class="label-text-alt text-error">{{ error }}</span>{% endfor %}
-      {% render_field form.days %}
-    </div>
-  </fieldset>
-{% endfor %}
+<table class="table table-sm">
+  <thead>
+    <tr>
+      <th>Days</th>
+      <th>Start</th>
+      <th>End</th>
+      <th class="w-full"></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for form in formset %}
+      {{ form.id }}
+      {{ form.timeslot }}
+      <tr>
+        <td>{% render_field form.days %}</td>
+        <td>{% render_field form.start class+="input input-bordered input-sm w-20" %}</td>
+        <td>{% render_field form.end class+="input input-bordered input-sm w-20" %}</td>
+        <td>
+          <label class="cursor-pointer">
+            {% render_field form.DELETE class+="hidden peer delete-check" onchange="toggleDeleteRow(this)" %}
+            <span class="flex items-center gap-2 text-base-content/60 peer-checked:hidden">
+              <i class="fa-regular fa-trash-can"></i> Delete
+            </span>
+            <span class="hidden items-center gap-2 text-error peer-checked:flex">
+              <i class="fa-solid fa-trash-can"></i> Keep
+            </span>
+          </label>
+        </td>
+      </tr>
+      {% if form.errors %}
+        <tr>
+          <td colspan="4" class="pt-0">
+            {% for field, errors in form.errors.items %}
+              {% for error in errors %}<span class="text-error text-xs">{{ field|capfirst }}: {{ error }}</span>{% endfor %}
+            {% endfor %}
+          </td>
+        </tr>
+      {% endif %}
+    {% endfor %}
+  </tbody>
+</table>
+<script>
+function toggleDeleteRow(checkbox) {
+  const tr = checkbox.closest("tr");
+  tr.querySelectorAll("td:not(:last-child)").forEach(td =>
+    td.classList.toggle("opacity-40", checkbox.checked)
+  );
+  tr.querySelectorAll("input:not(.delete-check)").forEach(input =>
+    input.disabled = checkbox.checked
+  );
+}
+document.querySelectorAll(".delete-check").forEach(cb => toggleDeleteRow(cb));
+</script>

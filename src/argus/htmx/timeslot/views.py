@@ -53,8 +53,8 @@ class TimeRecurrenceForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["days"].widget.attrs["class"] = "flex flex-row flex-wrap justify-between gap-2"
-        self.fields["days"].choices = TimeRecurrence.Day.choices
+        self.fields["days"].widget.attrs["class"] = "flex flex-row gap-1"
+        self.fields["days"].choices = [(day.value, day.label[0]) for day in TimeRecurrence.Day]
 
     def clean_start(self):
         timeobj = self.cleaned_data["start"]
