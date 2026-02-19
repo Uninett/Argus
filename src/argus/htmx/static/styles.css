@@ -5948,6 +5948,10 @@ details.collapse summary::-webkit-details-marker {
   border-width: 2px;
 }
 
+.border-0 {
+  border-width: 0;
+}
+
 .border-1 {
   border-width: 1px;
 }
@@ -6452,6 +6456,21 @@ details.collapse summary::-webkit-details-marker {
 .card-create {
   --tw-border-opacity: 1;
   border-color: var(--fallback-p,oklch(var(--p)/var(--tw-border-opacity, 1)));
+}
+
+tr.row-deleted td.strikethrough {
+  position: relative;
+}
+
+tr.row-deleted td.strikethrough::after {
+  content: '';
+  pointer-events: none;
+  position: absolute;
+  left: 0px;
+  right: 0px;
+  top: 50%;
+  border-top-width: 2px;
+  border-color: var(--fallback-bc,oklch(var(--bc)/0.3));
 }
 
 .card-base > .collapse > .collapse-title {

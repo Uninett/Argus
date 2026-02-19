@@ -13,10 +13,15 @@
     {% for form in formset %}
       {{ form.id }}
       {{ form.timeslot }}
+      {% if not form.instance.pk %}
+        <tr class="border-0">
+          <td colspan="4" class="pb-0 text-sm italic text-base-content/60">Unsaved</td>
+        </tr>
+      {% endif %}
       <tr>
-        <td>{% render_field form.days %}</td>
-        <td>{% render_field form.start class+="input input-bordered input-sm w-20 fp-time" %}</td>
-        <td>{% render_field form.end class+="input input-bordered input-sm w-20 fp-time" %}</td>
+        <td class="strikethrough">{% render_field form.days %}</td>
+        <td class="strikethrough">{% render_field form.start class+="input input-bordered input-sm w-20 fp-time" %}</td>
+        <td class="strikethrough">{% render_field form.end class+="input input-bordered input-sm w-20 fp-time" %}</td>
         <td class="text-right">
           {% if form.instance.pk %}
             <label for="{{ form.DELETE.id_for_label }}"
@@ -42,6 +47,7 @@
 <script>
 function toggleDeleteRow(checkbox) {
   const tr = checkbox.closest("tr");
+  tr.classList.toggle("row-deleted", checkbox.checked);
   tr.querySelectorAll("td:not(:last-child)").forEach(td =>
     td.classList.toggle("opacity-40", checkbox.checked)
   );

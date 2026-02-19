@@ -18,6 +18,15 @@
     @apply border-primary;
 }
 
+tr.row-deleted td.strikethrough {
+    @apply relative;
+}
+
+tr.row-deleted td.strikethrough::after {
+    content: '';
+    @apply absolute left-0 right-0 top-1/2 border-t-2 border-base-content/30 pointer-events-none;
+}
+
 .card-base > .collapse > .collapse-title {
     @apply min-h-0 p-3;
 }
