@@ -1,0 +1,14 @@
+<div class="card card-base my-4" id="timeslot-{{ timeslot.pk }}">
+  <details class="group collapse collapse-arrow"
+           name="timeslot-accordion"
+           hx-get="{% url 'htmx:timeslot-update' pk=timeslot.pk %}"
+           hx-trigger="toggle[this.open]"
+           hx-target="#timeslot-form-{{ timeslot.pk }}"
+           hx-swap="innerHTML">
+    <summary class="collapse-title min-h-0 p-3 pr-12">{% include "./_timeslot_summary.html" %}</summary>
+    <div class="collapse-content" id="timeslot-form-{{ timeslot.pk }}">
+      <span class="loading loading-spinner loading-md"></span>
+    </div>
+  </details>
+  {% include timeslot.delete_modal.template_name with modal=timeslot.delete_modal %}
+</div>

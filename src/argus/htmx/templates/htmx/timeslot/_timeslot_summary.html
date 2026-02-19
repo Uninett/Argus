@@ -1,0 +1,12 @@
+<div class="group-open:hidden flex flex-col gap-1 min-w-0"
+     id="timeslot-summary-{{ timeslot.pk }}"
+     hx-swap-oob="true">
+  <h2 class="text-lg font-semibold">{{ timeslot.name }}</h2>
+  <div class="flex flex-wrap gap-1">
+    {% for tr in timeslot.time_recurrences.all %}
+      <span class="badge badge-sm">{{ tr.short_str }}</span>
+    {% empty %}
+      <span class="text-sm italic text-base-content/60">No time recurrences</span>
+    {% endfor %}
+  </div>
+</div>

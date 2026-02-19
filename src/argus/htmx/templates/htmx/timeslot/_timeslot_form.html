@@ -24,7 +24,7 @@
               {% include "htmx/forms/input_field.html" with label=field.label max_width="md" field=field %}
             {% endwith %}
           </div>
-          <div class="card-actions flex items-end">
+          <div class="card-actions flex items-end gap-2 mb-2">
             {% if form.instance.pk %}
               <input type="submit" class="btn btn-primary btn-sm" value="Save">
               <button type="button"
