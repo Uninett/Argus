@@ -1,4 +1,4 @@
-from datetime import time
+from datetime import datetime, time
 import logging
 from typing import Optional
 
@@ -291,16 +291,10 @@ class TimeslotUpdateView(FormsetMixin, TimeslotMixin, UpdateView):
 
     def form_valid_response(self):
         if self.request.htmx:
-            self.object.refresh_from_db()
-            self._attach_card_delete_modal(self.object)
-            response = TemplateResponse(
-                self.request,
-                "htmx/timeslot/_timeslot_card.html",
-                {"timeslot": self.object},
-            )
-            response["HX-Retarget"] = f"#timeslot-{self.object.pk}"
-            response["HX-Reswap"] = "outerHTML"
-            return response
+            context = self.get_context_data()
+            now = datetime.now().strftime("%H:%M:%S")
+            context["success_message"] = f'Saved timeslot "{self.object}" at {now}.'
+            return self.render_to_response(context)
         return HttpResponseRedirect(self.get_success_url())
 
 
