@@ -13,3 +13,15 @@
 .card-gray {
     @apply bg-base-200/40;
 }
+
+.card-base > .collapse > .collapse-title {
+    @apply min-h-0 p-3;
+}
+
+.card-base > .collapse > .collapse-content {
+    @apply px-3 pb-3;
+}
+
+.card-base > .collapse > .collapse-content .form-control:first-of-type > .label:first-child {
+    @apply pt-0;
+}
