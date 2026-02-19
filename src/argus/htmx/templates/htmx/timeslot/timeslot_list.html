@@ -1,12 +1,17 @@
 {% extends "./base.html" %}
 {% block timeslot_main %}
   <div class="max-w-4xl w-full">
-    <div hx-get="{% url "htmx:timeslot-create" %}"
-         hx-swap="outerHTML"
-         hx-trigger="load once"
-         hx-select="#timeslot-form-create"></div>
-    {% for entry in form_list %}
-      {% include "./_timeslot_form.html" with form=entry.form formset=entry.formset %}
+    <div class="flex justify-end mb-4">
+      <button hx-get="{% url 'htmx:timeslot-create' %}"
+              hx-target="#timeslot-create"
+              hx-swap="outerHTML"
+              class="btn btn-primary">New timeslot</button>
+    </div>
+    <div id="timeslot-create"></div>
+    {% for timeslot in object_list %}
+      {% include "./_timeslot_card.html" %}
+    {% empty %}
+      <p class="text-center text-base-content/60">No timeslots yet.</p>
     {% endfor %}
   </div>
 {% endblock timeslot_main %}
