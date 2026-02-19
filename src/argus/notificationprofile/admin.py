@@ -75,8 +75,9 @@ class DestinationConfigAdmin(admin.ModelAdmin):
         "media",
         "label",
         "settings",
+        "managed",
     )
-    list_filter = ("media__name",)
+    list_filter = ("media__name", "managed")
     search_fields = (
         "user__first_name",
         "user__last_name",
