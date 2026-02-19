@@ -70,6 +70,7 @@ class DestinationConfigFactory(factory.django.DjangoModelFactory):
 
     user = factory.SubFactory(PersonUserFactory)
     media = factory.SubFactory(MediaFactory)
+    managed = None
 
 
 class NotificationProfileFactory(factory.django.DjangoModelFactory):

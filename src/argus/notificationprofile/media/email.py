@@ -9,6 +9,7 @@ from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from rest_framework.exceptions import ValidationError
 
+from argus.constants import API_STABLE_VERSION
 from argus.incident.models import Event
 from .base import NotificationMedium
 from ..models import DestinationConfig
@@ -16,8 +17,6 @@ from argus.util.datetime_utils import INFINITY, LOCAL_INFINITY
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
-
-    from types import NoneType
 
     from django.contrib.auth import get_user_model
     from django.db.models.query import QuerySet
@@ -69,17 +68,26 @@ class EmailNotification(NotificationMedium):
         "properties": {"email_address": {"type": "string", "title": "Email address"}},
     }
 
-    class Form(forms.Form):
+    class FormV3(forms.Form):
+        email_address = forms.EmailField()
+
+    class FormV2(forms.Form):
         synced = forms.BooleanField(disabled=True, required=False, initial=False)
         email_address = forms.EmailField()
 
-    @classmethod
-    def validate(cls, instance: RequestDestinationConfigSerializer, email_dict: dict, user: User) -> dict:
+    def __init__(self, version: str = API_STABLE_VERSION):
+        super().__init__(version)
+        if version == "v2":
+            self.Form = self.FormV2
+        else:
+            self.Form = self.FormV3
+
+    def validate(self, instance: RequestDestinationConfigSerializer, email_dict: dict, user: User) -> dict:
         """
         Validates the settings of an email destination and returns a dict
         with validated and cleaned data
         """
-        form = cls.Form(email_dict["settings"])
+        form = self.Form(email_dict["settings"])
         if not form.is_valid():
             raise ValidationError(form.errors)
         if form.cleaned_data["email_address"] == instance.context["request"].user.email:
@@ -90,41 +98,6 @@ class EmailNotification(NotificationMedium):
             raise ValidationError({"email_address": "Email address already exists"})
 
         return form.cleaned_data
-
-    @classmethod
-    def raise_if_not_deletable(cls, destination: DestinationConfig) -> NoneType:
-        """
-        Raises a NotDeletableError if the given email destination is not able
-        to be deleted (if it was defined by an outside source or is in use by
-        any notification profiles)
-        """
-        super().raise_if_not_deletable(destination=destination)
-
-        if destination.settings["synced"]:
-            raise cls.NotDeletableError(
-                "Cannot delete this email destination since it was defined by an outside source."
-            )
-
-    @staticmethod
-    def update(destination: DestinationConfig, validated_data: dict) -> DestinationConfig | NoneType:
-        """
-        Updates the synced email destination by copying its contents to
-        a new destination and updating the given destination with the given
-        validated data and returning the updated destination
-
-        This way the synced destination is not lost
-        """
-        if destination.settings["synced"]:
-            new_synced_destination = DestinationConfig(
-                user=destination.user,
-                media_id=destination.media_id,
-                settings=destination.settings,
-            )
-            destination.settings = validated_data["settings"]
-            DestinationConfig.objects.bulk_update([destination], fields=["settings"])
-            new_synced_destination.save()
-            return destination
-        return None
 
     @staticmethod
     def get_label(destination: DestinationConfig) -> str:
