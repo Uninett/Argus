@@ -1,7 +1,17 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+import logging
 from typing import TYPE_CHECKING, Any
+
+from apprise import Apprise
+
+from django.conf import settings
+from django.template.loader import render_to_string
+
+from argus.incident.models import Event
+from ..models import DestinationConfig
+from argus.util.datetime_utils import INFINITY, LOCAL_INFINITY
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -11,14 +21,20 @@ if TYPE_CHECKING:
     from django.contrib.auth import get_user_model
     from django.db.models.query import QuerySet
 
-    from argus.incident.models import Event
-    from ..models import DestinationConfig
     from ..serializers import RequestDestinationConfigSerializer
 
     User = get_user_model()
 
 
 __all__ = ["NotificationMedium"]
+
+LOG = logging.getLogger(__name__)
+
+
+def modelinstance_to_dict(obj):
+    dict_ = vars(obj).copy()
+    dict_.pop("_state")
+    return dict_
 
 
 class NotificationMedium(ABC):
@@ -122,3 +138,96 @@ class NotificationMedium(ABC):
         returns None otherwise
         """
         return None
+
+
+class AppriseMedium(NotificationMedium):
+    MEDIA_SLUG = "apprise"
+    MEDIA_NAME = "Apprise"
+    MEDIA_JSON_SCHEMA = {
+        "title": "Apprise Settings",
+        "description": "Settings for a DestinationConfig using apprise.",
+        "type": "object",
+        "required": ["destination"],
+        "properties": {"destination_url": {"type": "string", "title": "Apprise destination url"}},
+    }
+
+    @classmethod
+    def has_duplicate(cls, queryset: QuerySet, settings: dict) -> bool:
+        """
+        Returns True if an apprise destination with the same destination url
+        already exists in the given queryset
+        """
+        return queryset.filter(settings__destination_url=settings["destination_url"]).exists()
+
+    @staticmethod
+    def get_label(destination: DestinationConfig) -> str:
+        """
+        Returns the apprise destination url represented by this destination
+        """
+        return destination.settings.get("destination_url")
+
+    @classmethod
+    def get_relevant_address(cls, destination: DestinationConfig) -> Any:
+        """Returns an apprise destination url the message should be sent to"""
+        return destination.settings["destination_url"]
+
+    @staticmethod
+    def create_message_context(event: Event):
+        """Creates the subject and message for the Apprise notification"""
+        title = f"{event}"
+        incident_dict = modelinstance_to_dict(event.incident)
+        for field in ("id", "source_id"):
+            incident_dict.pop(field)
+        incident_dict["details_url"] = event.incident.pp_details_url()
+        if event.incident.end_time in {INFINITY, LOCAL_INFINITY}:
+            incident_dict["end_time"] = "Still open"
+
+        template_context = {
+            "title": title,
+            "event": event,
+            "incident_dict": incident_dict,
+        }
+        subject = f"{settings.NOTIFICATION_SUBJECT_PREFIX}{title}"
+        message = render_to_string("notificationprofile/email.txt", template_context)
+
+        return subject, message
+
+    @classmethod
+    def send(cls, event: Event, destinations: Iterable[DestinationConfig], **_) -> bool:
+        """
+        Sends Apprise notification about a given event to the given destinations
+
+        Returns False if no destinations were given and
+        True if notifications were sent
+        """
+        destinations = cls.get_relevant_destinations(destinations)
+        if not destinations:
+            return False
+
+        subject, message = cls.create_message_context(event=event)
+        failed = 0
+        num_destinations = len(destinations)
+        for destination in destinations:
+            destination_url = cls.get_relevant_address(destination)
+
+            notifier = Apprise()
+            notifier.add(destination_url)
+
+            result = notifier.notify(body=message, title=subject)
+
+            if not result:
+                failed += 1
+                LOG.error("Apprise: Failed to send event #%i to destination #%i", event.pk, destination.pk)
+            else:
+                LOG.debug("Apprise: Sent event #%i to destination #%i", event.pk, destination.pk)
+
+        if failed:
+            if num_destinations == failed:
+                LOG.error("Apprise: Failed to send to any destinations")
+                return False
+            LOG.warn(
+                "Apprise: Failed to send to %i of %i destinations",
+                failed,
+                num_destinations,
+            )
+        return True

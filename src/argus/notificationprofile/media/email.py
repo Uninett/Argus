@@ -10,7 +10,7 @@ from django.template.loader import render_to_string
 from rest_framework.exceptions import ValidationError
 
 from argus.incident.models import Event
-from .base import NotificationMedium
+from .base import modelinstance_to_dict, NotificationMedium
 from ..models import DestinationConfig
 from argus.util.datetime_utils import INFINITY, LOCAL_INFINITY
 
@@ -32,12 +32,6 @@ __all__ = [
     "send_email_safely",
     "EmailNotification",
 ]
-
-
-def modelinstance_to_dict(obj):
-    dict_ = vars(obj).copy()
-    dict_.pop("_state")
-    return dict_
 
 
 def send_email_safely(function, additional_error=None, *args, **kwargs) -> int:
