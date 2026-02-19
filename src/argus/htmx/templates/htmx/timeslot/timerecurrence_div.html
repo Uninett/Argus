@@ -15,18 +15,16 @@
       {{ form.timeslot }}
       <tr>
         <td>{% render_field form.days %}</td>
-        <td>{% render_field form.start class+="input input-bordered input-sm w-20" %}</td>
-        <td>{% render_field form.end class+="input input-bordered input-sm w-20" %}</td>
-        <td>
-          <label class="cursor-pointer">
-            {% render_field form.DELETE class+="hidden peer delete-check" onchange="toggleDeleteRow(this)" %}
-            <span class="flex items-center gap-2 text-base-content/60 peer-checked:hidden">
-              <i class="fa-regular fa-trash-can"></i> Delete
-            </span>
-            <span class="hidden items-center gap-2 text-error peer-checked:flex">
-              <i class="fa-solid fa-trash-can"></i> Keep
-            </span>
-          </label>
+        <td>{% render_field form.start class+="input input-bordered input-sm w-20 fp-time" %}</td>
+        <td>{% render_field form.end class+="input input-bordered input-sm w-20 fp-time" %}</td>
+        <td class="text-right">
+          {% if form.instance.pk %}
+            <label for="{{ form.DELETE.id_for_label }}"
+                   class="inline-flex items-center gap-2 cursor-pointer">
+              {% render_field form.DELETE class+="checkbox checkbox-sm delete-check" onchange="toggleDeleteRow(this)" %}
+              <span class="text-base-content/60">Delete</span>
+            </label>
+          {% endif %}
         </td>
       </tr>
       {% if form.errors %}
@@ -52,4 +50,12 @@ function toggleDeleteRow(checkbox) {
   );
 }
 document.querySelectorAll(".delete-check").forEach(cb => toggleDeleteRow(cb));
+flatpickr(".fp-time", {
+  enableTime: true,
+  noCalendar: true,
+  dateFormat: "H:i",
+  time_24hr: true,
+  allowInput: true,
+  appendTo: document.body,
+});
 </script>
