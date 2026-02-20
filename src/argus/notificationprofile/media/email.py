@@ -82,13 +82,12 @@ class EmailNotification(NotificationMedium):
         else:
             self.Form = self.FormV3
 
-    @classmethod
-    def validate(cls, instance: RequestDestinationConfigSerializer, email_dict: dict, user: User) -> dict:
+    def validate(self, instance: RequestDestinationConfigSerializer, email_dict: dict, user: User) -> dict:
         """
         Validates the settings of an email destination and returns a dict
         with validated and cleaned data
         """
-        form = cls.Form(email_dict["settings"])
+        form = self.Form(email_dict["settings"])
         if not form.is_valid():
             raise ValidationError(form.errors)
         if form.cleaned_data["email_address"] == instance.context["request"].user.email:

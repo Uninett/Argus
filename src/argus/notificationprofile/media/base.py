@@ -6,6 +6,7 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any
 
 from argus.constants import API_STABLE_VERSION
+from argus.notificationprofile.models import DestinationConfig
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -16,7 +17,6 @@ if TYPE_CHECKING:
     from django.db.models.query import QuerySet
 
     from argus.incident.models import Event
-    from ..models import DestinationConfig
     from ..serializers import RequestDestinationConfigSerializer
 
     User = get_user_model()
