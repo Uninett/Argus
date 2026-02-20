@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Any
 
 from apprise import Apprise
 
+from django import forms
 from django.conf import settings
 from django.template.loader import render_to_string
 
@@ -145,16 +146,19 @@ class AppriseMedium(NotificationMedium):
     MEDIA_NAME = "Apprise"
     MEDIA_JSON_SCHEMA = {
         "title": "Apprise Settings",
-        "description": "Settings for a DestinationConfig using apprise.",
+        "description": "Settings for a DestinationConfig using Apprise.",
         "type": "object",
-        "required": ["destination"],
+        "required": ["destination_url"],
         "properties": {"destination_url": {"type": "string", "title": "Apprise destination url"}},
     }
+
+    class Form(forms.Form):
+        destination_url = forms.URLField()
 
     @classmethod
     def has_duplicate(cls, queryset: QuerySet, settings: dict) -> bool:
         """
-        Returns True if an apprise destination with the same destination url
+        Returns True if an Apprise destination with the same destination url
         already exists in the given queryset
         """
         return queryset.filter(settings__destination_url=settings["destination_url"]).exists()
@@ -168,7 +172,7 @@ class AppriseMedium(NotificationMedium):
 
     @classmethod
     def get_relevant_address(cls, destination: DestinationConfig) -> Any:
-        """Returns an apprise destination url the message should be sent to"""
+        """Returns the apprise destination url the message should be sent to"""
         return destination.settings["destination_url"]
 
     @staticmethod
@@ -188,14 +192,14 @@ class AppriseMedium(NotificationMedium):
             "incident_dict": incident_dict,
         }
         subject = f"{settings.NOTIFICATION_SUBJECT_PREFIX}{title}"
-        message = render_to_string("notificationprofile/email.txt", template_context)
+        message = render_to_string("notificationprofile/apprise.txt", template_context)
 
         return subject, message
 
     @classmethod
     def send(cls, event: Event, destinations: Iterable[DestinationConfig], **_) -> bool:
         """
-        Sends Apprise notification about a given event to the given destinations
+        Sends an Apprise notification about a given event to the given destinations
 
         Returns False if no destinations were given and
         True if notifications were sent
@@ -204,6 +208,7 @@ class AppriseMedium(NotificationMedium):
         if not destinations:
             return False
 
+        # Note that Apprise automatically leaves out 'subject' for destinations that don't support it
         subject, message = cls.create_message_context(event=event)
         failed = 0
         num_destinations = len(destinations)
