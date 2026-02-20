@@ -23,6 +23,7 @@ from django.views.generic.base import RedirectView
 
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
+from argus.constants import API_STABLE_VERSION, API_STABLE_SCHEMA_VIEWNAME
 from argus.notificationprofile.v2.views import SchemaView
 from argus.site.utils import get_urlpatterns
 from argus.site.views import index, MetadataView, api_gone, error
@@ -34,8 +35,16 @@ urlpatterns = [
     path("favicon.ico", RedirectView.as_view(url="/static/favicon.svg", permanent=True)),
     path(".error/", error, name="error"),
     path("admin/", admin.site.urls),
-    path("api/schema/", SpectacularAPIView.as_view(api_version="v2"), name="schema-v2"),
-    path("api/schema/swagger-ui/", SpectacularSwaggerView.as_view(url_name="schema-v2"), name="swagger-ui-v2"),
+    path(
+        "api/schema/",
+        SpectacularAPIView.as_view(api_version=API_STABLE_VERSION),
+        name=API_STABLE_SCHEMA_VIEWNAME,
+    ),
+    path(
+        "api/schema/swagger-ui/",
+        SpectacularSwaggerView.as_view(url_name=API_STABLE_SCHEMA_VIEWNAME),
+        name=f"swagger-ui-{API_STABLE_VERSION}",
+    ),
     re_path(r"^api/v1/.*$", api_v1_gone),
     path("api/v2/", include(("argus.site.api_v2_urls", "api"), namespace="v2")),
     # path('api/sessionauth/', include('rest_framework.urls', namespace='rest_framework')),

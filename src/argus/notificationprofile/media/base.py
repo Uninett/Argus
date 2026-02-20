@@ -3,6 +3,8 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any
 
+from argus.constants import API_STABLE_VERSION
+
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
@@ -27,6 +29,9 @@ class NotificationMedium(ABC):
         Custom exception class that is raised when a destination cannot be
         deleted
         """
+
+    def __init__(self, version: str = API_STABLE_VERSION):
+        self.version = version
 
     @classmethod
     @abstractmethod
