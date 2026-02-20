@@ -17,6 +17,7 @@ from rest_framework import status as drf_status
 from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema, extend_schema_view
 
+from argus.constants import API_STABLE_VERSION, API_STABLE_SCHEMA_VIEWNAME
 from .serializers import MetadataSerializer
 
 LOG = logging.getLogger(__name__)
@@ -101,11 +102,12 @@ class MetadataView(APIView):
         metadata = {
             "server-version": get_version(),
             "api-version": {
-                "stable": "v2",
+                "stable": API_STABLE_VERSION,
             },
             "jsonapi-schema": {
-                "stable": reverse("schema-v2"),
+                "stable": reverse(API_STABLE_SCHEMA_VIEWNAME),
                 "v2": "/api/v2/schema/",
+                "v3": "/api/v3/schema/",
             },
             "ticket_plugin": getattr(settings, "TICKET_PLUGIN", None),
             "destination_plugins": getattr(settings, "MEDIA_PLUGINS", None),
