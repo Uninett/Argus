@@ -95,6 +95,7 @@ def _render_destination_list(
         "create_form": create_form,
         "grouped_forms": grouped_forms,
         "page_title": "Destinations",
+        "active_tab": "destinations",
     }
     return render(request, template, context=context)
 
