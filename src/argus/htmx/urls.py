@@ -17,10 +17,17 @@ urlpatterns = [
     # path("accounts/", include("django.contrib.auth.urls")),
     path("styleguide/", StyleGuideView.as_view(), name="styleguide"),
     path("incidents/", include(incident_urls)),
-    path("timeslots/", include(timeslot_urls)),
-    path("notificationprofiles/", include(notificationprofile_urls)),
+    path(
+        "notifications/",
+        include(
+            [
+                path("", include(notificationprofile_urls)),
+                path("timeslots/", include(timeslot_urls)),
+                path("destinations/", include(destination_urls)),
+            ]
+        ),
+    ),
     path("plannedmaintenance/", include(plannedmaintenance_urls)),
-    path("destinations/", include(destination_urls)),
     path("user/", include(user_urls)),
     path("", IncidentListRedirectView.as_view(), name="root"),
 ]

@@ -1,8 +1,10 @@
 {% extends "htmx/base.html" %}
 {% block main %}
-  {% include "htmx/components/_page_title.html" %}
-  <div class="flex justify-center px-4">
-    {% block profile_main %}
-    {% endblock profile_main %}
+  <div class="flex justify-center p-4">
+    <div class="max-w-4xl w-full">
+      {% include "htmx/notifications/_tabs.html" %}
+      {% block profile_main %}
+      {% endblock profile_main %}
+    </div>
   </div>
 {% endblock main %}
