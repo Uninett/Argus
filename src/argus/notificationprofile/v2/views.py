@@ -181,7 +181,8 @@ class DestinationConfigViewSet(rw_viewsets.ModelViewSet):
         return self.request.user.destinations.all()
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        serializer.validated_data["settings"].pop("synced", False)
+        serializer.save(user=self.request.user, managed=False)
 
     def destroy(self, request, *args, **kwargs):
         pk = self.kwargs["pk"]

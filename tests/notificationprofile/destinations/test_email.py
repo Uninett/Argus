@@ -6,12 +6,12 @@ from argus.auth.factories import PersonUserFactory
 from argus.notificationprofile.factories import DestinationConfigFactory, NotificationProfileFactory, TimeslotFactory
 from argus.notificationprofile.media.email import EmailNotification
 from argus.notificationprofile.models import DestinationConfig, Media
-from argus.notificationprofile.serializers import RequestDestinationConfigSerializer
+from argus.notificationprofile.v2.serializers import RequestDestinationConfigSerializer
 from argus.util.testing import connect_signals, disconnect_signals
 
 
 @tag("integration")
-class EmailDestinationConfigSerializerTests(TestCase):
+class EmailDestinationConfigSerializerV2Tests(TestCase):
     def setUp(self):
         self.user = PersonUserFactory()
         self.request_factory = APIRequestFactory()
@@ -103,7 +103,6 @@ class EmailDestinationConfigSerializerTests(TestCase):
             "media_id": "email",
             "settings": {
                 "email_address": "user@example.com",
-                "synced": False,
             },
             "user": self.user,
         }
@@ -115,7 +114,6 @@ class EmailDestinationConfigSerializerTests(TestCase):
             obj.settings,
             {
                 "email_address": "user@example.com",
-                "synced": False,
             },
         )
 
@@ -125,7 +123,6 @@ class EmailDestinationConfigSerializerTests(TestCase):
             media_id="email",
             settings={
                 "email_address": "user@example.com",
-                "synced": False,
             },
         )
 
@@ -135,7 +132,6 @@ class EmailDestinationConfigSerializerTests(TestCase):
             "media_id": "email",
             "settings": {
                 "email_address": "new.email@example.com",
-                "synced": False,
             },
             "user": self.user,
         }
@@ -190,28 +186,28 @@ class EmailSignalTests(APITestCase):
         # PersonUserFactory creates user with email address
         default_destination = self.user1.destinations.first()
         self.assertTrue(default_destination)
-        self.assertTrue(default_destination.settings["synced"])
+        self.assertTrue(default_destination.managed)
 
     def test_default_email_destination_should_not_be_created_if_user_has_no_email(self):
-        self.assertFalse(self.user2.destinations.filter(media_id="email", settings__synced=True).exists())
+        self.assertFalse(self.user2.destinations.filter(media_id="email", managed=True).exists())
 
     def test_default_email_destination_should_be_added_if_email_is_added_to_user(self):
         self.user2.email = self.user2.username
         self.user2.save(update_fields=["email"])
         default_destination = self.user2.destinations.first()
         self.assertTrue(default_destination)
-        self.assertTrue(default_destination.settings["synced"])
+        self.assertTrue(default_destination.managed)
 
     def test_default_email_destination_should_be_updated_if_user_email_changes(self):
         self.user2.email = "new.email@example.com"
         self.user2.save(update_fields=["email"])
-        default_destination = self.user2.destinations.filter(settings__synced=True).first()
+        default_destination = self.user2.destinations.filter(managed=True).first()
         self.assertEqual(self.user2.email, default_destination.settings["email_address"])
 
     def test_default_email_destination_should_be_deleted_if_user_email_is_deleted(self):
         self.user1.email = ""
         self.user1.save(update_fields=["email"])
-        self.assertFalse(self.user1.destinations.filter(settings__synced=True))
+        self.assertFalse(self.user1.destinations.filter(managed=True))
 
 
 @tag("API", "integration")
@@ -263,32 +259,33 @@ class EmailDestinationViewTests(APITestCase):
 
         self.notification_profile1 = NotificationProfileFactory(user=self.user1, timeslot=timeslot1)
         # Default email destination is automatically created with user
-        self.synced_email_destination = self.user1.destinations.get()
-        self.non_synced_email_destination = DestinationConfigFactory(
+        self.managed_email_destination = self.user1.destinations.get()
+        self.unmanaged_email_destination = DestinationConfigFactory(
             user=self.user1,
             media=Media.objects.get(slug="email"),
-            settings={"email_address": "test@example.com", "synced": False},
+            settings={"email_address": "test@example.com"},
+            managed=False,
         )
-        self.notification_profile1.destinations.set([self.synced_email_destination])
+        self.notification_profile1.destinations.set([self.managed_email_destination])
 
     def teardown(self):
         connect_signals()
 
-    def test_should_delete_unsynced_unused_email_destination(self):
-        response = self.user1_rest_client.delete(path=f"{self.ENDPOINT}{self.non_synced_email_destination.pk}/")
+    def test_should_delete_unmanaged_unused_email_destination(self):
+        response = self.user1_rest_client.delete(path=f"{self.ENDPOINT}{self.unmanaged_email_destination.pk}/")
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT, response.data)
-        self.assertFalse(DestinationConfig.objects.filter(id=self.non_synced_email_destination.pk).exists())
+        self.assertFalse(DestinationConfig.objects.filter(id=self.unmanaged_email_destination.pk).exists())
 
-    def test_should_not_allow_deletion_of_synced_email_destination(self):
-        response = self.user1_rest_client.delete(path=f"{self.ENDPOINT}{self.synced_email_destination.pk}/")
+    def test_should_not_allow_deletion_of_managed_email_destination(self):
+        response = self.user1_rest_client.delete(path=f"{self.ENDPOINT}{self.managed_email_destination.pk}/")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST, response.data)
-        self.assertTrue(DestinationConfig.objects.filter(id=self.synced_email_destination.pk).exists())
+        self.assertTrue(DestinationConfig.objects.filter(id=self.managed_email_destination.pk).exists())
 
     def test_should_not_allow_deletion_of_email_destination_in_use(self):
-        self.notification_profile1.destinations.add(self.non_synced_email_destination)
-        response = self.user1_rest_client.delete(path=f"{self.ENDPOINT}{self.non_synced_email_destination.pk}/")
+        self.notification_profile1.destinations.add(self.unmanaged_email_destination)
+        response = self.user1_rest_client.delete(path=f"{self.ENDPOINT}{self.unmanaged_email_destination.pk}/")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST, response.data)
-        self.assertTrue(DestinationConfig.objects.filter(id=self.non_synced_email_destination.pk).exists())
+        self.assertTrue(DestinationConfig.objects.filter(id=self.unmanaged_email_destination.pk).exists())
 
     def test_should_create_email_destination_with_valid_values(self):
         response = self.user1_rest_client.post(
@@ -303,10 +300,8 @@ class EmailDestinationViewTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertTrue(
             DestinationConfig.objects.filter(
-                settings={
-                    "email_address": "test2@example.com",
-                    "synced": False,
-                },
+                settings={"email_address": "test2@example.com"},
+                managed=False,
             ).exists()
         )
 
@@ -333,7 +328,7 @@ class EmailDestinationViewTests(APITestCase):
         )
 
     def test_should_update_email_destination_with_same_medium(self):
-        email_destination = self.non_synced_email_destination
+        email_destination = self.unmanaged_email_destination
         new_settings = {
             "email_address": "test2@example.com",
         }
@@ -360,7 +355,7 @@ class EmailDestinationViewTests(APITestCase):
         ).pk
         response = self.user1_rest_client.patch(
             path=f"{self.ENDPOINT}{email_destination_pk}/",
-            data={"settings": {"email_address": self.non_synced_email_destination.settings["email_address"]}},
+            data={"settings": {"email_address": self.unmanaged_email_destination.settings["email_address"]}},
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(
@@ -382,10 +377,8 @@ class EmailDestinationSendTests(TestCase):
         email_destination = DestinationConfigFactory(
             user=self.user1,
             media=Media.objects.get(slug="email"),
-            settings={
-                "email_address": email_address,
-                "synced": False,
-            },
+            settings={"email_address": email_address},
+            managed=False,
         )
         phone_number = "+4747474747"
         sms_destination = DestinationConfigFactory(
