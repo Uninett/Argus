@@ -23,16 +23,11 @@ jobs:
     steps:
     - uses: actions/checkout@v6
 
-    - name: Set up Python
-      uses: actions/setup-python@v6
-
-    - name: Install dependencies
-      run: |
-        pip install -U pip
-        pip install djlint
+    - name: Set up uv
+      uses: astral-sh/setup-uv@v6
 
     - name: Lint HTML
-      run: djlint --lint .
+      run: uvx djlint --lint .
 
   test:
     needs: ruff
@@ -48,18 +43,13 @@ jobs:
     steps:
     - uses: actions/checkout@v6
 
-    - uses: actions/cache@v5
-      id: cache
-      with:
-        path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-        restore-keys: |
-          ${{ runner.os }}-pip-
-
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v6
       with:
         python-version: ${{ matrix.python-version }}
+
+    - name: Set up uv
+      uses: astral-sh/setup-uv@v6
 
     - name: Set Environment Variables
       run: |
@@ -69,13 +59,7 @@ jobs:
         echo "POSTGRES_PASSWORD=password" >> $GITHUB_ENV
 
     - name: Install dependencies
-      # if: steps.cache.outputs.cache-hit != 'true'
-      run: |
-        set -xe
-        python -VV
-        python -m site
-        python -m pip install --upgrade pip "setuptools<46" wheel
-        python -m pip install --upgrade virtualenv "tox>=4" tox-gh-actions coverage
+      run: uv pip install --system "tox>=4" tox-gh-actions tox-uv coverage
 
     - name: Set up PostgreSQL
       uses: ankane/setup-postgres@v1

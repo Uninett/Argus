@@ -11,13 +11,14 @@ FROM python:3.13-trixie
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get install -y --no-install-recommends tini build-essential
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
 
 ENV VIRTUAL_ENV=/opt/venv
-RUN python3 -m venv $VIRTUAL_ENV
+RUN uv venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 # Install some dev requirements that aren't part of the minimal dependencies:
-RUN pip install psycopg2-binary django-extensions python-dotenv gunicorn
+RUN uv pip install psycopg2-binary django-extensions gunicorn
 
 # Make an unprivileged user to run the server
 RUN useradd --system argus
@@ -26,7 +27,7 @@ RUN mkdir -p /static && chown argus /static
 ENV STATIC_ROOT=/static
 
 COPY . /src
-RUN pip install '/src' && rm -rf /src
+RUN uv pip install '/src' && rm -rf /src
 
 # Install API backend settings suitable for Docker deployment
 RUN mkdir /extrapython

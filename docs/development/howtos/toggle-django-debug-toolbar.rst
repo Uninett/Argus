@@ -15,15 +15,15 @@ Make sure it is installed
 You need to have ``django-debug-toolbar`` installed for this, it's part of the
 dev-dependencies so you can get it through any of::
 
-        pip install django-debug-toolbar
+        uv pip install django-debug-toolbar
 
 or::
 
-        pip install argus-server[dev]
+        uv pip install argus-server[dev]
 
 or::
 
-        pip install -r requirements/dev.txt
+        uv sync --extra dev
 
 Set up extra-apps with django-debug-toolbar
 -------------------------------------------
