@@ -29,10 +29,12 @@ DEFAULT_INCIDENT_TABLE_COLUMN_LAYOUTS = {
         "events",
     ],
     "on maintenance": [
+        "start_time",
+        "level",
         "source_type",
         "source",
+        "description",
         "tags",
-        "under_maintenance",
     ],
 }
 ARGUS_HTMX_FILTER_FUNCTION = "argus.htmx.incident.filter.incident_list_filter"

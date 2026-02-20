@@ -1,0 +1,60 @@
+<script>
+  const flatpickrInstances = flatpickr('.flatpickr-datetime', {
+    enableTime: true,
+    dateFormat: 'Y-m-d H:i',
+    time_24hr: true,
+  });
+
+  // Clear infinite dates (year 9999) from end_time field to show placeholder
+  const endTimeInput = document.getElementById('id_end_time');
+  if (endTimeInput && endTimeInput.value.startsWith('9999')) {
+    const endTimeInstance = Array.isArray(flatpickrInstances)
+      ? flatpickrInstances.find(fp => fp.element === endTimeInput)
+      : flatpickrInstances;
+    if (endTimeInstance) {
+      endTimeInstance.clear();
+    }
+  }
+
+  function setEndTimeToNow() {
+    const endTimeInstance = Array.isArray(flatpickrInstances)
+      ? flatpickrInstances.find(fp => fp.element.id === 'id_end_time')
+      : flatpickrInstances;
+    if (endTimeInstance) {
+      endTimeInstance.setDate(new Date());
+    }
+  }
+
+  // Filter preview functionality
+  (() => {
+    const filterPreview = document.getElementById('filter-preview');
+    const filtersSelect = document.getElementById('id_filters');
+    if (!filterPreview || !filtersSelect) return;
+
+    const previewUrl = '{% url "htmx:plannedmaintenance-filter-preview" %}';
+    let debounceTimer = null;
+
+    const loadPreview = () => {
+      const filterIds = Array.from(filtersSelect.selectedOptions).map(opt => opt.value);
+
+      const params = new URLSearchParams();
+      filterIds.forEach(id => params.append('filters', id));
+
+      htmx.ajax('GET', `${previewUrl}?${params.toString()}`, {
+        target: filterPreview,
+        swap: 'innerHTML'
+      });
+    };
+
+    // Listen for changes on the select element (Choices.js triggers change events)
+    filtersSelect.addEventListener('change', () => {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(loadPreview, 500);
+    });
+
+    // Load initial preview if filters are already selected
+    if (filtersSelect.selectedOptions.length > 0) {
+      loadPreview();
+    }
+  })();
+</script>

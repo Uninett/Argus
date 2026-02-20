@@ -21,6 +21,7 @@ CELL_WRAPPER_TEMPLATE_DEFAULT = "htmx/incident/_incident_table_cell_wrapper_defa
 CELL_WRAPPER_TEMPLATE_LINK_TO_DETAILS = "htmx/incident/_incident_table_cell_wrapper_link_to_details.html"
 
 BUILTIN_COLUMN_LAYOUT_NAME = "built-in"
+MAINTENANCE_COLUMN_LAYOUT_NAME = "on maintenance"
 _DEFAULT_COLUMN_LAYOUT_NAME = "default"
 
 

@@ -5448,6 +5448,10 @@ details.collapse summary::-webkit-details-marker {
   margin-left: -0.5rem;
 }
 
+.mb-2 {
+  margin-bottom: 0.5rem;
+}
+
 .mb-4 {
   margin-bottom: 1rem;
 }
@@ -5591,6 +5595,10 @@ details.collapse summary::-webkit-details-marker {
   min-height: 2rem;
 }
 
+.min-h-\[3rem\] {
+  min-height: 3rem;
+}
+
 .min-h-fit {
   min-height: -moz-fit-content;
   min-height: fit-content;
@@ -5644,6 +5652,11 @@ details.collapse summary::-webkit-details-marker {
 .min-w-fit {
   min-width: -moz-fit-content;
   min-width: fit-content;
+}
+
+.min-w-max {
+  min-width: -moz-max-content;
+  min-width: max-content;
 }
 
 .max-w-2xl {
@@ -6203,6 +6216,11 @@ details.collapse summary::-webkit-details-marker {
   padding-bottom: 0.5rem;
 }
 
+.py-3 {
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+}
+
 .py-4 {
   padding-top: 1rem;
   padding-bottom: 1rem;
@@ -6219,6 +6237,10 @@ details.collapse summary::-webkit-details-marker {
 
 .pb-0\.5 {
   padding-bottom: 0.125rem;
+}
+
+.pb-8 {
+  padding-bottom: 2rem;
 }
 
 .pl-2 {
@@ -6318,6 +6340,10 @@ details.collapse summary::-webkit-details-marker {
 
 .capitalize {
   text-transform: capitalize;
+}
+
+.italic {
+  font-style: italic;
 }
 
 .leading-6 {
