@@ -8,6 +8,7 @@ See django settings for ``TEMPLATES``.
 """
 
 from django.conf import settings
+from packaging.version import InvalidVersion, Version
 
 from . import defaults
 from argus.site.views import get_version
@@ -29,4 +30,9 @@ def banner_message(request):
 
 
 def metadata(request):
-    return {"version": get_version()}
+    full_version = get_version()
+    try:
+        short_version = str(Version(full_version).base_version)
+    except (InvalidVersion, TypeError):
+        short_version = full_version or ""
+    return {"version": full_version, "short_version": short_version}

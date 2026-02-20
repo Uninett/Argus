@@ -1,6 +1,6 @@
 {% extends "./base.html" %}
 {% block timeslot_main %}
-  <div class="max-w-4xl w-full">
+  <div>
     <div class="flex justify-end mb-4">
       <button hx-get="{% url 'htmx:timeslot-create' %}"
               hx-target="#timeslot-create"
