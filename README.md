@@ -186,18 +186,28 @@ $ uv pip install -r requirements/dev.txt
 
 ### Step 2: Setting environment variables and Django settings
 
-Copy `.env.template` to `.env` and fill in the values.
+Environment files follow the naming convention `.env.<name>`. Create one from the
+template:
 ```console
-$ cp .env.template .env
+$ make create-env dev
 ```
 
-Required settings in `.env` are
+Edit `.env.dev` and fill in the required settings:
 
 - `DATABASE_URL`,
 - `DJANGO_SETTINGS_MODULE` and
 - `SECRET_KEY`.
 
 `DJANGO_SETTINGS_MODULE` can be set to `argus.site.settings.dev`.
+
+You can create multiple environments for different configurations (e.g.
+`.env.dev`, `.env.test`) and switch between them:
+```console
+$ make set-env dev
+```
+
+This symlinks `.env.dev` to `.env` so that `uv run` picks it up automatically.
+Run `make set-env` without arguments to list available environments.
 
 If you need more complex settings than environment variables can provide,
 we recommend having a `localsettings.py` in the same directory as `manage.py` with any
@@ -213,7 +223,8 @@ See https://argus-server.readthedocs.io/en/latest/reference/htmx-frontend.html.
 
 ### Step 3: Run Argus in development
 
-`uv run` automatically loads the `.env` file. Run the initial Argus setup and start the server.
+`uv run` automatically loads the `.env` file (or the file set via `UV_ENV_FILE`).
+Run the initial Argus setup and start the server.
 ```console
 $ uv run manage.py initial_setup
 $ uv run manage.py runserver

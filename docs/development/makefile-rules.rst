@@ -23,6 +23,34 @@ run
 
 Runs the Django development server via ``uv run manage.py runserver``.
 
+create-env
+----------
+
+Creates a new environment file from ``.env.template``::
+
+    $ make create-env dev
+
+This creates ``.env.dev`` with the template values for you to fill in.
+Will refuse to overwrite an existing file.
+
+set-env
+-------
+
+Switches between multiple environment configurations. Environment files are
+named by suffix, e.g. ``.env.dev``, ``.env.test``.
+
+List available environments::
+
+    $ make set-env
+
+Select an environment::
+
+    $ make set-env dev
+
+This creates a symlink from ``.env.<name>`` to ``.env``, which ``uv run``
+picks up automatically. If ``.env`` is a regular file, the command will refuse
+to overwrite it and ask you to rename it first.
+
 Rules that delete files
 =======================
 
