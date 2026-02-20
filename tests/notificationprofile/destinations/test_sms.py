@@ -6,7 +6,7 @@ from argus.auth.factories import PersonUserFactory
 from argus.notificationprofile.factories import DestinationConfigFactory, NotificationProfileFactory
 from argus.notificationprofile.media.sms_as_email import SMSNotification
 from argus.notificationprofile.models import DestinationConfig, Media
-from argus.notificationprofile.serializers import RequestDestinationConfigSerializer
+from argus.notificationprofile.v2.serializers import RequestDestinationConfigSerializer
 from argus.util.testing import connect_signals, disconnect_signals
 
 

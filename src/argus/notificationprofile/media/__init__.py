@@ -8,6 +8,7 @@ from django.conf import settings
 from django.db import connections
 from rest_framework.exceptions import ValidationError
 
+from argus.constants import API_STABLE_VERSION
 from argus.filter import get_filter_backend
 from argus.util.utils import import_class_from_dotted_path
 
@@ -44,11 +45,12 @@ _media_classes = [import_class_from_dotted_path(media_plugin) for media_plugin i
 MEDIA_CLASSES_DICT = {media_class.MEDIA_SLUG: media_class for media_class in _media_classes}
 
 
-def api_safely_get_medium_object(media_slug):
+def api_safely_get_medium_object(media_slug, version: str = API_STABLE_VERSION):
     try:
-        obj = MEDIA_CLASSES_DICT[media_slug]
+        classobj = MEDIA_CLASSES_DICT[media_slug]
     except KeyError:
         raise ValidationError(f'Medium "{media_slug}" is not installed.')
+    obj = classobj(version)
     return obj
 
 
