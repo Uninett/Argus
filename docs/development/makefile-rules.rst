@@ -4,7 +4,7 @@
 Makefile rules
 ==============
 
-The repo has a ``Makefile`` to help with development. The rules depend on having
+The repo has a ``Makefile`` to help with development. Some of the rules depend on having
 ``uv`` installed.
 
 Always run ``make`` from the root of the repository.
