@@ -47,6 +47,7 @@ urlpatterns = [
     ),
     re_path(r"^api/v1/.*$", api_v1_gone),
     path("api/v2/", include(("argus.site.api_v2_urls", "api"), namespace="v2")),
+    path("api/v3/", include(("argus.site.api_v3_urls", "api"), namespace="v3")),
     # path('api/sessionauth/', include('rest_framework.urls', namespace='rest_framework')),
     path("api/", MetadataView.as_view(), name="metadata"),
     path("json-schema/<slug:slug>", SchemaView.as_view(), name="json-schema"),

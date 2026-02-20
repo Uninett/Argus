@@ -114,6 +114,7 @@ class ResponseDestinationConfigSerializer(serializers.ModelSerializer):
     version = VERSION
     media = MediaSerializer()
     suggested_label = serializers.SerializerMethodField(method_name="get_suggested_label")
+    settings = serializers.SerializerMethodField(method_name="get_settings")
 
     class Meta:
         model = DestinationConfig
@@ -128,6 +129,12 @@ class ResponseDestinationConfigSerializer(serializers.ModelSerializer):
     def get_suggested_label(self, destination: DestinationConfig) -> str:
         medium = api_safely_get_medium_object(destination.media.slug, self.version)
         return f"{destination.media.name}: {medium.get_label(destination)}"
+
+    def get_settings(self, destination: DestinationConfig) -> dict:
+        settings = destination.settings.copy()
+        if destination.media.slug == "email":
+            settings["synced"] = bool(destination.managed)
+        return settings
 
 
 class RequestDestinationConfigSerializer(serializers.ModelSerializer):
@@ -159,10 +166,7 @@ class RequestDestinationConfigSerializer(serializers.ModelSerializer):
         medium = api_safely_get_medium_object(destination.media.slug, self.version)
         updated_destination = medium.update(destination, validated_data)
 
-        if updated_destination:
-            return updated_destination
-
-        return super().update(destination, validated_data)
+        return updated_destination
 
 
 class DuplicateDestinationSerializer(serializers.Serializer):
