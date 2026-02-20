@@ -171,7 +171,8 @@ $ git clone https://github.com/Uninett/Argus.git
 $ cd Argus
 ```
 
-Create and activate a Python virtual environment.
+Create and activate a Python virtual environment. You can also use
+virtualenv or virtualenvwrapper if you prefer.
 ```console
 $ uv venv
 $ source .venv/bin/activate
