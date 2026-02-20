@@ -18,7 +18,7 @@
             hx-on:change="htmx.ajax('GET', '{% url 'htmx:select-filter' %}');"
             {% endblock filter_select_custom_control %}>
     <legend class="sr-only">Filter incidents</legend>
-    <ul class="menu menu-horizontal menu-xs flex items-center gap-0.5 py-0">
+    <ul class="menu menu-horizontal menu-xs flex flex-wrap items-center gap-0.5 py-0">
       {% for field in filter_form %}
         {% if not field.field.in_header %}
           <li class="form-control">
