@@ -34,6 +34,8 @@ from .serializers import (
     TimeslotSerializer,
 )
 
+VERSION = "v2"
+
 
 filter_backend = get_filter_backend()
 QuerySetFilter = filter_backend.QuerySetFilter
@@ -117,17 +119,19 @@ class NotificationProfileViewSet(rw_viewsets.ModelViewSet):
 
 
 class SchemaView(DetailView):
+    version = VERSION
     template_name = "schemawrapper.html"
     model = Media
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
-        medium = api_safely_get_medium_object(self.object.slug)
+        medium = api_safely_get_medium_object(self.object.slug, self.version)
         kwargs["schema_info"] = medium.MEDIA_JSON_SCHEMA
         return kwargs
 
 
 class MediaViewSet(viewsets.ModelViewSet):
+    version = VERSION
     serializer_class = MediaSerializer
     queryset = Media.objects.none()
     http_method_names = ["get", "head"]
@@ -139,7 +143,7 @@ class MediaViewSet(viewsets.ModelViewSet):
     @action(methods=["get"], detail=True)
     def json_schema(self, request, pk, *args, **kwargs):
         try:
-            medium = api_safely_get_medium_object(pk)
+            medium = api_safely_get_medium_object(pk, self.version)
             schema = medium.MEDIA_JSON_SCHEMA
             schema["$id"] = reverse(
                 "json-schema",
@@ -165,6 +169,7 @@ class MediaViewSet(viewsets.ModelViewSet):
     ),
 )
 class DestinationConfigViewSet(rw_viewsets.ModelViewSet):
+    version = VERSION
     permission_classes = [*rw_viewsets.ModelViewSet.permission_classes, IsOwner]
     serializer_class = ResponseDestinationConfigSerializer
     read_serializer_class = ResponseDestinationConfigSerializer
@@ -183,7 +188,7 @@ class DestinationConfigViewSet(rw_viewsets.ModelViewSet):
         destination = get_object_or_404(self.get_queryset(), pk=pk)
 
         try:
-            medium = api_safely_get_medium_object(destination.media.slug)
+            medium = api_safely_get_medium_object(destination.media.slug, self.version)
             medium.raise_if_not_deletable(destination)
         except NotificationMedium.NotDeletableError as e:
             raise ValidationError(str(e))
@@ -194,7 +199,7 @@ class DestinationConfigViewSet(rw_viewsets.ModelViewSet):
         other_destinations = DestinationConfig.objects.filter(media=destination.media).filter(
             ~Q(user_id=destination.user.id)
         )
-        medium = api_safely_get_medium_object(destination.media_id)
+        medium = api_safely_get_medium_object(destination.media_id, self.version)
         destination_in_use = medium.has_duplicate(other_destinations, destination.settings)
         return destination_in_use
 
