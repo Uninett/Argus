@@ -21,6 +21,10 @@ User = get_user_model()
 MODIFICATION_WINDOW_PM = timedelta(hours=12)
 
 
+def limit_to_open_incidents():
+    return {"end_time__isnull": False, "end_time__gt": timezone.now()}
+
+
 class PlannedMaintenanceQuerySet(models.QuerySet):
     def future(self):
         return self.filter(start_time__gt=timezone.now())
@@ -66,7 +70,9 @@ class PlannedMaintenanceTask(models.Model):
     end_time = models.DateTimeField(default=LOCAL_INFINITY)
     description = models.CharField(blank=True, max_length=255)
     filters = models.ManyToManyField(to=Filter, related_name="planned_maintenance_tasks")
-    incidents = models.ManyToManyField(to=Incident, related_name="planned_maintenance_tasks", blank=True)
+    incidents = models.ManyToManyField(
+        to=Incident, related_name="planned_maintenance_tasks", blank=True, limit_choices_to=limit_to_open_incidents
+    )
 
     objects = PlannedMaintenanceQuerySet.as_manager()
 
