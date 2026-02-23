@@ -1,0 +1,15 @@
+<div class="card card-base my-4" id="notificationprofile-{{ profile.pk }}">
+  <details class="group collapse collapse-arrow"
+           name="notificationprofile-accordion"
+           hx-get="{% url 'htmx:notificationprofile-update' pk=profile.pk %}"
+           hx-trigger="toggle[this.open]"
+           hx-target="#notificationprofile-form-{{ profile.pk }}"
+           hx-swap="innerHTML">
+    <summary class="collapse-title min-h-0 p-3 pr-12">{% include "./_notificationprofile_summary.html" %}</summary>
+    <div class="collapse-content"
+         id="notificationprofile-form-{{ profile.pk }}">
+      <span class="loading loading-spinner loading-md"></span>
+    </div>
+  </details>
+  {% include profile.delete_modal.template_name with modal=profile.delete_modal %}
+</div>
