@@ -6,6 +6,8 @@ import logging
 from typing import TYPE_CHECKING, Any
 
 from argus.notificationprofile.utils import are_notifications_enabled
+from rest_framework.exceptions import ValidationError
+
 from apprise import Apprise
 
 from django import forms
@@ -29,7 +31,8 @@ if TYPE_CHECKING:
     User = get_user_model()
 
 
-__all__ = ["NotificationMedium"]
+__all__ = ["NotificationMedium", "AppriseMedium"]
+
 LOG = logging.getLogger(__name__)
 
 
@@ -156,6 +159,22 @@ class AppriseMedium(NotificationMedium):
 
     class Form(forms.Form):
         destination_url = forms.URLField()
+
+    @classmethod
+    def validate(cls, instance: RequestDestinationConfigSerializer, apprise_dict: dict, user: User) -> dict:
+        """
+        Validates the settings of an apprise destination and returns a dict
+        with validated and cleaned data
+        """
+        form = cls.Form(apprise_dict["settings"])
+        if not form.is_valid():
+            raise ValidationError(form.errors)
+        if user.destinations.filter(
+            media_id="apprise", settings__destination_url=form.cleaned_data["destination_url"]
+        ).exists():
+            raise ValidationError({"destination_url": "Webhook already exists"})
+
+        return form.cleaned_data
 
     @classmethod
     def has_duplicate(cls, queryset: QuerySet, settings: dict) -> bool:
