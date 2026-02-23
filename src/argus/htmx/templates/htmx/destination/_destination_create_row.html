@@ -1,0 +1,31 @@
+{% load widget_tweaks argus_htmx %}
+{% with media_field=form|get_form_field:"media" %}
+  <tr id="destination-create" class="border-b-2 border-primary">
+    <td>
+      {% csrf_token %}
+      {% render_field media_field class+="select select-bordered select-sm w-full" %}
+      {% for error in media_field.errors %}<span class="text-error text-xs">{{ error }}</span>{% endfor %}
+    </td>
+    <td>
+      {% render_field form.label class+="input input-bordered input-sm w-full" %}
+      {% for error in form.label.errors %}<span class="text-error text-xs">{{ error }}</span>{% endfor %}
+    </td>
+    <td>
+      {% render_field form.settings class+="input input-bordered input-sm w-full" %}
+      {% for error in form.settings.errors %}<span class="text-error text-xs">{{ error }}</span>{% endfor %}
+    </td>
+    <td>
+      <div class="flex gap-1 items-center">
+        <button type="button"
+                hx-post="{% url 'htmx:destination-create' %}"
+                hx-include="closest tr"
+                hx-target="#destination-create"
+                hx-swap="outerHTML"
+                class="btn btn-primary btn-sm">Save</button>
+        <button type="button"
+                onclick="this.closest('tr').outerHTML='<tr id=\'destination-create\'></tr>'"
+                class="btn btn-sm">Cancel</button>
+      </div>
+    </td>
+  </tr>
+{% endwith %}

@@ -18,8 +18,9 @@
           </tr>
         </thead>
         <tbody>
+          <tr id="destination-create"></tr>
           {% for form in update_forms %}
-            <tr>
+            <tr class="align-top">
               <td>
                 {% csrf_token %}
                 {% for hidden_field in form.hidden_fields %}{{ hidden_field }}{% endfor %}
