@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+import logging
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any
+
+from argus.notificationprofile.utils import are_notifications_enabled
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -19,6 +22,7 @@ if TYPE_CHECKING:
 
 
 __all__ = ["NotificationMedium"]
+LOG = logging.getLogger(__name__)
 
 
 class NotificationMedium(ABC):
@@ -86,20 +90,21 @@ class NotificationMedium(ABC):
         return set(addresses)
 
     @classmethod
-    @abstractmethod
     def send(cls, event: Event, destinations: Iterable[DestinationConfig], **kwargs) -> bool:
         """
         Sends message about a given event to the given destinations
 
         Loops over the destinations from ``cls.get_relevant_destinations`` and
-        coneverts each destination to a medium-specifoc "address" via
+        converts each destination to a medium-specific "address" via
         ``cls.get_relevant_address``.
 
         Returns a boolean:
         * True: everything ok
         * False: at least one destination failed
         """
-        pass
+        if not are_notifications_enabled():
+            LOG.info("notifications: turned off sitewide, not sending")
+            return False
 
     @classmethod
     def raise_if_not_deletable(cls, destination: DestinationConfig) -> NoneType:
