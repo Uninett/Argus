@@ -1,9 +1,20 @@
+from __future__ import annotations
+
 import logging
+from typing import TYPE_CHECKING
 
 from django.contrib.auth import get_user_model
 from django.db.utils import ProgrammingError
 
+from argus.notificationprofile.media import send_notifications_to_users
+from argus.notificationprofile.media import background_send_notification
+from argus.plannedmaintenance.utils import event_covered_by_planned_maintenance
+
 from .models import DestinationConfig, TimeRecurrence, Timeslot
+
+if TYPE_CHECKING:
+    from argus.incident.models import Event
+
 
 LOG = logging.getLogger(__name__)
 User = get_user_model()
@@ -12,6 +23,8 @@ __all__ = [
     "sync_media",
     "create_default_timeslot",
     "sync_email_destination",
+    "task_send_notification",
+    "task_background_send_notification",
 ]
 
 
@@ -100,3 +113,15 @@ def sync_email_destination(sender, instance: User, created, raw, *args, **kwargs
             settings={"email_address": instance.email, "synced": True},
         )
         DestinationConfig.objects.bulk_create([new_synced_destination])
+
+
+def task_send_notification(sender, instance: Event, *args, **kwargs):
+    if event_covered_by_planned_maintenance(event=instance):
+        return
+    send_notifications_to_users(instance)
+
+
+def task_background_send_notification(sender, instance: Event, *args, **kwargs):
+    if event_covered_by_planned_maintenance(event=instance):
+        return
+    send_notifications_to_users(instance, send=background_send_notification)
