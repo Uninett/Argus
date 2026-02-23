@@ -72,11 +72,11 @@
     }
 
     .choices-list-items {
-        @apply inline space-x-0.5;
+        @apply inline-flex flex-wrap gap-0.5;
     }
 
     .choices__list {
-        @apply flex space-x-0.5 items-center;
+        @apply flex flex-wrap gap-0.5 items-center;
     }
 
     /* Dropdown hidden by default */

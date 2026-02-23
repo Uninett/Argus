@@ -1,0 +1,44 @@
+<div class="group-open:hidden flex flex-col gap-1 min-w-0"
+     id="notificationprofile-summary-{{ profile.pk }}"
+     hx-swap-oob="true">
+  <div class="flex items-center gap-2">
+    <h2 class="text-lg font-semibold">{{ profile.name|default:"Unnamed profile" }}</h2>
+    {% if profile.active %}
+      <span class="badge badge-sm badge-success">Active</span>
+    {% else %}
+      <span class="badge badge-sm badge-ghost">Inactive</span>
+    {% endif %}
+  </div>
+  <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-base-content/70">
+    {% if profile.timeslot %}
+      <span class="flex items-center gap-1">
+        <i class="fa-regular fa-clock text-xs" aria-hidden="true"></i>
+        {{ profile.timeslot.name }}
+        {% for tr in profile.timeslot.time_recurrences.all %}
+          <span class="badge badge-sm">{{ tr.short_str }}</span>
+        {% endfor %}
+      </span>
+    {% endif %}
+    {% with filters=profile.filters.all %}
+      {% if filters %}
+        <span class="border-l border-base-content/20 pl-3 flex items-center gap-1">
+          <i class="fa-solid fa-filter text-xs" aria-hidden="true"></i>
+          {% for filter in filters %}
+            {{ filter.name }}
+            {% if not forloop.last %},{% endif %}
+          {% endfor %}
+        </span>
+      {% endif %}
+    {% endwith %}
+    {% with destinations=profile.destinations.all %}
+      {% if destinations %}
+        <span class="border-l border-base-content/20 pl-3 flex items-center gap-1 flex-wrap">
+          <i class="fa-regular fa-bell text-xs" aria-hidden="true"></i>
+          {% for dest in destinations %}
+            <span class="badge badge-sm badge-outline">{{ dest.media.name }}: {{ dest }}</span>
+          {% endfor %}
+        </span>
+      {% endif %}
+    {% endwith %}
+  </div>
+</div>
