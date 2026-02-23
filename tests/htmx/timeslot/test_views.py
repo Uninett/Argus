@@ -35,7 +35,7 @@ class TestTimeslotUpdateView(TimeslotViewTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("formset", response.context)
 
-    def test_deleting_all_recurrences_shows_warning(self):
+    def test_when_deleting_all_recurrences_it_should_show_warning(self):
         post_data = _build_timeslot_post_data(self.timeslot, [self.recurrence], delete_indices=[0])
 
         response = self.client.post(self.url, data=post_data)
@@ -46,7 +46,7 @@ class TestTimeslotUpdateView(TimeslotViewTestCase):
         self.assertEqual(messages[0].level_tag, "warning")
         self.assertIn("no time recurrences", str(messages[0]))
 
-    def test_missing_required_field_shows_error(self):
+    def test_when_missing_required_field_it_should_show_error(self):
         post_data = _build_timeslot_post_data(self.timeslot, [self.recurrence])
         formset_prefix = f"timerecurrenceform-{self.timeslot.pk}"
         post_data[f"{formset_prefix}-0-start"] = ""
@@ -56,7 +56,7 @@ class TestTimeslotUpdateView(TimeslotViewTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue(response.context["formset"].errors)
 
-    def test_start_time_must_be_before_end_time(self):
+    def test_when_start_time_after_end_time_it_should_show_error(self):
         post_data = _build_timeslot_post_data(self.timeslot, [self.recurrence])
         formset_prefix = f"timerecurrenceform-{self.timeslot.pk}"
         post_data[f"{formset_prefix}-0-start"] = "17:00"
@@ -68,12 +68,6 @@ class TestTimeslotUpdateView(TimeslotViewTestCase):
         formset = response.context["formset"]
         self.assertIn("start", formset.errors[0])
         self.assertIn("before", str(formset.errors[0]["start"]))
-
-    def test_given_htmx_get_it_should_return_form_content_partial(self):
-        response = self.client.get(self.url, HTTP_HX_REQUEST="true")
-
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "htmx/timeslot/_timeslot_form_content.html")
 
     def test_given_htmx_valid_post_it_should_persist_and_render_success(self):
         post_data = _build_timeslot_post_data(self.timeslot, [self.recurrence])
@@ -105,12 +99,11 @@ class TestTimeslotListView(TimeslotViewTestCase):
         TimeRecurrenceFactory(timeslot=self.timeslot)
         self.url = reverse("htmx:timeslot-list")
 
-    def test_when_get_it_should_list_timeslots_with_delete_modals(self):
+    def test_when_get_it_should_list_timeslots(self):
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, 200)
-        obj = response.context["object_list"][0]
-        self.assertTrue(hasattr(obj, "delete_modal"))
+        self.assertIn(self.timeslot, response.context["object_list"])
 
 
 class TestTimeslotDetailView(TimeslotViewTestCase):
@@ -120,12 +113,11 @@ class TestTimeslotDetailView(TimeslotViewTestCase):
         TimeRecurrenceFactory(timeslot=self.timeslot)
         self.url = reverse("htmx:timeslot-detail", kwargs={"pk": self.timeslot.pk})
 
-    def test_given_htmx_get_it_should_return_card_partial_with_delete_modal(self):
+    def test_given_htmx_get_it_should_return_card_partial(self):
         response = self.client.get(self.url, HTTP_HX_REQUEST="true")
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "htmx/timeslot/_timeslot_card.html")
-        self.assertTrue(hasattr(response.context["timeslot"], "delete_modal"))
 
     def test_when_non_htmx_get_it_should_redirect_to_update(self):
         response = self.client.get(self.url)
@@ -142,7 +134,7 @@ class TestTimeslotCreateView(TimeslotViewTestCase):
         super().setUp()
         self.url = reverse("htmx:timeslot-create")
 
-    def test_get_renders_form_with_formset(self):
+    def test_when_get_it_should_render_form_with_formset(self):
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, 200)

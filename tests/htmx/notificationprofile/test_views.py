@@ -50,7 +50,7 @@ class TestNotificationProfileDetailView(NotificationProfileViewTestCase):
         self.profile = NotificationProfileFactory(user=self.user, timeslot=timeslot)
         self.url = reverse("htmx:notificationprofile-detail", kwargs={"pk": self.profile.pk})
 
-    def test_when_htmx_get_it_should_return_card_partial(self):
+    def test_given_htmx_get_it_should_return_card_partial(self):
         response = self.client.get(self.url, HTTP_HX_REQUEST="true")
 
         self.assertEqual(response.status_code, 200)
@@ -90,7 +90,7 @@ class TestNotificationProfileCreateView(NotificationProfileViewTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("form", response.context)
 
-    def test_when_htmx_get_it_should_return_form_partial(self):
+    def test_given_htmx_get_it_should_return_form_partial(self):
         response = self.client.get(self.url, HTTP_HX_REQUEST="true")
 
         self.assertEqual(response.status_code, 200)
@@ -102,7 +102,7 @@ class TestNotificationProfileCreateView(NotificationProfileViewTestCase):
 
         self.assertRedirects(response, reverse("htmx:notificationprofile-list"), fetch_redirect_response=False)
 
-    def test_when_htmx_valid_post_it_should_redirect_via_hx_redirect(self):
+    def test_given_htmx_valid_post_it_should_redirect_via_hx_redirect(self):
         response = self.client.post(self.url, data=self._build_post_data(), HTTP_HX_REQUEST="true")
 
         self.assertEqual(response.status_code, 200)
@@ -136,7 +136,7 @@ class TestNotificationProfileUpdateView(NotificationProfileViewTestCase):
         data.update(overrides)
         return data
 
-    def test_when_htmx_valid_post_it_should_persist_and_render_success(self):
+    def test_given_htmx_valid_post_it_should_persist_and_render_success(self):
         prefix = f"npf{self.profile.pk}"
         post_data = self._build_post_data(**{f"{prefix}-name": "Updated Name"})
 
@@ -147,7 +147,7 @@ class TestNotificationProfileUpdateView(NotificationProfileViewTestCase):
         self.assertEqual(self.profile.name, "Updated Name")
         self.assertIn("success_message", response.context)
 
-    def test_when_htmx_invalid_post_it_should_return_form_content_partial_with_errors(self):
+    def test_given_htmx_invalid_post_it_should_return_form_content_partial_with_errors(self):
         prefix = f"npf{self.profile.pk}"
         post_data = self._build_post_data(**{f"{prefix}-timeslot": ""})
         del post_data[f"{prefix}-active"]
