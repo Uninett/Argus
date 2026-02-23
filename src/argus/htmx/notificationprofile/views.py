@@ -59,9 +59,9 @@ class FilterFieldMixin:
 class NotificationProfileForm(DestinationFieldMixin, FilterFieldMixin, NoColonMixin, forms.ModelForm):
     class Meta:
         model = NotificationProfile
-        fields = ["name", "timeslot", "filters", "active", "destinations"]
+        fields = ["name", "timeslot", "filters", "destinations", "active"]
         widgets = {
-            "timeslot": forms.Select(attrs={"class": "select input-bordered w-full max-w-xs"}),
+            "timeslot": forms.Select(attrs={"class": "select input-bordered w-full"}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -72,8 +72,8 @@ class NotificationProfileForm(DestinationFieldMixin, FilterFieldMixin, NoColonMi
 
         self.fields["filters"].help_text = "Multiple filters increase precision, not recall. They are AND-ed together."
         self.fields["timeslot"].queryset = Timeslot.objects.filter(user=self.user)
-        self.fields["active"].widget.attrs["class"] = "checkbox checkbox-sm border"
         self.fields["active"].widget.attrs["autocomplete"] = "off"
+        self.fields["active"].help_text = "When inactive, no notifications will be sent for this profile."
         self.fields["name"].widget.attrs["class"] = "input input-bordered"
 
         self.action = self.get_action()

@@ -7,27 +7,38 @@
 {% endif %}
 <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 w-full">
   {% for field, errors in fields %}
-    <div {% with classes=field.css_classes %}
-         {% if classes %}class="{{ classes }}"{% endif %}
-         {% endwith %}>
-      {% if field.name == "name" or field.name == "timeslot" %}
-        {% include "htmx/forms/input_field.html" with label=field.label max_width="full" field=field %}
-      {% elif field.name == "active" %}
-        {% include "htmx/forms/input_field.html" with label=field.label field=field input_classes="checkbox border-b border-1" %}
-      {% else %}
-        <div class="form-control w-full">
-          <label class="label" for="{{ field.auto_id }}">
-            <span class="label-text"><em>{{ field.label }}</em></span>
-          </label>
-          {% render_field field %}
-          {% if field.help_text %}<div class="helptext text-xs">{{ field.help_text }}</div>{% endif %}
-          {{ errors }}
-        </div>
-      {% endif %}
-      {% if forloop.last %}
-        {% for field in hidden_fields %}{{ field }}{% endfor %}
-      {% endif %}
-    </div>
+    {% if field.name == "name" %}
+      {% comment %}Rendered separately in the form template with action buttons{% endcomment %}
+    {% else %}
+      <div {% with classes=field.css_classes %}
+           {% if classes %}class="{{ classes }}"{% endif %}
+           {% endwith %}
+           {% if field.name == "active" %}class="sm:col-start-2"{% endif %}>
+        {% if field.name == "timeslot" %}
+          {% include "htmx/forms/input_field.html" with label=field.label max_width="full" field=field %}
+        {% elif field.name == "active" %}
+          <div class="flex flex-col justify-end h-full">
+            <label class="label cursor-pointer justify-start gap-3">
+              {% render_field field class+="checkbox checkbox-sm border-b border-1" %}
+              <span class="label-text"><em>{{ field.label }}</em></span>
+            </label>
+            {% if field.help_text %}<div class="helptext text-xs pl-8">{{ field.help_text }}</div>{% endif %}
+          </div>
+        {% else %}
+          <div class="form-control w-full">
+            <label class="label" for="{{ field.auto_id }}">
+              <span class="label-text"><em>{{ field.label }}</em></span>
+            </label>
+            {% render_field field %}
+            {% if field.help_text %}<div class="helptext text-xs">{{ field.help_text }}</div>{% endif %}
+            {{ errors }}
+          </div>
+        {% endif %}
+        {% if forloop.last %}
+          {% for field in hidden_fields %}{{ field }}{% endfor %}
+        {% endif %}
+      </div>
+    {% endif %}
   {% endfor %}
 </div>
 {% if not fields and not errors %}

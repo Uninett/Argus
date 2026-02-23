@@ -10,31 +10,36 @@
       {% if form.errors %}
         <div class="alert alert-error flex flex-col items-start gap-2 w-full mb-4"
              role="alert">
-          <div class="flex items-center gap-2 font-semibold">
+          <div class="flex items-end gap-2 mb-2 font-semibold">
             <i class="fa-solid fa-circle-xmark" aria-hidden="true"></i>
             <span>Please correct the errors below</span>
           </div>
         </div>
       {% endif %}
       <div class="flex flex-col gap-4 w-full">
-        {% if is_create %}<h2 class="text-lg font-semibold">New profile</h2>{% endif %}
-        {{ form.as_div }}
-        <div class="card-actions flex items-center gap-2">
-          {% if form.instance.pk %}
-            <input type="submit" class="btn btn-primary btn-sm" value="Save">
-            <button type="button"
-                    hx-get="{% url 'htmx:notificationprofile-detail' pk=form.instance.pk %}"
-                    hx-target="#notificationprofile-{{ form.instance.pk }}"
-                    hx-swap="outerHTML"
-                    class="btn btn-sm">Cancel</button>
-            {% include form.modal.template_name with modal=form.modal %}
-          {% else %}
-            <input type="submit" class="btn btn-primary btn-sm" value="Create">
-            <button type="button"
-                    _="on click set el to me.closest('[id=notificationprofile-create]') then set el.innerHTML to '' then set el.className to ''"
-                    class="btn btn-sm">Cancel</button>
-          {% endif %}
+        <div class="flex gap-16 justify-between">
+          <div>
+            {% if is_create %}<h2 class="text-lg font-semibold">New profile</h2>{% endif %}
+            {% include "htmx/forms/input_field.html" with label=form.name.label max_width="md" field=form.name %}
+          </div>
+          <div class="card-actions flex items-end gap-2 mb-2">
+            {% if form.instance.pk %}
+              <input type="submit" class="btn btn-primary btn-sm" value="Save">
+              <button type="button"
+                      hx-get="{% url 'htmx:notificationprofile-detail' pk=form.instance.pk %}"
+                      hx-target="#notificationprofile-{{ form.instance.pk }}"
+                      hx-swap="outerHTML"
+                      class="btn btn-sm">Cancel</button>
+              {% include form.modal.template_name with modal=form.modal %}
+            {% else %}
+              <input type="submit" class="btn btn-primary btn-sm" value="Create">
+              <button type="button"
+                      _="on click set el to me.closest('[id=notificationprofile-create]') then set el.innerHTML to '' then set el.className to ''"
+                      class="btn btn-sm">Cancel</button>
+            {% endif %}
+          </div>
         </div>
+        {{ form.as_div }}
       </div>
     </form>
   </section>
