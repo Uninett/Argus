@@ -1,0 +1,57 @@
+{% load widget_tweaks %}
+<div id="destination-table" class="card card-base max-w-4xl w-full">
+  <div class="card-body p-4">
+    {% if error_msg %}
+      {% include "messages/_banner.html" with message=error_msg level="error" %}
+    {% endif %}
+    {% if success_message %}
+      {% include "messages/_banner.html" with message=success_message level="success" %}
+    {% endif %}
+    <div class="overflow-x-auto">
+      <table class="table [&_td]:align-top">
+        <thead>
+          <tr>
+            <th class="w-[150px]">Media</th>
+            <th>Name</th>
+            <th>Value</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for form in update_forms %}
+            <tr>
+              <td>
+                {% csrf_token %}
+                {% for hidden_field in form.hidden_fields %}{{ hidden_field }}{% endfor %}
+                <span class="badge badge-outline">{{ form.instance.media.name }}</span>
+              </td>
+              <td>
+                {% render_field form.label class+="input input-bordered input-sm w-full" %}
+                {% for error in form.label.errors %}<span class="text-error text-xs">{{ error }}</span>{% endfor %}
+              </td>
+              <td>
+                {% render_field form.settings class+="input input-bordered input-sm w-full" %}
+                {% for error in form.settings.errors %}<span class="text-error text-xs">{{ error }}</span>{% endfor %}
+              </td>
+              <td>
+                <div class="flex gap-1 items-center">
+                  <button type="button"
+                          hx-post="{% url 'htmx:destination-update' pk=form.instance.pk %}"
+                          hx-include="closest tr"
+                          hx-target="#destination-table"
+                          hx-swap="outerHTML"
+                          class="btn btn-primary btn-sm">Save</button>
+                  {% include form.modal.template_name with modal=form.modal %}
+                </div>
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="4" class="text-base-content/60 text-center">No destinations yet.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

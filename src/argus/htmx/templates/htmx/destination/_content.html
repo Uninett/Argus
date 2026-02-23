@@ -1,4 +1,10 @@
 <div id="destination-content" class="flex flex-col items-center gap-4">
-  {% include "htmx/destination/_create_form.html" %}
-  {% include "htmx/destination/_form_list.html" %}
+  <div class="flex justify-end w-full">
+    <button hx-get="{% url 'htmx:destination-create' %}"
+            hx-target="#destination-create"
+            hx-swap="outerHTML"
+            class="btn btn-primary">New destination</button>
+  </div>
+  <div id="destination-create"></div>
+  {% include "htmx/destination/_destination_table.html" %}
 </div>

@@ -1,0 +1,28 @@
+{% load widget_tweaks %}
+<div class="card card-base card-create max-w-4xl w-full"
+     id="destination-create">
+  <section class="card-body p-4">
+    <h2 class="text-lg font-semibold">New destination</h2>
+    <form method="post"
+          novalidate
+          hx-post="{% url 'htmx:destination-create' %}"
+          hx-target="#destination-create"
+          hx-swap="outerHTML">
+      {% csrf_token %}
+      {% if form.errors %}
+        {% include "messages/_banner.html" with message="Please correct the errors below." level="error" dismissible=False %}
+      {% endif %}
+      <div class="flex gap-4 items-end flex-wrap">
+        {% for field in form %}
+          {% include "htmx/forms/input_field.html" with label=field.label field=field %}
+        {% endfor %}
+        <div class="flex items-end gap-2 mb-2">
+          <input type="submit" class="btn btn-primary btn-sm" value="Save">
+          <button type="button"
+                  onclick="this.closest('[id=destination-create]').outerHTML='<div id=\'destination-create\'></div>'"
+                  class="btn btn-sm">Cancel</button>
+        </div>
+      </div>
+    </form>
+  </section>
+</div>
