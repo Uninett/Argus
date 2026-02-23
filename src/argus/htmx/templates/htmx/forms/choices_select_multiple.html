@@ -11,7 +11,7 @@
 </select>
 <script>
 (function () {
-    const el = document.querySelector('#{{ widget.attrs.id }}');
+    const el = document.querySelector('#{{ widget.attrs.id|escapejs }}');
     if (el.choices) return;
     const instance = new Choices(el, {
         removeItemButton: true,
@@ -22,7 +22,7 @@
         itemSelectText: '',
         removeItemIconText: () => '',
         placeholder: true,
-        placeholderValue: '{{ widget.attrs.placeholder|default:"Select..." }}',
+        placeholderValue: '{{ widget.attrs.placeholder|default:"Select..."|escapejs }}',
         classNames: {
             containerOuter: ['choices', 'dropdown', 'w-full', 'max-w-none', 'self-auto'],
             containerInner: ['choices__inner'],

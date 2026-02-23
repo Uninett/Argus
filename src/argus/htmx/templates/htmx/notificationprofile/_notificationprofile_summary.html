@@ -1,6 +1,6 @@
 <div class="group-open:hidden flex flex-col gap-1 min-w-0"
      id="notificationprofile-summary-{{ profile.pk }}"
-     hx-swap-oob="true">
+     {% if oob %}hx-swap-oob="true"{% endif %}>
   <div class="flex items-center gap-2">
     <h2 class="text-lg font-semibold">{{ profile.name|default:"Unnamed profile" }}</h2>
     {% if profile.active %}

@@ -5,16 +5,14 @@ See https://ccbv.co.uk/ to grok class-based views.
 """
 
 from django import forms
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect
 from django.http import HttpResponseRedirect
 from django.template.response import TemplateResponse
 from django.urls import reverse
 from django.utils import timezone
-from django.views.decorators.http import require_GET
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 from django_htmx.http import HttpResponseClientRedirect
 
-from argus.htmx.request import HtmxHttpRequest
 from argus.notificationprofile.media import MEDIA_CLASSES_DICT
 from argus.htmx.modals import DeleteModal
 from argus.notificationprofile.models import NotificationProfile, Timeslot, Filter, DestinationConfig
@@ -96,57 +94,6 @@ class NotificationProfileForm(DestinationFieldMixin, FilterFieldMixin, NoColonMi
         if profiles_with_same_name.exists():
             raise forms.ValidationError(f"A profile by this user with the name '{name}' already exists.")
         return name
-
-
-class NotificationProfileFilterForm(FilterFieldMixin, NoColonMixin, forms.ModelForm):
-    class Meta:
-        model = NotificationProfile
-        fields = ["filters"]
-
-    def __init__(self, *args, **kwargs):
-        user = kwargs.pop("user")
-        super().__init__(*args, **kwargs)
-        self._init_filters(user)
-
-
-class NotificationProfileDestinationForm(DestinationFieldMixin, NoColonMixin, forms.ModelForm):
-    class Meta:
-        model = NotificationProfile
-        fields = ["destinations"]
-
-    def __init__(self, *args, **kwargs):
-        user = kwargs.pop("user")
-        super().__init__(*args, **kwargs)
-        self._init_destinations(user)
-
-
-def _render_form_field(request: HtmxHttpRequest, form, partial_template_name, prefix=None):
-    # Not a view!
-    form = form(request.GET or None, user=request.user, prefix=prefix)
-    context = {"form": form}
-    return render(request, partial_template_name, context=context)
-
-
-@require_GET
-def filters_form_view(request: HtmxHttpRequest, pk: int = None):
-    prefix = f"npf{pk}" if pk else None
-    return _render_form_field(
-        request,
-        NotificationProfileFilterForm,
-        "htmx/notificationprofile/_notificationprofile_form.html",
-        prefix=prefix,
-    )
-
-
-@require_GET
-def destinations_form_view(request: HtmxHttpRequest, pk: int = None):
-    prefix = f"npf{pk}" if pk else None
-    return _render_form_field(
-        request,
-        NotificationProfileDestinationForm,
-        "htmx/notificationprofile/_notificationprofile_form.html",
-        prefix=prefix,
-    )
 
 
 class NotificationProfileMixin:

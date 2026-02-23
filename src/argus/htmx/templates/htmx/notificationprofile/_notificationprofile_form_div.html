@@ -10,10 +10,7 @@
     {% if field.name == "name" %}
       {% comment %}Rendered separately in the form template with action buttons{% endcomment %}
     {% else %}
-      <div {% with classes=field.css_classes %}
-           {% if classes %}class="{{ classes }}"{% endif %}
-           {% endwith %}
-           {% if field.name == "active" %}class="sm:col-start-2"{% endif %}>
+      <div class="{% with classes=field.css_classes %}{{ classes }}{% endwith %}{% if field.name == "active" %} sm:col-start-2{% endif %}">
         {% if field.name == "timeslot" %}
           {% include "htmx/forms/input_field.html" with label=field.label max_width="full" field=field %}
         {% elif field.name == "active" %}
