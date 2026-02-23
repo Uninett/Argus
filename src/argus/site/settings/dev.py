@@ -23,10 +23,12 @@ INTERNAL_IPS = ["127.0.0.1"]
 
 INSTALLED_APPS += ["django_extensions"]  # noqa: F405
 
+
 # Paths to plugins
 MEDIA_PLUGINS = [
     "argus.notificationprofile.media.email.EmailNotification",
     "argus.notificationprofile.media.sms_as_email.SMSNotification",
+    "argus.notificationprofile.media.slack.SlackNotification",
 ]
 
 # Logging setup
