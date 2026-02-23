@@ -67,10 +67,11 @@ class DestinationListView(DestinationMixin, ListView):
 
 class DestinationCreateView(DestinationMixin, CreateView):
     form_class = DestinationFormCreate
+    htmx_template = "htmx/destination/_destination_create_row.html"
 
     def get_template_names(self):
         if self.request.htmx:
-            return ["htmx/destination/_destination_form.html"]
+            return [self.htmx_template]
         return super().get_template_names()
 
     def get_form_kwargs(self):
@@ -86,7 +87,11 @@ class DestinationCreateView(DestinationMixin, CreateView):
 
     def form_invalid(self, form):
         if self.request.htmx:
-            return self.render_to_response(self.get_context_data(form=form))
+            return TemplateResponse(
+                self.request,
+                self.htmx_template,
+                {"form": form},
+            )
         return super().form_invalid(form)
 
 
