@@ -42,8 +42,11 @@ def get_themes_from_css():
     THEME_NAME_RE = r"(?P<theme>[-_\w]+)"
     DATA_THEME_RE = rf"\[data-theme={THEME_NAME_RE}\]"
 
-    absolute_stylesheet_path = Path(find(get_stylesheet_path()))
-    styles_css = absolute_stylesheet_path.read_text()
+    stylesheet = find(get_stylesheet_path())
+    if stylesheet is None:
+        LOG.warning("Stylesheet %s not found, cannot extract themes from CSS", get_stylesheet_path())
+        return []
+    styles_css = Path(stylesheet).read_text()
 
     return findall(DATA_THEME_RE, styles_css)
 

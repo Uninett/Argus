@@ -119,6 +119,14 @@ Checklist
 
    Note: we bypass pull-requests here.
 
+#. Compile the Tailwind CSS stylesheet (requires the Tailwind binary;
+   run :code:`make upgrade-tailwind` first if it is not already
+   installed):
+
+    .. code:: console
+
+        $ make tailwind
+
 #. Create a wheel and source tarball:
 
     .. code:: console

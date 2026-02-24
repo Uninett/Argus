@@ -75,7 +75,12 @@ dev = [
 source = "versioningit"
 
 [tool.hatch.build]
-artifacts = ["src/argus/version.py"]
+artifacts = [
+    "src/argus/version.py",
+    "src/argus/htmx/static/styles.css",
+    "src/argus/htmx/tailwindtheme/tailwind.config.js",
+    "src/argus/htmx/tailwindtheme/styles.css",
+]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/argus"]
