@@ -54,7 +54,7 @@ class DestinationFieldMixin:
 
 class FilterFieldMixin:
     def _init_filters(self, user):
-        qs = Filter.objects.filter(user=user)
+        qs = Filter.objects.usable_by(user=user)
         self.fields["filters"].queryset = qs
 
         if self.instance.id:
