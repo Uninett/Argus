@@ -24,7 +24,7 @@
               <td>
                 {% csrf_token %}
                 {% for hidden_field in form.hidden_fields %}{{ hidden_field }}{% endfor %}
-                <span class="badge badge-outline">{{ form.instance.media.name }}</span>
+                <span class="badge badge-outline mt-1.5">{{ form.instance.media.name }}</span>
               </td>
               <td>
                 {% render_field form.label class+="input input-bordered input-sm w-full" %}
@@ -42,7 +42,14 @@
                           hx-target="#destination-table"
                           hx-swap="outerHTML"
                           class="btn btn-primary btn-sm">Save</button>
-                  {% include form.modal.template_name with modal=form.modal %}
+                  {% if form.delete_disabled %}
+                    <span class="tooltip tooltip-left tooltip-info cursor-not-allowed"
+                          data-tip="{{ form.delete_tooltip }}">
+                      <button class="btn btn-sm btn-outline btn-error" disabled>Delete</button>
+                    </span>
+                  {% else %}
+                    {% include form.modal.template_name with modal=form.modal %}
+                  {% endif %}
                 </div>
               </td>
             </tr>

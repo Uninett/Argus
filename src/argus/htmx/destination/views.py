@@ -16,6 +16,28 @@ from .forms import DestinationFormCreate, DestinationFormUpdate
 DESTINATION_TABLE_TEMPLATE = "htmx/destination/_destination_table.html"
 
 
+def _attach_delete_state(form, make_modal):
+    """Attach delete modal or disabled state to a form based on deletability.
+
+    Note: DestinationFormUpdate.__init__ mutates instance.settings from a dict
+    to a plain string, so we read the raw settings from DB for the synced check.
+    """
+    destination = form.instance
+    in_use = destination.notification_profiles.exists()
+    raw_settings = DestinationConfig.objects.values_list("settings", flat=True).get(pk=destination.pk)
+    synced = raw_settings.get("synced", False) if isinstance(raw_settings, dict) else False
+
+    if in_use:
+        form.delete_disabled = True
+        form.delete_tooltip = "This destination is used by a notification profile and cannot be deleted"
+    elif synced:
+        form.delete_disabled = True
+        form.delete_tooltip = "This destination is synced from an outside source and cannot be deleted"
+    else:
+        form.delete_disabled = False
+        form.modal = make_modal(destination)
+
+
 class DestinationMixin:
     model = DestinationConfig
     prefix = "destination"
@@ -60,7 +82,7 @@ class DestinationListView(DestinationMixin, ListView):
         context = super().get_context_data(**kwargs)
         update_forms = _get_update_forms(self.request.user)
         for f in update_forms:
-            f.modal = self._make_delete_modal(f.instance)
+            _attach_delete_state(f, self._make_delete_modal)
         context["update_forms"] = update_forms
         return context
 
@@ -120,7 +142,7 @@ class DestinationUpdateView(DestinationMixin, UpdateView):
         update_forms = _get_update_forms(self.request.user)
         update_forms = _replace_form_in_list(update_forms, form)
         for f in update_forms:
-            f.modal = self._make_delete_modal(f.instance)
+            _attach_delete_state(f, self._make_delete_modal)
         context = {"update_forms": update_forms}
         return TemplateResponse(
             self.request,
@@ -131,7 +153,7 @@ class DestinationUpdateView(DestinationMixin, UpdateView):
     def _render_table(self, error_msg=None, success_message=None):
         update_forms = _get_update_forms(self.request.user)
         for f in update_forms:
-            f.modal = self._make_delete_modal(f.instance)
+            _attach_delete_state(f, self._make_delete_modal)
         context = {
             "update_forms": update_forms,
             "error_msg": error_msg,
@@ -153,7 +175,7 @@ class DestinationDeleteView(DestinationMixin, DeleteView):
         except NotificationMedium.NotDeletableError as e:
             update_forms = _get_update_forms(request.user)
             for f in update_forms:
-                f.modal = self._make_delete_modal(f.instance)
+                _attach_delete_state(f, self._make_delete_modal)
             response = TemplateResponse(
                 request,
                 DESTINATION_TABLE_TEMPLATE,

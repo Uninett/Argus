@@ -50,6 +50,50 @@ class TestDestinationListView(DestinationViewTestCase):
         forms = response.context["update_forms"]
         self.assertEqual(len(forms), self.user.destinations.count())
 
+    def _get_form_for(self, response, destination):
+        return next(f for f in response.context["update_forms"] if f.instance.pk == destination.pk)
+
+    def test_free_destination_has_delete_disabled_false(self):
+        destination = DestinationConfigFactory(
+            user=self.user,
+            media=self.email_media,
+            settings={"email_address": "free@example.com", "synced": False},
+        )
+
+        response = self.client.get(self.url)
+
+        form = self._get_form_for(response, destination)
+        self.assertFalse(form.delete_disabled)
+
+    def test_destination_in_use_has_delete_disabled(self):
+        destination = DestinationConfigFactory(
+            user=self.user,
+            media=self.email_media,
+            settings={"email_address": "used@example.com", "synced": False},
+        )
+        timeslot = TimeslotFactory(user=self.user)
+        profile = NotificationProfileFactory(user=self.user, timeslot=timeslot)
+        profile.destinations.add(destination)
+
+        response = self.client.get(self.url)
+
+        form = self._get_form_for(response, destination)
+        self.assertTrue(form.delete_disabled)
+        self.assertIn("used by a notification profile", form.delete_tooltip)
+
+    def test_synced_destination_has_delete_disabled(self):
+        destination = DestinationConfigFactory(
+            user=self.user,
+            media=self.email_media,
+            settings={"email_address": "synced@example.com", "synced": True},
+        )
+
+        response = self.client.get(self.url)
+
+        form = self._get_form_for(response, destination)
+        self.assertTrue(form.delete_disabled)
+        self.assertIn("synced from an outside source", form.delete_tooltip)
+
     def test_only_shows_own_destinations(self):
         other_user = PersonUserFactory()
         DestinationConfigFactory(
