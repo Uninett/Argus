@@ -14,7 +14,11 @@
     {% for object in object_list %}
       <option value="{{ object.id }}"
               {% if request.session.selected_filter == object.id|stringformat:"i" %}selected{% endif %}>
-        {{ object.name }}
+        {% if object.label %}
+          {{ object.label }}
+        {% else %}
+          {{ object.name }}
+        {% endif %}
       </option>
     {% endfor %}
   </select>
