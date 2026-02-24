@@ -3,7 +3,13 @@
   <div class="flex justify-center p-4">
     <div class="max-w-4xl w-full">
       <h1 class="text-center text-3xl font-semibold mt-3 mb-4">Notification preferences</h1>
-      <div class="flex justify-between items-center mb-4">{% include "htmx/notifications/_tabs.html" %}</div>
+      <div class="flex justify-between items-center mb-4">
+        {% include "htmx/notifications/_tabs.html" %}
+        <button hx-get="{% url 'htmx:destination-create' %}"
+                hx-target="#destination-create"
+                hx-swap="outerHTML"
+                class="btn btn-primary">New destination</button>
+      </div>
       {% include "htmx/destination/_content.html" %}
     </div>
   </div>

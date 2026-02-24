@@ -1,9 +1,3 @@
 <div id="destination-content" class="flex flex-col items-center gap-4">
-  <div class="flex justify-end w-full">
-    <button hx-get="{% url 'htmx:destination-create' %}"
-            hx-target="#destination-create"
-            hx-swap="outerHTML"
-            class="btn btn-primary">New destination</button>
-  </div>
   {% include "htmx/destination/_destination_table.html" %}
 </div>
