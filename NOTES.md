@@ -50,6 +50,28 @@ of events that happened if the start of the incident was not covered by
 a notification timeslot. This might mean more notifications! Please set the
 `event types` filter to only the types of events desired.
 
+## Unreleased
+
+### Incident list filter UI refactoring
+
+The incident list filter UI has been refactored. The tabbed interface with
+"Filter Incidents" and "Update Incidents" tabs has been replaced with:
+
+- A collapsible filterbox (hidden by default, toggled with "Show/Hide filters")
+- A dynamic bulk actions bar that appears when rows are selected
+
+**Template changes for customizers:**
+
+The template `_incident_list_menubar.html` is now **deprecated** and will be
+removed in a future version. It currently acts as a shim that includes the new
+`_incident_toolbar.html` template.
+
+If you have overridden `_incident_list_menubar.html`, your override will still
+be loaded, but you should migrate to the new templates:
+
+- `_incident_toolbar.html`: Contains the full toolbar (filter controls + bulk actions)
+- `_filter_controls.html`: Contains the filter select dropdown, CRUD buttons, and show/hide toggle
+
 ## [2.6.0] - 2026-01-06
 
 This is a tiny release to finish up what was started at the end of 2025.

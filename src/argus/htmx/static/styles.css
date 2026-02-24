@@ -5356,6 +5356,10 @@ details.collapse summary::-webkit-details-marker {
   visibility: visible;
 }
 
+.invisible {
+  visibility: hidden;
+}
+
 .collapse {
   visibility: collapse;
 }
@@ -5597,11 +5601,6 @@ details.collapse summary::-webkit-details-marker {
 
 .min-h-\[3rem\] {
   min-height: 3rem;
-}
-
-.min-h-fit {
-  min-height: -moz-fit-content;
-  min-height: fit-content;
 }
 
 .w-1\/3 {
@@ -5985,6 +5984,10 @@ details.collapse summary::-webkit-details-marker {
   border-color: var(--fallback-p,oklch(var(--p)/var(--tw-border-opacity, 1)));
 }
 
+.border-primary\/50 {
+  border-color: var(--fallback-p,oklch(var(--p)/0.5));
+}
+
 .border-severity-primary-1 {
   --tw-border-opacity: 1;
   border-color: rgb(255 0 0 / var(--tw-border-opacity, 1));
@@ -6077,6 +6080,10 @@ details.collapse summary::-webkit-details-marker {
 .bg-primary {
   --tw-bg-opacity: 1;
   background-color: var(--fallback-p,oklch(var(--p)/var(--tw-bg-opacity, 1)));
+}
+
+.bg-primary\/10 {
+  background-color: var(--fallback-p,oklch(var(--p)/0.1));
 }
 
 .bg-red-700 {
@@ -6231,14 +6238,6 @@ details.collapse summary::-webkit-details-marker {
   padding-bottom: 1.25rem;
 }
 
-.pb-0 {
-  padding-bottom: 0px;
-}
-
-.pb-0\.5 {
-  padding-bottom: 0.125rem;
-}
-
 .pb-8 {
   padding-bottom: 2rem;
 }
@@ -6257,14 +6256,6 @@ details.collapse summary::-webkit-details-marker {
 
 .pr-4 {
   padding-right: 1rem;
-}
-
-.pt-0 {
-  padding-top: 0px;
-}
-
-.pt-0\.5 {
-  padding-top: 0.125rem;
 }
 
 .pt-4 {
@@ -6550,14 +6541,6 @@ details.collapse summary::-webkit-details-marker {
 
 .ease-in-out {
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.\[--tab-border-color\:theme\(colors\.primary\)\] {
-  --tab-border-color: var(--fallback-p,oklch(var(--p)/1));
-}
-
-.\[--tab-border\:theme\(borderWidth\.DEFAULT\)\] {
-  --tab-border: 2px;
 }
 
 /* use color-mix to give the illusion of transparency while not actually being transparent */
