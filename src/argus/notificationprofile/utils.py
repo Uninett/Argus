@@ -24,6 +24,6 @@ def annotate_public_filters_with_usernames(qs: FilterQuerySet, user: User = None
                 user_id=user.pk,
                 then=F("name"),
             ),
-            default=Concat("user__username", Value(": "), "name"),
+            default=Concat("name", Value(" ("), "user__username", Value(")")),
         )
     )

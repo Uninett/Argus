@@ -18,7 +18,7 @@ class AnnotatePublicFiltersWithUsernameTests(TestCase):
 
         label = qs.get(id=public_filter.id).label
         assert public_filter.name in label
-        assert self.user2.username in label
+        assert f"({self.user2.username})" in label
 
     def test_does_not_add_user_for_own_filters(self):
         own_filter = FilterFactory(user=self.user1)
@@ -27,4 +27,4 @@ class AnnotatePublicFiltersWithUsernameTests(TestCase):
 
         label = qs.get(id=own_filter.id).label
         assert own_filter.name in label
-        assert self.user1.username not in label
+        assert f"({self.user1.username})" not in label
