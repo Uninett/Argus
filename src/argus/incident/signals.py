@@ -27,6 +27,7 @@ def delete_associated_event(sender, instance: Acknowledgement, *args, **kwargs):
         instance.event.delete()
 
 
+# the rest_framework.authtoken is not under our control so keep the signal here
 def close_token_incident(instance: Token, **kwargs):
     if not hasattr(instance.user, "source_system"):
         return
