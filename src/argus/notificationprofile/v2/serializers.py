@@ -1,8 +1,10 @@
 from rest_framework import fields, serializers
 
 from argus.filter.serializers import FilterSerializer
-from .media import api_safely_get_medium_object
-from .models import DestinationConfig, Media, NotificationProfile, TimeRecurrence, Timeslot
+from argus.notificationprofile.media import api_safely_get_medium_object
+from argus.notificationprofile.models import DestinationConfig, Media, NotificationProfile, TimeRecurrence, Timeslot
+
+VERSION = "v2"
 
 
 class TimeRecurrenceSerializer(serializers.ModelSerializer):
@@ -109,8 +111,10 @@ class JSONSchemaSerializer(serializers.Serializer):
 
 
 class ResponseDestinationConfigSerializer(serializers.ModelSerializer):
+    version = VERSION
     media = MediaSerializer()
     suggested_label = serializers.SerializerMethodField(method_name="get_suggested_label")
+    settings = serializers.SerializerMethodField(method_name="get_settings")
 
     class Meta:
         model = DestinationConfig
@@ -123,11 +127,19 @@ class ResponseDestinationConfigSerializer(serializers.ModelSerializer):
         ]
 
     def get_suggested_label(self, destination: DestinationConfig) -> str:
-        medium = api_safely_get_medium_object(destination.media.slug)
+        medium = api_safely_get_medium_object(destination.media.slug, self.version)
         return f"{destination.media.name}: {medium.get_label(destination)}"
+
+    def get_settings(self, destination: DestinationConfig) -> dict:
+        settings = destination.settings.copy()
+        if destination.media.slug == "email":
+            settings["synced"] = bool(destination.managed)
+        return settings
 
 
 class RequestDestinationConfigSerializer(serializers.ModelSerializer):
+    version = VERSION
+
     class Meta:
         model = DestinationConfig
         fields = [
@@ -143,21 +155,18 @@ class RequestDestinationConfigSerializer(serializers.ModelSerializer):
             if not isinstance(attrs["settings"], dict):
                 raise serializers.ValidationError("Settings has to be a dictionary.")
             if self.instance:
-                medium = api_safely_get_medium_object(self.instance.media.slug)
+                medium = api_safely_get_medium_object(self.instance.media.slug, self.version)
             else:
-                medium = api_safely_get_medium_object(attrs["media"].slug)
+                medium = api_safely_get_medium_object(attrs["media"].slug, self.version)
             attrs["settings"] = medium.validate(self, attrs, self.context["request"].user)
 
         return attrs
 
     def update(self, destination: DestinationConfig, validated_data: dict):
-        medium = api_safely_get_medium_object(destination.media.slug)
+        medium = api_safely_get_medium_object(destination.media.slug, self.version)
         updated_destination = medium.update(destination, validated_data)
 
-        if updated_destination:
-            return updated_destination
-
-        return super().update(destination, validated_data)
+        return updated_destination
 
 
 class DuplicateDestinationSerializer(serializers.Serializer):

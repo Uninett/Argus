@@ -1,7 +1,12 @@
 from __future__ import annotations
 
+from django.db import transaction
+
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any
+
+from argus.constants import API_STABLE_VERSION
+from argus.notificationprofile.models import DestinationConfig
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -12,7 +17,6 @@ if TYPE_CHECKING:
     from django.db.models.query import QuerySet
 
     from argus.incident.models import Event
-    from ..models import DestinationConfig
     from ..serializers import RequestDestinationConfigSerializer
 
     User = get_user_model()
@@ -27,6 +31,9 @@ class NotificationMedium(ABC):
         Custom exception class that is raised when a destination cannot be
         deleted
         """
+
+    def __init__(self, version: str = API_STABLE_VERSION):
+        self.version = version
 
     @classmethod
     @abstractmethod
@@ -55,7 +62,6 @@ class NotificationMedium(ABC):
         pass
 
     @classmethod
-    @abstractmethod
     def get_relevant_address(cls, destination: DestinationConfig) -> Any:
         """
         Returns the "address" to send the message to
@@ -63,7 +69,7 @@ class NotificationMedium(ABC):
         The type of the address depends on the medium, it must be something
         ``cls.send()`` understands.
         """
-        pass
+        raise NotImplementedError
 
     @classmethod
     def get_relevant_destinations(cls, destinations: Iterable[DestinationConfig]) -> set[DestinationConfig]:
@@ -104,9 +110,16 @@ class NotificationMedium(ABC):
     @classmethod
     def raise_if_not_deletable(cls, destination: DestinationConfig) -> NoneType:
         """
-        Raises a NotDeletableError if the given destination is not able to be deleted
-        (if it is in use by any notification profiles)
+        Raises a NotDeletableError if the given destination cannot be deleted
+
+        Potential reasons:
+
+        * it is marked as "managed", which means it is usable but read-only for end-users
+        * it is in use by at least one notification profiles
         """
+        if destination.managed:
+            raise cls.NotDeletableError("Cannot delete this destination since it was defined by an outside source.")
+
         connected_profiles = destination.notification_profiles.all()
         if connected_profiles:
             profiles = ", ".join([str(profile) for profile in connected_profiles])
@@ -115,10 +128,22 @@ class NotificationMedium(ABC):
             )
 
     @staticmethod
+    @transaction.atomic()
     def update(destination: DestinationConfig, validated_data: dict) -> DestinationConfig | NoneType:
+        """Updates a destination
+
+        If the destination is marked as managed, a copy of the original will be
+        made before changing the destination.
         """
-        Updates a destination in case the normal update function is not
-        sufficient and returns the updated destination in that case,
-        returns None otherwise
-        """
-        return None
+        if destination.managed:
+            managed_destination = DestinationConfig(
+                user=destination.user,
+                media_id=destination.media_id,
+                settings=destination.settings,
+                managed=True,
+            )
+            managed_destination.save()
+        destination.settings = validated_data["settings"]
+        destination.managed = False
+        DestinationConfig.objects.bulk_update([destination], fields=["settings"])
+        return destination
