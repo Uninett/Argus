@@ -1,7 +1,6 @@
 from django.db.models import Q
 from rest_framework.authtoken.models import Token
 
-from argus.plannedmaintenance.utils import connect_incident_with_planned_maintenance_tasks
 from .models import (
     Acknowledgement,
     Incident,
@@ -48,7 +47,3 @@ def close_token_incident(instance: Token, **kwargs):
         return
 
     token_expiry_incident.set_end(actor=argus_user)
-
-
-def add_planned_maintenance_tasks_covering_incident(instance: Incident, **kwargs):
-    connect_incident_with_planned_maintenance_tasks(incident=instance)
