@@ -1,12 +1,12 @@
 {% extends "./base.html" %}
+{% block tab_action %}
+  <button hx-get="{% url 'htmx:notificationprofile-create' %}"
+          hx-target="#notificationprofile-create"
+          hx-swap="outerHTML"
+          class="btn btn-primary">New profile</button>
+{% endblock tab_action %}
 {% block profile_main %}
   <div>
-    <div class="flex justify-end mb-4">
-      <button hx-get="{% url 'htmx:notificationprofile-create' %}"
-              hx-target="#notificationprofile-create"
-              hx-swap="outerHTML"
-              class="btn btn-primary">New profile</button>
-    </div>
     <div id="notificationprofile-create"></div>
     {% for profile in object_list %}
       {% include "./_notificationprofile_card.html" %}
