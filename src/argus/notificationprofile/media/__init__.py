@@ -13,6 +13,7 @@ from argus.util.utils import import_class_from_dotted_path
 
 from ..models import DestinationConfig, Media, NotificationProfile
 from ..filterwrapper import NotificationProfileFilterWrapper
+from ..utils import are_notifications_enabled
 
 filter_backend = get_filter_backend()
 FallbackFilterWrapper = filter_backend.FallbackFilterWrapper
@@ -53,6 +54,10 @@ def api_safely_get_medium_object(media_slug):
 
 
 def send_notification(destinations: Iterable[DestinationConfig], *events: Iterable[Event]):
+    "Fetches the medium for each destination and sends each event to each destination"
+    if not are_notifications_enabled():
+        LOG.info("Notification: turned off sitewide, not sending any")
+        return
     if not events:
         return
     media = get_notification_media(destinations)
@@ -121,7 +126,7 @@ def send_notifications_to_users(*events: Iterable[Event], send=send_notification
     if not events:
         LOG.warn("Notification: no events to send, programming error?")
         return
-    if not getattr(settings, "SEND_NOTIFICATIONS", False):
+    if not are_notifications_enabled():
         LOG.info("Notification: turned off sitewide, not sending any")
         return
     # TODO: only send one notification per medium per user
