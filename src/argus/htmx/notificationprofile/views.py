@@ -15,6 +15,7 @@ from argus.htmx.widgets import DropdownMultiSelect
 from argus.notificationprofile.media import MEDIA_CLASSES_DICT
 from argus.htmx.modals import DeleteModal
 from argus.notificationprofile.models import NotificationProfile, Timeslot, Filter, DestinationConfig
+from argus.notificationprofile.utils import annotate_public_filters_with_usernames
 
 
 class NoColonMixin:
@@ -55,6 +56,7 @@ class DestinationFieldMixin:
 class FilterFieldMixin:
     def _init_filters(self, user):
         qs = Filter.objects.usable_by(user=user)
+        qs = annotate_public_filters_with_usernames(qs=qs, user=user)
         self.fields["filters"].queryset = qs
 
         if self.instance.id:
@@ -71,7 +73,7 @@ class FilterFieldMixin:
                 "field_styles": "input input-bordered border-b max-w-xs",
             },
         )
-        self.fields["filters"].choices = tuple(qs.values_list("id", "name"))
+        self.fields["filters"].choices = tuple(qs.values_list("id", "label"))
 
 
 class NotificationProfileForm(DestinationFieldMixin, FilterFieldMixin, NoColonMixin, forms.ModelForm):
