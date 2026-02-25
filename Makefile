@@ -1,4 +1,4 @@
-.PHONY: clean testclean distclean coverageclean cacheclean nuke tailwind docclean upgrade-tailwind tailwind-watch
+.PHONY: clean testclean distclean coverageclean cacheclean nuke tailwind docclean upgrade-tailwind tailwind-watch check-test-names
 
 TAILWINDDIR=src/argus/htmx/tailwindtheme
 STATICDIR=src/argus/htmx/static
@@ -39,3 +39,6 @@ tailwind-watch:
 
 upgrade-tailwind:
 	PYTHONPATH=$(PYTHONPATH) python3 src/argus/htmx/tailwindtheme/get_tailwind.py
+
+check-test-names:
+	python3 checks/check_test_names.py --base main
