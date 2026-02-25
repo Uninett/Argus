@@ -16,13 +16,13 @@ class TestNotificationProfileListView(NotificationProfileViewTestCase):
         super().setUp()
         self.url = reverse("htmx:notificationprofile-list")
 
-    def test_context_has_active_tab_profiles(self):
+    def test_it_should_have_active_tab_profiles_in_context(self):
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["active_tab"], "profiles")
 
-    def test_context_has_page_title(self):
+    def test_it_should_have_page_title_in_context(self):
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, 200)
