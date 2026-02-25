@@ -55,7 +55,7 @@ class TimeRecurrenceForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["days"].widget.attrs["class"] = "flex flex-row gap-1"
-        self.fields["days"].choices = [(day.value, day.label[0]) for day in TimeRecurrence.Day]
+        self.fields["days"].choices = [(day.value, day.label[:2]) for day in TimeRecurrence.Day]
 
     def clean_start(self):
         timeobj = self.cleaned_data["start"]
@@ -117,7 +117,7 @@ class TimeslotMixin:
         return DeleteModal(
             header="Delete timeslot",
             button_title="Delete",
-            button_class="btn-sm btn-outline btn-error",
+            button_class="btn-outline btn-error",
             explanation=f'Delete the timeslot "{obj}"?',
             dialog_id=f"timeslot-delete-confirm-{obj.pk}",
             endpoint=reverse("htmx:timeslot-delete", kwargs={"pk": obj.pk}),

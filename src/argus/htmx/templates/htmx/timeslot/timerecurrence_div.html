@@ -48,12 +48,10 @@
 function toggleDeleteRow(checkbox) {
   const tr = checkbox.closest("tr");
   tr.classList.toggle("row-deleted", checkbox.checked);
-  tr.querySelectorAll("td:not(:last-child)").forEach(td =>
-    td.classList.toggle("opacity-40", checkbox.checked)
-  );
-  tr.querySelectorAll("input:not(.delete-check)").forEach(input =>
-    input.disabled = checkbox.checked
-  );
+  tr.querySelectorAll("td:not(:last-child)").forEach(td => {
+    td.classList.toggle("opacity-40", checkbox.checked);
+    td.classList.toggle("pointer-events-none", checkbox.checked);
+  });
 }
 document.querySelectorAll(".delete-check").forEach(cb => toggleDeleteRow(cb));
 flatpickr(".fp-time", {

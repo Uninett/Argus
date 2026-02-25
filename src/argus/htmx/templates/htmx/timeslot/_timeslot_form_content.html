@@ -28,7 +28,7 @@
       {% include "messages/_banner.html" with message=success_message level="success" %}
     </div>
   {% elif form.errors or formset.total_error_count %}
-    {% include "messages/_banner.html" with message="Please correct the errors below" level="error" dismissible=False %}
+    {% include "messages/_banner.html" with message="Please correct the errors in the form" level="error" dismissible=False %}
   {% endif %}
 </div>
 </form>
