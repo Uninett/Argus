@@ -12,7 +12,7 @@ from argus.notificationprofile.models import DestinationConfig, Media
 
 @override_settings(AUTHENTICATION_BACKENDS=["django.contrib.auth.backends.ModelBackend"])
 class TestDestinationLoginRequired(TestCase):
-    def test_unauthenticated_get_redirects_to_login(self):
+    def test_when_unauthenticated_get_it_should_redirect_to_login(self):
         response = self.client.get(reverse("htmx:destination-list"))
 
         self.assertEqual(response.status_code, 302)
@@ -32,13 +32,13 @@ class TestDestinationListView(DestinationViewTestCase):
         super().setUp()
         self.url = reverse("htmx:destination-list")
 
-    def test_get_renders_list(self):
+    def test_when_get_it_should_render_list(self):
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "htmx/destination/destination_list.html")
 
-    def test_context_has_update_forms(self):
+    def test_it_should_have_update_forms_in_context(self):
         DestinationConfigFactory(
             user=self.user,
             media=self.email_media,
@@ -53,7 +53,7 @@ class TestDestinationListView(DestinationViewTestCase):
     def _get_form_for(self, response, destination):
         return next(f for f in response.context["update_forms"] if f.instance.pk == destination.pk)
 
-    def test_free_destination_has_delete_disabled_false(self):
+    def test_given_free_destination_it_should_have_delete_enabled(self):
         destination = DestinationConfigFactory(
             user=self.user,
             media=self.email_media,
@@ -65,7 +65,7 @@ class TestDestinationListView(DestinationViewTestCase):
         form = self._get_form_for(response, destination)
         self.assertFalse(form.delete_disabled)
 
-    def test_destination_in_use_has_delete_disabled(self):
+    def test_given_destination_in_use_it_should_have_delete_disabled(self):
         destination = DestinationConfigFactory(
             user=self.user,
             media=self.email_media,
@@ -81,7 +81,7 @@ class TestDestinationListView(DestinationViewTestCase):
         self.assertTrue(form.delete_disabled)
         self.assertIn("used by a notification profile", form.delete_tooltip)
 
-    def test_synced_destination_has_delete_disabled(self):
+    def test_given_synced_destination_it_should_have_delete_disabled(self):
         destination = DestinationConfigFactory(
             user=self.user,
             media=self.email_media,
@@ -94,7 +94,7 @@ class TestDestinationListView(DestinationViewTestCase):
         self.assertTrue(form.delete_disabled)
         self.assertIn("synced from an outside source", form.delete_tooltip)
 
-    def test_only_shows_own_destinations(self):
+    def test_it_should_only_show_own_destinations(self):
         other_user = PersonUserFactory()
         DestinationConfigFactory(
             user=other_user,
@@ -113,13 +113,13 @@ class TestDestinationCreateView(DestinationViewTestCase):
         super().setUp()
         self.url = reverse("htmx:destination-create")
 
-    def test_htmx_get_returns_create_row_partial(self):
+    def test_given_htmx_get_it_should_return_create_row_partial(self):
         response = self.client.get(self.url, HTTP_HX_REQUEST="true")
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "htmx/destination/_destination_create_row.html")
 
-    def test_htmx_valid_post_creates_and_redirects(self):
+    def test_given_htmx_valid_post_it_should_create_and_redirect(self):
         count_before = DestinationConfig.objects.filter(user=self.user).count()
         post_data = {
             "destination-media": self.email_media.pk,
@@ -133,7 +133,7 @@ class TestDestinationCreateView(DestinationViewTestCase):
         self.assertIn("HX-Redirect", response.headers)
         self.assertEqual(DestinationConfig.objects.filter(user=self.user).count(), count_before + 1)
 
-    def test_htmx_invalid_post_returns_create_row_with_errors(self):
+    def test_given_htmx_invalid_post_it_should_return_create_row_with_errors(self):
         post_data = {
             "destination-media": self.email_media.pk,
             "destination-label": "",
@@ -146,7 +146,7 @@ class TestDestinationCreateView(DestinationViewTestCase):
         self.assertTemplateUsed(response, "htmx/destination/_destination_create_row.html")
         self.assertTrue(response.context["form"].errors)
 
-    def test_form_clean_early_return_when_media_missing(self):
+    def test_when_media_missing_it_should_return_early_with_error(self):
         post_data = {
             "destination-media": "",
             "destination-label": "Test",
@@ -177,27 +177,27 @@ class TestDestinationUpdateView(DestinationViewTestCase):
             f"{prefix}-settings": settings,
         }
 
-    def test_valid_post_saves_and_renders_table_with_success(self):
+    def test_when_valid_post_it_should_save_and_render_table_with_success(self):
         response = self.client.post(self.url, data=self._build_post_data())
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "htmx/destination/_destination_table.html")
         self.assertIn("success_message", response.context)
 
-    def test_valid_post_persists_changes(self):
+    def test_when_valid_post_it_should_persist_changes(self):
         self.client.post(self.url, data=self._build_post_data(settings="new@example.com"))
 
         self.destination.refresh_from_db()
         self.assertEqual(self.destination.settings["email_address"], "new@example.com")
 
-    def test_invalid_post_returns_form_with_errors(self):
+    def test_when_invalid_post_it_should_return_form_with_errors(self):
         response = self.client.post(self.url, data=self._build_post_data(settings=""))
 
         self.assertEqual(response.status_code, 200)
         form = next(f for f in response.context["update_forms"] if f.instance.pk == self.destination.pk)
         self.assertTrue(form.errors)
 
-    def test_cannot_update_other_users_destination(self):
+    def test_it_should_not_allow_updating_other_users_destination(self):
         other_user = PersonUserFactory()
         other_dest = DestinationConfigFactory(
             user=other_user,
@@ -222,13 +222,13 @@ class TestDestinationDeleteView(DestinationViewTestCase):
         )
         self.url = reverse("htmx:destination-delete", kwargs={"pk": self.destination.pk})
 
-    def test_post_deletes_and_redirects(self):
+    def test_when_post_it_should_delete_and_redirect(self):
         response = self.client.post(self.url)
 
         self.assertRedirects(response, reverse("htmx:destination-list"), fetch_redirect_response=False)
         self.assertFalse(DestinationConfig.objects.filter(pk=self.destination.pk).exists())
 
-    def test_cannot_delete_other_users_destination(self):
+    def test_it_should_not_allow_deleting_other_users_destination(self):
         other_user = PersonUserFactory()
         other_dest = DestinationConfigFactory(
             user=other_user,
@@ -242,7 +242,7 @@ class TestDestinationDeleteView(DestinationViewTestCase):
         self.assertEqual(response.status_code, 404)
         self.assertTrue(DestinationConfig.objects.filter(pk=other_dest.pk).exists())
 
-    def test_delete_synced_destination_shows_error(self):
+    def test_given_synced_destination_when_delete_it_should_show_error(self):
         self.destination.settings["synced"] = True
         self.destination.save()
 
@@ -252,7 +252,7 @@ class TestDestinationDeleteView(DestinationViewTestCase):
         self.assertIn("error_msg", response.context)
         self.assertTrue(DestinationConfig.objects.filter(pk=self.destination.pk).exists())
 
-    def test_delete_destination_in_use_shows_error(self):
+    def test_given_destination_in_use_when_delete_it_should_show_error(self):
         timeslot = TimeslotFactory(user=self.user)
         profile = NotificationProfileFactory(user=self.user, timeslot=timeslot)
         profile.destinations.add(self.destination)
