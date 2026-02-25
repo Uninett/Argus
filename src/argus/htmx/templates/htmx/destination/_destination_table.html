@@ -63,3 +63,86 @@
     </div>
   </div>
 </div>
+<dialog id="unsaved-changes-dialog" class="modal">
+  <div class="modal-box">
+    <h3 class="text-lg font-bold">Unsaved changes</h3>
+    <p class="py-4">You have unsaved changes. Are you sure you want to leave?</p>
+    <div class="modal-action">
+      <button class="btn btn-error" id="unsaved-changes-leave">Leave</button>
+      <button class="btn" id="unsaved-changes-stay">Stay</button>
+    </div>
+  </div>
+  <form method="dialog" class="modal-backdrop">
+    <button>close</button>
+  </form>
+</dialog>
+<script>
+(() => {
+  const table = document.getElementById("destination-table");
+  if (!table) return;
+
+  const dialog = document.getElementById("unsaved-changes-dialog");
+  const leaveBtn = document.getElementById("unsaved-changes-leave");
+  const stayBtn = document.getElementById("unsaved-changes-stay");
+
+  const hasDirtyInputs = () => {
+    const t = document.getElementById("destination-table");
+    if (!t) return false;
+    const hasCreateRow = t.querySelector("#destination-create input") !== null;
+    return hasCreateRow || [...t.querySelectorAll("input[data-original]")]
+      .some((el) => el.value !== el.dataset.original);
+  };
+
+  // Store original values for dirty checking
+  table.querySelectorAll("input[type='text']").forEach((input) => {
+    input.dataset.original = input.value;
+  });
+
+  // Submit on Enter key
+  table.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && e.target.matches("input, select")) {
+      e.preventDefault();
+      e.target.closest("tr").querySelector("[hx-post]")?.click();
+    }
+  });
+
+  // Intercept link navigation when inputs are dirty
+  if (globalThis._destLinkHandler) {
+    document.body.removeEventListener("click", globalThis._destLinkHandler);
+  }
+  globalThis._destLinkHandler = (e) => {
+    const link = e.target.closest("a[href]");
+    if (!link || !hasDirtyInputs()) return;
+
+    e.preventDefault();
+    leaveBtn.onclick = () => {
+      globalThis.removeEventListener("beforeunload", globalThis._destBeforeUnload);
+      globalThis.location.href = link.href;
+    };
+    dialog.showModal();
+  };
+  document.body.addEventListener("click", globalThis._destLinkHandler);
+
+  stayBtn.addEventListener("click", () => dialog.close());
+
+  // Fallback for browser/tab close
+  if (globalThis._destBeforeUnload) {
+    globalThis.removeEventListener("beforeunload", globalThis._destBeforeUnload);
+  }
+  globalThis._destBeforeUnload = (e) => {
+    if (hasDirtyInputs()) {
+      e.preventDefault();
+      e.returnValue = "";
+    }
+  };
+  globalThis.addEventListener("beforeunload", globalThis._destBeforeUnload);
+
+  // Suspend guard during htmx requests (save/delete actions trigger redirects)
+  table.addEventListener("htmx:beforeRequest", () => {
+    globalThis.removeEventListener("beforeunload", globalThis._destBeforeUnload);
+  });
+  table.addEventListener("htmx:afterSettle", () => {
+    globalThis.addEventListener("beforeunload", globalThis._destBeforeUnload);
+  });
+})();
+</script>
