@@ -63,3 +63,69 @@
     </div>
   </div>
 </div>
+<dialog id="unsaved-changes-dialog" class="modal">
+  <div class="modal-box">
+    <h3 class="text-lg font-bold">Unsaved changes</h3>
+    <p class="py-4">You have unsaved changes. Are you sure you want to leave?</p>
+    <div class="modal-action">
+      <button class="btn btn-error" id="unsaved-changes-leave">Leave</button>
+      <button class="btn" id="unsaved-changes-stay">Stay</button>
+    </div>
+  </div>
+  <form method="dialog" class="modal-backdrop">
+    <button>close</button>
+  </form>
+</dialog>
+<script>
+(() => {
+  const table = document.getElementById("destination-table");
+  if (!table) return;
+
+  const dialog = document.getElementById("unsaved-changes-dialog");
+  const leaveBtn = document.getElementById("unsaved-changes-leave");
+  const stayBtn = document.getElementById("unsaved-changes-stay");
+
+  const hasDirtyInputs = () =>
+    [...table.querySelectorAll("input[data-original]")]
+      .some((el) => el.value !== el.dataset.original);
+
+  // Store original values for dirty checking
+  table.querySelectorAll("input[type='text']").forEach((input) => {
+    input.dataset.original = input.value;
+  });
+
+  // Submit on Enter key
+  table.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && e.target.matches("input, select")) {
+      e.preventDefault();
+      e.target.closest("tr").querySelector("[hx-post]")?.click();
+    }
+  });
+
+  // Intercept link navigation when inputs are dirty
+  table.closest("body").addEventListener("click", (e) => {
+    const link = e.target.closest("a[href]");
+    if (!link || !hasDirtyInputs()) return;
+
+    e.preventDefault();
+    leaveBtn.onclick = () => {
+      globalThis.removeEventListener("beforeunload", globalThis._destBeforeUnload);
+      globalThis.location.href = link.href;
+    };
+    dialog.showModal();
+  });
+
+  stayBtn.addEventListener("click", () => dialog.close());
+
+  // Fallback for browser/tab close
+  if (!globalThis._destBeforeUnload) {
+    globalThis._destBeforeUnload = (e) => {
+      if (hasDirtyInputs()) {
+        e.preventDefault();
+        e.returnValue = "";
+      }
+    };
+    globalThis.addEventListener("beforeunload", globalThis._destBeforeUnload);
+  }
+})();
+</script>
