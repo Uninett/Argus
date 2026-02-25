@@ -128,7 +128,7 @@ class TimeRecurrence(models.Model):
         if self.is_all_the_time:
             return "24/7"
         if self.is_around_the_clock:
-            hour_range = "round the clock"
+            hour_range = "around the clock"
         else:
             hour_range = f"{self.start.strftime('%H:%M')}-{self.end.strftime('%H:%M')}"
         if self.is_every_day:
