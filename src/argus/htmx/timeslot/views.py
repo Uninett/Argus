@@ -291,7 +291,7 @@ class TimeslotUpdateView(FormsetMixin, TimeslotMixin, UpdateView):
             context = self.get_context_data()
             context["timeslot"] = self.object
             now = timezone.localtime().strftime("%H:%M:%S")
-            context["success_message"] = f'Saved timeslot "{self.object}" at {now}.'
+            context["success_message"] = f'Saved timeslot "{self.object}" at {now}'
             return self.render_to_response(context)
         return HttpResponseRedirect(self.get_success_url())
 
@@ -304,4 +304,6 @@ class TimeslotDeleteView(TimeslotMixin, DeleteView):
         self.object = self.get_object()
         success_url = self.get_success_url()
         self.object.delete()
+        if request.htmx:
+            return HttpResponseClientRedirect(success_url)
         return HttpResponseRedirect(success_url)

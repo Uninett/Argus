@@ -127,13 +127,11 @@ class TimeRecurrence(models.Model):
     def short_str(self):
         if self.is_all_the_time:
             return "24/7"
-        all_hours = self.is_around_the_clock
-        if all_hours:
-            hour_range = "around the clock"
+        if self.is_around_the_clock:
+            hour_range = "round the clock"
         else:
             hour_range = f"{self.start.strftime('%H:%M')}-{self.end.strftime('%H:%M')}"
-        all_days = self.is_every_day
-        if all_days:
+        if self.is_every_day:
             days = ", every day"
         else:
             days = " on " + collection_to_prose(self.get_short_days_list())

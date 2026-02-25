@@ -102,7 +102,7 @@ class TimeRecurrenceShortStrTests(TestCase):
 
     def test_around_the_clock_single_day(self):
         tr = TimeRecurrence(timeslot=self.ts, days=[1], start=time.min, end=time.max)
-        self.assertEqual(tr.short_str(), "around the clock on Mon")
+        self.assertEqual(tr.short_str(), "round the clock on Mon")
 
     def test_every_day_specific_hours(self):
         tr = TimeRecurrence(timeslot=self.ts, days=[1, 2, 3, 4, 5, 6, 7], start=time(8, 0), end=time(17, 0))
