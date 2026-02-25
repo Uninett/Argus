@@ -127,6 +127,16 @@ class PlannedMaintenanceCreateView(UserIsStaffMixin, FilterWidgetMixin, PlannedM
         initial = super().get_initial()
         initial["start_time"] = timezone.now()
         # end_time defaults to infinite (no initial value)
+
+        copy_from = self.request.GET.get("copy_from")
+        if copy_from:
+            try:
+                source = PlannedMaintenanceTask.objects.get(pk=copy_from)
+                initial["description"] = source.description
+                initial["filters"] = list(source.filters.values_list("pk", flat=True))
+            except PlannedMaintenanceTask.DoesNotExist:
+                pass
+
         return initial
 
     def form_valid(self, form):
