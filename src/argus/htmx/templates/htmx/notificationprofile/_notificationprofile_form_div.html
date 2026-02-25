@@ -14,7 +14,7 @@
         {% if field.name == "timeslot" %}
           {% include "htmx/forms/input_field.html" with label=field.label max_width="full" field=field %}
         {% elif field.name == "active" %}
-          <div class="flex flex-col justify-end h-full">
+          <div class="flex flex-col justify-start h-full mt-5">
             <label class="label cursor-pointer justify-start gap-3">
               {% render_field field class+="checkbox checkbox-sm border-b border-1" %}
               <span class="label-text"><em>{{ field.label }}</em></span>

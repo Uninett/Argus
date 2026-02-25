@@ -3,6 +3,7 @@
   <button hx-get="{% url 'htmx:notificationprofile-create' %}"
           hx-target="#notificationprofile-create"
           hx-swap="outerHTML"
+          _="on click remove #no-profiles-message"
           class="btn btn-primary">New profile</button>
 {% endblock tab_action %}
 {% block profile_main %}
@@ -11,7 +12,7 @@
     {% for profile in object_list %}
       {% include "./_notificationprofile_card.html" %}
     {% empty %}
-      <p class="text-center text-base-content/60">No profiles yet.</p>
+      <p id="no-profiles-message" class="text-center text-base-content/60">No profiles yet.</p>
     {% endfor %}
   </div>
 {% endblock profile_main %}
