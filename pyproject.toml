@@ -1,5 +1,5 @@
 [build-system]
-requires = ["hatchling", "versioningit>=3.0.0"]
+requires = ["hatchling", "hatch-build-scripts", "versioningit>=3.0.0"]
 build-backend = "hatchling.build"
 
 [project]
@@ -75,7 +75,18 @@ dev = [
 source = "versioningit"
 
 [tool.hatch.build]
-artifacts = ["src/argus/version.py"]
+artifacts = [
+    "src/argus/version.py",
+    "src/argus/htmx/static/styles.css",
+]
+
+[[tool.hatch.build.hooks.build-scripts.scripts]]
+commands = [
+    "make upgrade-tailwind tailwind",
+]
+artifacts = [
+    "src/argus/htmx/static/styles.css",
+]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/argus"]
