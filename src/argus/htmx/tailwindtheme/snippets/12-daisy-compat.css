@@ -66,9 +66,13 @@
   outline-color: var(--color-base-300);
 }
 
-/* Restore form label color from DaisyUI v4 (not faded) */
+/* Restore form label color from DaisyUI v4 (not faded) and allow text wrapping */
 label.label, form label {
   color: var(--color-base-content);
+}
+.label {
+  white-space: normal;
+  padding: 0.5rem 0.25rem;
 }
 
 /* Tooltip aligned to end (right) instead of center */
@@ -105,6 +109,12 @@ label.label, form label {
   height: 3rem;
 }
 
+/* Primary colored active tab for boxed tabs */
+.tabs-box.tabs-primary > :is(.tab-active, [aria-selected="true"]) {
+  --tab-bg: var(--color-primary);
+  color: var(--color-primary-content);
+}
+
 /* Custom tabs-border-primary modifier for primary colored tab borders with 2px width */
 .tabs.tabs-border-primary {
   --border: 2px;
@@ -121,8 +131,8 @@ label.label, form label {
 
 /* Restore disabled btn-primary to keep primary color (DaisyUI v5 turns all disabled buttons gray) */
 .btn-primary:is(:disabled, [disabled], .btn-disabled) {
-  background-color: color-mix(in oklab, var(--color-primary) 40%, transparent) !important;
-  color: color-mix(in oklab, var(--color-primary-content) 40%, transparent) !important;
+  background-color: color-mix(in oklab, var(--color-primary) 60%, transparent) !important;
+  color: color-mix(in oklab, var(--color-primary-content) 60%, transparent) !important;
 }
 
 /* Menu divider - non-interactive separator line (used with menu-title) */
