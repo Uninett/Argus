@@ -1,8 +1,7 @@
 const projectPaths = [
     '../templates/**/*.html',
     './**/templates/**/*.html',
-    'src/argus_htmx/templates/**/*.html',
-    '!**/templates/**/admin/**'
+    'src/argus_htmx/templates/**/*.html'
 ];
 
 const contentPaths = [...projectPaths];
@@ -34,13 +33,11 @@ module.exports = {
                 "severity-secondary-3": "black",
                 "severity-secondary-4": "white",
                 "severity-secondary-5": "white",
-
             },
         },
     },
     safelist: [
         "htmx-request",
-        "w-[1%]",
         // Severity classes use string interpolation in templates, so must be safelisted
         {
             pattern: /^(bg|border|text)-severity-(primary|secondary)-[1-5]$/,

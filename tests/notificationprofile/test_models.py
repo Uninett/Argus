@@ -91,6 +91,29 @@ class TimeRecurrenceStrTests(TestCase):
 
 
 @tag("database")
+class TimeRecurrenceShortStrTests(TestCase):
+    def setUp(self):
+        self.user = PersonUserFactory()
+        self.ts = TimeslotFactory(user=self.user)
+
+    def test_when_all_the_time_it_should_return_24_7(self):
+        tr = TimeRecurrence(timeslot=self.ts, days=[1, 2, 3, 4, 5, 6, 7], start=time.min, end=time.max)
+        self.assertEqual(tr.short_str(), "24/7")
+
+    def test_when_around_the_clock_single_day_it_should_include_around_the_clock(self):
+        tr = TimeRecurrence(timeslot=self.ts, days=[1], start=time.min, end=time.max)
+        self.assertEqual(tr.short_str(), "around the clock on Mon")
+
+    def test_when_every_day_specific_hours_it_should_include_every_day(self):
+        tr = TimeRecurrence(timeslot=self.ts, days=[1, 2, 3, 4, 5, 6, 7], start=time(8, 0), end=time(17, 0))
+        self.assertEqual(tr.short_str(), "08:00-17:00, every day")
+
+    def test_when_specific_days_and_hours_it_should_include_days_and_time_range(self):
+        tr = TimeRecurrence(timeslot=self.ts, days=[1, 3, 5], start=time(9, 0), end=time(17, 0))
+        self.assertEqual(tr.short_str(), "09:00-17:00 on Mon, Wed and Fri")
+
+
+@tag("database")
 class TimeslotTests(TestCase, IncidentAPITestCaseHelper):
     def setUp(self):
         disconnect_signals()

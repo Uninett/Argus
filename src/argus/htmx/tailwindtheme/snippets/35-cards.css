@@ -13,3 +13,28 @@
 .card-gray {
     @apply bg-base-200/40;
 }
+
+.card-create {
+    @apply border-primary;
+}
+
+tr.row-deleted td.strikethrough {
+    @apply relative;
+}
+
+tr.row-deleted td.strikethrough::after {
+    content: '';
+    @apply absolute left-0 right-0 top-1/2 border-t-2 border-base-content/30 pointer-events-none;
+}
+
+.card-base > .collapse > .collapse-title {
+    @apply min-h-0 p-3;
+}
+
+.card-base > .collapse > .collapse-content {
+    @apply px-3 pb-3;
+}
+
+.card-base > .collapse > .collapse-content .form-control:first-of-type > .label:first-child {
+    @apply pt-0;
+}

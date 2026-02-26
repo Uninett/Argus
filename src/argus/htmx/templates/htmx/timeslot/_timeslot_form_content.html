@@ -1,0 +1,37 @@
+{% load widget_tweaks %}
+<form method="post"
+      novalidate
+      hx-post="{% url "htmx:timeslot-update" pk=form.instance.pk %}"
+      hx-target="#timeslot-form-{{ form.instance.pk }}"
+      hx-swap="innerHTML">
+  {% csrf_token %}
+  <div class="flex flex-col gap-4 w-full">
+    <div class="flex gap-16 justify-between">
+      <div>
+        {% with form.name as field %}
+          {% include "htmx/forms/input_field.html" with label=field.label max_width="md" field=field %}
+        {% endwith %}
+      </div>
+      <div class="card-actions flex items-end gap-2 mb-2">
+        <input type="submit" class="btn btn-primary btn-sm" value="Save">
+        <button type="button"
+                onclick="this.closest('details').removeAttribute('open')"
+                class="btn btn-sm">Cancel</button>
+        <button type="button"
+                onclick="htmx.find('#{{ form.modal.dialog_id }}').showModal()"
+                class="btn btn-sm btn-outline btn-error">Delete</button>
+      </div>
+    </div>
+    <div class="flex flex-col gap-4">{{ formset.as_div }}</div>
+    {% if success_message %}
+      <div _="on toggle from closest <details/> if not it.open remove me">
+      {% include "messages/_banner.html" with message=success_message level="success" %}
+    </div>
+  {% elif form.errors or formset.total_error_count %}
+    {% include "messages/_banner.html" with message="Please correct the errors in the form" level="error" dismissible=False %}
+  {% endif %}
+</div>
+</form>
+{% if timeslot %}
+  {% include "./_timeslot_summary.html" %}
+{% endif %}

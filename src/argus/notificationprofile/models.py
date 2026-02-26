@@ -121,6 +121,22 @@ class TimeRecurrence(models.Model):
     def get_days_list(self):
         return [self.Day(day).label for day in self.days]
 
+    def get_short_days_list(self):
+        return [self.Day(day).label[:3] for day in self.days]
+
+    def short_str(self):
+        if self.is_all_the_time:
+            return "24/7"
+        if self.is_around_the_clock:
+            hour_range = "around the clock"
+        else:
+            hour_range = f"{self.start.strftime('%H:%M')}-{self.end.strftime('%H:%M')}"
+        if self.is_every_day:
+            days = ", every day"
+        else:
+            days = " on " + collection_to_prose(self.get_short_days_list())
+        return f"{hour_range}{days}"
+
     def timestamp_is_within(self, timestamp: datetime):
         # FIXME: Might affect performance negatively if calling this method frequently
         timestamp = timestamp.astimezone(timezone.get_current_timezone())

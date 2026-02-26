@@ -1,11 +1,11 @@
 {% load widget_tweaks %}
-<div class="card card-base {% if is_create %}card-gray mt-4 mb-8{% else %}my-4{% endif %}"
-     id="timeslot-form-{{ form.instance.pk|default:'create' }}">
+<div class="card card-base {% if is_create %}card-create mt-4 mb-8{% else %}my-4{% endif %}"
+     id="timeslot-{{ form.instance.pk|default:'create' }}">
   <section class="card-body max-w-4xl w-full">
     <form method="post"
           novalidate
           hx-post="{% if form.instance.pk %}{% url "htmx:timeslot-update" pk=form.instance.pk %}{% else %}{% url "htmx:timeslot-create" %}{% endif %}"
-          hx-target="#timeslot-form-{{ form.instance.pk|default:'create' }}"
+          hx-target="#timeslot-{{ form.instance.pk|default:'create' }}"
           hx-swap="outerHTML">
       {% csrf_token %}
       {% if form.errors or formset.total_error_count %}
@@ -13,23 +13,32 @@
              role="alert">
           <div class="flex items-center gap-2 font-semibold">
             <i class="fa-solid fa-circle-xmark" aria-hidden="true"></i>
-            <span>Please correct the errors below</span>
+            <span>Please correct the errors in the form</span>
           </div>
         </div>
       {% endif %}
       <div class="flex flex-col gap-4 w-full">
+        {% if is_create %}<h2 class="text-lg font-semibold">New timeslot</h2>{% endif %}
         <div class="flex gap-16 justify-between">
           <div>
             {% with form.name as field %}
               {% include "htmx/forms/input_field.html" with label=field.label max_width="md" field=field %}
             {% endwith %}
           </div>
-          <div class="card-actions flex items-end">
+          <div class="card-actions flex items-end gap-2 mb-2">
             {% if form.instance.pk %}
-              <input type="submit" class="btn btn-primary" value="Save">
+              <input type="submit" class="btn btn-primary btn-sm" value="Save">
+              <button type="button"
+                      hx-get="{% url 'htmx:timeslot-detail' pk=form.instance.pk %}"
+                      hx-target="#timeslot-{{ form.instance.pk }}"
+                      hx-swap="outerHTML"
+                      class="btn btn-sm">Cancel</button>
               {% include form.modal.template_name with modal=form.modal %}
             {% else %}
-              <input type="submit" class="btn btn-primary" value="Create">
+              <input type="submit" class="btn btn-primary btn-sm" value="Create">
+              <button type="button"
+                      onclick="this.closest('[id=timeslot-create]').outerHTML='<div id=\'timeslot-create\'></div>'"
+                      class="btn btn-sm">Cancel</button>
             {% endif %}
           </div>
         </div>
