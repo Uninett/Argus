@@ -104,7 +104,7 @@ If one wishes to write a notification plugin for a medium supported by Apprise, 
 
 A minimal example of how to use it can be found in:
 
-| Class: ``argus.notificationprofile.media.email.SlackNotification``
+| Class: ``argus.notificationprofile.media.slack.SlackNotification``
 
 In this case as Apprise works with URLs, it can consume the destination webhook directly, so the notification class does not actually need anything.
 
@@ -112,4 +112,6 @@ Nevertheless, it is probably smart to set the constants to be less generic and p
 
 Note that if you change the name of the core ``destination_url`` property, you will need to extend many more of the functions to use the new name.
 
-For notification mediums where Apprise cannot consume the destination as an URL directly, more code will be needed to perform the translation.
+The default ``destination_url`` field implementations only supports http / https URLs.
+To use custom schemes (like the generic `service://configuration/?parameters` in the Apprise docs),
+you need to create a custom subclass overriding the appropriate fields and functions.

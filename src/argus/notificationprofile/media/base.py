@@ -5,17 +5,16 @@ from abc import ABC, abstractmethod
 import logging
 from typing import TYPE_CHECKING, Any
 
-from argus.notificationprofile.utils import are_notifications_enabled
-from rest_framework.exceptions import ValidationError
-
 from apprise import Apprise
 
 from django import forms
 from django.conf import settings
 from django.template.loader import render_to_string
+from rest_framework.exceptions import ValidationError
 
 from argus.incident.models import Event
 from ..models import DestinationConfig
+from argus.notificationprofile.utils import are_notifications_enabled
 from argus.util.datetime_utils import INFINITY, LOCAL_INFINITY
 
 if TYPE_CHECKING:
@@ -163,14 +162,14 @@ class AppriseMedium(NotificationMedium):
     @classmethod
     def validate(cls, instance: RequestDestinationConfigSerializer, apprise_dict: dict, user: User) -> dict:
         """
-        Validates the settings of an apprise destination and returns a dict
+        Validates the settings of an Apprise destination and returns a dict
         with validated and cleaned data
         """
         form = cls.Form(apprise_dict["settings"])
         if not form.is_valid():
             raise ValidationError(form.errors)
         if user.destinations.filter(
-            media_id="apprise", settings__destination_url=form.cleaned_data["destination_url"]
+            media_id=cls.MEDIA_SLUG, settings__destination_url=form.cleaned_data["destination_url"]
         ).exists():
             raise ValidationError({"destination_url": "Webhook already exists"})
 
@@ -187,13 +186,13 @@ class AppriseMedium(NotificationMedium):
     @staticmethod
     def get_label(destination: DestinationConfig) -> str:
         """
-        Returns the apprise destination url represented by this destination
+        Returns the Apprise destination url represented by this destination
         """
         return destination.settings.get("destination_url")
 
     @classmethod
     def get_relevant_address(cls, destination: DestinationConfig) -> Any:
-        """Returns the apprise destination url the message should be sent to"""
+        """Returns the Apprise destination url the message should be sent to"""
         return destination.settings["destination_url"]
 
     @staticmethod
@@ -251,7 +250,7 @@ class AppriseMedium(NotificationMedium):
             if num_destinations == failed:
                 LOG.error("Apprise: Failed to send to any destinations")
                 return False
-            LOG.warn(
+            LOG.warning(
                 "Apprise: Failed to send to %i of %i destinations",
                 failed,
                 num_destinations,
