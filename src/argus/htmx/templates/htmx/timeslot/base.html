@@ -5,9 +5,16 @@
   <link rel="stylesheet" href="{% static flatpickr_css_path %}">
 {% endblock head %}
 {% block main %}
-  {% include "htmx/components/_page_title.html" %}
-  <div class="flex justify-center px-4">
-    {% block timeslot_main %}
-    {% endblock timeslot_main %}
+  <div class="flex justify-center p-4">
+    <div class="max-w-4xl w-full">
+      <h1 class="text-center text-3xl font-semibold mt-3 mb-4">Notification preferences</h1>
+      <div class="flex justify-between items-center mb-4">
+        {% include "htmx/notifications/_tabs.html" %}
+        {% block tab_action %}
+        {% endblock tab_action %}
+      </div>
+      {% block timeslot_main %}
+      {% endblock timeslot_main %}
+    </div>
   </div>
 {% endblock main %}

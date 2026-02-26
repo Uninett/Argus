@@ -1,0 +1,11 @@
+<div role="tablist" class="tabs tabs-boxed w-fit">
+  <a role="tab"
+     class="tab {% if active_tab == 'profiles' %}tab-active{% endif %}"
+     href="{% url 'htmx:notificationprofile-list' %}">Profiles</a>
+  <a role="tab"
+     class="tab {% if active_tab == 'timeslots' %}tab-active{% endif %}"
+     href="{% url 'htmx:timeslot-list' %}">Timeslots</a>
+  <a role="tab"
+     class="tab {% if active_tab == 'destinations' %}tab-active{% endif %}"
+     href="{% url 'htmx:destination-list' %}">Destinations</a>
+</div>

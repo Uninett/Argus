@@ -1,12 +1,12 @@
 {% extends "./base.html" %}
+{% block tab_action %}
+  <button hx-get="{% url 'htmx:timeslot-create' %}"
+          hx-target="#timeslot-create"
+          hx-swap="outerHTML"
+          class="btn btn-primary">New timeslot</button>
+{% endblock tab_action %}
 {% block timeslot_main %}
-  <div class="max-w-4xl w-full">
-    <div class="flex justify-end mb-4">
-      <button hx-get="{% url 'htmx:timeslot-create' %}"
-              hx-target="#timeslot-create"
-              hx-swap="outerHTML"
-              class="btn btn-primary">New timeslot</button>
-    </div>
+  <div>
     <div id="timeslot-create"></div>
     {% for timeslot in object_list %}
       {% include "./_timeslot_card.html" %}
