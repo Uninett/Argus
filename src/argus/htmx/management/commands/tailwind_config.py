@@ -68,6 +68,15 @@ class Command(BaseCommand):
         target_path.write_text(css_content)
         self.stdout.write(f"Wrote theme '{theme_name}' to '{target_path}'")
 
+    # Keys that are handled separately or have global side effects and should
+    # not be passed through to the generated CSS.
+    # - name: extracted from the dict key, written explicitly
+    # - default: makes a theme the page-wide default via :where(:root), which
+    #   overrides all user theme selections
+    # - prefersdark: generates a @media (prefers-color-scheme: dark) rule that
+    #   overrides all [data-theme] selections for dark-mode OS users
+    THEME_META_KEYS = frozenset({"name", "default", "prefersdark"})
+
     def generate_theme_css(self, theme_name: str, theme_config: dict) -> str:
         """Generate CSS content for a DaisyUI v5 theme.
 
@@ -81,10 +90,12 @@ class Command(BaseCommand):
         ]
 
         for key, value in theme_config.items():
+            if key in self.THEME_META_KEYS:
+                continue
             if key.startswith("--"):
                 lines.append(f"  {key}: {value};")
             else:
-                # Non-variable keys like color-scheme, default, prefersdark
+                # Non-variable keys like color-scheme
                 lines.append(f'  {key}: "{value}";')
 
         lines.append("}")
