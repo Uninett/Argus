@@ -34,14 +34,27 @@ class Command(BaseCommand):
     """
     DEFAULT_CSS_TEMPLATE_NAME = "tailwind/styles.css"
     DEFAULT_CSS_TARGET = "src/argus/htmx/tailwindtheme/styles.css"
+    DEFAULT_TAILWIND_TEMPLATE_NAME = "tailwind/10-tailwind.css"
 
     def handle(self, *args, **options):
         css_template_name = getattr(settings, "TAILWIND_CSS_TEMPLATE", self.DEFAULT_CSS_TEMPLATE_NAME)
         css_target_path = pathlib.Path(getattr(settings, "TAILWIND_CSS_TARGET", self.DEFAULT_CSS_TARGET))
 
-        # Generate theme CSS files from DAISYUI_THEMES setting
+        snippets_dir = css_target_path.parent / "snippets"
         themes_dir = css_target_path.parent / "themes"
         themes_dir.mkdir(exist_ok=True)
+
+        themes_context = self.get_themes_context()
+
+        # Generate tailwind base snippet with DaisyUI plugin config
+        self.write_file(
+            self.DEFAULT_TAILWIND_TEMPLATE_NAME,
+            snippets_dir / "10-tailwind.css",
+            context=themes_context,
+            name="tailwind base snippet",
+        )
+
+        # Generate theme CSS files for custom themes from DAISYUI_THEMES setting
         self.generate_theme_files(themes_dir)
 
         # Generate main styles.css
@@ -53,7 +66,7 @@ class Command(BaseCommand):
         )
 
     def generate_theme_files(self, snippets_dir: pathlib.Path):
-        """Generate CSS theme files from DAISYUI_THEMES setting."""
+        """Generate CSS theme files for custom themes from DAISYUI_THEMES setting."""
         themes_setting = get_raw_themes_setting()
 
         for theme in themes_setting:
@@ -102,6 +115,11 @@ class Command(BaseCommand):
         lines.append("")  # trailing newline
 
         return "\n".join(lines)
+
+    def get_themes_context(self):
+        themes_setting = get_raw_themes_setting()
+        builtin_themes = ", ".join(t for t in themes_setting if isinstance(t, str))
+        return {"builtin_themes": builtin_themes}
 
     def get_context(self, target_dir: pathlib.Path):
         return {
