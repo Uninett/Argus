@@ -23,7 +23,6 @@ INTERNAL_IPS = ["127.0.0.1"]
 
 INSTALLED_APPS += ["django_extensions"]  # noqa: F405
 
-
 # Paths to plugins
 MEDIA_PLUGINS = [
     "argus.notificationprofile.media.email.EmailNotification",

@@ -104,7 +104,7 @@ If one wishes to write a notification plugin for a medium supported by Apprise, 
 
 A minimal example of how to use it can be found in:
 
-| Class: ``argus.notificationprofile.media.email.SlackNotification``
+| Class: ``argus.notificationprofile.media.slack.SlackNotification``
 
 In this case as Apprise works with URLs, it can consume the destination webhook directly, so the notification class does not actually need anything.
 

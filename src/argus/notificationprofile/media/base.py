@@ -4,13 +4,12 @@ from abc import ABC, abstractmethod
 import logging
 from typing import TYPE_CHECKING, Any
 
-from rest_framework.exceptions import ValidationError
-
 from apprise import Apprise
 
 from django import forms
 from django.conf import settings
 from django.template.loader import render_to_string
+from rest_framework.exceptions import ValidationError
 
 from argus.incident.models import Event
 from ..models import DestinationConfig
@@ -184,13 +183,13 @@ class AppriseMedium(NotificationMedium):
     @staticmethod
     def get_label(destination: DestinationConfig) -> str:
         """
-        Returns the apprise destination url represented by this destination
+        Returns the Apprise destination url represented by this destination
         """
         return destination.settings.get("destination_url")
 
     @classmethod
     def get_relevant_address(cls, destination: DestinationConfig) -> Any:
-        """Returns the apprise destination url the message should be sent to"""
+        """Returns the Apprise destination url the message should be sent to"""
         return destination.settings["destination_url"]
 
     @staticmethod
