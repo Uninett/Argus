@@ -214,7 +214,7 @@ class AppriseDestinationViewTests(APITestCase):
         )
 
     def test_should_not_allow_creating_apprise_destination_with_duplicate_urls(self):
-        settings = {"destination_url": "https://example.com/hook"}
+        settings = {"destination_url": "https://duplicate-example.com/hook"}
         DestinationConfigFactory(
             user=self.user1,
             media=Media.objects.get(slug="apprise"),
@@ -255,14 +255,15 @@ class AppriseMediumBehaviorTests(TestCase):
     def test_send_no_destinations_returns_false(self):
         self.assertFalse(AppriseMedium.send(self.event, []))
 
-    @patch("argus.notificationprofile.media.apprise.Apprise")
+    @patch("argus.notificationprofile.media.base.Apprise")
     def test_send_success_single_destination(self, mock_apprise):
         instance = mock_apprise.return_value
         instance.notify.return_value = True
+
         self.assertTrue(AppriseMedium.send(self.event, [self.destination]))
         instance.add.assert_called_once_with("https://example.com/hook")
 
-    @patch("argus.notificationprofile.media.apprise.Apprise")
+    @patch("argus.notificationprofile.media.base.Apprise")
     def test_send_failure_returns_false(self, mock_apprise):
         instance = mock_apprise.return_value
         instance.notify.return_value = False

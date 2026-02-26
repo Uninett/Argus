@@ -29,7 +29,7 @@ if TYPE_CHECKING:
     User = get_user_model()
 
 
-__all__ = ["NotificationMedium"]
+__all__ = ["NotificationMedium", "AppriseMedium"]
 
 LOG = logging.getLogger(__name__)
 
@@ -157,6 +157,7 @@ class AppriseMedium(NotificationMedium):
     class Form(forms.Form):
         destination_url = forms.URLField()
 
+    @classmethod
     def validate(cls, instance: RequestDestinationConfigSerializer, apprise_dict: dict, user: User) -> dict:
         """
         Validates the settings of an apprise destination and returns a dict
