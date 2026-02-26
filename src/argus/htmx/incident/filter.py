@@ -11,6 +11,7 @@ from argus.htmx.widgets import BadgeDropdownMultiSelect, SearchDropdownMultiSele
 from argus.incident.constants import AckedStatus, Level, OpenStatus
 from argus.incident.models import Event, SourceSystem, SourceSystemType, Tag
 from argus.notificationprofile.models import Filter
+from argus.notificationprofile.utils import annotate_public_filters_with_usernames
 
 filter_backend = get_filter_backend()
 QuerySetFilter = filter_backend.QuerySetFilter
@@ -206,7 +207,8 @@ class FilterListView(ListView):
     template_name = "htmx/incident/filter_list.html"
 
     def get_queryset(self):
-        return super().get_queryset().usable_by(self.request.user)
+        qs = super().get_queryset().usable_by(self.request.user)
+        return annotate_public_filters_with_usernames(qs=qs, user=self.request.user)
 
     def get_success_url(self):
         return reverse("htmx:filter-list")
