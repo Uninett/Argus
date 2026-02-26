@@ -1,9 +1,15 @@
+import logging
 from datetime import timedelta
+import sys
 
+from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 
 from argus.plannedmaintenance.models import PlannedMaintenanceTask
+
+
+LOG = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
@@ -19,8 +25,16 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
+        if not getattr(settings, "ENABLE_CRON_JOBS", False):
+            sys.exit()
         start_time = timezone.now() - timedelta(minutes=options.get("minutes"))
         started_pm_tasks = PlannedMaintenanceTask.objects.started_after_time(start_time)
+        if count := started_pm_tasks.count():
+            LOG.info("Linking up %i just started planned maintenance tasks to incidents", count)
+        else:
+            LOG.info("No planned maintenance tasks to link up")
 
         for pm_task in started_pm_tasks:
             pm_task.connect_covered_incidents()
+        else:
+            LOG.info("Finished linking up incidents to started planned maintenance tasks")
