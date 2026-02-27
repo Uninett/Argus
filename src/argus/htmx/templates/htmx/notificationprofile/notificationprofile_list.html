@@ -1,12 +1,18 @@
 {% extends "./base.html" %}
+{% block tab_action %}
+  <button hx-get="{% url 'htmx:notificationprofile-create' %}"
+          hx-target="#notificationprofile-create"
+          hx-swap="outerHTML"
+          _="on click if #no-profiles-message remove #no-profiles-message"
+          class="btn btn-primary">New profile</button>
+{% endblock tab_action %}
 {% block profile_main %}
   <div>
-    <div class="card card-base card-gray mt-4 mb-8"
-         hx-get="{% url "htmx:notificationprofile-create" %}"
-         hx-swap="innerHTML"
-         hx-trigger="load once"></div>
-    {% for form in form_list %}
-      <div class="card card-base card-border my-4">{% include "./_notificationprofile_form.html" %}</div>
+    <div id="notificationprofile-create"></div>
+    {% for profile in object_list %}
+      {% include "./_notificationprofile_card.html" %}
+    {% empty %}
+      <p id="no-profiles-message" class="text-center text-base-content/60">No profiles yet</p>
     {% endfor %}
   </div>
 {% endblock profile_main %}

@@ -1,0 +1,36 @@
+<select id="{{ widget.attrs.id }}"
+        name="{{ widget.name }}"
+        class="hidden"
+        multiple>
+  {% for _, options, _ in widget.optgroups %}
+    {% for option in options %}
+      <option value="{{ option.value }}"
+              {% if option.selected %}selected{% endif %}>{{ option.label }}</option>
+    {% endfor %}
+  {% endfor %}
+</select>
+<script>
+(function () {
+    const el = document.querySelector('#{{ widget.attrs.id|escapejs }}');
+    if (el.choices) return;
+    const instance = new Choices(el, {
+        removeItemButton: true,
+        duplicateItemsAllowed: false,
+        shouldSort: false,
+        searchEnabled: true,
+        searchChoices: true,
+        itemSelectText: '',
+        removeItemIconText: () => '',
+        placeholder: true,
+        placeholderValue: '{{ widget.attrs.placeholder|default:"Select..."|escapejs }}',
+        classNames: {
+            containerOuter: ['choices', 'dropdown', 'w-full', 'max-w-none', 'self-auto'],
+            containerInner: ['choices__inner'],
+            listDropdown: ['choices-dropdown'],
+            listItems: ['choices-list-items'],
+        }
+    });
+    // Prevent dropdown from opening immediately when loaded via HTMX
+    instance.hideDropdown();
+})();
+</script>
