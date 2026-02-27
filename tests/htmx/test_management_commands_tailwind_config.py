@@ -17,7 +17,6 @@ class TestHandle(TestCase):
 
 
 class TestGenerateThemeFile(TestCase):
-
     @override_settings(DAISYUI_THEMES=("light", "dark"))
     def test_generate_nothing_if_no_dicts_in_DAISYUI_THEMES_setting(self):
         cmd = Command()
@@ -42,7 +41,6 @@ class TestGenerateThemeFile(TestCase):
 
 @tag("unit")
 class TestGenerateThemeCss(TestCase):
-
     def test_empty_config_dict_still_generates_css(self):
         cmd = Command()
         expected = '@plugin "daisyui/theme" {\n  name: "foo";\n}\n'
