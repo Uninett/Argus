@@ -11,7 +11,7 @@ Get dependencies
 
 You need to have installed the development dependencies to regenerate the diagram::
 
-    pip install argus-server[dev]
+    uv sync --extra dev
 
 This will install ``django_extensions`` which has the diagram generator we use.
 

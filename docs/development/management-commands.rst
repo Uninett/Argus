@@ -53,7 +53,7 @@ as such:
 Generate a secret key
 ---------------------
 
-To generate a secret key to be used in the `cmd.sh` file one can use
+To generate a secret key to be used in your environment configuration one can use
 the command `gen_secret_key`:
 
     .. code:: console
