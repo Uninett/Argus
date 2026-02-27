@@ -59,19 +59,59 @@
               </div>
             </td>
             <td class="border-b border-neutral-content group-last:border-b-0">{{ task.created_by }}</td>
-            <td class="border-b border-neutral-content group-last:border-b-0 text-right">
+            <td class="border-b border-neutral-content group-last:border-b-0 text-right overflow-visible">
               <div class="flex gap-1 justify-end">
                 {% if request.user.is_staff and task.modifiable %}
                   <a href="{% url 'htmx:plannedmaintenance-update' pk=task.pk %}"
                      class="btn btn-sm btn-ghost">Edit</a>
-                  {% if task.current %}
-                    {% include "./_cancel_confirm_dialog.html" with task=task %}
-                  {% elif task.future %}
-                    {% include "./_delete_confirm_dialog.html" with task=task %}
-                  {% endif %}
                 {% else %}
                   <a href="{% url 'htmx:plannedmaintenance-detail' pk=task.pk %}"
                      class="btn btn-sm btn-ghost">View</a>
+                {% endif %}
+                {% if request.user.is_staff %}
+                  <div class="dropdown dropdown-end">
+                    <button tabindex="0" class="btn btn-sm btn-ghost btn-square">
+                      <svg xmlns="http://www.w3.org/2000/svg"
+                           class="h-4 w-4"
+                           viewBox="0 0 20 20"
+                           fill="currentColor">
+                        <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                      </svg>
+                    </button>
+                    <ul tabindex="0"
+                        class="dropdown-content z-[50] menu menu-sm p-2 shadow bg-base-100 rounded-box w-max border border-base-300">
+                      <li>
+                        <a href="{% url 'htmx:plannedmaintenance-create' %}?copy_from={{ task.pk }}">
+                          <i class="fa-regular fa-copy" aria-hidden="true"></i> Create copy
+                        </a>
+                      </li>
+                      {% if task.modifiable %}
+                        {% if task.current %}
+                          <li>
+                            <button type="button"
+                                    onclick="document.getElementById('end-dialog-{{ task.pk }}').showModal()">
+                              <i class="fa-regular fa-circle-stop" aria-hidden="true"></i> End now
+                            </button>
+                          </li>
+                        {% elif task.future %}
+                          <li>
+                            <button type="button"
+                                    class="text-error"
+                                    onclick="document.getElementById('delete-dialog-{{ task.pk }}').showModal()">
+                              <i class="fa-regular fa-trash-can" aria-hidden="true"></i> Delete
+                            </button>
+                          </li>
+                        {% endif %}
+                      {% endif %}
+                    </ul>
+                  </div>
+                  {% if task.modifiable %}
+                    {% if task.current %}
+                      {% include "./_cancel_confirm_dialog.html" with task=task %}
+                    {% elif task.future %}
+                      {% include "./_delete_confirm_dialog.html" with task=task %}
+                    {% endif %}
+                  {% endif %}
                 {% endif %}
               </div>
             </td>

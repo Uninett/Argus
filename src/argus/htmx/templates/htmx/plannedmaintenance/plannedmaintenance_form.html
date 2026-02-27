@@ -141,20 +141,28 @@
               </div>
             {% endif %}
           </div>
-          <div class="card-actions justify-end mt-6">
-            {% if object.pk and not object.modifiable or not request.user.is_staff %}
-              <a href="{% if object.past %}{% url 'htmx:plannedmaintenance-list' tab='past' %}{% else %}{% url 'htmx:plannedmaintenance-list' %}{% endif %}"
-                 class="btn">Back</a>
-            {% else %}
-              <button type="submit" class="btn btn-primary">
-                {% if object.pk %}
-                  Save changes
-                {% else %}
-                  Create
-                {% endif %}
-              </button>
-              <a href="{% url 'htmx:plannedmaintenance-list' %}" class="btn">Cancel</a>
-            {% endif %}
+          <div class="card-actions justify-between mt-6">
+            <div>
+              {% if object.pk and request.user.is_staff %}
+                <a href="{% url 'htmx:plannedmaintenance-create' %}?copy_from={{ object.pk }}"
+                   class="btn">Create copy</a>
+              {% endif %}
+            </div>
+            <div class="flex gap-2">
+              {% if object.pk and not object.modifiable or not request.user.is_staff %}
+                <a href="{% if object.past %}{% url 'htmx:plannedmaintenance-list' tab='past' %}{% else %}{% url 'htmx:plannedmaintenance-list' %}{% endif %}"
+                   class="btn">Back</a>
+              {% else %}
+                <button type="submit" class="btn btn-primary">
+                  {% if object.pk %}
+                    Save changes
+                  {% else %}
+                    Create
+                  {% endif %}
+                </button>
+                <a href="{% url 'htmx:plannedmaintenance-list' %}" class="btn">Cancel</a>
+              {% endif %}
+            </div>
           </div>
         </form>
       </div>
