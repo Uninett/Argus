@@ -2,7 +2,7 @@
 {% block plannedmaintenance_main %}
   <div class="flex flex-col gap-4 max-w-6xl w-full">
     <div class="flex justify-between items-center">
-      <div role="tablist" class="tabs tabs-boxed">
+      <div role="tablist" class="tabs tabs-box tabs-primary">
         <a role="tab"
            class="tab {% if current_tab == 'upcoming' %}tab-active{% endif %}"
            href="{% url 'htmx:plannedmaintenance-list' tab='upcoming' %}">Upcoming</a>

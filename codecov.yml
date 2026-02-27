@@ -13,6 +13,7 @@ ignore:
   - "tests/**"
   - "src/argus/site/settings/**"
   - "src/argus/spa/dataporten/social.py"
+  - "src/argus/htmx/tailwindtheme/*.py"
   - "**/apps.py"
   - "**/wsgi.py"
   - "**/test*.py"

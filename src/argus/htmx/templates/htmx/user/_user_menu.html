@@ -1,4 +1,4 @@
-<ul class="z-20 menu menu-md dropdown-content bg-base-200 text-base-content rounded-box mt-3 w-52 p-2 shadow max-h-svh">
+<ul class="z-20 menu menu-md dropdown-content bg-base-200 text-base-content rounded-box mt-3 w-52 p-2 shadow max-h-svh overflow-x-hidden">
   <li class="menu-title">
     Logged in as: <span class="text-info">{{ request.user }}</span>
     <div class="divider divider-secondary my-0 pointer-events-none"></div>
@@ -18,20 +18,22 @@
         <a href="{% url 'admin:index' %}" target="_blank">Admin</a>
       </li>
     {% endif %}
-    <li>
-      <div class="divider divider-secondary pl-2 pr-4 my-0 pointer-events-none"></div>
-      {% include "htmx/user/_user_menu_logout.html" %}
+    <li class="menu-title menu-divider" aria-hidden="true">
+      <div class="divider divider-secondary my-0"></div>
     </li>
+    <li>{% include "htmx/user/_user_menu_logout.html" %}</li>
   {% endblock items %}
-  <li>
-    <div class="divider divider-secondary pl-2 pr-4 my-0 pointer-events-none"></div>
-    <button class="text-xs tooltip flex"
+  <li class="menu-title menu-divider" aria-hidden="true">
+    <div class="divider divider-secondary my-0"></div>
+  </li>
+  <li class="overflow-hidden">
+    <button class="text-xs tooltip grid! grid-cols-[1fr_auto] w-full gap-2"
             aria-label="Copy Argus version to clipboard"
             data-tip="Copy version to clipboard"
             onclick="navigator.clipboard.writeText('{{ version }}')">
-      <div class="space-y-2 text-left">
+      <div class="space-y-2 text-left overflow-hidden">
         <span>Argus version:</span>
-        <span>{{ short_version }}</span>
+        <span class="block truncate">{{ short_version }}</span>
       </div>
       <i class="fa-solid fa-copy"></i>
     </button>

@@ -11,22 +11,22 @@
      {% endblock field_control %}>
   <div tabindex="0"
        role="button"
-       class="show-selected-box {{ widget.attrs.field_styles|default:"input input-primary input-bordered input-sm h-auto max-w-xs" }} overflow-y-auto min-h-8 max-h-16 leading-tight flex flex-wrap items-center gap-0.5">
-    {% if not widget.has_selected %}<p class="text-base-content/50">{{ widget.attrs.placeholder }}</p>{% endif %}
+       class="show-selected-box {{ widget.attrs.field_styles|default:"input input-primary h-auto" }} overflow-y-auto min-h-8 max-h-16 min-w-48 w-full leading-tight flex flex-wrap items-center gap-1">
+    {% if not widget.has_selected %}<span class="text-base-content/50">{{ widget.attrs.placeholder }}</span>{% endif %}
     {% for _, options, _ in widget.optgroups %}
       {% for option in options %}
         {% if option.selected %}
           {% block show_selected %}
-            <p class="text-primary font-medium">
+            <span class="text-primary font-medium">
               <em>{{ option.label }}</em>,
-            </p>
+            </span>
           {% endblock show_selected %}
         {% endif %}
       {% endfor %}
     {% endfor %}
   </div>
   <div tabindex="0"
-       class="dropdown-content bg-base-100 rounded-box z-20 min-w-fit w-full max-h-80 overflow-y-auto p-2 mt-0.5 shadow">
+       class="dropdown-content bg-base-100 rounded-box z-1 min-w-fit w-full max-h-80 overflow-y-auto p-2 mt-0.5 shadow-sm">
     {% block field_template %}
       {# Hidden input to ensure that a value always is included in the form submission, even when no options are selected #}
       <input type="hidden" name="{{ widget.name }}" value="">
