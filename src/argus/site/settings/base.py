@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     "django.forms",
 
     # 3rd party apps
+    "django_tasks",
+    "django_tasks_db",
     "corsheaders",
     "social_django",
     "rest_framework",
@@ -247,6 +249,12 @@ NOTIFICATION_SUBJECT_PREFIX = "[Argus] "
 SEND_NOTIFICATIONS = get_bool_env("ARGUS_SEND_NOTIFICATIONS", default=False)
 
 # 3rd party settings
+
+TASKS = {
+    "default": {
+        "BACKEND": "django_tasks_db.DatabaseBackend",
+    }
+}
 
 # Python social auth
 

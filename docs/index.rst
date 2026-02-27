@@ -15,6 +15,7 @@ Welcome to Argus' documentation!
    integrations/index
    customization
    development
+   production
    :maxdepth: 2
    :caption: Contents:
 
