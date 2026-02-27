@@ -591,7 +591,6 @@ class BulkAcknowledgementViewSet(BulkHelper, viewsets.ViewSet):
         qs, changes, status_codes_seen = self.bulk_setup(incident_ids)
 
         acks = qs.create_acks(actor, timestamp, description, expiration)
-        # send notifications manually
 
         for ack in acks:
             event = ack.event
