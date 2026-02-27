@@ -1,135 +1,203 @@
-from typing import Optional, Sequence
-from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponseRedirect
+from django.template.response import TemplateResponse
+from django.urls import reverse
+from django.utils import timezone
+from django.views.generic import CreateView, DeleteView, ListView, UpdateView
+from django_htmx.http import HttpResponseClientRedirect
 
-from django.views.decorators.http import require_http_methods
-from django.http import HttpResponse
-
-from argus.notificationprofile.models import DestinationConfig, Media
+from argus.htmx.modals import DeleteModal
+from argus.notificationprofile.models import DestinationConfig
 from argus.notificationprofile.media import api_safely_get_medium_object
 from argus.notificationprofile.media.base import NotificationMedium
 
 from .forms import DestinationFormCreate, DestinationFormUpdate
 
 
-@require_http_methods(["GET"])
-def destination_list(request):
-    return _render_destination_list(request)
+DESTINATION_TABLE_TEMPLATE = "htmx/destination/_destination_table.html"
 
 
-@require_http_methods(["POST"])
-def create_htmx(request) -> HttpResponse:
-    form = DestinationFormCreate(request.POST or None, request=request)
-    template = "htmx/destination/_content.html"
-    if form.is_valid():
-        form.save()
-        return _render_destination_list(request, template=template)
-    return _render_destination_list(request, create_form=form, template=template)
+def _attach_delete_state(form, make_modal):
+    """Attach delete modal or disabled state to a form based on deletability.
 
-
-@require_http_methods(["POST"])
-def delete_htmx(request, pk: int) -> HttpResponse:
-    destination = get_object_or_404(request.user.destinations.all(), pk=pk)
-    media = destination.media
-    error_msg = None
-    try:
-        medium = api_safely_get_medium_object(destination.media.slug)
-        medium.raise_if_not_deletable(destination)
-    except NotificationMedium.NotDeletableError as e:
-        error_msg = " ".join(e.args)
-    else:
-        destination.delete()
-
-    forms = _get_update_forms(request.user, media=media)
-
-    context = {
-        "error_msg": error_msg,
-        "forms": forms,
-        "media": media,
-    }
-    return render(request, "htmx/destination/_collapse_with_forms.html", context=context)
-
-
-@require_http_methods(["POST"])
-def update_htmx(request, pk: int) -> HttpResponse:
-    destination = DestinationConfig.objects.get(pk=pk)
-    media = destination.media
-    form = DestinationFormUpdate(
-        request.POST or None, instance=destination, prefix=f"destination_{destination.pk}", request=request
-    )
-    if is_valid := form.is_valid():
-        form.save()
-
-    update_forms = _get_update_forms(request.user, media=media)
-
-    if not is_valid:
-        update_forms = _replace_form_in_list(update_forms, form)
-
-    context = {
-        "error_msg": None,
-        "forms": update_forms,
-        "media": media,
-    }
-    return render(request, "htmx/destination/_collapse_with_forms.html", context=context)
-
-
-def _render_destination_list(
-    request,
-    create_form: Optional[DestinationFormCreate] = None,
-    update_forms: Optional[Sequence[DestinationFormUpdate]] = None,
-    template: str = "htmx/destination/destination_list.html",
-) -> HttpResponse:
-    """Function to render the destinations page.
-
-    :param create_form: this is used to display the form for creating a new destination
-    with errors while retaining the user input. If you want a blank form, pass None.
-    :param update_forms: list of update forms to display. Useful for rendering forms
-    with error messages while retaining the user input.
-    If this is None, the update forms will be generated from the user's destinations."""
-
-    if create_form is None:
-        create_form = DestinationFormCreate()
-    if update_forms is None:
-        update_forms = _get_update_forms(request.user)
-    grouped_forms = _group_update_forms_by_media(update_forms)
-    context = {
-        "create_form": create_form,
-        "grouped_forms": grouped_forms,
-        "page_title": "Destinations",
-        "active_tab": "destinations",
-    }
-    return render(request, template, context=context)
-
-
-def _get_update_forms(user, media: Media = None) -> list[DestinationFormUpdate]:
-    """Get a list of update forms for the user's destinations.
-    :param media: if provided, only return destinations for this media.
+    Note: DestinationFormUpdate.__init__ mutates instance.settings from a dict
+    to a plain string, so we read the raw settings from DB for the synced check.
     """
-    if media:
-        destinations = user.destinations.filter(media=media)
+    destination = form.instance
+    in_use = destination.notification_profiles.exists()
+    raw_settings = DestinationConfig.objects.values_list("settings", flat=True).get(pk=destination.pk)
+    synced = raw_settings.get("synced", False) if isinstance(raw_settings, dict) else False
+
+    if in_use:
+        form.delete_disabled = True
+        form.delete_tooltip = "This destination is used by a notification profile and cannot be deleted"
+    elif synced:
+        form.delete_disabled = True
+        form.delete_tooltip = "This destination is synced from an outside source and cannot be deleted"
     else:
-        destinations = user.destinations.all()
-    # Sort by oldest first
-    destinations = destinations.order_by("pk")
+        form.delete_disabled = False
+        form.modal = make_modal(destination)
+
+
+class DestinationMixin:
+    model = DestinationConfig
+    prefix = "destination"
+
+    def _get_prefix(self, pk):
+        if pk:
+            return f"{self.prefix}_{pk}"
+        return self.prefix
+
+    def _make_delete_modal(self, obj, **kwargs):
+        return DeleteModal(
+            header="Delete destination",
+            button_title="Delete",
+            button_class="btn-sm btn-outline btn-error",
+            explanation=f'Delete the destination "{obj.label or obj.pk}"?',
+            dialog_id=f"destination-delete-confirm-{obj.pk}",
+            endpoint=reverse("htmx:destination-delete", kwargs={"pk": obj.pk}),
+            **kwargs,
+        )
+
+    def get_prefix(self):
+        return self._get_prefix(getattr(self.object, "pk", None))
+
+    def get_queryset(self):
+        return super().get_queryset().filter(user=self.request.user).order_by("pk")
+
+    def get_template_names(self):
+        return [f"htmx/destination/destination{self.template_name_suffix}.html"]
+
+    def get_success_url(self):
+        return reverse("htmx:destination-list")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["page_title"] = "Destinations"
+        context["active_tab"] = "destinations"
+        return context
+
+
+class DestinationListView(DestinationMixin, ListView):
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        update_forms = _get_update_forms(self.request.user)
+        for f in update_forms:
+            _attach_delete_state(f, self._make_delete_modal)
+        context["update_forms"] = update_forms
+        return context
+
+
+class DestinationCreateView(DestinationMixin, CreateView):
+    form_class = DestinationFormCreate
+    htmx_template = "htmx/destination/_destination_create_row.html"
+
+    def get_template_names(self):
+        if self.request.htmx:
+            return [self.htmx_template]
+        return super().get_template_names()
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["request"] = self.request
+        return kwargs
+
+    def form_valid(self, form):
+        form.save()
+        if self.request.htmx:
+            return HttpResponseClientRedirect(self.get_success_url())
+        return HttpResponseRedirect(self.get_success_url())
+
+    def form_invalid(self, form):
+        if self.request.htmx:
+            return TemplateResponse(
+                self.request,
+                self.htmx_template,
+                {"form": form},
+            )
+        return super().form_invalid(form)
+
+
+class DestinationUpdateView(DestinationMixin, UpdateView):
+    form_class = DestinationFormUpdate
+
+    def get_prefix(self):
+        return self._get_prefix(self.object.pk)
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["request"] = self.request
+        return kwargs
+
+    def get_object(self, queryset=None):
+        self.object = super().get_object(queryset)
+        return self.object
+
+    def form_valid(self, form):
+        form.save()
+        return self._render_table(
+            success_message=f"Saved destination at {timezone.localtime().strftime('%H:%M:%S')}.",
+        )
+
+    def form_invalid(self, form):
+        update_forms = _get_update_forms(self.request.user)
+        update_forms = _replace_form_in_list(update_forms, form)
+        for f in update_forms:
+            _attach_delete_state(f, self._make_delete_modal)
+        context = {"update_forms": update_forms}
+        return TemplateResponse(
+            self.request,
+            DESTINATION_TABLE_TEMPLATE,
+            context,
+        )
+
+    def _render_table(self, error_msg=None, success_message=None):
+        update_forms = _get_update_forms(self.request.user)
+        for f in update_forms:
+            _attach_delete_state(f, self._make_delete_modal)
+        context = {
+            "update_forms": update_forms,
+            "error_msg": error_msg,
+            "success_message": success_message,
+        }
+        return TemplateResponse(
+            self.request,
+            DESTINATION_TABLE_TEMPLATE,
+            context,
+        )
+
+
+class DestinationDeleteView(DestinationMixin, DeleteView):
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        try:
+            medium = api_safely_get_medium_object(self.object.media.slug)
+            medium.raise_if_not_deletable(self.object)
+        except NotificationMedium.NotDeletableError as e:
+            update_forms = _get_update_forms(request.user)
+            for f in update_forms:
+                _attach_delete_state(f, self._make_delete_modal)
+            response = TemplateResponse(
+                request,
+                DESTINATION_TABLE_TEMPLATE,
+                {
+                    "update_forms": update_forms,
+                    "error_msg": " ".join(e.args),
+                },
+            )
+            response["HX-Retarget"] = "#destination-table"
+            response["HX-Reswap"] = "outerHTML"
+            return response
+        else:
+            self.object.delete()
+        return HttpResponseRedirect(self.get_success_url())
+
+
+def _get_update_forms(user) -> list[DestinationFormUpdate]:
+    destinations = user.destinations.all().order_by("pk")
     return [
         DestinationFormUpdate(instance=destination, prefix=f"destination_{destination.pk}")
         for destination in destinations
     ]
-
-
-def _group_update_forms_by_media(
-    destination_forms: Sequence[DestinationFormUpdate],
-) -> dict[Media, list[DestinationFormUpdate]]:
-    grouped_destinations = {}
-
-    # Adding a media to the dict even if there are no destinations for it
-    # is useful so that the template can render a section for that media
-    for media in Media.objects.all():
-        grouped_destinations[media] = []
-
-    for form in destination_forms:
-        grouped_destinations[form.instance.media].append(form)
-
-    return grouped_destinations
 
 
 def _replace_form_in_list(forms: list[DestinationFormUpdate], form: DestinationFormUpdate):

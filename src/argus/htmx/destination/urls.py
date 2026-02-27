@@ -1,11 +1,16 @@
 from django.urls import path
 
-from .views import destination_list, create_htmx, delete_htmx, update_htmx
+from .views import (
+    DestinationListView,
+    DestinationCreateView,
+    DestinationUpdateView,
+    DestinationDeleteView,
+)
 
 app_name = "htmx"
 urlpatterns = [
-    path("", destination_list, name="destination-list"),
-    path("htmx-create/", create_htmx, name="htmx-create"),
-    path("<int:pk>/htmx-delete/", delete_htmx, name="htmx-delete"),
-    path("<int:pk>/htmx-update/", update_htmx, name="htmx-update"),
+    path("", DestinationListView.as_view(), name="destination-list"),
+    path("create/", DestinationCreateView.as_view(), name="destination-create"),
+    path("<int:pk>/update/", DestinationUpdateView.as_view(), name="destination-update"),
+    path("<int:pk>/delete/", DestinationDeleteView.as_view(), name="destination-delete"),
 ]
