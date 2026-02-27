@@ -34,9 +34,7 @@
       {% if destinations %}
         <span class="border-l border-base-content/20 pl-3 flex items-center gap-1 flex-wrap">
           <i class="fa-regular fa-bell text-xs" aria-hidden="true"></i>
-          {% for dest in destinations %}
-            <span class="badge badge-sm badge-outline">{{ dest.media.name }}: {{ dest }}</span>
-          {% endfor %}
+          {% for dest in destinations %}<span class="badge badge-sm badge-outline">{{ dest }}</span>{% endfor %}
         </span>
       {% endif %}
     {% endwith %}

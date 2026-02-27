@@ -6,7 +6,7 @@ from argus.notificationprofile.factories import (
     NotificationProfileFactory,
     TimeslotFactory,
 )
-from argus.notificationprofile.models import Filter
+from argus.filter.factories import FilterFactory
 
 
 @override_settings(AUTHENTICATION_BACKENDS=["django.contrib.auth.backends.ModelBackend"])
@@ -70,7 +70,7 @@ class TestNotificationProfileCreateView(NotificationProfileViewTestCase):
     def setUp(self):
         super().setUp()
         self.timeslot = TimeslotFactory(user=self.user)
-        self.filter = Filter.objects.create(user=self.user, name="Test Filter", filter={})
+        self.filter = FilterFactory(user=self.user, name="Test Filter", filter={})
         self.url = reverse("htmx:notificationprofile-create")
 
     def _build_post_data(self, **overrides):
@@ -113,7 +113,7 @@ class TestNotificationProfileUpdateView(NotificationProfileViewTestCase):
     def setUp(self):
         super().setUp()
         self.timeslot = TimeslotFactory(user=self.user)
-        self.filter = Filter.objects.create(user=self.user, name="Test Filter", filter={})
+        self.filter = FilterFactory(user=self.user, name="Test Filter", filter={})
         self.profile = NotificationProfileFactory(user=self.user, timeslot=self.timeslot, name="Test Profile")
         self.profile.filters.add(self.filter)
         self.url = reverse("htmx:notificationprofile-update", kwargs={"pk": self.profile.pk})
