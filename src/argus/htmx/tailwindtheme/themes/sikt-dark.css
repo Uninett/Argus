@@ -1,0 +1,38 @@
+@plugin "daisyui/theme" {
+  name: "sikt-dark";
+  color-scheme: "dark";
+  --color-primary: #7351FB;
+  --color-primary-content: #FFFFFF;
+  --color-secondary: #1D1D1D;
+  --color-secondary-content: #FFFFFF;
+  --color-accent: #4324C8;
+  --color-accent-content: #FFFFFF;
+  --color-neutral: #595959;
+  --color-neutral-content: #FFFFFF;
+  --color-base-100: #262626;
+  --color-base-200: #1A1A1A;
+  --color-base-300: #595959;
+  --color-base-content: #FFFFFF;
+  --color-info: #005AEA;
+  --color-info-content: #FFFFFF;
+  --color-success: #007638;
+  --color-success-content: #FFFFFF;
+  --color-warning: #FFB700;
+  --color-warning-content: #FFFFFF;
+  --color-error: #CC1201;
+  --color-error-content: #FFFFFF;
+}
+
+/* Severity colors from Sikt datavisualization category tokens */
+[data-theme="sikt-dark"] {
+  --color-severity-primary-1: #FF957A;
+  --color-severity-primary-2: #FFAC70;
+  --color-severity-primary-3: #FBE774;
+  --color-severity-primary-4: #82E3CB;
+  --color-severity-primary-5: #75C7F0;
+  --color-severity-secondary-1: #0A0132;
+  --color-severity-secondary-2: #0A0132;
+  --color-severity-secondary-3: #0A0132;
+  --color-severity-secondary-4: #0A0132;
+  --color-severity-secondary-5: #0A0132;
+}

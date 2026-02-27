@@ -3,7 +3,7 @@
 @source "../../templates";
 
 @plugin "daisyui" {
-  themes: dark, light, argus;
+  themes: dark, light, argus, sikt, sikt-dark;
 }
 
 /*
