@@ -163,6 +163,7 @@ class SourceSystem(models.Model):
         help_text="Base url to combine with an incident's relative url to point to more info in the source system.",
         blank=True,
     )
+    last_seen = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         constraints = [
