@@ -91,6 +91,24 @@ class PlannedMaintenanceCreateViewTests(TestCase):
         form = response.context["form"]
         self.assertIn("start_time", form.initial)
 
+    def test_given_existing_task_when_copy_from_it_should_populate_description_and_filters(self):
+        self.client.force_login(self.staff_user)
+        test_filter = FilterFactory(user=self.staff_user)
+        source_pm = PlannedMaintenanceFactory(description="Source description")
+        source_pm.filters.add(test_filter)
+
+        response = self.client.get(reverse("htmx:plannedmaintenance-create"), {"copy_from": source_pm.pk})
+        form = response.context["form"]
+        self.assertEqual(form.initial["description"], "Source description")
+        self.assertEqual(form.initial["filters"], [test_filter.pk])
+
+    def test_given_nonexistent_task_when_copy_from_it_should_ignore_silently(self):
+        self.client.force_login(self.staff_user)
+        response = self.client.get(reverse("htmx:plannedmaintenance-create"), {"copy_from": 99999})
+        form = response.context["form"]
+        self.assertNotIn("description", form.initial)
+        self.assertNotIn("filters", form.initial)
+
     def test_create_view_sets_created_by(self):
         self.client.force_login(self.staff_user)
         test_filter = FilterFactory(user=self.staff_user)
