@@ -26,7 +26,7 @@ jobs:
     - name: Set up uv
       uses: astral-sh/setup-uv@v6
 
-    - name: Format HTML
+    - name: Check HTML formatting and lint
       run: |
         uvx djlint --version
-        uvx djlint . --check --configuration pyproject.toml
+        uvx djlint . --check --lint --configuration pyproject.toml

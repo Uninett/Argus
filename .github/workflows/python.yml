@@ -17,18 +17,6 @@ jobs:
       with:
         version: "0.14.13"
 
-  djlint:
-    runs-on: ubuntu-latest
-    name: Lint HTML
-    steps:
-    - uses: actions/checkout@v6
-
-    - name: Set up uv
-      uses: astral-sh/setup-uv@v6
-
-    - name: Lint HTML
-      run: uvx djlint --lint .
-
   test:
     needs: ruff
 
