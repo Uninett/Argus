@@ -47,6 +47,9 @@ django==6.0.1
     #   django-htmx
     #   django-phonenumber-field
     #   django-rest-knox
+    #   django-stubs-ext
+    #   django-tasks
+    #   django-tasks-db
     #   djangorestframework
     #   drf-spectacular
     #   social-auth-app-django
@@ -59,6 +62,14 @@ django-htmx==1.27.0
 django-phonenumber-field[phonenumberslite]==8.4.0
     # via argus-server (pyproject.toml)
 django-rest-knox==5.0.2
+    # via argus-server (pyproject.toml)
+django-stubs-ext==5.2.9
+    # via
+    #   django-tasks
+    #   django-tasks-db
+django-tasks==0.12.0
+    # via django-tasks-db
+django-tasks-db==0.12.0
     # via argus-server (pyproject.toml)
 django-widget-tweaks==1.5.0
     # via argus-server (pyproject.toml)
@@ -153,6 +164,9 @@ sqlparse==0.5.5
 typing-extensions==4.15.0
     # via
     #   anyio
+    #   django-stubs-ext
+    #   django-tasks
+    #   django-tasks-db
     #   pydantic
     #   pydantic-core
     #   referencing
