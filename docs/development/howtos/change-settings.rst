@@ -42,7 +42,7 @@ A settings file may override anything set via environment variable.
 ``argus.site.settings.prod`` is a good starting point for production.
 
 .. note:: The development settings file assumes that the optional development
-   dependencies are installed. You can get them via ``uv sync --extra dev``.
+   dependencies are installed. You can get them via ``uv pip install argus-server[dev]``.
 
 Development
 ~~~~~~~~~~~
