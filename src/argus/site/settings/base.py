@@ -327,3 +327,5 @@ del _extra_apps_env
 update_settings(globals(), EXTRA_APPS)
 
 BANNER_MESSAGE = get_str_env("ARGUS_BANNER_MESSAGE", default=None)
+
+ENABLE_CRON_JOBS = get_bool_env("ARGUS_ENABLE_CRON_JOBS", default=False)
