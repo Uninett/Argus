@@ -24,8 +24,8 @@ from argus.filter import get_filter_backend
 from argus.util.datetime_utils import INFINITY_REPR
 from argus.util.drf import Forbidden403Serializer, NoContent204Serializer, Unauthorized401Serializer
 
-from .forms import AddSourceSystemForm
-from .models import (
+from argus.incident.forms import AddSourceSystemForm
+from argus.incident.models import (
     Acknowledgement,
     ChangeEvent,
     Event,
@@ -34,6 +34,14 @@ from .models import (
     SourceSystemType,
     Tag,
 )
+from argus.incident.ticket.base import (
+    TicketClientException,
+    TicketCreationException,
+    TicketPluginException,
+    TicketPluginImportException,
+    TicketSettingsException,
+)
+from argus.incident.ticket.utils import autocreate_ticket
 from .serializers import (
     UpdateAcknowledgementSerializer,
     EmptySerializer,
@@ -52,14 +60,6 @@ from .serializers import (
     TagSerializer,
     IncidentTagRelation,
 )
-from .ticket.base import (
-    TicketClientException,
-    TicketCreationException,
-    TicketPluginException,
-    TicketPluginImportException,
-    TicketSettingsException,
-)
-from .ticket.utils import autocreate_ticket
 
 filter_backend = get_filter_backend()
 IncidentFilter = filter_backend.IncidentFilter

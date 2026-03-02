@@ -9,8 +9,8 @@ from rest_framework import serializers
 
 from argus.auth.serializers import UsernameSerializer
 from argus.util.datetime_utils import INFINITY_REPR
-from . import fields
-from .models import (
+from argus.incident import fields
+from argus.incident.models import (
     Acknowledgement,
     ChangeEvent,
     Event,
@@ -23,6 +23,9 @@ from .models import (
 
 
 User = get_user_model()
+
+
+VERSION = "v2"
 
 
 def clean_tag(value: str) -> tuple[str, str]:

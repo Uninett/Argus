@@ -10,6 +10,10 @@ import factory
 import factory.fuzzy
 
 from argus.auth.factories import SourceUserFactory
+
+# FIXME: should use a version-less form, not a version-dependent IncidentSerializer
+# Fix depending on tags being simplified in the database
+from argus.incident.v2.serializers import IncidentSerializer
 from argus.util.datetime_utils import INFINITY, INFINITY_REPR
 from .models import (
     Tag,
@@ -22,7 +26,6 @@ from .models import (
     get_or_create_default_instances,
 )
 from .constants import Level
-from .serializers import IncidentSerializer
 
 
 __all__ = [

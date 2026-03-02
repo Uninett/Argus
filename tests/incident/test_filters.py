@@ -13,7 +13,7 @@ from argus.incident.factories import (
     TagFactory,
 )
 from argus.incident.models import Incident, IncidentTagRelation, SourceSystem, get_or_create_default_instances
-from argus.incident.views import IncidentFilter
+from argus.incident.v2.views import IncidentFilter
 from argus.filter.factories import FilterFactory
 from argus.notificationprofile.factories import NotificationProfileFactory
 from argus.notificationprofile.models import Filter, NotificationProfile
