@@ -64,8 +64,10 @@ dev = [
     "djlint",
     "ipython",
     "pre-commit",
+    "pydotplus",
     "python-dotenv",
     "towncrier",
+    "unittest-xml-reporting",
     "werkzeug",
     "tox>=4",
     "build",  # for debugging builds/installs
