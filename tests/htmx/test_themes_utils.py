@@ -16,7 +16,7 @@ class TestGetThemeNamesFromSetting(TestCase):
             self.assertEqual(result, raw_themes)
 
     def test_get_theme_names_from_Setting_with_dict_theme_returns_name(self):
-        raw_themes = [{"b": None}]
+        raw_themes = [{"b": {"primary": "#fff"}}]
         with patch("argus.htmx.themes.utils.get_raw_themes_setting", return_value=raw_themes):
             result = get_theme_names_from_setting()
             self.assertEqual(result, ["b"])

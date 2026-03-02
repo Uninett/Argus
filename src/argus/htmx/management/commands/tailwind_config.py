@@ -6,7 +6,7 @@ from django.template import engines
 from django.template.context import make_context
 from django.template.loader import get_template
 
-from argus.htmx.themes.utils import get_raw_themes_setting
+from argus.htmx.themes.utils import ThemesList, clean_themes, get_raw_themes_setting
 
 
 # Copied from https://github.com/GEANT/geant-argus/pull/15 with minor modifications
@@ -44,7 +44,8 @@ class Command(BaseCommand):
         themes_dir = css_target_path.parent / "themes"
         themes_dir.mkdir(exist_ok=True)
 
-        themes_context = self.get_themes_context()
+        themes = clean_themes(get_raw_themes_setting())
+        themes_context = self.get_themes_context(themes)
 
         # Generate tailwind base snippet with DaisyUI plugin config
         self.write_file(
@@ -55,7 +56,7 @@ class Command(BaseCommand):
         )
 
         # Generate theme CSS files for custom themes from DAISYUI_THEMES setting
-        self.generate_theme_files(themes_dir)
+        self.generate_theme_files(themes_dir, themes)
 
         # Generate main styles.css
         self.write_file(
@@ -65,11 +66,9 @@ class Command(BaseCommand):
             name="tailwind base css",
         )
 
-    def generate_theme_files(self, snippets_dir: pathlib.Path):
+    def generate_theme_files(self, snippets_dir: pathlib.Path, themes: ThemesList):
         """Generate CSS theme files for custom themes from DAISYUI_THEMES setting."""
-        themes_setting = get_raw_themes_setting()
-
-        for theme in themes_setting:
+        for theme in themes:
             if isinstance(theme, dict):
                 for theme_name, theme_config in theme.items():
                     self.write_theme_file(snippets_dir, theme_name, theme_config)
@@ -116,9 +115,8 @@ class Command(BaseCommand):
 
         return "\n".join(lines)
 
-    def get_themes_context(self):
-        themes_setting = get_raw_themes_setting()
-        builtin_themes = ", ".join(t for t in themes_setting if isinstance(t, str))
+    def get_themes_context(self, themes: ThemesList):
+        builtin_themes = ", ".join(t for t in themes if isinstance(t, str))
         return {"builtin_themes": builtin_themes}
 
     def get_context(self, target_dir: pathlib.Path):
