@@ -1,4 +1,5 @@
 import logging
+from collections.abc import Sequence
 from pathlib import Path
 from re import findall
 
@@ -13,6 +14,7 @@ __all__ = [
     "clean_themes",
     "get_raw_themes_setting",
     "get_theme_names",
+    "get_theme_names_from_setting",
     "get_theme_default",
 ]
 
@@ -25,7 +27,7 @@ def get_raw_themes_setting():
     return getattr(settings, "DAISYUI_THEMES", fallbacks.DAISYUI_THEMES)
 
 
-def clean_themes(themes) -> ThemesList:
+def clean_themes(themes: Sequence[str | dict]) -> ThemesList:
     """Validate a raw themes list and return a cleaned version.
 
     - Valid string entries pass through

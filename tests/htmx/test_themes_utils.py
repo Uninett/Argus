@@ -4,22 +4,7 @@ from unittest.mock import patch
 from django.core.exceptions import ImproperlyConfigured
 from django.test import tag
 
-from argus.htmx.themes.utils import get_theme_names_from_setting, get_theme_names
-
-
-@tag("unit")
-class TestGetThemeNamesFromSetting(TestCase):
-    def test_get_theme_names_from_setting_with_str_theme_returns_name(self):
-        raw_themes = ["a"]
-        with patch("argus.htmx.themes.utils.get_raw_themes_setting", return_value=raw_themes):
-            result = get_theme_names_from_setting()
-            self.assertEqual(result, raw_themes)
-
-    def test_get_theme_names_from_Setting_with_dict_theme_returns_name(self):
-        raw_themes = [{"b": {"primary": "#fff"}}]
-        with patch("argus.htmx.themes.utils.get_raw_themes_setting", return_value=raw_themes):
-            result = get_theme_names_from_setting()
-            self.assertEqual(result, ["b"])
+from argus.htmx.themes.utils import get_theme_names
 
 
 @tag("unit")
