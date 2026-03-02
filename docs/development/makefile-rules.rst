@@ -88,6 +88,3 @@ After a change in version, running ``upgrade-tailwind`` should be followed by
 running::
 
     $ python3 manage.py tailwind_config && make tailwind
-
-... and a commit so that the correct ``src/argus/htmx/static/styles.css`` is
-available to everyone.
