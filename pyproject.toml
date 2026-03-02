@@ -79,6 +79,9 @@ source = "versioningit"
 artifacts = [
     "src/argus/version.py",
     "src/argus/htmx/static/styles.css",
+    "src/argus/htmx/tailwindtheme/styles.css",
+    "src/argus/htmx/tailwindtheme/snippets/10-tailwind.css",
+    "src/argus/htmx/tailwindtheme/themes/*.css",
 ]
 
 [[tool.hatch.build.hooks.build-scripts.scripts]]
@@ -87,6 +90,9 @@ commands = [
 ]
 artifacts = [
     "src/argus/htmx/static/styles.css",
+    "src/argus/htmx/tailwindtheme/styles.css",
+    "src/argus/htmx/tailwindtheme/snippets/10-tailwind.css",
+    "src/argus/htmx/tailwindtheme/themes/*.css",
 ]
 
 [tool.hatch.build.targets.wheel]

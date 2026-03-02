@@ -48,6 +48,10 @@ spasettings.py
 
 # Tailwind CSS
 src/argus/htmx/static/styles.css
+src/argus/htmx/tailwindtheme/styles.css
+src/argus/htmx/tailwindtheme/snippets/10-tailwind.css
+src/argus/htmx/tailwindtheme/themes/
+
 # OS specific
 src/argus/htmx/tailwindtheme/tailwindcss
 
