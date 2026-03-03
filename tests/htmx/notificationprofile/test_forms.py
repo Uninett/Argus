@@ -49,6 +49,17 @@ class NotificationProfileFormTests(TestCase):
             form=form, field="name", errors=f"A profile by this user with the name '{self.name1}' already exists."
         )
 
+    def test_form_with_no_name_and_other_profile_no_name_is_valid(self):
+        NotificationProfileFactory(name=None, user=self.user, timeslot=self.timeslot)
+        data = {
+            "name": None,
+            "timeslot": self.notification_profile1.timeslot,
+            "filters": [self.filter],
+        }
+        form = NotificationProfileForm(data=data, user=self.notification_profile1.user)
+
+        self.assertTrue(form.is_valid())
+
     def test_updating_form_with_same_name_as_self_is_valid(self):
         data = {
             "name": self.name1,
@@ -74,3 +85,16 @@ class NotificationProfileFormTests(TestCase):
         self.assertFormError(
             form=form, field="name", errors=f"A profile by this user with the name '{self.name2}' already exists."
         )
+
+    def test_updating_form_with_no_name_and_other_profile_no_name_is_valid(self):
+        NotificationProfileFactory(name=None, user=self.user, timeslot=self.timeslot)
+        data = {
+            "name": None,
+            "timeslot": self.notification_profile1.timeslot,
+            "filters": [self.filter],
+        }
+        form = NotificationProfileForm(
+            data=data, instance=self.notification_profile1, user=self.notification_profile1.user
+        )
+
+        self.assertTrue(form.is_valid())
