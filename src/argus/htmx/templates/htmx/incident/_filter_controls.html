@@ -1,41 +1,37 @@
 {% include "htmx/incident/_filter_controls_script.html" %}
 <div class="flex flex-wrap items-center gap-1">
   {% include "htmx/incident/_filter_select.html" %}
-  <div id="filter-actions" class="flex items-center gap-1">
+  <div id="filter-actions" class="flex items-center">
     <div class="join join-horizontal items-center filter-context-action">
       <button type="button"
               id="filter-update-btn"
-              class="btn btn-sm btn-square join-item tooltip tooltip-bottom"
-              aria-label="Update filter"
-              data-tip="Update filter"
+              class="btn btn-sm join-item"
               onclick="htmx.find('#filter-update-dialog').showModal()"
               disabled>
         <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i>
+        Save
       </button>
       <button type="button"
-              id="filter-reset-btn"
-              class="btn btn-sm btn-square join-item tooltip tooltip-bottom"
-              aria-label="Reset to saved filter"
-              data-tip="Reset to saved filter"
-              onclick="resetFilter()"
-              disabled>
-        <i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i>
-      </button>
-      <button class="btn btn-sm btn-square join-item tooltip tooltip-bottom"
-              aria-label="Save as new filter"
-              data-tip="Save as new filter"
+              class="btn btn-sm join-item"
               onclick="htmx.find('#create-filter-dialog').showModal()">
         <i class="fa-solid fa-plus" aria-hidden="true"></i>
+        Create
       </button>
     </div>
     <button type="button"
             id="filter-delete-btn"
-            class="btn btn-sm btn-square tooltip tooltip-bottom"
-            aria-label="Delete filter"
-            data-tip="Delete filter"
+            class="btn btn-sm"
             onclick="htmx.find('#filter-delete-dialog').showModal()"
             disabled>
       <i class="fa-solid fa-trash-can" aria-hidden="true"></i>
+      Delete
+    </button>
+    <button type="button"
+            id="filter-reset-btn"
+            class="btn btn-sm btn-outline ml-1 hidden filter-context-action"
+            onclick="resetFilter()">
+      <i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i>
+      Reset
     </button>
     {% include "htmx/incident/_filter_create_modal.html" with dialog_id="create-filter-dialog" dialog_only=True header="Create new filter" explanation="Create new filter from currently selected filter parameters" cancel_text="Cancel" submit_text="Submit" %}
     {% include "htmx/incident/_filter_update_dialog.html" %}

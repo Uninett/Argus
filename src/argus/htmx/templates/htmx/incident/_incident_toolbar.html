@@ -1,13 +1,13 @@
-<section class="flex flex-wrap gap-2 items-center mt-1">
+<section class="flex flex-col gap-2 mt-1">
   <div id="filter-controls-box"
-       class="order-1 lg:order-none w-full lg:w-auto border-2 border-primary rounded-box p-2 flex flex-wrap gap-0.5 items-center">
+       class="border-2 border-primary rounded-box p-2 flex flex-wrap gap-0.5 items-center">
     {% include "htmx/incident/_filter_controls.html" %}
     <div id="filterbox" class="flex flex-wrap items-center basis-full">
       {% include "htmx/incident/_incident_filterbox.html" %}
     </div>
   </div>
   <div id="bulk-actions"
-       class="order-2 lg:order-none w-full lg:w-auto hidden flex gap-2 border-2 border-primary/50 bg-primary/10 rounded-box p-1">
+       class="hidden flex gap-2 w-fit border-2 border-primary/50 bg-primary/10 rounded-box p-1">
     {% include "htmx/incident/_incident_list_update_menu.html" %}
   </div>
 </section>
