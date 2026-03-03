@@ -89,6 +89,9 @@ class NotificationProfileForm(DestinationFieldMixin, FilterFieldMixin, NoColonMi
 
     def clean_name(self):
         name = self.cleaned_data["name"]
+        if name is None:
+            return name
+
         # Making sure to check for duplicate names, but allow updating of profiles
         profiles_with_same_name = NotificationProfile.objects.filter(user=self.user, name=name).exclude(
             pk=getattr(self.instance, "pk", None)
