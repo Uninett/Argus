@@ -42,7 +42,8 @@ class TestDestinationListView(DestinationViewTestCase):
         DestinationConfigFactory(
             user=self.user,
             media=self.email_media,
-            settings={"email_address": "test@example.com", "synced": False},
+            settings={"email_address": "test@example.com"},
+            managed=False,
         )
 
         response = self.client.get(self.url)
@@ -57,7 +58,8 @@ class TestDestinationListView(DestinationViewTestCase):
         destination = DestinationConfigFactory(
             user=self.user,
             media=self.email_media,
-            settings={"email_address": "unused@example.com", "synced": False},
+            settings={"email_address": "unused@example.com"},
+            managed=False,
         )
 
         response = self.client.get(self.url)
@@ -69,7 +71,8 @@ class TestDestinationListView(DestinationViewTestCase):
         destination = DestinationConfigFactory(
             user=self.user,
             media=self.email_media,
-            settings={"email_address": "used@example.com", "synced": False},
+            settings={"email_address": "used@example.com"},
+            managed=False,
         )
         timeslot = TimeslotFactory(user=self.user)
         profile = NotificationProfileFactory(user=self.user, timeslot=timeslot)
@@ -81,11 +84,12 @@ class TestDestinationListView(DestinationViewTestCase):
         self.assertTrue(form.delete_disabled)
         self.assertIn("in use in the notification profile", form.delete_tooltip)
 
-    def test_given_synced_destination_it_should_have_delete_disabled(self):
+    def test_given_managed_destination_it_should_have_delete_disabled(self):
         destination = DestinationConfigFactory(
             user=self.user,
             media=self.email_media,
-            settings={"email_address": "synced@example.com", "synced": True},
+            settings={"email_address": "managed@example.com"},
+            managed=True,
         )
 
         response = self.client.get(self.url)
@@ -99,7 +103,8 @@ class TestDestinationListView(DestinationViewTestCase):
         DestinationConfigFactory(
             user=other_user,
             media=self.email_media,
-            settings={"email_address": "other@example.com", "synced": False},
+            settings={"email_address": "other@example.com"},
+            managed=False,
         )
 
         response = self.client.get(self.url)
@@ -165,7 +170,8 @@ class TestDestinationUpdateView(DestinationViewTestCase):
         self.destination = DestinationConfigFactory(
             user=self.user,
             media=self.email_media,
-            settings={"email_address": "old@example.com", "synced": False},
+            settings={"email_address": "old@example.com"},
+            managed=False,
         )
         self.url = reverse("htmx:destination-update", kwargs={"pk": self.destination.pk})
 
@@ -202,7 +208,8 @@ class TestDestinationUpdateView(DestinationViewTestCase):
         other_dest = DestinationConfigFactory(
             user=other_user,
             media=self.email_media,
-            settings={"email_address": "other@example.com", "synced": False},
+            settings={"email_address": "other@example.com"},
+            managed=False,
         )
         url = reverse("htmx:destination-update", kwargs={"pk": other_dest.pk})
 
@@ -218,7 +225,8 @@ class TestDestinationDeleteView(DestinationViewTestCase):
         self.destination = DestinationConfigFactory(
             user=self.user,
             media=self.email_media,
-            settings={"email_address": "delete@example.com", "synced": False},
+            settings={"email_address": "delete@example.com"},
+            managed=False,
         )
         self.url = reverse("htmx:destination-delete", kwargs={"pk": self.destination.pk})
 
@@ -233,7 +241,8 @@ class TestDestinationDeleteView(DestinationViewTestCase):
         other_dest = DestinationConfigFactory(
             user=other_user,
             media=self.email_media,
-            settings={"email_address": "other@example.com", "synced": False},
+            settings={"email_address": "other@example.com"},
+            managed=False,
         )
         url = reverse("htmx:destination-delete", kwargs={"pk": other_dest.pk})
 
@@ -242,8 +251,8 @@ class TestDestinationDeleteView(DestinationViewTestCase):
         self.assertEqual(response.status_code, 404)
         self.assertTrue(DestinationConfig.objects.filter(pk=other_dest.pk).exists())
 
-    def test_given_synced_destination_when_delete_it_should_show_error(self):
-        self.destination.settings["synced"] = True
+    def test_given_managed_destination_when_delete_it_should_show_error(self):
+        self.destination.managed = True
         self.destination.save()
 
         response = self.client.post(self.url)
