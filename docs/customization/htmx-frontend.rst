@@ -225,7 +225,8 @@ Or to override default values::
       --default-border-width: 1px;
     }
 
-After adding your theme overrides, run ``make tailwind`` as usual.
+After adding your theme overrides, run ``make tailwind-config tailwind`` as
+usual.
 
 Some links that may be relevant for customization:
 

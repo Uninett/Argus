@@ -72,7 +72,7 @@ Assumes that the standalone tailwind CLI client is downloaded and uses the
 tailwind configuration in ``src/argus/htmx/tailwindtheme`` to generate
 a stylesheet that is put in ``src/argus/htmx/static/styles.css``.
 
-When changing themes or the :setting:`DAISYUI_THEMES` setting, run both::
+When changing themes or the :setting:`DAISYUI_THEMES` setting, run::
 
     $ make tailwind-config tailwind
 

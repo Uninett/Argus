@@ -61,6 +61,13 @@ Checklist
 
         $ git stash -u
 
+#. Generate the tailwind CSS from default settings. This ensures no custom
+   themes from :file:`localsettings.py` leak into the wheel:
+
+    .. code:: console
+
+        $ make setup-tailwind
+
 #. Run the tests one last time:
 
     .. code:: console
