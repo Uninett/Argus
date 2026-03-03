@@ -14,9 +14,7 @@
   {# Hidden inputs to preserve sort state across filter submissions #}
   <input type="hidden" name="sort" value="{{ current_sort }}">
   <input type="hidden" name="sort_order" value="{{ current_sort_order }}">
-  <fieldset {% block filter_select_custom_control %}
-            hx-on:change="htmx.ajax('GET', '{% url 'htmx:select-filter' %}');"
-            {% endblock filter_select_custom_control %}>
+  <fieldset>
     <legend class="sr-only">Filter incidents</legend>
     <ul class="menu menu-horizontal menu-xs flex flex-wrap items-center gap-0.5 py-0">
       {% for field in filter_form %}

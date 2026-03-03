@@ -1,9 +1,24 @@
+{% include "htmx/incident/_filter_controls_script.html" %}
 <div class="flex flex-wrap items-center gap-1">
   {% include "htmx/incident/_filter_select.html" %}
   <div id="filter-actions">
     <div class="join join-horizontal items-center">
-      {% include "htmx/incident/_filter_update_dropdown.html" %}
-      {% include "htmx/incident/_filter_delete_dropdown.html" %}
+      <button type="button"
+              id="filter-update-btn"
+              class="btn btn-sm btn-square join-item tooltip tooltip-bottom"
+              data-tip="Update filter"
+              onclick="htmx.find('#filter-update-dialog').showModal()"
+              disabled>
+        <i class="fa-solid fa-floppy-disk"></i>
+      </button>
+      <button type="button"
+              id="filter-delete-btn"
+              class="btn btn-sm btn-square join-item tooltip tooltip-bottom"
+              data-tip="Delete filter"
+              onclick="htmx.find('#filter-delete-dialog').showModal()"
+              disabled>
+        <i class="fa-solid fa-trash-can"></i>
+      </button>
       <button class="btn btn-sm btn-square join-item tooltip tooltip-bottom"
               data-tip="Save as new filter"
               onclick="htmx.find('#create-filter-dialog').showModal()">
@@ -11,31 +26,17 @@
       </button>
     </div>
     {% include "htmx/incident/_filter_create_modal.html" with dialog_id="create-filter-dialog" dialog_only=True header="Create new filter" explanation="Create new filter from currently selected filter parameters" cancel_text="Cancel" submit_text="Submit" %}
+    {% include "htmx/incident/_filter_update_dialog.html" %}
+    {% include "htmx/incident/_filter_delete_dialog.html" %}
   </div>
-  {# djlint:off #}
-  <button class="btn btn-sm btn-primary"
+  <button id="filter-toggle-btn"
+          class="btn btn-sm btn-primary"
           aria-label="Toggle filters"
           aria-expanded="true"
           aria-controls="filterbox"
-          _="init
-               if localStorage.getItem('argus_show_filters') is 'false'
-                 add .filters-collapsed to #filter-controls-box
-                 set my @aria-expanded to 'false'
-               end
-             end
-             on click
-               toggle .filters-collapsed on #filter-controls-box
-               if #filter-controls-box matches .filters-collapsed
-                 call localStorage.setItem('argus_show_filters', 'false')
-                 set my @aria-expanded to 'false'
-               else
-                 call localStorage.setItem('argus_show_filters', 'true')
-                 set my @aria-expanded to 'true'
-               end
-             end">
+          onclick="toggleFilters(this)">
     Filters
     <i class="fa-solid fa-chevron-down fa-xs filter-expand-icon"></i>
     <i class="fa-solid fa-chevron-up fa-xs filter-collapse-icon"></i>
   </button>
-  {# djlint:on #}
 </div>

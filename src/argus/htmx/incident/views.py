@@ -137,7 +137,11 @@ def create_filter(request: HtmxHttpRequest):
 
     filter_name = request.POST.get("filter_name", None)
     incident_list_filter = get_filter_function()
+    # Temporarily clear selected filter so the pluggable function reads POST data
+    selected = request.session.pop("selected_filter", None)
     filter_form, _ = incident_list_filter(request, None)
+    if selected:
+        request.session["selected_filter"] = selected
     if filter_name and filter_form.is_valid():
         filterblob = filter_form.to_filterblob()
         _, filter_obj = create_named_filter(request, filter_name, filterblob)
@@ -154,7 +158,11 @@ def update_filter(request: HtmxHttpRequest, pk: int):
     if not filter_obj.editable_by(request.user):
         return HttpResponseForbidden(f"{request.user} may not alter this filter")
     incident_list_filter = get_filter_function()
+    # Temporarily clear selected filter so the pluggable function reads POST data
+    selected = request.session.pop("selected_filter", None)
     filter_form, _ = incident_list_filter(request, None)
+    if selected:
+        request.session["selected_filter"] = selected
     if filter_form.is_valid():
         filterblob = filter_form.to_filterblob()
         filter_obj.filter = filterblob

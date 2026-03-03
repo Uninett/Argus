@@ -1,0 +1,52 @@
+<script>
+  const FILTER_UPDATE_URL_TEMPLATE = '{% url "htmx:filter-update" pk=0 %}'.replace('/0/', '/{id}/');
+  const FILTER_DELETE_URL_TEMPLATE = '{% url "htmx:filter-delete" pk=0 %}'.replace('/0/', '/{id}/');
+
+  function updateFilterActionButtons() {
+    const select = document.getElementById('incident-filter-select');
+    const updateBtn = document.getElementById('filter-update-btn');
+    const deleteBtn = document.getElementById('filter-delete-btn');
+    const updateConfirm = document.getElementById('filter-update-confirm');
+    const deleteConfirm = document.getElementById('filter-delete-confirm');
+    if (!select || !updateBtn || !deleteBtn) return;
+
+    const val = select.value;
+    const selectedOption = select.options[select.selectedIndex];
+    const filterName = selectedOption?.text?.trim() ?? '';
+    const editable = val && selectedOption?.hasAttribute('data-editable');
+
+    document.getElementById('filter-update-name')?.replaceChildren(document.createTextNode(filterName));
+    document.getElementById('filter-delete-name')?.replaceChildren(document.createTextNode(filterName));
+
+    if (editable) {
+      updateBtn.removeAttribute('disabled');
+      deleteBtn.removeAttribute('disabled');
+      if (updateConfirm) {
+        updateConfirm.setAttribute('hx-post', FILTER_UPDATE_URL_TEMPLATE.replace('{id}', val));
+        htmx.process(updateConfirm);
+      }
+      if (deleteConfirm) {
+        deleteConfirm.setAttribute('hx-post', FILTER_DELETE_URL_TEMPLATE.replace('{id}', val));
+        htmx.process(deleteConfirm);
+      }
+    } else {
+      updateBtn.setAttribute('disabled', '');
+      deleteBtn.setAttribute('disabled', '');
+    }
+  }
+
+  function toggleFilters(btn) {
+    const box = document.getElementById('filter-controls-box');
+    box.classList.toggle('filters-collapsed');
+    const collapsed = box.classList.contains('filters-collapsed');
+    localStorage.setItem('argus_show_filters', collapsed ? 'false' : 'true');
+    btn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    if (localStorage.getItem('argus_show_filters') === 'false') {
+      document.getElementById('filter-controls-box')?.classList.add('filters-collapsed');
+      document.getElementById('filter-toggle-btn')?.setAttribute('aria-expanded', 'false');
+    }
+  });
+</script>

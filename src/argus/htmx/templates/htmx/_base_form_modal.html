@@ -16,14 +16,13 @@
         <h3 class="card-title">{{ header }}</h3>
       </div>
       <form id="{{ dialog_id }}-form"
-            class="card-body"
             {% block form_control %}
             method="post"
             action="{{ endpoint }}"
             {% endblock form_control %}>
         {% csrf_token %}
-        <fieldset class="menu menu-vertical gap-4">
-          <legend class="antialiased text-base font-bold py-2">{{ explanation }}</legend>
+        <fieldset class="flex flex-col gap-4">
+          <legend class="antialiased text-base font-normal py-2">{{ explanation }}</legend>
           {% block dialogform %}
           {% endblock dialogform %}
         </fieldset>
