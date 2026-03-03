@@ -1,6 +1,15 @@
 import importlib
 from typing import Collection
 
+from rest_framework.exceptions import APIException
+
+
+class DRFGone(APIException):
+    # DRF has 404 (NotFound) but not 410 (Gone)
+    status_code = 410
+    default_detail = "Resource is no longer available"
+    default_code = "gone"
+
 
 class AttrGetter:
     def __init__(self, attr_name: str):

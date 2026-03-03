@@ -133,11 +133,8 @@ class SchemaView(DetailView):
 class MediaViewSet(viewsets.ModelViewSet):
     version = VERSION
     serializer_class = MediaSerializer
-    queryset = Media.objects.none()
+    queryset = Media.objects.available()
     http_method_names = ["get", "head"]
-
-    def get_queryset(self):
-        return Media.objects.all()
 
     @extend_schema(responses={"200": JSONSchemaSerializer})
     @action(methods=["get"], detail=True)
@@ -178,7 +175,7 @@ class DestinationConfigViewSet(rw_viewsets.ModelViewSet):
     http_method_names = ["get", "head", "post", "patch", "delete"]
 
     def get_queryset(self):
-        return self.request.user.destinations.all()
+        return self.request.user.destinations.available()
 
     def perform_create(self, serializer):
         serializer.validated_data["settings"].pop("synced", False)
@@ -188,6 +185,9 @@ class DestinationConfigViewSet(rw_viewsets.ModelViewSet):
         pk = self.kwargs["pk"]
         destination = get_object_or_404(self.get_queryset(), pk=pk)
 
+        medium = api_safely_get_medium_object(destination.media.slug)
+        if not medium:
+            raise ValidationError(f"Media {destination.media.slug} of destination not installed")
         try:
             medium = api_safely_get_medium_object(destination.media.slug, self.version)
             medium.raise_if_not_deletable(destination)
@@ -197,8 +197,10 @@ class DestinationConfigViewSet(rw_viewsets.ModelViewSet):
             return super().destroy(destination)
 
     def _is_destination_duplicate(self, destination):
-        other_destinations = DestinationConfig.objects.filter(media=destination.media).filter(
-            ~Q(user_id=destination.user.id)
+        other_destinations = (
+            DestinationConfig.objects.available()
+            .filter(media=destination.media)
+            .filter(~Q(user_id=destination.user.id))
         )
         medium = api_safely_get_medium_object(destination.media_id, self.version)
         destination_in_use = medium.has_duplicate(other_destinations, destination.settings)
@@ -213,6 +215,8 @@ class DestinationConfigViewSet(rw_viewsets.ModelViewSet):
             destination = request.user.destinations.get(pk=pk)
         except DestinationConfig.DoesNotExist:
             raise ValidationError(f"Destination with pk={pk} does not exist.")
+        if not destination.media.installed:
+            raise ValidationError(f"Destination with pk={pk} is not supported, plugin not installed correctly.")
         is_duplicate = self._is_destination_duplicate(destination=destination)
         serializer = DuplicateDestinationSerializer({"is_duplicate": is_duplicate})
         return Response(serializer.data)
