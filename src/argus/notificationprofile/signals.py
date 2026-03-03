@@ -4,7 +4,6 @@ import logging
 from typing import TYPE_CHECKING
 
 from django.contrib.auth import get_user_model
-from django.db.utils import ProgrammingError
 
 from argus.notificationprofile.media import send_notifications_to_users
 from argus.notificationprofile.tasks import task_check_for_notifications
@@ -20,46 +19,11 @@ LOG = logging.getLogger(__name__)
 User = get_user_model()
 
 __all__ = [
-    "sync_media",
     "create_default_timeslot",
     "sync_email_destination",
     "task_send_notification",
     "task_background_send_notification",
 ]
-
-
-def sync_media(sender, **kwargs):
-    """Sync MEDIA_PLUGINS with the Media table
-
-    Check if all media in Media has a respective class"""
-
-    from .media import MEDIA_CLASSES_DICT
-
-    apps = kwargs["apps"]
-    try:
-        Media = apps.get_model("argus_notificationprofile", "Media")
-    except ImportError:
-        return
-
-    try:
-        for medium in Media.objects.all():
-            if medium.slug not in MEDIA_CLASSES_DICT.keys():
-                LOG.warning("%s plugin is not registered in MEDIA_PLUGINS", medium.name)
-                # Need to check in case of backwards migrations
-                if getattr(medium, "installed", None):
-                    medium.installed = False
-                    medium.save(update_fields=["installed"])
-    except ProgrammingError:
-        return
-
-    # Check if all media plugins are also saved in Media
-    new_media = [
-        Media(slug=media_class.MEDIA_SLUG, name=media_class.MEDIA_NAME)
-        for media_class in MEDIA_CLASSES_DICT.values()
-        if not Media.objects.filter(slug=media_class.MEDIA_SLUG)
-    ]
-    if new_media:
-        Media.objects.bulk_create(new_media)
 
 
 # Create default immediate Timeslot when a user is created
