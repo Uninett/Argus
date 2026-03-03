@@ -65,8 +65,10 @@ class MediaAdmin(admin.ModelAdmin):
     list_display = (
         "slug",
         "name",
+        "installed",
     )
     fields = ("name",)
+    list_filter = ("installed",)
 
 
 class DestinationConfigAdmin(admin.ModelAdmin):
