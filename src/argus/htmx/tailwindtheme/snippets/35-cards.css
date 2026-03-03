@@ -38,3 +38,7 @@ tr.row-deleted td.strikethrough::after {
 .card-base > .collapse > .collapse-content .form-control:first-of-type > .label:first-child {
     @apply pt-0;
 }
+
+.card-base > .collapse[open] {
+    @apply overflow-visible;
+}
