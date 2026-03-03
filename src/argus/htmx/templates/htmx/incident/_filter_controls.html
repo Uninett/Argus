@@ -19,6 +19,14 @@
               disabled>
         <i class="fa-solid fa-trash-can"></i>
       </button>
+      <button type="button"
+              id="filter-reset-btn"
+              class="btn btn-sm btn-square join-item tooltip tooltip-bottom"
+              data-tip="Reset to saved filter"
+              onclick="resetFilter()"
+              disabled>
+        <i class="fa-solid fa-arrows-rotate"></i>
+      </button>
       <button class="btn btn-sm btn-square join-item tooltip tooltip-bottom"
               data-tip="Save as new filter"
               onclick="htmx.find('#create-filter-dialog').showModal()">
