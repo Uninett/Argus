@@ -59,6 +59,8 @@ class SourceSystemAdmin(TextWidgetsOverrideModelAdmin):
 
     text_input_form_fields = ("name",)
     raw_id_fields = ("user",)
+    read_only_fields = ("last_seen",)
+    date_hierarchy = "last_seen"
 
     def get_form(self, request, obj=None, **kwargs):
         # If add form (instead of change form):
