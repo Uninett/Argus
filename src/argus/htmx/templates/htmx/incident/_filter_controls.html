@@ -11,24 +11,20 @@
   <button class="btn btn-sm btn-primary"
           _="init
                if localStorage.getItem('argus_show_filters') is 'false'
-                 add .hidden to #filterbox
-                 add .hidden to #filter-actions
-                 toggle .hidden on .filter-toggle-label
+                 add .filters-collapsed to #filter-controls-box
                end
              end
              on click
-               toggle .hidden on #filterbox
-               toggle .hidden on .filter-toggle-label
-               toggle .hidden on #filter-actions
-               if #filterbox matches .hidden
+               toggle .filters-collapsed on #filter-controls-box
+               if #filter-controls-box matches .filters-collapsed
                  call localStorage.setItem('argus_show_filters', 'false')
                else
                  call localStorage.setItem('argus_show_filters', 'true')
                end
              end">
     <i class="fa-solid fa-filter"></i>
-    <span class="filter-toggle-label hidden">Show filters</span>
-    <span class="filter-toggle-label">Hide filters</span>
+    <span class="filter-show-label">Show filters</span>
+    <span class="filter-hide-label">Hide filters</span>
   </button>
   {# djlint:on #}
 </div>

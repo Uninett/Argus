@@ -1,0 +1,14 @@
+/*
+ * Filter pane collapse/expand: controlled by toggling .filters-collapsed
+ * on #filter-controls-box. Default state is expanded.
+ */
+#filter-controls-box .filter-show-label,
+#filter-controls-box.filters-collapsed #filterbox,
+#filter-controls-box.filters-collapsed #filter-actions,
+#filter-controls-box.filters-collapsed .filter-hide-label {
+  display: none;
+}
+
+#filter-controls-box.filters-collapsed .filter-show-label {
+  display: inline;
+}
