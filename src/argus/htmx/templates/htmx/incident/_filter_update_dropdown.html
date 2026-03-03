@@ -1,10 +1,13 @@
-<div class="dropdown dropdown-bottom dropdown-end">
+<div class="dropdown dropdown-bottom dropdown-end join-item">
   <button type="button"
-          class="btn btn-sm text-xs join-item rounded-l-none! ml-1"
+          class="btn btn-sm btn-square rounded-[inherit] tooltip tooltip-bottom"
+          data-tip="Update filter"
           hx-trigger="click"
           hx-get="{% url 'htmx:existing-filters' %}"
           hx-target="#update-filter-items"
-          hx-swap="innerHTML">Update filter</button>
+          hx-swap="innerHTML">
+    <i class="fa-solid fa-floppy-disk"></i>
+  </button>
   <ul id="update-filter-items"
       tabindex="0"
       class="dropdown-content menu menu-vertical flex-nowrap bg-base-100 rounded-box z-10 w-max min-w-32 p-2 shadow-sm max-h-80 overflow-y-auto">

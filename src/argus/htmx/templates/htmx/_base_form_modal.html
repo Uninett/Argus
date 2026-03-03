@@ -1,5 +1,14 @@
-<button class="btn {{ button_class|default:"btn-primary" }}"
-        onclick="htmx.find('#{{ dialog_id }}').showModal()">{{ button_title }}</button>
+{% if not dialog_only %}
+  <button class="btn {{ button_class|default:"btn-primary" }}{% if button_tooltip %} tooltip tooltip-bottom{% endif %}"
+          {% if button_tooltip %}data-tip="{{ button_tooltip }}"{% endif %}
+          onclick="htmx.find('#{{ dialog_id }}').showModal()">
+    {% if button_icon %}
+      <i class="{{ button_icon }}"></i>
+    {% else %}
+      {{ button_title }}
+    {% endif %}
+  </button>
+{% endif %}
 <dialog id="{{ dialog_id }}" class="modal">
   <div class="modal-box card card-compact shadow-xl loading-box">
     <div class="w-full">
