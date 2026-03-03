@@ -12,6 +12,7 @@ class HtmxFrontendConfig(AppConfig):
         tailwindtheme_dir = pathlib.Path(__file__).parent / "tailwindtheme"
         yield from tailwindtheme_dir.glob("snippets/*.css")
         yield from tailwindtheme_dir.glob("themes/*.css")
+        yield from tailwindtheme_dir.glob("custom-themes/*.css")
 
     def ready(self):
         # Register checks

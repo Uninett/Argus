@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-@source "../../templates";
+@source "../templates";
 
 @plugin "daisyui" {
   themes: {{ builtin_themes }};

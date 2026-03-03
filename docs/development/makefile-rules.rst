@@ -61,8 +61,8 @@ tailwind-config
 ---------------
 
 Runs the ``tailwind_config`` management command, which generates the tailwind
-configuration files (``styles.css``, ``snippets/10-tailwind.css``, and theme
-files) in ``src/argus/htmx/tailwindtheme``. Run this whenever
+configuration files (``styles.css``, ``tailwind.css``, and custom theme files in
+``custom-themes/``) in ``src/argus/htmx/tailwindtheme``. Run this whenever
 :setting:`DAISYUI_THEMES` or theme CSS files change.
 
 tailwind

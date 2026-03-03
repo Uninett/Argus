@@ -1,2 +1,3 @@
+@import './tailwind.css';
 {% for cssfile in cssfiles %}@import './{{ cssfile }}';
 {% endfor %}

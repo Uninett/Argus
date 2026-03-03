@@ -20,8 +20,12 @@ class Command(BaseCommand):
        Apps may define a `tailwind_css_files` method that returns paths to CSS
        files to include. (see argus.htmx.apps.HtmxFrontendConfig for an example)
 
-    2. CSS theme files for custom themes defined in the DAISYUI_THEMES setting.
-       Custom themes are defined as dicts with CSS variables, e.g.:
+    2. A `tailwind.css` file with the base Tailwind/DaisyUI configuration
+       (imported first by styles.css).
+
+    3. CSS theme files in `custom-themes/` for custom themes defined in the
+       DAISYUI_THEMES setting. Custom themes are defined as dicts with CSS
+       variables, e.g.:
        DAISYUI_THEMES = ["dark", "light", {"mytheme": {"--color-primary": "#006d91", ...}}]
        Built-in themes (strings like "dark", "light") are handled by DaisyUI directly.
 
@@ -34,29 +38,28 @@ class Command(BaseCommand):
     """
     DEFAULT_CSS_TEMPLATE_NAME = "tailwind/styles.css"
     DEFAULT_CSS_TARGET = "src/argus/htmx/tailwindtheme/styles.css"
-    DEFAULT_TAILWIND_TEMPLATE_NAME = "tailwind/10-tailwind.css"
+    DEFAULT_TAILWIND_TEMPLATE_NAME = "tailwind/tailwind.css"
 
     def handle(self, *args, **options):
         css_template_name = getattr(settings, "TAILWIND_CSS_TEMPLATE", self.DEFAULT_CSS_TEMPLATE_NAME)
         css_target_path = pathlib.Path(getattr(settings, "TAILWIND_CSS_TARGET", self.DEFAULT_CSS_TARGET))
 
-        snippets_dir = css_target_path.parent / "snippets"
-        themes_dir = css_target_path.parent / "themes"
-        themes_dir.mkdir(exist_ok=True)
+        custom_themes_dir = css_target_path.parent / "custom-themes"
+        custom_themes_dir.mkdir(exist_ok=True)
 
         themes = clean_themes(get_raw_themes_setting())
         themes_context = self.get_themes_context(themes)
 
-        # Generate tailwind base snippet with DaisyUI plugin config
+        # Generate tailwind base config with DaisyUI plugin config
         self.write_file(
             self.DEFAULT_TAILWIND_TEMPLATE_NAME,
-            snippets_dir / "10-tailwind.css",
+            css_target_path.parent / "tailwind.css",
             context=themes_context,
-            name="tailwind base snippet",
+            name="tailwind base config",
         )
 
         # Generate theme CSS files for custom themes from DAISYUI_THEMES setting
-        self.generate_theme_files(themes_dir, themes)
+        self.generate_theme_files(custom_themes_dir, themes)
 
         # Generate main styles.css
         self.write_file(
