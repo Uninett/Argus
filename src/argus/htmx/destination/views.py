@@ -4,6 +4,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.views.generic import CreateView, DeleteView, ListView, UpdateView
 from django_htmx.http import HttpResponseClientRedirect
+from rest_framework.exceptions import ValidationError
 
 from argus.htmx.modals import DeleteModal
 from argus.notificationprofile.models import DestinationConfig
@@ -58,7 +59,7 @@ class DestinationMixin:
         return self._get_prefix(getattr(self.object, "pk", None))
 
     def get_queryset(self):
-        return super().get_queryset().filter(user=self.request.user).order_by("media", "pk")
+        return super().get_queryset().available().filter(user=self.request.user).order_by("media", "pk")
 
     def get_template_names(self):
         return [f"htmx/destination/destination{self.template_name_suffix}.html"]
@@ -168,6 +169,14 @@ class DestinationDeleteView(DestinationMixin, DeleteView):
         self.object = self.get_object()
         try:
             medium = api_safely_get_medium_object(self.object.media.slug)
+        except ValidationError:
+            # should send 410 probably
+            return HttpResponseRedirect(self.get_success_url())
+
+        if not medium:
+            return HttpResponseRedirect(self.get_success_url())
+
+        try:
             medium.raise_if_not_deletable(self.object)
         except NotificationMedium.NotDeletableError as e:
             update_forms = _get_update_forms(request.user)
@@ -190,7 +199,7 @@ class DestinationDeleteView(DestinationMixin, DeleteView):
 
 
 def _get_update_forms(user) -> list[DestinationFormUpdate]:
-    destinations = user.destinations.all().order_by("media", "pk")
+    destinations = user.destinations.available().order_by("media", "pk")
     return [
         DestinationFormUpdate(instance=destination, prefix=f"destination_{destination.pk}")
         for destination in destinations
