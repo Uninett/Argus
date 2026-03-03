@@ -26,6 +26,8 @@ class DestinationFormCreate(ModelForm):
 
     def clean(self):
         super().clean()
+        if "media" not in self.cleaned_data or "settings" not in self.cleaned_data:
+            return self.cleaned_data
         settings_key = _get_settings_key_for_media(self.cleaned_data["media"])
         # Convert settings value (e.g. email address) to be compatible with JSONField
         self.cleaned_data["settings"] = {settings_key: self.cleaned_data["settings"]}
