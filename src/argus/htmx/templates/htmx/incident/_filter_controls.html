@@ -1,50 +1,56 @@
 {% include "htmx/incident/_filter_controls_script.html" %}
 <div class="flex flex-wrap items-center gap-1">
   {% include "htmx/incident/_filter_select.html" %}
-  <div id="filter-actions">
-    <div class="join join-horizontal items-center">
+  <div id="filter-actions" class="flex items-center gap-1">
+    <div class="join join-horizontal items-center filter-context-action">
       <button type="button"
               id="filter-update-btn"
               class="btn btn-sm btn-square join-item tooltip tooltip-bottom"
+              aria-label="Update filter"
               data-tip="Update filter"
               onclick="htmx.find('#filter-update-dialog').showModal()"
               disabled>
-        <i class="fa-solid fa-floppy-disk"></i>
-      </button>
-      <button type="button"
-              id="filter-delete-btn"
-              class="btn btn-sm btn-square join-item tooltip tooltip-bottom"
-              data-tip="Delete filter"
-              onclick="htmx.find('#filter-delete-dialog').showModal()"
-              disabled>
-        <i class="fa-solid fa-trash-can"></i>
+        <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i>
       </button>
       <button type="button"
               id="filter-reset-btn"
               class="btn btn-sm btn-square join-item tooltip tooltip-bottom"
+              aria-label="Reset to saved filter"
               data-tip="Reset to saved filter"
               onclick="resetFilter()"
               disabled>
-        <i class="fa-solid fa-arrows-rotate"></i>
+        <i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i>
       </button>
       <button class="btn btn-sm btn-square join-item tooltip tooltip-bottom"
+              aria-label="Save as new filter"
               data-tip="Save as new filter"
               onclick="htmx.find('#create-filter-dialog').showModal()">
-        <i class="fa-solid fa-plus"></i>
+        <i class="fa-solid fa-plus" aria-hidden="true"></i>
       </button>
     </div>
+    <button type="button"
+            id="filter-delete-btn"
+            class="btn btn-sm btn-square tooltip tooltip-bottom"
+            aria-label="Delete filter"
+            data-tip="Delete filter"
+            onclick="htmx.find('#filter-delete-dialog').showModal()"
+            disabled>
+      <i class="fa-solid fa-trash-can" aria-hidden="true"></i>
+    </button>
     {% include "htmx/incident/_filter_create_modal.html" with dialog_id="create-filter-dialog" dialog_only=True header="Create new filter" explanation="Create new filter from currently selected filter parameters" cancel_text="Cancel" submit_text="Submit" %}
     {% include "htmx/incident/_filter_update_dialog.html" %}
     {% include "htmx/incident/_filter_delete_dialog.html" %}
   </div>
   <button id="filter-toggle-btn"
           class="btn btn-sm btn-primary"
-          aria-label="Toggle filters"
           aria-expanded="true"
           aria-controls="filterbox"
           onclick="toggleFilters(this)">
-    Filters
-    <i class="fa-solid fa-chevron-down fa-xs filter-expand-icon"></i>
-    <i class="fa-solid fa-chevron-up fa-xs filter-collapse-icon"></i>
+    <span class="filter-collapse-icon">Hide filters</span>
+    <span class="filter-expand-icon">Show filters</span>
+    <i class="fa-solid fa-chevron-down fa-xs filter-expand-icon"
+       aria-hidden="true"></i>
+    <i class="fa-solid fa-chevron-up fa-xs filter-collapse-icon"
+       aria-hidden="true"></i>
   </button>
 </div>

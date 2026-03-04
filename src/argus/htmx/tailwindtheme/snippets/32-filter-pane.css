@@ -2,9 +2,11 @@
  * Filter pane collapse/expand: controlled by toggling .filters-collapsed
  * on #filter-controls-box. Default state is expanded.
  */
-#filter-controls-box.filters-collapsed #filterbox {
+#filter-controls-box.filters-collapsed #filterbox,
+#filter-controls-box.filters-collapsed .filter-context-action {
   display: none;
 }
+
 
 /* Toggle filter button icons: show expand icon when collapsed, collapse icon when expanded */
 #filter-controls-box .filter-expand-icon,
