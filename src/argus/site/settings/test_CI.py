@@ -35,6 +35,9 @@ MIDDLEWARE = middleware
 MEDIA_PLUGINS = [
     "argus.notificationprofile.media.email.EmailNotification",
     "argus.notificationprofile.media.sms_as_email.SMSNotification",
+    "argus.notificationprofile.media.slack.SlackNotification",
+    # Only used this way for testing purposes.
+    "argus.notificationprofile.media.base.AppriseMedium",
 ]
 
 # Faster tests

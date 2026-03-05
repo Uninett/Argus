@@ -27,6 +27,7 @@ INSTALLED_APPS += ["django_extensions"]  # noqa: F405
 MEDIA_PLUGINS = [
     "argus.notificationprofile.media.email.EmailNotification",
     "argus.notificationprofile.media.sms_as_email.SMSNotification",
+    "argus.notificationprofile.media.slack.SlackNotification",
 ]
 
 # Logging setup
