@@ -42,3 +42,4 @@
 }
 
 @source inline("htmx-request");
+@source inline("bg-base-100 bg-base-200 bg-base-300 bg-primary bg-secondary bg-accent bg-neutral bg-info bg-success bg-warning bg-error text-base-content text-primary-content text-secondary-content text-accent-content text-neutral-content text-info-content text-success-content text-warning-content text-error-content");

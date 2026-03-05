@@ -1,14 +1,9 @@
 <!-- htmx/user/_preference_choice_preview_theme.html -->
 <div class="flex items-center gap-1 p-1 rounded-sm bg-transparent"
      data-theme="{{ current_theme }}">
-  {% comment %}
-        // Necessary for tailwind to include these classes in the build
-        bg-primary, bg-secondary, bg-accent, bg-neutral, bg-info, bg-success, bg-warning, bg-error, bg-base-100,
-        bg-base-200, bg-base-300
-  {% endcomment %}
   {% for color_class in theme_colors %}
     <div class="tooltip tooltip-left" data-tip="{{ color_class|slice:"3:" }}">
-      <div class="flex items-center justify-center h-5 w-5 rounded-sm border-1 border-base-300 {{ color_class }} badge-{{ color_class|slice:"3:" }}">
+      <div class="flex items-center justify-center h-5 w-5 rounded-sm border-1 border-base-300 {{ color_class }} {% if 'base' in color_class %}text-base-content{% else %}text-{{ color_class|slice:"3:" }}-content{% endif %}">
         T
       </div>
     </div>
