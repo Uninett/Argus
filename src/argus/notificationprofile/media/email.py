@@ -100,7 +100,7 @@ class EmailNotification(NotificationMedium):
         """
         super().raise_if_not_deletable(destination=destination)
 
-        if destination.settings["synced"]:
+        if destination.settings.get("synced", False):
             raise cls.NotDeletableError(
                 "Cannot delete this email destination since it was defined by an outside source."
             )

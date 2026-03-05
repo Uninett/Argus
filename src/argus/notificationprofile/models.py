@@ -179,6 +179,14 @@ class Filter(models.Model):
         return False
 
 
+class MediaQuerySet(models.QuerySet):
+    def available(self):
+        return self.filter(installed=True)
+
+    def unavailable(self):
+        return self.filter(installed=False)
+
+
 class Media(models.Model):
     class Meta:
         verbose_name = "Medium"
@@ -189,6 +197,8 @@ class Media(models.Model):
     name = models.CharField(max_length=MEDIA_NAME_LENGTH)
     installed = models.BooleanField(default=True)
 
+    objects = MediaQuerySet.as_manager()
+
     def __str__(self) -> str:
         return f"{self.slug}"
 
@@ -196,6 +206,14 @@ class Media(models.Model):
         if not self.slug:
             self.slug = slugify(self.name)
         return super(Media, self).save(*args, **kwargs)
+
+
+class DestinationConfigQuerySet(models.QuerySet):
+    def available(self):
+        return self.filter(media__installed=True)
+
+    def unavailable(self):
+        return self.filter(media__installed=False)
 
 
 class DestinationConfig(models.Model):
@@ -213,6 +231,8 @@ class DestinationConfig(models.Model):
     )
     label = models.CharField(max_length=50, blank=True, null=True)
     settings = models.JSONField()
+
+    objects = DestinationConfigQuerySet.as_manager()
 
     def __str__(self):
         if self.label:
