@@ -2,6 +2,7 @@
 
 django-admin collectstatic --noinput
 django-admin migrate --noinput
+django-admin sync_media
 
 # Stop password from being printed in logs
 set +x
