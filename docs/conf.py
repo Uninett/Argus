@@ -28,8 +28,8 @@ django.setup()
 # -- Project information -----------------------------------------------------
 
 project = "Argus"
-copyright = "2020, XXXX"
-author = "XXXX"
+copyright = "2020-2026 Sikt - Norwegian Agency for Shared Services in Education and Research"
+author = "The Argus developer team"
 
 # The short X.Y version
 version = ""
