@@ -477,12 +477,14 @@ class DestinationViewTests(APITestCase):
         self.non_synced_email_destination = DestinationConfigFactory(
             user=user1,
             media=Media.objects.get(slug="email"),
-            settings={"email_address": "test@example.com", "synced": False},
+            settings={"email_address": "test@example.com"},
+            managed=False,
         )
         self.sms_destination = DestinationConfigFactory(
             user=user1,
             media=Media.objects.get(slug="sms"),
             settings={"phone_number": "+4747474747"},
+            managed=None,
         )
 
     def teardown(self):
@@ -492,15 +494,24 @@ class DestinationViewTests(APITestCase):
         response = self.user1_rest_client.get(path=self.ENDPOINT)
         self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
         self.assertEqual(len(response.data), 3, response.data)
-        response_settings = [destination["settings"] for destination in response.data]
-        self.assertTrue(self.synced_email_destination.settings in response_settings)
-        self.assertTrue(self.non_synced_email_destination.settings in response_settings)
-        self.assertTrue(self.sms_destination.settings in response_settings)
+        response_settings = set()
+        # the response should have a synced-key in v2 which is not stored in the database
+        for destination in response.data:
+            settings = destination["settings"]
+            settings.pop("synced", None)
+            response_settings.add(tuple(settings.items()))
+        self.assertTrue(tuple(self.synced_email_destination.settings.items()) in response_settings)
+        self.assertTrue(tuple(self.non_synced_email_destination.settings.items()) in response_settings)
+        self.assertTrue(tuple(self.sms_destination.settings.items()) in response_settings)
 
     def test_should_get_specific_destination(self):
         response = self.user1_rest_client.get(path=f"{self.ENDPOINT}{self.synced_email_destination.pk}/")
         self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
-        self.assertEqual(response.data["settings"], self.synced_email_destination.settings)
+        # v2 response has "synced", which is not visible in the database
+        self.assertEqual(response.data["settings"]["synced"], self.synced_email_destination.managed)
+        self.assertEqual(
+            response.data["settings"]["email_address"], self.synced_email_destination.settings["email_address"]
+        )
 
     def test_should_indicate_duplicate_destination_when_it_exists(self):
         DestinationConfigFactory(media_id="sms", settings=self.sms_destination.settings)
