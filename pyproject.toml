@@ -86,7 +86,7 @@ artifacts = [
 
 [[tool.hatch.build.hooks.build-scripts.scripts]]
 commands = [
-    "make upgrade-tailwind tailwind",
+    "make upgrade-tailwind tailwind-build-config tailwind",
 ]
 artifacts = [
     "src/argus/htmx/static/styles.css",

@@ -2,11 +2,10 @@ import pathlib
 from django.apps import apps
 from django.core.management.base import BaseCommand
 from django.conf import settings
-from django.template import engines
-from django.template.context import make_context
 from django.template.loader import get_template
 
-from argus.htmx.themes.utils import ThemesList, clean_themes, get_raw_themes_setting
+from argus.htmx.tailwindtheme.cssconfig import generate_config
+from argus.htmx.themes.utils import clean_themes, get_raw_themes_setting
 
 
 # Copied from https://github.com/GEANT/geant-argus/pull/15 with minor modifications
@@ -43,104 +42,20 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         css_template_name = getattr(settings, "TAILWIND_CSS_TEMPLATE", self.DEFAULT_CSS_TEMPLATE_NAME)
         css_target_path = pathlib.Path(getattr(settings, "TAILWIND_CSS_TARGET", self.DEFAULT_CSS_TARGET))
-
-        custom_themes_dir = css_target_path.parent / "custom-themes"
-        custom_themes_dir.mkdir(exist_ok=True)
+        output_dir = css_target_path.parent
 
         themes = clean_themes(get_raw_themes_setting())
-        themes_context = self.get_themes_context(themes)
+        tailwind_template = self.read_template_source(self.DEFAULT_TAILWIND_TEMPLATE_NAME)
+        styles_template = self.read_template_source(css_template_name)
+        css_files = self.get_css_files(output_dir)
 
-        # Generate tailwind base config with DaisyUI plugin config
-        self.write_file(
-            self.DEFAULT_TAILWIND_TEMPLATE_NAME,
-            css_target_path.parent / "tailwind.css",
-            context=themes_context,
-            name="tailwind base config",
-        )
-
-        # Generate theme CSS files for custom themes from DAISYUI_THEMES setting
-        self.generate_theme_files(custom_themes_dir, themes)
-
-        # Generate main styles.css
-        self.write_file(
-            css_template_name,
-            css_target_path,
-            context=self.get_context(target_dir=css_target_path.parent),
-            name="tailwind base css",
-        )
-
-    def generate_theme_files(self, snippets_dir: pathlib.Path, themes: ThemesList):
-        """Generate CSS theme files for custom themes from DAISYUI_THEMES setting."""
-        for theme in themes:
-            if isinstance(theme, dict):
-                for theme_name, theme_config in theme.items():
-                    self.write_theme_file(snippets_dir, theme_name, theme_config)
-
-    def write_theme_file(self, themes_dir: pathlib.Path, theme_name: str, theme_config: dict):
-        """Write a single theme CSS file."""
-        css_content = self.generate_theme_css(theme_name, theme_config)
-        target_path = themes_dir / f"{theme_name}.css"
-        target_path.write_text(css_content)
-        self.stdout.write(f"Wrote theme '{theme_name}' to '{target_path}'")
-
-    # Keys that are handled separately or have global side effects and should
-    # not be passed through to the generated CSS.
-    # - name: extracted from the dict key, written explicitly
-    # - default: makes a theme the page-wide default via :where(:root), which
-    #   overrides all user theme selections
-    # - prefersdark: generates a @media (prefers-color-scheme: dark) rule that
-    #   overrides all [data-theme] selections for dark-mode OS users
-    THEME_META_KEYS = frozenset({"name", "default", "prefersdark"})
-
-    def generate_theme_css(self, theme_name: str, theme_config: dict) -> str:
-        """Generate CSS content for a DaisyUI v5 theme.
-
-        Theme config keys are passed through directly as CSS properties.
-        Keys starting with '--' are written as-is, other keys are written
-        without the '--' prefix (for DaisyUI plugin options like color-scheme).
-        """
-        lines = [
-            '@plugin "daisyui/theme" {',
-            f'  name: "{theme_name}";',
-        ]
-
-        for key, value in theme_config.items():
-            if key in self.THEME_META_KEYS:
-                continue
-            if key.startswith("--"):
-                lines.append(f"  {key}: {value};")
-            else:
-                # Non-variable keys like color-scheme
-                lines.append(f'  {key}: "{value}";')
-
-        lines.append("}")
-        lines.append("")  # trailing newline
-
-        return "\n".join(lines)
-
-    def get_themes_context(self, themes: ThemesList):
-        builtin_themes = ", ".join(t for t in themes if isinstance(t, str))
-        return {"builtin_themes": builtin_themes}
-
-    def get_context(self, target_dir: pathlib.Path):
-        return {
-            "cssfiles": self.get_css_files(target_dir),
-        }
-
-    def write_file(self, template_name, target_path, context, name):
-        pathlib.Path(target_path).write_text(self.render(template_name=template_name, context=context))
-
-        self.stdout.write(f"Wrote {name} to '{target_path}'")
+        generate_config(themes, tailwind_template, styles_template, css_files, output_dir, log=self.stdout.write)
 
     @staticmethod
-    def render(template_name: str, context):
+    def read_template_source(template_name: str) -> str:
+        """Read raw template source text via Django's template discovery."""
         template = get_template(template_name)
-        return template.template.render(make_context(context, autoescape=False))
-
-    @staticmethod
-    def get_template_dirs():
-        for engine in engines.all():
-            yield from getattr(engine, "template_dirs", [])
+        return template.template.source
 
     @classmethod
     def get_css_files(cls, target_dir: pathlib.Path):

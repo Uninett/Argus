@@ -1,6 +1,14 @@
 from pathlib import Path
 
 
+DEFAULT_THEMES = [
+    "dark",
+    "light",
+    "argus",
+    "sikt",
+    "sikt-dark",
+]
+
 VERSION = "2.1.37"
 
 TAILWIND_EXTRA_URL = (
@@ -26,6 +34,7 @@ TAILWIND_PATH = Path(__file__).resolve()
 FILENAME = TAILWIND_PATH.parent / "tailwindcss"
 
 __all__ = [
+    "DEFAULT_THEMES",
     "VERSION",
     "ARCHITECTURE_MAP",
     "TAILWIND_PATH",
