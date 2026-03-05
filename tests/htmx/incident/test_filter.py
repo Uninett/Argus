@@ -3,14 +3,14 @@ from unittest.mock import Mock
 
 from django.contrib.messages.middleware import MessageMiddleware
 from django.contrib.sessions.middleware import SessionMiddleware
-from django.http import QueryDict
+from django.http import Http404, QueryDict
 from django.test import RequestFactory, TestCase
 
 from argus.auth.factories import PersonUserFactory
 from argus.auth.utils import get_preference_obj
 from argus.filter.factories import FilterFactory
 from argus.htmx.incident.filter import IncidentFilterForm, NamedFilterForm, create_named_filter, incident_list_filter
-from argus.htmx.incident.views import search_tags
+from argus.htmx.incident.views import create_filter, update_filter, delete_filter, search_tags
 from argus.incident.constants import AckedStatus, OpenStatus
 from argus.incident.factories import IncidentFactory, SourceSystemFactory
 from argus.incident.models import Incident, Tag
@@ -241,6 +241,140 @@ class TestFilterPreference(TestCase):
 
         assert not form.is_valid()
         assert "tags" in form.errors
+
+
+class TestCreateFilterView(TestCase):
+    def setUp(self):
+        disconnect_signals()
+        self.factory = RequestFactory()
+        self.user = PersonUserFactory()
+
+    def tearDown(self):
+        connect_signals()
+
+    def _post(self, data, selected_filter=None):
+        request = self.factory.post("/filter-create/", data)
+        request.user = self.user
+        SessionMiddleware(lambda x: x).process_request(request)
+        MessageMiddleware(lambda x: x).process_request(request)
+        if selected_filter:
+            request.session["selected_filter"] = selected_filter
+        return create_filter(request)
+
+    def test_when_valid_then_it_should_create_filter_and_return_refresh(self):
+        response = self._post({"filter_name": "My filter", "maxlevel": 5, "tags": ""})
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(Filter.objects.filter(name="My filter", user=self.user).exists())
+
+    def test_when_session_has_selected_filter_then_it_should_use_post_data(self):
+        existing = FilterFactory(user=self.user, filter={"maxlevel": 1, "tags": []})
+        response = self._post(
+            {"filter_name": "New filter", "maxlevel": 3, "tags": ""},
+            selected_filter=str(existing.pk),
+        )
+        self.assertEqual(response.status_code, 200)
+        new_filter = Filter.objects.get(name="New filter", user=self.user)
+        self.assertEqual(new_filter.filter["maxlevel"], 3)
+
+    def test_when_name_missing_then_it_should_return_bad_request(self):
+        response = self._post({"maxlevel": 5, "tags": ""})
+        self.assertEqual(response.status_code, 400)
+
+    def test_when_session_has_selected_filter_then_it_should_preserve_session(self):
+        existing = FilterFactory(user=self.user, filter={"maxlevel": 1, "tags": []})
+        request = self.factory.post("/filter-create/", {"filter_name": "test", "maxlevel": 5, "tags": ""})
+        request.user = self.user
+        SessionMiddleware(lambda x: x).process_request(request)
+        MessageMiddleware(lambda x: x).process_request(request)
+        request.session["selected_filter"] = str(existing.pk)
+        create_filter(request)
+        self.assertIsNotNone(request.session.get("selected_filter"))
+
+
+class TestUpdateFilterView(TestCase):
+    def setUp(self):
+        disconnect_signals()
+        self.factory = RequestFactory()
+        self.user = PersonUserFactory()
+        self.filter_obj = FilterFactory(user=self.user, name="Original", filter={"maxlevel": 1, "tags": []})
+
+    def tearDown(self):
+        connect_signals()
+
+    def _post(self, pk, data, user=None, selected_filter=None):
+        request = self.factory.post(f"/filter/update/{pk}/", data)
+        request.user = user or self.user
+        SessionMiddleware(lambda x: x).process_request(request)
+        MessageMiddleware(lambda x: x).process_request(request)
+        if selected_filter:
+            request.session["selected_filter"] = selected_filter
+        return update_filter(request, pk)
+
+    def test_when_valid_then_it_should_update_filter_and_return_refresh(self):
+        response = self._post(self.filter_obj.pk, {"maxlevel": 3, "tags": ""})
+        self.assertEqual(response.status_code, 200)
+        self.filter_obj.refresh_from_db()
+        self.assertEqual(self.filter_obj.filter["maxlevel"], 3)
+
+    def test_when_session_has_selected_filter_then_it_should_use_post_data(self):
+        other_filter = FilterFactory(user=self.user, filter={"maxlevel": 5, "tags": []})
+        response = self._post(
+            self.filter_obj.pk,
+            {"maxlevel": 2, "tags": ""},
+            selected_filter=str(other_filter.pk),
+        )
+        self.assertEqual(response.status_code, 200)
+        self.filter_obj.refresh_from_db()
+        self.assertEqual(self.filter_obj.filter["maxlevel"], 2)
+
+    def test_when_other_user_then_it_should_return_forbidden(self):
+        other_user = PersonUserFactory()
+        response = self._post(self.filter_obj.pk, {"maxlevel": 3, "tags": ""}, user=other_user)
+        self.assertEqual(response.status_code, 403)
+
+    def test_when_filter_not_found_then_it_should_raise_404(self):
+        with self.assertRaises(Http404):
+            self._post(99999, {"maxlevel": 3, "tags": ""})
+
+
+class TestDeleteFilterView(TestCase):
+    def setUp(self):
+        disconnect_signals()
+        self.factory = RequestFactory()
+        self.user = PersonUserFactory()
+        self.filter_obj = FilterFactory(user=self.user, name="To delete", filter={})
+
+    def tearDown(self):
+        connect_signals()
+
+    def _post(self, pk, user=None, selected_filter=None):
+        request = self.factory.post(f"/filter/delete/{pk}/")
+        request.user = user or self.user
+        SessionMiddleware(lambda x: x).process_request(request)
+        MessageMiddleware(lambda x: x).process_request(request)
+        if selected_filter:
+            request.session["selected_filter"] = selected_filter
+        return delete_filter(request, pk), request
+
+    def test_when_valid_then_it_should_delete_filter_and_return_refresh(self):
+        pk = self.filter_obj.pk
+        response, _ = self._post(pk)
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(Filter.objects.filter(pk=pk).exists())
+
+    def test_when_deleted_filter_was_selected_then_it_should_clear_session(self):
+        pk = self.filter_obj.pk
+        _, request = self._post(pk, selected_filter=str(pk))
+        self.assertIsNone(request.session.get("selected_filter"))
+
+    def test_when_other_user_then_it_should_return_forbidden(self):
+        other_user = PersonUserFactory()
+        response, _ = self._post(self.filter_obj.pk, user=other_user)
+        self.assertEqual(response.status_code, 403)
+
+    def test_when_filter_not_found_then_it_should_raise_404(self):
+        with self.assertRaises(Http404):
+            self._post(99999)
 
 
 class TestSearchTagsFilter(TestCase):

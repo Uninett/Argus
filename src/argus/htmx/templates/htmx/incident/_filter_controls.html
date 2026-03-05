@@ -1,34 +1,52 @@
+{% include "htmx/incident/_filter_controls_script.html" %}
 <div class="flex flex-wrap items-center gap-1">
   {% include "htmx/incident/_filter_select.html" %}
-  <div id="filter-actions">
-    <div class="join join-horizontal items-center">
-      {% include "htmx/incident/_filter_create_modal.html" with dialog_id="create-filter-dialog" button_title="Create filter" button_class="btn-sm text-xs join-item" header="Create new filter" explanation="Create new filter from currently selected filter parameters" cancel_text="Cancel" submit_text="Submit" %}
-      {% include "htmx/incident/_filter_update_dropdown.html" %}
-      {% include "htmx/incident/_filter_delete_dropdown.html" %}
+  <div id="filter-actions" class="flex items-center">
+    <div class="join join-horizontal items-center filter-context-action">
+      <button type="button"
+              id="filter-update-btn"
+              class="btn btn-sm join-item"
+              onclick="htmx.find('#filter-update-dialog').showModal()"
+              disabled>
+        <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i>
+        Save
+      </button>
+      <button type="button"
+              class="btn btn-sm join-item"
+              onclick="htmx.find('#create-filter-dialog').showModal()">
+        <i class="fa-solid fa-plus" aria-hidden="true"></i>
+        Create
+      </button>
     </div>
+    <button type="button"
+            id="filter-delete-btn"
+            class="btn btn-sm"
+            onclick="htmx.find('#filter-delete-dialog').showModal()"
+            disabled>
+      <i class="fa-solid fa-trash-can" aria-hidden="true"></i>
+      Delete
+    </button>
+    <button type="button"
+            id="filter-reset-btn"
+            class="btn btn-sm btn-outline ml-1 hidden filter-context-action"
+            onclick="resetFilter()">
+      <i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i>
+      Reset
+    </button>
+    {% include "htmx/incident/_filter_create_modal.html" with dialog_id="create-filter-dialog" dialog_only=True header="Create new filter" explanation="Create new filter from currently selected filter parameters" cancel_text="Cancel" submit_text="Submit" %}
+    {% include "htmx/incident/_filter_update_dialog.html" %}
+    {% include "htmx/incident/_filter_delete_dialog.html" %}
   </div>
-  {# djlint:off #}
-  <button class="btn btn-sm btn-primary"
-          _="init
-               if localStorage.getItem('argus_show_filters') is 'false'
-                 add .hidden to #filterbox
-                 add .hidden to #filter-actions
-                 toggle .hidden on .filter-toggle-label
-               end
-             end
-             on click
-               toggle .hidden on #filterbox
-               toggle .hidden on .filter-toggle-label
-               toggle .hidden on #filter-actions
-               if #filterbox matches .hidden
-                 call localStorage.setItem('argus_show_filters', 'false')
-               else
-                 call localStorage.setItem('argus_show_filters', 'true')
-               end
-             end">
-    <i class="fa-solid fa-filter"></i>
-    <span class="filter-toggle-label hidden">Show filters</span>
-    <span class="filter-toggle-label">Hide filters</span>
+  <button id="filter-toggle-btn"
+          class="btn btn-sm btn-primary"
+          aria-expanded="true"
+          aria-controls="filterbox"
+          onclick="toggleFilters(this)">
+    <span class="filter-collapse-icon">Hide filters</span>
+    <span class="filter-expand-icon">Show filters</span>
+    <i class="fa-solid fa-chevron-down fa-xs filter-expand-icon"
+       aria-hidden="true"></i>
+    <i class="fa-solid fa-chevron-up fa-xs filter-collapse-icon"
+       aria-hidden="true"></i>
   </button>
-  {# djlint:on #}
 </div>

@@ -1,0 +1,30 @@
+/*
+ * Filter pane collapse/expand: controlled by toggling .filters-collapsed
+ * on #filter-controls-box. Default state is expanded.
+ */
+#filter-controls-box.filters-collapsed #filterbox,
+#filter-controls-box.filters-collapsed .filter-context-action {
+  display: none;
+}
+
+/* Visually connect delete button to the join group when filters are expanded */
+#filter-controls-box:not(.filters-collapsed) .join > :last-child {
+  border-start-end-radius: 0;
+  border-end-end-radius: 0;
+}
+
+#filter-controls-box:not(.filters-collapsed) #filter-delete-btn {
+  border-start-start-radius: 0;
+  border-end-start-radius: 0;
+  margin-inline-start: calc(var(--border, 1px) * -1);
+}
+
+/* Toggle filter button icons: show expand icon when collapsed, collapse icon when expanded */
+#filter-controls-box .filter-expand-icon,
+#filter-controls-box.filters-collapsed .filter-collapse-icon {
+  display: none;
+}
+
+#filter-controls-box.filters-collapsed .filter-expand-icon {
+  display: inline;
+}

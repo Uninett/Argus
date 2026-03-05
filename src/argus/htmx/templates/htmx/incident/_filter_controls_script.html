@@ -1,0 +1,124 @@
+<script>
+  const FILTER_SELECT_URL = '{% url "htmx:select-filter" %}';
+  const FILTER_UPDATE_URL_TEMPLATE = '{% url "htmx:filter-update" pk=0 %}'.replace('/0/', '/{id}/');
+  const FILTER_DELETE_URL_TEMPLATE = '{% url "htmx:filter-delete" pk=0 %}'.replace('/0/', '/{id}/');
+
+  let savedFilterState = null;
+
+  function serializeFilterForm() {
+    const form = document.getElementById('incident-filter-box');
+    if (!form) return null;
+    const data = new URLSearchParams(new FormData(form));
+    data.delete('sort');
+    data.delete('sort_order');
+    data.delete('csrfmiddlewaretoken');
+    data.sort();
+    return data.toString();
+  }
+
+  function captureFilterState() {
+    savedFilterState = serializeFilterForm();
+  }
+
+  function checkFilterDirty() {
+    const resetBtn = document.getElementById('filter-reset-btn');
+    const updateBtn = document.getElementById('filter-update-btn');
+    if (!resetBtn || savedFilterState === null) return;
+    const dirty = serializeFilterForm() !== savedFilterState;
+    resetBtn.classList.toggle('hidden', !dirty);
+    if ('editable' in (updateBtn?.dataset ?? {})) {
+      updateBtn.toggleAttribute('disabled', !dirty);
+    }
+  }
+
+  function updateFilterActionButtons() {
+    const select = document.getElementById('incident-filter-select');
+    const updateBtn = document.getElementById('filter-update-btn');
+    const deleteBtn = document.getElementById('filter-delete-btn');
+    const resetBtn = document.getElementById('filter-reset-btn');
+    const updateConfirm = document.getElementById('filter-update-confirm');
+    const deleteConfirm = document.getElementById('filter-delete-confirm');
+    if (!select || !updateBtn || !deleteBtn || !resetBtn) return;
+
+    const val = select.value;
+    const selectedOption = select.options[select.selectedIndex];
+    const filterName = selectedOption?.text?.trim() ?? '';
+    const editable = val && selectedOption?.hasAttribute('data-editable');
+
+    if (filterName) {
+      document.getElementById('filter-update-name')?.replaceChildren(document.createTextNode(filterName));
+      document.getElementById('filter-delete-name')?.replaceChildren(document.createTextNode(filterName));
+    }
+
+    if (val) {
+      captureFilterState();
+    } else {
+      savedFilterState = null;
+    }
+    resetBtn.classList.add('hidden');
+
+    if (editable) {
+      updateBtn.dataset.editable = '';
+      deleteBtn.disabled = false;
+      if (updateConfirm) {
+        updateConfirm.setAttribute('hx-post', FILTER_UPDATE_URL_TEMPLATE.replace('{id}', val));
+        htmx.process(updateConfirm);
+      }
+      if (deleteConfirm) {
+        deleteConfirm.setAttribute('hx-post', FILTER_DELETE_URL_TEMPLATE.replace('{id}', val));
+        htmx.process(deleteConfirm);
+      }
+    } else {
+      delete updateBtn.dataset.editable;
+      updateBtn.disabled = true;
+      deleteBtn.disabled = true;
+    }
+  }
+
+  function resetFilter() {
+    const select = document.getElementById('incident-filter-select');
+    if (!select?.value) return;
+    htmx.ajax('GET', `${FILTER_SELECT_URL}?filter=${select.value}`, {
+      target: '#incident-filter-box',
+      swap: 'outerHTML',
+    }).then(() => {
+      captureFilterState();
+      document.getElementById('filter-reset-btn')?.classList.add('hidden');
+      const updateBtn = document.getElementById('filter-update-btn');
+      if (updateBtn) updateBtn.disabled = true;
+    });
+  }
+
+  function toggleFilters(btn) {
+    const box = document.getElementById('filter-controls-box');
+    box.classList.toggle('filters-collapsed');
+    const collapsed = box.classList.contains('filters-collapsed');
+    localStorage.setItem('argus_show_filters', collapsed ? 'false' : 'true');
+    btn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    if (localStorage.getItem('argus_show_filters') === 'false') {
+      document.getElementById('filter-controls-box')?.classList.add('filters-collapsed');
+      document.getElementById('filter-toggle-btn')?.setAttribute('aria-expanded', 'false');
+    }
+
+    // Listen for filter form changes to enable/disable reset button
+    const controlsBox = document.getElementById('filter-controls-box');
+    const onFilterChange = (e) => {
+      if (e.target.closest('#incident-filter-box')) {
+        requestAnimationFrame(checkFilterDirty);
+      }
+    };
+    controlsBox?.addEventListener('change', onFilterChange);
+    controlsBox?.addEventListener('input', onFilterChange);
+
+    // Hide bulk actions when the incident table is refreshed (e.g. filter change)
+    document.body.addEventListener('htmx:afterSwap', (e) => {
+      if (e.detail.target?.id === 'table') {
+        document.getElementById('bulk-actions')?.classList.add('hidden');
+        document.querySelectorAll('[id^="select-all-on-page-"], .row-select').forEach(cb => cb.checked = false);
+      }
+    });
+  });
+</script>

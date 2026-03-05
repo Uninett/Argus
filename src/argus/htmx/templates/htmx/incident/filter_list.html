@@ -1,4 +1,4 @@
-<label class="flex items-center w-full max-w-xs">
+<label class="flex items-center gap-1 w-full max-w-xs">
   <span class="block label">
     <span class="label-text">Filter</span>
   </span>
@@ -13,6 +13,7 @@
             value="">---</option>
     {% for object in object_list %}
       <option value="{{ object.id }}"
+              {% if object.user == request.user %}data-editable{% endif %}
               {% if request.session.selected_filter == object.id|stringformat:"i" %}selected{% endif %}>
         {% if object.label %}
           {{ object.label }}

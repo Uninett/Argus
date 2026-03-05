@@ -1,0 +1,27 @@
+<dialog id="filter-update-dialog" class="modal">
+  <div class="modal-box card card-compact shadow-xl">
+    <div class="w-full">
+      <div class="divider divider-start">
+        <h3 class="card-title">Save filter</h3>
+      </div>
+      <p class="antialiased text-base font-normal">
+        Are you sure you want to override <em id="filter-update-name" class="font-semibold"></em> with the current filter parameters?
+      </p>
+      <div class="modal-action card-actions">
+        <form method="dialog" class="w-full">
+          {% csrf_token %}
+          <div class="divider divider-end">
+            <button id="filter-update-confirm"
+                    class="btn btn-primary"
+                    type="button"
+                    hx-include="#incident-filter-box fieldset">Yes</button>
+            <button class="btn" type="submit">No</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <form method="dialog" class="modal-backdrop">
+    <button>close</button>
+  </form>
+</dialog>

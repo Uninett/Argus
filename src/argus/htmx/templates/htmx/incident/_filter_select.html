@@ -1,6 +1,8 @@
 <form id="filter-selector-form"
       hx-get="{% url 'htmx:filter-list' %}"
       hx-trigger="load, unselect"
-      hx-swap="innerHTML">
+      hx-swap="innerHTML"
+      hx-on::after-swap="updateFilterActionButtons()"
+      hx-on:change="updateFilterActionButtons()">
   <p>Loading existing filters...</p>
 </form>
