@@ -5,6 +5,7 @@ git config --global --add safe.directory /argus
 python3 -m pip install -e .
 python3 manage.py collectstatic --noinput
 python3 manage.py migrate --noinput
+python3 manage.py sync
 
 # Stop password from being printed in logs
 set +x
