@@ -34,11 +34,6 @@
     display: none;
   }
 
-  /* Badges should be fully rounded */
-  .badge {
-    border-radius: 9999px !important;
-  }
-
   /* Restore table-xs font sizes from DaisyUI v4 (12px instead of 11px) */
   .table-xs :not(thead, tfoot) tr {
     font-size: 0.75rem !important;
