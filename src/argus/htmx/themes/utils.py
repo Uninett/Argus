@@ -1,4 +1,5 @@
 import logging
+from collections.abc import Sequence
 from pathlib import Path
 from re import findall
 
@@ -10,11 +11,14 @@ from argus.htmx import defaults as fallbacks
 
 
 __all__ = [
+    "clean_themes",
     "get_raw_themes_setting",
     "get_theme_names",
+    "get_theme_names_from_setting",
     "get_theme_default",
 ]
 
+ThemesList = list[str | dict[str, dict]]
 
 LOG = logging.getLogger(__name__)
 
@@ -23,8 +27,47 @@ def get_raw_themes_setting():
     return getattr(settings, "DAISYUI_THEMES", fallbacks.DAISYUI_THEMES)
 
 
+def clean_themes(themes: Sequence[str | dict]) -> ThemesList:
+    """Validate a raw themes list and return a cleaned version.
+
+    - Valid string entries pass through
+    - Valid dict entries (single-key with dict value) pass through
+    - Multi-key dicts are split into individual single-key dicts
+    - Invalid entries are skipped with a warning
+    """
+    cleaned: ThemesList = []
+    for entry in themes:
+        if isinstance(entry, str):
+            if not entry:
+                LOG.warning("Skipping empty string theme entry")
+                continue
+            cleaned.append(entry)
+        elif isinstance(entry, dict):
+            if not entry:
+                LOG.warning("Skipping empty dict theme entry")
+                continue
+            cleaned.extend(_validated_dict_themes(entry))
+        else:
+            LOG.warning("Skipping invalid theme entry of type %s: %r", type(entry).__name__, entry)
+    return cleaned
+
+
+def _validated_dict_themes(entry):
+    """Yield valid single-key theme dicts from a dict entry."""
+    for key, value in entry.items():
+        if not isinstance(key, str) or not key:
+            LOG.warning("Skipping theme dict entry with invalid key: %r", key)
+            continue
+        if not isinstance(value, dict):
+            LOG.warning("Skipping theme %r: value must be a dict, got %s", key, type(value).__name__)
+            continue
+        if not value:
+            LOG.warning("Theme %r has empty colors dict; daisyUI will use defaults", key)
+        yield {key: value}
+
+
 def get_theme_names_from_setting():
-    themes_setting = get_raw_themes_setting()
+    themes_setting = clean_themes(get_raw_themes_setting())
     theme_names = []
     for theme in themes_setting:
         if isinstance(theme, str):

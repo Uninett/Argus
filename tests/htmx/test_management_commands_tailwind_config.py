@@ -4,6 +4,7 @@ from unittest.mock import patch
 from django.test import override_settings, tag
 
 from argus.htmx.management.commands.tailwind_config import Command
+from argus.htmx.themes.utils import clean_themes, get_raw_themes_setting
 
 
 class TestHandle(TestCase):
@@ -21,21 +22,21 @@ class TestGenerateThemeFile(TestCase):
     def test_generate_nothing_if_no_dicts_in_DAISYUI_THEMES_setting(self):
         cmd = Command()
         with patch("argus.htmx.management.commands.tailwind_config.Command.write_theme_file") as writer:
-            cmd.generate_theme_files("/tmp")
+            cmd.generate_theme_files("/tmp", clean_themes(get_raw_themes_setting()))
             writer.assert_not_called()
 
     @override_settings(DAISYUI_THEMES=({},))
     def test_generate_nothing_if_empty_dicts_in_DAISYUI_THEMES_setting(self):
         cmd = Command()
         with patch("argus.htmx.management.commands.tailwind_config.Command.write_theme_file") as writer:
-            cmd.generate_theme_files("/tmp")
+            cmd.generate_theme_files("/tmp", clean_themes(get_raw_themes_setting()))
             writer.assert_not_called()
 
     @override_settings(DAISYUI_THEMES=({"mytheme": {}},))
     def test_generate_n_files_if_n_valid_dicts_in_DAISYUI_THEMES_setting(self):
         cmd = Command()
         with patch("argus.htmx.management.commands.tailwind_config.Command.write_theme_file") as writer:
-            cmd.generate_theme_files("/tmp")
+            cmd.generate_theme_files("/tmp", clean_themes(get_raw_themes_setting()))
             writer.assert_called_once()
 
 
