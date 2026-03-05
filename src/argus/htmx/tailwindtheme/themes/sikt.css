@@ -1,0 +1,38 @@
+@plugin "daisyui/theme" {
+  name: "sikt";
+  color-scheme: "light";
+  --color-primary: #7351FB; /* interaction.primary: purple.65-100 */
+  --color-primary-content: #FFFFFF; /* neutral.100-100 */
+  --color-secondary: #150266; /* interaction.secondary: purple.20-100 */
+  --color-secondary-content: #FFFFFF; /* neutral.100-100 */
+  --color-accent: #D1CDFF; /* purple.90-100 */
+  --color-accent-content: #0A0132; /* purple.10-100 */
+  --color-neutral: #595959; /* neutral.35-100 */
+  --color-neutral-content: #FFFFFF; /* neutral.100-100 */
+  --color-base-100: #FFFFFF; /* neutral.100-100 */
+  --color-base-200: #F1F1F1; /* neutral.95-100 */
+  --color-base-300: #DEDEDE; /* neutral.87-100 */
+  --color-base-content: #0A0132; /* purple.10-100 */
+  --color-info: #004FCF; /* support.info.strong: blue.41-100 */
+  --color-info-content: #FFFFFF; /* neutral.100-100 */
+  --color-success: #138849; /* support.success.strong: green.30-100 */
+  --color-success-content: #FFFFFF; /* neutral.100-100 */
+  --color-warning: #FFB700; /* support.warning.strong: yellow.50-100 */
+  --color-warning-content: #0A0132; /* purple.10-100 */
+  --color-error: #D74033; /* support.critical.strong: red.52-100 */
+  --color-error-content: #FFFFFF; /* neutral.100-100 */
+}
+
+/* Severity colors from Sikt datavisualization category tokens */
+[data-theme="sikt"] {
+  --color-severity-primary-1: #FF957A;
+  --color-severity-primary-2: #FFAC70;
+  --color-severity-primary-3: #FBE774;
+  --color-severity-primary-4: #82E3CB;
+  --color-severity-primary-5: #75C7F0;
+  --color-severity-secondary-1: #0A0132;
+  --color-severity-secondary-2: #0A0132;
+  --color-severity-secondary-3: #0A0132;
+  --color-severity-secondary-4: #0A0132;
+  --color-severity-secondary-5: #0A0132;
+}

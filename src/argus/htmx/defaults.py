@@ -52,6 +52,8 @@ DEFAULT_THEMES = [
     "dark",
     "light",
     "argus",
+    "sikt",
+    "sikt-dark",
 ]
 DAISYUI_THEMES = get_json_env("DAISYUI_THEMES", DEFAULT_THEMES, quiet=True)
 THEME_DEFAULT = get_str_env("ARGUS_THEME_DEFAULT", "argus")
