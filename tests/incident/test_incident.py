@@ -89,3 +89,35 @@ class IncidentLevelTests(TestCase):
     def test_level_str_returns_name_of_level(self):
         incident = StatefulIncidentFactory(level=1)
         self.assertEqual(incident.pp_level(), "Critical")
+
+
+class IncidentAgeTests(TestCase):
+    def setUp(self):
+        disconnect_signals()
+
+    def tearDown(self):
+        connect_signals()
+
+    def test_given_open_incident_then_returns_age_from_start_time_to_now(self):
+        open_incident = StatefulIncidentFactory()
+        self.assertAlmostEqual(open_incident.age, timezone.now() - open_incident.start_time, delta=timedelta(seconds=1))
+
+    def test_given_closed_incident_then_returns_age_from_start_time_to_end_time(self):
+        closed_incident = StatefulIncidentFactory(
+            start_time=timezone.now() - timedelta(days=1), end_time=timezone.now()
+        )
+        self.assertEqual(closed_incident.age, closed_incident.end_time - closed_incident.start_time)
+
+    def test_given_stateless_incident_then_return_none(self):
+        self.assertIsNone(StatelessIncidentFactory().age)
+
+
+class IncidentHumanizeAgeTests(TestCase):
+    def setUp(self):
+        disconnect_signals()
+
+    def tearDown(self):
+        connect_signals()
+
+    def test_given_stateless_incident_then_returns_empty_string(self):
+        self.assertEqual(StatelessIncidentFactory().humanize_age, "")

@@ -471,12 +471,18 @@ class Incident(models.Model):
         If the incident is open, the age is calculated up to the current time.
         If the incident is closed, the age is calculated up to the end_time.
         """
+        if not self.stateful:
+            return None
+
         end_time = self.end_time if not self.open else timezone.now()
         return end_time - self.start_time
 
     @property
     def humanize_age(self):
         """Return the age of the incident as a human-readable string"""
+        if not self.stateful:
+            return ""
+
         comparison_date = timezone.now() - self.age
         return timesince(comparison_date)
 
