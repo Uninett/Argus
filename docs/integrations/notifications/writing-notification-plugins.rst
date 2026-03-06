@@ -78,7 +78,7 @@ of settings for a possible destination and should return True if a destination
 with such settings exists in the given QuerySet.
 
 ``raise_if_not_deletable`` should check if a given destination can be deleted.
-This is used in case some destinations are synced from an outside source and
+This is used in case some destinations are managed by an outside source and
 should not be able to be deleted by a user. If that is the case a
 ``NotDeletableError`` should be raised. If not simply return None.
 
