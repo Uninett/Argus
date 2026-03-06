@@ -1,9 +1,9 @@
 @import "tailwindcss";
 
-@source "../../templates";
+@source "../templates";
 
 @plugin "daisyui" {
-  themes: dark, light, argus, sikt, sikt-dark;
+  themes: {{ builtin_themes }};
 }
 
 /*

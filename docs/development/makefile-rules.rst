@@ -57,6 +57,14 @@ nuke`` instead.
 Rules that generate files
 =========================
 
+tailwind-config
+---------------
+
+Runs the ``tailwind_config`` management command, which generates the tailwind
+configuration files (``styles.css``, ``tailwind.css``, and custom theme files in
+``custom-themes/``) in ``src/argus/htmx/tailwindtheme``. Run this whenever
+:setting:`DAISYUI_THEMES` or theme CSS files change.
+
 tailwind
 --------
 
@@ -64,10 +72,9 @@ Assumes that the standalone tailwind CLI client is downloaded and uses the
 tailwind configuration in ``src/argus/htmx/tailwindtheme`` to generate
 a stylesheet that is put in ``src/argus/htmx/static/styles.css``.
 
-This rule can be used together with the ``tailwind_config`` management command
-when when changing styles or themeing::
+When changing themes or the :setting:`DAISYUI_THEMES` setting, run::
 
-    $ python3 manage.py tailwind_config && make tailwind
+    $ make tailwind-config tailwind
 
 upgrade-tailwind
 ----------------
@@ -87,4 +94,12 @@ The version in the config is for one of the releases at
 After a change in version, running ``upgrade-tailwind`` should be followed by
 running::
 
-    $ python3 manage.py tailwind_config && make tailwind
+    $ make tailwind-config tailwind
+
+setup-tailwind
+--------------
+
+Runs ``upgrade-tailwind``, ``tailwind-config``, and ``tailwind`` in sequence.
+Use this on a fresh clone or in CI to bootstrap everything from scratch::
+
+    $ make setup-tailwind

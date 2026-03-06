@@ -45,8 +45,7 @@ How to choose which themes are available
 ----------------------------------------
 
 This is controlled by the setting :setting:`DAISYUI_THEMES`. You need to run
-the ``tailwind_config`` management command afterwards, followed by ``make
-tailwind``.
+``make tailwind-config tailwind`` afterwards.
 
 How to add additional themes
 ----------------------------
@@ -54,8 +53,7 @@ How to add additional themes
 See the `Daisy UI 5 theme generator <https://daisyui.com/theme-generator/>`_
 for the themes that are shipped with Argus. You can also generate new themes
 there. To add a pre-configured theme just add the name to the
-:setting:`DAISYUI_THEMES` setting and run ``tailwind_config`` + ``make
-tailwind`` as usual.
+:setting:`DAISYUI_THEMES` setting and run ``make tailwind-config tailwind`` as usual.
 
 If generating a new theme:
 
@@ -156,7 +154,7 @@ be converted to Python like so::
         },
     ]
 
-Then run ``tailwind_config`` + ``make tailwind`` as usual.
+Then run ``make tailwind-config tailwind`` as usual.
 
 2. Via an app and css snippet
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -170,8 +168,8 @@ We recommend naming the file ``theme-THEMENAME.css``, where THEMENAME is the
 name you chose when generating the theme.
 
 Add the app to :setting:`INSTALLED_APPS`, the name to
-:setting:`DAISYUI_THEMES`, and finish with ``tailwind_config`` + ``make
-tailwind`` as usual.
+:setting:`DAISYUI_THEMES`, and finish with ``make tailwind-config tailwind``
+as usual.
 
 How to customize severity colors
 --------------------------------
@@ -227,7 +225,8 @@ Or to override default values::
       --default-border-width: 1px;
     }
 
-After adding your theme overrides, run ``tailwind_config`` + ``make tailwind`` as usual.
+After adding your theme overrides, run ``make tailwind-config tailwind`` as
+usual.
 
 Some links that may be relevant for customization:
 

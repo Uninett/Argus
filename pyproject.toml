@@ -79,14 +79,20 @@ source = "versioningit"
 artifacts = [
     "src/argus/version.py",
     "src/argus/htmx/static/styles.css",
+    "src/argus/htmx/tailwindtheme/styles.css",
+    "src/argus/htmx/tailwindtheme/tailwind.css",
+    "src/argus/htmx/tailwindtheme/custom-themes/*.css",
 ]
 
 [[tool.hatch.build.hooks.build-scripts.scripts]]
 commands = [
-    "make upgrade-tailwind tailwind",
+    "make upgrade-tailwind tailwind-build-config tailwind",
 ]
 artifacts = [
     "src/argus/htmx/static/styles.css",
+    "src/argus/htmx/tailwindtheme/styles.css",
+    "src/argus/htmx/tailwindtheme/tailwind.css",
+    "src/argus/htmx/tailwindtheme/custom-themes/*.css",
 ]
 
 [tool.hatch.build.targets.wheel]

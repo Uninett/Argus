@@ -61,6 +61,12 @@ Checklist
 
         $ git stash -u
 
+#. Generate the tailwind CSS:
+
+    .. code:: console
+
+        $ make setup-tailwind
+
 #. Run the tests one last time:
 
     .. code:: console

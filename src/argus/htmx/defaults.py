@@ -2,6 +2,7 @@
 # items in INCIDENT_TABLE_COLUMNS can be either a `str` referring to a key in
 # argus.htmx.incident.columns.BUILTIN_COLUMNS or an instance of
 # argus.htmx.incident.columns.IncidentTableColumn
+from argus.htmx.tailwindtheme.config import DEFAULT_THEMES
 from argus.site.settings import get_json_env, get_str_env
 
 
@@ -48,13 +49,8 @@ TAILWIND_CSS_TEMPLATE = "tailwind/styles.css"
 TAILWIND_CSS_TARGET = "src/argus/htmx/tailwindtheme/styles.css"
 
 STYLESHEET_PATH_DEFAULT = "styles.css"
-DEFAULT_THEMES = [
-    "dark",
-    "light",
-    "argus",
-    "sikt",
-    "sikt-dark",
-]
+
+
 DAISYUI_THEMES = get_json_env("DAISYUI_THEMES", DEFAULT_THEMES, quiet=True)
 THEME_DEFAULT = get_str_env("ARGUS_THEME_DEFAULT", "argus")
 
