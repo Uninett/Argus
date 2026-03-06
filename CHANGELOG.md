@@ -8,6 +8,107 @@ This project uses [*towncrier*](https://towncrier.readthedocs.io/) and the chang
 
 <!-- towncrier release notes start -->
 
+## [2.8.0] - 2026-03-06
+
+The most important change in this release is that we have finally added the
+long awaited task queue, to handle background tasks. The task queue uses the
+database for storage by default so running migrations is necessary. As part of
+using the queue to send notifications we fixed several bugs that caused a lower
+amount of notifications to be sent than expected. Another big change is we have
+upgraded tailwind, which affects theme customization and building packages.
+
+You *must* see the NOTES before updating if you or your deployment do any of
+the following:
+
+- Send notifications (`SEND_NOTIFICATIONS = True`). Affected both by the new
+  queue and the bug-fixes.
+- Alter any templates or CSS, due to the upgrade of tailwind.
+- Replace or rework the incident list filter box.
+- Write your own media plugins.
+- Build your own package (useful for bundling themes and tweaks). The release
+  checklist has changed.
+
+### Added
+
+- Added support for a task queue. We're using `django-tasks`, which is in the
+  process of being merged into Django proper, with the backend
+  `django-tasks-db`. This stores the tasks in the same database as everything
+  else. We're currently only using the queue to send notifications, so if you
+  are not using argus for that (`SEND_NOTIFICATIONS` is off), nothing changes.
+  ([#1608](https://github.com/Uninett/Argus/issues/1608))
+- Add "Create copy" action for planned maintenance tasks
+  ([#1613](https://github.com/Uninett/Argus/issues/1613))
+- Show name of owner for public filters
+  ([#1748](https://github.com/Uninett/Argus/issues/1748))
+- Add preview of incidents covered by selected filters in planned maintenance
+  task form ([#1765](https://github.com/Uninett/Argus/issues/1765))
+- Create admin user from env variables in docker entrypoint
+  ([#1776](https://github.com/Uninett/Argus/issues/1776))
+- Validate `DAISYUI_THEMES` entries, skipping invalid ones with warnings
+  ([#1819](https://github.com/Uninett/Argus/issues/1819))
+- Add Sikt light and dark DaisyUI themes based on Sikt Design System color
+  tokens ([#1822](https://github.com/Uninett/Argus/issues/1822))
+
+### Changed
+
+- Upgrade to Tailwind CSS v4 and DaisyUI v5. See NOTES for theme customization.
+  ([#1262](https://github.com/Uninett/Argus/issues/1262))
+- We are now using a task queue to send notifications instead of forking off
+  a process. This is to increase robustness and hopefully to increase
+  throughput. If argus is being used to send notifications, you MUST change
+  your deployment as there now is an additional service that needs to run in
+  order to handle the notifications on the queue. See the NOTES!
+  ([#1608](https://github.com/Uninett/Argus/issues/1608))
+- Refactor incident list filter UI with collapsible filterbox and dynamic bulk
+  actions bar. ([#1693](https://github.com/Uninett/Argus/issues/1693))
+- Improve maintenance column by adding a dropdown with tasks that affect the
+  incident ([#1745](https://github.com/Uninett/Argus/issues/1745))
+- Support searching for filters by first and last name of user
+  ([#1764](https://github.com/Uninett/Argus/issues/1764))
+- Added under maintenance column to maintenance column preset
+  ([#1775](https://github.com/Uninett/Argus/issues/1775))
+- Improve timeslot form with compact table layout for time recurrences
+  ([#1794](https://github.com/Uninett/Argus/issues/1794))
+- Consolidate notification routes under /notifications/ with tab navigation
+  ([#1795](https://github.com/Uninett/Argus/issues/1795))
+- Improve notification profile form with collapsible cards and inline actions
+  ([#1796](https://github.com/Uninett/Argus/issues/1796))
+- Moved some functionality from the email media plugin to the base class of all
+  media plugins. Basically, any destination can now be marked as being
+  "managed", which means that it is created and managed by a system outside of
+  an end-users control. This can be for instance email addresses or phone
+  numbers fetched from an account-database or address book.
+  ([#1802](https://github.com/Uninett/Argus/issues/1802))
+- Redesign destination page as flat table with inline editing
+  ([#1806](https://github.com/Uninett/Argus/issues/1806))
+- Tailwind CSS intermediate files (theme CSS, config snippets) are no longer
+  tracked in git. See NOTES.
+  ([#1826](https://github.com/Uninett/Argus/issues/1826))
+- Redesign filter toolbar with compact icon buttons and direct filter actions
+  ([#1831](https://github.com/Uninett/Argus/issues/1831))
+
+### Fixed
+
+- Notifications are now also sent on bulk changes to incidents. Note that for
+  filters used for sending notifications, it will be necessary to control event
+  types to maintain the current expected amount of notifications sent. See
+  NOTES. ([#1763](https://github.com/Uninett/Argus/issues/1763))
+- Limit choices of incidents field in PM admin to open incidents
+  ([#1789](https://github.com/Uninett/Argus/issues/1789))
+- Make it possible to use public filters in notification profiles
+  ([#1805](https://github.com/Uninett/Argus/issues/1805))
+- Fixed a bug where the setting that controls whether notifications will be
+  sent was ignored when sending notifications in the background. The
+  notifications were sent regardless.
+  ([#1808](https://github.com/Uninett/Argus/issues/1808))
+- Allow for multiple notification profiles with no name
+  ([#1828](https://github.com/Uninett/Argus/issues/1828))
+- Fix showing age for stateless incidents
+  ([#1833](https://github.com/Uninett/Argus/issues/1833))
+- Fix theme preview showing wrong foreground text color on color swatches
+  ([#1834](https://github.com/Uninett/Argus/issues/1834))
+
+
 ## [2.7.0] - 2026-01-23
 
 This release improves the UX for creating planned maintenance tasks, by having

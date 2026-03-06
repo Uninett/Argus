@@ -3,6 +3,133 @@
 This file documents changes to Argus that are relevant for operations,
 customizers and end-users.
 
+## [2.8.0] - 2026-03-06
+
+This release adds an important new dependency, django-tasks-db, which brings
+with it a new table. Remember to freshen installed dependencies, then migrate.
+
+### Sending notifications via a task queue
+
+We are now using a task queue to send notifications instead of forking off
+a process. This is to increase robustness and hopefully to increase throughput.
+If argus is being used to send notifications, you MUST change your deployment
+as there now is an additional service that needs to run in order to handle the
+notifications on the queue.
+
+There is a new management command `db_worker` used to proceess the queue. In
+order to send out notifications, this command needs to run supervised by
+something. The included docker-compose for development already does this, but
+if using for instance Kubernetes it should run in its own pod, and if running
+on hardware it needs to be handled by for instance systemd, supervisor, nosh,
+s6 or daemontools. See the new production section of the documentation.
+
+If your argus sends no or very few notifications, it might be relevant to
+override the settings file to use
+`django_tasks.backends.immediate.ImmediateBackend`, see the site settings
+docs.
+
+### Themes and looks
+
+Tailwind has been upgraded to v4 and DaisyUI to v5. Check out the
+[DaisyUi 5 theme-generator](https://daisyui.com/theme-generator/)!
+
+- Custom themes defined in `DAISYUI_THEMES` must now use CSS variable syntax
+  with explicit `--color-` prefixes (e.g., `"--color-primary": "#006d91"`).
+- The `TAILWIND_THEME_OVERRIDE` setting has been removed. Use CSS `@theme`
+  blocks in a `themes/override.css` file instead.
+
+The Makefile has grown several new commands and the release checklist has been
+updated to take them into account.
+
+See the updated documentation for full details on theme customization.
+
+Tailwind CSS intermediate files (theme CSS, config snippets) are no longer
+tracked in git.
+
+- Local theme customizations via `DAISYUI_THEMES` will no longer dirty the
+  working tree.
+- Use `make tailwind-config tailwind` (needs virtualenv) after changing themes
+  or settings.
+- Use `make setup-tailwind` (needs virtualenv) to bootstrap CSS from scratch
+  (fresh clone or CI).
+
+### Frontend, incident list filter box: templates refactored, looks updated
+
+The work that started in 2.7 continues. The filter box in its hidden state now
+takes up even less space than it used to, and when open it now takes up less
+height. The bulk action bar has been made more dynamic; it is easier to see
+which filter has been selected, and the Delete and Update buttons work on thge
+currently selected fiilter.
+
+If you do not use the filterbox but you do support bulk actions you might have
+to update your templates again.
+
+A reminder:
+
+The template `_incident_list_menubar.html` is deprecated; override
+`_incident_toolbar.html` or `_filter_controls.html` instead.
+
+### All notification plugins now supports "managed" mode
+
+A "managed" destination is not managed by an end-user but fetched/generated
+from somewhere else. Such a destination cannot be deleted.
+
+It used to be only the bundled email media plugin had this functionality, we've
+moved it to the base class and renamed it from "synced" to "managed". This is
+most useful for phone numbers and email addresses.
+
+Media plugins will need to be updated if they override any of the methods
+`validate`, `raise_if_not_deletable` or `update`. Media plugins are now
+instantiated with what API version of the settings-field they should return,
+and for that reason `validate` has become an instance method as opposed to
+a classmethod. `raise_if_not_deletable` and `update` has grown in size on the
+base class and might not need to be overidden anymore.
+
+### More notifications will be generated and sent
+
+Notifications are now also sent on bulk changes to incidents. This means that
+by default there will be notifications if the API alters incidents in bulk, or
+an end user alters incidents in the frontend. This means more notifications,
+and it may mean *a lot more* notifications. One per changed incident.
+
+If you want the full fire hose of notifications site-wide you need do
+nothing.
+
+To maintain a lower amount of notifications it is necessary to alter the "Event
+types" filter to care only about source-initiated changes to the incident
+status.
+
+Note: It might not lower the amount all the way back to the levels before
+this bugfix, as it depends on whether any glue-services used the bulk API to
+alter multiple incidents at once. Previously, notifications for those changes
+would be suppressed.
+
+The easiest and fastest way to get back to lower levels of notifications is by
+changing the Django setting `ARGUS_FALLBACK_FILTER` to:
+
+```
+ARGUS_FALLBACK_FILTER = {"event_types": ["STA", "END"]}
+```
+
+This affects all existing and future notification filters, and can be
+overridden by end-users themselves.
+
+End-users themselves can get back the old, low amount of notifications via the
+frontend by creating a filter with "Event Types" set to both:
+
+- Incident start
+- Incident end
+
+… and adding that to their existing notification profiles. This will override
+what's set in `ARGUS_FALLBACK_FILTER`.
+
+A third option is adding a public filter "Source-initiated status changes" via
+admin and using the admin to add that filter to all notification profiles that
+don't explicitly set event types.
+
+`ARGUS_FALLBACK_FILTER` will not affect what's shown on the dashboard or
+filters used for planned maintenance.
+
 ## [2.7.0] - 2026-01-23
 
 ### Planned maintenance
@@ -49,8 +176,6 @@ A long-standing bug has been fixed that prevented the sending of notifications
 of events that happened if the start of the incident was not covered by
 a notification timeslot. This might mean more notifications! Please set the
 `event types` filter to only the types of events desired.
-
-## Unreleased
 
 ### Incident list filter UI refactoring
 
