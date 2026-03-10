@@ -11,7 +11,7 @@
            class="dropdown-content bg-base-100 rounded-box z-20 w-72 p-2 shadow-lg flex flex-col gap-1">
         {% for task in tasks %}
           <a href="{% url 'htmx:plannedmaintenance-detail' pk=task.pk %}"
-             class="flex flex-col gap-0.5 p-2 rounded-lg hover:bg-base-200 transition-colors">
+             class="flex flex-col gap-0.5 p-2 rounded-box hover:bg-base-200 transition-colors">
             <span class="font-medium truncate" title="{{ task.description }}">{{ task.description|default:"No description" }}</span>
             <div class="flex items-center justify-between gap-2 text-xs opacity-60">
               <span>{{ task.start_time|date:preferences.argus_htmx.date_format }}
