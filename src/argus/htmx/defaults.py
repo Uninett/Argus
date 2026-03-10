@@ -9,7 +9,6 @@ from argus.site.settings import get_json_env, get_str_env
 HTMX_PATH_DEFAULT = "htmx-2.0.2.min.js"
 HYPERSCRIPT_PATH_DEFAULT = "hyperscript-0.9.13.min.js"
 INCIDENT_TABLE_COLUMNS = [
-    "color_status",
     "row_select",
     "start_time",
     "combined_status",
