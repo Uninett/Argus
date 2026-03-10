@@ -26,16 +26,17 @@
   <li class="menu-title menu-divider" aria-hidden="true">
     <div class="divider divider-secondary my-0"></div>
   </li>
-  <li class="overflow-hidden">
-    <button class="text-xs tooltip grid! grid-cols-[1fr_auto] w-full gap-2"
+  <li aria-hidden="true" class="pointer-events-none h-0 p-0 m-0"></li>
+  <div class="text-xs grid grid-cols-[1fr_auto] gap-2 px-3 py-1.5">
+    <div class="space-y-2 text-left overflow-hidden select-text">
+      <span>Argus version:</span>
+      <span class="block truncate">{{ short_version }}</span>
+    </div>
+    <button class="btn btn-ghost btn-xs pointer-events-auto"
             aria-label="Copy Argus version to clipboard"
-            data-tip="Copy version to clipboard"
+            title="Copy version to clipboard"
             onclick="navigator.clipboard.writeText('{{ version }}')">
-      <div class="space-y-2 text-left overflow-hidden">
-        <span>Argus version:</span>
-        <span class="block truncate">{{ short_version }}</span>
-      </div>
       <i class="fa-solid fa-copy"></i>
     </button>
-  </li>
+  </div>
 </ul>
