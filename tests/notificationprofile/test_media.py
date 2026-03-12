@@ -33,7 +33,8 @@ class FindDestinationsTest(TestCase):
         self.extra_destination1 = factories.DestinationConfigFactory(
             user=self.user1,
             media=Media.objects.get(slug="email"),
-            settings={"email": "a@b.ca", "synced": False},
+            settings={"email": "a@b.ca"},
+            managed=False,
         )
 
         self.user2 = PersonUserFactory()
@@ -41,7 +42,8 @@ class FindDestinationsTest(TestCase):
         self.extra_destination2 = factories.DestinationConfigFactory(
             user=self.user2,
             media=Media.objects.get(slug="email"),
-            settings={"email": "b@c.de", "synced": False},
+            settings={"email": "b@c.de"},
+            managed=False,
         )
 
         # Create a filter that matches your test incident
