@@ -33,7 +33,10 @@ class StressTester:
         self.token = token
         self.timeout = timeout
         self.worker_count = worker_count
-        self._loop = asyncio.get_event_loop()
+        try:
+            self._loop = asyncio.get_running_loop()
+        except RuntimeError:
+            self._loop = asyncio.new_event_loop()
 
     def _get_incident_data(self) -> dict[str, Any]:
         return {
