@@ -126,7 +126,7 @@ pydantic==2.11.5
     # via argus-server (pyproject.toml)
 pydantic-core==2.33.2
     # via pydantic
-pyjwt==2.10.1
+pyjwt==2.12.0
     # via social-auth-core
 python-dataporten-auth==2.0.0
     # via argus-server (pyproject.toml)
