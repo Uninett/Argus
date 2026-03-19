@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 
 from .models import User, Preferences
+from argus.incident.models import SourceSystem
 from argus.notificationprofile.models import DestinationConfig
 
 
@@ -23,9 +24,35 @@ class PreferencesInline(admin.TabularInline):
     model = Preferences
 
 
+class SourceUserListFilter(admin.SimpleListFilter):
+    title = "is incident source"
+    parameter_name = "sourcesystem"
+
+    def lookups(self, request, model_admin):
+        return (
+            ("yes", "Yes"),
+            ("no", "No"),
+        )
+
+    def queryset(self, request, queryset):
+        ss = SourceSystem.objects.values_list("id", flat=True)
+        if self.value() == "yes":
+            return queryset.filter(id__in=ss)
+        elif self.value() == "no":
+            return queryset.exclude(id__in=ss)
+
+
 class UserAdmin(DjangoUserAdmin):
+    def sourcesystem__name(self, obj):
+        sourcesystem = getattr(obj, "sourcesystem", None)
+        if sourcesystem:
+            return sourcesystem.name
+        return None
+
     # inlines = [DestinationConfigInline]
+
     inlines = [PreferencesInline]
+    list_filter = DjangoUserAdmin.list_filter + (SourceUserListFilter,)
 
     def has_delete_permission(self, request, obj=None):
         if obj:
