@@ -341,8 +341,8 @@ class SMSDestinationSendTests(TestCase):
             media=Media.objects.get(slug="email"),
             settings={
                 "email_address": email_address,
-                "synced": False,
             },
+            managed=False,
         )
 
         phone_numbers = SMSNotification.get_relevant_addresses(
