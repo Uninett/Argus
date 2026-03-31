@@ -346,6 +346,25 @@ class EmailDestinationViewTests(APITestCase):
             new_settings["email_address"],
         )
 
+    def test_given_settings_to_update_managed_email_destination_then_it_should_update_and_create_copy_of_old_settings(
+        self,
+    ):
+        old_settings = self.managed_email_destination.settings.copy()
+        new_settings = {
+            "email_address": "test2@example.com",
+        }
+        response = self.user1_rest_client.patch(
+            path=f"{self.ENDPOINT}{self.managed_email_destination.pk}/",
+            data={"settings": new_settings},
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
+        self.managed_email_destination.refresh_from_db()
+        self.assertEqual(
+            self.managed_email_destination.settings["email_address"],
+            new_settings["email_address"],
+        )
+        self.assertTrue(DestinationConfig.objects.filter(managed=True, settings=old_settings).exists())
+
     def test_should_not_allow_updating_email_destination_with_duplicate_email_address(self):
         settings = {"email_address": "test2@example.com"}
         email_destination_pk = DestinationConfigFactory(
