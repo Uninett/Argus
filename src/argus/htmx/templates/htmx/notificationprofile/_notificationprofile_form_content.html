@@ -6,7 +6,9 @@
   {% csrf_token %}
   <div class="flex flex-col gap-4 w-full">
     <div class="flex gap-16 justify-between">
-      <div>{% include "htmx/forms/input_field.html" with label=form.name.label max_width="md" field=form.name %}</div>
+      <div>
+        {% include "htmx/forms/input_field.html" with label=form.name.label max_width="md" field=form.name maxlength=40 %}
+      </div>
       <div class="card-actions flex items-end gap-2 mb-2">
         <input type="submit" class="btn btn-primary btn-sm" value="Save">
         <button type="button"
