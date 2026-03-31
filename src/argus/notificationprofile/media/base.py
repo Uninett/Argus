@@ -136,23 +136,37 @@ class NotificationMedium(ABC):
     def update(destination: DestinationConfig, validated_data: dict) -> DestinationConfig | NoneType:
         """Updates a destination
 
-        If the destination is marked as managed, a copy of the original will be
-        made before changing the destination.
+        If the destination is marked as managed and the settings are being updated,
+        a copy of the original will be made before changing the destination.
         """
+        if "label" in validated_data and "settings" not in validated_data:
+            destination.label = validated_data.get("label")
+            destination.save()
+            return destination
+
+        original_destination = {}
         if destination.managed:
-            # clone the mananged destination so that it doesn't need to be resynced
-            managed_destination = DestinationConfig(
-                user=destination.user,
-                media_id=destination.media_id,
+            # copy the managed destination to create a clone after the changes are
+            # applied to the original destination
+            # this needs to be done this way due to the 'unique_destination_per_user'
+            # constraint on destinations
+            original_destination = {
+                "user": destination.user,
+                "media_id": destination.media_id,
                 # don't create a label in order to avoid duplicate label
-                settings=destination.settings,
-                managed=True,
-            )
-            managed_destination.save()
+                "settings": destination.settings,
+                "managed": True,
+            }
 
         # update destination with known id instead of returning a new one
         destination.label = validated_data.get("label", destination.label)
         destination.settings = validated_data.get("settings", destination.settings)
         destination.managed = False
         destination.save()
+
+        if original_destination:
+            # finally clone the original destination
+            managed_destination = DestinationConfig(**original_destination)
+            managed_destination.save()
+
         return destination
