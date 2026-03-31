@@ -22,7 +22,7 @@
         <div class="flex gap-16 justify-between">
           <div>
             {% with form.name as field %}
-              {% include "htmx/forms/input_field.html" with label=field.label max_width="md" field=field %}
+              {% include "htmx/forms/input_field.html" with label=field.label max_width="md" field=field maxlength=40 %}
             {% endwith %}
           </div>
           <div class="card-actions flex items-end gap-2 mb-2">
