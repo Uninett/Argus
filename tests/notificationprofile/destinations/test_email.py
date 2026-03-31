@@ -346,6 +346,19 @@ class EmailDestinationViewTests(APITestCase):
             new_settings["email_address"],
         )
 
+    def test_given_label_to_update_managed_email_destination_then_it_should_update(self):
+        data = {"label": "new_label"}
+        response = self.user1_rest_client.patch(
+            path=f"{self.ENDPOINT}{self.managed_email_destination.pk}/",
+            data=data,
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
+        self.managed_email_destination.refresh_from_db()
+        self.assertEqual(
+            self.managed_email_destination.label,
+            data["label"],
+        )
+
     def test_given_settings_to_update_managed_email_destination_then_it_should_update_and_create_copy_of_old_settings(
         self,
     ):

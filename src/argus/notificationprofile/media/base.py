@@ -136,9 +136,14 @@ class NotificationMedium(ABC):
     def update(destination: DestinationConfig, validated_data: dict) -> DestinationConfig | NoneType:
         """Updates a destination
 
-        If the destination is marked as managed, a copy of the original will be
-        made before changing the destination.
+        If the destination is marked as managed and the settings are being updated,
+        a copy of the original will be made before changing the destination.
         """
+        if "label" in validated_data and "settings" not in validated_data:
+            destination.label = validated_data.get("label")
+            destination.save()
+            return destination
+
         original_destination = {}
         if destination.managed:
             # copy the managed destination to create a clone after the changes are
