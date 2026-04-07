@@ -7,9 +7,9 @@ django-admin migrate --noinput
 set +x
 if [ -n "$ADMIN_USERNAME" ] && [ -n "$ADMIN_PASSWORD" ]; then
      if [ -n "$ADMIN_EMAIL" ]; then
-         python3 manage.py initial_setup -u $ADMIN_USERNAME -p $ADMIN_PASSWORD -e $ADMIN_EMAIL
+          django-admin initial_setup -u $ADMIN_USERNAME -p $ADMIN_PASSWORD -e $ADMIN_EMAIL
      else
-          python3 manage.py initial_setup -u $ADMIN_USERNAME -p $ADMIN_PASSWORD
+          django-admin initial_setup -u $ADMIN_USERNAME -p $ADMIN_PASSWORD
      fi
 fi
 set -x
