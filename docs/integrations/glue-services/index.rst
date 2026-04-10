@@ -75,10 +75,10 @@ Alertmanager (Prometheus)
 | Home: https://prometheus.io/docs/alerting/latest/alertmanager/
 | Source: https://github.com/REANNZ/prometheus-argus-glue
 
-Made by`REANNZ <https://www.reannz.co.nz/>`_.
+Made by `REANNZ <https://www.reannz.co.nz/>`_.
 
 ``prometheus-argus-glue`` is a webhook the alertmanager talks to. In addition
-there is a sync script ``argys-sync`` that cleans up alerts that have been
+there is a sync script ``argus-sync`` that cleans up alerts that have been
 silenced in alertmanager.
 
 NAGIOS
