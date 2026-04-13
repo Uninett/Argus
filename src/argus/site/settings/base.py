@@ -146,15 +146,10 @@ AUTH_USER_MODEL = "argus_auth.User"
 
 LANGUAGE_CODE = "en-us"
 
-# Date formatting
-DATE_FORMAT = "Y-m-d"
-TIME_FORMAT = "H:i:s"
+# Date formatting: locale-specific formats are defined in the format module
+# below, overriding Django's default locale formats with ISO-style dates.
+FORMAT_MODULE_PATH = ["argus.site.formats"]
 SHORT_TIME_FORMAT = "H:i"  # Not a Django setting
-DATETIME_FORMAT = f"{DATE_FORMAT} {TIME_FORMAT}"
-SHORT_DATETIME_FORMAT = f"{DATE_FORMAT} {SHORT_TIME_FORMAT}"
-
-# Disable localized date and time formatting, due to the custom settings above
-USE_L10N = False
 
 USE_I18N = True
 
