@@ -40,7 +40,7 @@ class DateTimeInfinityField(models.DateTimeField):
 
     @staticmethod
     def is_postgres(connection):
-        return connection.settings_dict["ENGINE"].startswith("django.db.backends.postgresql")
+        return connection.vendor == "postgresql"
 
 
 class SplitDateTimeInfinityField(forms.SplitDateTimeField):
