@@ -390,6 +390,12 @@ Special environment settings
   processors list in the ``django.template.backends.django.DjangoTemplates``
   template backend.
 
+* The banner can be customized per theme by setting CSS variables in a theme
+  definition: ``--color-banner`` (border/background accent),
+  ``--color-banner-content`` (text), and ``--banner-bg-opacity`` (background
+  opacity as a percentage, default ``25%``). See :ref:`themes-and-styling` for
+  how to customize themes.
+
 Debugging settings
 ------------------
 

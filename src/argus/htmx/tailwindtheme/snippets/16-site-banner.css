@@ -1,0 +1,21 @@
+@layer base {
+  :root {
+    --color-banner: #75C7F0;
+    --color-banner-content: var(--color-base-content);
+    --banner-bg-opacity: 25%;
+  }
+}
+.site-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.375rem 1rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 600;
+  border: 1.5px solid var(--color-banner);
+  border-radius: var(--radius-box, 1rem);
+  background-color: color-mix(in srgb, var(--color-banner) var(--banner-bg-opacity), transparent);
+  color: var(--color-banner-content);
+}
