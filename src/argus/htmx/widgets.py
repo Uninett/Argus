@@ -1,3 +1,5 @@
+import json
+
 from django import forms
 
 
@@ -60,3 +62,29 @@ class SearchDropdownMultiSelect(DropdownMultiSelect):
 
 class BadgeDropdownMultiSelect(DropdownMultiSelect):
     template_name = "htmx/forms/badge_dropdown_select_multiple.html"
+
+
+class DropdownRadioSelect(forms.RadioSelect):
+    template_name = "htmx/forms/dropdown_radio_select.html"
+    option_template_name = "htmx/forms/radio_option.html"
+
+    def __init__(self, badge_classes=None, **kwargs):
+        super().__init__(**kwargs)
+        self.badge_classes = badge_classes or {}
+
+    def __deepcopy__(self, memo):
+        obj = super().__deepcopy__(memo)
+        obj.badge_classes = self.badge_classes.copy()
+        memo[id(self)] = obj
+        return obj
+
+    def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
+        option = super().create_option(name, value, label, selected, index, subindex, attrs)
+        option["badge_class"] = self.badge_classes.get(str(value), "")
+        return option
+
+    def get_context(self, name, value, attrs):
+        context = super().get_context(name, value, attrs)
+        context["widget"]["badge_classes"] = self.badge_classes
+        context["widget"]["badge_classes_json"] = json.dumps(self.badge_classes)
+        return context

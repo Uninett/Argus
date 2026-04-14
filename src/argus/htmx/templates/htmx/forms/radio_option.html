@@ -1,0 +1,14 @@
+<!-- htmx/forms/radio_option.html -->
+{% if widget.wrap_label %}
+  <label {% if widget.attrs.id %}for="{{ widget.attrs.id }}"{% endif %}
+         class="flex gap-2 items-center py-1.5 px-1 text-sm cursor-pointer">
+  {% endif %}
+  <input type="{{ widget.type }}"
+         name="{{ widget.name }}"
+         autocomplete="off"
+         {% if widget.value != None %} class="radio radio-xs radio-primary" value="{{ widget.value|stringformat:'s' }}"{% endif %}
+         {% include "django/forms/widgets/attrs.html" %}>
+  {% if widget.wrap_label %}
+    <span class="{{ widget.badge_class }}{% if widget.badge_class %} inline-block text-center min-w-12{% endif %}">{{ widget.label }}</span>
+  </label>
+{% endif %}
