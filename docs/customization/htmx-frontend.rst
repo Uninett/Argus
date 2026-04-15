@@ -38,6 +38,8 @@ You can merge your urlpatterns with the apps' urlpatterns via the
 ``argus.site.utils.get_urlpatterns`` function, see ``argus.htmx.urls`` for an
 example.
 
+.. _themes-and-styling:
+
 Themes and styling
 ==================
 
