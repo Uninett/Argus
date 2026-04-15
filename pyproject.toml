@@ -34,7 +34,7 @@ dependencies = [
     "drf-rw-serializers>=1.1",
     "drf-spectacular>=0.17",
     "factory_boy",
-    "psycopg2",
+    "psycopg[c]",
     "python-dataporten-auth",
     "social-auth-core>=4.1",
     "social-auth-app-django>=5.0",
