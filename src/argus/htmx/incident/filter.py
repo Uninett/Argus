@@ -2,6 +2,7 @@ import logging
 
 from django import forms
 from django.contrib import messages
+from django.http import QueryDict
 from django.urls import reverse
 from django.views.generic import ListView
 
@@ -31,12 +32,12 @@ class TagFieldMixin:
         Initializes the 'tags' field widget and choices as key=value strings, and dynamically adds submitted tags.
         """
         self.fields["tags"].widget.partial_get = reverse("htmx:search-tags")
-        query_dict = args[0] if args else None
-        if not query_dict:
+        data = args[0] if args else None
+        if not data:
             self.fields["tags"].choices = []
             return
 
-        tags = query_dict.get("tags", [])
+        tags = data.getlist("tags") if isinstance(data, QueryDict) else data.get("tags", [])
 
         choices = [(tag, tag) for tag in tags]
         self.fields["tags"].choices = choices
@@ -315,17 +316,13 @@ def _convert_filterblob(filterblob):
 
 
 def _normalize_form_data(request):
-    """Normalizes form data from request, especially the 'tags' parameter."""
+    """Normalizes form data from request, preserving the QueryDict."""
 
     raw_data = request.POST if request.method == "POST" else request.GET
-    data = dict(raw_data.items())
-    for key in raw_data:
-        value = raw_data.getlist(key, [])
-        if key == "tags":
-            value = _normalize_tags_param(value)
-        elif key not in ["source_types", "sourceSystemIds", "event_types"]:
-            value = value[0]
-        data[key] = value
+    data = raw_data.copy()
+    if "tags" in data:
+        tags = _normalize_tags_param(data.getlist("tags"))
+        data.setlist("tags", tags)
     return data
 
 
