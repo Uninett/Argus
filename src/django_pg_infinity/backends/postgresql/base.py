@@ -6,7 +6,7 @@ from psycopg.abc import Loader
 from psycopg.postgres import types
 from psycopg.pq import Format
 
-from argus.util.datetime_utils import INFINITY, NEGATIVE_INFINITY
+from django_pg_infinity.utils import INFINITY, NEGATIVE_INFINITY
 
 
 # PostgreSQL type OIDs used to register custom loaders
@@ -21,7 +21,7 @@ NEGATIVE_INFINITY_TEXT = b"-infinity"
 INFINITY_BINARY = b"\x7f\xff\xff\xff\xff\xff\xff\xff"
 NEGATIVE_INFINITY_BINARY = b"\x80\x00\x00\x00\x00\x00\x00\x00"
 
-# UTC-aware sentinels for the loaders (must match the naive values in datetime_utils)
+# UTC-aware sentinels for the loaders (must match the naive values in utils)
 INFINITY_UTC = INFINITY.replace(tzinfo=timezone.utc)
 NEGATIVE_INFINITY_UTC = NEGATIVE_INFINITY.replace(tzinfo=timezone.utc)
 

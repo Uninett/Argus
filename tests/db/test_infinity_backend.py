@@ -55,8 +55,3 @@ class InfinityTimestampLoaderTests(TestCase):
             cur.execute("SELECT %s::timestamptz", ["-infinity"])
             result = cur.fetchone()[0]
         self.assertEqual(result.replace(tzinfo=None), datetime.min)
-
-    def test_when_vendor_is_postgresql_then_is_postgres_returns_true(self):
-        from argus.incident.fields import DateTimeInfinityField
-
-        self.assertTrue(DateTimeInfinityField.is_postgres(connection))

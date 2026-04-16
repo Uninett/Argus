@@ -118,7 +118,7 @@ WSGI_APPLICATION = "argus.site.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASE_ENGINE = "argus.db.backends.postgresql"
+DATABASE_ENGINE = "django_pg_infinity.backends.postgresql"
 
 # fmt: off
 DATABASE_URL = get_str_env("DATABASE_URL")
