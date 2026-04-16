@@ -2,7 +2,6 @@ import logging
 
 from django import forms
 from django.contrib import messages
-from django.http import QueryDict
 from django.urls import reverse
 from django.views.generic import ListView
 
@@ -26,24 +25,7 @@ class RangeInput(forms.NumberInput):
     template_name = "django/forms/widgets/range.html"
 
 
-class TagFieldMixin:
-    def _init_tag_field(self, *args, **kwargs):
-        """
-        Initializes the 'tags' field widget and choices as key=value strings, and dynamically adds submitted tags.
-        """
-        self.fields["tags"].widget.partial_get = reverse("htmx:search-tags")
-        data = args[0] if args else None
-        if not data:
-            self.fields["tags"].choices = []
-            return
-
-        tags = data.getlist("tags") if isinstance(data, QueryDict) else data.get("tags", [])
-
-        choices = [(tag, tag) for tag in tags]
-        self.fields["tags"].choices = choices
-
-
-class IncidentFilterForm(TagFieldMixin, forms.Form):
+class IncidentFilterForm(forms.Form):
     open = forms.IntegerField(
         widget=RangeInput(attrs={"step": "1", "min": min(OpenStatus).value, "max": max(OpenStatus).value}),
         label="Open State",
@@ -65,9 +47,10 @@ class IncidentFilterForm(TagFieldMixin, forms.Form):
         label="Source Types",
     )
     sourceSystemIds = forms.MultipleChoiceField(
-        widget=BadgeDropdownMultiSelect(
-            attrs={"placeholder": "select sources..."},
+        widget=SearchDropdownMultiSelect(
+            attrs={"placeholder": "search sources..."},
             partial_get=None,
+            extra={"preload": True, "display_name": "sources"},
         ),
         required=False,
         label="Sources",
@@ -113,9 +96,7 @@ class IncidentFilterForm(TagFieldMixin, forms.Form):
         # mollify tests
         partial_get = reverse("htmx:incident-filter")
 
-        self.fields["sourceSystemIds"].widget.partial_get = partial_get
-        source_choices = SourceSystem.objects.order_by("name").values_list("id", "name")
-        self.fields["sourceSystemIds"].choices = tuple(source_choices)
+        self._init_source_field()
         self._init_tag_field(*args, **kwargs)
 
         self.fields["source_types"].widget.partial_get = partial_get
@@ -125,6 +106,29 @@ class IncidentFilterForm(TagFieldMixin, forms.Form):
         self.fields["event_types"].widget.partial_get = partial_get
         event_type_choices = Event.Type.choices
         self.fields["event_types"].choices = event_type_choices
+
+    def _init_tag_field(self, *args, **kwargs):
+        """
+        Initializes the 'tags' field widget and choices as key=value strings, and dynamically adds submitted tags.
+        """
+        self.fields["tags"].widget.partial_get = reverse("htmx:search-tags")
+        query_dict = args[0] if args else None
+        if not query_dict:
+            self.fields["tags"].choices = []
+            return
+
+        tags = query_dict.get("tags", [])
+
+        choices = [(tag, tag) for tag in tags]
+        self.fields["tags"].choices = choices
+
+    def _init_source_field(self):
+        """
+        Initializes the 'sourceSystemIds' field widget for type-ahead search,
+        pre-loading all sources for client-side filtering.
+        """
+        source_choices = SourceSystem.objects.order_by("name").values_list("id", "name")
+        self.fields["sourceSystemIds"].choices = tuple(source_choices)
 
     def clean_tags(self):
         tags = self.cleaned_data["tags"]

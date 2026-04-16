@@ -6,9 +6,10 @@
         multiple="true">
   {% for _, options, _ in widget.optgroups %}
     {% for option in options %}
-      {% if option.selected %}
+      {% if option.selected or widget.extra.preload %}
         {% block show_selected %}
-          <option value="{{ option.value }}" selected="selected">{{ option.label }}</option>
+          <option value="{{ option.value }}"
+                  {% if option.selected %}selected="selected"{% endif %}>{{ option.label }}</option>
         {% endblock show_selected %}
       {% endif %}
     {% endfor %}
@@ -17,8 +18,9 @@
 <script>
 (function () {
     const selectId = '#id_{{ widget.name }}';
-    const parameterName = '{{ widget.name }}';
+    const parameterName = '{% if widget.extra.display_name %}{{ widget.extra.display_name }}{% else %}{{ widget.name }}{% endif %}';
     const searchUrl = '{{ widget.partial_get }}';
+    const preload = {{ widget.extra.preload|yesno:"true,false" }};
 
     const choices = new Choices(selectId, {
         removeItemButton: true,
@@ -26,12 +28,16 @@
         duplicateItemsAllowed: false,
         shouldSort: false,
         searchEnabled: true,
-        searchChoices: false,
+        searchChoices: preload,
         loadingText: 'Loading...',
         noResultsText: `No ${parameterName} found`,
         noChoicesText: `No ${parameterName} to choose from`,
         itemSelectText: '',
-        searchFloor: 2,
+        searchFloor: preload ? 1 : 2,
+        fuseOptions: {
+            threshold: 0.4,
+            ignoreLocation: true,
+        },
         removeItemIconText: () => '',
         classNames: {
             containerOuter: ['choices', 'dropdown', 'max-w-sm', 'self-center'],
@@ -40,6 +46,8 @@
             listItems: ['choices-list-items'],
         }
     });
+
+    if (preload) return;
 
     const choicesElement = choices.passedElement.element;
 
