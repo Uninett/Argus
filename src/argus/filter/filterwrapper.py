@@ -18,6 +18,7 @@ __all__ = [
     "FilterWrapper",
     "FallbackFilterWrapper",
     "PrecisionFilterWrapper",
+    "SpecialFilterKey",
 ]
 
 
@@ -39,11 +40,16 @@ class FilterKey(StrEnum):
     MAXLEVEL = "maxlevel"
 
 
+class SpecialFilterKey(StrEnum):
+    HIDE_CLOSED_ACKED = "hide_closed_acked"
+
+
 class FilterWrapper:
     TRINARY_FILTERS = (FilterKey.OPEN, FilterKey.ACKED, FilterKey.STATEFUL)
     LIST_FILTERS = (FilterKey.SOURCE_SYSTEM_IDS, FilterKey.SOURCE_SYSTEM_TYPES, FilterKey.TAGS, FilterKey.EVENT_TYPES)
     INT_FILTERS = (FilterKey.MAXLEVEL,)
-    FILTER_KEYS = TRINARY_FILTERS + LIST_FILTERS + INT_FILTERS
+    PRIMARY_FILTER_KEYS = TRINARY_FILTERS + LIST_FILTERS + INT_FILTERS
+    FILTER_KEYS = PRIMARY_FILTER_KEYS + tuple(SpecialFilterKey)
 
     def __init__(self, filterblob: FilterBlobType):
         self.filter = filterblob.copy()
@@ -95,6 +101,22 @@ class FilterWrapper:
         incident_tristate = getattr(incident, tristate, None)
         return incident_tristate is filter_
 
+    def _incident_fits_special_filters(self, incident: Incident) -> TriState:
+        """Check compound/special filters against an incident.
+
+        Returns False if any active special filter excludes this incident,
+        None if no special filters are active.
+        """
+        results = []
+
+        if self.filter.get(SpecialFilterKey.HIDE_CLOSED_ACKED, False):
+            fits = incident.open or not incident.acked
+            results.append(fits)
+
+        if not results:
+            return None
+        return all(results)
+
     # public
 
     def event_fits(self, event) -> bool:
@@ -113,6 +135,7 @@ class FilterWrapper:
         checks["max_level"] = self._incident_fits_maxlevel(incident)
         for tristate in self.TRINARY_FILTERS:
             checks[tristate.value] = self._incident_fits_tristate(incident, tristate)
+        checks["special_filters"] = self._incident_fits_special_filters(incident)
 
         any_failed = False in checks.values()
         if any_failed:

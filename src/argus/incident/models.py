@@ -305,6 +305,17 @@ class IncidentQuerySet(models.QuerySet):
     def not_acked(self):
         return self.exclude(id__in=self._get_acked_incident_ids())
 
+    def open_or_unacked(self):
+        """Exclude incidents that are both closed and acked.
+
+        Shows all open incidents regardless of ack status, and all closed
+        incidents that are still unacked.
+        """
+        return self.exclude(
+            end_time__lte=timezone.now(),
+            id__in=self._get_acked_incident_ids(),
+        )
+
     def has_ticket(self):
         return self.exclude(ticket_url="")
 

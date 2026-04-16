@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from argus.filter.filterwrapper import FilterWrapper, FilterBlobType
+from argus.filter.filterwrapper import FilterWrapper, FilterBlobType, SpecialFilterKey
 from argus.incident.models import Incident
 
 if TYPE_CHECKING:
@@ -55,6 +55,12 @@ def _incidents_fitting_tristates(incident_queryset, filterblob: FilterBlobType):
     return fitting_incidents.distinct()
 
 
+def _incidents_fitting_special_filters(incident_queryset, filterblob: FilterBlobType):
+    if filterblob.get(SpecialFilterKey.HIDE_CLOSED_ACKED, False):
+        incident_queryset = incident_queryset.open_or_unacked()
+    return incident_queryset.distinct()
+
+
 def _incidents_fitting_maxlevel(incident_queryset, filterblob: FilterBlobType):
     maxlevel = filterblob.get("maxlevel", None)
     if not maxlevel:
@@ -85,6 +91,7 @@ class QuerySetFilter:
         filtered_by_tristates = _incidents_fitting_tristates(incident_queryset, filterblob)
         filtered_by_maxlevel = _incidents_fitting_maxlevel(incident_queryset, filterblob)
         filtered_by_event_types = _incidents_fitting_event_types(incident_queryset, filterblob)
+        filtered_by_special = _incidents_fitting_special_filters(incident_queryset, filterblob)
 
         return (
             filtered_by_source_type
@@ -93,6 +100,7 @@ class QuerySetFilter:
             & filtered_by_tristates
             & filtered_by_maxlevel
             & filtered_by_event_types
+            & filtered_by_special
         )
 
     @classmethod

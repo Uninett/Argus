@@ -20,7 +20,9 @@
       {% for field in filter_form %}
         {% if not field.field.in_header %}
           <li class="form-control">
-            {% if "dropdownmultiselect" in field|widget_type or "dropdownradioselect" in field|widget_type %}
+            {% if field.name == "special_filters" %}
+              {{ field }}
+            {% elif "dropdownmultiselect" in field|widget_type or "dropdownradioselect" in field|widget_type %}
               <div class="flex flex-nowrap">
                 <label class="label">
                   <span class="label-text">{{ field.label }}</span>
