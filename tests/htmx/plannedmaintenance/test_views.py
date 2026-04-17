@@ -263,71 +263,83 @@ class PlannedMaintenanceCancelViewTests(TestCase):
 @tag("integration")
 class SearchFiltersViewTests(TestCase):
     def setUp(self):
-        self.user = PersonUserFactory(username="felaali", first_name="Ferrari", last_name="Testarossa")
-        self.other_user = PersonUserFactory(username="lambo", first_name="Lamborghini", last_name="Countach")
+        self.user = PersonUserFactory()
+        self.staff_user = AdminUserFactory(username="felaali", first_name="Ferrari", last_name="Testarossa")
+        self.other_staff_user = AdminUserFactory(username="lambo", first_name="Lamborghini", last_name="Countach")
 
-        self.user_filter = FilterFactory(user=self.user, name="My Filter")
-        self.other_filter = FilterFactory(user=self.other_user, name="Other Filter")
+        self.staff_filter = FilterFactory(user=self.staff_user, name="My Filter")
+        self.other_staff_filter = FilterFactory(user=self.other_staff_user, name="Other Filter")
 
     def test_search_filters_requires_login(self):
         response = self.client.get(reverse("htmx:search-filters"))
         self.assertEqual(response.status_code, 302)
 
-    def test_search_filters_returns_json(self):
+    def test_search_filters_when_not_staff_then_forbidden(self):
         self.client.force_login(self.user)
+        response = self.client.get(reverse("htmx:search-filters"))
+        self.assertEqual(response.status_code, 403)
+
+    def test_search_filters_it_should_return_json(self):
+        self.client.force_login(self.staff_user)
         response = self.client.get(reverse("htmx:search-filters"))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["Content-Type"], "application/json")
 
     def test_search_filters_returns_all_filters_without_query(self):
-        self.client.force_login(self.user)
+        self.client.force_login(self.staff_user)
         response = self.client.get(reverse("htmx:search-filters"))
         data = response.json()
         self.assertEqual(len(data["results"]), 2)
 
     def test_search_filters_filters_by_name(self):
-        self.client.force_login(self.user)
+        self.client.force_login(self.staff_user)
         response = self.client.get(reverse("htmx:search-filters"), {"q": "My"})
         data = response.json()
         self.assertEqual(len(data["results"]), 1)
-        self.assertEqual(data["results"][0]["id"], self.user_filter.pk)
+        self.assertEqual(data["results"][0]["id"], self.staff_filter.pk)
 
     def test_search_filters_filters_by_username(self):
-        self.client.force_login(self.user)
-        response = self.client.get(reverse("htmx:search-filters"), {"q": self.other_user.username})
+        self.client.force_login(self.staff_user)
+        response = self.client.get(reverse("htmx:search-filters"), {"q": self.other_staff_user.username})
         data = response.json()
         self.assertEqual(len(data["results"]), 1)
-        self.assertEqual(data["results"][0]["id"], self.other_filter.pk)
+        self.assertEqual(data["results"][0]["id"], self.other_staff_filter.pk)
 
     def test_search_filters_sorts_current_user_filters_first(self):
-        self.client.force_login(self.user)
+        self.client.force_login(self.staff_user)
         response = self.client.get(reverse("htmx:search-filters"))
         data = response.json()
-        self.assertEqual(data["results"][0]["id"], self.user_filter.pk)
+        self.assertEqual(data["results"][0]["id"], self.staff_filter.pk)
 
 
 @tag("integration")
 class FilterPreviewViewTests(TestCase):
     def setUp(self):
         self.user = PersonUserFactory()
+        self.staff_user = AdminUserFactory()
 
     def test_filter_preview_requires_login(self):
         response = self.client.get(reverse("htmx:plannedmaintenance-filter-preview"))
         self.assertEqual(response.status_code, 302)
 
-    def test_filter_preview_without_filters_shows_no_filters(self):
+    def test_filter_preview_when_not_staff_then_forbidden(self):
         self.client.force_login(self.user)
+        response = self.client.get(reverse("htmx:plannedmaintenance-filter-preview"))
+        self.assertEqual(response.status_code, 403)
+
+    def test_filter_preview_when_no_filters_then_shows_no_filters(self):
+        self.client.force_login(self.staff_user)
         response = self.client.get(reverse("htmx:plannedmaintenance-filter-preview"))
         self.assertTrue(response.context["no_filters"])
 
     def test_filter_preview_with_filters_shows_counts(self):
-        self.client.force_login(self.user)
+        self.client.force_login(self.staff_user)
         # Create an open incident
         incident = StatefulIncidentFactory()
 
         # Create a filter that matches by source
         filter_with_match = FilterFactory(
-            user=self.user,
+            user=self.staff_user,
             filter={"sourceSystemIds": [incident.source.pk]},
         )
 
@@ -342,13 +354,13 @@ class FilterPreviewViewTests(TestCase):
         self.assertEqual(response.context["matching_count"], 1)
 
     def test_filter_preview_with_no_matching_incidents(self):
-        self.client.force_login(self.user)
+        self.client.force_login(self.staff_user)
         # Create an open incident
         StatefulIncidentFactory()
 
         # Create a filter that matches nothing (non-existent source ID)
         filter_no_match = FilterFactory(
-            user=self.user,
+            user=self.staff_user,
             filter={"sourceSystemIds": [99999]},
         )
 
@@ -360,9 +372,9 @@ class FilterPreviewViewTests(TestCase):
         self.assertEqual(response.context["matching_count"], 0)
 
     def test_filter_preview_with_no_open_incidents(self):
-        self.client.force_login(self.user)
+        self.client.force_login(self.staff_user)
         # Don't create any incidents - should return early
-        filter_obj = FilterFactory(user=self.user)
+        filter_obj = FilterFactory(user=self.staff_user)
 
         response = self.client.get(
             reverse("htmx:plannedmaintenance-filter-preview"),
@@ -372,18 +384,18 @@ class FilterPreviewViewTests(TestCase):
         self.assertTrue(response.context["no_open_incidents"])
 
     def test_filter_preview_intersects_multiple_filters(self):
-        self.client.force_login(self.user)
+        self.client.force_login(self.staff_user)
         # Create two incidents with different sources
         incident1 = StatefulIncidentFactory()
         StatefulIncidentFactory()
 
         # Create two filters: one matching incident1's source, one matching a non-existent source
         filter1 = FilterFactory(
-            user=self.user,
+            user=self.staff_user,
             filter={"sourceSystemIds": [incident1.source.pk]},
         )
         filter2 = FilterFactory(
-            user=self.user,
+            user=self.staff_user,
             filter={"sourceSystemIds": [99999]},
         )
 
@@ -396,14 +408,14 @@ class FilterPreviewViewTests(TestCase):
         self.assertEqual(response.context["matching_count"], 0)
 
     def test_filter_preview_limits_incident_list(self):
-        self.client.force_login(self.user)
+        self.client.force_login(self.staff_user)
         source = SourceSystemFactory()
         # Create more incidents than the limit
         for _ in range(FILTER_PREVIEW_LIMIT + 1):
             StatefulIncidentFactory(source=source)
 
         filter_obj = FilterFactory(
-            user=self.user,
+            user=self.staff_user,
             filter={"sourceSystemIds": [source.pk]},
         )
 
