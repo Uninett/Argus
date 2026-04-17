@@ -316,6 +316,15 @@ class IncidentQuerySet(models.QuerySet):
             id__in=self._get_acked_incident_ids(),
         )
 
+    def under_maintenance(self):
+        """Return incidents with at least one currently active maintenance task."""
+        from argus.plannedmaintenance.models import PlannedMaintenanceTask
+
+        active_task_incident_ids = (
+            PlannedMaintenanceTask.objects.current().values_list("incidents", flat=True).distinct()
+        )
+        return self.filter(id__in=active_task_incident_ids)
+
     def has_ticket(self):
         return self.exclude(ticket_url="")
 

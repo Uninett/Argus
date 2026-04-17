@@ -58,6 +58,8 @@ def _incidents_fitting_tristates(incident_queryset, filterblob: FilterBlobType):
 def _incidents_fitting_special_filters(incident_queryset, filterblob: FilterBlobType):
     if filterblob.get(SpecialFilterKey.HIDE_CLOSED_ACKED, False):
         incident_queryset = incident_queryset.open_or_unacked()
+    if filterblob.get(SpecialFilterKey.UNDER_MAINTENANCE, False):
+        incident_queryset = incident_queryset.under_maintenance()
     return incident_queryset.distinct()
 
 

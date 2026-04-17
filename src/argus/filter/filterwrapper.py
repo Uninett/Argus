@@ -42,6 +42,7 @@ class FilterKey(StrEnum):
 
 class SpecialFilterKey(StrEnum):
     HIDE_CLOSED_ACKED = "hide_closed_acked"
+    UNDER_MAINTENANCE = "under_maintenance"
 
 
 class FilterWrapper:
@@ -111,6 +112,10 @@ class FilterWrapper:
 
         if self.filter.get(SpecialFilterKey.HIDE_CLOSED_ACKED, False):
             fits = incident.open or not incident.acked
+            results.append(fits)
+
+        if self.filter.get(SpecialFilterKey.UNDER_MAINTENANCE, False):
+            fits = incident.planned_maintenance_tasks.current().exists()
             results.append(fits)
 
         if not results:
