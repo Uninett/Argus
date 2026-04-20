@@ -1,5 +1,5 @@
 @plugin "daisyui/theme" {
-  name: "sikt";
+  name: "light";
   color-scheme: "light";
   --color-primary: #7351FB; /* interaction.primary: purple.65-100 */
   --color-primary-content: #FFFFFF; /* neutral.100-100 */
@@ -24,7 +24,7 @@
 }
 
 /* Severity colors from Sikt datavisualization category tokens */
-[data-theme="sikt"] {
+[data-theme="light"] {
   --color-severity-primary-1: #FF957A;
   --color-severity-primary-2: #FFAC70;
   --color-severity-primary-3: #FBE774;
