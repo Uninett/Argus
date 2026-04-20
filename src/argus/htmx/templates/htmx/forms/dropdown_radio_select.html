@@ -1,0 +1,36 @@
+<!-- htmx/forms/dropdown_radio_select.html -->
+{% spaceless %}
+  <div class="dropdown dropdown-bottom"
+       id="dropdown-{{ widget.attrs.id }}"
+       data-badge-classes='{{ widget.badge_classes_json }}'
+       onchange=" const radio = event.target; if (radio?.type === 'radio') { const label = this.querySelector('.selected-label'); const badgeClasses = JSON.parse(this.dataset.badgeClasses); label.textContent = radio.parentElement.textContent.trim(); label.className = 'selected-label flex items-center gap-1 font-medium ' + (badgeClasses[radio.value] || ''); document.activeElement.blur(); } ">
+    <button type="button"
+            tabindex="0"
+            class="show-selected-box input input-primary h-auto min-h-8 px-2 cursor-pointer flex items-center justify-between gap-1">
+      {% for _, options, _ in widget.optgroups %}
+        {% for option in options %}
+          {% if option.selected %}
+            {% with val=option.value|stringformat:'s' %}
+              <span class="selected-label flex items-center gap-1 font-medium{% for bk, bv in widget.badge_classes.items %}{% if bk == val %} {{ bv }}{% endif %}{% endfor %}">{{ option.label }}</span>
+            {% endwith %}
+          {% endif %}
+        {% endfor %}
+      {% endfor %}
+      <svg class="h-4 w-4 shrink-0 opacity-50 transition-transform duration-200 [:focus-within>&]:rotate-180"
+           xmlns="http://www.w3.org/2000/svg"
+           viewBox="0 0 24 24"
+           fill="none"
+           stroke="currentColor"
+           stroke-width="2"
+           stroke-linecap="round"
+           stroke-linejoin="round">
+        <path d="m6 9 6 6 6-6" />
+      </svg>
+    </button>
+    <div tabindex="0"
+         role="radiogroup"
+         class="dropdown-content bg-base-100 rounded-box z-1 min-w-fit w-full max-h-80 overflow-y-auto p-2 mt-0.5 shadow-sm">
+      {% include "django/forms/widgets/multiple_input.html" %}
+    </div>
+  </div>
+{% endspaceless %}

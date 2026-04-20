@@ -7,7 +7,7 @@ from django.views.generic import ListView
 
 from argus.auth.utils import get_preference, get_preference_obj
 from argus.filter import get_filter_backend
-from argus.htmx.widgets import BadgeDropdownMultiSelect, SearchDropdownMultiSelect
+from argus.htmx.widgets import BadgeDropdownMultiSelect, DropdownRadioSelect, SearchDropdownMultiSelect
 from argus.incident.constants import AckedStatus, Level, OpenStatus
 from argus.incident.models import Event, SourceSystem, SourceSystemType, Tag
 from argus.notificationprofile.models import Filter
@@ -26,15 +26,47 @@ class RangeInput(forms.NumberInput):
 
 
 class IncidentFilterForm(forms.Form):
-    open = forms.IntegerField(
-        widget=RangeInput(attrs={"step": "1", "min": min(OpenStatus).value, "max": max(OpenStatus).value}),
-        label="Open State",
+    OPEN_CHOICES = [
+        (OpenStatus.BOTH, "Any"),
+        (OpenStatus.OPEN, "Open"),
+        (OpenStatus.CLOSED, "Closed"),
+    ]
+    ACKED_CHOICES = [
+        (AckedStatus.BOTH, "Any"),
+        (AckedStatus.ACKED, "Yes"),
+        (AckedStatus.UNACKED, "No"),
+    ]
+
+    BADGE_NEUTRAL = "text-base-content/70 bg-base-content/15 rounded px-2 py-0.5"
+    BADGE_SUCCESS = "text-success bg-success/20 rounded px-2 py-0.5"
+    BADGE_ERROR = "text-error bg-error/20 rounded px-2 py-0.5"
+    BADGE_WARNING = "text-warning bg-warning/20 rounded px-2 py-0.5"
+
+    open = forms.TypedChoiceField(
+        coerce=int,
+        choices=OPEN_CHOICES,
+        widget=DropdownRadioSelect(
+            badge_classes={
+                str(OpenStatus.BOTH): BADGE_NEUTRAL,
+                str(OpenStatus.OPEN): BADGE_ERROR,
+                str(OpenStatus.CLOSED): BADGE_SUCCESS,
+            }
+        ),
+        label="State",
         initial=OpenStatus.BOTH.value,
         required=False,
     )
-    acked = forms.IntegerField(
-        widget=RangeInput(attrs={"step": "1", "min": min(AckedStatus).value, "max": max(AckedStatus).value}),
-        label="Acked",
+    acked = forms.TypedChoiceField(
+        coerce=int,
+        choices=ACKED_CHOICES,
+        widget=DropdownRadioSelect(
+            badge_classes={
+                str(AckedStatus.BOTH): BADGE_NEUTRAL,
+                str(AckedStatus.ACKED): BADGE_SUCCESS,
+                str(AckedStatus.UNACKED): BADGE_WARNING,
+            }
+        ),
+        label="Acknowledged",
         initial=AckedStatus.BOTH.value,
         required=False,
     )
@@ -107,6 +139,14 @@ class IncidentFilterForm(forms.Form):
         event_type_choices = Event.Type.choices
         self.fields["event_types"].choices = event_type_choices
 
+    def _init_source_field(self):
+        """
+        Initializes the 'sourceSystemIds' field widget for type-ahead search,
+        pre-loading all sources for client-side filtering.
+        """
+        source_choices = SourceSystem.objects.order_by("name").values_list("id", "name")
+        self.fields["sourceSystemIds"].choices = tuple(source_choices)
+
     def _init_tag_field(self, *args, **kwargs):
         """
         Initializes the 'tags' field widget and choices as key=value strings, and dynamically adds submitted tags.
@@ -121,14 +161,6 @@ class IncidentFilterForm(forms.Form):
 
         choices = [(tag, tag) for tag in tags]
         self.fields["tags"].choices = choices
-
-    def _init_source_field(self):
-        """
-        Initializes the 'sourceSystemIds' field widget for type-ahead search,
-        pre-loading all sources for client-side filtering.
-        """
-        source_choices = SourceSystem.objects.order_by("name").values_list("id", "name")
-        self.fields["sourceSystemIds"].choices = tuple(source_choices)
 
     def clean_tags(self):
         tags = self.cleaned_data["tags"]
