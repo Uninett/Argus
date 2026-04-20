@@ -7,7 +7,7 @@
   --color-secondary-content: #FFFFFF; /* neutral.100-100 */
   --color-accent: #D1CDFF; /* purple.90-100 */
   --color-accent-content: #0A0132; /* purple.10-100 */
-  --color-neutral: #595959; /* neutral.35-100 */
+  --color-neutral: #2b3440; /* override: Sikt neutral.35-100 is too light for navbar */
   --color-neutral-content: #FFFFFF; /* neutral.100-100 */
   --color-base-100: #FFFFFF; /* neutral.100-100 */
   --color-base-200: #F1F1F1; /* neutral.95-100 */
