@@ -1,29 +1,43 @@
 <!-- htmx/forms/dropdown_select_multiple.html -->
-<div class="dropdown dropdown-bottom"
+<div class="dropdown dropdown-bottom max-w-sm"
      {% block field_control %}
      id="dropdown-{{ widget.attrs.id }}"
-     hx-trigger="change from:(find #{{ widget.attrs.id }})"
+     hx-trigger="change from:(find .dropdown-content)"
      hx-swap="outerHTML"
      hx-target="find .show-selected-box"
      hx-select="#dropdown-{{ widget.attrs.id }} .show-selected-box"
      hx-get="{{ widget.partial_get }}"
      hx-include="find .dropdown-content"
+     hx-on::before-request="this.classList.add('dropdown-open')"
+     hx-on::after-settle="this.classList.remove('dropdown-open')"
      {% endblock field_control %}>
   <div tabindex="0"
        role="button"
-       class="show-selected-box {{ widget.attrs.field_styles|default:"input input-primary h-auto" }} overflow-y-auto min-h-8 max-h-16 min-w-48 w-full leading-tight flex flex-wrap items-center gap-1">
-    {% if not widget.has_selected %}<span class="text-base-content/50">{{ widget.attrs.placeholder }}</span>{% endif %}
-    {% for _, options, _ in widget.optgroups %}
-      {% for option in options %}
-        {% if option.selected %}
-          {% block show_selected %}
-            <span class="text-primary font-medium">
-              <em>{{ option.label }}</em>,
-            </span>
-          {% endblock show_selected %}
-        {% endif %}
-      {% endfor %}
-    {% endfor %}
+       class="show-selected-box {{ widget.attrs.field_styles|default:"input input-primary h-auto" }} min-h-8 min-w-48 w-full leading-tight flex items-center gap-1">
+    {% if not widget.has_selected %}
+      <span class="text-base-content/50">{{ widget.attrs.placeholder }}</span>
+    {% else %}
+      <span class="flex flex-wrap gap-1 flex-1 items-center overflow-y-auto max-h-14">
+        {% for _, options, _ in widget.optgroups %}
+          {% for option in options %}
+            {% if option.selected %}
+              {% block show_selected %}
+                <span class="text-primary font-medium">
+                  <em>{{ option.label }}</em>,
+                </span>
+              {% endblock show_selected %}
+            {% endif %}
+          {% endfor %}
+        {% endfor %}
+      </span>
+      <button type="button"
+              class="cursor-pointer opacity-50 hover:opacity-100 flex-shrink-0"
+              aria-label="Clear selection"
+              data-clear-field="{{ widget.name }}"
+              onmousedown="event.preventDefault()">
+        <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+      </button>
+    {% endif %}
   </div>
   <div tabindex="0"
        class="dropdown-content bg-base-100 rounded-box z-1 min-w-fit w-full max-h-80 overflow-y-auto p-2 mt-0.5 shadow-sm">
@@ -33,4 +47,14 @@
       {% include "django/forms/widgets/multiple_input.html" %}
     {% endblock field_template %}
   </div>
+  <script>
+  document.getElementById('dropdown-{{ widget.attrs.id }}').addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-clear-field]');
+    if (!btn) return;
+    const dropdown = btn.closest('.dropdown');
+    const name = btn.dataset.clearField;
+    dropdown.querySelectorAll(`input[name="${name}"]:checked`).forEach(i => i.checked = false);
+    dropdown.querySelector('.dropdown-content').dispatchEvent(new Event('change', {bubbles: true}));
+  });
+  </script>
 </div>

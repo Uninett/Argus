@@ -148,8 +148,8 @@ class IncidentFilterForm(forms.Form):
         # mollify tests
         partial_get = reverse("htmx:incident-filter")
 
-        self._init_source_field()
-        self._init_tag_field(*args, **kwargs)
+        self._init_source_field(partial_get)
+        self._init_tag_field(partial_get, *args, **kwargs)
 
         self.fields["source_types"].widget.partial_get = partial_get
         source_type_choices = SourceSystemType.objects.order_by("name").values_list("name", "name")
@@ -162,28 +162,33 @@ class IncidentFilterForm(forms.Form):
         self.fields["special_filters"].widget.partial_get = partial_get
         self.fields["special_filters"].choices = self.SPECIAL_FILTER_CHOICES
 
-    def _init_source_field(self):
-        """
-        Initializes the 'sourceSystemIds' field widget for type-ahead search,
-        pre-loading all sources for client-side filtering.
-        """
-        source_choices = SourceSystem.objects.order_by("name").values_list("id", "name")
-        self.fields["sourceSystemIds"].choices = tuple(source_choices)
-
-    def _init_tag_field(self, *args, **kwargs):
+    def _init_tag_field(self, partial_get, *args, **kwargs):
         """
         Initializes the 'tags' field widget and choices as key=value strings, and dynamically adds submitted tags.
         """
-        self.fields["tags"].widget.partial_get = reverse("htmx:search-tags")
+        self.fields["tags"].widget.partial_get = partial_get
+        self.fields["tags"].widget.extra["search_url"] = reverse("htmx:search-tags")
         query_dict = args[0] if args else None
         if not query_dict:
             self.fields["tags"].choices = []
             return
 
-        tags = query_dict.get("tags", [])
+        if hasattr(query_dict, "getlist"):
+            tags = query_dict.getlist("tags")
+        else:
+            tags = query_dict.get("tags", [])
 
         choices = [(tag, tag) for tag in tags]
         self.fields["tags"].choices = choices
+
+    def _init_source_field(self, partial_get):
+        """
+        Initializes the 'sourceSystemIds' field widget for type-ahead search,
+        pre-loading all sources for client-side filtering.
+        """
+        self.fields["sourceSystemIds"].widget.partial_get = partial_get
+        source_choices = SourceSystem.objects.order_by("name").values_list("id", "name")
+        self.fields["sourceSystemIds"].choices = tuple(source_choices)
 
     def clean_tags(self):
         tags = self.cleaned_data["tags"]
