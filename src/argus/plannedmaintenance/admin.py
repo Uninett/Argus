@@ -52,9 +52,11 @@ class PlannedMaintenanceTaskAdmin(admin.ModelAdmin):
         ),
         list_filter_factory(
             "current",
-            lambda qs, yes_filter: qs.current()
-            if yes_filter
-            else qs.filter(Q(start_time__gt=timezone.now()) | Q(end_time__lt=timezone.now())),
+            lambda qs, yes_filter: (
+                qs.current()
+                if yes_filter
+                else qs.filter(Q(start_time__gt=timezone.now()) | Q(end_time__lt=timezone.now()))
+            ),
         ),
     ]
 
