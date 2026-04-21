@@ -1,0 +1,20 @@
+<!-- htmx/forms/button_dropdown_select_multiple.html -->
+<div class="dropdown dropdown-bottom"
+     id="dropdown-{{ widget.attrs.id }}"
+     hx-trigger="change from:(find #{{ widget.attrs.id }})"
+     hx-swap="outerHTML"
+     hx-target="find .btn"
+     hx-select="#dropdown-{{ widget.attrs.id }} .btn"
+     hx-get="{{ widget.partial_get }}"
+     hx-include="find .dropdown-content"
+     hx-on::after-settle="if(typeof checkFilterDirty === 'function') requestAnimationFrame(checkFilterDirty)">
+  <button type="button" class="btn btn-ghost btn-xs">
+    {{ widget.attrs.placeholder }}
+    {% if widget.selected_count %}<span class="badge badge-primary badge-sm">{{ widget.selected_count }}</span>{% endif %}
+  </button>
+  <div tabindex="0"
+       class="dropdown-content bg-base-100 rounded-box z-1 w-max max-h-80 overflow-y-auto p-2 mt-0.5 shadow-sm">
+    <input type="hidden" name="{{ widget.name }}" value="">
+    {% include "django/forms/widgets/multiple_input.html" %}
+  </div>
+</div>

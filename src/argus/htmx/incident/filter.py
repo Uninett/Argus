@@ -7,7 +7,13 @@ from django.views.generic import ListView
 
 from argus.auth.utils import get_preference, get_preference_obj
 from argus.filter import get_filter_backend
-from argus.htmx.widgets import BadgeDropdownMultiSelect, DropdownRadioSelect, SearchDropdownMultiSelect
+from argus.filter.filterwrapper import SpecialFilterKey
+from argus.htmx.widgets import (
+    BadgeDropdownMultiSelect,
+    ButtonDropdownMultiSelect,
+    DropdownRadioSelect,
+    SearchDropdownMultiSelect,
+)
 from argus.incident.constants import AckedStatus, Level, OpenStatus
 from argus.incident.models import Event, SourceSystem, SourceSystemType, Tag
 from argus.notificationprofile.models import Filter
@@ -112,6 +118,19 @@ class IncidentFilterForm(forms.Form):
         required=False,
         label="Event Types",
     )
+    special_filters = forms.MultipleChoiceField(
+        widget=ButtonDropdownMultiSelect(
+            attrs={"placeholder": "Special filters"},
+            partial_get=None,
+        ),
+        required=False,
+        label="Special Filters",
+    )
+
+    SPECIAL_FILTER_CHOICES = [
+        (SpecialFilterKey.HIDE_CLOSED_ACKED.value, "Hide Closed & Acked"),
+        (SpecialFilterKey.UNDER_MAINTENANCE.value, "Under Maintenance"),
+    ]
 
     DEFAULT_VALUES = {
         "open": None,
@@ -121,6 +140,7 @@ class IncidentFilterForm(forms.Form):
         "tags": [],
         "maxlevel": max(Level).value,
         "event_types": [],
+        "special_filters": [],
     }
 
     def __init__(self, *args, **kwargs):
@@ -138,6 +158,9 @@ class IncidentFilterForm(forms.Form):
         self.fields["event_types"].widget.partial_get = partial_get
         event_type_choices = Event.Type.choices
         self.fields["event_types"].choices = event_type_choices
+
+        self.fields["special_filters"].widget.partial_get = partial_get
+        self.fields["special_filters"].choices = self.SPECIAL_FILTER_CHOICES
 
     def _init_source_field(self):
         """
@@ -228,6 +251,10 @@ class IncidentFilterForm(forms.Form):
         if event_types:
             filterblob["event_types"] = event_types
 
+        special_filters = self.cleaned_data.get("special_filters", [])
+        for key in special_filters:
+            filterblob[key] = True
+
         return filterblob
 
 
@@ -262,7 +289,7 @@ def incident_list_filter(request, qs, use_empty_filter=False):
             del request.session["selected_filter"]
             filter_pk, filter_obj = None, None
     if filter_obj:
-        form = IncidentFilterForm(_convert_filterblob(filter_obj.filter))
+        form = IncidentFilterForm(_convert_filterblob(filter_obj.filter.copy()))
         LOG.debug("using stored filter: %s", filter_obj.filter)
     else:
         form_data = _normalize_form_data(request)
@@ -347,6 +374,12 @@ def _convert_filterblob(filterblob):
             filterblob["acked"] = AckedStatus.UNACKED
         else:
             filterblob["acked"] = AckedStatus.BOTH
+
+    # Convert individual special filter booleans back to a list for the form
+    special_filter_keys = [key.value for key in SpecialFilterKey]
+    special_filters = [key for key in special_filter_keys if filterblob.pop(key, False)]
+    if special_filters:
+        filterblob["special_filters"] = special_filters
 
     return filterblob
 

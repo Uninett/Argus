@@ -36,3 +36,5 @@ class FilterBlobSerializer(serializers.Serializer):
         choices=Event.Type.choices,
         required=False,
     )
+    hide_closed_acked = serializers.BooleanField(required=False, default=False)
+    under_maintenance = serializers.BooleanField(required=False, default=False)

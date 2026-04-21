@@ -305,6 +305,26 @@ class IncidentQuerySet(models.QuerySet):
     def not_acked(self):
         return self.exclude(id__in=self._get_acked_incident_ids())
 
+    def open_or_unacked(self):
+        """Exclude incidents that are both closed and acked.
+
+        Shows all open incidents regardless of ack status, and all closed
+        incidents that are still unacked.
+        """
+        return self.exclude(
+            end_time__lte=timezone.now(),
+            id__in=self._get_acked_incident_ids(),
+        )
+
+    def under_maintenance(self):
+        """Return incidents with at least one currently active maintenance task."""
+        from argus.plannedmaintenance.models import PlannedMaintenanceTask
+
+        active_task_incident_ids = (
+            PlannedMaintenanceTask.objects.current().values_list("incidents", flat=True).distinct()
+        )
+        return self.filter(id__in=active_task_incident_ids)
+
     def has_ticket(self):
         return self.exclude(ticket_url="")
 
