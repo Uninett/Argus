@@ -160,6 +160,10 @@ class PlannedMaintenanceUpdateViewTests(TestCase):
             start_time=now - timedelta(days=1),
             end_time=LOCAL_INFINITY,
         )
+        self.past_pm = PlannedMaintenanceFactory(
+            start_time=now - timedelta(minutes=10),
+            end_time=now - timedelta(minutes=5),
+        )
         self.non_modifiable_pm = PlannedMaintenanceFactory(
             start_time=now - MODIFICATION_WINDOW_PM - timedelta(hours=2),
             end_time=now - MODIFICATION_WINDOW_PM - timedelta(hours=1),
@@ -189,6 +193,12 @@ class PlannedMaintenanceUpdateViewTests(TestCase):
     def test_update_view_ongoing_task_does_not_have_start_time_field(self):
         self.client.force_login(self.staff_user)
         response = self.client.get(reverse("htmx:plannedmaintenance-update", kwargs={"pk": self.current_pm.pk}))
+        form = response.context["form"]
+        self.assertNotIn("start_time", form.fields)
+
+    def test_update_view_past_task_does_not_have_start_time_field(self):
+        self.client.force_login(self.staff_user)
+        response = self.client.get(reverse("htmx:plannedmaintenance-update", kwargs={"pk": self.past_pm.pk}))
         form = response.context["form"]
         self.assertNotIn("start_time", form.fields)
 

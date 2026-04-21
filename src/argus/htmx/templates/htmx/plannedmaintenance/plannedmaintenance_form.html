@@ -51,9 +51,9 @@
                        disabled
                        value="{{ object.start_time|date:preferences.argus_htmx.datetime_format }}"
                        class="input input-bordered w-full input-disabled" />
-                {% if object.modifiable and object.current %}
+                {% if object.modifiable and not object.future %}
                   <div class="label">
-                    <span class="label-text-alt">Cannot be changed for ongoing tasks</span>
+                    <span class="label-text-alt">Can only be changed for scheduled tasks</span>
                   </div>
                 {% endif %}
               {% endif %}
