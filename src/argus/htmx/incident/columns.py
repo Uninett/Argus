@@ -275,6 +275,12 @@ _BUILTIN_COLUMN_LIST = [
         "Maintenance",
         "htmx/incident/cells/_incident_maintenance.html",
     ),
+    IncidentTableColumn(
+        "is_under_maintenance",
+        "Maintenance",
+        "htmx/incident/cells/_incident_maintenance.html",
+        filter_field="is_under_maintenance",
+    ),
 ]
 BUILTIN_COLUMNS = {col.name: col for col in _BUILTIN_COLUMN_LIST}
 

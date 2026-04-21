@@ -354,6 +354,20 @@ under_maintenance
     :Description: An icon indicating if there exists a planned maintenance task that
                   covers the incident, meaning no notifications are being sent for that
                   incident.
+    :Redundant with: is_under_maintenance
+
+    .. image:: img/columns/under_maintenance.png
+           :width: 200
+
+is_under_maintenance
+    :From: planned_maintenance_tasks
+    :Name: is_under_maintenance
+    :Description: An icon indicating if there exists a planned maintenance task that
+                  covers the incident, meaning no notifications are being sent for that
+                  incident.
+                  Can toggle showing only incidents that are or are not covered by
+                  maintenance.
+    :Redundant with: under_maintenance
 
     .. image:: img/columns/under_maintenance.png
            :width: 200

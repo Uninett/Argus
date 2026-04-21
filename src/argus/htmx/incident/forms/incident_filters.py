@@ -9,7 +9,7 @@ from argus.htmx.constants import (
     TIMEFRAME_CHOICES,
     TIMEFRAME_DEFAULT,
 )
-from argus.htmx.incident.forms.base import IncidentListForm, SearchMixin, HasTextSearchMixin
+from argus.htmx.incident.forms.base import HasAttributeSearchMixin, HasTextSearchMixin, IncidentListForm, SearchMixin
 from argus.incident.constants import Level
 
 
@@ -84,7 +84,7 @@ class HasTicketForm(HasTextSearchMixin, IncidentListForm):
 
     has_ticket = forms.ChoiceField(
         required=False,
-        choices=[("yes", "Yes"), ("no", "No"), ("", "N/A")],
+        choices=[("yes", "Yes"), ("no", "No"), ("", "Any")],
         widget=forms.RadioSelect,
     )
 
@@ -97,6 +97,19 @@ class FindTicketForm(SearchMixin, IncidentListForm):
     placeholder = "part of ticket url"
 
     ticket_url = forms.CharField(required=False)
+
+
+class IsUnderMaintenanceForm(HasAttributeSearchMixin, IncidentListForm):
+    widget_classes = "incident-list-param"
+    fieldname = "is_under_maintenance"
+    field_initial = ""
+    lookup = "planned_maintenance_tasks"
+
+    is_under_maintenance = forms.ChoiceField(
+        required=False,
+        choices=[("yes", "Yes"), ("no", "No"), ("", "Any")],
+        widget=forms.RadioSelect,
+    )
 
 
 # Stored in preference

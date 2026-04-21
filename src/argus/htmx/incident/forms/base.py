@@ -102,3 +102,13 @@ class HasTextSearchMixin:
         elif _input == "no":
             queryset = queryset.filter(**{self.lookup: ""})
         return queryset
+
+
+class HasAttributeSearchMixin:
+    def filter(self, queryset, request):
+        _input = self.get_clean_value(request)
+        if _input == "yes":
+            queryset = queryset.exclude(**{self.lookup: None})
+        elif _input == "no":
+            queryset = queryset.filter(**{self.lookup: None})
+        return queryset
