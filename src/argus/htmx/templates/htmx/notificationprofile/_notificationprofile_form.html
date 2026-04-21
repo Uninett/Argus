@@ -20,7 +20,7 @@
         <div class="flex gap-16 justify-between">
           <div>
             {% if is_create %}<h2 class="text-lg font-semibold">New profile</h2>{% endif %}
-            {% include "htmx/forms/input_field.html" with label=form.name.label max_width="md" field=form.name %}
+            {% include "htmx/forms/input_field.html" with label=form.name.label max_width="md" field=form.name maxlength=40 %}
           </div>
           <div class="card-actions flex items-end gap-2 mb-2">
             {% if form.instance.pk %}
