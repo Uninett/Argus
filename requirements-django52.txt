@@ -116,11 +116,11 @@ packaging==25.0
     #   wheel
 phonenumberslite==9.0.5
     # via django-phonenumber-field
-psycopg[binary]==3.3.3
+psycopg[c]==3.3.3
     # via
     #   -r constraints.txt
     #   argus-server (pyproject.toml)
-psycopg-binary==3.3.3
+psycopg-c==3.3.3
     # via psycopg
 pycparser==2.22
     # via cffi
