@@ -160,10 +160,10 @@ class PlannedMaintenanceUpdateView(
 
     def get_form_class(self):
         obj = self.get_object()
-        if obj.current:
-            fields = self.ongoing_fields
-        else:
+        if obj.future:
             fields = self.future_fields
+        else:
+            fields = self.ongoing_fields
 
         widgets = {}
         if "start_time" in fields:
