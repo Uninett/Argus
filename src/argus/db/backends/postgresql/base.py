@@ -69,7 +69,7 @@ def _make_inf_loader(parent_class, inf_text, neg_inf_text):
         return InfLoader
 
     except TypeError:
-        # C-extension loaders (psycopg-binary) cannot be subclassed.
+        # C-extension loaders (psycopg-c/psycopg-binary) cannot be subclassed.
         # Use a wrapper that delegates to an instance of the original.
         class InfLoaderWrapper(Loader):
             format = parent_class.format
@@ -87,8 +87,7 @@ def _make_inf_loader(parent_class, inf_text, neg_inf_text):
 
         # Copy the timezone attribute that Django inspects on the loader
         # to determine cursor timezone (see Django's create_cursor).
-        for attr in ("timezone",):
-            if hasattr(parent_class, attr):
-                setattr(InfLoaderWrapper, attr, getattr(parent_class, attr))
+        if hasattr(parent_class, "timezone"):
+            InfLoaderWrapper.timezone = parent_class.timezone
 
         return InfLoaderWrapper
