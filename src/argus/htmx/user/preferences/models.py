@@ -5,6 +5,7 @@ from argus.htmx.constants import (
     UPDATE_INTERVAL_DEFAULT,
 )
 from argus.htmx.incident.utils import update_interval_string
+from argus.htmx.themes.utils import resolve_theme_name
 from .forms import (
     DateTimeFormatForm,
     IncidentFilterPreferenceForm,
@@ -29,6 +30,11 @@ class ArgusHtmxPreferences:
     }
 
     def update_context(self, context):
+        # Resolve deprecated theme names (e.g. "sikt" → "light")
+        theme = context.get("theme")
+        if theme:
+            context["theme"] = resolve_theme_name(theme)
+
         datetime_format_name = context.get("datetime_format_name", self.FIELDS["datetime_format_name"].default)
         datetime_format = DATETIME_FORMATS[datetime_format_name]
         incidents_table_layout = context.get("incidents_table_layout", INCIDENTS_TABLE_LAYOUT_DEFAULT)

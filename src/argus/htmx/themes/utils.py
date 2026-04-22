@@ -16,11 +16,27 @@ __all__ = [
     "get_theme_names",
     "get_theme_names_from_setting",
     "get_theme_default",
+    "resolve_theme_name",
 ]
 
 ThemesList = list[str | dict[str, dict]]
 
 LOG = logging.getLogger(__name__)
+
+# Themes renamed in Argus 2.x; old names still work at runtime.
+DEPRECATED_THEME_NAMES = {
+    "sikt": "light",
+    "sikt-dark": "dark",
+}
+
+
+def resolve_theme_name(name: str) -> str:
+    """Map a deprecated theme name to its replacement, if applicable."""
+    new_name = DEPRECATED_THEME_NAMES.get(name)
+    if new_name is not None:
+        LOG.warning("Theme %r has been renamed to %r; please update your configuration", name, new_name)
+        return new_name
+    return name
 
 
 def get_raw_themes_setting():
@@ -41,7 +57,7 @@ def clean_themes(themes: Sequence[str | dict]) -> ThemesList:
             if not entry:
                 LOG.warning("Skipping empty string theme entry")
                 continue
-            cleaned.append(entry)
+            cleaned.append(resolve_theme_name(entry))
         elif isinstance(entry, dict):
             if not entry:
                 LOG.warning("Skipping empty dict theme entry")
@@ -110,4 +126,4 @@ def get_theme_names(quiet=True):
 
 
 def get_theme_default():
-    return getattr(settings, "THEME_DEFAULT", fallbacks.THEME_DEFAULT)
+    return resolve_theme_name(getattr(settings, "THEME_DEFAULT", fallbacks.THEME_DEFAULT))

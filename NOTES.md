@@ -3,6 +3,27 @@
 This file documents changes to Argus that are relevant for operations,
 customizers and end-users.
 
+## Unreleased
+
+### Theme consolidation
+
+The ``sikt`` and ``sikt-dark`` themes have been renamed to ``light`` and
+``dark``. This means the built-in DaisyUI themes with those names are no longer
+directly accessible — the custom Sikt themes take their place. The bundled
+themes are now ``light``, ``dark``, and ``argus``.
+
+The old names still work at runtime (mapped automatically with a deprecation
+warning), but ``DAISYUI_THEMES`` and ``THEME_DEFAULT`` should be updated.
+
+To get the original DaisyUI light/dark themes back, add them as custom themes
+under a different name (e.g. ``daisy-light``) via ``DAISYUI_THEMES``. See
+`DaisyUI 5 theme generator <https://daisyui.com/theme-generator/>`_ and the
+:ref:`themes and styling <themes-and-styling>` docs for how to install custom
+themes.
+
+Severity badge colors and support colors (info, success, warning, error) have
+been aligned with the Sikt data visualization palette across all themes.
+
 ## [2.8.0] - 2026-03-06
 
 This release adds an important new dependency, django-tasks-db, which brings

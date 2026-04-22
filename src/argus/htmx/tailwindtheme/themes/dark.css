@@ -1,5 +1,5 @@
 @plugin "daisyui/theme" {
-  name: "sikt-dark";
+  name: "dark";
   color-scheme: "dark";
   --color-primary: #7351FB; /* interaction.primary: purple.65-100 */
   --color-primary-content: #FFFFFF; /* neutral.100-100 */
@@ -7,7 +7,7 @@
   --color-secondary-content: #FFFFFF; /* neutral.100-100 */
   --color-accent: #4324C8; /* purple.46-100 */
   --color-accent-content: #FFFFFF; /* neutral.100-100 */
-  --color-neutral: #595959; /* neutral.35-100 */
+  --color-neutral: #2a323b; /* override: Sikt neutral.35-100 is too light for navbar */
   --color-neutral-content: #FFFFFF; /* neutral.100-100 */
   --color-base-100: #262626; /* neutral.15-100 */
   --color-base-200: #1A1A1A; /* neutral.10-100 */
@@ -21,18 +21,4 @@
   --color-warning-content: #FFFFFF; /* neutral.100-100 */
   --color-error: #D74033; /* support.critical.strong: red.52-100 */
   --color-error-content: #FFFFFF; /* neutral.100-100 */
-}
-
-/* Severity colors from Sikt datavisualization category tokens */
-[data-theme="sikt-dark"] {
-  --color-severity-primary-1: #FF957A;
-  --color-severity-primary-2: #FFAC70;
-  --color-severity-primary-3: #FBE774;
-  --color-severity-primary-4: #82E3CB;
-  --color-severity-primary-5: #75C7F0;
-  --color-severity-secondary-1: #0A0132;
-  --color-severity-secondary-2: #0A0132;
-  --color-severity-secondary-3: #0A0132;
-  --color-severity-secondary-4: #0A0132;
-  --color-severity-secondary-5: #0A0132;
 }

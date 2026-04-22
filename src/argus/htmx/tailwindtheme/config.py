@@ -2,11 +2,9 @@ from pathlib import Path
 
 
 DEFAULT_THEMES = [
-    "dark",
     "light",
+    "dark",
     "argus",
-    "sikt",
-    "sikt-dark",
 ]
 
 VERSION = "2.1.37"

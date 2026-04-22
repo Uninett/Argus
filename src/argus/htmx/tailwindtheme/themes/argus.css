@@ -13,12 +13,12 @@
   --color-base-200: #ced9de;
   --color-base-300: #b0babd;
   --color-base-content: #141516;
-  --color-info: #006ad4;
-  --color-info-content: #ffffff;
-  --color-success: #008700;
-  --color-success-content: #ffffff;
-  --color-warning: #ee4900;
-  --color-warning-content: #140200;
-  --color-error: #e5545a;
-  --color-error-content: #2c0608;
+  --color-info: #004FCF;
+  --color-info-content: #FFFFFF;
+  --color-success: #138849;
+  --color-success-content: #FFFFFF;
+  --color-warning: #FFB700;
+  --color-warning-content: #141516;
+  --color-error: #D74033;
+  --color-error-content: #FFFFFF;
 }

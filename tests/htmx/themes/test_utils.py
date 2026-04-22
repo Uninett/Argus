@@ -1,7 +1,13 @@
 from django import test
 from django.test import override_settings
 
-from argus.htmx.themes.utils import clean_themes, get_theme_names_from_setting
+from argus.htmx.themes.utils import (
+    DEPRECATED_THEME_NAMES,
+    clean_themes,
+    get_theme_default,
+    get_theme_names_from_setting,
+    resolve_theme_name,
+)
 from argus.htmx import defaults as fallbacks
 
 
@@ -57,3 +63,46 @@ class TestGetThemesFromSetting(test.SimpleTestCase):
     @override_settings(DAISYUI_THEMES=["dark", None, "", 42, "light"])
     def test_given_invalid_entries_then_filters_them_out(self):
         self.assertEqual(get_theme_names_from_setting(), ["dark", "light"])
+
+
+class TestResolveThemeName(test.SimpleTestCase):
+    def test_given_current_name_then_passes_through(self):
+        self.assertEqual(resolve_theme_name("light"), "light")
+        self.assertEqual(resolve_theme_name("dark"), "dark")
+        self.assertEqual(resolve_theme_name("argus"), "argus")
+
+    def test_given_deprecated_name_then_returns_new_name(self):
+        for old_name, new_name in DEPRECATED_THEME_NAMES.items():
+            with self.assertLogs("argus.htmx.themes.utils", level="WARNING"):
+                self.assertEqual(resolve_theme_name(old_name), new_name)
+
+    def test_given_unknown_name_then_passes_through(self):
+        self.assertEqual(resolve_theme_name("custom"), "custom")
+
+
+class TestCleanThemesDeprecatedNames(test.SimpleTestCase):
+    def test_given_deprecated_string_entries_then_resolves_them(self):
+        with self.assertLogs("argus.htmx.themes.utils", level="WARNING"):
+            result = clean_themes(["sikt", "argus", "sikt-dark"])
+        self.assertEqual(result, ["light", "argus", "dark"])
+
+    def test_given_both_old_and_new_name_then_keeps_both(self):
+        with self.assertLogs("argus.htmx.themes.utils", level="WARNING"):
+            result = clean_themes(["light", "sikt"])
+        self.assertEqual(result, ["light", "light"])
+
+
+class TestGetThemeDefaultDeprecated(test.SimpleTestCase):
+    @override_settings(THEME_DEFAULT="sikt")
+    def test_given_deprecated_default_then_resolves_to_light(self):
+        with self.assertLogs("argus.htmx.themes.utils", level="WARNING"):
+            self.assertEqual(get_theme_default(), "light")
+
+    @override_settings(THEME_DEFAULT="sikt-dark")
+    def test_given_deprecated_dark_default_then_resolves_to_dark(self):
+        with self.assertLogs("argus.htmx.themes.utils", level="WARNING"):
+            self.assertEqual(get_theme_default(), "dark")
+
+    @override_settings(THEME_DEFAULT="argus")
+    def test_given_current_default_then_passes_through(self):
+        self.assertEqual(get_theme_default(), "argus")
