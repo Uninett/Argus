@@ -55,11 +55,6 @@ _INCIDENT_OPENAPI_CUSTOM_FILTER_PARAMETERS = [
         enum=BooleanStringOAEnum,
     ),
     OpenApiParameter(
-        name="under_maintenance",
-        description="Show only incidents that are currently under planned maintenance (`true`).",
-        enum=BooleanStringOAEnum,
-    ),
-    OpenApiParameter(
         name="tags",
         description="Fetch incidents with specified tags",
         type=str,
@@ -186,7 +181,6 @@ class IncidentFilter(filters.FilterSet):
     duration__gte = filters.NumberFilter(label="Duration", method="incident_filter")
     token_expiry = filters.BooleanFilter(label="Token expiry", method="incident_filter")
     hide_closed_acked = filters.BooleanFilter(label="Hide closed acked", method="incident_filter")
-    under_maintenance = filters.BooleanFilter(label="Under maintenance", method="incident_filter")
     filter_pk = IntegerFilter(label="Filter pk", method="incident_filter")
     notificationprofile_pk = IntegerFilter(label="Notificationprofile pk", method="incident_filter")
 
@@ -256,10 +250,6 @@ class IncidentFilter(filters.FilterSet):
         if name == "hide_closed_acked":
             if value:
                 return queryset.open_or_unacked()
-            return queryset
-        if name == "under_maintenance":
-            if value:
-                return queryset.under_maintenance()
             return queryset
         if name == "filter_pk":
             return QuerySetFilter.incidents_by_filter_pk(queryset, value)
