@@ -1,0 +1,15 @@
+<!-- htmx/incident/cells/_incident_filter_dropdown_body.html -->
+<div id="{{ column.name }}-dropdown-content"
+     class="dropdown-content bg-base-100 p-2 mt-1 rounded-box shadow border-2 border-primary z-10 w-max h-max"
+     tabindex="-1">
+  <form class="incident-list-param">
+    {% if not dummy_column %}
+      {% url 'htmx:incident-list' as incident_list_url %}
+    {% endif %}
+    {# djlint:off #}
+    <div aria-labelledby="{{ field.name }}-label" {% if not dummy_column %}hx-get="{{ incident_list_url }}" hx-include=".incident-list-param" hx-target="#table-body" hx-select="#table-body" hx-select-oob="#table-footer" hx-swap="outerHTML" hx-push-url="true" hx-indicator="#incident-list .htmx-indicator" hx-trigger="change delay:500ms"{% endif %}>
+      {{ field }}
+    </div>
+    {# djlint:on #}
+  </form>
+</div>

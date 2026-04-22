@@ -63,6 +63,8 @@ class LevelForm(SearchMixin, IncidentListForm):
     fieldname = "level"
     field_initial = ""
     widget_classes = "incident-list-param"
+    widget_template_name = "htmx/forms/menu_checkbox_select.html"
+    widget_option_template_name = "htmx/forms/menu_checkbox_option.html"
     lookup = f"{fieldname}__in"
 
     level = forms.TypedMultipleChoiceField(
@@ -70,6 +72,7 @@ class LevelForm(SearchMixin, IncidentListForm):
         choices=Level,
         coerce=int,
         empty_value="",
+        widget=forms.CheckboxSelectMultiple,
     )
 
 

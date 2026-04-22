@@ -1,0 +1,33 @@
+<!-- htmx/incident/cells/_incident_filter_dropdown_script.html -->
+<script>
+(function() {
+  const dropdown = document.querySelector('#{{ column.name }}-dropdown');
+  const filterBtn = dropdown.querySelector('.filter-btn');
+
+  filterBtn.addEventListener('focus', function() {
+    const content = dropdown.querySelector('.dropdown-content');
+    const rect = content.getBoundingClientRect();
+
+    if (rect.right > window.innerWidth) {
+      dropdown.classList.add('dropdown-end');
+    } else if (rect.left < 0) {
+      dropdown.classList.remove('dropdown-end');
+    }
+  });
+
+  dropdown.addEventListener('htmx:afterRequest', function() {
+    const select = dropdown.querySelector('select');
+    const hasValue = select
+      ? !!select.value
+      : !!dropdown.querySelector('input[type="checkbox"]:checked')
+        || !!dropdown.querySelector('input:not([type="hidden"]):not([type="checkbox"])')?.value;
+    if (hasValue) {
+      filterBtn.classList.add('btn-primary');
+      filterBtn.classList.remove('btn-ghost', 'text-primary');
+    } else {
+      filterBtn.classList.remove('btn-primary');
+      filterBtn.classList.add('btn-ghost', 'text-primary');
+    }
+  });
+})();
+</script>

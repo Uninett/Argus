@@ -1,0 +1,11 @@
+<!-- htmx/forms/menu_checkbox_select.html -->
+{% with id=widget.attrs.id %}
+  <div {% if id %}id="{{ id }}"{% endif %} class="flex flex-col gap-1">
+    {% for group, options, index in widget.optgroups %}
+      {% if group %}<span class="text-xs font-semibold opacity-60">{{ group }}</span>{% endif %}
+      {% for option in options %}
+        {% include option.template_name with widget=option %}
+      {% endfor %}
+    {% endfor %}
+  </div>
+{% endwith %}

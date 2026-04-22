@@ -1,0 +1,10 @@
+<!-- htmx/forms/menu_checkbox_option.html -->
+<label class="flex items-center gap-2 cursor-pointer text-sm"
+       {% if widget.attrs.id %}for="{{ widget.attrs.id }}"{% endif %}>
+  <input type="checkbox"
+         name="{{ widget.name }}"
+         class="checkbox checkbox-sm checkbox-primary"
+         {% if widget.value != None %}value="{{ widget.value|stringformat:'s' }}"{% endif %}
+         {% include "django/forms/widgets/classless_attrs.html" %}>
+  <span class="font-normal">{{ widget.label }}</span>
+</label>
