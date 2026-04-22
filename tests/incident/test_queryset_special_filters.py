@@ -1,5 +1,3 @@
-from datetime import timedelta
-
 from django.test import TestCase
 from django.utils import timezone
 
@@ -10,7 +8,6 @@ from argus.incident.factories import (
     StatefulIncidentFactory,
 )
 from argus.incident.models import Incident
-from argus.plannedmaintenance.factories import PlannedMaintenanceFactory
 from argus.util.testing import disconnect_signals, connect_signals
 
 
@@ -51,40 +48,4 @@ class OpenOrUnackedQuerySetTests(TestCase):
         )
         incident.create_ack(self.user)
         result = Incident.objects.open_or_unacked()
-        self.assertNotIn(incident, result)
-
-
-class UnderMaintenanceQuerySetTests(TestCase):
-    def setUp(self):
-        disconnect_signals()
-        source_user = SourceUserFactory()
-        self.source = SourceSystemFactory(user=source_user)
-        self.now = timezone.now()
-
-    def tearDown(self):
-        connect_signals()
-
-    def test_when_incident_has_active_maintenance_task_then_it_should_be_included(self):
-        incident = StatefulIncidentFactory(source=self.source)
-        pm_task = PlannedMaintenanceFactory(
-            start_time=self.now - timedelta(hours=1),
-            end_time=self.now + timedelta(hours=1),
-        )
-        pm_task.incidents.add(incident)
-        result = Incident.objects.under_maintenance()
-        self.assertIn(incident, result)
-
-    def test_when_incident_has_no_maintenance_task_then_it_should_be_excluded(self):
-        incident = StatefulIncidentFactory(source=self.source)
-        result = Incident.objects.under_maintenance()
-        self.assertNotIn(incident, result)
-
-    def test_when_incident_has_only_past_maintenance_task_then_it_should_be_excluded(self):
-        incident = StatefulIncidentFactory(source=self.source)
-        pm_task = PlannedMaintenanceFactory(
-            start_time=self.now - timedelta(hours=2),
-            end_time=self.now - timedelta(hours=1),
-        )
-        pm_task.incidents.add(incident)
-        result = Incident.objects.under_maintenance()
         self.assertNotIn(incident, result)

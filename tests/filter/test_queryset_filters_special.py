@@ -1,5 +1,3 @@
-from datetime import timedelta
-
 from django.test import TestCase, tag
 from django.utils import timezone
 
@@ -11,7 +9,6 @@ from argus.incident.factories import (
     StatefulIncidentFactory,
 )
 from argus.incident.models import Incident
-from argus.plannedmaintenance.factories import PlannedMaintenanceFactory
 from argus.util.testing import disconnect_signals, connect_signals
 
 
@@ -36,20 +33,6 @@ class IncidentsFittingSpecialFiltersTests(TestCase):
         result = _incidents_fitting_special_filters(qs, {SpecialFilterKey.HIDE_CLOSED_ACKED: True})
         self.assertNotIn(closed_acked, result)
         self.assertIn(open_incident, result)
-
-    def test_when_under_maintenance_is_true_then_it_should_return_only_maintained_incidents(self):
-        maintained = StatefulIncidentFactory(source=self.source)
-        not_maintained = StatefulIncidentFactory(source=self.source)
-        pm_task = PlannedMaintenanceFactory(
-            start_time=self.now - timedelta(hours=1),
-            end_time=self.now + timedelta(hours=1),
-        )
-        pm_task.incidents.add(maintained)
-
-        qs = Incident.objects.all()
-        result = _incidents_fitting_special_filters(qs, {SpecialFilterKey.UNDER_MAINTENANCE: True})
-        self.assertIn(maintained, result)
-        self.assertNotIn(not_maintained, result)
 
     def test_when_no_special_filters_then_it_should_return_all_incidents(self):
         StatefulIncidentFactory(source=self.source)

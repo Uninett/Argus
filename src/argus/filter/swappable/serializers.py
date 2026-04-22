@@ -37,4 +37,3 @@ class FilterBlobSerializer(serializers.Serializer):
         required=False,
     )
     hide_closed_acked = serializers.BooleanField(required=False, default=False)
-    under_maintenance = serializers.BooleanField(required=False, default=False)

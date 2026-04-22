@@ -38,56 +38,8 @@ class FilterWrapperIncidentFitsSpecialFiltersTests(unittest.TestCase):
         result = fw._incident_fits_special_filters(incident)
         self.assertFalse(result)
 
-    def test_when_under_maintenance_is_true_and_incident_has_active_task_then_returns_True(self):
-        fw = FilterWrapper({SpecialFilterKey.UNDER_MAINTENANCE: True})
-        incident = Mock()
-        incident.planned_maintenance_tasks.current.return_value.exists.return_value = True
-        result = fw._incident_fits_special_filters(incident)
-        self.assertTrue(result)
-
-    def test_when_under_maintenance_is_true_and_incident_has_no_active_task_then_returns_False(self):
-        fw = FilterWrapper({SpecialFilterKey.UNDER_MAINTENANCE: True})
-        incident = Mock()
-        incident.planned_maintenance_tasks.current.return_value.exists.return_value = False
-        result = fw._incident_fits_special_filters(incident)
-        self.assertFalse(result)
-
-    def test_when_both_special_filters_active_and_both_pass_then_returns_True(self):
-        fw = FilterWrapper(
-            {
-                SpecialFilterKey.HIDE_CLOSED_ACKED: True,
-                SpecialFilterKey.UNDER_MAINTENANCE: True,
-            }
-        )
-        incident = Mock()
-        incident.open = True
-        incident.acked = False
-        incident.planned_maintenance_tasks.current.return_value.exists.return_value = True
-        result = fw._incident_fits_special_filters(incident)
-        self.assertTrue(result)
-
-    def test_when_both_special_filters_active_and_one_fails_then_returns_False(self):
-        fw = FilterWrapper(
-            {
-                SpecialFilterKey.HIDE_CLOSED_ACKED: True,
-                SpecialFilterKey.UNDER_MAINTENANCE: True,
-            }
-        )
-        incident = Mock()
-        incident.open = False
-        incident.acked = True
-        incident.planned_maintenance_tasks.current.return_value.exists.return_value = True
-        result = fw._incident_fits_special_filters(incident)
-        self.assertFalse(result)
-
     def test_when_hide_closed_acked_is_false_then_it_should_be_ignored(self):
         fw = FilterWrapper({SpecialFilterKey.HIDE_CLOSED_ACKED: False})
-        incident = Mock()
-        result = fw._incident_fits_special_filters(incident)
-        self.assertIsNone(result)
-
-    def test_when_under_maintenance_is_false_then_it_should_be_ignored(self):
-        fw = FilterWrapper({SpecialFilterKey.UNDER_MAINTENANCE: False})
         incident = Mock()
         result = fw._incident_fits_special_filters(incident)
         self.assertIsNone(result)

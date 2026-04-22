@@ -129,7 +129,6 @@ class IncidentFilterForm(forms.Form):
 
     SPECIAL_FILTER_CHOICES = [
         (SpecialFilterKey.HIDE_CLOSED_ACKED.value, "Hide Closed & Acked"),
-        (SpecialFilterKey.UNDER_MAINTENANCE.value, "Under Maintenance"),
     ]
 
     DEFAULT_VALUES = {
