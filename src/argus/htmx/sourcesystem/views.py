@@ -6,7 +6,10 @@ from django.db.models import Count, ProtectedError
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils import timezone
+from django.shortcuts import get_object_or_404
+from django.views import View
 from django.views.generic import CreateView, DeleteView, ListView, UpdateView
+from rest_framework.authtoken.models import Token
 
 from argus.htmx.plannedmaintenance.views import UserIsStaffMixin
 from argus.htmx.utils import TemplateNameViewMixin
@@ -90,6 +93,20 @@ class ProtectedDeleteMixin:
 
 class SourceSystemDeleteView(UserIsStaffMixin, SourceSystemMixin, ProtectedDeleteMixin, DeleteView):
     protected_error_message = 'Cannot delete source "{object}" because it has associated incidents.'
+
+
+class SourceSystemTokenView(UserIsStaffMixin, View):
+    http_method_names = ["post"]
+
+    def post(self, request, pk):
+        source = get_object_or_404(SourceSystem, pk=pk)
+        Token.objects.filter(user=source.user).delete()
+        token = Token.objects.create(user=source.user)
+        messages.success(
+            request,
+            f'New token for "{source}": {token.key}',
+        )
+        return HttpResponseRedirect(reverse("htmx:sourcesystem-list"))
 
 
 class SourceSystemTypeListView(SourceSystemTypeMixin, ListView):
