@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     # 3rd party apps
     "django_tasks",
     "django_tasks_db",
+    "crontask",
     "corsheaders",
     "social_django",
     "rest_framework",

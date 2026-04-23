@@ -29,6 +29,7 @@ dependencies = [
     "django-cors-headers>=3.2",
     "django-filter",
     "django-tasks-db",
+    "django-crontask",
     "django-phonenumber-field[phonenumberslite]",
     "djangorestframework>=3.14",
     "drf-rw-serializers>=1.1",
