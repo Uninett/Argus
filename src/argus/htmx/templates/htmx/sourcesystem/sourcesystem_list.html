@@ -29,19 +29,32 @@
               {{ source.base_url|default:"-" }}
             </td>
             <td class="border-b border-neutral-content group-last:border-b-0">
-              {% if source.token_status == "valid" %}
-                <span class="badge badge-outline badge-success text-xs gap-1">
-                  <i class="fa-solid fa-check" aria-hidden="true"></i> Valid
-                </span>
-              {% elif source.token_status == "expired" %}
-                <span class="badge badge-outline badge-error text-xs gap-1">
-                  <i class="fa-solid fa-exclamation" aria-hidden="true"></i> Expired
-                </span>
-              {% else %}
-                <span class="badge badge-outline text-xs gap-1">
-                  <i class="fa-solid fa-minus" aria-hidden="true"></i> Missing
-                </span>
-              {% endif %}
+              <div class="flex items-center gap-2">
+                {% if source.token_status == "valid" %}
+                  <span class="badge badge-outline badge-success text-xs gap-1">
+                    <i class="fa-solid fa-check" aria-hidden="true"></i> Valid
+                  </span>
+                {% elif source.token_status == "expired" %}
+                  <span class="badge badge-outline badge-error text-xs gap-1">
+                    <i class="fa-solid fa-exclamation" aria-hidden="true"></i> Expired
+                  </span>
+                {% else %}
+                  <span class="badge badge-outline text-xs gap-1">
+                    <i class="fa-solid fa-minus" aria-hidden="true"></i> Missing
+                  </span>
+                {% endif %}
+                {% if request.user.is_staff %}
+                  <form method="post"
+                        action="{% url 'htmx:sourcesystem-token' pk=source.pk %}">
+                    {% csrf_token %}
+                    <button type="submit"
+                            class="btn btn-xs btn-ghost"
+                            title="{% if source.token_status == 'missing' %}Generate token{% else %}Regenerate token{% endif %}">
+                      <i class="fa-solid fa-rotate" aria-hidden="true"></i>
+                    </button>
+                  </form>
+                {% endif %}
+              </div>
             </td>
             <td class="border-b border-neutral-content group-last:border-b-0 text-right">{{ source.incident_count }}</td>
             <td class="border-b border-neutral-content group-last:border-b-0 text-right">

@@ -190,6 +190,45 @@ class SourceSystemDeleteViewTests(TestCase):
 
 
 @tag("integration")
+class SourceSystemTokenViewTests(TestCase):
+    def setUp(self):
+        self.user = PersonUserFactory()
+        self.staff_user = AdminUserFactory()
+        self.source = SourceSystemFactory()
+
+    def test_when_not_staff_then_forbidden(self):
+        self.client.force_login(self.user)
+        response = self.client.post(reverse("htmx:sourcesystem-token", kwargs={"pk": self.source.pk}))
+        self.assertEqual(response.status_code, 403)
+
+    def test_given_no_token_when_generating_it_should_create_token(self):
+        self.client.force_login(self.staff_user)
+        self.assertFalse(Token.objects.filter(user=self.source.user).exists())
+        response = self.client.post(reverse("htmx:sourcesystem-token", kwargs={"pk": self.source.pk}))
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(Token.objects.filter(user=self.source.user).exists())
+
+    def test_given_existing_token_when_regenerating_it_should_replace_token(self):
+        old_token = Token.objects.create(user=self.source.user)
+        self.client.force_login(self.staff_user)
+        response = self.client.post(reverse("htmx:sourcesystem-token", kwargs={"pk": self.source.pk}))
+        self.assertEqual(response.status_code, 302)
+        new_token = Token.objects.get(user=self.source.user)
+        self.assertNotEqual(old_token.key, new_token.key)
+
+    def test_when_generating_it_should_show_token_in_message(self):
+        self.client.force_login(self.staff_user)
+        response = self.client.post(
+            reverse("htmx:sourcesystem-token", kwargs={"pk": self.source.pk}),
+            follow=True,
+        )
+        token = Token.objects.get(user=self.source.user)
+        msgs = list(response.context["messages"])
+        self.assertEqual(len(msgs), 1)
+        self.assertIn(token.key, str(msgs[0]))
+
+
+@tag("integration")
 class SourceSystemTypeListViewTests(TestCase):
     def setUp(self):
         self.user = PersonUserFactory()
