@@ -1,0 +1,8 @@
+{% extends "htmx/base.html" %}
+{% block main %}
+  {% include "htmx/components/_page_title.html" %}
+  <div class="flex flex-col items-center px-4">
+    {% block sourcesystem_main %}
+    {% endblock sourcesystem_main %}
+  </div>
+{% endblock main %}

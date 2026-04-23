@@ -1,7 +1,11 @@
+from datetime import timedelta
+
+from django.conf import settings
 from django.contrib import messages
 from django.db.models import Count, ProtectedError
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+from django.utils import timezone
 from django.views.generic import CreateView, DeleteView, ListView, UpdateView
 
 from argus.htmx.plannedmaintenance.views import UserIsStaffMixin
@@ -44,10 +48,24 @@ class SourceSystemListView(SourceSystemMixin, ListView):
         return (
             super()
             .get_queryset()
-            .select_related("type", "user")
+            .select_related("type", "user", "user__auth_token")
             .annotate(incident_count=Count("incidents"))
             .order_by("name")
         )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        expiration_duration = timedelta(days=settings.AUTH_TOKEN_EXPIRES_AFTER_DAYS)
+        now = timezone.now()
+        for source in context["object_list"]:
+            token = getattr(source.user, "auth_token", None)
+            if token is None:
+                source.token_status = "missing"
+            elif token.created + expiration_duration < now:
+                source.token_status = "expired"
+            else:
+                source.token_status = "valid"
+        return context
 
 
 class SourceSystemCreateView(UserIsStaffMixin, SourceSystemMixin, CreateView):
