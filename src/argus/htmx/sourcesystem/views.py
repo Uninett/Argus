@@ -46,7 +46,7 @@ class SourceSystemTypeMixin(TemplateNameViewMixin):
         return context
 
 
-class SourceSystemListView(SourceSystemMixin, ListView):
+class SourceSystemListView(UserIsStaffMixin, SourceSystemMixin, ListView):
     def get_queryset(self):
         return (
             super()
@@ -109,7 +109,7 @@ class SourceSystemTokenView(UserIsStaffMixin, View):
         return HttpResponseRedirect(reverse("htmx:sourcesystem-list"))
 
 
-class SourceSystemTypeListView(SourceSystemTypeMixin, ListView):
+class SourceSystemTypeListView(UserIsStaffMixin, SourceSystemTypeMixin, ListView):
     def get_queryset(self):
         return SourceSystemType.objects.annotate(source_count=Count("instances")).order_by("name")
 

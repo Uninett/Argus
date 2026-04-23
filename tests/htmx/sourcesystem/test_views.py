@@ -29,42 +29,42 @@ class SourceSystemListViewTests(TestCase):
         response = self.client.get(reverse("htmx:sourcesystem-list"))
         self.assertEqual(response.status_code, 302)
 
-    def test_when_regular_user_then_accessible(self):
+    def test_when_regular_user_then_forbidden(self):
         self.client.force_login(self.user)
         response = self.client.get(reverse("htmx:sourcesystem-list"))
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 403)
 
     def test_it_should_show_sources_in_list(self):
-        self.client.force_login(self.user)
+        self.client.force_login(self.staff_user)
         response = self.client.get(reverse("htmx:sourcesystem-list"))
         self.assertIn(self.source, response.context["object_list"])
 
     def test_it_should_annotate_incident_count(self):
         StatefulIncidentFactory(source=self.source)
-        self.client.force_login(self.user)
+        self.client.force_login(self.staff_user)
         response = self.client.get(reverse("htmx:sourcesystem-list"))
         source = response.context["object_list"].get(pk=self.source.pk)
         self.assertEqual(source.incident_count, 1)
 
     def test_it_should_set_page_title(self):
-        self.client.force_login(self.user)
+        self.client.force_login(self.staff_user)
         response = self.client.get(reverse("htmx:sourcesystem-list"))
         self.assertEqual(response.context["page_title"], "Sources")
 
     def test_it_should_set_active_tab_to_sources(self):
-        self.client.force_login(self.user)
+        self.client.force_login(self.staff_user)
         response = self.client.get(reverse("htmx:sourcesystem-list"))
         self.assertEqual(response.context["active_tab"], "sources")
 
     def test_given_no_token_then_status_is_missing(self):
-        self.client.force_login(self.user)
+        self.client.force_login(self.staff_user)
         response = self.client.get(reverse("htmx:sourcesystem-list"))
         source = next(s for s in response.context["object_list"] if s.pk == self.source.pk)
         self.assertEqual(source.token_status, "missing")
 
     def test_given_valid_token_then_status_is_valid(self):
         Token.objects.create(user=self.source.user)
-        self.client.force_login(self.user)
+        self.client.force_login(self.staff_user)
         response = self.client.get(reverse("htmx:sourcesystem-list"))
         source = next(s for s in response.context["object_list"] if s.pk == self.source.pk)
         self.assertEqual(source.token_status, "valid")
@@ -73,7 +73,7 @@ class SourceSystemListViewTests(TestCase):
         token = Token.objects.create(user=self.source.user)
         token.created = timezone.now() - timedelta(days=365)
         token.save()
-        self.client.force_login(self.user)
+        self.client.force_login(self.staff_user)
         response = self.client.get(reverse("htmx:sourcesystem-list"))
         source = next(s for s in response.context["object_list"] if s.pk == self.source.pk)
         self.assertEqual(source.token_status, "expired")
@@ -239,20 +239,20 @@ class SourceSystemTypeListViewTests(TestCase):
         response = self.client.get(reverse("htmx:sourcesystemtype-list"))
         self.assertEqual(response.status_code, 302)
 
-    def test_when_regular_user_then_accessible(self):
+    def test_when_regular_user_then_forbidden(self):
         self.client.force_login(self.user)
         response = self.client.get(reverse("htmx:sourcesystemtype-list"))
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 403)
 
     def test_it_should_annotate_source_count(self):
         SourceSystemFactory(type=self.source_type)
-        self.client.force_login(self.user)
+        self.client.force_login(self.staff_user)
         response = self.client.get(reverse("htmx:sourcesystemtype-list"))
         source_type = response.context["object_list"].get(pk=self.source_type.pk)
         self.assertEqual(source_type.source_count, 1)
 
     def test_it_should_set_active_tab_to_types(self):
-        self.client.force_login(self.user)
+        self.client.force_login(self.staff_user)
         response = self.client.get(reverse("htmx:sourcesystemtype-list"))
         self.assertEqual(response.context["active_tab"], "types")
 
