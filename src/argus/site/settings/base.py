@@ -67,6 +67,7 @@ INSTALLED_APPS = [
     "argus.notificationprofile",
     "argus.dev",
     "argus.plannedmaintenance",
+    "argus.versioncheck",
 ]
 # fmt: on
 
