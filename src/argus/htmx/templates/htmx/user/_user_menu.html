@@ -15,6 +15,9 @@
     </li>
     {% if request.user.is_staff %}
       <li>
+        <a href="{% url 'htmx:sourcesystem-list' %}">Sources</a>
+      </li>
+      <li>
         <a href="{% url 'admin:index' %}" target="_blank">Admin</a>
       </li>
     {% endif %}

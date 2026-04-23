@@ -1,0 +1,8 @@
+<div role="tablist" class="tabs tabs-box tabs-primary">
+  <a role="tab"
+     class="tab {% if active_tab == 'sources' %}tab-active{% endif %}"
+     href="{% url 'htmx:sourcesystem-list' %}">Sources</a>
+  <a role="tab"
+     class="tab {% if active_tab == 'types' %}tab-active{% endif %}"
+     href="{% url 'htmx:sourcesystemtype-list' %}">Source Types</a>
+</div>
