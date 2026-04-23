@@ -99,4 +99,11 @@
       </div>
     </div>
   </div>
+  {% if form.username %}
+    <script>
+      document.getElementById("{{ form.name.auto_id }}").addEventListener("input", function () {
+        document.getElementById("{{ form.username.auto_id }}").placeholder = this.value || "";
+      });
+    </script>
+  {% endif %}
 {% endblock sourcesystem_main %}
