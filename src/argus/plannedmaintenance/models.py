@@ -126,8 +126,7 @@ class PlannedMaintenanceTask(models.Model):
         queryset = Incident.objects.exclude(planned_maintenance_tasks__pk=self.pk)
 
         covered_incidents = incidents_covered_by_planned_maintenance_task(queryset=queryset, pm_task=self)
-
-        self.incidents.add(*covered_incidents)
+        self.incidents.set(covered_incidents)
 
     def clean(self):
         super().clean()
