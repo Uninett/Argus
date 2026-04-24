@@ -30,6 +30,7 @@ LOG = logging.getLogger(__name__)
 
 
 __all__ = [
+    "sync_media",
     "api_safely_get_medium_object",
     "send_notification",
     "background_send_notification",
@@ -41,18 +42,65 @@ __all__ = [
 
 
 # TODO: Raise Incident if media_class not importable?
+
 MEDIA_PLUGINS = getattr(settings, "MEDIA_PLUGINS")
-_media_classes = [import_class_from_dotted_path(media_plugin) for media_plugin in MEDIA_PLUGINS]
-MEDIA_CLASSES_DICT = {media_class.MEDIA_SLUG: media_class for media_class in _media_classes}
+
+
+def _compile_MEDIA_CLASSES_DICT():
+    media_classes_dict = {}
+    for media_plugin in MEDIA_PLUGINS:
+        try:
+            plugin_class = import_class_from_dotted_path(media_plugin)
+        except (ImportError, ModuleNotFoundError, AttributeError) as e:
+            LOG.warning('Failed to load media plugin "%s": %s', media_plugin, str(e))
+        else:
+            media_classes_dict[plugin_class.MEDIA_SLUG] = plugin_class
+    return media_classes_dict
+
+
+MEDIA_CLASSES_DICT = _compile_MEDIA_CLASSES_DICT()
+
+
+def sync_media():
+    """Sync MEDIA_PLUGINS with the Media table
+
+    Check if all media in Media has a respective class"""
+
+    for medium in Media.objects.all():
+        is_installed = medium.slug in MEDIA_CLASSES_DICT.keys()
+        if is_installed != medium.installed:
+            medium.installed = is_installed
+            medium.save(update_fields=["installed"])
+            if not is_installed:
+                LOG.warning("%s plugin is no longer registered in MEDIA_PLUGINS", medium.name)
+            else:
+                LOG.info("%s plugin is again registered in MEDIA_PLUGINS", medium.name)
+
+    # Check if all media plugins are also saved in Media
+    for media_class in MEDIA_CLASSES_DICT.values():
+        if not Media.objects.filter(slug=media_class.MEDIA_SLUG):
+            media = Media(
+                slug=media_class.MEDIA_SLUG,
+                name=media_class.MEDIA_NAME,
+                installed=True,
+            )
+            media.save()
+            LOG.info("%s media plugin is now installed and registered correctly", media.name)
 
 
 def api_safely_get_medium_object(media_slug, version: str = API_STABLE_VERSION):
     try:
-        classobj = MEDIA_CLASSES_DICT[media_slug]
-    except KeyError:
+        medium_obj = Media.objects.get(slug=media_slug)
+    except Media.DoesNotExist:
         raise ValidationError(f'Medium "{media_slug}" is not installed.')
-    obj = classobj(version)
-    return obj
+    if medium_obj.installed:
+        try:
+            classobj = MEDIA_CLASSES_DICT[media_slug]
+        except KeyError:
+            raise ValidationError(f'Python module for "{media_slug}" not found')
+        obj = classobj(version)
+        return obj
+    return None
 
 
 def send_notification(destinations: Iterable[DestinationConfig], *events: Iterable[Event]):
