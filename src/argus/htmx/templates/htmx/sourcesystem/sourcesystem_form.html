@@ -11,12 +11,6 @@
             Create Source
           {% endif %}
         </h2>
-        {% if object.pk %}
-          <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-sm mb-4 p-3 bg-base-200 rounded">
-            <span class="text-base-content/60">Type</span>
-            <span>{{ object.type }}</span>
-          </div>
-        {% endif %}
         <form method="post"
               action="{% if object.pk %}{% url 'htmx:sourcesystem-update' pk=object.pk %}{% else %}{% url 'htmx:sourcesystem-create' %}{% endif %}">
           {% csrf_token %}

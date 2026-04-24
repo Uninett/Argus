@@ -15,7 +15,7 @@ class CreateSourceSystemForm(AddSourceSystemForm):
 class UpdateSourceSystemForm(forms.ModelForm):
     class Meta:
         model = SourceSystem
-        fields = ["name", "base_url"]
+        fields = ["name", "type", "base_url"]
         widgets = {
             "name": forms.TextInput,
             "base_url": forms.TextInput,
