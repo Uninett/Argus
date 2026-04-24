@@ -4,7 +4,7 @@ from rest_framework.test import APIRequestFactory
 from argus.auth.factories import PersonUserFactory
 from argus.notificationprofile.factories import DestinationConfigFactory
 from argus.notificationprofile.models import Media
-from argus.notificationprofile.serializers import RequestDestinationConfigSerializer
+from argus.notificationprofile.v2.serializers import RequestDestinationConfigSerializer
 
 
 @tag("integration")
@@ -13,7 +13,7 @@ class SlackNotificationBasicBehaviorTests(TestCase):
         self.user = PersonUserFactory()
         self.request_factory = APIRequestFactory()
 
-    def test_can_create_slack_destination(self):
+    def test_given_valid_request_should_create_slack_destination(self):
         request = self.request_factory.post("/")
         request.user = self.user
         validated_data = {
@@ -34,7 +34,7 @@ class SlackNotificationBasicBehaviorTests(TestCase):
             },
         )
 
-    def test_can_update_slack_destination(self):
+    def test_given_valid_request_should_update_slack_destination(self):
         destination = DestinationConfigFactory(
             user=self.user,
             media=Media.objects.get(slug="slack"),
@@ -55,7 +55,7 @@ class SlackNotificationBasicBehaviorTests(TestCase):
         obj = serializer.update(destination, validated_data)
         self.assertEqual(obj.settings["destination_url"], "https://hooks.slack.com/services/CCC/BBB/AAA")
 
-    def test_slack_destination_serializer_is_invalid_with_different_medium(self):
+    def test_given_invalid_medium_slack_destination_serializer_should_not_be_valid(self):
         request = self.request_factory.post("/")
         request.user = self.user
 

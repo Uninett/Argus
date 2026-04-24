@@ -9,7 +9,7 @@ from argus.incident.factories import EventFactory, IncidentFactory
 from argus.notificationprofile.factories import DestinationConfigFactory, NotificationProfileFactory, TimeslotFactory
 from argus.notificationprofile.media.base import AppriseMedium
 from argus.notificationprofile.models import DestinationConfig, Media
-from argus.notificationprofile.serializers import RequestDestinationConfigSerializer
+from argus.notificationprofile.v2.serializers import RequestDestinationConfigSerializer
 from argus.util.testing import connect_signals, disconnect_signals
 
 
@@ -19,7 +19,7 @@ class AppriseDestinationConfigSerializerTests(TestCase):
         self.user = PersonUserFactory()
         self.request_factory = APIRequestFactory()
 
-    def test_apprise_medium_serializer_is_valid_with_correct_input(self):
+    def test_given_correct_input_apprise_medium_serializer_should_be_valid(self):
         request = self.request_factory.post("/")
         request.user = self.user
         data = {
@@ -34,7 +34,7 @@ class AppriseDestinationConfigSerializerTests(TestCase):
         )
         self.assertTrue(serializer.is_valid(), serializer.errors)
 
-    def test_apprise_destination_serializer_is_invalid_with_empty_settings(self):
+    def test_given_empty_settings_apprise_medium_serializer_should_not_be_valid(self):
         request = self.request_factory.post("/")
         request.user = self.user
         data = {
@@ -48,7 +48,7 @@ class AppriseDestinationConfigSerializerTests(TestCase):
         self.assertFalse(serializer.is_valid())
         self.assertTrue(serializer.errors)
 
-    def test_apprise_destination_serializer_is_invalid_with_missing_key(self):
+    def tests_given_missing_key_apprise_destination_serializer_should_not_be_valid(self):
         request = self.request_factory.post("/")
         request.user = self.user
         data = {
@@ -62,7 +62,7 @@ class AppriseDestinationConfigSerializerTests(TestCase):
         self.assertFalse(serializer.is_valid())
         self.assertTrue(serializer.errors)
 
-    def test_apprise_destination_serializer_is_invalid_with_invalid_url(self):
+    def test_given_invalid_url_apprise_destination_serializer_should_not_be_valid(self):
         request = self.request_factory.post("/")
         request.user = self.user
         data = {
@@ -78,7 +78,7 @@ class AppriseDestinationConfigSerializerTests(TestCase):
         self.assertFalse(serializer.is_valid())
         self.assertTrue(serializer.errors)
 
-    def test_apprise_destination_serializer_is_valid_with_additional_arguments(self):
+    def test_given_additional_arguments_apprise_destination_serializer_should_be_valid(self):
         request = self.request_factory.post("/")
         request.user = self.user
         data = {
@@ -100,7 +100,7 @@ class AppriseDestinationConfigSerializerTests(TestCase):
             },
         )
 
-    def test_can_create_apprise_destination(self):
+    def test_given_valid_request_should_create_apprise_destination(self):
         request = self.request_factory.post("/")
         request.user = self.user
         validated_data = {
@@ -121,7 +121,7 @@ class AppriseDestinationConfigSerializerTests(TestCase):
             },
         )
 
-    def test_can_update_apprise_destination(self):
+    def test_given_valid_request_should_update_apprise_destination(self):
         destination = DestinationConfigFactory(
             user=self.user,
             media=Media.objects.get(slug="apprise"),
@@ -142,7 +142,7 @@ class AppriseDestinationConfigSerializerTests(TestCase):
         obj = serializer.update(destination, validated_data)
         self.assertEqual(obj.settings["destination_url"], "https://new.example.com/hook")
 
-    def test_apprise_destination_serializer_is_invalid_with_different_medium(self):
+    def test_given_different_medium_apprise_destination_serializer_should_not_be_valid(self):
         request = self.request_factory.post("/")
         request.user = self.user
 
@@ -194,7 +194,7 @@ class AppriseDestinationViewTests(APITestCase):
     def tearDown(self):
         connect_signals()
 
-    def test_should_create_apprise_destination_with_valid_values(self):
+    def test_given_valid_values_should_create_apprise_destination(self):
         response = self.user1_rest_client.post(
             path=self.ENDPOINT,
             data={
@@ -213,7 +213,7 @@ class AppriseDestinationViewTests(APITestCase):
             ).exists()
         )
 
-    def test_should_not_allow_creating_apprise_destination_with_duplicate_urls(self):
+    def test_given_duplicate_urls_should_not_allow_creating_apprise_destination(self):
         settings = {"destination_url": "https://duplicate-example.com/hook"}
         DestinationConfigFactory(
             user=self.user1,
@@ -252,11 +252,11 @@ class AppriseMediumBehaviorTests(TestCase):
     def tearDown(self):
         connect_signals()
 
-    def test_send_no_destinations_returns_false(self):
+    def test_given_no_destinations_should_return_false(self):
         self.assertFalse(AppriseMedium.send(self.event, []))
 
     @patch("argus.notificationprofile.media.base.Apprise")
-    def test_send_success_single_destination(self, mock_apprise):
+    def test_given_single_destination_should_send_notification(self, mock_apprise):
         instance = mock_apprise.return_value
         instance.notify.return_value = True
 
@@ -264,7 +264,7 @@ class AppriseMediumBehaviorTests(TestCase):
         instance.add.assert_called_once_with("https://example.com/hook")
 
     @patch("argus.notificationprofile.media.base.Apprise")
-    def test_send_failure_returns_false(self, mock_apprise):
+    def test_when_send_fails_should_return_false(self, mock_apprise):
         instance = mock_apprise.return_value
         instance.notify.return_value = False
 
