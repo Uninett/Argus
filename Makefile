@@ -1,4 +1,4 @@
-.PHONY: clean testclean distclean coverageclean cacheclean nuke setup-tailwind tailwind-config tailwind-build-config tailwind docclean upgrade-tailwind tailwind-watch check-test-names
+.PHONY: clean testclean distclean coverageclean cacheclean nuke setup-tailwind tailwind-config tailwind-build-config tailwind docclean upgrade-tailwind tailwind-watch check-test-names sync
 
 TAILWINDDIR=src/argus/htmx/tailwindtheme
 STATICDIR=src/argus/htmx/static
@@ -47,6 +47,12 @@ tailwind-watch:
 
 upgrade-tailwind:
 	PYTHONPATH=$(PYTHONPATH) python3 src/argus/htmx/tailwindtheme/get_tailwind.py
+
+sync:
+ifndef VIRTUAL_ENV
+	$(error Run this command inside a virtual environment)
+endif
+	pip3 install -r requirements.txt -e ".[dev]"
 
 check-test-names:
 	python3 checks/check_test_names.py --base main
