@@ -335,3 +335,6 @@ del _extra_apps_env
 update_settings(globals(), EXTRA_APPS)
 
 BANNER_MESSAGE = get_str_env("ARGUS_BANNER_MESSAGE", default=None)
+
+# Used for looking up the latest version of Argus on PyPI
+PYPI_URL = get_str_env("ARGUS_PYPI_URL", "https://pypi-proxy.sokrates.edupaas.no")

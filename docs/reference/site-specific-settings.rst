@@ -429,3 +429,13 @@ Debugging settings
 
 * :setting:`TEMPLATE_DEBUG` (optional) provides a convenient way to turn debugging on and off
   for templates. If undefined it will default to the value of :setting:`DEBUG`.
+
+
+PyPI settings
+-------------
+.. setting:: PYPI_URL
+
+* :setting:`PYPI_URL` is the URL used to check for the latest version of Argus. The default is
+  a proxy server called ``https://pypi-proxy.sokrates.edupaas.no``.
+  The proxy is used so we can get a sense of how many people use Argus and what versions they are running.
+  If you do not wish to use the Proxy, simply change the URL to ``https://pypi.org``.
