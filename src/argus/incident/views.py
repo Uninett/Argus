@@ -83,14 +83,29 @@ class EventPagination(CursorPagination):
     page_size_query_param = "page_size"
 
 
+class HeartBeatMixin:
+    def initial(self, request, *args, **kwargs):
+        # ensure we are logged in
+        super().initial(request, *args, **kwargs)
+
+        if request.user.is_authenticated and request.user.is_source_system:
+            LOG.info("Heartbeat: %s", request.user.source_system.name)
+            request.user.source_system.update_last_seen()
+
+
 class SourceSystemTypeViewSet(
-    mixins.CreateModelMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet
+    HeartBeatMixin,
+    mixins.CreateModelMixin,
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    viewsets.GenericViewSet,
 ):
     serializer_class = SourceSystemTypeSerializer
     queryset = SourceSystemType.objects.all()
 
 
 class SourceSystemViewSet(
+    HeartBeatMixin,
     mixins.CreateModelMixin,
     mixins.UpdateModelMixin,
     mixins.RetrieveModelMixin,
@@ -127,6 +142,7 @@ class SourceSystemViewSet(
 
 
 class BaseIncidentViewSet(
+    HeartBeatMixin,
     mixins.ListModelMixin,
     mixins.CreateModelMixin,
     mixins.RetrieveModelMixin,
@@ -279,7 +295,7 @@ class SourceLockedIncidentViewSet(BaseIncidentViewSet):
         request=EmptySerializer,
     ),
 )
-class TicketPluginViewSet(viewsets.ViewSet):
+class TicketPluginViewSet(HeartBeatMixin, viewsets.ViewSet):
     """This endpoint will automatically create a pre-filled ticket in a ticket
     system that is configured in the settings and return its URL or return the
     URL of an existing linked ticket.
@@ -336,6 +352,7 @@ class TicketPluginViewSet(viewsets.ViewSet):
 
 
 class IncidentTagViewSet(
+    HeartBeatMixin,
     mixins.ListModelMixin,
     mixins.RetrieveModelMixin,
     mixins.CreateModelMixin,
@@ -403,7 +420,7 @@ class IncidentTagViewSet(
         ],
     )
 )
-class AllEventsViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+class AllEventsViewSet(HeartBeatMixin, mixins.ListModelMixin, viewsets.GenericViewSet):
     pagination_class = EventPagination
     queryset = Event.objects.none()
     serializer_class = EventSerializer
@@ -420,7 +437,9 @@ class AllEventsViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
         ],
     )
 )
-class EventViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
+class EventViewSet(
+    HeartBeatMixin, mixins.ListModelMixin, mixins.CreateModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet
+):
     queryset = Incident.objects.none()  # For OpenAPI
     serializer_class = EventSerializer
 
@@ -512,7 +531,7 @@ class EventViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, mixins.Retrie
         responses={"200": ResponseAcknowledgementSerializer},
     ),
 )
-class AcknowledgementViewSet(rw_viewsets.ModelViewSet):
+class AcknowledgementViewSet(HeartBeatMixin, rw_viewsets.ModelViewSet):
     queryset = Incident.objects.none()  # For OpenAPI
     serializer_class = ResponseAcknowledgementSerializer
     read_serializer_class = ResponseAcknowledgementSerializer
@@ -569,7 +588,7 @@ class BulkHelper:
         responses=ResponseBulkSerializer,
     )
 )
-class BulkAcknowledgementViewSet(BulkHelper, viewsets.ViewSet):
+class BulkAcknowledgementViewSet(HeartBeatMixin, BulkHelper, viewsets.ViewSet):
     serializer_class = ResponseBulkSerializer
     write_serializer_class = RequestBulkAcknowledgementSerializer
     queryset = Incident.objects.all()
@@ -614,7 +633,7 @@ class BulkAcknowledgementViewSet(BulkHelper, viewsets.ViewSet):
         responses=ResponseBulkSerializer,
     )
 )
-class BulkEventViewSet(BulkHelper, viewsets.ViewSet):
+class BulkEventViewSet(HeartBeatMixin, BulkHelper, viewsets.ViewSet):
     serializer_class = ResponseBulkSerializer
     write_serializer_class = RequestBulkEventSerializer
     queryset = Incident.objects.all()
@@ -664,7 +683,7 @@ class BulkEventViewSet(BulkHelper, viewsets.ViewSet):
         responses=ResponseBulkSerializer,
     )
 )
-class BulkTicketUrlViewSet(BulkHelper, viewsets.ViewSet):
+class BulkTicketUrlViewSet(HeartBeatMixin, BulkHelper, viewsets.ViewSet):
     serializer_class = ResponseBulkSerializer
     write_serializer_class = RequestBulkTicketUrlSerializer
     queryset = Incident.objects.all()
