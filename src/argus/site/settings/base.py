@@ -118,11 +118,13 @@ WSGI_APPLICATION = "argus.site.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+DATABASE_ENGINE = "django_psycopg_infinity.backends.postgresql"
+
 # fmt: off
 DATABASE_URL = get_str_env("DATABASE_URL")
 if DATABASE_URL:
     DATABASES = {
-        "default": dj_database_url.parse(DATABASE_URL),
+        "default": dj_database_url.parse(DATABASE_URL, engine=DATABASE_ENGINE),
     }
 del DATABASE_URL
 # fmt: on

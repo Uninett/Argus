@@ -17,7 +17,7 @@ RUN python3 -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 # Install some dev requirements that aren't part of the minimal dependencies:
-RUN pip install psycopg2-binary django-extensions python-dotenv gunicorn
+RUN pip install "psycopg[binary]" django-extensions python-dotenv gunicorn
 
 # Make an unprivileged user to run the server
 RUN useradd --system argus

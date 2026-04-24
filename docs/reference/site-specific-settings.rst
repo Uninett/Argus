@@ -212,6 +212,28 @@ A common value in development would be::
 
   DATABASE_URL=postgresql://argus_user:superSecretPassword@localhost:5432/argus_db
 
+When ``DATABASE_URL`` is set, the database engine is automatically configured to
+use the ``django_psycopg_infinity`` backend, which provides infinity timestamp
+support with psycopg3.
+
+.. setting:: DATABASE_ENGINE
+
+* :setting:`DATABASE_ENGINE` defaults to
+  ``"django_psycopg_infinity.backends.postgresql"``.
+
+If you override ``DATABASES`` directly instead of using ``DATABASE_URL``, you
+must set the ``ENGINE`` to the same value::
+
+  DATABASES = {
+      "default": {
+          "ENGINE": "django_psycopg_infinity.backends.postgresql",
+          ...
+      }
+  }
+
+Using the standard ``django.db.backends.postgresql`` engine will work for most
+operations but will not correctly handle infinity timestamps.
+
 Task queue settings
 -------------------
 
