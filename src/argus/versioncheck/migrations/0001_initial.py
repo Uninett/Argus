@@ -16,7 +16,6 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(primary_key=True, serialize=False)),
                 ('version', models.CharField(max_length=20)),
-                ('seen', models.BooleanField(default=False)),
                 ('timestamp', models.DateTimeField(auto_now_add=True)),
             ],
         ),
