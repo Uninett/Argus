@@ -5,6 +5,34 @@ customizers and end-users.
 
 ## Unreleased
 
+### PostgreSQL driver: psycopg2 replaced with psycopg3
+
+The PostgreSQL driver has been changed from `psycopg2` to `psycopg3`
+(`psycopg`). This also introduces a new dependency,
+`django-psycopg-infinity`, which provides a custom database backend for
+infinity timestamp support.
+
+**What you need to do:**
+
+1. Replace `psycopg2` (or `psycopg2-binary`) with `psycopg` in your
+   deployment. For production use `psycopg[c]` (compiled C extension), for
+   Docker/quick setups `psycopg[binary]` works too.
+
+2. If you override `DATABASES` directly in your own settings file instead
+   of using `DATABASE_URL`, you must change the `ENGINE`:
+
+   ```python
+   DATABASES = {
+       "default": {
+           "ENGINE": "django_psycopg_infinity.backends.postgresql",
+           # ... other settings
+       }
+   }
+   ```
+
+   If you use `DATABASE_URL` (the recommended approach), the engine is set
+   automatically.
+
 ### Theme consolidation
 
 The ``sikt`` and ``sikt-dark`` themes have been renamed to ``light`` and
