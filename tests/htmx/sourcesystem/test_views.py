@@ -137,17 +137,17 @@ class SourceSystemUpdateViewTests(TestCase):
         self.client.force_login(self.staff_user)
         response = self.client.post(
             reverse("htmx:sourcesystem-update", kwargs={"pk": self.source.pk}),
-            {"name": "updated-name", "base_url": ""},
+            {"name": "updated-name", "type": self.source.type.pk, "base_url": ""},
         )
         self.assertEqual(response.status_code, 302)
         self.source.refresh_from_db()
         self.assertEqual(self.source.name, "updated-name")
 
-    def test_it_should_not_expose_type_field(self):
+    def test_it_should_expose_type_field(self):
         self.client.force_login(self.staff_user)
         response = self.client.get(reverse("htmx:sourcesystem-update", kwargs={"pk": self.source.pk}))
         form = response.context["form"]
-        self.assertNotIn("type", form.fields)
+        self.assertIn("type", form.fields)
 
     def test_it_should_not_expose_user_field(self):
         self.client.force_login(self.staff_user)
