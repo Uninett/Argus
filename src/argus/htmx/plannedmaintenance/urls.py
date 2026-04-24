@@ -6,8 +6,8 @@ from . import views
 app_name = "htmx"
 urlpatterns = [
     path("create/", views.PlannedMaintenanceCreateView.as_view(), name="plannedmaintenance-create"),
-    path("search-filters/", views.SearchFiltersView.as_view(), name="search-filters"),
-    path("filter-preview/", views.FilterPreviewView.as_view(), name="plannedmaintenance-filter-preview"),
+    path("search-filters/", views.search_filters, name="search-filters"),
+    path("filter-preview/", views.filter_preview, name="plannedmaintenance-filter-preview"),
     re_path(r"^(?P<tab>upcoming|past)?/$", views.PlannedMaintenanceListView.as_view(), name="plannedmaintenance-list"),
     path("<pk>/cancel/", views.PlannedMaintenanceCancelView.as_view(), name="plannedmaintenance-cancel"),
     path("<pk>/delete/", views.PlannedMaintenanceDeleteView.as_view(), name="plannedmaintenance-delete"),
