@@ -1,0 +1,103 @@
+{% extends "./base.html" %}
+{% load widget_tweaks %}
+{% block sourcesystem_main %}
+  <div class="max-w-2xl w-full pb-8">
+    <div class="card card-compact bg-base-100 shadow-sm border border-base-300">
+      <div class="card-body">
+        <h2 class="card-title">
+          {% if object.pk %}
+            Edit Source
+          {% else %}
+            Create Source
+          {% endif %}
+        </h2>
+        <form method="post"
+              action="{% if object.pk %}{% url 'htmx:sourcesystem-update' pk=object.pk %}{% else %}{% url 'htmx:sourcesystem-create' %}{% endif %}">
+          {% csrf_token %}
+          {% if form.non_field_errors %}
+            <div class="alert alert-error mb-4">
+              {% for error in form.non_field_errors %}<span>{{ error }}</span>{% endfor %}
+            </div>
+          {% endif %}
+          <div class="flex flex-col gap-4">
+            <div class="form-control w-full">
+              <label class="label" for="{{ form.name.auto_id }}">
+                <span class="label-text"><em>Name</em></span>
+              </label>
+              {% render_field form.name class+="input input-bordered w-full" %}
+              {% if form.name.errors %}
+                <div class="label">
+                  {% for error in form.name.errors %}<span class="label-text-alt text-error">{{ error }}</span>{% endfor %}
+                </div>
+              {% endif %}
+            </div>
+            {% if form.type %}
+              <div class="form-control w-full">
+                <label class="label" for="{{ form.type.auto_id }}">
+                  <span class="label-text"><em>Type</em></span>
+                </label>
+                {% render_field form.type class+="select select-bordered w-full" %}
+                {% if form.type.errors %}
+                  <div class="label">
+                    {% for error in form.type.errors %}<span class="label-text-alt text-error">{{ error }}</span>{% endfor %}
+                  </div>
+                {% endif %}
+              </div>
+            {% endif %}
+            {% if form.username %}
+              <div class="form-control w-full">
+                <label class="label" for="{{ form.username.auto_id }}">
+                  <span class="label-text"><em>Username</em></span>
+                </label>
+                {% render_field form.username class+="input input-bordered w-full" %}
+                {% if form.username.help_text %}
+                  <div class="label">
+                    <span class="label-text-alt">{{ form.username.help_text }}</span>
+                  </div>
+                {% endif %}
+                {% if form.username.errors %}
+                  <div class="label">
+                    {% for error in form.username.errors %}<span class="label-text-alt text-error">{{ error }}</span>{% endfor %}
+                  </div>
+                {% endif %}
+              </div>
+            {% endif %}
+            <div class="form-control w-full">
+              <label class="label" for="{{ form.base_url.auto_id }}">
+                <span class="label-text"><em>Base URL</em></span>
+              </label>
+              {% render_field form.base_url class+="input input-bordered w-full" placeholder="https://..." %}
+              {% if form.base_url.help_text %}
+                <div class="label">
+                  <span class="label-text-alt">{{ form.base_url.help_text }}</span>
+                </div>
+              {% endif %}
+              {% if form.base_url.errors %}
+                <div class="label">
+                  {% for error in form.base_url.errors %}<span class="label-text-alt text-error">{{ error }}</span>{% endfor %}
+                </div>
+              {% endif %}
+            </div>
+          </div>
+          <div class="card-actions justify-end mt-6">
+            <button type="submit" class="btn btn-primary">
+              {% if object.pk %}
+                Save changes
+              {% else %}
+                Create
+              {% endif %}
+            </button>
+            <a href="{% url 'htmx:sourcesystem-list' %}" class="btn">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  {% if form.username %}
+    <script>
+      document.getElementById("{{ form.name.auto_id }}").addEventListener("input", function () {
+        document.getElementById("{{ form.username.auto_id }}").placeholder = this.value || "";
+      });
+    </script>
+  {% endif %}
+{% endblock sourcesystem_main %}

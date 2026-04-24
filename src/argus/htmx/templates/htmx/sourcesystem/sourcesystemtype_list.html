@@ -1,0 +1,50 @@
+{% extends "./base.html" %}
+{% block sourcesystem_main %}
+  <div class="flex flex-col gap-4 max-w-6xl w-full">
+    <div class="flex justify-between items-center">
+      {% include "./_tabs.html" %}
+      {% if request.user.is_staff %}
+        <a class="btn btn-primary"
+           href="{% url 'htmx:sourcesystemtype-create' %}">Create new</a>
+      {% endif %}
+    </div>
+    <table class="border border-separate border-spacing-1 border-primary table table-xs">
+      <thead>
+        <tr class="border-b border-primary bg-base-100">
+          <th class="border-b border-primary">Name</th>
+          <th class="border-b border-primary text-right">Sources</th>
+          <th class="border-b border-primary text-right">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for type in object_list %}
+          <tr class="group">
+            <td class="border-b border-neutral-content group-last:border-b-0">{{ type.name }}</td>
+            <td class="border-b border-neutral-content group-last:border-b-0 text-right">{{ type.source_count }}</td>
+            <td class="border-b border-neutral-content group-last:border-b-0 text-right">
+              {% if request.user.is_staff %}
+                {% if type.source_count %}
+                  <span class="tooltip tooltip-left tooltip-warning cursor-not-allowed"
+                        data-tip="Cannot delete: has {{ type.source_count }} source{{ type.source_count|pluralize }}">
+                    <button type="button" class="btn btn-sm btn-ghost" disabled>Delete</button>
+                  </span>
+                {% else %}
+                  <button type="button"
+                          class="btn btn-sm btn-ghost text-error"
+                          onclick="document.getElementById('delete-dialog-{{ type.pk }}').showModal()">Delete</button>
+                {% endif %}
+              {% endif %}
+            </td>
+          </tr>
+          {% if request.user.is_staff and not type.source_count %}
+            {% include "./_delete_confirm_dialog.html" with obj=type delete_url_name="htmx:sourcesystemtype-delete" obj_type="source type" %}
+          {% endif %}
+        {% empty %}
+          <tr>
+            <td colspan="3" class="text-center text-base-content/60 py-4">No source types configured</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock sourcesystem_main %}

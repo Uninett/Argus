@@ -1,0 +1,21 @@
+<dialog id="delete-dialog-{{ obj.pk }}" class="modal">
+  <div class="modal-box">
+    <h3 class="font-semibold text-xl text-left">Delete {{ obj_type }}</h3>
+    <p class="py-4 text-base text-left">
+      Are you sure you want to delete "{{ obj }}"?
+      This action cannot be undone.
+    </p>
+    <div class="modal-action">
+      <form method="post" action="{% url delete_url_name pk=obj.pk %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-error">Yes, delete it</button>
+      </form>
+      <form method="dialog">
+        <button class="btn">No, keep it</button>
+      </form>
+    </div>
+  </div>
+  <form method="dialog" class="modal-backdrop">
+    <button>close</button>
+  </form>
+</dialog>
