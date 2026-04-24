@@ -11,8 +11,7 @@ from django.views import View
 from django.views.generic import CreateView, DeleteView, ListView, UpdateView
 from rest_framework.authtoken.models import Token
 
-from argus.htmx.plannedmaintenance.views import UserIsStaffMixin
-from argus.htmx.utils import TemplateNameViewMixin
+from argus.htmx.utils import TemplateNameViewMixin, UserIsStaffMixin
 from argus.incident.models import SourceSystem, SourceSystemType
 
 from .forms import AddSourceSystemTypeForm, CreateSourceSystemForm, UpdateSourceSystemForm
