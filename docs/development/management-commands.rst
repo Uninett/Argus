@@ -577,3 +577,20 @@ the command `rqworker`:
     .. code:: console
 
         $ python manage.py rqworker
+
+Look for new Argus release
+==========================
+To check if there is a new release of Argus available one can use the command `version_check`:
+
+    .. code:: console
+
+        $ python manage.py version_check
+
+To also save the latest version in the database, use the `--save` flag:
+
+    .. code:: console
+
+        $ python manage.py version_check --save
+
+This will currently not do anything, but in the future you will be able to get
+a notification in the frontend if there is a new release registered in the database that you haven't seen yet.
