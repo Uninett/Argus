@@ -86,19 +86,18 @@ class IncidentFilterForm(forms.Form):
     )
     sourceSystemIds = forms.MultipleChoiceField(
         widget=SearchDropdownMultiSelect(
-            attrs={"placeholder": "search sources..."},
+            attrs={"placeholder": "Select sources..."},
             partial_get=None,
-            extra={"preload": True, "display_name": "sources"},
+            extra={"preload": True, "display_name": "sources", "search_placeholder": "Search sources..."},
         ),
         required=False,
         label="Sources",
     )
     tags = forms.MultipleChoiceField(
         widget=SearchDropdownMultiSelect(
-            attrs={
-                "placeholder": "search tags...",
-            },
+            attrs={"placeholder": "Select tags..."},
             partial_get=None,
+            extra={"search_placeholder": "Search tags..."},
         ),
         required=False,
         label="Tags",

@@ -6,7 +6,7 @@
 {% block field_template %}
   <input type="search"
          class="input input-sm w-full mb-2"
-         placeholder="{{ widget.attrs.placeholder|default:'Search...' }}"
+         placeholder="{{ widget.extra.search_placeholder|default:'Search...' }}"
          data-search-input
          autocomplete="off"
          onchange="event.stopPropagation()"

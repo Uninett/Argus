@@ -1,5 +1,5 @@
 <!-- htmx/forms/dropdown_select_multiple.html -->
-<div class="dropdown dropdown-bottom max-w-sm"
+<div class="group dropdown dropdown-bottom max-w-sm"
      {% block field_control %}
      id="dropdown-{{ widget.attrs.id }}"
      hx-trigger="change from:(find .dropdown-content)"
@@ -15,7 +15,17 @@
        role="button"
        class="show-selected-box {{ widget.attrs.field_styles|default:"input input-primary h-auto" }} min-h-8 min-w-48 w-full leading-tight flex items-center gap-1">
     {% if not widget.has_selected %}
-      <span class="text-base-content/50">{{ widget.attrs.placeholder }}</span>
+      <span class="text-base-content/50 flex-1">{{ widget.attrs.placeholder }}</span>
+      <svg class="h-4 w-4 shrink-0 opacity-50 transition-transform duration-200 group-focus-within:rotate-180"
+           xmlns="http://www.w3.org/2000/svg"
+           viewBox="0 0 24 24"
+           fill="none"
+           stroke="currentColor"
+           stroke-width="2"
+           stroke-linecap="round"
+           stroke-linejoin="round">
+        <path d="m6 9 6 6 6-6" />
+      </svg>
     {% else %}
       <span class="flex flex-wrap gap-1 flex-1 items-center overflow-y-auto max-h-14">
         {% for _, options, _ in widget.optgroups %}
