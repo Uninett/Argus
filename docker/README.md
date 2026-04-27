@@ -2,7 +2,8 @@
 
 Whereas the top-level Dockerfile is development-oriented, this directory
 contains definitions to build a production-oriented Docker image of the Argus
-API backend component.
+API backend component and one that additionally installs all ticket and notification
+plugins.
 
 To build this image, the build context needs to be that of the git repository
 root. Something like this would work (when the current working directory is
@@ -10,6 +11,12 @@ here):
 
 ```shell
 docker build -t argus -f Dockerfile ..
+```
+
+or for the all-plugins image:
+
+```shell
+docker build -t argus-all-plugins --target all-plugins -f Dockerfile ..
 ```
 
 Or, from the top level directory:
