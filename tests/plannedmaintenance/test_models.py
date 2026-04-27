@@ -160,3 +160,31 @@ class PlannedMaintenanceTaskTests(TestCase):
 
         self.assertNotEqual(self.current_pm.end_time, current_pm_end_time)
         self.assertLess(self.current_pm.end_time, timezone.now())
+
+    def test_given_task_has_not_started_then_can_modify_start_time(self):
+        new_start = self.future_pm.start_time + timedelta(hours=1)
+        self.future_pm.start_time = new_start
+        self.future_pm.save()
+        self.future_pm.refresh_from_db()
+        self.assertEqual(self.future_pm.start_time, new_start)
+
+    def test_given_task_has_already_started_then_cannot_modify_start_time(self):
+        original_start = self.current_pm.start_time
+        self.current_pm.start_time = timezone.now() + timedelta(hours=1)
+        with self.assertRaises(ValidationError):
+            self.current_pm.save()
+        self.current_pm.refresh_from_db()
+        self.assertEqual(self.current_pm.start_time, original_start)
+
+    def test_given_task_has_recently_ended_then_cannot_modify_start_time(self):
+        now = timezone.now()
+        recently_ended_pm = PlannedMaintenanceFactory(
+            start_time=now - timedelta(hours=2),
+            end_time=now - timedelta(minutes=5),
+        )
+        original_start = recently_ended_pm.start_time
+        recently_ended_pm.start_time = now + timedelta(hours=1)
+        with self.assertRaises(ValidationError):
+            recently_ended_pm.save()
+        recently_ended_pm.refresh_from_db()
+        self.assertEqual(recently_ended_pm.start_time, original_start)

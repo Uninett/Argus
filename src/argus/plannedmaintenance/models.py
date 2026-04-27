@@ -137,6 +137,8 @@ class PlannedMaintenanceTask(models.Model):
                 raise ValidationError(
                     f"This planned maintenance task is no longer modifiable as it ended more than {hours} hours ago."
                 )
+            if not old.future and old.start_time != self.start_time:
+                raise ValidationError("The start time cannot be modified after the task has already started.")
 
     def save(self, *args, **kwargs):
         self.full_clean()
