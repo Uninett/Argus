@@ -53,12 +53,13 @@ class SourceSystemTypeAdmin(TextWidgetsOverrideModelAdmin):
 
 
 class SourceSystemAdmin(TextWidgetsOverrideModelAdmin):
-    list_display = ("name", "type", "user")
+    list_display = ("name", "type", "user", "last_seen")
     search_fields = ("name", "user__username")
     list_filter = ("type",)
 
     text_input_form_fields = ("name",)
     raw_id_fields = ("user",)
+    date_hierarchy = "last_seen"
 
     def get_form(self, request, obj=None, **kwargs):
         # If add form (instead of change form):

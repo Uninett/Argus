@@ -18,7 +18,7 @@ class AddSourceSystemForm(forms.ModelForm):
 
     class Meta:
         model = SourceSystem
-        exclude = ["user"]
+        exclude = ["user", "last_seen"]
 
     def clean_username(self):
         username = self.cleaned_data["username"]
