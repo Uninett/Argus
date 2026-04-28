@@ -4,6 +4,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.db.models import Count, ProtectedError
 from django.http import HttpResponseRedirect
+from django.template.response import TemplateResponse
 from django.urls import reverse
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
@@ -98,9 +99,24 @@ class SourceSystemTokenView(UserIsStaffMixin, View):
     http_method_names = ["post"]
 
     def post(self, request, pk):
-        source = get_object_or_404(SourceSystem, pk=pk)
+        source = get_object_or_404(
+            SourceSystem.objects.select_related("type", "user", "user__auth_token").annotate(
+                incident_count=Count("incidents")
+            ),
+            pk=pk,
+        )
         Token.objects.filter(user=source.user).delete()
         token = Token.objects.create(user=source.user)
+
+        if request.headers.get("HX-Request"):
+            source.token_status = "valid"
+            messages.success(request, f'New token generated for "{source}".')
+            return TemplateResponse(
+                request,
+                "htmx/sourcesystem/_sourcesystem_row.html",
+                {"source": source, "generated_token": token.key},
+            )
+
         messages.success(
             request,
             f'New token for "{source}": {token.key}',
