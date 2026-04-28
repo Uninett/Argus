@@ -1,4 +1,4 @@
-.PHONY: clean testclean distclean coverageclean cacheclean nuke setup-tailwind tailwind-config tailwind-build-config tailwind docclean upgrade-tailwind tailwind-watch check-test-names sync
+.PHONY: clean testclean distclean coverageclean cacheclean nuke setup-tailwind setup-tailwind-standalone tailwind-config tailwind-build-config tailwind docclean upgrade-tailwind tailwind-watch check-test-names sync
 
 TAILWINDDIR=src/argus/htmx/tailwindtheme
 STATICDIR=src/argus/htmx/static
@@ -32,6 +32,8 @@ testclean: coverageclean clean
 nuke: clean docclean distclean testclean cacheclean
 
 setup-tailwind: upgrade-tailwind tailwind-config tailwind
+
+setup-tailwind-standalone: upgrade-tailwind tailwind-build-config tailwind
 
 tailwind-config:
 	PYTHONPATH=$(PYTHONPATH) python3 manage.py tailwind_config
