@@ -1,0 +1,39 @@
+{% extends "./base.html" %}
+{% load widget_tweaks %}
+{% block sourcesystem_main %}
+  <div class="max-w-2xl w-full pb-8">
+    <div class="card card-compact bg-base-100 shadow-sm border border-base-300">
+      <div class="card-body">
+        <h2 class="card-title">Create Source Type</h2>
+        <form method="post" action="{% url 'htmx:sourcesystemtype-create' %}">
+          {% csrf_token %}
+          {% if form.non_field_errors %}
+            <div class="alert alert-error mb-4">
+              {% for error in form.non_field_errors %}<span>{{ error }}</span>{% endfor %}
+            </div>
+          {% endif %}
+          <div class="flex flex-col gap-4">
+            <div class="form-control w-full">
+              <label class="label" for="{{ form.name.auto_id }}">
+                <span class="label-text"><em>Name</em></span>
+              </label>
+              {% render_field form.name class+="input input-bordered w-full" %}
+              <div class="label">
+                <span class="label-text-alt">Will be stored in lowercase.</span>
+              </div>
+              {% if form.name.errors %}
+                <div class="label">
+                  {% for error in form.name.errors %}<span class="label-text-alt text-error">{{ error }}</span>{% endfor %}
+                </div>
+              {% endif %}
+            </div>
+          </div>
+          <div class="card-actions justify-end mt-6">
+            <button type="submit" class="btn btn-primary">Create</button>
+            <a href="{% url 'htmx:sourcesystemtype-list' %}" class="btn">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+{% endblock sourcesystem_main %}

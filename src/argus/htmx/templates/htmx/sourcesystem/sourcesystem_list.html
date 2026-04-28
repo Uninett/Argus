@@ -1,0 +1,116 @@
+{% extends "./base.html" %}
+{% block sourcesystem_main %}
+  <div class="flex flex-col gap-4 max-w-6xl w-full">
+    <div class="flex justify-between items-center">
+      {% include "./_tabs.html" %}
+      {% if request.user.is_staff %}
+        <a class="btn btn-primary" href="{% url 'htmx:sourcesystem-create' %}">Create new</a>
+      {% endif %}
+    </div>
+    <table class="border border-separate border-spacing-1 border-primary table table-xs">
+      <thead>
+        <tr class="border-b border-primary bg-base-100">
+          <th class="border-b border-primary">Name</th>
+          <th class="border-b border-primary">Type</th>
+          <th class="border-b border-primary">Base URL</th>
+          <th class="border-b border-primary">Token</th>
+          <th class="border-b border-primary text-right">Incidents</th>
+          <th class="border-b border-primary text-right">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for source in object_list %}
+          <tr class="group">
+            <td class="border-b border-neutral-content group-last:border-b-0">{{ source.name }}</td>
+            <td class="border-b border-neutral-content group-last:border-b-0">
+              <span class="badge badge-primary text-xs">{{ source.type }}</span>
+            </td>
+            <td class="border-b border-neutral-content group-last:border-b-0 max-w-xs truncate">
+              {{ source.base_url|default:"-" }}
+            </td>
+            <td class="border-b border-neutral-content group-last:border-b-0">
+              {% if source.token_status == "valid" %}
+                <span class="badge badge-outline badge-success text-xs gap-1">
+                  <i class="fa-solid fa-check" aria-hidden="true"></i> Valid
+                </span>
+              {% elif source.token_status == "expired" %}
+                <span class="badge badge-outline badge-error text-xs gap-1">
+                  <i class="fa-solid fa-exclamation" aria-hidden="true"></i> Expired
+                </span>
+              {% else %}
+                <span class="badge badge-outline text-xs gap-1">
+                  <i class="fa-solid fa-minus" aria-hidden="true"></i> Missing
+                </span>
+              {% endif %}
+            </td>
+            <td class="border-b border-neutral-content group-last:border-b-0 text-right">{{ source.incident_count }}</td>
+            <td class="border-b border-neutral-content group-last:border-b-0 text-right overflow-visible">
+              {% if request.user.is_staff %}
+                <div class="flex gap-1 justify-end">
+                  <a href="{% url 'htmx:sourcesystem-update' pk=source.pk %}"
+                     class="btn btn-sm btn-ghost">Edit</a>
+                  <div class="dropdown dropdown-end">
+                    <button tabindex="0" class="btn btn-sm btn-ghost btn-square">
+                      <svg xmlns="http://www.w3.org/2000/svg"
+                           class="h-4 w-4"
+                           viewBox="0 0 20 20"
+                           fill="currentColor">
+                        <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                      </svg>
+                    </button>
+                    <ul class="dropdown-content z-[50] menu menu-sm p-2 shadow bg-base-100 rounded-box w-max border border-base-300">
+                      <li>
+                        <button type="button"
+                                onclick="document.getElementById('token-form-{{ source.pk }}').submit()">
+                          <i class="fa-solid fa-key" aria-hidden="true"></i>
+                          {% if source.token_status == "missing" %}
+                            Generate token
+                          {% else %}
+                            Regenerate token
+                          {% endif %}
+                        </button>
+                      </li>
+                      {% if source.incident_count %}
+                        <li class="disabled">
+                          <span class="tooltip tooltip-left tooltip-warning"
+                                data-tip="Cannot delete: has {{ source.incident_count }} incident{{ source.incident_count|pluralize }}">
+                            <i class="fa-regular fa-trash-can" aria-hidden="true"></i> Delete
+                          </span>
+                        </li>
+                      {% else %}
+                        <li>
+                          <button type="button"
+                                  class="text-error"
+                                  onclick="document.getElementById('delete-dialog-{{ source.pk }}').showModal()">
+                            <i class="fa-regular fa-trash-can" aria-hidden="true"></i> Delete
+                          </button>
+                        </li>
+                      {% endif %}
+                    </ul>
+                  </div>
+                </div>
+              {% endif %}
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="6" class="text-center text-base-content/60 py-4">No source systems configured</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% if request.user.is_staff %}
+      {% for source in object_list %}
+        <form id="token-form-{{ source.pk }}"
+              method="post"
+              action="{% url 'htmx:sourcesystem-token' pk=source.pk %}"
+              class="hidden">
+          {% csrf_token %}
+        </form>
+        {% if not source.incident_count %}
+          {% include "./_delete_confirm_dialog.html" with obj=source delete_url_name="htmx:sourcesystem-delete" obj_type="source" %}
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+  </div>
+{% endblock sourcesystem_main %}

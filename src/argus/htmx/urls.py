@@ -7,6 +7,7 @@ from .timeslot.urls import urlpatterns as timeslot_urls
 from .notificationprofile.urls import urlpatterns as notificationprofile_urls
 from .plannedmaintenance.urls import urlpatterns as plannedmaintenance_urls
 from .destination.urls import urlpatterns as destination_urls
+from .sourcesystem.urls import urlpatterns as sourcesystem_urls
 from .user.urls import urlpatterns as user_urls
 from .views import IncidentListRedirectView, StyleGuideView
 
@@ -28,6 +29,7 @@ urlpatterns = [
         ),
     ),
     path("plannedmaintenance/", include(plannedmaintenance_urls)),
+    path("sources/", include(sourcesystem_urls)),
     path("user/", include(user_urls)),
     path("", IncidentListRedirectView.as_view(), name="root"),
 ]

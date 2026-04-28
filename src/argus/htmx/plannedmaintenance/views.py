@@ -1,5 +1,4 @@
 from django import forms
-from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
 from django.db.models import Q
 from django.forms import modelform_factory
@@ -11,7 +10,7 @@ from django.views.generic import CreateView, DeleteView, DetailView, ListView, U
 
 from argus.filter.queryset_filters import QuerySetFilter
 from argus.htmx.incident.columns import get_incident_table_columns, MAINTENANCE_COLUMN_LAYOUT_NAME
-from argus.htmx.utils import TemplateNameViewMixin
+from argus.htmx.utils import TemplateNameViewMixin, UserIsStaffMixin
 from argus.htmx.widgets import SearchDropdownMultiSelect
 from argus.incident.models import Incident
 from argus.notificationprofile.models import Filter
@@ -21,11 +20,6 @@ from argus.util.datetime_utils import LOCAL_INFINITY
 FLATPICKR_DATETIME_FORMAT = "%Y-%m-%d %H:%M"
 FILTER_PREVIEW_TEMPLATE = "htmx/plannedmaintenance/_filter_preview.html"
 FILTER_PREVIEW_LIMIT = 5
-
-
-class UserIsStaffMixin(UserPassesTestMixin):
-    def test_func(self):
-        return self.request.user.is_staff
 
 
 class PlannedMaintenanceMixin(TemplateNameViewMixin):

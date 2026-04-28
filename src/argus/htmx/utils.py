@@ -6,10 +6,16 @@
 
 from typing import Any
 
+from django.contrib.auth.mixins import UserPassesTestMixin
 from django.utils import timezone
 
 from argus.incident.models import Incident
 from argus.incident.ticket.utils import autocreate_ticket
+
+
+class UserIsStaffMixin(UserPassesTestMixin):
+    def test_func(self):
+        return self.request.user.is_staff
 
 
 class TemplateNameViewMixin:
