@@ -31,6 +31,7 @@ Notification plugins maintained by Argus developers, vendored
 .. toctree::
    email-plugin
    sms-plugin
+   slack-plugin
 
 Notification plugins maintained by Argus developers, optional
 -------------------------------------------------------------

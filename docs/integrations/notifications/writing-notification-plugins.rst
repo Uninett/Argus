@@ -94,3 +94,24 @@ example for SMS the given phone number will be checked. Django forms can be
 helpful for validation. A ``ValidationError`` should be raised if the given
 settings are invalid and the validated and cleaned data should be returned if
 not.
+
+Writing destination plugins using Apprise
+----------------------------------------------------------------
+If one wishes to write a notification plugin for a medium supported by Apprise, see `Apprise documentation: Supported services
+<https://appriseit.com/services/>`__, a pre-made base class is provided that allows you to get started almost straight "out of the box".
+
+| Class: ``argus.notificationprofile.media.base.AppriseMedium``
+
+A minimal example of how to use it can be found in:
+
+| Class: ``argus.notificationprofile.media.slack.SlackNotification``
+
+In this case as Apprise works with URLs, it can consume the destination webhook directly, so the notification class does not actually need anything.
+
+Nevertheless, it is probably smart to set the constants to be less generic and provide an extension of the ``validate`` function using your desired `MEDIA_SLUG`.
+
+Note that if you change the name of the core ``destination_url`` property, you will need to extend many more of the functions to use the new name.
+
+The default ``destination_url`` field implementation only supports http / https URLs.
+To use custom schemes (like the generic `service://configuration/?parameters` in the `Apprise docs <https://appriseit.com/getting-started/universal-syntax/>`_),
+you need to create a custom subclass overriding the appropriate fields and functions.
