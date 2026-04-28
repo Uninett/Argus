@@ -8,6 +8,16 @@ This project uses [*towncrier*](https://towncrier.readthedocs.io/) and the chang
 
 <!-- towncrier release notes start -->
 
+## [2.8.1] - 2026-04-28
+
+Mini-release to help something depending on the production docker image.
+
+### Fixed
+
+- Use `django-admin` to call `initial_setup` instead of `python3 manage.py` in
+  production image
+
+
 ## [2.8.0] - 2026-03-06
 
 The most important change in this release is that we have finally added the
