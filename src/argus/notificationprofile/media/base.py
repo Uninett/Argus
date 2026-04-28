@@ -4,11 +4,18 @@ import logging
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any
 
-from django.db import transaction
+from apprise import Apprise
 
-from argus.constants import API_STABLE_VERSION
+from django import forms
+from django.conf import settings
+from django.db import transaction
+from django.template.loader import render_to_string
+from rest_framework.exceptions import ValidationError
+
 from argus.notificationprofile.models import DestinationConfig
+from argus.constants import API_STABLE_VERSION
 from argus.notificationprofile.utils import are_notifications_enabled
+from argus.util.datetime_utils import INFINITY, LOCAL_INFINITY
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -24,8 +31,15 @@ if TYPE_CHECKING:
     User = get_user_model()
 
 
-__all__ = ["NotificationMedium"]
+__all__ = ["NotificationMedium", "AppriseMedium"]
+
 LOG = logging.getLogger(__name__)
+
+
+def modelinstance_to_dict(obj):
+    dict_ = vars(obj).copy()
+    dict_.pop("_state")
+    return dict_
 
 
 class NotificationMedium(ABC):
@@ -170,3 +184,121 @@ class NotificationMedium(ABC):
             managed_destination.save()
 
         return destination
+
+
+class AppriseMedium(NotificationMedium):
+    MEDIA_SLUG = "apprise"
+    MEDIA_NAME = "Apprise"
+    MEDIA_JSON_SCHEMA = {
+        "title": "Apprise Settings",
+        "description": "Settings for a DestinationConfig using Apprise.",
+        "type": "object",
+        "required": ["destination_url"],
+        "properties": {"destination_url": {"type": "string", "title": "Apprise destination url"}},
+    }
+
+    class Form(forms.Form):
+        destination_url = forms.URLField()
+
+    @classmethod
+    def validate(cls, instance: RequestDestinationConfigSerializer, apprise_dict: dict, user: User) -> dict:
+        """
+        Validates the settings of an Apprise destination and returns a dict
+        with validated and cleaned data
+        """
+        form = cls.Form(apprise_dict["settings"])
+        if not form.is_valid():
+            raise ValidationError(form.errors)
+        if user.destinations.filter(
+            media_id=cls.MEDIA_SLUG, settings__destination_url=form.cleaned_data["destination_url"]
+        ).exists():
+            raise ValidationError({"destination_url": "Webhook already exists"})
+
+        return form.cleaned_data
+
+    @classmethod
+    def has_duplicate(cls, queryset: QuerySet, settings: dict) -> bool:
+        """
+        Returns True if an Apprise destination with the same destination url
+        already exists in the given queryset
+        """
+        return queryset.filter(settings__destination_url=settings["destination_url"]).exists()
+
+    @staticmethod
+    def get_label(destination: DestinationConfig) -> str:
+        """
+        Returns the Apprise destination url represented by this destination
+        """
+        return destination.settings.get("destination_url")
+
+    @classmethod
+    def get_relevant_address(cls, destination: DestinationConfig) -> Any:
+        """Returns the Apprise destination url the message should be sent to"""
+        return destination.settings["destination_url"]
+
+    @staticmethod
+    def create_message_context(event: Event):
+        """Creates the subject and message for the Apprise notification"""
+        title = f"{event}"
+        incident_dict = modelinstance_to_dict(event.incident)
+        for field in ("id", "source_id"):
+            incident_dict.pop(field)
+        incident_dict["details_url"] = event.incident.pp_details_url()
+        if event.incident.end_time in {INFINITY, LOCAL_INFINITY}:
+            incident_dict["end_time"] = "Still open"
+
+        template_context = {
+            "title": title,
+            "event": event,
+            "incident_dict": incident_dict,
+        }
+        subject = f"{settings.NOTIFICATION_SUBJECT_PREFIX}{title}"
+        message = render_to_string("notificationprofile/apprise.txt", template_context)
+
+        return subject, message
+
+    @classmethod
+    def send(cls, event: Event, destinations: Iterable[DestinationConfig], **_) -> bool:
+        """
+        Sends an Apprise notification about a given event to the given destinations
+
+        Returns False if no destinations were given and
+        True if notifications were sent
+        """
+        if not are_notifications_enabled():
+            LOG.info("notifications: turned off sitewide, not sending")
+            return False
+
+        destinations = cls.get_relevant_destinations(destinations)
+        if not destinations:
+            return False
+
+        # Note that Apprise automatically leaves out 'subject' for destinations that don't support it
+        subject, message = cls.create_message_context(event=event)
+        failed = 0
+        num_destinations = len(destinations)
+        for destination in destinations:
+            destination_url = cls.get_relevant_address(destination)
+
+            notifier = Apprise()
+            notifier.add(destination_url)
+
+            result = notifier.notify(body=message, title=subject)
+
+            if not result:
+                failed += 1
+                LOG.error("Apprise: Failed to send event #%i to destination #%i", event.pk, destination.pk)
+            else:
+                LOG.debug("Apprise: Sent event #%i to destination #%i", event.pk, destination.pk)
+
+        if failed:
+            if num_destinations == failed:
+                LOG.error("Apprise: Failed to send event #%i to any destinations", event.pk)
+                return False
+            LOG.warning(
+                "Apprise: Failed to send event #%i to %i of %i destinations",
+                event.pk,
+                failed,
+                num_destinations,
+            )
+        return True
