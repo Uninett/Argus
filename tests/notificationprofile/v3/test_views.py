@@ -26,8 +26,8 @@ class MediumViewTests(APITestCase):
     def test_should_get_all_media(self):
         response = self.user1_rest_client.get(path="/api/v3/notificationprofiles/media/")
         self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
-        self.assertEqual(len(response.data), 2)
-        self.assertEqual(set([medium["slug"] for medium in response.data]), set(["sms", "email"]))
+        self.assertEqual(len(response.data), 4)
+        self.assertEqual(set([medium["slug"] for medium in response.data]), set(["sms", "email", "apprise", "slack"]))
 
     def test_should_get_specific_medium(self):
         response = self.user1_rest_client.get(path="/api/v3/notificationprofiles/media/email/")
