@@ -1,75 +1,139 @@
 <!-- htmx/forms/search_select_multiple.html -->
-<select id="id_{{ widget.name }}"
-        name="{{ widget.name }}"
-        class="hidden"
-        data-placeholder="{% if widget.attrs.placeholder %}{{ widget.attrs.placeholder }}{% else %}Search for {{ widget.name }}...{% endif %}"
-        multiple="true">
-  {% for _, options, _ in widget.optgroups %}
-    {% for option in options %}
-      {% if option.selected or widget.extra.preload %}
-        {% block show_selected %}
-          <option value="{{ option.value }}"
-                  {% if option.selected %}selected="selected"{% endif %}>{{ option.label }}</option>
-        {% endblock show_selected %}
-      {% endif %}
-    {% endfor %}
-  {% endfor %}
-</select>
-<script>
-(function () {
-    const selectId = '#id_{{ widget.name }}';
-    const parameterName = '{% if widget.extra.display_name %}{{ widget.extra.display_name }}{% else %}{{ widget.name }}{% endif %}';
-    const searchUrl = '{{ widget.partial_get }}';
+{% extends "htmx/forms/dropdown_select_multiple.html" %}
+{% block show_selected %}
+  <span class="badge badge-primary">{{ option.label }}</span>
+{% endblock show_selected %}
+{% block field_template %}
+  <input type="search"
+         class="input input-sm w-full mb-2"
+         placeholder="{{ widget.extra.search_placeholder|default:'Search...' }}"
+         data-search-input
+         autocomplete="off"
+         onchange="event.stopPropagation()"
+         onkeydown="if(event.key==='Enter'){event.preventDefault();event.stopPropagation()}">
+  {# Hidden input to ensure a value is always included in form submission #}
+  <input type="hidden" name="{{ widget.name }}" value="">
+  <div data-options-container class="max-h-64 overflow-y-auto">
+    {% include "django/forms/widgets/multiple_input.html" %}
+  </div>
+  {% if widget.extra.search_url %}<div data-search-results></div>{% endif %}
+  <script>
+  (function() {
+    const dropdown = document.getElementById('dropdown-{{ widget.attrs.id }}');
+    const searchInput = dropdown.querySelector('[data-search-input]');
+    const optionsContainer = dropdown.querySelector('[data-options-container]');
     const preload = {{ widget.extra.preload|yesno:"true,false" }};
+    const searchUrl = '{{ widget.extra.search_url|default:"" }}';
+    const fieldName = '{{ widget.name }}';
 
-    const choices = new Choices(selectId, {
-        removeItemButton: true,
-        searchResultLimit: 10,
-        duplicateItemsAllowed: false,
-        shouldSort: false,
-        searchEnabled: true,
-        searchChoices: preload,
-        loadingText: 'Loading...',
-        noResultsText: `No ${parameterName} found`,
-        noChoicesText: `No ${parameterName} to choose from`,
-        itemSelectText: '',
-        searchFloor: preload ? 1 : 2,
-        fuseOptions: {
-            threshold: 0.4,
-            ignoreLocation: true,
-        },
-        removeItemIconText: () => '',
-        classNames: {
-            containerOuter: ['choices', 'dropdown', 'max-w-sm', 'self-center'],
-            containerInner: ['choices__inner'],
-            listDropdown: ['choices-dropdown'],
-            listItems: ['choices-list-items'],
+    const resultsContainer = searchUrl ? dropdown.querySelector('[data-search-results]') : null;
+
+    // Auto-focus search input when dropdown opens
+    dropdown.addEventListener('focusin', (e) => {
+      if (e.target.closest('.show-selected-box')) {
+        setTimeout(() => searchInput.focus(), 50);
+      }
+    });
+
+    // Reset search state when dropdown closes
+    dropdown.addEventListener('focusout', (e) => {
+      if (dropdown.contains(e.relatedTarget)) return;
+      searchInput.value = '';
+      if (preload) {
+        optionsContainer.querySelectorAll('label').forEach(label => {
+          label.style.display = '';
+        });
+      }
+      if (resultsContainer) {
+        preserveCheckedResults();
+        resultsContainer.innerHTML = '';
+        // Remove unchecked items that were added from search
+        optionsContainer.querySelectorAll('[data-from-search]').forEach(label => {
+          if (!label.querySelector('input:checked')) label.remove();
+        });
+      }
+    });
+
+    // Move checked search results into persistent options before replacing
+    function preserveCheckedResults() {
+      if (!resultsContainer) return;
+      resultsContainer.querySelectorAll('input:checked').forEach(input => {
+        const label = input.closest('label');
+        if (label) {
+          label.dataset.fromSearch = 'true';
+          optionsContainer.appendChild(label);
         }
-    });
+      });
+    }
 
-    if (preload) return;
+    if (preload) {
+      // Client-side filtering for preloaded options
+      searchInput.addEventListener('input', () => {
+        const query = searchInput.value.toLowerCase();
+        optionsContainer.querySelectorAll('label').forEach(label => {
+          const text = label.textContent.toLowerCase();
+          label.style.display = text.includes(query) ? '' : 'none';
+        });
+      });
+    } else if (searchUrl) {
+      let searchTimeout;
 
-    const choicesElement = choices.passedElement.element;
+      // Remove all search-result items when selections are fully cleared
+      dropdown.querySelector('.dropdown-content').addEventListener('change', () => {
+        if (!dropdown.querySelector(`input[name="${fieldName}"]:checked`)) {
+          optionsContainer.querySelectorAll('[data-from-search]').forEach(label => label.remove());
+          resultsContainer.innerHTML = '';
+        }
+      });
 
-    let searchTimeout;
-    choicesElement.addEventListener('search', (event) => {
+      searchInput.addEventListener('input', () => {
         clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(async () => {
-            try {
-                const searchTerm = event.detail.value;
-                const response = await fetch(
-                    `${searchUrl}?q=${encodeURIComponent(searchTerm)}`
-                );
-                const options = await response.json();
-                choices.setChoices(options.results, 'id', 'text', true);
-            } catch (error) {
-                choices.setChoices([{value: 'error', label: `Failed to load ${parameterName}`}]);
-            }
-        }, 500);
-    });
+        const query = searchInput.value.trim();
 
-    choicesElement.addEventListener('change', function (event) {
-        choices.setChoices([], 'id', 'text', true);
-    });
-})();
-</script>
+        if (query.length < 2) {
+          preserveCheckedResults();
+          resultsContainer.innerHTML = '';
+          return;
+        }
+
+        searchTimeout = setTimeout(async () => {
+          try {
+            const response = await fetch(
+              `${searchUrl}?q=${encodeURIComponent(query)}`
+            );
+            const data = await response.json();
+
+            // Get currently selected values to avoid duplicates
+            const selected = new Set(
+              [...dropdown.querySelectorAll(`input[name="${fieldName}"]:checked`)]
+                .map(input => input.value)
+            );
+
+            preserveCheckedResults();
+            resultsContainer.innerHTML = '';
+            data.results.forEach(item => {
+              if (selected.has(String(item.id))) return;
+
+              const label = document.createElement('label');
+              label.className = 'flex gap-2 items-center my-1';
+
+              const input = document.createElement('input');
+              input.type = 'checkbox';
+              input.name = fieldName;
+              input.value = item.id;
+              input.className = 'checkbox checkbox-sm checkbox-primary border-base-content/20';
+              input.autocomplete = 'off';
+
+              label.appendChild(input);
+              label.appendChild(document.createTextNode(' ' + item.text));
+              resultsContainer.appendChild(label);
+            });
+          } catch (error) {
+            resultsContainer.innerHTML = '<span class="text-error text-sm">Search failed</span>';
+          }
+        }, 300);
+      });
+    }
+  })();
+  </script>
+{% endblock field_template %}
