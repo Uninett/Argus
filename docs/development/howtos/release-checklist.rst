@@ -40,8 +40,21 @@ in :file:`NOTES.md`.
 We plan to increase the first digit when dropping a REST API version. We have
 not needed to do this yet.
 
+.. attention::
+
+   It should not be necessary to do any this in a virtualenv. If one is needed,
+   file a bug. Dependencies are: ``python``, ``git``, ``tar``, something that
+   can list the contents of a zip file, something that can build a python
+   package (we use ``build`` as an example), and something that can upload
+   a packege to PyPI (here we use ``twine`` as an example.)
+
 Checklist
 ---------
+
+.. tip::
+
+   It is a good idea to do this in a fresh copy of the repo. Then several of
+   the more paranoid steps below will be less necessary.
 
 #. Ensure you're on the correct branch to be released. Either ``main`` or
    newest stable, which has a name of the form ``stable/1.5.x``. Release from
@@ -65,7 +78,7 @@ Checklist
 
     .. code:: console
 
-        $ make setup-tailwind
+        $ make setup-build-tailwind
 
 #. Run the tests one last time:
 
@@ -144,14 +157,32 @@ Checklist
 
         $ ls dist/
 
-   Then check the contents with any tool that can analyze
-   a zip-file, for instance ``zipinfo``. Check that no unwanted files are
-   included, like editor swap files, ``.pyc`` files, or ``__pycache__``
-   directories:
+   Then check the contents. For a wheel (``.whl``), use any tool that can
+   analyze a zip-file, for instance ``zipinfo``:
 
     .. code:: console
 
         $ zipinfo dist/FILENAME.wheel
+
+   For a tarball:
+
+    .. code:: console
+
+        $ tar tzf dist/FILENAME.tar.gz
+
+   Check that no unwanted files are included, like editor swap files, ``.pyc``
+   files, or ``__pycache__`` directories. Also check that the following
+   build-artifacts are included:
+
+   - src/argus/version.py
+   - src/argus/htmx/static/styles.css
+   - src/argus/htmx/tailwindtheme/styles.css
+   - src/argus/htmx/tailwindtheme/tailwind.css
+   - src/argus/htmx/tailwindtheme/custom-themes/\*.css
+
+   Note that the last directory SHOULD always have a ``README.md`` file, but
+   will only have css files if adding extra themes or overriding existing
+   themes in a branded package. For upstream, there should generally be none.
 
 #. Upload the wheel at `PyPI <https://pypi.org/>`_, for instance with
    `twine <https://twine.readthedocs.io/>`_:
