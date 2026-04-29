@@ -8,6 +8,127 @@ This project uses [*towncrier*](https://towncrier.readthedocs.io/) and the chang
 
 <!-- towncrier release notes start -->
 
+## [2.9.0] - 2026-04-29
+
+
+### Frontend changes
+
+This time around there are plenty small improvements to the planned maintenance
+subsystem.
+
+There's several small changes to the dashboard. Most importantly there's a spot
+for more complex, dashboard-only, filters. First one out is a filter to hide incidents that
+are "closed" AND "acked". Click on "Special filters".
+
+It is now no longer necessary to use the Django admin for administering
+sources. If a user has the `is_staff` flag set (easiest via Django admin) they
+can easily administer sources and their tokens via some new pages accessible
+via the user dropdown.
+
+There's a new management command to check for new versions of argus-server, we
+hope to eventually be able to have a subscription/notification service for
+this. The command is `check_version`. See also the new app
+`argus.versioncheck` if you are curious.
+
+The styling of the fixed banner (via the `BANNER_MESSAGE` setting) has changed.
+
+### Less visible things
+
+We now include a new notification plugin, for Slack. This is based on the 3rd
+party library `apprise`. Remember to upgrade dependencies!
+
+Finally, we have started to implement heart beat functionality. For a proper
+heart beat functionality the glue services must be able to explicitly send
+a heart beat, currently we only keep track of when a source (via a glue
+service) last used the API.
+
+### Note:
+
+We have changed the database backend to `psycopg` (from `psycopg2`). If you
+have not altered the default database settings you need only install the new
+dependency. Otherwise, see NOTES.md for details.
+
+We have replaced the included "light" and "dark" themes with themes based on
+the Sikt palette. The new ones have better contrast. To get the old themes
+back, see NOTES.md.
+
+While we have added support for running on Python 3.14, there has been some
+trouble in practice, so hold off on upgrading Python for now.
+
+### Added
+
+- Added support for testing and running on Python 3.14, also leading to various
+  dependency upgrades centered around pydantic.
+  ([#1725](https://github.com/Uninett/Argus/issues/1725))
+- Add Apprise-based notification plugin base class and built-in Slack
+  notification support ([#1768](https://github.com/Uninett/Argus/issues/1768))
+- Add special filters dropdown with "Hide closed acked" compound filter
+  ([#1879](https://github.com/Uninett/Argus/issues/1879))
+- Disabled the updating of start time for past planned maintenance tasks
+  ([#1891](https://github.com/Uninett/Argus/issues/1891))
+- Add "is under maintenance" column with filtering
+  ([#1894](https://github.com/Uninett/Argus/issues/1894))
+- Add ability to manage sources and source types directly in the Argus UI,
+  including token management
+  ([#1898](https://github.com/Uninett/Argus/issues/1898))
+- Add management command for finding newest Argus release
+  ([#1907](https://github.com/Uninett/Argus/issues/1907))
+- Record when a source last did something. This makes it easy to spot which
+  sources are actually in use, and serves as the start of heartbeat support.
+
+### Changed
+
+- Replace psycopg2 with psycopg3, using django-psycopg-infinity for infinity
+  timestamp support ([#942](https://github.com/Uninett/Argus/issues/942))
+- Remove `color_status` from the default built-in column preset
+  ([#1683](https://github.com/Uninett/Argus/issues/1683))
+- Add type-ahead search to sources filter
+  ([#1864](https://github.com/Uninett/Argus/issues/1864))
+- Replace tri-state range sliders with styled dropdown selects for State and
+  Acknowledged filters ([#1865](https://github.com/Uninett/Argus/issues/1865))
+- Improve banner message styling and make it themeable via CSS variables
+  ([#1867](https://github.com/Uninett/Argus/issues/1867))
+- Consolidate theme colors: replace built-in DaisyUI light/dark with Sikt
+  themes, align support and severity colors across all themes, and add runtime
+  fallback for deprecated theme names
+  ([#1884](https://github.com/Uninett/Argus/issues/1884))
+- Boost severity badge color visibility using OKLCH for sharper at-a-glance
+  identification ([#1884](https://github.com/Uninett/Argus/issues/1884))
+- Improve dropdown filter UX: fix tag selection, prevent flicker during
+  updates, and keep search results visible when selecting multiple items
+  ([#1887](https://github.com/Uninett/Argus/issues/1887))
+- Make severity level column filter more accessible
+  ([#1890](https://github.com/Uninett/Argus/issues/1890))
+- Blocked editing of start time for planned maintenance tasks that have already
+  started ([#1900](https://github.com/Uninett/Argus/issues/1900))
+
+### Fixed
+
+- Make version string selectable by separating text from copy button
+  ([#1661](https://github.com/Uninett/Argus/issues/1661))
+- Fix insufficient contrast on content colors in the Argus theme
+  ([#1749](https://github.com/Uninett/Argus/issues/1749))
+- Add missing staff access control to planned maintenance filter search and
+  preview views ([#1784](https://github.com/Uninett/Argus/issues/1784))
+- Add maxlength and character counter to filter name input
+  ([#1801](https://github.com/Uninett/Argus/issues/1801))
+- Fix hardcoded border radius classes overriding theme settings
+  ([#1817](https://github.com/Uninett/Argus/issues/1817))
+- Add maxlength and character counter to profile and timeslot name input
+  ([#1859](https://github.com/Uninett/Argus/issues/1859))
+- Fixed updating managed destinations
+  Make it possible to change the label of managed destinations
+  ([#1860](https://github.com/Uninett/Argus/issues/1860))
+- Fix compact severity column filter dropdown being constrained by narrow
+  column width ([#1866](https://github.com/Uninett/Argus/issues/1866))
+- Remove linked incidents for all ended planned maintenance tasks
+  ([#1885](https://github.com/Uninett/Argus/issues/1885))
+- Link relevant incidents to all current planned maintenance tasks
+  ([#1886](https://github.com/Uninett/Argus/issues/1886))
+- Fix duplicate URL parameters and improve checkbox accessibility on incidents
+  page ([#1906](https://github.com/Uninett/Argus/issues/1906))
+
+
 ## [2.8.1] - 2026-04-28
 
 Mini-release to help something depending on the production docker image.

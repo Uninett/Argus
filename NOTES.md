@@ -3,14 +3,20 @@
 This file documents changes to Argus that are relevant for operations,
 customizers and end-users.
 
-## Unreleased
+## [2.9.0] - 2026-04-29
 
-### PostgreSQL driver: psycopg2 replaced with psycopg3
+There are both new dependencies and table changes this time around, so
+remember to install the new dependencies (e.g. via `pip install -r
+requirements.txt`) and to migrate.
 
-The PostgreSQL driver has been changed from `psycopg2` to `psycopg3`
-(`psycopg`). This also introduces a new dependency,
-`django-psycopg-infinity`, which provides a custom database backend for
-infinity timestamp support.
+While we have added support for running on Python 3.14, there has been some
+trouble in practice, so hold off on upgrading Python for now.
+
+### PostgreSQL driver: psycopg2 replaced with psycopg 3
+
+The PostgreSQL driver has been changed from `psycopg2` to `psycopg` version 3.
+This also introduces a new dependency, `django-psycopg-infinity`, which
+provides a custom database backend for infinity timestamp support.
 
 **What you need to do:**
 
@@ -35,19 +41,20 @@ infinity timestamp support.
 
 ### Theme consolidation
 
-The ``sikt`` and ``sikt-dark`` themes have been renamed to ``light`` and
-``dark``. This means the built-in DaisyUI themes with those names are no longer
-directly accessible — the custom Sikt themes take their place. The bundled
-themes are now ``light``, ``dark``, and ``argus``.
+The `sikt` and `sikt-dark` themes have been renamed to `light` and
+`dark`. This means the built-in DaisyUI themes with those names are no longer
+directly accessible, the custom Sikt themes take their place. The bundled
+themes are now `light`, `dark`, and `argus`.
 
 The old names still work at runtime (mapped automatically with a deprecation
-warning), but ``DAISYUI_THEMES`` and ``THEME_DEFAULT`` should be updated.
+warning), but `DAISYUI_THEMES` and `THEME_DEFAULT` should be updated.
 
 To get the original DaisyUI light/dark themes back, add them as custom themes
-under a different name (e.g. ``daisy-light``) via ``DAISYUI_THEMES``. See
-`DaisyUI 5 theme generator <https://daisyui.com/theme-generator/>`_ and the
-:ref:`themes and styling <themes-and-styling>` docs for how to install custom
-themes.
+under a different name (e.g. `daisy-light`) via `DAISYUI_THEMES`. See
+[DaisyUI 5 theme generator](https://daisyui.com/theme-generator/) and the
+[themes and styling](<https://argus-server.readthedocs.io/en/v2.9.0/customization/htmx-frontend.html#themes-and-styling)
+(offline: [Customizing the HTMx frontend](<docs/customization/htmx-frontend.rst))
+docs for how to install custom themes.
 
 Severity badge colors and support colors (info, success, warning, error) have
 been aligned with the Sikt data visualization palette across all themes.
