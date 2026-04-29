@@ -1,0 +1,102 @@
+<tbody id="source-{{ source.pk }}"
+       class="[&:last-child_tr:last-child_td]:border-b-0">
+  <tr>
+    <td class="{% if not generated_token %}border-b border-base-300{% endif %}">{{ source.name }}</td>
+    <td class="{% if not generated_token %}border-b border-base-300{% endif %}">
+      <span class="badge badge-primary text-xs">{{ source.type }}</span>
+    </td>
+    <td class="{% if not generated_token %}border-b border-base-300{% endif %} max-w-xs truncate">
+      {{ source.base_url|default:"-" }}
+    </td>
+    <td class="{% if not generated_token %}border-b border-base-300{% endif %}">
+      {% if source.token_status == "valid" %}
+        <span class="badge badge-outline badge-success text-xs gap-1">
+          <i class="fa-solid fa-check" aria-hidden="true"></i> Valid
+        </span>
+      {% elif source.token_status == "expired" %}
+        <span class="badge badge-outline badge-error text-xs gap-1">
+          <i class="fa-solid fa-exclamation" aria-hidden="true"></i> Expired
+        </span>
+      {% else %}
+        <span class="badge badge-outline text-xs gap-1">
+          <i class="fa-solid fa-minus" aria-hidden="true"></i> Missing
+        </span>
+      {% endif %}
+    </td>
+    <td class="{% if not generated_token %}border-b border-base-300{% endif %} text-right">{{ source.incident_count }}</td>
+    <td class="{% if not generated_token %}border-b border-base-300{% endif %} text-right overflow-visible">
+      {% if request.user.is_staff %}
+        <div class="flex gap-1 justify-end">
+          <a href="{% url 'htmx:sourcesystem-update' pk=source.pk %}"
+             class="btn btn-sm btn-ghost">Edit</a>
+          <div class="dropdown dropdown-end">
+            <button tabindex="0" class="btn btn-sm btn-ghost btn-square">
+              <svg xmlns="http://www.w3.org/2000/svg"
+                   class="h-4 w-4"
+                   viewBox="0 0 20 20"
+                   fill="currentColor">
+                <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+              </svg>
+            </button>
+            <ul class="dropdown-content z-[50] menu menu-sm p-2 shadow bg-base-100 rounded-box w-max border border-base-300">
+              <li>
+                <button type="button"
+                        hx-post="{% url 'htmx:sourcesystem-token' pk=source.pk %}"
+                        hx-target="#source-{{ source.pk }}"
+                        hx-swap="outerHTML"
+                        hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+                  <i class="fa-solid fa-key" aria-hidden="true"></i>
+                  {% if source.token_status == "missing" %}
+                    Generate token
+                  {% else %}
+                    Regenerate token
+                  {% endif %}
+                </button>
+              </li>
+              {% if source.incident_count %}
+                <li class="disabled">
+                  <span class="tooltip tooltip-left tooltip-warning"
+                        data-tip="Cannot delete: has {{ source.incident_count }} incident{{ source.incident_count|pluralize }}">
+                    <i class="fa-regular fa-trash-can" aria-hidden="true"></i> Delete
+                  </span>
+                </li>
+              {% else %}
+                <li>
+                  <button type="button"
+                          class="text-error"
+                          onclick="document.getElementById('delete-dialog-{{ source.pk }}').showModal()">
+                    <i class="fa-regular fa-trash-can" aria-hidden="true"></i> Delete
+                  </button>
+                </li>
+              {% endif %}
+            </ul>
+          </div>
+        </div>
+      {% endif %}
+    </td>
+  </tr>
+  {% if generated_token %}
+    <tr>
+      <td colspan="6" class="border-b border-base-300 py-2">
+        <div class="flex items-center gap-2">
+          <span class="text-xs text-success font-medium">
+            <i class="fa-solid fa-check" aria-hidden="true"></i>
+            Token generated for "{{ source.name }}"
+          </span>
+          <input type="text"
+                 value="{{ generated_token }}"
+                 readonly
+                 size="40"
+                 class="input input-xs input-bordered font-mono w-auto select-all"
+                 onclick="this.select()" />
+          <button type="button"
+                  class="btn btn-xs btn-ghost"
+                  onclick="navigator.clipboard.writeText('{{ generated_token }}'); this.querySelector('i').className = 'fa-solid fa-check'; setTimeout(() => this.querySelector('i').className = 'fa-regular fa-clipboard', 2000)"
+                  title="Copy to clipboard">
+            <i class="fa-regular fa-clipboard"></i>
+          </button>
+        </div>
+      </td>
+    </tr>
+  {% endif %}
+</tbody>

@@ -227,6 +227,27 @@ class SourceSystemTokenViewTests(TestCase):
         self.assertEqual(len(msgs), 1)
         self.assertIn(token.key, str(msgs[0]))
 
+    def test_given_htmx_request_when_generating_it_should_return_partial(self):
+        self.client.force_login(self.staff_user)
+        response = self.client.post(
+            reverse("htmx:sourcesystem-token", kwargs={"pk": self.source.pk}),
+            HTTP_HX_REQUEST="true",
+        )
+        self.assertEqual(response.status_code, 200)
+        token = Token.objects.get(user=self.source.user)
+        self.assertContains(response, token.key)
+
+    def test_given_htmx_request_when_generating_it_should_not_include_token_in_message(self):
+        self.client.force_login(self.staff_user)
+        response = self.client.post(
+            reverse("htmx:sourcesystem-token", kwargs={"pk": self.source.pk}),
+            HTTP_HX_REQUEST="true",
+        )
+        token = Token.objects.get(user=self.source.user)
+        msgs = list(response.context["messages"])
+        self.assertEqual(len(msgs), 1)
+        self.assertNotIn(token.key, str(msgs[0]))
+
 
 @tag("integration")
 class SourceSystemTypeListViewTests(TestCase):
