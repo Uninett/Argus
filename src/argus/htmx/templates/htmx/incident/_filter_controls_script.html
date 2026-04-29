@@ -97,6 +97,19 @@
     btn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
   }
 
+  // Deduplicate single-valued HTMX request parameters caused by hx-vals
+  // and hx-include overlap (e.g. sort button provides sort via hx-vals while
+  // hx-include also picks up the hidden sort inputs from the filter form).
+  // For array params, keep the last value which comes from hx-vals.
+  document.body.addEventListener('htmx:configRequest', (e) => {
+    const params = e.detail.parameters;
+    for (const key of ['sort', 'sort_order', 'page']) {
+      if (Array.isArray(params[key])) {
+        params[key] = params[key][params[key].length - 1];
+      }
+    }
+  });
+
   document.addEventListener('DOMContentLoaded', () => {
     if (localStorage.getItem('argus_show_filters') === 'false') {
       document.getElementById('filter-controls-box')?.classList.add('filters-collapsed');
