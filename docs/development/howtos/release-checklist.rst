@@ -78,7 +78,7 @@ Checklist
 
     .. code:: console
 
-        $ make setup-build-tailwind
+        $ make setup-tailwind-standalone
 
 #. Run the tests one last time:
 
