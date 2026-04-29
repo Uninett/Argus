@@ -5,6 +5,7 @@ import logging
 from operator import and_
 from random import randint, choice
 from urllib.parse import urljoin
+from typing import Optional
 
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
@@ -172,6 +173,10 @@ class SourceSystem(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.type})"
+
+    def update_last_seen(self, timestamp: Optional[datetime] = None):
+        self.last_seen = timestamp if timestamp else timezone.now()
+        self.save()
 
 
 class TagQuerySet(models.QuerySet):

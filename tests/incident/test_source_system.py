@@ -1,16 +1,37 @@
+from datetime import datetime
+from unittest.mock import patch
+
 from django.contrib.auth import get_user_model
-from django.test import Client, tag
+from django.test import Client, tag, TestCase
 from django.urls import reverse
 
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient, APITestCase
 
 from argus.auth.factories import AdminUserFactory
-from argus.incident.factories import SourceSystemTypeFactory
+from argus.incident.factories import SourceSystemFactory, SourceSystemTypeFactory
 from argus.incident.models import SourceSystem
 
 
 User = get_user_model()
+
+
+@tag("db")
+class SourceSystemUpdateLastSeenTests(TestCase):
+    def test_updates_last_seen_field_to_given_timestamp(self):
+        source = SourceSystemFactory()
+        self.assertIsNone(source.last_seen)
+        testtime = datetime(1970, 1, 1)
+        source.update_last_seen(testtime)
+        self.assertEqual(source.last_seen, testtime)
+
+    def test_updates_last_seen_field_to_current_timestamp(self):
+        source = SourceSystemFactory()
+        self.assertIsNone(source.last_seen)
+        testtime = datetime(1970, 1, 1)
+        with patch("argus.incident.models.timezone.now", return_value=testtime):
+            source.update_last_seen()
+            self.assertEqual(source.last_seen, testtime)
 
 
 @tag("api", "integration")
