@@ -42,11 +42,11 @@ not needed to do this yet.
 
 .. attention::
 
-   It should not be necessary to do any this in a virtualenv. If one is needed,
+   It should not be necessary to do any of this in a virtualenv. If one is needed,
    file a bug. Dependencies are: ``python``, ``git``, ``tar``, something that
    can list the contents of a zip file, something that can build a python
    package (we use ``build`` as an example), and something that can upload
-   a packege to PyPI (here we use ``twine`` as an example.)
+   a package to PyPI (here we use ``twine`` as an example.)
 
 Checklist
 ---------
