@@ -18,6 +18,7 @@ from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema, extend_schema_view
 
 from argus.constants import API_STABLE_VERSION, API_STABLE_SCHEMA_VIEWNAME
+from argus.util.http import HttpResponseNoContent
 from .serializers import MetadataSerializer
 
 LOG = logging.getLogger(__name__)
@@ -31,6 +32,13 @@ def index(request):
     }
     return render(request, "index.html", context=context)
 index.login_required = False
+# fmt: on
+
+
+# fmt: off
+def health_check(request):
+    return HttpResponseNoContent()
+health_check.login_required = False
 # fmt: on
 
 
