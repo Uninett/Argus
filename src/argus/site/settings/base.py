@@ -322,6 +322,13 @@ SOCIAL_AUTH_NEW_USER_REDIRECT_URL = SOCIAL_AUTH_LOGIN_REDIRECT_URL
 
 # App settings: override themes, urls, context processors
 
+BANNER_MESSAGE = get_str_env("ARGUS_BANNER_MESSAGE", default=None)
+
+# Used for looking up the latest version of Argus on PyPI
+PYPI_URL = get_str_env("ARGUS_PYPI_URL", "https://pypi-proxy.sokrates.edupaas.no")
+
+ENVIRONMENT = get_str_env("ARGUS_ENVIRONMENT", "environment-unset")
+
 # add apps that may override other apps
 _overriding_apps_env = get_json_env("ARGUS_OVERRIDING_APPS", [], quiet=False)
 OVERRIDING_APPS = validate_app_setting(_overriding_apps_env)
@@ -334,7 +341,4 @@ EXTRA_APPS = validate_app_setting(_extra_apps_env)
 del _extra_apps_env
 update_settings(globals(), EXTRA_APPS)
 
-BANNER_MESSAGE = get_str_env("ARGUS_BANNER_MESSAGE", default=None)
-
-# Used for looking up the latest version of Argus on PyPI
-PYPI_URL = get_str_env("ARGUS_PYPI_URL", "https://pypi-proxy.sokrates.edupaas.no")
+#### DO NOT DEFINE ANY SETTINGS BELOW OVERRIDING_APPS and EXTRA_APPS!
