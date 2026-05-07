@@ -4,7 +4,10 @@ import logging.config
 
 from argus.htmx.settings import *  # noqa: F403
 
-from . import get_bool_env, get_str_env
+from . import get_bool_env, get_str_env, setup_logging
+
+
+setup_logging()
 
 DEBUG = get_bool_env("DEBUG", True)
 TEMPLATES[0]["OPTIONS"]["debug"] = get_bool_env("TEMPLATE_DEBUG", True)  # noqa: F405

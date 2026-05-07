@@ -1,14 +1,12 @@
 from __future__ import annotations
 
 import json
-import logging.config
 from os import getenv
 from pathlib import Path
 from urllib.parse import urlsplit, urlunsplit
 
-from django.utils.module_loading import import_string
-
 from ._serializers import ListAppSetting
+from argus.logging.utils import setup_logging
 
 
 __all__ = [
@@ -128,38 +126,3 @@ def normalize_url(url):
     netloc = "".join(netloc.rsplit(":", 1)[0])
     fixed_url = parsed_url._replace(netloc=netloc)
     return urlunsplit(fixed_url)
-
-
-# logging-helpers, we want the logging-setup separate from the rest
-
-
-def setup_logging(dotted_path=None):
-    """Use the dictionary on the dotted path to set up logging
-
-    Returns the dictionary on success, otherwise None.
-    """
-    if dotted_path:
-        try:
-            class_or_attr = import_string(dotted_path)
-        except AttributeError:
-            return
-        logging.config.dictConfig(class_or_attr)
-        return class_or_attr
-
-
-def update_loglevels(loglevel: str = "INFO", loggers=(), handlers=()) -> None:
-    """Override specific loglevels in already setup loggers or handlers"""
-    loglevel = loglevel.upper()
-    for logger in loggers:
-        logging.getLogger(logger).setLevel(loglevel)
-    if handlers:
-        handlerdict = {}
-        for handler in handlers:
-            handlerdict["handler"] = {"level": loglevel}
-        logdict = {
-            "version": 1,
-            "disable_existing_loggers": False,
-            "incremental": True,
-            "handlers": handlerdict,
-        }
-        logging.config.dictConfig(logdict)

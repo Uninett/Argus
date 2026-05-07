@@ -21,6 +21,14 @@ from ..utils import update_settings
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
+# Logging
+
+LOGGING_MODULE = get_str_env("DJANGO_LOGGING_MODULE", None)
+if LOGGING_MODULE:
+    LOGGING_CONFIG = None
+    STARTUP_LOGGING = setup_logging(LOGGING_MODULE)
+
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = get_bool_env("DEBUG", False)
 
@@ -193,13 +201,6 @@ EMAIL_PORT = get_int_env("EMAIL_PORT", 25)
 EMAIL_USE_TLS = get_bool_env("EMAIL_USE_TLS", default=False)
 EMAIL_HOST_PASSWORD = get_str_env("EMAIL_HOST_PASSWORD")
 DEFAULT_FROM_EMAIL = get_str_env("DEFAULT_FROM_EMAIL", "argus@localhost")
-
-# Logging
-
-LOGGING_MODULE = get_str_env("DJANGO_LOGGING_MODULE", None)
-if LOGGING_MODULE:
-    LOGGING_CONFIG = None
-    STARTUP_LOGGING = setup_logging(LOGGING_MODULE)
 
 # For permalinks to incidents in argus dashboard
 FRONTEND_URL = get_str_env("ARGUS_FRONTEND_URL")
