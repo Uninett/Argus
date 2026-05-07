@@ -283,7 +283,7 @@ class FilterListView(ListView):
 
 def incident_list_filter(request, qs, use_empty_filter=False):
     LOG = logging.getLogger(__name__ + ".incident_list_filter")
-    LOG.debug("GET at start: %s", request.GET)
+    LOG.trace("GET at start: %s", request.GET)
     filter_pk, filter_obj = request.session.get("selected_filter", None), None
     if filter_pk:
         try:
@@ -293,41 +293,41 @@ def incident_list_filter(request, qs, use_empty_filter=False):
             filter_pk, filter_obj = None, None
     if filter_obj:
         form = IncidentFilterForm(_convert_filterblob(filter_obj.filter.copy()))
-        LOG.debug("using stored filter: %s", filter_obj.filter)
+        LOG.trace("using stored filter: %s", filter_obj.filter)
     else:
         form_data = _normalize_form_data(request)
         if request.method == "POST":
             form = IncidentFilterForm(form_data)
-            LOG.debug("using POST: %s", form_data)
+            LOG.trace("using POST: %s", form_data)
         else:
             if use_empty_filter:
                 form_data = IncidentFilterForm.DEFAULT_VALUES
                 form = IncidentFilterForm(form_data)
-                LOG.debug("using empty filter: %s", form_data)
+                LOG.trace("using empty filter: %s", form_data)
             elif form_data:
                 # User has explicitly set filter params in URL
                 form = IncidentFilterForm(form_data)
-                LOG.debug("using GET: %s", form_data)
+                LOG.trace("using GET: %s", form_data)
             else:
                 # No filter params - try to load from user preference
                 stored_filter = _get_filter_preference(request)
                 if stored_filter:
                     form = IncidentFilterForm(_convert_filterblob(stored_filter.copy()))
-                    LOG.debug("using stored preference filter: %s", stored_filter)
+                    LOG.trace("using stored preference filter: %s", stored_filter)
                 else:
                     form = IncidentFilterForm(None)
-                    LOG.debug("using empty form (no preference)")
+                    LOG.trace("using empty form (no preference)")
 
     filterblob = {}
     if form.is_valid():
-        LOG.debug("Cleaned data: %s", form.cleaned_data)
+        LOG.trace("Cleaned data: %s", form.cleaned_data)
         filterblob = form.to_filterblob()
         qs = QuerySetFilter.filtered_incidents(filterblob, qs)
     else:
         if not request.GET:
-            LOG.debug("empty form")
+            LOG.trace("empty form")
         else:
-            LOG.debug("Dirty form: %s", form.errors)
+            LOG.trace("Dirty form: %s", form.errors)
             for field, error_messages in form.errors.items():
                 messages.error(request, f"{field}: {','.join(error_messages)}")
 

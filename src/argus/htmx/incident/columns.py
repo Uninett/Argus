@@ -292,7 +292,7 @@ def get_default_column_layout():
     be removed in the future.
     """
     column_setting = getattr(settings, "INCIDENT_TABLE_COLUMNS", [])
-    LOG.debug("Getting INCIDENT_TABLE_COLUMNS: column_setting: %s", column_setting)
+    LOG.trace("Getting INCIDENT_TABLE_COLUMNS: column_setting: %s", column_setting)
     return _DEFAULT_COLUMN_LAYOUT_NAME, column_setting
 
 
@@ -304,7 +304,7 @@ def get_configured_column_layouts():
     argus.htmx.defaults and INCIDENT_TABLE_COLUMNS.
     """
     column_settings = getattr(settings, "INCIDENT_TABLE_COLUMN_LAYOUTS", {})
-    LOG.debug("Getting INCIDENT_TABLE_COLUMN_LAYOUTS: column_setting: %s", column_settings)
+    LOG.trace("Getting INCIDENT_TABLE_COLUMN_LAYOUTS: column_setting: %s", column_settings)
     return column_settings
 
 
@@ -322,7 +322,7 @@ def get_available_column_layouts():
     if configured_layouts:
         layouts.update(configured_layouts)
 
-    LOG.debug("Available column layouts: %s", layouts)
+    LOG.trace("Available column layouts: %s", layouts)
     return layouts
 
 
@@ -339,7 +339,7 @@ def get_incident_table_columns(name: str = BUILTIN_COLUMN_LAYOUT_NAME) -> list[I
 
     Falls back to the built-in layout if the name is unknown."""
 
-    LOG.debug("Getting layouts: get_incident_table_columns")
+    LOG.trace("Getting layouts: get_incident_table_columns")
     layouts = get_available_column_layouts()
     if name not in layouts:
         name = BUILTIN_COLUMN_LAYOUT_NAME
@@ -353,7 +353,7 @@ def get_default_column_layout_name():
     If a layout named "default" is found in the layouts, use that as the
     fallback, otherwise fall back to the built-in layout."""
 
-    LOG.debug("Getting layouts: get_default_column_layout_name")
+    LOG.trace("Getting layouts: get_default_column_layout_name")
     layouts = get_available_column_layouts()
     if _DEFAULT_COLUMN_LAYOUT_NAME in layouts.keys():
         return _DEFAULT_COLUMN_LAYOUT_NAME
