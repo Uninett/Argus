@@ -418,6 +418,14 @@ Special environment settings
   opacity as a percentage, default ``25%``). See :ref:`themes-and-styling` for
   how to customize themes.
 
+.. setting:: ENVIRONMENT
+
+* :setting:`ENVIRONMENT` is a plain text string used to enrich log messages.
+  Examples: "dev", "production", "new feature test".
+
+See :doc:`../production/logging`
+
+
 Debugging settings
 ------------------
 
