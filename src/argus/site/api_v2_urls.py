@@ -19,5 +19,6 @@ urlpatterns = [
     path("auth/", include("argus.auth.urls")),
     path("incidents/", include("argus.incident.urls")),
     path("notificationprofiles/", include("argus.notificationprofile.v2.urls")),
+    path("plannedmaintenance/", include("argus.plannedmaintenance.urls")),
     path("token-auth/", include((tokenauth_urls, "auth"))),
 ]
