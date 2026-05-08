@@ -74,6 +74,7 @@ dev = [
     "tox>=4",
     "build",  # for debugging builds/installs
 ]
+jsonlogging = ["python-json-logger"]
 
 [tool.hatch.version]
 source = "versioningit"
