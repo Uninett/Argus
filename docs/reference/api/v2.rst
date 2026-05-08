@@ -1003,3 +1003,78 @@ Notification profile endpoints
        {
            "sourceSystemIds": [<SourceSystem.pk>, ...]
        }
+
+Planned maintenance endpoints
+-----------------------------
+
+-  ``/api/v2/plannedmaintenance/``:
+
+   -  ``GET``: returns all planned maintenance tasks
+
+      .. code-block:: json
+        :caption: Example response body
+
+          [
+            {
+              "pk": 0,
+              "created_by": {
+                "pk": 1,
+                "username": "admin"
+              },
+              "created": "2026-05-08T14:03:12.590Z",
+              "start_time": "2026-05-08T14:03:12.590Z",
+              "end_time": "2026-05-09T14:03:12.590Z",
+              "description": "Moving the server room",
+              "filters": [
+                {
+                  "pk": 7,
+                  "name": "test",
+                  "filter": {
+                    "sourceSystemIds": [
+                      2
+                    ],
+                    "source_types": [
+                      "argus"
+                    ],
+                    "open": null,
+                    "acked": null,
+                    "stateful": null,
+                    "maxlevel": null,
+                    "event_type": null
+                  }
+                }
+              ]
+            }
+          ]
+
+
+   -  ``POST``: creates and returns a planned maintenance task, which is then
+      connected to the logged in user, omit the end time to set it to infinite, only
+      possible for admins
+
+      .. code-block:: json
+        :caption: Example request body
+
+          {
+            "start_time": "2026-05-08T08:28:51.204Z",
+            "end_time": "2026-05-09T08:28:51.204Z",
+            "description": "Moving the server room",
+            "filters": [
+              1
+            ]
+          }
+
+
+-  ``/api/v2/plannedmaintenance/<int:pk>/``:
+
+   -  ``GET``: returns a planned maintenance task by primary key
+
+   -  ``PATCH``: updates and returns a planned maintenance task by primary key, only
+      possible if the task has not ended more than 12 hours ago, only possible for
+      admins
+
+      -  Example request body: same or a subset of ``POST`` to
+         ``/api/v2/plannedmaintenance/``
+
+   -  ``DELETE``: deletes a planned maintenance task by primary key, only possible if
+      the task is in the future and for admins
