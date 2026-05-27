@@ -103,8 +103,9 @@ httpcore==1.0.9
     # via httpx
 httpx==0.28.1
     # via argus-server (pyproject.toml)
-idna==3.11
+idna==3.16
     # via
+    #   -r constraints.txt
     #   anyio
     #   httpx
     #   requests
@@ -140,9 +141,7 @@ pydantic==2.13.3
 pydantic-core==2.46.3
     # via pydantic
 pyjwt[crypto]==2.12.1
-    # via
-    #   pyjwt
-    #   social-auth-core
+    # via social-auth-core
 python-dataporten-auth==2.0.0
     # via argus-server (pyproject.toml)
 python3-openid==3.2.0
@@ -180,17 +179,20 @@ sqlparse==0.5.5
     # via django
 typing-extensions==4.15.0
     # via
+    #   anyio
     #   django-stubs-ext
     #   django-tasks
     #   django-tasks-db
+    #   psycopg
     #   pydantic
     #   pydantic-core
+    #   referencing
     #   typing-inspection
 typing-inspection==0.4.2
     # via pydantic
 uritemplate==4.2.0
     # via drf-spectacular
-urllib3==2.6.3
+urllib3==2.7.0
     # via
     #   -r constraints.txt
     #   requests

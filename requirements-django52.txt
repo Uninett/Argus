@@ -91,6 +91,8 @@ drf-rw-serializers==1.4.0
     # via argus-server (pyproject.toml)
 drf-spectacular==0.29.0
     # via argus-server (pyproject.toml)
+exceptiongroup==1.3.1
+    # via anyio
 factory-boy==3.3.3
     # via argus-server (pyproject.toml)
 faker==40.5.1
@@ -103,8 +105,9 @@ httpcore==1.0.9
     # via httpx
 httpx==0.28.1
     # via argus-server (pyproject.toml)
-idna==3.11
+idna==3.16
     # via
+    #   -r constraints.txt
     #   anyio
     #   httpx
     #   requests
@@ -180,17 +183,24 @@ sqlparse==0.5.5
     # via django
 typing-extensions==4.15.0
     # via
+    #   anyio
+    #   asgiref
+    #   cryptography
     #   django-stubs-ext
     #   django-tasks
     #   django-tasks-db
+    #   exceptiongroup
+    #   psycopg
     #   pydantic
     #   pydantic-core
+    #   pyjwt
+    #   referencing
     #   typing-inspection
 typing-inspection==0.4.2
     # via pydantic
 uritemplate==4.2.0
     # via drf-spectacular
-urllib3==2.6.3
+urllib3==2.7.0
     # via
     #   -r constraints.txt
     #   requests
