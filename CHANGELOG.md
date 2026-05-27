@@ -8,8 +8,25 @@ This project uses [*towncrier*](https://towncrier.readthedocs.io/) and the chang
 
 <!-- towncrier release notes start -->
 
-## [2.9.0] - 2026-04-29
+## [2.9.1] - 2026-05-27
 
+The purpose for this release is primarily to aid in creating a Helm chart for
+Argus via changes to the production Dockerfile.
+
+### Added
+
+- Document how to log with structured (JSON) logs and add an optional
+  dependency to accomplish this.
+
+### Changed
+
+- Some subdependencies were updated for security reasons.
+- The production Dockerfile was changed to be able to include all plugins
+  maintained by the same team as argus, see the README.md in the docker
+  directory.
+
+
+## [2.9.0] - 2026-04-29
 
 ### Frontend changes
 
