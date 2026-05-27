@@ -42,7 +42,7 @@ defusedxml==0.7.1
     #   social-auth-core
 dj-database-url==3.1.2
     # via argus-server (pyproject.toml)
-django==6.0.4
+django==6.0.5
     # via
     #   -r requirements/django60.txt
     #   argus-server (pyproject.toml)
@@ -141,7 +141,9 @@ pydantic==2.13.3
 pydantic-core==2.46.3
     # via pydantic
 pyjwt[crypto]==2.12.1
-    # via social-auth-core
+    # via
+    #   pyjwt
+    #   social-auth-core
 python-dataporten-auth==2.0.0
     # via argus-server (pyproject.toml)
 python3-openid==3.2.0
@@ -179,14 +181,11 @@ sqlparse==0.5.5
     # via django
 typing-extensions==4.15.0
     # via
-    #   anyio
     #   django-stubs-ext
     #   django-tasks
     #   django-tasks-db
-    #   psycopg
     #   pydantic
     #   pydantic-core
-    #   referencing
     #   typing-inspection
 typing-inspection==0.4.2
     # via pydantic
