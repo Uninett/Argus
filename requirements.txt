@@ -190,7 +190,7 @@ typing-inspection==0.4.2
     # via pydantic
 uritemplate==4.2.0
     # via drf-spectacular
-urllib3==2.6.3
+urllib3==2.7.0
     # via
     #   -r constraints.txt
     #   requests
