@@ -1,9 +1,7 @@
 {% load widget_tweaks %}
 {{ errors }}
 {% if errors and not fields %}
-  <div>
-    {% for field in hidden_fields %}{{ field }}{% endfor %}
-  </div>
+  <div>{% for field in hidden_fields %}{{ field }}{% endfor %}</div>
 {% endif %}
 <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 w-full items-start">
   {% for field, errors in fields %}

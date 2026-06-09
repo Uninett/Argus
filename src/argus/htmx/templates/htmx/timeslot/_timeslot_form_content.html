@@ -25,12 +25,12 @@
     <div class="flex flex-col gap-4">{{ formset.as_div }}</div>
     {% if success_message %}
       <div _="on toggle from closest <details/> if not it.open remove me">
-      {% include "messages/_banner.html" with message=success_message level="success" %}
-    </div>
-  {% elif form.errors or formset.total_error_count %}
-    {% include "messages/_banner.html" with message="Please correct the errors in the form" level="error" dismissible=False %}
-  {% endif %}
-</div>
+        {% include "messages/_banner.html" with message=success_message level="success" %}
+      </div>
+    {% elif form.errors or formset.total_error_count %}
+      {% include "messages/_banner.html" with message="Please correct the errors in the form" level="error" dismissible=False %}
+    {% endif %}
+  </div>
 </form>
 {% if timeslot %}
   {% include "./_timeslot_summary.html" %}

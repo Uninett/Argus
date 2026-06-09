@@ -22,12 +22,12 @@
     {{ form.as_div }}
     {% if success_message %}
       <div _="on toggle from closest <details/> if not it.open remove me">
-      {% include "messages/_banner.html" with message=success_message level="success" %}
-    </div>
-  {% elif form.errors %}
-    {% include "messages/_banner.html" with message="Please correct the errors below." level="error" dismissible=False %}
-  {% endif %}
-</div>
+        {% include "messages/_banner.html" with message=success_message level="success" %}
+      </div>
+    {% elif form.errors %}
+      {% include "messages/_banner.html" with message="Please correct the errors below." level="error" dismissible=False %}
+    {% endif %}
+  </div>
 </form>
 {% if profile %}
   {% include "./_notificationprofile_summary.html" with oob=True %}
