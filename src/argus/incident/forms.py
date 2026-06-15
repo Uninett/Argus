@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
+from django.db import IntegrityError
 from django.forms import modelform_factory
 
 from .constants import Level
@@ -19,6 +20,21 @@ class AddSourceSystemForm(forms.ModelForm):
     class Meta:
         model = SourceSystem
         exclude = ["user", "last_seen"]
+
+    def clean(self):
+        super().clean()
+        name = self.cleaned_data.get("name", None)
+        username = self.cleaned_data.get("username", name)
+        if username:
+            try:
+                user, _ = User.objects.get_or_create(username=username)
+            except IntegrityError:
+                user = User.objects.get(username=username)
+            self.cleaned_data["user"] = user
+            self.errors.pop("user", None)
+        else:
+            pass
+            breakpoint()
 
     def clean_username(self):
         username = self.cleaned_data["username"]
@@ -47,7 +63,7 @@ class AddSourceSystemForm(forms.ModelForm):
 
         instance: SourceSystem = super().save(False)
 
-        user = User.objects.create(username=self.cleaned_data["username"])
+        user, _ = User.objects.get_or_create(username=self.cleaned_data["username"])
         instance.user = user
         if commit:
             instance.save()
