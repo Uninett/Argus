@@ -32,6 +32,30 @@ def get_or_create_default_instances():
     return (argus_user, sst, ss)
 
 
+@transaction.atomic
+def create_source(user: str | User, type: str | SourceSystemType, base_url: Optional[str] = None) -> SourceSystem:
+    assert isinstance(user, [str, User]), '"user" must be str or a User instance'
+    assert isinstance(type, [str, SourceSystemType]), '"type" must be str or a SourceSystemType instance'
+    try:
+        SourceSystem.objects.get(name=name)
+    except SourceSystem.DoesNotExist:
+        pass
+    else:
+        return None
+    if isinstance(user, str):
+        user = SourceUserFactory(username=name)
+    if isinstance(type, str):
+        type, _ = SourceSystemType.objects.get_or_create(name=type.lower())
+    data = dict(
+        user=user,
+        name=name,
+        type=sst,
+    )
+    if base_url is not None:
+        data["base_url"] = base_url
+    return SourceSystemFactory(**data)
+
+
 def create_fake_incident(
     tags=None,
     description=None,
