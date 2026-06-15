@@ -40,6 +40,8 @@ class SourceSystemFactory(factory.django.DjangoModelFactory):
     type = factory.SubFactory(SourceSystemTypeFactory)
     user = factory.SubFactory(SourceUserFactory)
     base_url = factory.Faker("url")
+    last_seen = None
+    heartbeat_frequency = None
 
 
 class TagFactory(factory.django.DjangoModelFactory):
