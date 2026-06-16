@@ -53,9 +53,9 @@ class SourceSystemTypeAdmin(TextWidgetsOverrideModelAdmin):
 
 
 class SourceSystemAdmin(TextWidgetsOverrideModelAdmin):
-    list_display = ("name", "type", "user", "last_seen")
+    list_display = ("name", "type", "user", "last_seen", "heartbeat_frequency")
     search_fields = ("name", "user__username")
-    list_filter = ("type",)
+    list_filter = ("type", "last_seen", "heartbeat_frequency")
 
     text_input_form_fields = ("name",)
     raw_id_fields = ("user",)

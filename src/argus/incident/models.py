@@ -9,7 +9,7 @@ from typing import Optional
 
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
-from django.core.validators import URLValidator
+from django.core.validators import URLValidator, MinValueValidator
 from django.db import models
 from django.db.models import F, Q
 from django.utils import timezone
@@ -165,6 +165,12 @@ class SourceSystem(models.Model):
         blank=True,
     )
     last_seen = models.DateTimeField(null=True, blank=True)
+    heartbeat_frequency = models.IntegerField(
+        blank=True,
+        null=True,
+        help_text="Expected to send heartbeat at least every N seconds, lower bound: 60 seconds",
+        validators=[MinValueValidator(60)],
+    )
 
     class Meta:
         constraints = [
