@@ -13,6 +13,7 @@ from argus.constants import API_STABLE_VERSION
 from argus.incident.models import Event
 from .base import NotificationMedium, modelinstance_to_dict
 from ..models import DestinationConfig
+from ..utils import are_notifications_enabled
 from argus.util.datetime_utils import INFINITY, LOCAL_INFINITY
 
 if TYPE_CHECKING:
@@ -143,6 +144,10 @@ class EmailNotification(NotificationMedium):
         Returns False if no email destinations were given and
         True if emails were sent
         """
+        if not are_notifications_enabled():
+            LOG.info("notifications: turned off sitewide, not sending")
+            return False
+
         destinations = cls.get_relevant_destinations(destinations)
         if not destinations:
             return False
