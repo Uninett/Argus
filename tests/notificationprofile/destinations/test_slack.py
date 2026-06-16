@@ -55,6 +55,31 @@ class SlackNotificationBasicBehaviorTests(TestCase):
         obj = serializer.update(destination, validated_data)
         self.assertEqual(obj.settings["destination_url"], "https://hooks.slack.com/services/CCC/BBB/AAA")
 
+    def test_given_non_slack_url_slack_destination_serializer_should_not_be_valid(self):
+        request = self.request_factory.post("/")
+        request.user = self.user
+        serializer = RequestDestinationConfigSerializer(
+            data={
+                "media": "slack",
+                "settings": {"destination_url": "https://example.com/hook"},
+            },
+            context={"request": request},
+        )
+        self.assertFalse(serializer.is_valid())
+        self.assertIn("destination_url", str(serializer.errors))
+
+    def test_given_apprise_slack_url_slack_destination_serializer_should_be_valid(self):
+        request = self.request_factory.post("/")
+        request.user = self.user
+        serializer = RequestDestinationConfigSerializer(
+            data={
+                "media": "slack",
+                "settings": {"destination_url": "slack://TokenA/TokenB/TokenC"},
+            },
+            context={"request": request},
+        )
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+
     def test_given_invalid_medium_slack_destination_serializer_should_not_be_valid(self):
         request = self.request_factory.post("/")
         request.user = self.user
