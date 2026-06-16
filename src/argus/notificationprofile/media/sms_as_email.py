@@ -18,6 +18,7 @@ from rest_framework.exceptions import ValidationError
 from ...incident.models import Event
 from .base import NotificationMedium
 from .email import send_email_safely
+from ..utils import are_notifications_enabled
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -97,6 +98,10 @@ class SMSNotification(NotificationMedium):
 
         Returns False if no SMS destinations were given and True if SMS were sent
         """
+        if not are_notifications_enabled():
+            LOG.info("notifications: turned off sitewide, not sending")
+            return False
+
         recipient = getattr(settings, "SMS_GATEWAY_ADDRESS", None)
         if not recipient:
             LOG.error("SMS_GATEWAY_ADDRESS is not set, cannot dispatch SMS notifications using this plugin")

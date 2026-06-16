@@ -3,6 +3,7 @@ from rest_framework import status
 from rest_framework.test import APIClient, APIRequestFactory, APITestCase
 
 from argus.auth.factories import PersonUserFactory
+from argus.incident.factories import EventFactory, IncidentFactory
 from argus.notificationprofile.factories import DestinationConfigFactory, NotificationProfileFactory
 from argus.notificationprofile.media.sms_as_email import SMSNotification
 from argus.notificationprofile.models import DestinationConfig, Media
@@ -323,8 +324,18 @@ class SMSDestinationSendTests(TestCase):
         disconnect_signals()
         self.user1 = PersonUserFactory()
 
-    def teardown(self):
+    def tearDown(self):
         connect_signals()
+
+    def test_given_disabled_notifications_should_return_false(self):
+        event = EventFactory(incident=IncidentFactory())
+        destination = DestinationConfigFactory(
+            user=self.user1,
+            media=Media.objects.get_or_create(slug="sms")[0],
+            settings={"phone_number": "+4747474748"},
+        )
+        with self.settings(SEND_NOTIFICATIONS=False):
+            self.assertFalse(SMSNotification.send(event, [destination]))
 
     def test_get_relevant_addresses_returns_only_phone_numbers(self):
         phone_number = "+4747474747"

@@ -3,6 +3,7 @@ from rest_framework import status
 from rest_framework.test import APIClient, APIRequestFactory, APITestCase
 
 from argus.auth.factories import PersonUserFactory
+from argus.incident.factories import EventFactory, IncidentFactory
 from argus.notificationprofile.factories import DestinationConfigFactory, NotificationProfileFactory, TimeslotFactory
 from argus.notificationprofile.media.email import EmailNotification
 from argus.notificationprofile.models import DestinationConfig, Media
@@ -403,8 +404,18 @@ class EmailDestinationSendTests(TestCase):
         disconnect_signals()
         self.user1 = PersonUserFactory()
 
-    def teardown(self):
+    def tearDown(self):
         connect_signals()
+
+    def test_given_disabled_notifications_should_return_false(self):
+        event = EventFactory(incident=IncidentFactory())
+        destination = DestinationConfigFactory(
+            user=self.user1,
+            media=Media.objects.get(slug="email"),
+            settings={"email_address": "test@example.com"},
+        )
+        with self.settings(SEND_NOTIFICATIONS=False):
+            self.assertFalse(EmailNotification.send(event, [destination]))
 
     def test_get_relevant_addresses_returns_only_email_addresses(self):
         email_address = "test2@example.com"
