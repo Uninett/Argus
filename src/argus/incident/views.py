@@ -291,12 +291,12 @@ class SourceLockedIncidentViewSet(BaseIncidentViewSet):
 
 
 class UpdateLastSeenView(views.APIView):
-    "Explicitly update `last_seen` field on source system"
+    "Set `SourceSystem.last_seen` to access time for the requesting source user"
 
-    http_method_names = ["post", "put", "patch", "head", "options", "trace"]
+    http_method_names = ["post", "head", "options", "trace"]
 
     @extend_schema(
-        summary="Update `last_seen` field on source system",
+        summary="Update `last_seen` field on inquiring source system",
         responses={
             "204": inline_serializer("no content", {}),
             "403": inline_serializer("forbidden", {}),
@@ -310,9 +310,6 @@ class UpdateLastSeenView(views.APIView):
         except Exception:
             pass
         return Response(status=status.HTTP_403_FORBIDDEN)
-
-    patch = post
-    put = post
 
 
 @extend_schema_view(
