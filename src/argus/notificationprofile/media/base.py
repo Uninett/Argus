@@ -4,7 +4,10 @@ import logging
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any
 
-from apprise import Apprise
+try:
+    from apprise import Apprise
+except ImportError:
+    Apprise = None
 
 from django import forms
 from django.conf import settings
@@ -271,6 +274,10 @@ class AppriseMedium(NotificationMedium):
 
         destinations = cls.get_relevant_destinations(destinations)
         if not destinations:
+            return False
+
+        if Apprise is None:
+            LOG.error("The 'apprise' package is not installed")
             return False
 
         # Note that Apprise automatically leaves out 'subject' for destinations that don't support it

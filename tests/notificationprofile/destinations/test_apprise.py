@@ -277,3 +277,11 @@ class AppriseMediumBehaviorTests(TestCase):
         with self.settings(SEND_NOTIFICATIONS=True):
             self.assertFalse(AppriseMedium.send(self.event, [self.destination]))
             instance.add.assert_called_once_with("https://example.com/hook")
+
+    @patch("argus.notificationprofile.media.base.Apprise", None)
+    def test_when_apprise_not_installed_then_it_should_log_error_and_return_false(self):
+        with self.settings(SEND_NOTIFICATIONS=True):
+            with self.assertLogs("argus.notificationprofile.media.base", level="ERROR") as cm:
+                result = AppriseMedium.send(self.event, [self.destination])
+        self.assertFalse(result)
+        self.assertIn("not installed", cm.output[0])
