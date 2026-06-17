@@ -97,6 +97,10 @@ not.
 
 Writing destination plugins using Apprise
 ----------------------------------------------------------------
+`Apprise <https://pypi.org/project/apprise/>`_ is an **optional dependency** — install it with::
+
+    pip install argus-server[apprise]
+
 If one wishes to write a notification plugin for a medium supported by Apprise, see `Apprise documentation: Supported services
 <https://appriseit.com/services/>`__, a pre-made base class is provided that allows you to get started almost straight "out of the box".
 

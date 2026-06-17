@@ -5,7 +5,11 @@ Slack notifications using incoming webhooks
 
 This plugin is **not** enabled by default.
 
-This is a minimal plugin built on Apprise. All you need to get started is an incoming webhook connected to your Slack app.
+This is a minimal plugin built on `Apprise <https://pypi.org/project/apprise/>`_, which is an optional dependency. To use it, install Argus with the ``apprise`` argument::
+
+    pip install argus-server[apprise]
+
+All you need to get started is an incoming webhook connected to your Slack app.
 For instructions on how to set this up, see `Sending messages using incoming webhooks
 <https://docs.slack.dev/messaging/sending-messages-using-incoming-webhooks>`__.
 
