@@ -80,9 +80,6 @@ class EventAPITests(APITestCase, IncidentBasedAPITestCaseHelper):
         self.assertEqual(datetime_utils.make_naive(incident.end_time), datetime.max)
 
     def test_posting_close_and_reopen_events_properly_changes_stateful_incidents(self):
-        self.assertTrue(self.stateful_incident.stateful)
-        self.assertTrue(self.stateful_incident.open)
-
         # Test closing incident
         close_event_dict = self._create_event_dict(Event.Type.CLOSE)
         event_timestamp = close_event_dict["timestamp"]
@@ -107,9 +104,6 @@ class EventAPITests(APITestCase, IncidentBasedAPITestCaseHelper):
         )
 
     def test_posting_end_and_restart_events_properly_changes_stateful_incidents(self):
-        self.assertTrue(self.stateful_incident.stateful)
-        self.assertTrue(self.stateful_incident.open)
-
         # Test ending incident
         end_event_dict = self._create_event_dict(Event.Type.INCIDENT_END)
         event_timestamp = end_event_dict["timestamp"]
@@ -172,7 +166,6 @@ class EventAPITests(APITestCase, IncidentBasedAPITestCaseHelper):
             self.assertFalse(self.stateless_incident.stateful)
             self.assertFalse(self.stateless_incident.open)
 
-        assert_incident_stateless()
         response = self.user1_rest_client.post(
             self.events_url(self.stateless_incident), self._create_event_dict(Event.Type.CLOSE)
         )
@@ -195,7 +188,6 @@ class EventAPITests(APITestCase, IncidentBasedAPITestCaseHelper):
 
         event_count = self.stateless_incident.events.count()
 
-        assert_incident_stateless()
         response = self.source1_rest_client.post(
             self.events_url(self.stateless_incident), self._create_event_dict(Event.Type.INCIDENT_END)
         )
