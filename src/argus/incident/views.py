@@ -8,7 +8,7 @@ from django.utils import timezone
 
 from django_filters import rest_framework as filters
 from drf_rw_serializers import viewsets as rw_viewsets
-from drf_spectacular.utils import extend_schema, extend_schema_view, inline_serializer
+from drf_spectacular.utils import extend_schema, extend_schema_view
 from drf_spectacular.utils import OpenApiParameter, OpenApiResponse
 from rest_framework.filters import SearchFilter
 from rest_framework import mixins, serializers, status, viewsets, views
@@ -22,6 +22,7 @@ from rest_framework.reverse import reverse
 from argus.drf.permissions import IsSuperuserOrReadOnly
 from argus.filter import get_filter_backend
 from argus.util.datetime_utils import INFINITY_REPR
+from argus.util.drf import Forbidden403Serializer, NoContent204Serializer, Unauthorized401Serializer
 
 from .forms import AddSourceSystemForm
 from .models import (
@@ -298,8 +299,9 @@ class UpdateLastSeenView(views.APIView):
     @extend_schema(
         summary="Update `last_seen` field on inquiring source system",
         responses={
-            "204": inline_serializer("no content", {}),
-            "403": inline_serializer("forbidden", {}),
+            "204": NoContent204Serializer,
+            "401": Unauthorized401Serializer,
+            "403": Forbidden403Serializer,
         },
     )
     def post(self, request, *args, **kwargs):
