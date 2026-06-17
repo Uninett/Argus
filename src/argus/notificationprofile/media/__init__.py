@@ -39,6 +39,8 @@ __all__ = [
     "get_notification_media",
 ]
 
+# Special case for consistency
+EMAIL_DESTINATION_SLUG = "email"
 
 # TODO: Raise Incident if media_class not importable?
 MEDIA_PLUGINS = getattr(settings, "MEDIA_PLUGINS")

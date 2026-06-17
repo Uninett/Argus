@@ -87,7 +87,7 @@ class EmailNotification(NotificationMedium):
         if form.cleaned_data["email_address"] == instance.context["request"].user.email:
             raise ValidationError("This email address is already registered in another destination.")
         if user.destinations.filter(
-            media_id="email", settings__email_address=form.cleaned_data["email_address"]
+            media_id=self.MEDIA_SLUG, settings__email_address=form.cleaned_data["email_address"]
         ).exists():
             raise ValidationError({"email_address": "Email address already exists"})
 
