@@ -7,11 +7,11 @@ from django.db import IntegrityError
 from django.utils import timezone
 
 from django_filters import rest_framework as filters
-from rest_framework.filters import SearchFilter
 from drf_rw_serializers import viewsets as rw_viewsets
-from drf_spectacular.utils import extend_schema, extend_schema_view
+from drf_spectacular.utils import extend_schema, extend_schema_view, inline_serializer
 from drf_spectacular.utils import OpenApiParameter, OpenApiResponse
-from rest_framework import mixins, serializers, status, viewsets
+from rest_framework.filters import SearchFilter
+from rest_framework import mixins, serializers, status, viewsets, views
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError, PermissionDenied, MethodNotAllowed
 from rest_framework.generics import get_object_or_404
@@ -288,6 +288,28 @@ class SourceLockedIncidentViewSet(BaseIncidentViewSet):
 
     def get_queryset(self):
         return Incident.objects.filter(source__user=self.request.user).prefetch_default_related()
+
+
+class UpdateLastSeenView(views.APIView):
+    "Set `SourceSystem.last_seen` to access time for the requesting source user"
+
+    http_method_names = ["post", "head", "options", "trace"]
+
+    @extend_schema(
+        summary="Update `last_seen` field on inquiring source system",
+        responses={
+            "204": inline_serializer("no content", {}),
+            "403": inline_serializer("forbidden", {}),
+        },
+    )
+    def post(self, request, *args, **kwargs):
+        user = self.request.user
+        try:
+            user.source_system.update_last_seen()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except Exception:
+            pass
+        return Response(status=status.HTTP_403_FORBIDDEN)
 
 
 @extend_schema_view(
