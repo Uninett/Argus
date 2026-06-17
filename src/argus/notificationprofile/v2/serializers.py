@@ -1,7 +1,7 @@
 from rest_framework import fields, serializers
 
 from argus.filter.serializers import FilterSerializer
-from argus.notificationprofile.media import api_safely_get_medium_object
+from argus.notificationprofile.media import EMAIL_DESTINATION_SLUG, api_safely_get_medium_object
 from argus.notificationprofile.models import DestinationConfig, Media, NotificationProfile, TimeRecurrence, Timeslot
 
 VERSION = "v2"
@@ -132,7 +132,7 @@ class ResponseDestinationConfigSerializer(serializers.ModelSerializer):
 
     def get_settings(self, destination: DestinationConfig) -> dict:
         settings = destination.settings.copy()
-        if destination.media.slug == "email":
+        if destination.media.slug == EMAIL_DESTINATION_SLUG:
             settings["synced"] = bool(destination.managed)
         return settings
 

@@ -65,7 +65,9 @@ class SMSNotification(NotificationMedium):
 
         form.cleaned_data["phone_number"] = form.cleaned_data["phone_number"].as_e164
 
-        if user.destinations.filter(media_id="sms", settings__phone_number=form.cleaned_data["phone_number"]).exists():
+        if user.destinations.filter(
+            media_id=cls.MEDIA_SLUG, settings__phone_number=form.cleaned_data["phone_number"]
+        ).exists():
             raise ValidationError({"phone_number": "Phone number already exists"})
 
         return form.cleaned_data
