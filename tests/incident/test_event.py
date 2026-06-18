@@ -32,12 +32,11 @@ class EventAPITests(APITestCase, IncidentBasedAPITestCaseHelper):
             type=Event.Type.CLOSE,
         )
 
-        self.stateful_incident = StatefulIncidentFactory(
+        self.open_incident = StatefulIncidentFactory(
             start_time=timezone.now() - timedelta(weeks=1),
-            end_time=timezone.now() + timedelta(weeks=1),
             source=self.source1,
         )
-        self.stateful_incident.create_first_event()
+        self.open_incident.create_first_event()
 
         self.stateless_incident = StatelessIncidentFactory(source=self.source1)
         self.stateless_incident.create_first_event()
@@ -50,12 +49,12 @@ class EventAPITests(APITestCase, IncidentBasedAPITestCaseHelper):
     def test_when_posting_close_event_for_stateful_open_incident_then_incident_gets_closed(self):
         close_event_dict = {"timestamp": timezone.now(), "type": Event.Type.CLOSE}
 
-        response = self.user1_rest_client.post(self.events_url(self.stateful_incident), close_event_dict)
+        response = self.user1_rest_client.post(self.events_url(self.open_incident), close_event_dict)
 
         self.assertEqual(parse_datetime(response.data["timestamp"]), close_event_dict["timestamp"])
-        self.stateful_incident.refresh_from_db()
-        self.assertFalse(self.stateful_incident.open)
-        self.assertEqual(self.stateful_incident.end_time, close_event_dict["timestamp"])
+        self.open_incident.refresh_from_db()
+        self.assertFalse(self.open_incident.open)
+        self.assertEqual(self.open_incident.end_time, close_event_dict["timestamp"])
 
     def test_when_posting_close_event_for_stateful_closed_incident_then_end_time_does_not_change(self):
         close_event_dict = {"timestamp": timezone.now(), "type": Event.Type.CLOSE}
@@ -80,26 +79,26 @@ class EventAPITests(APITestCase, IncidentBasedAPITestCaseHelper):
 
     def test_when_posting_reopen_event_for_stateful_open_incident_then_return_bad_request(self):
         reopen_event_dict = {"timestamp": timezone.now(), "type": Event.Type.REOPEN}
-        original_end_time = self.stateful_incident.end_time
+        original_end_time = self.open_incident.end_time
 
-        response = self.user1_rest_client.post(self.events_url(self.stateful_incident), reopen_event_dict)
+        response = self.user1_rest_client.post(self.events_url(self.open_incident), reopen_event_dict)
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("type", response.data)
         self.assertEqual(response.data["type"].code, "invalid")
 
-        self.stateful_incident.refresh_from_db()
-        self.assertEqual(self.stateful_incident.end_time, original_end_time)
+        self.open_incident.refresh_from_db()
+        self.assertEqual(self.open_incident.end_time, original_end_time)
 
     def test_when_posting_end_event_for_stateful_open_incident_then_incident_gets_closed(self):
         end_event_dict = {"timestamp": timezone.now(), "type": Event.Type.INCIDENT_END}
 
-        response = self.source1_rest_client.post(self.events_url(self.stateful_incident), end_event_dict)
+        response = self.source1_rest_client.post(self.events_url(self.open_incident), end_event_dict)
 
         self.assertEqual(parse_datetime(response.data["timestamp"]), end_event_dict["timestamp"])
-        self.stateful_incident.refresh_from_db()
-        self.assertFalse(self.stateful_incident.open)
-        self.assertEqual(self.stateful_incident.end_time, end_event_dict["timestamp"])
+        self.open_incident.refresh_from_db()
+        self.assertFalse(self.open_incident.open)
+        self.assertEqual(self.open_incident.end_time, end_event_dict["timestamp"])
 
     def test_when_posting_restart_event_for_stateful_closed_incident_then_incident_gets_reopened(self):
         restart_event_dict = {"timestamp": timezone.now(), "type": Event.Type.INCIDENT_RESTART}
@@ -131,11 +130,11 @@ class EventAPITests(APITestCase, IncidentBasedAPITestCaseHelper):
 
         end_event_dict = {"timestamp": timezone.now(), "type": Event.Type.INCIDENT_END}
 
-        response = self.source1_rest_client.post(self.events_url(self.stateful_incident), end_event_dict)
+        response = self.source1_rest_client.post(self.events_url(self.open_incident), end_event_dict)
         self.assertEqual(parse_datetime(response.data["timestamp"]), end_event_dict["timestamp"])
-        self.stateful_incident.refresh_from_db()
-        self.assertFalse(self.stateful_incident.open)
-        self.assertEqual(self.stateful_incident.end_time, end_event_dict["timestamp"])
+        self.open_incident.refresh_from_db()
+        self.assertFalse(self.open_incident.open)
+        self.assertEqual(self.open_incident.end_time, end_event_dict["timestamp"])
 
     def test_given_closed_incident_when_source_posts_end_then_records_event_without_state_change(self):
         # An end user posting a state-invalid event gets a 400; a source system does
@@ -159,19 +158,16 @@ class EventAPITests(APITestCase, IncidentBasedAPITestCaseHelper):
         # not. Its event is recorded for the audit trail (201) but update_incident is
         # skipped, so the incident is unchanged. Here: RESTART on an already-open
         # incident must be accepted and recorded without re-touching end_time.
-        self.stateful_incident.end_time = datetime_utils.INFINITY_REPR
-        self.stateful_incident.save(update_fields=["end_time"])
-
-        count_before = self.stateful_incident.events.count()
+        count_before = self.open_incident.events.count()
 
         restart_event_dict = {"timestamp": timezone.now(), "type": Event.Type.INCIDENT_RESTART}
-        response = self.source1_rest_client.post(self.events_url(self.stateful_incident), restart_event_dict)
+        response = self.source1_rest_client.post(self.events_url(self.open_incident), restart_event_dict)
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.stateful_incident.refresh_from_db()
-        self.assertTrue(self.stateful_incident.open)
-        self.assertEqual(datetime_utils.make_naive(self.stateful_incident.end_time), datetime.max)
-        self.assertEqual(self.stateful_incident.events.count(), count_before + 1)
+        self.open_incident.refresh_from_db()
+        self.assertTrue(self.open_incident.open)
+        self.assertEqual(datetime_utils.make_naive(self.open_incident.end_time), datetime.max)
+        self.assertEqual(self.open_incident.events.count(), count_before + 1)
 
     def test_when_posting_close_event_for_stateless_incident_then_incident_does_not_change(self):
         response = self.user1_rest_client.post(
@@ -229,18 +225,18 @@ class EventAPITests(APITestCase, IncidentBasedAPITestCaseHelper):
         }
         for event_type, ensure_precondition in source_system_allowed_types_and_preconditions.items():
             with self.subTest(event_type=event_type):
-                ensure_precondition(self.stateful_incident)
-                event_count = self.stateful_incident.events.count()
+                ensure_precondition(self.open_incident)
+                event_count = self.open_incident.events.count()
 
                 response = self.source1_rest_client.post(
-                    self.events_url(self.stateful_incident),
+                    self.events_url(self.open_incident),
                     {"timestamp": timezone.now(), "type": event_type},
                 )
                 self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-                self.assertEqual(self.stateful_incident.events.count(), event_count + 1)
-                self.assertTrue(self.stateful_incident.events.filter(pk=response.data["pk"]).exists())
-                self.assertEqual(response.data["incident"], self.stateful_incident.pk)
+                self.assertEqual(self.open_incident.events.count(), event_count + 1)
+                self.assertTrue(self.open_incident.events.filter(pk=response.data["pk"]).exists())
+                self.assertEqual(response.data["incident"], self.open_incident.pk)
 
     def test_posting_allowed_event_types_for_end_user_is_valid(self):
         def set_end_time_to(end_time):
@@ -257,21 +253,21 @@ class EventAPITests(APITestCase, IncidentBasedAPITestCaseHelper):
         }
         for event_type, ensure_precondition in end_user_allowed_types_and_preconditions.items():
             with self.subTest(event_type=event_type):
-                ensure_precondition(self.stateful_incident)
-                event_count = self.stateful_incident.events.count()
+                ensure_precondition(self.open_incident)
+                event_count = self.open_incident.events.count()
 
                 response = self.user1_rest_client.post(
-                    self.events_url(self.stateful_incident),
+                    self.events_url(self.open_incident),
                     {"timestamp": timezone.now(), "type": event_type},
                 )
                 self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-                self.assertEqual(self.stateful_incident.events.count(), event_count + 1)
-                self.assertTrue(self.stateful_incident.events.filter(pk=response.data["pk"]).exists())
-                self.assertEqual(response.data["incident"], self.stateful_incident.pk)
+                self.assertEqual(self.open_incident.events.count(), event_count + 1)
+                self.assertTrue(self.open_incident.events.filter(pk=response.data["pk"]).exists())
+                self.assertEqual(response.data["incident"], self.open_incident.pk)
 
     def test_posting_disallowed_event_types_for_source_system_is_invalid(self):
-        original_end_time = self.stateful_incident.end_time
+        original_end_time = self.open_incident.end_time
 
         source_system_disallowed_types = set(Event.Type.values) - Event.ALLOWED_TYPES_FOR_SOURCE_SYSTEMS
         for event_type in source_system_disallowed_types:
@@ -279,18 +275,18 @@ class EventAPITests(APITestCase, IncidentBasedAPITestCaseHelper):
                 event_count = Event.objects.count()
 
                 response = self.source1_rest_client.post(
-                    self.events_url(self.stateful_incident), {"timestamp": timezone.now(), "type": event_type}
+                    self.events_url(self.open_incident), {"timestamp": timezone.now(), "type": event_type}
                 )
                 self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
                 self.assertIn("type", response.data)
                 self.assertEqual(response.data["type"].code, "invalid")
 
                 self.assertEqual(Event.objects.count(), event_count)
-                self.stateful_incident.refresh_from_db()
-                self.assertEqual(self.stateful_incident.end_time, original_end_time)
+                self.open_incident.refresh_from_db()
+                self.assertEqual(self.open_incident.end_time, original_end_time)
 
     def test_posting_disallowed_event_types_for_end_user_is_invalid(self):
-        original_end_time = self.stateful_incident.end_time
+        original_end_time = self.open_incident.end_time
 
         end_user_disallowed_types = set(Event.Type.values) - Event.ALLOWED_TYPES_FOR_END_USERS
         for event_type in end_user_disallowed_types:
@@ -298,12 +294,12 @@ class EventAPITests(APITestCase, IncidentBasedAPITestCaseHelper):
                 event_count = Event.objects.count()
 
                 response = self.user1_rest_client.post(
-                    self.events_url(self.stateful_incident), {"timestamp": timezone.now(), "type": event_type}
+                    self.events_url(self.open_incident), {"timestamp": timezone.now(), "type": event_type}
                 )
                 self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
                 self.assertIn("type", response.data)
                 self.assertEqual(response.data["type"].code, "invalid")
 
                 self.assertEqual(Event.objects.count(), event_count)
-                self.stateful_incident.refresh_from_db()
-                self.assertEqual(self.stateful_incident.end_time, original_end_time)
+                self.open_incident.refresh_from_db()
+                self.assertEqual(self.open_incident.end_time, original_end_time)
