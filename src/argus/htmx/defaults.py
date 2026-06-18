@@ -35,6 +35,7 @@ DEFAULT_INCIDENT_TABLE_COLUMN_LAYOUTS = {
         "source",
         "description",
         "tags",
+        "is_under_maintenance",
     ],
 }
 ARGUS_HTMX_FILTER_FUNCTION = "argus.htmx.incident.filter.incident_list_filter"
