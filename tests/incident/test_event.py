@@ -9,7 +9,7 @@ from rest_framework.test import APITestCase
 from argus.util import datetime_utils
 from argus.util.testing import disconnect_signals, connect_signals
 from argus.incident.factories import StatefulIncidentFactory, StatelessIncidentFactory
-from argus.incident.models import Event, Incident
+from argus.incident.models import Event
 from . import IncidentBasedAPITestCaseHelper
 
 
@@ -215,35 +215,36 @@ class EventAPISourceSystemUserTests(APITestCase, IncidentBasedAPITestCaseHelper)
         )
         self.open_incident.create_first_event()
 
+        self.open_incident_without_start_event = StatefulIncidentFactory(
+            start_time=timezone.now() - timedelta(weeks=1),
+            source=self.source1,
+        )
+
         self.events_url = lambda incident: reverse("v2:incident:incident-events", args=[incident.pk])
 
     def tearDown(self):
         connect_signals()
 
     def test_when_posting_allowed_event_types_for_source_system_user_then_event_is_created(self):
-        def delete_start_event(incident: Incident):
-            incident.start_event.delete()
-
-        source_system_allowed_types_and_preconditions = {
-            Event.Type.INCIDENT_START: delete_start_event,
-            Event.Type.INCIDENT_END: lambda incident: None,
-            Event.Type.INCIDENT_RESTART: lambda incident: None,
-            Event.Type.OTHER: lambda incident: None,
+        source_system_allowed_types_and_incidents = {
+            Event.Type.INCIDENT_START: self.open_incident_without_start_event,
+            Event.Type.INCIDENT_END: self.open_incident,
+            Event.Type.INCIDENT_RESTART: self.closed_incident,
+            Event.Type.OTHER: self.open_incident,
         }
-        for event_type, ensure_precondition in source_system_allowed_types_and_preconditions.items():
+        for event_type, incident in source_system_allowed_types_and_incidents.items():
             with self.subTest(event_type=event_type):
-                ensure_precondition(self.open_incident)
-                event_count = self.open_incident.events.count()
+                event_count = incident.events.count()
 
                 response = self.source1_rest_client.post(
-                    self.events_url(self.open_incident),
+                    self.events_url(incident),
                     {"timestamp": timezone.now(), "type": event_type},
                 )
                 self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-                self.assertEqual(self.open_incident.events.count(), event_count + 1)
-                self.assertTrue(self.open_incident.events.filter(pk=response.data["pk"]).exists())
-                self.assertEqual(response.data["incident"], self.open_incident.pk)
+                self.assertEqual(incident.events.count(), event_count + 1)
+                self.assertTrue(incident.events.filter(pk=response.data["pk"]).exists())
+                self.assertEqual(response.data["incident"], incident.pk)
 
     def test_when_posting_disallowed_event_types_for_source_system_user_then_return_bad_request(self):
         original_end_time = self.open_incident.end_time
@@ -251,7 +252,7 @@ class EventAPISourceSystemUserTests(APITestCase, IncidentBasedAPITestCaseHelper)
         source_system_disallowed_types = set(Event.Type.values) - Event.ALLOWED_TYPES_FOR_SOURCE_SYSTEMS
         for event_type in source_system_disallowed_types:
             with self.subTest(event_type=event_type):
-                event_count = Event.objects.count()
+                event_count = self.open_incident.events.count()
 
                 response = self.source1_rest_client.post(
                     self.events_url(self.open_incident), {"timestamp": timezone.now(), "type": event_type}
@@ -260,7 +261,7 @@ class EventAPISourceSystemUserTests(APITestCase, IncidentBasedAPITestCaseHelper)
                 self.assertIn("type", response.data)
                 self.assertEqual(response.data["type"].code, "invalid")
 
-                self.assertEqual(Event.objects.count(), event_count)
+                self.assertEqual(self.open_incident.events.count(), event_count)
                 self.open_incident.refresh_from_db()
                 self.assertEqual(self.open_incident.end_time, original_end_time)
 
@@ -296,32 +297,24 @@ class EventAPIEndUserTests(APITestCase, IncidentBasedAPITestCaseHelper):
         connect_signals()
 
     def test_when_posting_allowed_event_types_for_end_user_then_event_is_created(self):
-        def set_end_time_to(end_time):
-            def set_end_time(incident: Incident):
-                incident.end_time = end_time
-                incident.save()
-
-            return set_end_time
-
-        end_user_allowed_types_and_preconditions = {
-            Event.Type.CLOSE: set_end_time_to("infinity"),
-            Event.Type.REOPEN: set_end_time_to(timezone.now()),
-            Event.Type.OTHER: lambda incident: None,
+        end_user_allowed_types_and_incidents = {
+            Event.Type.CLOSE: self.open_incident,
+            Event.Type.REOPEN: self.closed_incident,
+            Event.Type.OTHER: self.open_incident,
         }
-        for event_type, ensure_precondition in end_user_allowed_types_and_preconditions.items():
+        for event_type, incident in end_user_allowed_types_and_incidents.items():
             with self.subTest(event_type=event_type):
-                ensure_precondition(self.open_incident)
-                event_count = self.open_incident.events.count()
+                event_count = incident.events.count()
 
                 response = self.user1_rest_client.post(
-                    self.events_url(self.open_incident),
+                    self.events_url(incident),
                     {"timestamp": timezone.now(), "type": event_type},
                 )
                 self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-                self.assertEqual(self.open_incident.events.count(), event_count + 1)
-                self.assertTrue(self.open_incident.events.filter(pk=response.data["pk"]).exists())
-                self.assertEqual(response.data["incident"], self.open_incident.pk)
+                self.assertEqual(incident.events.count(), event_count + 1)
+                self.assertTrue(incident.events.filter(pk=response.data["pk"]).exists())
+                self.assertEqual(response.data["incident"], incident.pk)
 
     def test_when_posting_disallowed_event_types_for_end_user_then_return_bad_request(self):
         original_end_time = self.open_incident.end_time
@@ -329,7 +322,7 @@ class EventAPIEndUserTests(APITestCase, IncidentBasedAPITestCaseHelper):
         end_user_disallowed_types = set(Event.Type.values) - Event.ALLOWED_TYPES_FOR_END_USERS
         for event_type in end_user_disallowed_types:
             with self.subTest(event_type=event_type):
-                event_count = Event.objects.count()
+                event_count = self.open_incident.events.count()
 
                 response = self.user1_rest_client.post(
                     self.events_url(self.open_incident), {"timestamp": timezone.now(), "type": event_type}
@@ -338,6 +331,6 @@ class EventAPIEndUserTests(APITestCase, IncidentBasedAPITestCaseHelper):
                 self.assertIn("type", response.data)
                 self.assertEqual(response.data["type"].code, "invalid")
 
-                self.assertEqual(Event.objects.count(), event_count)
+                self.assertEqual(self.open_incident.events.count(), event_count)
                 self.open_incident.refresh_from_db()
                 self.assertEqual(self.open_incident.end_time, original_end_time)
