@@ -8,8 +8,7 @@ This plugin is enabled by default.
 This plugin uses the email server settings provided by Django itself to
 configure the server.
 
-The settings-field for an email-destination contains an
-``email_address``-field.
+The settings-field for an email-destination contains an email address.
 
 The managed-field will be set to ``True`` if the User model-instance has its
 ``email_address``-field set. If the email-address has ``managed`` set to ``True``, that
