@@ -9,7 +9,7 @@ from typing import Optional
 
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
-from django.core.validators import URLValidator, MinValueValidator
+from django.core.validators import MaxValueValidator, MinValueValidator, URLValidator
 from django.db import models
 from django.db.models import F, Q
 from django.utils import timezone
@@ -18,9 +18,11 @@ from django.utils.timesince import timesince
 from argus.util.datetime_utils import INFINITY_REPR, get_infinity_repr
 from .constants import Level
 from .fields import DateTimeInfinityField
-from .validators import validate_lowercase, validate_key
+from .validators import validate_key, validate_lowercase
 
 
+MINIMUM_DURATION = timedelta(seconds=60)
+MAXIMUM_DURATION = timedelta(days=1)
 LOG = logging.getLogger(__name__)
 User = get_user_model()
 
@@ -165,11 +167,14 @@ class SourceSystem(models.Model):
         blank=True,
     )
     last_seen = models.DateTimeField(null=True, blank=True)
-    heartbeat_frequency = models.IntegerField(
+    heartbeat_frequency = models.DurationField(
         blank=True,
         null=True,
-        help_text="Expected to send heartbeat at least every N seconds, lower bound: 60 seconds",
-        validators=[MinValueValidator(60)],
+        help_text="Expected to send heartbeat at least every N seconds. Lower bound: 60 seconds. Upper bound: 1 day. Valid inputs: seconds (as an integer, e.g. 86400), DD HH:MM:SS (1 00:00:00), ISO 8601 periods (P1D, note the T is needed if less than a day), PostgreSQL's day-time interval format (1 day)",
+        validators=[
+            MinValueValidator(MINIMUM_DURATION),
+            MaxValueValidator(MAXIMUM_DURATION),
+        ],
     )
 
     class Meta:
