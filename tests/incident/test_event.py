@@ -137,7 +137,7 @@ class EventAPITests(APITestCase, IncidentBasedAPITestCaseHelper):
         self.assertFalse(self.stateful_incident.open)
         self.assertEqual(self.stateful_incident.end_time, end_event_dict["timestamp"])
 
-    def test_posting_close_and_reopen_events_does_not_change_stateless_incidents(self):
+    def test_when_posting_close_event_for_stateless_incident_then_incident_does_not_change(self):
         response = self.user1_rest_client.post(
             self.events_url(self.stateless_incident), {"timestamp": timezone.now(), "type": Event.Type.CLOSE}
         )
@@ -148,6 +148,7 @@ class EventAPITests(APITestCase, IncidentBasedAPITestCaseHelper):
         self.assertFalse(self.stateless_incident.stateful)
         self.assertFalse(self.stateless_incident.open)
 
+    def test_when_posting_reopen_event_for_stateless_incident_then_incident_does_not_change(self):
         response = self.user1_rest_client.post(
             self.events_url(self.stateless_incident), {"timestamp": timezone.now(), "type": Event.Type.REOPEN}
         )
@@ -158,7 +159,7 @@ class EventAPITests(APITestCase, IncidentBasedAPITestCaseHelper):
         self.assertFalse(self.stateless_incident.stateful)
         self.assertFalse(self.stateless_incident.open)
 
-    def test_posting_end_and_restart_events_does_not_change_stateless_incidents(self):
+    def test_when_posting_end_event_for_stateless_incident_then_incident_does_not_change(self):
         response = self.user1_rest_client.post(
             self.events_url(self.stateless_incident), {"timestamp": timezone.now(), "type": Event.Type.INCIDENT_END}
         )
@@ -169,6 +170,7 @@ class EventAPITests(APITestCase, IncidentBasedAPITestCaseHelper):
         self.assertFalse(self.stateless_incident.stateful)
         self.assertFalse(self.stateless_incident.open)
 
+    def test_when_posting_restart_event_for_stateless_incident_then_incident_does_not_change(self):
         response = self.user1_rest_client.post(
             self.events_url(self.stateless_incident), {"timestamp": timezone.now(), "type": Event.Type.INCIDENT_RESTART}
         )
