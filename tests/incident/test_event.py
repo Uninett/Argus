@@ -173,7 +173,7 @@ class EventAPITests(APITestCase, IncidentBasedAPITestCaseHelper):
         self.assertEqual(datetime_utils.make_naive(self.stateful_incident.end_time), datetime.max)
         self.assertEqual(self.stateful_incident.events.count(), count_before + 1)
 
-    def test_posting_close_and_reopen_events_does_not_change_stateless_incidents(self):
+    def test_when_posting_close_event_for_stateless_incident_then_incident_does_not_change(self):
         response = self.user1_rest_client.post(
             self.events_url(self.stateless_incident), {"timestamp": timezone.now(), "type": Event.Type.CLOSE}
         )
@@ -183,6 +183,7 @@ class EventAPITests(APITestCase, IncidentBasedAPITestCaseHelper):
         self.assertFalse(self.stateless_incident.stateful)
         self.assertFalse(self.stateless_incident.open)
 
+    def test_when_posting_reopen_event_for_stateless_incident_then_incident_does_not_change(self):
         response = self.user1_rest_client.post(
             self.events_url(self.stateless_incident), {"timestamp": timezone.now(), "type": Event.Type.REOPEN}
         )
@@ -192,7 +193,7 @@ class EventAPITests(APITestCase, IncidentBasedAPITestCaseHelper):
         self.assertFalse(self.stateless_incident.stateful)
         self.assertFalse(self.stateless_incident.open)
 
-    def test_posting_end_and_restart_events_does_not_change_stateless_incidents_but_records_event(self):
+    def test_when_posting_end_event_for_stateless_incident_then_incident_is_unchanged_and_event_is_recorded(self):
         event_count = self.stateless_incident.events.count()
 
         response = self.source1_rest_client.post(
@@ -204,6 +205,9 @@ class EventAPITests(APITestCase, IncidentBasedAPITestCaseHelper):
         self.assertFalse(self.stateless_incident.open)
         self.assertEqual(self.stateless_incident.events.count(), event_count + 1)
 
+    def test_when_posting_restart_event_for_stateless_incident_then_incident_is_unchanged_and_event_is_recorded(self):
+        event_count = self.stateless_incident.events.count()
+
         response = self.source1_rest_client.post(
             self.events_url(self.stateless_incident), {"timestamp": timezone.now(), "type": Event.Type.INCIDENT_RESTART}
         )
@@ -211,7 +215,7 @@ class EventAPITests(APITestCase, IncidentBasedAPITestCaseHelper):
         self.stateless_incident.refresh_from_db()
         self.assertFalse(self.stateless_incident.stateful)
         self.assertFalse(self.stateless_incident.open)
-        self.assertEqual(self.stateless_incident.events.count(), event_count + 2)
+        self.assertEqual(self.stateless_incident.events.count(), event_count + 1)
 
     def test_posting_allowed_event_types_for_source_system_is_valid(self):
         def delete_start_event(incident: Incident):
