@@ -1,3 +1,4 @@
+{% load argus_htmx %}
 <tbody id="source-{{ source.pk }}"
        class="[&:last-child_tr:last-child_td]:border-b-0">
   <tr>
@@ -7,6 +8,12 @@
     </td>
     <td class="{% if not generated_token %}border-b border-base-300{% endif %} max-w-xs truncate">
       {{ source.base_url|default:"-" }}
+    </td>
+    <td class="{% if not generated_token %}border-b border-base-300{% endif %} max-w-xs truncate">
+      {{ source.last_seen|default:"Never" }}
+    </td>
+    <td class="{% if not generated_token %}border-b border-base-300{% endif %} max-w-xs truncate">
+      {{ source.heartbeat_frequency|pretty_timedelta:"Off" }}
     </td>
     <td class="{% if not generated_token %}border-b border-base-300{% endif %}">
       {% if source.token_status == "valid" %}

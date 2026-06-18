@@ -1,9 +1,13 @@
+from datetime import timedelta
 from typing import Literal
+
 from django import template
 from django.contrib.messages.storage.base import Message
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
+from django.utils.timesince import timesince, timeuntil
+from django.utils.timezone import now as tznow
 
 from .. import defaults
 
@@ -99,3 +103,18 @@ def is_valid_url(value: str) -> bool:
         return True
     except ValidationError:
         return False
+
+
+@register.filter
+def pretty_timedelta(value: timedelta, fallback: str = "") -> str:
+    '''Humanize a timedelta with the same alogrithm as "timesince"'''
+
+    if value is None:
+        return fallback
+    now = tznow()
+    then = now + value
+    if now > then:
+        return timesince(now, then)
+    if now < then:
+        return timeuntil(then, now)
+    return "0\xa0minutes"

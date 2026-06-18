@@ -78,6 +78,66 @@
                 </div>
               {% endif %}
             </div>
+            <div class="form-control w-full">
+              <label class="label" for="{{ form.heartbeat_frequency.auto_id }}">
+                <span class="label-text"><em>Heartbeat frequency</em></span>
+              </label>
+              {% render_field form.heartbeat_frequency class+="input input-bordered w-full" %}
+              {% if form.heartbeat_frequency.help_text %}
+                <div class="label">
+                  <div class="label-text-alt">
+                    <p>Expected to send heartbeat at least every N seconds. Lower bound: 60 seconds. Upper bound: 1 day.</p>
+                    <table class="table table-sm">
+                      <thead>
+                        <tr>
+                          <th scope="col">Valid inputs</th>
+                          <th scope="col">Short</th>
+                          <th scope="col">Long</th>
+                          <th scope="col">Notes</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <th scope="row">seconds as an integer</th>
+                          <td>1000</td>
+                          <td>86400</td>
+                          <td></td>
+                        </tr>
+                        <tr>
+                          <th scope="row">DD HH:MM:SS</th>
+                          <td>00:16:40</td>
+                          <td>1 00:00:00</td>
+                          <td>This is the format that is displayed in the form</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">
+                            <a href="https://en.wikipedia.org/wiki/ISO_8601#Durations">ISO 8601 periods</a>
+                          </th>
+                          <td>PT16M40S</td>
+                          <td>P1D</td>
+                          <td>The T is needed if less than a day.</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">
+                            <a href="https://www.postgresql.org/docs/current/datatype-datetime.html#DATATYPE-INTERVAL-INPUT">PostgreSQL’s day-time interval format</a>
+                          </th>
+                          <td>00:16:40</td>
+                          <td>1 day 00:00:00</td>
+                          <td></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              {% endif %}
+              {% if form.heartbeat_frequency.errors %}
+                <div class="label">
+                  {% for error in form.heartbeat_frequency.errors %}
+                    <span class="label-text-alt text-error">{{ error }}</span>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
           </div>
           <div class="card-actions justify-end mt-6">
             <button type="submit" class="btn btn-primary">
