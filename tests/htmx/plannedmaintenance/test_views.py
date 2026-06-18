@@ -271,55 +271,39 @@ class PlannedMaintenanceCancelViewTests(TestCase):
 
 
 @tag("integration")
-class SearchFiltersViewTests(TestCase):
+class PlannedMaintenanceFilterDropdownTests(TestCase):
     def setUp(self):
-        self.user = PersonUserFactory()
-        self.staff_user = AdminUserFactory(username="felaali", first_name="Ferrari", last_name="Testarossa")
-        self.other_staff_user = AdminUserFactory(username="lambo", first_name="Lamborghini", last_name="Countach")
+        self.staff_user = AdminUserFactory()
 
-        self.staff_filter = FilterFactory(user=self.staff_user, name="My Filter")
-        self.other_staff_filter = FilterFactory(user=self.other_staff_user, name="Other Filter")
-
-    def test_search_filters_requires_login(self):
-        response = self.client.get(reverse("htmx:search-filters"))
-        self.assertEqual(response.status_code, 302)
-
-    def test_search_filters_when_not_staff_then_forbidden(self):
-        self.client.force_login(self.user)
-        response = self.client.get(reverse("htmx:search-filters"))
-        self.assertEqual(response.status_code, 403)
-
-    def test_search_filters_it_should_return_json(self):
+    def test_given_create_form_filter_queryset_should_include_all_filters(self):
         self.client.force_login(self.staff_user)
-        response = self.client.get(reverse("htmx:search-filters"))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response["Content-Type"], "application/json")
+        f1 = FilterFactory(user=self.staff_user)
+        f2 = FilterFactory(user=AdminUserFactory())
+        response = self.client.get(reverse("htmx:plannedmaintenance-create"))
+        qs = response.context["form"].fields["filters"].queryset
+        self.assertIn(f1, qs)
+        self.assertIn(f2, qs)
 
-    def test_search_filters_returns_all_filters_without_query(self):
+    def test_given_create_form_queryset_users_own_filters_come_first(self):
         self.client.force_login(self.staff_user)
-        response = self.client.get(reverse("htmx:search-filters"))
-        data = response.json()
-        self.assertEqual(len(data["results"]), 2)
+        other_user_1 = AdminUserFactory()
+        other_user_2 = AdminUserFactory()
 
-    def test_search_filters_filters_by_name(self):
-        self.client.force_login(self.staff_user)
-        response = self.client.get(reverse("htmx:search-filters"), {"q": "My"})
-        data = response.json()
-        self.assertEqual(len(data["results"]), 1)
-        self.assertEqual(data["results"][0]["id"], self.staff_filter.pk)
+        FilterFactory(user=other_user_1, name="B other")
+        FilterFactory(user=self.staff_user, name="M own")
+        FilterFactory(user=self.staff_user, name="A own")
+        FilterFactory(user=other_user_2, name="Z other")
+        FilterFactory(user=other_user_2, name="C other")
+        response = self.client.get(reverse("htmx:plannedmaintenance-create"))
+        names = [f.name for f in response.context["form"].fields["filters"].queryset]
+        self.assertEqual(names, ["A own", "M own", "B other", "C other", "Z other"])
 
-    def test_search_filters_filters_by_username(self):
+    def test_given_selected_filter_ids_partial_view_it_should_render_them_as_checked(self):
         self.client.force_login(self.staff_user)
-        response = self.client.get(reverse("htmx:search-filters"), {"q": self.other_staff_user.username})
-        data = response.json()
-        self.assertEqual(len(data["results"]), 1)
-        self.assertEqual(data["results"][0]["id"], self.other_staff_filter.pk)
-
-    def test_search_filters_sorts_current_user_filters_first(self):
-        self.client.force_login(self.staff_user)
-        response = self.client.get(reverse("htmx:search-filters"))
-        data = response.json()
-        self.assertEqual(data["results"][0]["id"], self.staff_filter.pk)
+        f = FilterFactory(user=self.staff_user)
+        response = self.client.get(reverse("htmx:plannedmaintenance-filter-widget"), {"filters": [f.pk]})
+        self.assertContains(response, f'value="{f.pk}"')
+        self.assertContains(response, "checked")
 
 
 @tag("integration")
