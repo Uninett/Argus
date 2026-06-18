@@ -9,16 +9,18 @@ class CreateSourceSystemForm(AddSourceSystemForm):
         widgets = {
             "name": forms.TextInput,
             "base_url": forms.TextInput,
+            "heartbeat_frequency": forms.TextInput(attrs={"placeholder": "00:01:00"}),
         }
 
 
 class UpdateSourceSystemForm(forms.ModelForm):
     class Meta:
         model = SourceSystem
-        fields = ["name", "type", "base_url"]
+        fields = ["name", "type", "base_url", "heartbeat_frequency"]
         widgets = {
             "name": forms.TextInput,
             "base_url": forms.TextInput,
+            "heartbeat_frequency": forms.TextInput(attrs={"placeholder": "00:01:00"}),
         }
 
 
