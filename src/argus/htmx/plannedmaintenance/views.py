@@ -83,10 +83,14 @@ class FilterWidgetMixin:
     """Mixin to configure the filters field with SearchDropdownMultiSelect widget."""
 
     def get_filter_widget(self):
+        search_url = reverse("htmx:search-filters")
         return SearchDropdownMultiSelect(
-            partial_get=reverse("htmx:search-filters"),
+            partial_get=search_url,
             attrs={"placeholder": "Select filters..."},
-            extra={"search_placeholder": "Search by filter name or user..."},
+            extra={
+                "search_placeholder": "Search by filter name or user...",
+                "search_url": search_url,
+            },
         )
 
     def get_form(self, form_class=None):

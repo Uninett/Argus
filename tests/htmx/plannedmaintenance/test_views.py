@@ -271,6 +271,29 @@ class PlannedMaintenanceCancelViewTests(TestCase):
 
 
 @tag("integration")
+class PlannedMaintenanceFilterWidgetTests(TestCase):
+    def setUp(self):
+        self.staff_user = AdminUserFactory()
+        now = timezone.now()
+        self.future_pm = PlannedMaintenanceFactory(
+            start_time=now + timedelta(days=1),
+            end_time=LOCAL_INFINITY,
+        )
+
+    def test_given_create_form_with_filters_field_it_should_have_search_url(self):
+        self.client.force_login(self.staff_user)
+        response = self.client.get(reverse("htmx:plannedmaintenance-create"))
+        widget = response.context["form"].fields["filters"].widget
+        self.assertIn("search_url", widget.extra)
+
+    def test_given_update_form_with_filters_field_it_should_have_search_url(self):
+        self.client.force_login(self.staff_user)
+        response = self.client.get(reverse("htmx:plannedmaintenance-update", kwargs={"pk": self.future_pm.pk}))
+        widget = response.context["form"].fields["filters"].widget
+        self.assertIn("search_url", widget.extra)
+
+
+@tag("integration")
 class SearchFiltersViewTests(TestCase):
     def setUp(self):
         self.user = PersonUserFactory()

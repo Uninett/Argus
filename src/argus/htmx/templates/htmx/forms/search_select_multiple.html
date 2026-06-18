@@ -1,5 +1,8 @@
 <!-- htmx/forms/search_select_multiple.html -->
 {% extends "htmx/forms/dropdown_select_multiple.html" %}
+{% block field_control %}
+  id="dropdown-{{ widget.attrs.id }}"
+{% endblock field_control %}
 {% block show_selected %}
   <span class="badge badge-primary">{{ option.label }}</span>
 {% endblock show_selected %}
@@ -25,8 +28,30 @@
     const preload = {{ widget.extra.preload|yesno:"true,false" }};
     const searchUrl = '{{ widget.extra.search_url|default:"" }}';
     const fieldName = '{{ widget.name }}';
+    const placeholder = '{{ widget.attrs.placeholder|default:"Select..." }}';
+    const arrowSvg = '<svg class="h-4 w-4 shrink-0 opacity-50 transition-transform duration-200 group-focus-within:rotate-180" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6" /></svg>';
 
     const resultsContainer = searchUrl ? dropdown.querySelector('[data-search-results]') : null;
+
+    function updateShowSelected() {
+      const showSelected = dropdown.querySelector('.show-selected-box');
+      const checked = [...dropdown.querySelectorAll(`input[name="${fieldName}"]:checked`)];
+
+      if (checked.length === 0) {
+        showSelected.innerHTML = `<span class="text-base-content/50 flex-1">${placeholder}</span>${arrowSvg}`;
+      } else {
+        const badges = checked.map(input => {
+          const label = input.closest('label');
+          const text = label ? label.textContent.trim() : input.value;
+          return `<span class="badge badge-primary">${text}</span>`;
+        }).join('');
+        showSelected.innerHTML = `
+          <span class="flex flex-wrap gap-1 flex-1 items-center overflow-y-auto max-h-14">${badges}</span>
+          <button type="button" class="cursor-pointer opacity-50 hover:opacity-100 flex-shrink-0" aria-label="Clear selection" data-clear-field="${fieldName}" onmousedown="event.preventDefault()">
+            <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+          </button>`;
+      }
+    }
 
     // Auto-focus search input when dropdown opens
     dropdown.addEventListener('focusin', (e) => {
@@ -65,6 +90,9 @@
         }
       });
     }
+
+    // Update the show-selected-box client-side on every checkbox change
+    dropdown.querySelector('.dropdown-content').addEventListener('change', updateShowSelected);
 
     if (preload) {
       // Client-side filtering for preloaded options
