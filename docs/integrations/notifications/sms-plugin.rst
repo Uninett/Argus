@@ -25,9 +25,9 @@ then the resulting address is::
 
     sms+345656787643@example.com
 
-The settings-field for an SMS-destination contains only a ``phone_number``,
-which is a string that includes the international calling code, see for
-instance `Wikipedia: List of mobile telephone prefixes by country
+The settings-field for an SMS-destination contains a phone number
+including the international calling code, see for instance `Wikipedia:
+List of mobile telephone prefixes by country
 <https://en.wikipedia.org/wiki/List_of_mobile_telephone_prefixes_by_country>`__.
 
 The library used to validate that the number is a real phone number is based on
