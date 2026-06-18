@@ -2,8 +2,8 @@
 Planned maintenance
 ===================
 
-To interact with planned maintenance tasks visit the admin interface at:
-``/admin/argus_plannedmaintenance/plannedmaintenancetask/``.
+To interact with planned maintenance tasks visit the dedicated page at:
+``/plannedmaintenancetask/`` or use the user menu to navigate to it.
 
 A planned maintenance task consists of a start time and an end time (where the latter
 is by default infinity). Those define the period during which planned work is happening
@@ -24,20 +24,13 @@ suppressed if all of the filters apply to that event.
 The planned maintenance task list
 =================================
 
-In the admin you can view a list of planned maintenance tasks, filter them and search
-for specific ones.
+From the maintenance list page you can mark planned maintenances tasks as finished,
+which will set an open task's end time to the current time. Tasks that have not
+started yet can be deleted.
 
-You can also select multiple planned maintenance tasks and delete them or mark them as
-finished. Marking a task as finished will set an open task's end time to the current
-time. If you mark a task as finished that has not begun yet, then that task will be
-deleted.
+If you want to add a planned maintenance task click the ``Create new`` button.
+It is also possible to create copies of existing tasks to make recurring maintenance
+easier.
 
-Adding/editing a planned maintenance task
-=========================================
-
-If you want to add a planned maintenance task click the
-``Add planned maintenance task`` button. If you want to see details for a specific
-task or edit it, click the username in the column ``created by``.
-
-You can mark an existing task as finished and see its history by clicking on the
-buttons in the top right corner of the edit page.
+You can also edit tasks that are ongoing or scheduled and can view details for
+finished tasks by clicking on ``Edit`` / ``View``.
