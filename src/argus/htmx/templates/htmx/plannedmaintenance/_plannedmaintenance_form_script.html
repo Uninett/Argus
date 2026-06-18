@@ -28,14 +28,15 @@
   // Filter preview functionality
   (() => {
     const filterPreview = document.getElementById('filter-preview');
-    const filtersSelect = document.getElementById('id_filters');
-    if (!filterPreview || !filtersSelect) return;
+    const filtersDropdown = document.getElementById('dropdown-id_filters');
+    if (!filterPreview || !filtersDropdown) return;
 
     const previewUrl = '{% url "htmx:plannedmaintenance-filter-preview" %}';
     let debounceTimer = null;
 
     const loadPreview = () => {
-      const filterIds = Array.from(filtersSelect.selectedOptions).map(opt => opt.value);
+      const filterIds = [...filtersDropdown.querySelectorAll('input[name="filters"]:checked')]
+        .map(input => input.value);
 
       const params = new URLSearchParams();
       filterIds.forEach(id => params.append('filters', id));
@@ -46,14 +47,13 @@
       });
     };
 
-    // Listen for changes on the select element (Choices.js triggers change events)
-    filtersSelect.addEventListener('change', () => {
+    filtersDropdown.querySelector('.dropdown-content').addEventListener('change', () => {
       clearTimeout(debounceTimer);
       debounceTimer = setTimeout(loadPreview, 500);
     });
 
     // Load initial preview if filters are already selected
-    if (filtersSelect.selectedOptions.length > 0) {
+    if (filtersDropdown.querySelector('input[name="filters"]:checked')) {
       loadPreview();
     }
   })();
