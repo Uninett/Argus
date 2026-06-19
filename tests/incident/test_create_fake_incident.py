@@ -6,7 +6,7 @@ from django.utils import timezone
 
 from argus.auth.factories import SourceUserFactory
 from argus.incident.factories import SourceSystemFactory, SourceSystemTypeFactory
-from argus.incident.models import IncidentTagRelation, create_fake_incident
+from argus.incident.models import IncidentTagRelation, create_fake_incident, create_stateless_incident
 from argus.util.testing import disconnect_signals, connect_signals
 
 
@@ -98,3 +98,14 @@ class CreateFakeIncidentTestCase(TestCase):
 
     def test_create_fake_incident_does_not_raise_error_on_extra_args(self):
         create_fake_incident(extra_arg="extra")
+
+
+def TestCreateStatelessIncident(TestCase):
+    def test_create_stateless_incident(self):
+        source_name = "source_a"
+        sst = SourceSystemTypeFactory(name=source_name)
+        user = SourceUserFactory(username=source_name)
+        source = SourceSystemFactory(name=source_name, type=sst, user=user)
+        result = create_stateless_incident("test", source, 5)
+        self.assertEqual(result.end_time, None)
+        self.assertFalse(result.stateful)
