@@ -40,11 +40,9 @@
       if (checked.length === 0) {
         showSelected.innerHTML = `<span class="text-base-content/50 flex-1">${placeholder}</span>${arrowSvg}`;
       } else {
-        const badges = checked.map(input => {
-          const label = input.closest('label');
-          const text = label ? label.textContent.trim() : input.value;
-          return `<span class="badge badge-primary">${text}</span>`;
-        }).join('');
+        const badges = checked.map(input =>
+          `<span class="badge badge-primary">${input.closest('label')?.textContent.trim() ?? input.value}</span>`
+        ).join('');
         showSelected.innerHTML = `
           <span class="flex flex-wrap gap-1 flex-1 items-center overflow-y-auto max-h-14">${badges}</span>
           <button type="button" class="cursor-pointer opacity-50 hover:opacity-100 flex-shrink-0" aria-label="Clear selection" data-clear-field="${fieldName}" onmousedown="event.preventDefault()">
@@ -70,8 +68,8 @@
         });
       }
       if (resultsContainer) {
-        preserveCheckedResults();
-        resultsContainer.innerHTML = '';
+        optionsContainer.style.display = '';
+        returnResultsToOptions();
         // Remove unchecked items that were added from search
         optionsContainer.querySelectorAll('[data-from-search]').forEach(label => {
           if (!label.querySelector('input:checked')) label.remove();
@@ -79,19 +77,14 @@
       }
     });
 
-    // Move checked search results into persistent options before replacing
-    function preserveCheckedResults() {
+    function returnResultsToOptions() {
       if (!resultsContainer) return;
-      resultsContainer.querySelectorAll('input:checked').forEach(input => {
-        const label = input.closest('label');
-        if (label) {
-          label.dataset.fromSearch = 'true';
-          optionsContainer.appendChild(label);
-        }
+      [...resultsContainer.querySelectorAll('label')].forEach(label => {
+        optionsContainer.appendChild(label);
       });
+      resultsContainer.innerHTML = '';
     }
 
-    // Update the show-selected-box client-side on every checkbox change
     dropdown.querySelector('.dropdown-content').addEventListener('change', updateShowSelected);
 
     if (preload) {
@@ -106,11 +99,11 @@
     } else if (searchUrl) {
       let searchTimeout;
 
-      // Remove all search-result items when selections are fully cleared
+      // Remove search-created items when selections are fully cleared
       dropdown.querySelector('.dropdown-content').addEventListener('change', () => {
         if (!dropdown.querySelector(`input[name="${fieldName}"]:checked`)) {
+          returnResultsToOptions();
           optionsContainer.querySelectorAll('[data-from-search]').forEach(label => label.remove());
-          resultsContainer.innerHTML = '';
         }
       });
 
@@ -119,11 +112,12 @@
         const query = searchInput.value.trim();
 
         if (query.length < 2) {
-          preserveCheckedResults();
-          resultsContainer.innerHTML = '';
+          optionsContainer.style.display = '';
+          returnResultsToOptions();
           return;
         }
 
+        optionsContainer.style.display = 'none';
         searchTimeout = setTimeout(async () => {
           try {
             const response = await fetch(
@@ -131,19 +125,17 @@
             );
             const data = await response.json();
 
-            // Get currently selected values to avoid duplicates
-            const selected = new Set(
-              [...dropdown.querySelectorAll(`input[name="${fieldName}"]:checked`)]
-                .map(input => input.value)
-            );
-
-            preserveCheckedResults();
-            resultsContainer.innerHTML = '';
+            returnResultsToOptions();
             data.results.forEach(item => {
-              if (selected.has(String(item.id))) return;
+              const existingLabel = optionsContainer.querySelector(`input[name="${fieldName}"][value="${String(item.id)}"]`)?.closest('label');
+              if (existingLabel) {
+                resultsContainer.appendChild(existingLabel);
+                return;
+              }
 
               const label = document.createElement('label');
               label.className = 'flex gap-2 items-center my-1';
+              label.dataset.fromSearch = 'true';
 
               const input = document.createElement('input');
               input.type = 'checkbox';
