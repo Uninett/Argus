@@ -24,8 +24,8 @@ from .models import (
     SourceSystem,
     SourceSystemType,
     Tag,
-    create_fake_incident,
 )
+from .factories import create_fake_incident
 
 User = get_user_model()
 

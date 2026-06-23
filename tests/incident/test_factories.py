@@ -5,8 +5,13 @@ from django.test import TestCase
 from django.utils import timezone
 
 from argus.auth.factories import SourceUserFactory
-from argus.incident.factories import SourceSystemFactory, SourceSystemTypeFactory
-from argus.incident.models import IncidentTagRelation, create_fake_incident, create_stateless_incident
+from argus.incident.factories import (
+    SourceSystemFactory,
+    SourceSystemTypeFactory,
+    create_fake_incident,
+    create_stateless_incident,
+)
+from argus.incident.models import IncidentTagRelation
 from argus.util.testing import disconnect_signals, connect_signals
 
 
