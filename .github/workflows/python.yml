@@ -105,24 +105,10 @@ jobs:
         path: |
           test-reports/**/*
 
-
-  upload-pr-number-base-sha:
-    name: Save PR number and base SHA in artifact
-    runs-on: ubuntu-latest
-    if: ${{ github.event.number && always() }}
-    env:
-      PR_NUMBER: ${{ github.event.number }}
-      BASE_SHA: ${{ github.event.pull_request.base.sha }}
-    steps:
-      - name: Make PR number file
-        run: |
-          mkdir -p ./extra
-          echo $PR_NUMBER > ./extra/pr_number
-      - name: Make base SHA file
-        run: |
-          echo $BASE_SHA > ./extra/base_sha
-      - name: Upload PR number file and base SHA file
-        uses: actions/upload-artifact@v7
-        with:
-          name: extra
-          path: extra/
+    - name: Upload coverage reports to Codecov
+      if: github.repository_owner == 'Uninett'
+      uses: codecov/codecov-action@v7
+      with:
+        fail_ci_if_error: true
+        token: ${{ secrets.CODECOV_TOKEN }}
+        verbose: true
