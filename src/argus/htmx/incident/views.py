@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from collections.abc import Iterable
 from datetime import datetime
-from urllib.parse import urlencode
+from urllib.parse import urlencode, urlparse
 from typing import Optional, Any
 
 from django import forms
@@ -18,6 +18,7 @@ from django.http import (
     QueryDict,
 )
 from django.shortcuts import render, get_object_or_404
+from django.urls import reverse
 from django.utils.timezone import now as tznow
 from django.views.decorators.http import require_POST, require_GET
 
@@ -46,6 +47,7 @@ from ..utils import (
 
 User = get_user_model()
 LOG = logging.getLogger(__name__)
+KIOSK_URL_NAME = "htmx:incident-list-kiosk"
 
 
 # Map request trigger to parameters for incidents update
@@ -190,19 +192,22 @@ def delete_filter(request: HtmxHttpRequest, pk: int):
 
 @require_GET
 def filter_select(request: HtmxHttpRequest):
+    current_url = request.META.get("HTTP_HX_CURRENT_URL", "")
+    kiosk_mode = urlparse(current_url).path == reverse(KIOSK_URL_NAME) if current_url else False
+
     filter_id = request.GET.get("filter", None)
     if filter_id and get_object_or_404(Filter, id=filter_id):
         request.session["selected_filter"] = filter_id
         incident_list_filter = get_filter_function()
         filter_form, _ = incident_list_filter(request, None)
-        context = {"filter_form": filter_form}
+        context = {"filter_form": filter_form, "kiosk_mode": kiosk_mode}
         return render(request, "htmx/incident/_incident_filterbox.html", context=context)
     else:
         request.session["selected_filter"] = None
         if request.htmx.trigger:
             incident_list_filter = get_filter_function()
             filter_form, _ = incident_list_filter(request, None, use_empty_filter=True)
-            context = {"filter_form": filter_form}
+            context = {"filter_form": filter_form, "kiosk_mode": kiosk_mode}
             return render(request, "htmx/incident/_incident_filterbox.html", context=context)
         else:
             return retarget(HttpResponse(), "#incident-filter-select")
@@ -266,7 +271,7 @@ def search_tags(request):
 
 
 @require_GET
-def incident_list(request: HtmxHttpRequest) -> HttpResponse:
+def incident_list(request: HtmxHttpRequest, kiosk_mode: bool = False) -> HttpResponse:
     LOG = logging.getLogger(__name__ + ".incident_list")
     LOG.debug("GET at start: %s", request.GET)
     request.GET = dedupe_querydict(request.GET)
@@ -275,6 +280,8 @@ def incident_list(request: HtmxHttpRequest) -> HttpResponse:
     preferences = request.user.get_preferences_context()
     column_layout_name = preferences["argus_htmx"]["incidents_table_column_name"]
     columns = get_incident_table_columns(column_layout_name)
+    if kiosk_mode:
+        columns = [c for c in columns if c.name != "row_select"]
 
     # Handle sorting
     sort_form = SortForm(request.GET)
@@ -345,6 +352,8 @@ def incident_list(request: HtmxHttpRequest) -> HttpResponse:
     else:
         base_template = "htmx/incident/_base.html"
 
+    incident_list_url = reverse(KIOSK_URL_NAME if kiosk_mode else "htmx:incident-list")
+
     LOG.debug("GET at end: %s", request.GET)
     context = {
         "columns": columns,
@@ -358,5 +367,12 @@ def incident_list(request: HtmxHttpRequest) -> HttpResponse:
         "page": page,
         "last_page_num": last_page_num,
         "second_to_last_page": last_page_num - 1,
+        "kiosk_mode": kiosk_mode,
+        "incident_list_url": incident_list_url,
     }
     return render(request, "htmx/incident/incident_list.html", context=context)
+
+
+@require_GET
+def incident_list_kiosk(request: HtmxHttpRequest) -> HttpResponse:
+    return incident_list(request, kiosk_mode=True)

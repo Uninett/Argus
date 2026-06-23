@@ -1,7 +1,12 @@
 {% load widget_tweaks %}
+{% if kiosk_mode %}
+  {% url 'htmx:incident-list-kiosk' as incident_list_url %}
+{% else %}
+  {% url 'htmx:incident-list' as incident_list_url %}
+{% endif %}
 <form id="incident-filter-box"
       class="incident-list-param"
-      hx-get="{% url 'htmx:incident-list' %}"
+      hx-get="{{ incident_list_url }}"
       hx-include=".incident-list-param"
       {% block filter_trigger_control %}
       hx-trigger="keydown[keyCode==13], change delay:100ms, load once"
