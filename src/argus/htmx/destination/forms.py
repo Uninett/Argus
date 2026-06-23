@@ -13,6 +13,8 @@ class DestinationFormCreate(ModelForm):
         # Serializer request the request object
         self.request = kwargs.pop("request", None)
         super().__init__(*args, **kwargs)
+        self._available_media = Media.objects.available()
+        self.fields["media"].queryset = self._available_media
 
     class Meta:
         model = DestinationConfig
