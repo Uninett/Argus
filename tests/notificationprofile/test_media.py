@@ -4,8 +4,8 @@ from django.test import TestCase, override_settings
 
 from argus.auth.factories import PersonUserFactory
 from argus.filter.factories import FilterFactory
-from argus.incident.factories import EventFactory
-from argus.incident.models import create_fake_incident, get_or_create_default_instances, Event
+from argus.incident.factories import EventFactory, create_fake_incident
+from argus.incident.models import get_or_create_default_instances, Event
 from argus.notificationprofile import factories
 from argus.notificationprofile.media import find_destinations_for_event
 from argus.notificationprofile.media import find_destinations_for_many_events
