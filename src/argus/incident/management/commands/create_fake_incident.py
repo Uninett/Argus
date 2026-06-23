@@ -12,7 +12,7 @@ from django.db.utils import IntegrityError
 
 from argus.dev.utils import get_json_from_file
 from argus.incident.constants import Level
-from argus.incident.models import create_fake_incident
+from argus.incident.factories import create_fake_incident
 
 LOG = logging.getLogger(__name__)
 User = get_user_model()
