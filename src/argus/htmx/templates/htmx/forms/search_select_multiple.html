@@ -1,8 +1,5 @@
 <!-- htmx/forms/search_select_multiple.html -->
 {% extends "htmx/forms/dropdown_select_multiple.html" %}
-{% block field_control %}
-  id="dropdown-{{ widget.attrs.id }}"
-{% endblock field_control %}
 {% block show_selected %}
   <span class="badge badge-primary">{{ option.label }}</span>
 {% endblock show_selected %}
@@ -28,28 +25,8 @@
     const preload = {{ widget.extra.preload|yesno:"true,false" }};
     const searchUrl = '{{ widget.extra.search_url|default:"" }}';
     const fieldName = '{{ widget.name }}';
-    const placeholder = '{{ widget.attrs.placeholder|default:"Select..." }}';
-    const arrowSvg = '<svg class="h-4 w-4 shrink-0 opacity-50 transition-transform duration-200 group-focus-within:rotate-180" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6" /></svg>';
 
     const resultsContainer = searchUrl ? dropdown.querySelector('[data-search-results]') : null;
-
-    function updateShowSelected() {
-      const showSelected = dropdown.querySelector('.show-selected-box');
-      const checked = [...dropdown.querySelectorAll(`input[name="${fieldName}"]:checked`)];
-
-      if (checked.length === 0) {
-        showSelected.innerHTML = `<span class="text-base-content/50 flex-1">${placeholder}</span>${arrowSvg}`;
-      } else {
-        const badges = checked.map(input =>
-          `<span class="badge badge-primary">${input.closest('label')?.textContent.trim() ?? input.value}</span>`
-        ).join('');
-        showSelected.innerHTML = `
-          <span class="flex flex-wrap gap-1 flex-1 items-center overflow-y-auto max-h-14">${badges}</span>
-          <button type="button" class="cursor-pointer opacity-50 hover:opacity-100 flex-shrink-0" aria-label="Clear selection" data-clear-field="${fieldName}" onmousedown="event.preventDefault()">
-            <i class="fa-solid fa-xmark" aria-hidden="true"></i>
-          </button>`;
-      }
-    }
 
     // Auto-focus search input when dropdown opens
     dropdown.addEventListener('focusin', (e) => {
@@ -68,8 +45,8 @@
         });
       }
       if (resultsContainer) {
-        optionsContainer.style.display = '';
-        returnResultsToOptions();
+        preserveCheckedResults();
+        resultsContainer.innerHTML = '';
         // Remove unchecked items that were added from search
         optionsContainer.querySelectorAll('[data-from-search]').forEach(label => {
           if (!label.querySelector('input:checked')) label.remove();
@@ -77,33 +54,35 @@
       }
     });
 
-    function returnResultsToOptions() {
+    // Move checked search results into persistent options before replacing
+    function preserveCheckedResults() {
       if (!resultsContainer) return;
-      [...resultsContainer.querySelectorAll('label')].forEach(label => {
-        optionsContainer.appendChild(label);
+      resultsContainer.querySelectorAll('input:checked').forEach(input => {
+        const label = input.closest('label');
+        if (label) {
+          label.dataset.fromSearch = 'true';
+          optionsContainer.appendChild(label);
+        }
       });
-      resultsContainer.innerHTML = '';
     }
 
-    dropdown.querySelector('.dropdown-content').addEventListener('change', updateShowSelected);
-
     if (preload) {
-      // Client-side filtering for preloaded options
+      // Client-side filtering, checked items always stay visible
       searchInput.addEventListener('input', () => {
         const query = searchInput.value.toLowerCase();
         optionsContainer.querySelectorAll('label').forEach(label => {
           const text = label.textContent.toLowerCase();
-          label.style.display = text.includes(query) ? '' : 'none';
+          label.style.display = (label.querySelector('input:checked') || text.includes(query)) ? '' : 'none';
         });
       });
     } else if (searchUrl) {
       let searchTimeout;
 
-      // Remove search-created items when selections are fully cleared
+      // Remove all search-result items when selections are fully cleared
       dropdown.querySelector('.dropdown-content').addEventListener('change', () => {
         if (!dropdown.querySelector(`input[name="${fieldName}"]:checked`)) {
-          returnResultsToOptions();
           optionsContainer.querySelectorAll('[data-from-search]').forEach(label => label.remove());
+          resultsContainer.innerHTML = '';
         }
       });
 
@@ -112,12 +91,11 @@
         const query = searchInput.value.trim();
 
         if (query.length < 2) {
-          optionsContainer.style.display = '';
-          returnResultsToOptions();
+          preserveCheckedResults();
+          resultsContainer.innerHTML = '';
           return;
         }
 
-        optionsContainer.style.display = 'none';
         searchTimeout = setTimeout(async () => {
           try {
             const response = await fetch(
@@ -125,17 +103,19 @@
             );
             const data = await response.json();
 
-            returnResultsToOptions();
+            // Get currently selected values to avoid duplicates
+            const selected = new Set(
+              [...dropdown.querySelectorAll(`input[name="${fieldName}"]:checked`)]
+                .map(input => input.value)
+            );
+
+            preserveCheckedResults();
+            resultsContainer.innerHTML = '';
             data.results.forEach(item => {
-              const existingLabel = optionsContainer.querySelector(`input[name="${fieldName}"][value="${String(item.id)}"]`)?.closest('label');
-              if (existingLabel) {
-                resultsContainer.appendChild(existingLabel);
-                return;
-              }
+              if (selected.has(String(item.id))) return;
 
               const label = document.createElement('label');
               label.className = 'flex gap-2 items-center my-1';
-              label.dataset.fromSearch = 'true';
 
               const input = document.createElement('input');
               input.type = 'checkbox';

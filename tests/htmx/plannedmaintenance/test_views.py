@@ -271,26 +271,25 @@ class PlannedMaintenanceCancelViewTests(TestCase):
 
 
 @tag("integration")
-class PlannedMaintenanceFilterWidgetTests(TestCase):
+class PlannedMaintenanceFilterDropdownTests(TestCase):
     def setUp(self):
         self.staff_user = AdminUserFactory()
-        now = timezone.now()
-        self.future_pm = PlannedMaintenanceFactory(
-            start_time=now + timedelta(days=1),
-            end_time=LOCAL_INFINITY,
-        )
 
-    def test_given_create_form_with_filters_field_it_should_have_search_url(self):
+    def test_given_create_form_filter_queryset_should_include_all_filters(self):
         self.client.force_login(self.staff_user)
+        f1 = FilterFactory(user=self.staff_user)
+        f2 = FilterFactory(user=AdminUserFactory())
         response = self.client.get(reverse("htmx:plannedmaintenance-create"))
-        widget = response.context["form"].fields["filters"].widget
-        self.assertIn("search_url", widget.extra)
+        qs = response.context["form"].fields["filters"].queryset
+        self.assertIn(f1, qs)
+        self.assertIn(f2, qs)
 
-    def test_given_update_form_with_filters_field_it_should_have_search_url(self):
+    def test_given_selected_filter_ids_partial_view_it_should_render_them_as_checked(self):
         self.client.force_login(self.staff_user)
-        response = self.client.get(reverse("htmx:plannedmaintenance-update", kwargs={"pk": self.future_pm.pk}))
-        widget = response.context["form"].fields["filters"].widget
-        self.assertIn("search_url", widget.extra)
+        f = FilterFactory(user=self.staff_user)
+        response = self.client.get(reverse("htmx:pm-filter-widget"), {"filters": [f.pk]})
+        self.assertContains(response, f'value="{f.pk}"')
+        self.assertContains(response, "checked")
 
 
 @tag("integration")

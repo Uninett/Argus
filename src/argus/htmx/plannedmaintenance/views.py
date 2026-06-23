@@ -2,7 +2,7 @@ from django import forms
 from django.core.exceptions import PermissionDenied
 from django.db.models import Q
 from django.forms import modelform_factory
-from django.http import HttpResponseRedirect, JsonResponse
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils import timezone
@@ -83,13 +83,12 @@ class FilterWidgetMixin:
     """Mixin to configure the filters field with SearchDropdownMultiSelect widget."""
 
     def get_filter_widget(self):
-        search_url = reverse("htmx:search-filters")
         return SearchDropdownMultiSelect(
-            partial_get=search_url,
+            partial_get=reverse("htmx:pm-filter-widget"),
             attrs={"placeholder": "Select filters..."},
             extra={
                 "search_placeholder": "Search by filter name or user...",
-                "search_url": search_url,
+                "preload": True,
             },
         )
 
@@ -182,6 +181,25 @@ class PlannedMaintenanceUpdateView(
         if not form.instance.end_time:
             form.instance.end_time = LOCAL_INFINITY
         return super().form_valid(form)
+
+
+class FilterWidgetPartialView(UserIsStaffMixin, View):
+    http_method_names = ["get"]
+
+    def get(self, request):
+        filter_ids = [fid for fid in request.GET.getlist("filters") if fid.isdigit()]
+        selected_filters = Filter.objects.filter(pk__in=filter_ids).select_related("user")
+
+        class FiltersForm(forms.Form):
+            filters = forms.ModelMultipleChoiceField(
+                queryset=selected_filters,
+                widget=FilterWidgetMixin().get_filter_widget(),
+                required=False,
+            )
+
+        form = FiltersForm(request.GET)
+        form.fields["filters"].label_from_instance = lambda obj: f"{obj.name} ({obj.user.username})"
+        return HttpResponse(str(form["filters"]))
 
 
 class SearchFiltersView(UserIsStaffMixin, View):
