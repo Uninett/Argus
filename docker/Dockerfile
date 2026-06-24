@@ -44,7 +44,8 @@ ENTRYPOINT ["/usr/bin/tini", "-v", "--"]
 CMD ["/cmd-argus.sh"]
 
 # ── all-plugins target ──────────────────────────────
-# Includes all Sikt-maintained notification and ticket plugins
+# Includes all Sikt-maintained notification and ticket plugins and apprise
+# (optional dependency for notification plugins)
 FROM base AS all-plugins
 USER root
 RUN pip install \
@@ -52,5 +53,6 @@ RUN pip install \
     argus-ticket-gitlab \
     argus-ticket-jira \
     argus-ticket-rt \
-    argus-notification-msteams
+    argus-notification-msteams \
+    apprise>=1.9.6
 USER argus
