@@ -190,24 +190,28 @@ class EventAPITests(APITestCase, IncidentBasedAPITestCaseHelper):
         self.assertEqual(response.data["type"], "Cannot change the state of a stateless incident.")
         assert_incident_stateless()
 
-    def test_posting_end_and_restart_events_does_not_change_stateless_incidents(self):
+    def test_posting_end_and_restart_events_does_not_change_stateless_incidents_but_records_event(self):
         def assert_incident_stateless():
             self.stateless_incident1.refresh_from_db()
             self.assertFalse(self.stateless_incident1.stateful)
             self.assertFalse(self.stateless_incident1.open)
 
+        event_count = self.stateless_incident1.events.count()
+
         assert_incident_stateless()
-        response = self.user1_rest_client.post(
+        response = self.source1_rest_client.post(
             self.events_url(self.stateless_incident1), self._create_event_dict(Event.Type.INCIDENT_END)
         )
-        self._assert_response_field_invalid(response, "type")
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         assert_incident_stateless()
+        self.assertEqual(self.stateless_incident1.events.count(), event_count + 1)
 
-        response = self.user1_rest_client.post(
+        response = self.source1_rest_client.post(
             self.events_url(self.stateless_incident1), self._create_event_dict(Event.Type.INCIDENT_RESTART)
         )
-        self._assert_response_field_invalid(response, "type")
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         assert_incident_stateless()
+        self.assertEqual(self.stateless_incident1.events.count(), event_count + 2)
 
     def test_posting_allowed_event_types_for_source_system_is_valid(self):
         def delete_start_event(incident: Incident):
