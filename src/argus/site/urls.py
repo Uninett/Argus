@@ -26,7 +26,7 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from argus.constants import API_STABLE_VERSION, API_STABLE_SCHEMA_VIEWNAME
 from argus.notificationprofile.v2.views import SchemaView
 from argus.site.utils import get_urlpatterns
-from argus.site.views import index, MetadataView, api_gone, error
+from argus.site.views import index, MetadataView, api_gone, error, health_check
 
 api_v1_gone = partial(api_gone, message="API v1 has been removed")
 
@@ -34,6 +34,7 @@ api_v1_gone = partial(api_gone, message="API v1 has been removed")
 urlpatterns = [
     path("favicon.ico", RedirectView.as_view(url="/static/favicon.svg", permanent=True)),
     path(".error/", error, name="error"),
+    path(".still-alive/", health_check),  # doesn't need a name
     path("admin/", admin.site.urls),
     path(
         "api/schema/",

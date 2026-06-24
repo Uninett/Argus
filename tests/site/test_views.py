@@ -15,6 +15,12 @@ class TestAPIV1GoneView(TestCase):
             self.assertEqual(response.status_code, status.HTTP_410_GONE)
 
 
+class TestHealthCheckView(TestCase):
+    def test_it_should_always_return_204(self):
+        response = self.client.get("/.still-alive/")
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+
 class TestErrorView(TestCase):
     def setUp(self):
         self.user = PersonUserFactory()
