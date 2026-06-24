@@ -43,6 +43,18 @@ Zino
 This is a standalone process that connects to both the Zino and Argus APIs and
 exchanges/synchronizes information between them.
 
+Zabbix
+~~~~~~
+
+| Home: https://www.zabbix.com/
+| Source: https://github.com/Uninett/zabbix-argus-glue
+| PyPI: `zabbix-argus-glue <https://pypi.org/project/zabbix-argus-glue/>`_
+
+This is a standalone service that synchronizes Zabbix 7.2+ problems with Argus
+incidents. It combines a webhook receiver for near real-time updates with a
+reconciliation poller that periodically corrects any drift between the two
+systems.
+
 
 Mist Systems Administration (Juniper)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
