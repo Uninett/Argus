@@ -24,7 +24,7 @@ suppressed if all of the filters apply to that event.
 The planned maintenance task list
 =================================
 
-From the maintenance list page you can mark planned maintenances tasks as finished,
+From the maintenance list page you can mark planned maintenance tasks as finished,
 which will set an open task's end time to the current time. Tasks that have not
 started yet can be deleted.
 
