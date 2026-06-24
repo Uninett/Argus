@@ -71,10 +71,6 @@ CMD ["/cmd-argus.sh"]
 # extends `build` instead and copy the resulting venv.)
 FROM base AS all-plugins
 USER root
-RUN pip install \
-    argus-ticket-github \
-    argus-ticket-gitlab \
-    argus-ticket-jira \
-    argus-ticket-rt \
-    argus-notification-msteams
+COPY --from=build /src/pyproject.toml /tmp/pyproject.toml
+RUN pip install --group /tmp/pyproject.toml:all-plugins
 USER argus
