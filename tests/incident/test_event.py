@@ -133,6 +133,42 @@ class EventAPITests(APITestCase, IncidentBasedAPITestCaseHelper):
         self.assertEqual(parse_datetime(response.data["timestamp"]), event_timestamp)
         self._assert_incident_is_closed_at_timestamp(self.stateful_incident1, event_timestamp)
 
+    def test_given_closed_incident_when_source_posts_end_then_records_event_without_state_change(self):
+        # An end user posting a state-invalid event gets a 400; a source system does
+        # not. Its event is recorded for the audit trail (201) but update_incident is
+        # skipped, so the incident is unchanged. Here: END on an already-closed
+        # incident must be accepted and recorded without re-touching end_time.
+        count_before = self.stateful_incident1.events.count()
+
+        self.stateful_incident1.end_time = timezone.now()
+        self.stateful_incident1.save(update_fields=["end_time"])
+
+        end_event_dict = self._create_event_dict(Event.Type.INCIDENT_END)
+        response = self.source1_rest_client.post(self.events_url(self.stateful_incident1), end_event_dict)
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self._assert_incident_is_closed_at_timestamp(self.stateful_incident1, self.stateful_incident1.end_time)
+        self.stateful_incident1.refresh_from_db()
+        self.assertEqual(self.stateful_incident1.events.count(), count_before + 1)
+
+    def test_given_open_incident_when_source_posts_restart_then_records_event_without_state_change(self):
+        # An end user posting a state-invalid event gets a 400; a source system does
+        # not. Its event is recorded for the audit trail (201) but update_incident is
+        # skipped, so the incident is unchanged. Here: RESTART on an already-open
+        # incident must be accepted and recorded without re-touching end_time.
+        self.stateful_incident1.end_time = datetime_utils.INFINITY_REPR
+        self.stateful_incident1.save(update_fields=["end_time"])
+
+        count_before = self.stateful_incident1.events.count()
+
+        restart_event_dict = self._create_event_dict(Event.Type.INCIDENT_RESTART)
+        response = self.source1_rest_client.post(self.events_url(self.stateful_incident1), restart_event_dict)
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self._assert_incident_is_open(self.stateful_incident1)
+        self.stateful_incident1.refresh_from_db()
+        self.assertEqual(self.stateful_incident1.events.count(), count_before + 1)
+
     def test_posting_close_and_reopen_events_does_not_change_stateless_incidents(self):
         def assert_incident_stateless():
             self.stateless_incident1.refresh_from_db()
