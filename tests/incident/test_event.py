@@ -176,16 +176,18 @@ class EventAPITests(APITestCase, IncidentBasedAPITestCaseHelper):
             self.assertFalse(self.stateless_incident1.open)
 
         assert_incident_stateless()
-        response = self.source1_rest_client.post(
+        response = self.user1_rest_client.post(
             self.events_url(self.stateless_incident1), self._create_event_dict(Event.Type.CLOSE)
         )
         self._assert_response_field_invalid(response, "type")
+        self.assertEqual(response.data["type"], "Cannot change the state of a stateless incident.")
         assert_incident_stateless()
 
-        response = self.source1_rest_client.post(
+        response = self.user1_rest_client.post(
             self.events_url(self.stateless_incident1), self._create_event_dict(Event.Type.REOPEN)
         )
         self._assert_response_field_invalid(response, "type")
+        self.assertEqual(response.data["type"], "Cannot change the state of a stateless incident.")
         assert_incident_stateless()
 
     def test_posting_end_and_restart_events_does_not_change_stateless_incidents(self):
