@@ -1,8 +1,7 @@
 from django import forms
 from django.core.exceptions import PermissionDenied
-from django.db.models import Q
 from django.forms import modelform_factory
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils import timezone
@@ -200,27 +199,6 @@ class FilterWidgetPartialView(UserIsStaffMixin, View):
         form = FiltersForm(request.GET)
         form.fields["filters"].label_from_instance = lambda obj: f"{obj.name} ({obj.user.username})"
         return HttpResponse(str(form["filters"]))
-
-
-class SearchFiltersView(UserIsStaffMixin, View):
-    http_method_names = ["get"]
-
-    def get(self, request):
-        query = request.GET.get("q", "")
-
-        filters = Filter.objects.select_related("user")
-        if query:
-            filters = filters.filter(
-                Q(name__icontains=query)
-                | Q(user__username__icontains=query)
-                | Q(user__first_name__icontains=query)
-                | Q(user__last_name__icontains=query)
-            )
-        filters = sorted(filters, key=lambda f: (f.user != request.user, f.name))[:20]
-
-        options = [{"id": f.pk, "text": f"{f.name} ({f.user.username})"} for f in filters]
-
-        return JsonResponse({"results": options})
 
 
 class FilterPreviewView(UserIsStaffMixin, View):

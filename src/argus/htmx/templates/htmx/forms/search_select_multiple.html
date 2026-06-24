@@ -67,12 +67,20 @@
     }
 
     if (preload) {
-      // Client-side filtering, checked items always stay visible
+      // Client-side filtering, checked items always stay visible, unchecked results capped at 20
       searchInput.addEventListener('input', () => {
         const query = searchInput.value.toLowerCase();
+        let shown = 0;
         optionsContainer.querySelectorAll('label').forEach(label => {
-          const text = label.textContent.toLowerCase();
-          label.style.display = (label.querySelector('input:checked') || text.includes(query)) ? '' : 'none';
+          const isChecked = label.querySelector('input:checked');
+          if (isChecked) {
+            label.style.display = '';
+          } else if (label.textContent.toLowerCase().includes(query) && shown < 20) {
+            label.style.display = '';
+            shown++;
+          } else {
+            label.style.display = 'none';
+          }
         });
       });
     } else if (searchUrl) {

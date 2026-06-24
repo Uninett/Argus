@@ -293,58 +293,6 @@ class PlannedMaintenanceFilterDropdownTests(TestCase):
 
 
 @tag("integration")
-class SearchFiltersViewTests(TestCase):
-    def setUp(self):
-        self.user = PersonUserFactory()
-        self.staff_user = AdminUserFactory(username="felaali", first_name="Ferrari", last_name="Testarossa")
-        self.other_staff_user = AdminUserFactory(username="lambo", first_name="Lamborghini", last_name="Countach")
-
-        self.staff_filter = FilterFactory(user=self.staff_user, name="My Filter")
-        self.other_staff_filter = FilterFactory(user=self.other_staff_user, name="Other Filter")
-
-    def test_search_filters_requires_login(self):
-        response = self.client.get(reverse("htmx:search-filters"))
-        self.assertEqual(response.status_code, 302)
-
-    def test_search_filters_when_not_staff_then_forbidden(self):
-        self.client.force_login(self.user)
-        response = self.client.get(reverse("htmx:search-filters"))
-        self.assertEqual(response.status_code, 403)
-
-    def test_search_filters_it_should_return_json(self):
-        self.client.force_login(self.staff_user)
-        response = self.client.get(reverse("htmx:search-filters"))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response["Content-Type"], "application/json")
-
-    def test_search_filters_returns_all_filters_without_query(self):
-        self.client.force_login(self.staff_user)
-        response = self.client.get(reverse("htmx:search-filters"))
-        data = response.json()
-        self.assertEqual(len(data["results"]), 2)
-
-    def test_search_filters_filters_by_name(self):
-        self.client.force_login(self.staff_user)
-        response = self.client.get(reverse("htmx:search-filters"), {"q": "My"})
-        data = response.json()
-        self.assertEqual(len(data["results"]), 1)
-        self.assertEqual(data["results"][0]["id"], self.staff_filter.pk)
-
-    def test_search_filters_filters_by_username(self):
-        self.client.force_login(self.staff_user)
-        response = self.client.get(reverse("htmx:search-filters"), {"q": self.other_staff_user.username})
-        data = response.json()
-        self.assertEqual(len(data["results"]), 1)
-        self.assertEqual(data["results"][0]["id"], self.other_staff_filter.pk)
-
-    def test_search_filters_sorts_current_user_filters_first(self):
-        self.client.force_login(self.staff_user)
-        response = self.client.get(reverse("htmx:search-filters"))
-        data = response.json()
-        self.assertEqual(data["results"][0]["id"], self.staff_filter.pk)
-
-
-@tag("integration")
 class FilterPreviewViewTests(TestCase):
     def setUp(self):
         self.user = PersonUserFactory()
