@@ -292,8 +292,13 @@ def incident_list_filter(request, qs, use_empty_filter=False):
             del request.session["selected_filter"]
             filter_pk, filter_obj = None, None
     if filter_obj:
-        form = IncidentFilterForm(_convert_filterblob(filter_obj.filter.copy()))
-        LOG.trace("using stored filter: %s", filter_obj.filter)
+        form_data = _normalize_form_data(request)
+        if form_data.keys() & IncidentFilterForm.DEFAULT_VALUES.keys():
+            form = IncidentFilterForm(form_data)
+            LOG.trace("using form data (overriding stored filter): %s", form_data)
+        else:
+            form = IncidentFilterForm(_convert_filterblob(filter_obj.filter.copy()))
+            LOG.trace("using stored filter: %s", filter_obj.filter)
     else:
         form_data = _normalize_form_data(request)
         if request.method == "POST":
