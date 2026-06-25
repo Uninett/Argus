@@ -138,6 +138,26 @@ class TestIncidentListFilter(TestCase):
         form, _ = incident_list_filter(self.request, self.qs)
         assert form.to_filterblob()["maxlevel"] == maxlevel
 
+    def test_when_saved_filter_is_selected_and_request_has_form_params_then_it_should_use_the_form_params(self):
+        # The saved filter (maxlevel=1) would exclude the level-5 incident. Form params
+        # in the request must override the saved filter's params, so maxlevel=5 wins and
+        # the incident becomes visible again.
+        self.request.session["selected_filter"] = self.valid_filter.pk
+        self.request.GET = QueryDict("maxlevel=5&tags=")
+        form, qs = incident_list_filter(self.request, self.qs)
+        assert form.is_valid()  # guard against the wrong-reason pass: an invalid form filters nothing
+        assert form.to_filterblob()["maxlevel"] == 5  # form param won over saved maxlevel=1
+        assert self.incident in qs  # ...and the override actually reaches the queryset
+
+    def test_when_saved_filter_is_selected_and_request_has_no_form_params_then_it_should_use_the_saved_filter(self):
+        # sort/sort_order are always present as hidden inputs but are not form params,
+        # so they must not count as an override and the saved filter still applies.
+        self.request.session["selected_filter"] = self.valid_filter.pk
+        self.request.GET = QueryDict("sort=start_time&sort_order=desc")
+        form, qs = incident_list_filter(self.request, self.qs)
+        assert form.to_filterblob()["maxlevel"] == 1  # saved filter value, not overridden
+        assert self.incident not in qs  # saved filter still filters the queryset
+
     def test_post_request_without_selected_filter_should_use_post_parameters_as_form_data(self):
         maxlevel = 3
         request = self.factory.post("random-url", {}, content_type="application/json")
