@@ -287,7 +287,7 @@ class PlannedMaintenanceFilterDropdownTests(TestCase):
     def test_given_selected_filter_ids_partial_view_it_should_render_them_as_checked(self):
         self.client.force_login(self.staff_user)
         f = FilterFactory(user=self.staff_user)
-        response = self.client.get(reverse("htmx:pm-filter-widget"), {"filters": [f.pk]})
+        response = self.client.get(reverse("htmx:plannedmaintenance-filter-widget"), {"filters": [f.pk]})
         self.assertContains(response, f'value="{f.pk}"')
         self.assertContains(response, "checked")
 

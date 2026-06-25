@@ -83,7 +83,7 @@ class FilterWidgetMixin:
 
     def get_filter_widget(self):
         return SearchDropdownMultiSelect(
-            partial_get=reverse("htmx:pm-filter-widget"),
+            partial_get=reverse("htmx:plannedmaintenance-filter-widget"),
             attrs={"placeholder": "Select filters..."},
             extra={
                 "search_placeholder": "Search by filter name or user...",
