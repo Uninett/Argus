@@ -49,6 +49,13 @@ jobs:
             tag="$latest_tag"
           fi
           echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          # Only move the `latest` tag when building the current latest release,
+          # so a manual rebuild of an older release does not clobber it.
+          if [ "$tag" = "$latest_tag" ]; then
+            echo "latest=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "latest=false" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Checkout repository
         uses: actions/checkout@v7
@@ -68,6 +75,7 @@ jobs:
         with:
           tags: |
             type=semver,pattern={{version}},value=${{ steps.release.outputs.tag }}
+            type=raw,value=latest,enable=${{ steps.release.outputs.latest }}
           images: ${{ matrix.image }}
 
       - name: Build and push backend Docker image
