@@ -6,6 +6,12 @@ on:
     types:
       - published
       - edited
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release version tag to (re)build, e.g. v2.9.1 (a bare 2.9.1 is also accepted). Defaults to the latest release."
+        required: false
+        type: string
 
 env:
   REGISTRY: ghcr.io
@@ -25,8 +31,36 @@ jobs:
             target: all-plugins
 
     steps:
+      - name: Determine release tag to build
+        id: release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          latest_tag=$(gh release view --repo "${{ github.repository }}" --json tagName -q .tagName)
+          if [ "${{ github.event_name }}" = "release" ]; then
+            tag="$RELEASE_TAG"
+          elif [ -n "$INPUT_VERSION" ]; then
+            tag="$INPUT_VERSION"
+            # Release tags are v-prefixed; tolerate a bare version such as 2.9.1
+            case "$tag" in v*) ;; *) tag="v$tag" ;; esac
+          else
+            tag="$latest_tag"
+          fi
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          # Only move the `latest` tag when building the current latest release,
+          # so a manual rebuild of an older release does not clobber it.
+          if [ "$tag" = "$latest_tag" ]; then
+            echo "latest=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "latest=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Checkout repository
         uses: actions/checkout@v7
+        with:
+          ref: ${{ steps.release.outputs.tag }}
 
       - name: Log in to the Container registry
         uses: docker/login-action@v4
@@ -40,7 +74,8 @@ jobs:
         uses: docker/metadata-action@v6
         with:
           tags: |
-            type=semver,pattern={{version}}
+            type=semver,pattern={{version}},value=${{ steps.release.outputs.tag }}
+            type=raw,value=latest,enable=${{ steps.release.outputs.latest }}
           images: ${{ matrix.image }}
 
       - name: Build and push backend Docker image
