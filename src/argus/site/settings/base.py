@@ -166,7 +166,7 @@ USE_I18N = True
 
 USE_TZ = True
 
-TIME_ZONE = "Europe/Oslo"
+TIME_ZONE = get_str_env("TIME_ZONE", "Europe/Oslo")
 
 
 # Static files (CSS, JavaScript, Images)

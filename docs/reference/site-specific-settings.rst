@@ -43,6 +43,17 @@ Django-specific settings
   .. warning:: Keep the :setting:`SECRET_KEY` secret, as it is relevant to the
     security and integrity of your Argus instance.
 
+.. setting:: TIME_ZONE
+
+* :setting:`TIME_ZONE` (optional) the time zone Argus uses to *display*
+  timestamps, as an IANA name (e.g. ``Europe/Oslo``, ``UTC``). Defaults to
+  ``Europe/Oslo``.
+
+  Note that this setting only affects how timestamps are presented. Internally,
+  all timestamps are stored in UTC, so changing :setting:`TIME_ZONE` does not
+  alter existing data — it only changes the time zone the values are rendered
+  in.
+
 .. _site-specific-settings-additional-apps:
 
 Settings for adding additional Django apps
