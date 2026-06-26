@@ -106,7 +106,7 @@ class CreateFakeIncidentTestCase(TestCase):
 
 
 def TestCreateStatelessIncident(TestCase):
-    def test_create_stateless_incident(self):
+    def test_it_should_always_return_a_stateless_incident(self):
         source_name = "source_a"
         sst = SourceSystemTypeFactory(name=source_name)
         user = SourceUserFactory(username=source_name)
