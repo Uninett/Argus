@@ -1,5 +1,5 @@
 from zoneinfo import ZoneInfo
-from datetime import datetime
+from datetime import datetime, timedelta
 from random import randint, choice
 from typing import Optional, Any
 
@@ -45,6 +45,54 @@ def update_tags(incident: Incident, *tags):
         _, created = IncidentTagRelation.objects.get_or_create(tag=tag, incident=incident, added_by=argus_user)
         c += 1 if created else 0
     return c
+
+
+def create_fake_source(
+    name: Optional[str] = None,
+    type: Optional[str] = None,
+    user: Optional[str] = None,
+    last_seen: Optional[datetime] = None,
+    heartbeat_frequency: Optional[timedelta] = None,
+    commit=True,
+):
+    generated_name = factory.Sequence(lambda s: "source-%s" % s)
+    name = name or type or user or generated_name
+    if not type:
+        type = "type-" + name
+    if not user:
+        user = "user-" + name
+
+    source_user = SourceUserFactory(username=name)
+    source_type = SourceSystemTypeFactory(name=type)
+    source = SourceSystem(
+        name=name,
+        user=source_user,
+        type=source_type,
+        last_seen=last_seen,
+        heartbeat_frequency=heartbeat_frequency,
+    )
+    if commit:
+        source.save()
+    return source
+
+
+def create_dead_source(
+    name,
+    type: str = None,
+    user: str = None,
+    timestamp: Optional[None] = None,
+):
+    timestamp = timestamp if timestamp else timezone.now()
+    heartbeat_frequency = timedelta(minutes=5)
+    last_seen = timestamp - (2 * heartbeat_frequency)
+    source = create_fake_source(
+        name=name,
+        type=type,
+        user=user,
+        last_seen=last_seen,
+        heartbeat_frequency=heartbeat_frequency,
+    )
+    return source, timestamp
 
 
 def create_fake_incident(
