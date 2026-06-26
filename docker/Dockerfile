@@ -27,7 +27,7 @@ RUN mkdir -p /static && chown argus /static
 ENV STATIC_ROOT=/static
 
 COPY . /src
-RUN pip install '/src' && rm -rf /src
+RUN pip install '/src'
 
 # Install API backend settings suitable for Docker deployment
 RUN mkdir /extrapython
@@ -48,11 +48,6 @@ CMD ["/cmd-argus.sh"]
 # (optional dependency for notification plugins)
 FROM base AS all-plugins
 USER root
-RUN pip install \
-    argus-ticket-github \
-    argus-ticket-gitlab \
-    argus-ticket-jira \
-    argus-ticket-rt \
-    argus-notification-msteams \
-    apprise>=1.9.6
+COPY --from=base /src/pyproject.toml /tmp/pyproject.toml
+RUN pip install --group /tmp/pyproject.toml:all-plugins && rm -f /tmp/pyproject.toml
 USER argus
