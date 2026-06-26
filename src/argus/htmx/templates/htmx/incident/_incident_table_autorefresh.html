@@ -1,7 +1,7 @@
 {# djlint:off #}
 {% with preferences.argus_htmx.update_interval as update_interval %}
   {% if update_interval != 'never' %}
-    hx-get="{% url 'htmx:incident-list' %}"
+    hx-get="{{ incident_list_url }}"
     hx-vals='{"page": "{{ page.number }}"}'
     hx-target="this"
     hx-swap="outerHTML"

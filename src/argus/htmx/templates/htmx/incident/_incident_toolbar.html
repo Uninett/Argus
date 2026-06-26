@@ -6,8 +6,10 @@
       {% include "htmx/incident/_incident_filterbox.html" %}
     </div>
   </div>
-  <div id="bulk-actions"
-       class="hidden flex gap-2 w-fit border-2 border-primary/50 bg-primary/10 rounded-box p-1">
-    {% include "htmx/incident/_incident_list_update_menu.html" %}
-  </div>
+  {% if not kiosk_mode %}
+    <div id="bulk-actions"
+         class="hidden flex gap-2 w-fit border-2 border-primary/50 bg-primary/10 rounded-box p-1">
+      {% include "htmx/incident/_incident_list_update_menu.html" %}
+    </div>
+  {% endif %}
 </section>

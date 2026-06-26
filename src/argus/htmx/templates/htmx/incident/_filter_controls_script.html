@@ -1,4 +1,5 @@
 <script>
+  const KIOSK_MODE = {{ kiosk_mode|yesno:"true,false" }};
   const FILTER_SELECT_URL = '{% url "htmx:select-filter" %}';
   const FILTER_UPDATE_URL_TEMPLATE = '{% url "htmx:filter-update" pk=0 %}'.replace('/0/', '/{id}/');
   const FILTER_DELETE_URL_TEMPLATE = '{% url "htmx:filter-delete" pk=0 %}'.replace('/0/', '/{id}/');
@@ -93,7 +94,9 @@
     const box = document.getElementById('filter-controls-box');
     box.classList.toggle('filters-collapsed');
     const collapsed = box.classList.contains('filters-collapsed');
-    localStorage.setItem('argus_show_filters', collapsed ? 'false' : 'true');
+    if (!KIOSK_MODE) {
+      localStorage.setItem('argus_show_filters', collapsed ? 'false' : 'true');
+    }
     btn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
   }
 
@@ -111,7 +114,7 @@
   });
 
   document.addEventListener('DOMContentLoaded', () => {
-    if (localStorage.getItem('argus_show_filters') === 'false') {
+    if (KIOSK_MODE || localStorage.getItem('argus_show_filters') === 'false') {
       document.getElementById('filter-controls-box')?.classList.add('filters-collapsed');
       document.getElementById('filter-toggle-btn')?.setAttribute('aria-expanded', 'false');
     }
