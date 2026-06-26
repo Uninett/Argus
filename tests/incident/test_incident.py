@@ -8,8 +8,10 @@ from argus.incident.factories import (
     EventFactory,
     StatefulIncidentFactory,
     StatelessIncidentFactory,
+    create_fake_incident,
+    create_fake_source,
 )
-from argus.incident.models import Event
+from argus.incident.models import HEARTBEAT_TAG, SOURCE_TAG_KEY, Event
 from argus.incident.factories import SourceSystemFactory, SourceUserFactory
 from argus.util.testing import disconnect_signals, connect_signals
 
@@ -121,3 +123,41 @@ class IncidentHumanizeAgeTests(TestCase):
 
     def test_given_stateless_incident_then_returns_empty_string(self):
         self.assertEqual(StatelessIncidentFactory().humanize_age, "")
+
+
+class TestIncidentTagMethods(TestCase):
+    def test_when_incident_lacks_tag_return_False(self):
+        incident = create_fake_incident(tags=["existing=badtag"])
+        result = incident.has_tags("existing=goodtag")
+        self.assertFalse(result)
+
+    def test_when_incident_has_tag_return_True(self):
+        incident = create_fake_incident(tags=["existing=goodtag"])
+        result = incident.has_tags("existing=goodtag")
+        self.assertTrue(result)
+
+    def test_when_incident_lacks_tag_key_return_False(self):
+        incident = create_fake_incident(tags=["existing=goodtag"])
+        result = incident.has_tag_keys("nonexisting")
+        self.assertFalse(result)
+
+    def test_when_incident_has_tag_key_return_True(self):
+        incident = create_fake_incident(tags=["existing=goodtag"])
+        result = incident.has_tag_keys("existing")
+        self.assertTrue(result)
+
+    def test_when_incident_lacks_magical_heartbeat_tags_return_False(self):
+        incident = create_fake_incident(tags=["existing=goodtag"])
+        result = incident.is_heartbeat_incident()
+        self.assertFalse(result)
+
+    def test_when_incident_has_both_magical_heartbeat_tags_return_True(self):
+        source_name = "hearteat-source"
+        source = create_fake_source(name=source_name)
+        tags = [
+            HEARTBEAT_TAG,
+            f"{SOURCE_TAG_KEY}={source.pk}",
+        ]
+        incident = create_fake_incident(source=source_name, tags=tags)
+        result = incident.is_heartbeat_incident()
+        self.assertTrue(result)

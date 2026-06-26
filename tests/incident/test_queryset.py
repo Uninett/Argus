@@ -8,8 +8,12 @@ from argus.incident.factories import (
     SourceUserFactory,
     StatefulIncidentFactory,
     StatelessIncidentFactory,
+    TagFactory,
+    create_dead_source,
+    create_fake_incident,
 )
-from argus.incident.models import Incident, Event
+from argus.incident.models import Incident, Event, SourceSystem, Tag, get_or_create_default_instances
+from argus.incident.heartbeat_utils import _get_or_create_incident_for_dead_source
 
 
 class IncidentQuerySetTestCase(TestCase):
@@ -124,3 +128,70 @@ class IncidentQuerySetUpdatingTestCase(TestCase):
         qs.reopen(self.user, description="Bar")
         result = set(e.incident for e in Event.objects.filter(type=Event.Type.REOPEN, description="Bar"))
         self.assertEqual(result, set(qs.all()))
+
+
+class TestTagQuerySetMethods(TestCase):
+    def test_from_tags_converts_tagstrings_to_existing_tags_and_returns_a_set_of_tags(self):
+        tag1 = TagFactory()
+        tag2 = TagFactory()
+        tag3 = TagFactory()
+        result = Tag.objects.from_tags(tag1.representation, tag2.representation)
+        self.assertNotIn(tag3, result)
+        self.assertEqual(set((tag1, tag2)), result)
+
+    def test_given_existing_tags_from_tag_keys_returns_a_queryset_of_tags_the_given_tag_key(self):
+        tag1 = TagFactory(key="foo", value="foo")
+        tag2 = TagFactory(key="foo", value="bar")
+        tag3 = TagFactory(key="xux", value="foo")
+        result = Tag.objects.from_tag_keys(tag1.key)
+        self.assertNotIn(tag3, result)
+        self.assertEqual(set((tag1, tag2)), set(result))
+
+
+class TestSourceSystemQuerySet(TestCase):
+    def setUp(self):
+        disconnect_signals()
+
+    def tearDown(self):
+        connect_signals()
+
+    def test_when_no_dead_sources_return_empty_queryset(self):
+        result = SourceSystem.objects.dead(timezone.now())
+        self.assertFalse(result.exists())
+
+    def test_when_a_dead_source_return_annotated_queryset(self):
+        zombie_source, timestamp = create_dead_source("zombie_walking")
+        result = SourceSystem.objects.dead(timestamp)
+        self.assertEqual(result.count(), 1)
+        self.assertEqual(result[0].name, "zombie_walking")
+        self.assertTrue(result[0].next_heartbeat)
+
+
+@tag("db")
+class TestIncidentQuerySetTagMethods(TestCase):
+    def test_when_no_incident_has_source_with_key_return_empty_queryset(self):
+        self.assertFalse(Incident.objects.from_tag_keys("blbl", "nonexistent").exists())
+
+    def test_when_incident_has_source_with_key_return_queryset_with_incident(self):
+        incident = create_fake_incident(tags=["blbl=foo"])
+        result = Incident.objects.from_tag_keys("blbl")
+        self.assertIn(incident, result)
+
+
+@tag("db")
+class TestIncidentQuerySetHeartbeatIncidents(TestCase):
+    def setUp(self):
+        _, sst, self.owner_source = get_or_create_default_instances()
+        self.zombie_source, self.timestamp = create_dead_source("zombie_walking")
+        self.irrelevant_incident = create_fake_incident(source=self.owner_source.name, tags=["test=test"])
+
+    def test_when_no_heartbeat_incidents_returns_empty_queryset(self):
+        self.assertFalse(Incident.objects.heartbeat_incidents().exists())
+
+    def test_when_heartbeat_incidents_exist_return_them(self):
+        incident = _get_or_create_incident_for_dead_source(
+            self.zombie_source, incident_owner=self.owner_source, timestamp=self.timestamp
+        )
+        result = Incident.objects.heartbeat_incidents()
+        self.assertIn(incident, result)
+        self.assertNotIn(self.irrelevant_incident, result)
