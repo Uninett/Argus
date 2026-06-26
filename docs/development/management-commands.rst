@@ -491,6 +491,50 @@ This field is be used to show in the dashboard which incidents are covered by an
 ongoing planned maintenance task. Since the task has ended these incidents are not
 covered by it anymore.
 
+Task queue workers
+==================
+
+.. _db_worker:
+
+db_worker
+---------
+
+To run the queue worker that reads tasks from the database one can use
+the command `db_worker`:
+
+    .. code:: console
+
+        $ python manage.py db_worker
+
+.. _rqworker:
+
+rqworker
+--------
+
+To run the queue worker that reads tasks from redis one can use
+the command `rqworker`:
+
+    .. code:: console
+
+        $ python manage.py rqworker
+
+Look for new Argus release
+==========================
+To check if there is a new release of Argus available one can use the command `check_version`:
+
+    .. code:: console
+
+        $ python manage.py check_version
+
+To also save the latest version in the database, use the `--save` flag:
+
+    .. code:: console
+
+        $ python manage.py check_version --save
+
+This will currently not do anything, but in the future you will be able to get
+a notification in the frontend if there is a new release registered in the database that you haven't seen yet.
+
 Deprecated/overlapping commands
 ===============================
 
@@ -550,47 +594,3 @@ Django ships with a command ``changepassword`` but you might as well use
 
 Instead of using the ``-p``-flag you can set the environment variable
 ``DJANGO_USER_PASSWORD``.
-
-Task queue workers
-==================
-
-.. _db_worker:
-
-db_worker
----------
-
-To run the queue worker that reads tasks from the database one can use
-the command `db_worker`:
-
-    .. code:: console
-
-        $ python manage.py db_worker
-
-.. _rqworker:
-
-rqworker
---------
-
-To run the queue worker that reads tasks from redis one can use
-the command `rqworker`:
-
-    .. code:: console
-
-        $ python manage.py rqworker
-
-Look for new Argus release
-==========================
-To check if there is a new release of Argus available one can use the command `check_version`:
-
-    .. code:: console
-
-        $ python manage.py check_version
-
-To also save the latest version in the database, use the `--save` flag:
-
-    .. code:: console
-
-        $ python manage.py check_version --save
-
-This will currently not do anything, but in the future you will be able to get
-a notification in the frontend if there is a new release registered in the database that you haven't seen yet.
