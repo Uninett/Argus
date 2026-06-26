@@ -3,7 +3,7 @@ Planned maintenance
 ===================
 
 To interact with planned maintenance tasks visit the dedicated page at:
-``/plannedmaintenancetask/`` or use the user menu to navigate to it.
+``/plannedmaintenance/`` or use the user menu to navigate to it.
 
 A planned maintenance task consists of a start time and an end time (where the latter
 is by default infinity). Those define the period during which planned work is happening
@@ -32,5 +32,5 @@ If you want to add a planned maintenance task click the ``Create new`` button.
 It is also possible to create copies of existing tasks to make recurring maintenance
 easier.
 
-You can also edit tasks that are ongoing or scheduled and can view details for
-finished tasks by clicking on ``Edit`` / ``View``.
+You can also edit tasks that are ongoing or scheduled and view details for finished
+tasks by clicking on ``Edit`` / ``View``.
