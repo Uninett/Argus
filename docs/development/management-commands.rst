@@ -535,6 +535,21 @@ To also save the latest version in the database, use the `--save` flag:
 This will currently not do anything, but in the future you will be able to get
 a notification in the frontend if there is a new release registered in the database that you haven't seen yet.
 
+Handling source heartbeats
+==========================
+
+If there are sources capable of and configured to send heartbeats,
+there's a command suitable for creating and closing incidents to warn about
+missing heartbeats:
+
+    .. code:: console
+
+        $ python manage.py sync_heartbeat_incidents
+
+This command is suitable for running by cron. The smallest heartbeat frequency
+configured should be the same as or less often than the frequency of the cron-job.
+
+
 Deprecated/overlapping commands
 ===============================
 
