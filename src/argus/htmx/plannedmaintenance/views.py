@@ -1,8 +1,7 @@
 from django import forms
 from django.core.exceptions import PermissionDenied
-from django.db.models import Q
 from django.forms import modelform_factory
-from django.http import HttpResponseRedirect, JsonResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils import timezone
@@ -84,9 +83,12 @@ class FilterWidgetMixin:
 
     def get_filter_widget(self):
         return SearchDropdownMultiSelect(
-            partial_get=reverse("htmx:search-filters"),
+            partial_get=reverse("htmx:plannedmaintenance-filter-widget"),
             attrs={"placeholder": "Select filters..."},
-            extra={"search_placeholder": "Search by filter name or user..."},
+            extra={
+                "search_placeholder": "Search by filter name or user...",
+                "preload": True,
+            },
         )
 
     def get_form(self, form_class=None):
@@ -180,25 +182,23 @@ class PlannedMaintenanceUpdateView(
         return super().form_valid(form)
 
 
-class SearchFiltersView(UserIsStaffMixin, View):
+class FilterWidgetPartialView(UserIsStaffMixin, View):
     http_method_names = ["get"]
 
     def get(self, request):
-        query = request.GET.get("q", "")
+        filter_ids = [fid for fid in request.GET.getlist("filters") if fid.isdigit()]
+        selected_filters = Filter.objects.filter(pk__in=filter_ids).select_related("user")
 
-        filters = Filter.objects.select_related("user")
-        if query:
-            filters = filters.filter(
-                Q(name__icontains=query)
-                | Q(user__username__icontains=query)
-                | Q(user__first_name__icontains=query)
-                | Q(user__last_name__icontains=query)
+        class FiltersForm(forms.Form):
+            filters = forms.ModelMultipleChoiceField(
+                queryset=selected_filters,
+                widget=FilterWidgetMixin().get_filter_widget(),
+                required=False,
             )
-        filters = sorted(filters, key=lambda f: (f.user != request.user, f.name))[:20]
 
-        options = [{"id": f.pk, "text": f"{f.name} ({f.user.username})"} for f in filters]
-
-        return JsonResponse({"results": options})
+        form = FiltersForm(request.GET)
+        form.fields["filters"].label_from_instance = lambda obj: f"{obj.name} ({obj.user.username})"
+        return HttpResponse(str(form["filters"]))
 
 
 class FilterPreviewView(UserIsStaffMixin, View):
