@@ -4,7 +4,7 @@
   {% for tag in incident.deprecated_tags %}
     <span class="badge badge-xs badge-neutral-content badge-outline  h-auto text-wrap break-all text-center text-xs">
       {# djlint:off #}
-      {{ tag.key }}{{ tag.TAG_DELIMITER }}{% if tag.value|is_valid_url %}<a href="{{ tag.value }}" target="_blank" rel="noreferrer">{{ tag.value }}</a>{% else %}{{ tag.value }}{% endif %}
+      {{ tag.key }}{{ tag.TAG_DELIMITER }}{% if tag.value|is_valid_url %}<a class="link" href="{{ tag.value }}" target="_blank" rel="noreferrer">{{ tag.value }}</a>{% else %}{{ tag.value }}{% endif %}
       {# djlint:on #}
     </span>
   {% endfor %}
