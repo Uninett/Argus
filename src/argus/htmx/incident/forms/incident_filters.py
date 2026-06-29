@@ -53,7 +53,7 @@ class DescriptionForm(SearchMixin, IncidentListForm):
     widget_template_name = "htmx/incident/cells/search_fields/input_search.html"
     fieldname = "description"
     field_initial = ""
-    lookup = f"{fieldname}__contains"
+    lookup = f"{fieldname}__icontains"
     placeholder = "part of description"
 
     description = forms.CharField(required=False)
