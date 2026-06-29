@@ -261,7 +261,7 @@ class AppriseMedium(NotificationMedium):
         return subject, message
 
     @classmethod
-    def send(cls, event: Event, destinations: Iterable[DestinationConfig], **_) -> bool:
+    def send(cls, event: Event, destinations: Iterable[DestinationConfig], notify_type=None, **_) -> bool:
         """
         Sends an Apprise notification about a given event to the given destinations
 
@@ -290,7 +290,10 @@ class AppriseMedium(NotificationMedium):
             notifier = Apprise()
             notifier.add(destination_url)
 
-            result = notifier.notify(body=message, title=subject)
+            kwargs = {"body": message, "title": subject}
+            if notify_type is not None:
+                kwargs["notify_type"] = notify_type
+            result = notifier.notify(**kwargs)
 
             if not result:
                 failed += 1
