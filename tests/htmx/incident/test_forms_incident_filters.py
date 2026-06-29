@@ -105,6 +105,16 @@ class DescriptionFormTest(TestCase):
         self.assertEqual(result_qs.count(), 1)
         self.assertEqual(result_qs[0], self.incident)
 
+    def test_given_mixedcase_description_search_should_return_matching_incident(self):
+        qs = Incident.objects.all()
+        request = self.obj()
+
+        request.GET = QueryDict(query_string="description=BaLo")
+        form = DescriptionForm(data=request.GET)
+        result_qs = form.filter(qs, request)
+        self.assertEqual(result_qs.count(), 1)
+        self.assertEqual(result_qs[0], self.incident)
+
 
 class HasTicketFormTest(TestCase):
     class obj:
