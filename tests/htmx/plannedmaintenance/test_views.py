@@ -284,6 +284,20 @@ class PlannedMaintenanceFilterDropdownTests(TestCase):
         self.assertIn(f1, qs)
         self.assertIn(f2, qs)
 
+    def test_given_create_form_queryset_users_own_filters_come_first(self):
+        self.client.force_login(self.staff_user)
+        other_user_1 = AdminUserFactory()
+        other_user_2 = AdminUserFactory()
+
+        FilterFactory(user=other_user_1, name="B other")
+        FilterFactory(user=self.staff_user, name="M own")
+        FilterFactory(user=self.staff_user, name="A own")
+        FilterFactory(user=other_user_2, name="Z other")
+        FilterFactory(user=other_user_2, name="C other")
+        response = self.client.get(reverse("htmx:plannedmaintenance-create"))
+        names = [f.name for f in response.context["form"].fields["filters"].queryset]
+        self.assertEqual(names, ["A own", "M own", "B other", "C other", "Z other"])
+
     def test_given_selected_filter_ids_partial_view_it_should_render_them_as_checked(self):
         self.client.force_login(self.staff_user)
         f = FilterFactory(user=self.staff_user)

@@ -1,5 +1,6 @@
 from django import forms
 from django.core.exceptions import PermissionDenied
+from django.db.models import Case, IntegerField, When
 from django.forms import modelform_factory
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
@@ -94,7 +95,11 @@ class FilterWidgetMixin:
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
         if "filters" in form.fields:
-            form.fields["filters"].queryset = Filter.objects.select_related("user")
+            form.fields["filters"].queryset = (
+                Filter.objects.select_related("user")
+                .annotate(own=Case(When(user=self.request.user, then=0), default=1, output_field=IntegerField()))
+                .order_by("own", "name")
+            )
             form.fields["filters"].label_from_instance = lambda obj: f"{obj.name} ({obj.user.username})"
         if "end_time" in form.fields:
             form.fields["end_time"].required = False
