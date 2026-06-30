@@ -193,7 +193,9 @@ def delete_filter(request: HtmxHttpRequest, pk: int):
 @require_GET
 def filter_select(request: HtmxHttpRequest):
     current_url = request.htmx.current_url
-    kiosk_mode = urlparse(current_url).path == reverse(KIOSK_URL_NAME) if current_url else False
+    kiosk_mode = False
+    if current_url and urlparse(current_url).path == reverse(KIOSK_URL_NAME):
+        kiosk_mode = True
 
     filter_id = request.GET.get("filter", None)
     if filter_id and get_object_or_404(Filter, id=filter_id):
