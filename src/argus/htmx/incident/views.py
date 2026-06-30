@@ -192,7 +192,7 @@ def delete_filter(request: HtmxHttpRequest, pk: int):
 
 @require_GET
 def filter_select(request: HtmxHttpRequest):
-    current_url = request.META.get("HTTP_HX_CURRENT_URL", "")
+    current_url = request.htmx.current_url
     kiosk_mode = urlparse(current_url).path == reverse(KIOSK_URL_NAME) if current_url else False
 
     filter_id = request.GET.get("filter", None)

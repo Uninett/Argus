@@ -156,13 +156,11 @@ class FilterSelectTests(test.TestCase):
         self.user = PersonUserFactory()
         ArgusHtmxPreferencesFactory(user=self.user)
 
-    def _make_request(self, params=None, hx_current_url="", trigger=None):
+    def _make_request(self, params=None, hx_current_url=None, trigger=None):
         request = RequestFactory().get("/incidents/", params or {})
         request.session = {}
         request.user = self.user
-        request.htmx = SimpleNamespace(trigger=trigger)
-        if hx_current_url:
-            request.META["HTTP_HX_CURRENT_URL"] = hx_current_url
+        request.htmx = SimpleNamespace(trigger=trigger, current_url=hx_current_url)
         return request
 
     def test_given_no_trigger_filter_select_it_should_retarget(self):
