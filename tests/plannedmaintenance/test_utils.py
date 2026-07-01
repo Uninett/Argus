@@ -23,7 +23,7 @@ class TestIncidentsCoveredByPlannedMaintenanceTask(TestCase):
         self.open_incident = StatefulIncidentFactory(level=5)
         self.maxlevel_filter = FilterFactory(filter={"maxlevel": 5})
 
-    def teardown(self):
+    def tearDown(self):
         connect_signals()
 
     def test_returns_only_open_incidents(self):
@@ -72,7 +72,7 @@ class TestEventCoveredByPlannedMaintenanceTasks(TestCase):
         self.current_pm = PlannedMaintenanceFactory()
         self.maxlevel_filter = FilterFactory(filter={"maxlevel": self.default_level})
 
-    def teardown(self):
+    def tearDown(self):
         connect_signals()
 
     def test_given_relevant_event_return_true(self):
@@ -132,7 +132,7 @@ class TestConnectIncidentWithPlannedMaintenanceTasks(TestCase):
         self.not_covering_pm = PlannedMaintenanceFactory()
         self.not_covering_pm.filters.add(self.not_hitting_filter)
 
-    def teardown(self):
+    def tearDown(self):
         connect_signals()
 
     def test_given_incident_with_fitting_pms_connects_them(self):

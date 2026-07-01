@@ -178,7 +178,7 @@ class SMSMediumViewTests(APITestCase):
         self.user1_rest_client = APIClient()
         self.user1_rest_client.force_authenticate(user=user1)
 
-    def teardown(self):
+    def tearDown(self):
         connect_signals()
 
     def test_should_get_json_schema_for_sms(self):
@@ -226,7 +226,7 @@ class SMSDestinationViewTests(APITestCase):
             settings={"phone_number": "+4747474747"},
         )
 
-    def teardown(self):
+    def tearDown(self):
         connect_signals()
 
     def test_should_create_sms_destination_with_valid_values(self):

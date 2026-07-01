@@ -81,7 +81,7 @@ class IncidentAPITestCase(APITestCase):
         self.admin = AdminUserFactory()
         self.client.force_authenticate(user=self.user)
 
-    def teardown(self):
+    def tearDown(self):
         connect_signals()
 
 
@@ -188,7 +188,7 @@ class IncidentViewSetTestCase(APITestCase):
         self.admin = AdminUserFactory()
         self.client.force_authenticate(user=self.user)
 
-    def teardown(self):
+    def tearDown(self):
         connect_signals()
 
     def add_open_incident_with_start_event_and_tag(self, description="incident"):

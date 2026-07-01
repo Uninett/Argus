@@ -19,7 +19,7 @@ class PlannedMaintenanceQuerySetTests(TestCase):
         self.current_pm = PlannedMaintenanceFactory(start_time=now - timedelta(minutes=5))
         self.past_pm = PlannedMaintenanceFactory(start_time=now - timedelta(days=1), end_time=now - timedelta(hours=12))
 
-    def teardown(self):
+    def tearDown(self):
         connect_signals()
 
     def test_future_returns_only_pms_with_start_time_in_future(self):
@@ -92,7 +92,7 @@ class PlannedMaintenanceTaskTests(TestCase):
             end_time=timezone.now() - MODIFICATION_WINDOW_PM - timedelta(hours=1),
         )
 
-    def teardown(self):
+    def tearDown(self):
         connect_signals()
 
     def test_given_open_pm_task_modifiable_is_true(self):

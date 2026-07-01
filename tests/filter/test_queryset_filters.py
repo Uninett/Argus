@@ -52,7 +52,7 @@ class FilteredIncidentsHelpersTests(TestCase):
         IncidentTagRelationFactory(tag=self.tag3, incident=self.incident2, added_by=self.user1)
         self.all_incidents = Incident.objects.all()
 
-    def teardown(self):
+    def tearDown(self):
         connect_signals()
 
     def test_incidents_with_source_systems_empty_if_no_incidents_with_these_source_systems(self):
@@ -152,7 +152,7 @@ class FilteredIncidentsTests(TestCase):
         IncidentTagRelationFactory(tag=self.tag2, incident=self.incident2, added_by=self.user1)
         IncidentTagRelationFactory(tag=self.tag3, incident=self.incident2, added_by=self.user1)
 
-    def teardown(self):
+    def tearDown(self):
         connect_signals()
 
     def test_filtered_incidents_returns_empty_if_no_incident_fits_filter(self):

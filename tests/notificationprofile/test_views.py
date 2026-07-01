@@ -56,7 +56,7 @@ class NotificationProfileViewTests(APITestCase):
         self.synced_email_destination = self.user1.destinations.get()
         self.notification_profile1.destinations.set([self.synced_email_destination])
 
-    def teardown(self):
+    def tearDown(self):
         connect_signals()
 
     def test_list_is_reachable(self):
@@ -244,7 +244,7 @@ class NotificationIncidentViewTests(APITestCase):
         self.notification_profile1 = NotificationProfileFactory(user=user1, timeslot=timeslot1)
         self.notification_profile1.filters.add(filter1)
 
-    def teardown(self):
+    def tearDown(self):
         connect_signals()
 
     def test_should_get_list_of_all_incidents_matched_by_notification_profile(self):
@@ -292,7 +292,7 @@ class NotificationFilterIncidentViewTests(APITestCase):
         self.notification_profile1 = NotificationProfileFactory(user=user1, timeslot=timeslot1)
         self.notification_profile1.filters.add(filter1)
 
-    def teardown(self):
+    def tearDown(self):
         connect_signals()
 
     def test_filterpreview_returns_only_incidents_matching_specified_filter(self):
@@ -343,7 +343,7 @@ class FilterViewTests(APITestCase):
         notification_profile1 = NotificationProfileFactory(user=self.user1, timeslot=timeslot1)
         notification_profile1.filters.add(self.filter1)
 
-    def teardown(self):
+    def tearDown(self):
         connect_signals()
 
     def test_list_is_reachable(self):
@@ -446,7 +446,7 @@ class MediumViewTests(APITestCase):
         self.user1_rest_client = APIClient()
         self.user1_rest_client.force_authenticate(user=user1)
 
-    def teardown(self):
+    def tearDown(self):
         connect_signals()
 
     def test_should_get_all_media(self):
@@ -487,7 +487,7 @@ class DestinationViewTests(APITestCase):
             managed=None,
         )
 
-    def teardown(self):
+    def tearDown(self):
         connect_signals()
 
     def test_should_get_list_of_all_destinations(self):
@@ -555,7 +555,7 @@ class TimeslotViewTests(APITestCase):
         notification_profile1 = NotificationProfileFactory(user=self.user1, timeslot=self.timeslot1)
         notification_profile1.filters.add(filter1)
 
-    def teardown(self):
+    def tearDown(self):
         connect_signals()
 
     def test_list_is_reachable(self):

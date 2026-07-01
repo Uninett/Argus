@@ -19,7 +19,7 @@ class ViewTests(APITestCase):
         self.user2_rest_client = APIClient()
         self.user2_rest_client.force_authenticate(user=self.user2)
 
-    def teardown(self):
+    def tearDown(self):
         connect_signals()
 
     def test_can_get_specific_user(self):

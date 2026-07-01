@@ -13,7 +13,7 @@ class JsonAuthenticationTests(APITestCase):
     def setUp(self):
         disconnect_signals()
 
-    def teardown(self):
+    def tearDown(self):
         connect_signals()
 
     def test_authenticate_golden_path(self):
