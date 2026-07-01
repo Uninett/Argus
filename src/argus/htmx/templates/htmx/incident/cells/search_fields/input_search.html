@@ -1,4 +1,5 @@
 <!-- htmx/incident/cells/search_fields/input_search.html -->
+{% url 'htmx:incident-list' as incident_list_url %}
 <div class="flex gap-1 input input-xs grow input-primary pr-0 group">
   <input name="{{ widget.name }}"
          type="text"
