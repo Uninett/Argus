@@ -49,24 +49,9 @@
     <i class="fa-solid fa-chevron-up fa-xs filter-collapse-icon"
        aria-hidden="true"></i>
   </button>
-  {% if kiosk_mode %}
-    <a href="{% url 'htmx:incident-list' %}" class="btn btn-sm btn-ghost">
-      <i class="fa-solid fa-xmark fa-xs" aria-hidden="true"></i>
-      <span class="link">Exit kiosk</span>
-    </a>
-    <span class="text-sm font-medium ml-1">
-      <span class="opacity-60">After filtering:</span>
-      <span id="kiosk-filtered-count">{{ refresh_info.filtered_count }}</span>
-    </span>
-    <span class="text-sm font-medium ml-1">
-      <span class="opacity-60">Last refreshed:</span>
-      <span id="kiosk-last-refreshed">{{ refresh_info.last_refreshed|date:preferences.argus_htmx.datetime_format|default:"?" }}</span>
-    </span>
-  {% else %}
-    <a href="{% url 'htmx:incident-list-kiosk' %}"
-       class="btn btn-sm btn-ghost">
-      <i class="fa-solid fa-display fa-xs" aria-hidden="true"></i>
-      <span class="link">Kiosk</span>
-    </a>
-  {% endif %}
+  <a href="{% url 'htmx:incident-list-kiosk' %}"
+     class="btn btn-sm btn-ghost">
+    <i class="fa-solid fa-display fa-xs" aria-hidden="true"></i>
+    <span class="link">Kiosk</span>
+  </a>
 </div>

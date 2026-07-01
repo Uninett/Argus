@@ -1,4 +1,26 @@
 {% extends base %}
+{% block navbar_kiosk %}
+  {% if kiosk_mode %}
+    <div class="border-2 border-primary rounded-box px-3 py-1 bg-base-100 text-base-content flex gap-0.5 items-center">
+      <span class="text-sm font-medium ml-1">
+        <span class="opacity-60">Filter:</span>
+        {{ kiosk_filter_name|default:"None" }}
+      </span>
+      <span class="text-sm font-medium ml-1">
+        <span class="opacity-60">After filtering:</span>
+        <span id="kiosk-filtered-count">{{ refresh_info.filtered_count }}</span>
+      </span>
+      <span class="text-sm font-medium ml-1">
+        <span class="opacity-60">Last refreshed:</span>
+        <span id="kiosk-last-refreshed">{{ refresh_info.last_refreshed|date:preferences.argus_htmx.datetime_format|default:"?" }}</span>
+      </span>
+      <a href="{% url 'htmx:incident-list' %}" class="btn btn-sm btn-ghost">
+        <i class="fa-solid fa-xmark fa-xs" aria-hidden="true"></i>
+        <span class="link">Exit kiosk</span>
+      </a>
+    </div>
+  {% endif %}
+{% endblock navbar_kiosk %}
 {% block main %}
   {% if incidents_extra_widget %}
     <div class="flex">

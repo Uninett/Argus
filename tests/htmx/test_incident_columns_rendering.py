@@ -118,19 +118,27 @@ class KioskModeTests(test.TestCase):
         self.assertNotContains(self.kiosk_response, 'id="col-row_select"')
         self.assertNotContains(self.kiosk_response, 'id="bulk-actions"')
 
-    def test_given_kiosk_mode_it_should_move_stats_to_toolbar(self):
+    def test_given_kiosk_mode_it_should_move_stats_to_navbar(self):
         self.assertNotContains(self.kiosk_response, 'id="table-refresh-info"')
+        self.assertNotContains(self.kiosk_response, 'id="filter-controls-box"')
         self.assertContains(self.kiosk_response, 'id="kiosk-filtered-count"')
         self.assertContains(self.kiosk_response, 'id="kiosk-last-refreshed"')
 
     def test_given_normal_mode_it_should_show_interactive_controls_and_footer(self):
         self.assertContains(self.normal_response, 'id="bulk-actions"')
+        self.assertContains(self.normal_response, 'id="filter-controls-box"')
         self.assertContains(self.normal_response, 'id="table-refresh-info"')
         self.assertNotContains(self.normal_response, 'id="kiosk-filtered-count"')
         self.assertNotContains(self.normal_response, 'id="kiosk-last-refreshed"')
 
     def test_given_kiosk_mode_it_should_use_kiosk_url(self):
         self.assertContains(self.kiosk_response, f'hx-get="{reverse(KIOSK_URL_NAME)}"')
+
+    def test_given_kiosk_mode_it_should_show_exit_button_in_navbar(self):
+        self.assertContains(self.kiosk_response, f'href="{reverse("htmx:incident-list")}"')
+
+    def test_given_normal_mode_it_should_show_kiosk_button_in_filter_bar(self):
+        self.assertContains(self.normal_response, f'href="{reverse(KIOSK_URL_NAME)}"')
 
     def test_given_kiosk_mode_htmx_refresh_it_should_include_oob_swaps(self):
         request = RequestFactory().get("/incidents/kiosk/")
@@ -148,6 +156,7 @@ class KioskModeTests(test.TestCase):
         request.htmx = False
         response = incident_list_kiosk(request)
         self.assertContains(response, 'id="kiosk-filtered-count"')
+        self.assertContains(response, 'id="kiosk-last-refreshed"')
 
 
 @test.override_settings(INCIDENT_TABLE_COLUMNS=["id"])
@@ -156,11 +165,11 @@ class FilterSelectTests(test.TestCase):
         self.user = PersonUserFactory()
         ArgusHtmxPreferencesFactory(user=self.user)
 
-    def _make_request(self, params=None, hx_current_url=None, trigger=None):
+    def _make_request(self, params=None, trigger=None):
         request = RequestFactory().get("/incidents/", params or {})
         request.session = {}
         request.user = self.user
-        request.htmx = SimpleNamespace(trigger=trigger, current_url=hx_current_url)
+        request.htmx = SimpleNamespace(trigger=trigger)
         return request
 
     def test_given_no_trigger_filter_select_it_should_retarget(self):
@@ -170,16 +179,6 @@ class FilterSelectTests(test.TestCase):
     def test_given_trigger_filter_select_it_should_render_filterbox(self):
         response = filter_select(self._make_request(trigger="some-element"))
         self.assertContains(response, 'id="incident-filter-box"')
-
-    def test_given_kiosk_url_filter_select_it_should_detect_kiosk_mode(self):
-        kiosk_url = reverse(KIOSK_URL_NAME)
-        response = filter_select(
-            self._make_request(
-                hx_current_url=f"http://testserver{kiosk_url}",
-                trigger="some-element",
-            )
-        )
-        self.assertContains(response, kiosk_url)
 
     def test_given_filter_id_filter_select_it_should_select_filter(self):
         filter_obj = FilterFactory(user=self.user)

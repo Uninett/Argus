@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from collections.abc import Iterable
 from datetime import datetime
-from urllib.parse import urlencode, urlparse
+from urllib.parse import urlencode
 from typing import Optional, Any
 
 from django import forms
@@ -192,21 +192,19 @@ def delete_filter(request: HtmxHttpRequest, pk: int):
 
 @require_GET
 def filter_select(request: HtmxHttpRequest):
-    kiosk_mode = urlparse(request.htmx.current_url or "").path == reverse(KIOSK_URL_NAME)
-
     filter_id = request.GET.get("filter", None)
     if filter_id and get_object_or_404(Filter, id=filter_id):
         request.session["selected_filter"] = filter_id
         incident_list_filter = get_filter_function()
         filter_form, _ = incident_list_filter(request, None)
-        context = {"filter_form": filter_form, "kiosk_mode": kiosk_mode}
+        context = {"filter_form": filter_form}
         return render(request, "htmx/incident/_incident_filterbox.html", context=context)
     else:
         request.session["selected_filter"] = None
         if request.htmx.trigger:
             incident_list_filter = get_filter_function()
             filter_form, _ = incident_list_filter(request, None, use_empty_filter=True)
-            context = {"filter_form": filter_form, "kiosk_mode": kiosk_mode}
+            context = {"filter_form": filter_form}
             return render(request, "htmx/incident/_incident_filterbox.html", context=context)
         else:
             return retarget(HttpResponse(), "#incident-filter-select")
@@ -353,6 +351,12 @@ def incident_list(request: HtmxHttpRequest, kiosk_mode: bool = False) -> HttpRes
 
     incident_list_url = reverse(KIOSK_URL_NAME if kiosk_mode else "htmx:incident-list")
 
+    kiosk_filter_name = None
+    if kiosk_mode:
+        selected_filter_id = request.session.get("selected_filter")
+        if selected_filter_id:
+            kiosk_filter_name = Filter.objects.filter(id=selected_filter_id).values_list("name", flat=True).first()
+
     LOG.debug("GET at end: %s", request.GET)
     context = {
         "columns": columns,
@@ -367,6 +371,7 @@ def incident_list(request: HtmxHttpRequest, kiosk_mode: bool = False) -> HttpRes
         "last_page_num": last_page_num,
         "second_to_last_page": last_page_num - 1,
         "kiosk_mode": kiosk_mode,
+        "kiosk_filter_name": kiosk_filter_name,
         "incident_list_url": incident_list_url,
     }
     return render(request, "htmx/incident/incident_list.html", context=context)

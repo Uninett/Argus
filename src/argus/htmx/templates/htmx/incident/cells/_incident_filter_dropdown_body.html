@@ -4,11 +4,7 @@
      tabindex="-1">
   <form class="incident-list-param">
     {% if not dummy_column %}
-      {% if kiosk_mode %}
-        {% url 'htmx:incident-list-kiosk' as incident_list_url %}
-      {% else %}
-        {% url 'htmx:incident-list' as incident_list_url %}
-      {% endif %}
+      {% url 'htmx:incident-list' as incident_list_url %}
     {% endif %}
     {# djlint:off #}
     <div aria-labelledby="{{ field.name }}-label" {% if not dummy_column %}hx-get="{{ incident_list_url }}" hx-include=".incident-list-param" hx-target="#table-body" hx-select="#table-body" hx-select-oob="#table-footer" hx-swap="outerHTML" hx-push-url="true" hx-indicator="#incident-list .htmx-indicator" hx-trigger="change delay:500ms"{% endif %}>
