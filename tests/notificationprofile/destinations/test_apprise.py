@@ -285,3 +285,25 @@ class AppriseMediumBehaviorTests(TestCase):
                 result = AppriseMedium.send(self.event, [self.destination])
         self.assertFalse(result)
         self.assertIn("not installed", cm.output[0])
+
+    @patch("argus.notificationprofile.media.base.Apprise")
+    def test_given_no_notify_type_notifier_should_be_called_without_notify_type(self, mock_apprise):
+        instance = mock_apprise.return_value
+        instance.notify.return_value = True
+
+        with self.settings(SEND_NOTIFICATIONS=True):
+            AppriseMedium.send(self.event, [self.destination])
+
+        _, call_kwargs = instance.notify.call_args
+        self.assertNotIn("notify_type", call_kwargs)
+
+    @patch("argus.notificationprofile.media.base.Apprise")
+    def test_given_notify_type_notifier_should_be_called_with_notify_type(self, mock_apprise):
+        instance = mock_apprise.return_value
+        instance.notify.return_value = True
+
+        with self.settings(SEND_NOTIFICATIONS=True):
+            AppriseMedium.send(self.event, [self.destination], notify_type="warning")
+
+        _, call_kwargs = instance.notify.call_args
+        self.assertEqual(call_kwargs["notify_type"], "warning")
