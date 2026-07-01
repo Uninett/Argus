@@ -24,7 +24,7 @@ class NotificationProfileFormTests(TestCase):
 
         self.filter = FilterFactory(user=self.user)
 
-    def teardown(self):
+    def tearDown(self):
         connect_signals()
 
     def test_form_with_different_name_as_other_profiles_is_valid(self):

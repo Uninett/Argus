@@ -28,7 +28,7 @@ class ChangeEventTests(APITestCase, IncidentBasedAPITestCaseHelper):
             source=self.source1,
         )
 
-    def teardown(self):
+    def tearDown(self):
         connect_signals()
 
     def test_change_event_is_created_on_level_changes(self):

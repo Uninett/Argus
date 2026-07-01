@@ -20,7 +20,7 @@ class MediumViewTests(APITestCase):
         self.user1_rest_client = APIClient()
         self.user1_rest_client.force_authenticate(user=user1)
 
-    def teardown(self):
+    def tearDown(self):
         connect_signals()
 
     def test_should_get_all_media(self):
@@ -61,7 +61,7 @@ class DestinationViewTests(APITestCase):
             managed=None,
         )
 
-    def teardown(self):
+    def tearDown(self):
         connect_signals()
 
     def test_should_get_list_of_all_destinations(self):

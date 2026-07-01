@@ -180,7 +180,7 @@ class EmailSignalTests(APITestCase):
         self.user1 = PersonUserFactory()
         self.user2 = PersonUserFactory(email="")
 
-    def teardown(self):
+    def tearDown(self):
         connect_signals()
 
     def test_default_email_destination_should_be_created_if_user_has_email(self):
@@ -220,7 +220,7 @@ class EmailMediumViewTests(APITestCase):
         self.user1_rest_client = APIClient()
         self.user1_rest_client.force_authenticate(user=user1)
 
-    def teardown(self):
+    def tearDown(self):
         connect_signals()
 
     def test_should_get_json_schema_for_email(self):
@@ -269,7 +269,7 @@ class EmailDestinationViewTests(APITestCase):
         )
         self.notification_profile1.destinations.set([self.managed_email_destination])
 
-    def teardown(self):
+    def tearDown(self):
         connect_signals()
 
     def test_should_delete_unmanaged_unused_email_destination(self):

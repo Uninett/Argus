@@ -52,7 +52,7 @@ class TimeRecurrenceTests(TestCase, IncidentAPITestCaseHelper):
             end=parse_time("00:30:01"),
         )
 
-    def teardown(self):
+    def tearDown(self):
         connect_signals()
 
     def test_timestamp_is_within_false_if_before_recurrence(self):
@@ -143,7 +143,7 @@ class TimeslotTests(TestCase, IncidentAPITestCaseHelper):
             end=TimeRecurrence.DAY_END,
         )
 
-    def teardown(self):
+    def tearDown(self):
         connect_signals()
 
     def test_timestamp_is_within_recurrences_true_if_within_recurrences(self):

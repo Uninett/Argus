@@ -32,7 +32,7 @@ class TestIncidentFilterForm(TestCase):
         }
         self.valid_form = IncidentFilterForm(self.valid_field_values)
 
-    def teardown(self):
+    def tearDown(self):
         connect_signals()
 
     def test_if_form_is_valid_then_filterblob_should_contain_correct_open_value(self):
@@ -101,7 +101,7 @@ class TestIncidentListFilter(TestCase):
         SessionMiddleware(lambda x: x).process_request(self.request)
         MessageMiddleware(lambda x: x).process_request(self.request)
 
-    def teardown(self):
+    def tearDown(self):
         connect_signals()
 
     def test_nonexistent_filter_should_return_unfiltered_queryset_and_repair_session(self):
@@ -158,7 +158,7 @@ class TestCreateNamedFilter(TestCase):
             "acked": True,
         }
 
-    def teardown(self):
+    def tearDown(self):
         connect_signals()
 
     def test_if_input_is_valid_it_should_return_a_filter(self):
