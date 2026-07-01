@@ -138,6 +138,12 @@ class TestIncidentListFilter(TestCase):
         form, _ = incident_list_filter(self.request, self.qs)
         assert form.to_filterblob()["maxlevel"] == maxlevel
 
+    def test_when_saved_filter_is_selected_and_request_has_form_params_then_it_should_use_form_params(self):
+        self.request.session["selected_filter"] = self.valid_filter.pk
+        self.request.GET = QueryDict("open=0&maxlevel=5&tags=")
+        _, qs = incident_list_filter(self.request, self.qs)
+        assert self.incident in qs
+
     def test_post_request_without_selected_filter_should_use_post_parameters_as_form_data(self):
         maxlevel = 3
         request = self.factory.post("random-url", {}, content_type="application/json")
