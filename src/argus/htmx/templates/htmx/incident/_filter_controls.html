@@ -50,9 +50,9 @@
        aria-hidden="true"></i>
   </button>
   {% if kiosk_mode %}
-    <a href="{% url 'htmx:incident-list' %}" class="link btn btn-sm btn-ghost">
+    <a href="{% url 'htmx:incident-list' %}" class="btn btn-sm btn-ghost">
       <i class="fa-solid fa-xmark fa-xs" aria-hidden="true"></i>
-      Exit kiosk
+      <span class="link">Exit kiosk</span>
     </a>
     <span class="text-sm font-medium ml-1">
       <span class="opacity-60">After filtering:</span>
@@ -64,9 +64,9 @@
     </span>
   {% else %}
     <a href="{% url 'htmx:incident-list-kiosk' %}"
-       class="link btn btn-sm btn-ghost">
+       class="btn btn-sm btn-ghost">
       <i class="fa-solid fa-display fa-xs" aria-hidden="true"></i>
-      Kiosk
+      <span class="link">Kiosk</span>
     </a>
   {% endif %}
 </div>
