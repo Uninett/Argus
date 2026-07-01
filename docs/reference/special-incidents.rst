@@ -81,3 +81,38 @@ a source system.
 
 The ``object`` tag holds the integer value of the primary key of the generated
 incident.
+
+
+Missing heartbeat incidents
+===========================
+
+These stateful incidents may be generated when a source system has both the
+fields ``heartbeat_frequency`` (a duration) and ``last_seen`` (a timestamp)
+set.
+
+If it is more than ``last_seen`` + ``heartbeat_frequency`` since the source
+used the API, the incident is generated.
+
+If a previously marked source is back, th eincident is automatically closed.
+
+
+Description
+-----------
+
+"Missing heartbeat from source NAME, dead?"
+
+The NAME is the name of a source, without its type.
+
+Default level
+-------------
+
+4
+
+Tags
+----
+
+* problem_type=missing_heartbeat
+* source_system_id=INTEGER
+
+The ``source_system_id`` tag takes a value that is the integer primary key of
+a source system.

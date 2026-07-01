@@ -50,6 +50,14 @@ class SourceSystemUpdateLastSeenTests(TestCase):
             self.assertEqual(source.last_seen, testtime)
 
 
+class SourceSystemIsDeadTests(TestCase):
+    def test_when_heartbeat_frequency_not_set_always_returns_None(self):
+        source = SourceSystemFactory(heartbeat_frequency=None)
+        self.assertIsNone(source.heartbeat_frequency)
+        # timestamp does not matter
+        self.assertIsNone(source.is_dead(datetime.max))
+
+
 @tag("api", "integration")
 class SourceSystemPostingTests(APITestCase):
     def setUp(self):
