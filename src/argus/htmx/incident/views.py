@@ -18,6 +18,7 @@ from django.http import (
     QueryDict,
 )
 from django.shortcuts import render, get_object_or_404
+from django.urls import reverse
 from django.utils.timezone import now as tznow
 from django.views.decorators.http import require_POST, require_GET
 
@@ -46,6 +47,7 @@ from ..utils import (
 
 User = get_user_model()
 LOG = logging.getLogger(__name__)
+KIOSK_URL_NAME = "htmx:incident-list-kiosk"
 
 
 # Map request trigger to parameters for incidents update
@@ -266,7 +268,7 @@ def search_tags(request):
 
 
 @require_GET
-def incident_list(request: HtmxHttpRequest) -> HttpResponse:
+def incident_list(request: HtmxHttpRequest, kiosk_mode: bool = False) -> HttpResponse:
     LOG = logging.getLogger(__name__ + ".incident_list")
     LOG.debug("GET at start: %s", request.GET)
     request.GET = dedupe_querydict(request.GET)
@@ -275,6 +277,8 @@ def incident_list(request: HtmxHttpRequest) -> HttpResponse:
     preferences = request.user.get_preferences_context()
     column_layout_name = preferences["argus_htmx"]["incidents_table_column_name"]
     columns = get_incident_table_columns(column_layout_name)
+    if kiosk_mode:
+        columns = [c for c in columns if c.name != "row_select"]
 
     # Handle sorting
     sort_form = SortForm(request.GET)
@@ -345,6 +349,14 @@ def incident_list(request: HtmxHttpRequest) -> HttpResponse:
     else:
         base_template = "htmx/incident/_base.html"
 
+    incident_list_url = reverse(KIOSK_URL_NAME if kiosk_mode else "htmx:incident-list")
+
+    kiosk_filter_name = None
+    if kiosk_mode:
+        selected_filter_id = request.session.get("selected_filter")
+        if selected_filter_id:
+            kiosk_filter_name = Filter.objects.filter(id=selected_filter_id).values_list("name", flat=True).first()
+
     LOG.debug("GET at end: %s", request.GET)
     context = {
         "columns": columns,
@@ -358,5 +370,13 @@ def incident_list(request: HtmxHttpRequest) -> HttpResponse:
         "page": page,
         "last_page_num": last_page_num,
         "second_to_last_page": last_page_num - 1,
+        "kiosk_mode": kiosk_mode,
+        "kiosk_filter_name": kiosk_filter_name,
+        "incident_list_url": incident_list_url,
     }
     return render(request, "htmx/incident/incident_list.html", context=context)
+
+
+@require_GET
+def incident_list_kiosk(request: HtmxHttpRequest) -> HttpResponse:
+    return incident_list(request, kiosk_mode=True)

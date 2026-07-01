@@ -4,7 +4,7 @@
         class="btn btn-xs btn-ghost p-0 aspect-square min-h-4 h-4 {% if active %}text-primary{% else %}text-base-content/50 hover:text-primary{% endif %}"
         aria-label="{{ label }}"
         {% if dummy_column %}disabled{% endif %}
-        hx-get="{% url 'htmx:incident-list' %}"
+        hx-get="{{ incident_list_url }}"
         hx-vals='{"sort": "{{ next_sort }}", "sort_order": "{{ next_order }}"}'
         hx-include=".incident-list-param"
         hx-target="#table"

@@ -1,2 +1,6 @@
 {% block table %}
 {% endblock table %}
+{% if kiosk_mode %}
+  <span hx-swap-oob="innerHTML:#kiosk-filtered-count">{{ refresh_info.filtered_count }}</span>
+  <span hx-swap-oob="innerHTML:#kiosk-last-refreshed">{{ refresh_info.last_refreshed|date:preferences.argus_htmx.datetime_format|default:"?" }}</span>
+{% endif %}
