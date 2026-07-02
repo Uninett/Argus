@@ -189,7 +189,7 @@ class TestIncidentQuerySetHeartbeatIncidents(TestCase):
         self.assertFalse(Incident.objects.heartbeat_incidents().exists())
 
     def test_when_heartbeat_incidents_exist_return_them(self):
-        incident = _get_or_create_incident_for_dead_source(
+        incident, _ = _get_or_create_incident_for_dead_source(
             self.zombie_source, incident_owner=self.owner_source, timestamp=self.timestamp
         )
         result = Incident.objects.heartbeat_incidents()

@@ -52,9 +52,11 @@ class SourceSystemType(models.Model):
 
 class SourceSystemQuerySet(models.QuerySet):
     def has_heartbeat(self):
+        """Find active sources configured to send heartbeats"""
         return self.filter(heartbeat_frequency__isnull=False, last_seen__isnull=False)
 
     def with_next_expected_heartbeat(self, timestamp: Optional[datetime] = None):
+        """Annotate heartbeat sources with the timestamp of the next predicted heartbeat"""
         timestamp = timestamp if timestamp else timezone.now()
         qs = self.has_heartbeat()
         qs = qs.annotate(next_heartbeat=F("last_seen") + F("heartbeat_frequency"))
@@ -580,7 +582,7 @@ class Incident(models.Model):
 
     # @transaction.atomic
     def set_closed(self, actor: User, timestamp: datetime = None, description=""):
-        "Incident closed by user"
+        "Incident closed by human user"
         if not self.stateful:
             raise ValidationError("Cannot set a stateless incident as closed")
         if not self.open:
@@ -598,7 +600,7 @@ class Incident(models.Model):
 
     # @transaction.atomic
     def set_end(self, actor: User, timestamp: datetime = None, description: str = ""):
-        "Incident closed by source"
+        "Incident ended by machine source"
         if not self.stateful:
             raise ValidationError("Cannot set a stateless incident as ended")
         if not self.open:
