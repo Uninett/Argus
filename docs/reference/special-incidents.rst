@@ -93,15 +93,15 @@ set.
 If it is more than ``last_seen`` + ``heartbeat_frequency`` since the source
 used the API, the incident is generated.
 
-If a previously marked source is back, th eincident is automatically closed.
+If a previously marked source is back, the incident is automatically closed.
 
 
 Description
 -----------
 
-"Missing heartbeat from source NAME, dead?"
+"Missing heartbeat from source NAME (TYPE), dead?"
 
-The NAME is the name of a source, without its type.
+The NAME is the name of a source, while TYPE is the type of that source.
 
 Default level
 -------------
