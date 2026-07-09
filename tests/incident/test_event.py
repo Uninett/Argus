@@ -178,6 +178,9 @@ class EventAPIStatelessIncidentTests(APITestCase, IncidentBasedAPITestCaseHelper
 
         self.events_url = lambda incident: reverse("v2:incident:incident-events", args=[incident.pk])
 
+    def tearDown(self):
+        connect_signals()
+
     def test_when_posting_close_event_for_stateless_incident_then_incident_does_not_change(self):
         response = self.user1_rest_client.post(
             self.events_url(self.stateless_incident), {"timestamp": timezone.now(), "type": Event.Type.CLOSE}
