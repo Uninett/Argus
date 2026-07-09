@@ -127,11 +127,11 @@ class EventAPIStatefulIncidentTests(APITestCase, IncidentBasedAPITestCaseHelper)
 
         end_event_dict = {"timestamp": timezone.now(), "type": Event.Type.INCIDENT_END}
 
-        response = self.source1_rest_client.post(self.events_url(self.open_incident), end_event_dict)
+        response = self.source1_rest_client.post(self.events_url(restarted_incident), end_event_dict)
         self.assertEqual(parse_datetime(response.data["timestamp"]), end_event_dict["timestamp"])
-        self.open_incident.refresh_from_db()
-        self.assertFalse(self.open_incident.open)
-        self.assertEqual(self.open_incident.end_time, end_event_dict["timestamp"])
+        restarted_incident.refresh_from_db()
+        self.assertFalse(restarted_incident.open)
+        self.assertEqual(restarted_incident.end_time, end_event_dict["timestamp"])
 
     def test_given_closed_incident_when_source_posts_end_then_records_event_without_state_change(self):
         # An end user posting a state-invalid event gets a 400; a source system does
