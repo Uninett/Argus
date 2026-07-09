@@ -23,8 +23,11 @@ def _attach_delete_state(form, make_modal):
     to a plain string, so we fetch a fresh copy from DB for the deletability check.
     """
     destination = DestinationConfig.objects.get(pk=form.instance.pk)
+    # raise_if_not_deletable is a generic check on the base class (managed status,
+    # profiles in use) that every medium inherits unchanged, so it doesn't need a
+    # real plugin object even when the medium itself isn't installed.
+    medium = api_safely_get_medium_object(destination.media.slug) if destination.media.installed else NotificationMedium
     try:
-        medium = api_safely_get_medium_object(destination.media.slug)
         medium.raise_if_not_deletable(destination)
     except NotificationMedium.NotDeletableError as e:
         form.delete_disabled = True
@@ -166,8 +169,10 @@ class DestinationUpdateView(DestinationMixin, UpdateView):
 class DestinationDeleteView(DestinationMixin, DeleteView):
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
+        medium = (
+            api_safely_get_medium_object(self.object.media.slug) if self.object.media.installed else NotificationMedium
+        )
         try:
-            medium = api_safely_get_medium_object(self.object.media.slug)
             medium.raise_if_not_deletable(self.object)
         except NotificationMedium.NotDeletableError as e:
             update_forms = _get_update_forms(request.user)

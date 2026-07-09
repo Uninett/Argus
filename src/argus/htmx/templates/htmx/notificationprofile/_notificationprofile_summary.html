@@ -34,7 +34,17 @@
       {% if destinations %}
         <span class="border-l border-base-content/20 pl-3 flex items-center gap-1 flex-wrap">
           <i class="fa-regular fa-bell text-xs" aria-hidden="true"></i>
-          {% for dest in destinations %}<span class="badge badge-sm badge-outline">{{ dest }}</span>{% endfor %}
+          {% for dest in destinations %}
+            <span class="inline-flex items-center gap-1 whitespace-nowrap">
+              <span class="badge badge-sm badge-outline">{{ dest }}</span>
+              {% if not dest.media.installed %}
+                <span class="text-warning text-lg tooltip tooltip-right w-5 before:bg-base-200 before:text-base-content after:bg-base-200"
+                      data-tip="This destination's medium is not installed. No notifications will be sent to it.">
+                  <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+                </span>
+              {% endif %}
+            </span>
+          {% endfor %}
         </span>
       {% endif %}
     {% endwith %}

@@ -3,10 +3,13 @@ from django.urls import reverse
 
 from argus.auth.factories import PersonUserFactory
 from argus.notificationprofile.factories import (
+    DestinationConfigFactory,
+    MediaFactory,
     NotificationProfileFactory,
     TimeslotFactory,
 )
 from argus.filter.factories import FilterFactory
+from argus.notificationprofile.models import Media
 
 
 @override_settings(AUTHENTICATION_BACKENDS=["django.contrib.auth.backends.ModelBackend"])
@@ -41,6 +44,33 @@ class TestNotificationProfileListView(NotificationProfileViewTestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.context["object_list"]), 1)
+
+    def test_when_profile_has_destination_with_uninstalled_medium_it_should_show_warning(self):
+        timeslot = TimeslotFactory(user=self.user)
+        profile = NotificationProfileFactory(user=self.user, timeslot=timeslot)
+        uninstalled_media = MediaFactory(installed=False)
+        destination = DestinationConfigFactory(
+            user=self.user, media=uninstalled_media, settings={"test_key": "test_val"}
+        )
+        profile.destinations.add(destination)
+
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "not installed")
+
+    def test_when_profile_has_only_installed_media_destinations_it_should_not_show_warning(self):
+        timeslot = TimeslotFactory(user=self.user)
+        profile = NotificationProfileFactory(user=self.user, timeslot=timeslot)
+        destination = DestinationConfigFactory(
+            user=self.user, media=Media.objects.get(slug="email"), settings={"email_address": "test@test.com"}
+        )
+        profile.destinations.add(destination)
+
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, "not installed")
 
 
 class TestNotificationProfileDetailView(NotificationProfileViewTestCase):
