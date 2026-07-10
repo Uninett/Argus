@@ -4,6 +4,7 @@ import logging
 from typing import TYPE_CHECKING
 
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ImproperlyConfigured
 from django.db.utils import ProgrammingError
 
 from argus.notificationprofile.media import EMAIL_DESTINATION_SLUG, send_notifications_to_users
@@ -34,6 +35,16 @@ def sync_media(sender, **kwargs):
     Check if all media in Media has a respective class"""
 
     from .media import MEDIA_CLASSES_DICT
+    from .media.base import Apprise, AppriseMedium
+
+    if Apprise is None:
+        missing = sorted(cls.__name__ for cls in MEDIA_CLASSES_DICT.values() if issubclass(cls, AppriseMedium))
+        if missing:
+            raise ImproperlyConfigured(
+                "MEDIA_PLUGINS lists media that require the 'apprise' package, which is not installed: "
+                f'{", ".join(missing)}. Install the "apprise" extra (`pip install argus-server[apprise]`) '
+                "or remove these media from MEDIA_PLUGINS."
+            )
 
     apps = kwargs["apps"]
     try:

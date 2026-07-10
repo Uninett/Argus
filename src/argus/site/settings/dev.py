@@ -23,6 +23,15 @@ INTERNAL_IPS = ["127.0.0.1"]
 
 INSTALLED_APPS += ["django_extensions"]  # noqa: F405
 
+# Mock to bypass Apprise check for development.
+try:
+    import apprise  # noqa: F401
+except ImportError:
+    import sys
+    from unittest.mock import MagicMock
+
+    sys.modules["apprise"] = MagicMock()
+
 # Paths to plugins
 MEDIA_PLUGINS = [
     "argus.notificationprofile.media.email.EmailNotification",

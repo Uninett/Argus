@@ -34,6 +34,16 @@ except ValueError:
     pass
 MIDDLEWARE = middleware
 
+# Hack to bypass Apprise check for running tests.
+# Remove as soon as the real Apprise library is included in the test environment.
+try:
+    import apprise  # noqa: F401
+except ImportError:
+    import sys
+    from unittest.mock import MagicMock
+
+    sys.modules["apprise"] = MagicMock()
+
 # Paths to plugins
 MEDIA_PLUGINS = [
     "argus.notificationprofile.media.email.EmailNotification",
