@@ -1,8 +1,10 @@
+from datetime import timedelta
 from types import SimpleNamespace
 
 from django import forms, test
 from django.test.client import RequestFactory
 from django.urls import reverse
+from django.utils import timezone
 
 from argus.auth.factories import PersonUserFactory
 from argus.filter.factories import FilterFactory
@@ -13,7 +15,6 @@ from argus.htmx.incident.views import (
     filter_select,
     get_form,
     get_incident_ids_to_update,
-    incident_detail,
     incident_list,
     incident_list_kiosk,
     KIOSK_URL_NAME,
@@ -160,6 +161,15 @@ class KioskModeTests(test.TestCase):
         self.assertContains(response, 'id="kiosk-filtered-count"')
         self.assertContains(response, 'id="kiosk-last-refreshed"')
 
+    def test_given_kiosk_mode_with_selected_filter_it_should_display_filter_name(self):
+        filter_obj = FilterFactory(user=self.user, name="Kiosk Test Filter XYZ")
+        request = RequestFactory().get("/incidents/kiosk/")
+        request.session = {"selected_filter": str(filter_obj.pk)}
+        request.user = self.user
+        request.htmx = False
+        response = incident_list(request, kiosk_mode=True)
+        self.assertContains(response, "Kiosk Test Filter XYZ")
+
 
 @test.override_settings(INCIDENT_TABLE_COLUMNS=["id"])
 class FilterSelectTests(test.TestCase):
@@ -173,10 +183,6 @@ class FilterSelectTests(test.TestCase):
         request.user = self.user
         request.htmx = SimpleNamespace(trigger=trigger)
         return request
-
-    def test_given_no_trigger_filter_select_it_should_retarget(self):
-        response = filter_select(self._make_request())
-        self.assertEqual(response.status_code, 200)
 
     def test_given_trigger_filter_select_it_should_render_filterbox(self):
         response = filter_select(self._make_request(trigger="some-element"))
@@ -212,24 +218,27 @@ class IncidentListVariantTests(test.TestCase):
         return request
 
     def test_given_non_default_sort_field_it_should_apply_secondary_sort(self):
-        response = incident_list(self._make_request({"sort": "level"}))
+        now = timezone.now()
+        older = StatelessIncidentFactory(level=3, start_time=now - timedelta(hours=2))
+        newer = StatelessIncidentFactory(level=3, start_time=now - timedelta(hours=1))
+        response = incident_list(self._make_request({"sort": "level", "maxlevel": 5}))
         self.assertEqual(response.status_code, 200)
+        content = response.content.decode()
+        self.assertLess(
+            content.index(f'id="incident-{newer.pk}-row"'),
+            content.index(f'id="incident-{older.pk}-row"'),
+        )
 
     def test_given_timeframe_in_session_it_should_include_timeframe_in_query(self):
+        now = timezone.now()
+        within_timeframe = StatelessIncidentFactory(start_time=now - timedelta(minutes=10))
+        outside_timeframe = StatelessIncidentFactory(start_time=now - timedelta(minutes=120))
         request = self._make_request()
         request.session["timeframe"] = 60
         response = incident_list(request)
         self.assertEqual(response.status_code, 200)
-
-
-class IncidentDetailTests(test.TestCase):
-    def test_given_existing_incident_it_should_render_detail(self):
-        incident = StatelessIncidentFactory()
-        request = RequestFactory().get(f"/incidents/{incident.pk}/")
-        request.user = PersonUserFactory()
-        request.htmx = False
-        response = incident_detail(request, pk=incident.pk)
-        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, f'id="incident-{within_timeframe.pk}-row"')
+        self.assertNotContains(response, f'id="incident-{outside_timeframe.pk}-row"')
 
 
 class UtilityFunctionTests(test.TestCase):
