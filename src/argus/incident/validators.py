@@ -37,3 +37,6 @@ key_value_validator = RegexValidator(
 
 def validate_key_value(value):
     return key_value_validator(value)
+
+
+validate_tagstring = validate_key_value

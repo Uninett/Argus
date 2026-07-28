@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 
 from django_filters import rest_framework as filters
 from rest_framework.filters import SearchFilter
+
 from drf_spectacular.utils import extend_schema, extend_schema_view
 
 from argus.filter import get_filter_backend
@@ -11,6 +12,8 @@ from argus.filter import get_filter_backend
 from argus.incident.models import (
     Incident,
 )
+
+# from argus.incident.views import HeartBeatMixin
 from argus.incident.v2.views import (
     BaseIncidentViewSet as BaseIncidentViewSetV2,
     SourceSystemViewSet as SourceSystemViewSetV2,
