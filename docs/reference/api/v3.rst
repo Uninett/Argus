@@ -226,6 +226,30 @@ See v2 for the other endpoints.
       -  ``tags``
 
 
+-  ``/api/v3/incidents/<int:pk>/tags/``:
+
+   -  ``GET``: returns a list of all the tags for the incident given by the by
+     primary key
+
+   -  ``POST``: adds one or more tags to the incident and returns the modified list
+
+      .. code-block:: json
+        :caption: Example request body
+
+          [
+              "object=Netbox 4",
+              "problem_type=boxDown"
+          ]
+
+
+-  ``/api/v3/incidents/<int:pk>/tags/<str:tag>/``:
+
+   -  ``GET``: returns a list of the tag specified be the incident primary key
+     and the tag. Useful for checking if an incident has that specific tag.
+
+   -  ``DELETE``: removes the given tag from the incident
+
+
 -  ``/api/v3/incidents/<int:pk>/ticket_url/``:
 
    -  ``PUT``: modifies just the ticket url of an incident and returns
