@@ -16,6 +16,7 @@ jobs:
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
           owner: ${{ github.repository_owner }}
           repositories: "argus-docker"
+          permission-actions: write
       - name: Trigger Workflow in argus-docker
         env:
           GH_TOKEN: ${{ steps.generate-token.outputs.token }}
