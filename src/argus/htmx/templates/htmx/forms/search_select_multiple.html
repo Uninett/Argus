@@ -89,8 +89,13 @@
       // Remove all search-result items when selections are fully cleared
       dropdown.querySelector('.dropdown-content').addEventListener('change', () => {
         if (!dropdown.querySelector(`input[name="${fieldName}"]:checked`)) {
+          // Move focus to the search input before removing
+          // anything, so clearing out the just-unchecked checkbox doesn't drop focus
+          // from the dropdown entirely and close it.
+          searchInput.focus();
           optionsContainer.querySelectorAll('[data-from-search]').forEach(label => label.remove());
           resultsContainer.innerHTML = '';
+          searchInput.value = '';
         }
       });
 
