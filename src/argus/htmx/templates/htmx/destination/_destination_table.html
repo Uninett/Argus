@@ -42,8 +42,8 @@
                 <span class="inline-flex items-center gap-1 mt-1.5">
                   <span class="badge badge-outline">{{ form.instance.media.name }}</span>
                   {% if not form.instance.media.installed %}
-                    <span class="text-warning text-lg tooltip tooltip-right w-5 before:bg-base-200 before:text-base-content after:bg-base-200"
-                          data-tip="This medium is not installed. No notifications will be sent to this destination.">
+                    <span class="text-warning text-lg w-5"
+                          title="This medium is not installed. No notifications will be sent to this destination.">
                       <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
                     </span>
                   {% endif %}
