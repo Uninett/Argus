@@ -30,7 +30,7 @@ class DestinationFieldMixin:
         choices = []
         for dc in DestinationConfig.objects.filter(user=user).select_related("media"):
             if not dc.media.installed:
-                label = "medium not installed"
+                label = "Medium not installed"
             else:
                 label = MEDIA_CLASSES_DICT[dc.media.slug].get_label(dc)
             choices.append((dc.id, f"{dc.media.name}: {label}"))
