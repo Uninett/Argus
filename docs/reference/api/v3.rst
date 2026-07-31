@@ -1,0 +1,141 @@
+Endpoints, API v3
+=================
+
+Authorization
+-------------
+
+Use the endpoints in version 2.
+
+Notification profile endpoints
+------------------------------
+
+See v2 for the other endpoints.
+
+-  ``/api/v3/notificationprofiles/destinations/``:
+
+   -  ``GET``: returns the logged in user’s destination-configs
+
+      .. code-block:: json
+        :caption: Example response body
+
+          [
+            {
+              "pk": 2,
+              "media": {
+                "slug": "email",
+                "name": "Email",
+                "installed": true
+              },
+              "label": "work",
+              "suggested_label": "Email: work@example.com",
+              "settings": {
+                "synced": false,
+                "email_address": "work@example.com"
+              }
+            },
+            {
+              "pk": 3,
+              "media": {
+                "slug": "sms",
+                "name": "SMS",
+                "installed": true
+              },
+              "label": "work",
+              "suggested_label": "SMS: +4747474747",
+              "settings": {
+                "phone_number": "+4747474747"
+              }
+            }
+          ]
+
+   -  ``POST``: creates and returns a destination-config, which is then
+      connected to the logged in user
+
+      .. code-block:: json
+        :caption: Example request body for email
+
+          {
+              "media": "email",
+              "label": "Work email",
+              "settings": {
+                    "email_address":"work@email.com"
+              }
+          }
+
+      .. code-block:: json
+        :caption: Example request body for sms
+
+          {
+              "media": "sms",
+              "label": "Work phone",
+              "settings": {
+                    "phone_number":"+4747474747"
+              }
+          }
+-  ``/api/v3/notificationprofiles/destinations/<int:pk>/``:
+
+   -  ``GET``: returns one of the logged in user’s destination-configs
+      by primary key
+
+   -  ``PUT``: updates and returns one of the logged in user’s
+      destination-configs by primary key
+
+      -  Example request body: same as ``POST`` to
+         ``/api/v3/notificationprofiles/destinations/``
+
+   -  ``DELETE``: deletes one of the logged in user’s destination-configs by primary key
+
+-  ``/api/v3/notificationprofiles/destinations/<int:pk>/duplicate/``:
+
+   -  ``GET``: returns True if another user has a destination with the same
+      medium and settings as the destination with the given primary key
+
+
+-  ``/api/v3/notificationprofiles/media/``:
+
+   -  ``GET``: returns media
+
+      .. code-block:: json
+        :caption: Example response body
+
+          [
+            {
+              "slug": "email",
+              "name": "Email",
+              "installed": true
+            },
+            {
+              "slug": "sms",
+              "name": "SMS",
+              "installed": true
+            }
+          ]
+
+-  ``/api/v3/notificationprofiles/media/<slug:slug>/``:
+
+   -  ``GET``: returns one of the media by it's slug
+
+-  ``/api/v3/notificationprofiles/media/<slug:slug>/json_schema/``:
+
+   -  ``GET``: returns the json schema of the media by it's slug
+
+      .. code-block:: json
+        :caption: Example response body
+
+          {
+            "json_schema": {
+              "title": "Email Settings",
+              "description": "Settings for a DestinationConfig using email.",
+              "type": "object",
+              "required": [
+                "email_address"
+              ],
+              "properties": {
+                "email_address": {
+                  "type": "string",
+                  "title": "Email address"
+                }
+              },
+              "$id": "http://localhost:8000/json-schema/email"
+            }
+          }
