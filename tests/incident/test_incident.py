@@ -152,7 +152,7 @@ class TestIncidentTagMethods(TestCase):
         self.assertFalse(result)
 
     def test_when_incident_has_both_magical_heartbeat_tags_return_True(self):
-        source_name = "hearteat-source"
+        source_name = "heartbeat-source"
         source = create_fake_source(name=source_name)
         tags = [
             HEARTBEAT_TAG,

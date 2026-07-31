@@ -35,8 +35,8 @@ def sync_heartbeats_with_heartbeat_incidents() -> Tuple[List[SourceSystem], List
 def _close_heartbeat_incidents(timestamp: datetime) -> Tuple[List[SourceSystem], List[Incident], List[Incident]]:
     """Close all existing heartbeat incidents that can be closed
 
-    Returns a list of reanimated sources foll: owed by a list of freshly
-    created incidents and ifinally a list of incidents that could not be closed.
+    Returns a list of reanimated sources followed by a list of freshly
+    created incidents and finally a list of incidents that could not be closed.
     """
     outdated_incidents = Incident.objects.heartbeat_incidents().open()
     sources = []
@@ -144,7 +144,7 @@ def _get_or_create_incident_for_dead_source(
     freshly created (True) or not (False).
 
     Logs if there are multiple incidents for the source, and returns one of the
-    sources and that it was not feshly created (False).
+    incidents and that it was not freshly created (False).
 
     If the source is actually alive, returns (None, None)
     """

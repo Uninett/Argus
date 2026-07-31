@@ -139,7 +139,7 @@ class TestTagQuerySetMethods(TestCase):
         self.assertNotIn(tag3, result)
         self.assertEqual(set((tag1, tag2)), result)
 
-    def test_given_existing_tags_from_tag_keys_returns_a_queryset_of_tags_the_given_tag_key(self):
+    def test_given_existing_tags_from_tag_keys_returns_a_queryset_of_tags_with_the_given_tag_key(self):
         tag1 = TagFactory(key="foo", value="foo")
         tag2 = TagFactory(key="foo", value="bar")
         tag3 = TagFactory(key="xux", value="foo")

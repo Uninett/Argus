@@ -582,7 +582,8 @@ class Incident(models.Model):
 
     # @transaction.atomic
     def set_closed(self, actor: User, timestamp: datetime = None, description=""):
-        "Incident closed by human user"
+        "Closes incident as a human user"
+
         if not self.stateful:
             raise ValidationError("Cannot set a stateless incident as closed")
         if not self.open:
@@ -600,7 +601,7 @@ class Incident(models.Model):
 
     # @transaction.atomic
     def set_end(self, actor: User, timestamp: datetime = None, description: str = ""):
-        "Incident ended by machine source"
+        "Ends incident as a machine source"
         if not self.stateful:
             raise ValidationError("Cannot set a stateless incident as ended")
         if not self.open:

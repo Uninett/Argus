@@ -5,8 +5,8 @@ from django.utils.timezone import now as tznow
 
 from argus.incident.factories import SourceSystemFactory, create_dead_source, create_fake_incident
 from argus.incident.heartbeat_utils import (
-    SOURCE_TAG_KEY,
     HEARTBEAT_TAG,
+    SOURCE_TAG_KEY,
     _close_heartbeat_incidents,
     _create_incidents_for_dead_sources,
     _get_or_create_incident_for_dead_source,
@@ -51,7 +51,7 @@ class TestGetOrCreateIncidentForDeadSource(MakeImmutableFixtures, TestCase):
         incident, _ = _get_or_create_incident_for_dead_source(zombie_source, incident_owner=self.owner_source)
         self.assertNotEqual(in_timestamp, incident.start_time)
 
-    def test_when_dead_sources_exist_we_only_make_one_incident_per_source(self):
+    def test_when_incident_for_dead_source_exist_then_do_not_create_new_incident(self):
         self.assertFalse(Incident.objects.heartbeat_incidents().exists())
 
         in_timestamp = tznow() - timedelta(seconds=60)
@@ -87,7 +87,7 @@ class TestCloseHeartbeatIncidents(MakeImmutableFixtures, TestCase):
         self.assertFalse(closed_incidents)
         self.assertFalse(remaining_incidents)
 
-    def test_when_a_reanimated_source_with_heartbeat_incident_exist_close_it(self):
+    def test_when_a_reanimated_source_with_heartbeat_incident_exists_then_close_incident(self):
         self.assertFalse(Incident.objects.heartbeat_incidents().open().exists())
         zombie_source, timestamp = create_dead_source("zombie_walking")
         new_incidents, existing_incidents = _create_incidents_for_dead_sources(timestamp)
