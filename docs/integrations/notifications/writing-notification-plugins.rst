@@ -77,16 +77,23 @@ The rest is very dependent on the notification medium and, if used, the Python
 library. The given event can be used to extract relevant information that
 should be included in the message that will be sent to each destination.
 
-Class methods for destinations
-------------------------------
+Helper class methods
+--------------------
 
 .. autoclass:: argus.notificationprofile.media.base.NotificationMedium
    :members: get_label, has_duplicate, raise_if_not_deletable, update, validate
    :noindex:
 
-Your implementation of ``get_label`` should show a reasonable representation
-for a destination of that type that makes it easy to identify. For SMS that
-would simply be the phone number.
+With a little luck you might not need to override any of these.
+
+get_label
+   Your implementation of ``get_label`` should show a reasonable representation
+   for a destination of that type that makes it easy to identify. For SMS that
+   would simply be the phone number. The default implementation uses
+   ``MEDIA_SETTINGS_KEY`` to look up the most important piece of information in
+   the settings and uses that directly.
+   If the label would be very long, for instance if the needed setting is a
+   very long url (40+ characters), you should write your own ``get_label``.
 
 The method ``has_duplicate`` will receive a QuerySet of destinations and a dict
 of settings for a possible destination and should return True if a destination
@@ -111,7 +118,7 @@ settings are invalid and the validated and cleaned data should be returned if
 not.
 
 Writing destination plugins using Apprise
-----------------------------------------------------------------
+-----------------------------------------
 `Apprise <https://pypi.org/project/apprise/>`_ is an **optional dependency** — install it with::
 
     pip install argus-server[apprise]

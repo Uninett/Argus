@@ -100,13 +100,6 @@ class EmailNotification(NotificationMedium):
 
         return form.cleaned_data
 
-    @staticmethod
-    def get_label(destination: DestinationConfig) -> str:
-        """
-        Returns the e-mail address represented by this destination
-        """
-        return destination.settings.get("email_address")
-
     @classmethod
     def has_duplicate(cls, queryset: QuerySet, settings: dict) -> bool:
         """

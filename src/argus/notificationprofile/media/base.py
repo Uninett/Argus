@@ -90,13 +90,12 @@ class NotificationMedium(ABC):
         """
         pass
 
-    @staticmethod
-    @abstractmethod
-    def get_label(destination: DestinationConfig) -> str:
+    @classmethod
+    def get_label(cls, destination: DestinationConfig) -> str:
         """
         Returns a descriptive label for this destination.
         """
-        pass
+        return destination.settings.get(cls.MEDIA_SETTINGS_KEY)
 
     @classmethod
     def get_relevant_address(cls, destination: DestinationConfig) -> Any:
@@ -249,13 +248,6 @@ class AppriseMedium(NotificationMedium):
         already exists in the given queryset
         """
         return queryset.filter(settings__destination_url=settings["destination_url"]).exists()
-
-    @staticmethod
-    def get_label(destination: DestinationConfig) -> str:
-        """
-        Returns the Apprise destination url represented by this destination
-        """
-        return destination.settings.get("destination_url")
 
     @classmethod
     def get_relevant_address(cls, destination: DestinationConfig) -> Any:

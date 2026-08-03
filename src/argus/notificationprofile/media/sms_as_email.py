@@ -74,13 +74,6 @@ class SMSNotification(NotificationMedium):
 
         return form.cleaned_data
 
-    @staticmethod
-    def get_label(destination: DestinationConfig) -> str:
-        """
-        Returns the phone number represented by this SMS destination
-        """
-        return destination.settings.get("phone_number")
-
     @classmethod
     def has_duplicate(cls, queryset: QuerySet, settings: dict) -> bool:
         """
