@@ -102,11 +102,8 @@ class NotificationMedium(ABC):
     def get_relevant_address(cls, destination: DestinationConfig) -> Any:
         """
         Returns the "address" to send the message to
-
-        The type of the address depends on the medium, it must be something
-        ``cls.send()`` understands.
         """
-        raise NotImplementedError
+        return destination.settings[cls.MEDIA_SETTINGS_KEY]
 
     @classmethod
     def get_relevant_destinations(cls, destinations: Iterable[DestinationConfig]) -> set[DestinationConfig]:
@@ -241,11 +238,6 @@ class AppriseMedium(NotificationMedium):
             raise ValidationError({"destination_url": "Webhook already exists"})
 
         return form.cleaned_data
-
-    @classmethod
-    def get_relevant_address(cls, destination: DestinationConfig) -> Any:
-        """Returns the Apprise destination url the message should be sent to"""
-        return destination.settings["destination_url"]
 
     @staticmethod
     def create_message_context(event: Event):
