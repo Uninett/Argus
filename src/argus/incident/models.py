@@ -63,7 +63,7 @@ class SourceSystemQuerySet(models.QuerySet):
         return qs
 
     def dead(self, timestamp: Optional[datetime] = None):
-        """Find sources that have missed heartbeats
+        """Find sources that have missed heartbeats as per timestamp
 
         The calculation is done in the database.
         """
@@ -128,6 +128,7 @@ class TagQuerySet(models.QuerySet):
         return tag
 
     def from_tags(self, *tags: str):
+        "Get a set Tag objects matching one or more tagstrings of format key=value"
         qss = self.parse(*tags)
         tagobjs = []
         for qs in qss:
@@ -135,6 +136,7 @@ class TagQuerySet(models.QuerySet):
         return set(tagobjs)
 
     def from_tag_keys(self, *keys: str):
+        "Get a queryset of Tag objects having the given keys"
         qs = self.filter(key__in=keys)
         return qs
 

@@ -38,11 +38,11 @@ def _close_heartbeat_incidents(timestamp: datetime) -> Tuple[List[SourceSystem],
     Returns a list of reanimated sources followed by a list of freshly
     created incidents and finally a list of incidents that could not be closed.
     """
-    outdated_incidents = Incident.objects.heartbeat_incidents().open()
+    open_heartbeat_incidents = Incident.objects.heartbeat_incidents().open()
     sources = []
     closed_incidents = []
     remaining_incidents = []
-    for incident in outdated_incidents:
+    for incident in open_heartbeat_incidents:
         source, incident = _attempt_closing_heartbeat_incident(incident, timestamp)
         if source:
             sources.append(source)
@@ -111,15 +111,15 @@ def _create_incidents_for_dead_sources(timestamp: Optional[datetime] = None) -> 
 
     Keeps track of freshly created incidents versus already existing incidents.
     """
-    # Create existing incidents whose sources have become dead
-    dead_sources = SourceSystem.objects.dead(timestamp - HEARTBEAT_FUDGE)
     incident_owner = SourceSystem.objects.get(name="argus")
-    # prevent multiple incidents
+    # find dead sources
+    dead_sources = SourceSystem.objects.dead(timestamp - HEARTBEAT_FUDGE)
     heartbeat_incidents = Incident.objects.heartbeat_incidents().open()
     source_ids = (incident.source_id for incident in heartbeat_incidents)
     new_incidents = []
     existing_incidents = []
     for source in dead_sources.exclude(id__in=source_ids):
+        # prevent multiple incidents per source
         incident, new = _get_or_create_incident_for_dead_source(
             source, incident_owner=incident_owner, timestamp=timestamp
         )
@@ -148,7 +148,6 @@ def _get_or_create_incident_for_dead_source(
 
     If the source is actually alive, returns (None, None)
     """
-    assert isinstance(source, SourceSystem), "source is not a SourceSystem"
     if not timestamp:
         timestamp = timezone.now()
 
