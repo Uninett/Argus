@@ -13,7 +13,7 @@ from argus.incident.factories import (
     SourceUserFactory,
     StatefulIncidentFactory,
 )
-from argus.incident.serializers import (
+from argus.incident.v2.serializers import (
     EventSerializer,
     IncidentPureDeserializer,
     IncidentSerializer,

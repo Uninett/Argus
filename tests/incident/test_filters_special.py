@@ -8,7 +8,7 @@ from argus.incident.factories import (
     StatefulIncidentFactory,
 )
 from argus.incident.models import Incident
-from argus.incident.views import IncidentFilter
+from argus.incident.v2.views import IncidentFilter
 from argus.util.testing import disconnect_signals, connect_signals
 
 

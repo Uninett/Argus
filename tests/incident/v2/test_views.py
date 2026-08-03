@@ -33,7 +33,7 @@ from argus.incident.models import (
     SourceSystemType,
     Tag,
 )
-from argus.incident.views import EventViewSet
+from argus.incident.v2.views import EventViewSet
 from argus.notificationprofile.models import Filter
 from argus.util.testing import disconnect_signals, connect_signals
 

@@ -2,7 +2,7 @@ from django.db import IntegrityError
 from django.test import TestCase
 
 from argus.incident.models import SourceSystemType
-from argus.incident.serializers import SourceSystemTypeSerializer
+from argus.incident.v2.serializers import SourceSystemTypeSerializer
 
 
 class SourceSystemTypeTests(TestCase):

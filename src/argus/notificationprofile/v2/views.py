@@ -13,7 +13,7 @@ from drf_rw_serializers import viewsets as rw_viewsets
 from argus.drf.permissions import IsOwner
 from argus.filter import get_filter_backend
 from argus.filter.serializers import FilterSerializer
-from argus.incident.serializers import IncidentSerializer
+from argus.incident.v2.serializers import IncidentSerializer
 from argus.notificationprofile.media import api_safely_get_medium_object
 from argus.notificationprofile.media.base import NotificationMedium
 from argus.notificationprofile.models import (

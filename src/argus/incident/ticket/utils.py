@@ -11,9 +11,8 @@ from argus.incident.ticket.base import (
     TicketPluginImportException,
     TicketSettingsException,
 )
+from argus.incident.v2.serializers import IncidentSerializer
 from argus.util.utils import import_class_from_dotted_path
-
-from ..serializers import IncidentSerializer
 
 if TYPE_CHECKING:
     from argus.incident.models import Incident

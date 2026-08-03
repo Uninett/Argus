@@ -11,4 +11,5 @@ openapi_urls = [
 urlpatterns = [
     path("schema/", include((openapi_urls, "openapi"))),
     path("notificationprofiles/", include("argus.notificationprofile.v3.urls")),
+    path("incidents/", include("argus.incident.v3.urls")),
 ]
