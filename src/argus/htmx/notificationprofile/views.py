@@ -30,7 +30,7 @@ class DestinationFieldMixin:
         choices = []
         for dc in DestinationConfig.objects.filter(user=user).order_by("media", "pk"):
             MediaPlugin = MEDIA_CLASSES_DICT[dc.media.slug]
-            label = MediaPlugin.get_label(dc)
+            label = dc.label if dc.label else MediaPlugin.get_label(dc)
             choices.append((dc.id, f"{dc.media.name}: {label}"))
         return choices
 
