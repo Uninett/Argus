@@ -82,13 +82,14 @@ class NotificationMedium(ABC):
         pass
 
     @classmethod
-    @abstractmethod
     def has_duplicate(cls, queryset: QuerySet, settings: dict) -> bool:
         """
         Returns True if a destination with the given settings already exists
         in the given queryset
         """
-        pass
+        key = f"settings__{cls.MEDIA_SETTINGS_KEY}"
+        value = settings[cls.MEDIA_SETTINGS_KEY]
+        return queryset.filter(media_id=cls.MEDIA_SLUG, **{key: value}).exists()
 
     @classmethod
     def get_label(cls, destination: DestinationConfig) -> str:
@@ -240,14 +241,6 @@ class AppriseMedium(NotificationMedium):
             raise ValidationError({"destination_url": "Webhook already exists"})
 
         return form.cleaned_data
-
-    @classmethod
-    def has_duplicate(cls, queryset: QuerySet, settings: dict) -> bool:
-        """
-        Returns True if an Apprise destination with the same destination url
-        already exists in the given queryset
-        """
-        return queryset.filter(settings__destination_url=settings["destination_url"]).exists()
 
     @classmethod
     def get_relevant_address(cls, destination: DestinationConfig) -> Any:
