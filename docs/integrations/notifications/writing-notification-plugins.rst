@@ -28,22 +28,37 @@ implement the following:
 Class constants
 ---------------
 
-You need to set the constants `MEDIA_SLUG`, `MEDIA_NAME` and
-`MEDIA_JSON_SCHEMA`.
+You need to set the constants ``MEDIA_SLUG``, ``MEDIA_NAME`` and
+``MEDIA_JSON_SCHEMA``. If your plugin only takes or needs a single
+configuration flag you should also set ``MEDIA_SETTINGS_KEY``.
 
-The media name is the name of the service you want to send notifications by.
-This is used only for display purposes so you might want to keep it short and
-sweet. So for example `Email`, `SMS` or `MS Teams`.
+MEDIA_NAME
+   The media name is the name of the service you want to send notifications by.
+   This is used only for display purposes so you might want to keep it short
+   and sweet. So for example ``"Email"``, ``"SMS"`` or ``"MS Teams"``.
 
-The media slug is the slugified version of that, so the name simplified to only
-contain lowercase letters, numbers, underscores and hyphens. Always have it
-start with a letter, a-z. For example `email`, `sms` or `msteams`.
+MEDIA_SLUG
+   The media slug is the slugified version of that, so the name simplified to
+   only contain lowercase letters, numbers, underscores and hyphens. Always
+   have it start with a letter, a-z. For example ``"email"``, ``"sms"`` or
+   ``"msteams"``.
 
-The media `json schema <https://json-schema.org/>`_ is a representation of how
-a destination that will be used by this notification plugin should look like.
-Such a destination should include all necessary information that is needed to
-send notifications with your notification plugin. In case of SMS that is a
-phone number or for MS Teams a webhook.
+MEDIA_JSON_SCHEMA
+   The media `json schema <https://json-schema.org/>`_ is a representation of
+   how a destination that will be used by this notification plugin should look
+   like, so that it is possible to autogenerate a form with JavaScript. It will
+   be accessible via the API. Such a destination should include all necessary
+   information that is needed to send notifications with your notification
+   plugin. In case of SMS that is a phone number or for MS Teams a webhook.
+
+MEDIA_SETTINGS_KEY
+   The media settings key is the name of the most important key in the settings
+   JSON field. It is used to cut down on the amount of code you need to write
+   if there is only one piece of config you need to send the notification.
+   Among other things, it is used to check for duplicate entries, so in a way
+   it acts as storage for the value of the primary key for a destination plugin. For that reason, it must be
+   required in the json schema. For example for an email plugin this would be
+   "email_address" or for a SMS plugin it would be "phone_number".
 
 Class methods for sending notifications
 ---------------------------------------

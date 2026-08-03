@@ -37,17 +37,18 @@ LOG = logging.getLogger(__name__)
 class SMSNotification(NotificationMedium):
     MEDIA_SLUG = "sms"
     MEDIA_NAME = "SMS"
+    MEDIA_SETTINGS_KEY = "phone_number"
     MEDIA_JSON_SCHEMA = {
         "title": "SMS Settings",
         "description": "Settings for a DestinationConfig using SMS.",
         "type": "object",
-        "required": ["phone_number"],
+        "required": [MEDIA_SETTINGS_KEY],
         "properties": {
-            "phone_number": {
+            MEDIA_SETTINGS_KEY: {
                 "type": "string",
                 "title": "Phone number",
                 "description": "The phone number is validated and the country code needs to be given.",
-            }
+            },
         },
     }
 

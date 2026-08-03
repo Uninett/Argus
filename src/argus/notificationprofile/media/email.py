@@ -55,12 +55,18 @@ def send_email_safely(function, additional_error=None, *args, **kwargs) -> int:
 class EmailNotification(NotificationMedium):
     MEDIA_SLUG = "email"
     MEDIA_NAME = "Email"
+    MEDIA_SETTINGS_KEY = "email_address"
     MEDIA_JSON_SCHEMA = {
         "title": "Email Settings",
         "description": "Settings for a DestinationConfig using email.",
         "type": "object",
-        "required": ["email_address"],
-        "properties": {"email_address": {"type": "string", "title": "Email address"}},
+        "required": [MEDIA_SETTINGS_KEY],
+        "properties": {
+            MEDIA_SETTINGS_KEY: {
+                "type": "string",
+                "title": "Email address",
+            },
+        },
     }
 
     class FormV3(forms.Form):

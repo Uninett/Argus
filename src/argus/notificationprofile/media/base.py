@@ -46,6 +46,23 @@ def modelinstance_to_dict(obj):
 
 
 class NotificationMedium(ABC):
+    """
+    Must be defined by subclasses:
+
+    Class attributes:
+
+    - MEDIA_SLUG: short string id for the medium, lowercase
+    - MEDIA_NAME: human friendly id for the medium
+    - MEDIA_SETTINGS_KEY: the field in settings that is specific for this medium
+    - MEDIA_JSON_SCHEMA: A json-schema to describe the settings field to
+      javascript, used by the API
+
+    Class methods:
+
+    - send(event, destinations): How to send the given event to the given
+      destinations of type MEDIA_SLUG.
+    """
+
     class NotDeletableError(Exception):
         """
         Custom exception class that is raised when a destination cannot be
@@ -192,12 +209,18 @@ class NotificationMedium(ABC):
 class AppriseMedium(NotificationMedium):
     MEDIA_SLUG = "apprise"
     MEDIA_NAME = "Apprise"
+    MEDIA_SETTINGS_KEY = "destination_url"
     MEDIA_JSON_SCHEMA = {
         "title": "Apprise Settings",
         "description": "Settings for a DestinationConfig using Apprise.",
         "type": "object",
-        "required": ["destination_url"],
-        "properties": {"destination_url": {"type": "string", "title": "Apprise destination url"}},
+        "required": [MEDIA_SETTINGS_KEY],
+        "properties": {
+            MEDIA_SETTINGS_KEY: {
+                "type": "string",
+                "title": "Apprise destination url",
+            }
+        },
     }
 
     class Form(forms.Form):
