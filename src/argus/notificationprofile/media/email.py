@@ -20,7 +20,6 @@ if TYPE_CHECKING:
     from collections.abc import Iterable
 
     from django.contrib.auth import get_user_model
-    from django.db.models.query import QuerySet
 
     from ..serializers import RequestDestinationConfigSerializer
 
@@ -99,14 +98,6 @@ class EmailNotification(NotificationMedium):
             raise ValidationError({"email_address": "Email address already exists"})
 
         return form.cleaned_data
-
-    @classmethod
-    def has_duplicate(cls, queryset: QuerySet, settings: dict) -> bool:
-        """
-        Returns True if an email destination with the same email address
-        already exists in the given queryset
-        """
-        return queryset.filter(settings__email_address=settings["email_address"]).exists()
 
     @classmethod
     def get_relevant_address(cls, destination: DestinationConfig) -> Any:

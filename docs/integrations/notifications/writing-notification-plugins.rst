@@ -95,9 +95,12 @@ get_label
    If the label would be very long, for instance if the needed setting is a
    very long url (40+ characters), you should write your own ``get_label``.
 
-The method ``has_duplicate`` will receive a QuerySet of destinations and a dict
-of settings for a possible destination and should return True if a destination
-with such settings exists in the given QuerySet.
+has_duplicate
+   The method ``has_duplicate`` will receive a QuerySet of destinations and
+   a dict of settings for a possible destination and should return True if
+   a destination with such settings exists in the given QuerySet. By default it
+   will use ``MEDIA_SETTINGS_KEY`` to lookup the most important piece of
+   information in the settings.
 
 ``raise_if_not_deletable`` should check if a given destination can be deleted.
 This is used in case some destinations are managed by an outside source and

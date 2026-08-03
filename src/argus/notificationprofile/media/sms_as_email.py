@@ -24,7 +24,6 @@ if TYPE_CHECKING:
     from collections.abc import Iterable
 
     from django.contrib.auth import get_user_model
-    from django.db.models.query import QuerySet
 
     from ..models import DestinationConfig
     from ..serializers import RequestDestinationConfigSerializer
@@ -73,14 +72,6 @@ class SMSNotification(NotificationMedium):
             raise ValidationError({"phone_number": "Phone number already exists"})
 
         return form.cleaned_data
-
-    @classmethod
-    def has_duplicate(cls, queryset: QuerySet, settings: dict) -> bool:
-        """
-        Returns True if a sms destination with the same phone number
-        already exists in the given queryset
-        """
-        return queryset.filter(settings__phone_number=settings["phone_number"]).exists()
 
     @classmethod
     def get_relevant_address(cls, destination: DestinationConfig) -> Any:
