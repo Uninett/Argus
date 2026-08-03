@@ -102,6 +102,11 @@ has_duplicate
    will use ``MEDIA_SETTINGS_KEY`` to lookup the most important piece of
    information in the settings.
 
+get_relevant_address
+   Used by ``send``. You should only need to override this if the key in
+   MEDIA_SETTINGS_KEY is insuffcient to look up the actual configuration of the
+   destinations of the type set by MEDIA_SLUG.
+
 ``raise_if_not_deletable`` should check if a given destination can be deleted.
 This is used in case some destinations are managed by an outside source and
 should not be able to be deleted by a user. If that is the case a

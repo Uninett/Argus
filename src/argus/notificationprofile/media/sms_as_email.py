@@ -7,7 +7,7 @@ recipient's phone number. The email body must contain the message text.
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from django import forms
 from django.conf import settings
@@ -72,11 +72,6 @@ class SMSNotification(NotificationMedium):
             raise ValidationError({"phone_number": "Phone number already exists"})
 
         return form.cleaned_data
-
-    @classmethod
-    def get_relevant_address(cls, destination: DestinationConfig) -> Any:
-        "Get a single phone number from the destination, as a string"
-        return destination.settings["phone_number"]
 
     @classmethod
     def send(cls, event: Event, destinations: Iterable[DestinationConfig], **_) -> bool:

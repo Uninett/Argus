@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from django import forms
 from django.conf import settings
@@ -98,11 +98,6 @@ class EmailNotification(NotificationMedium):
             raise ValidationError({"email_address": "Email address already exists"})
 
         return form.cleaned_data
-
-    @classmethod
-    def get_relevant_address(cls, destination: DestinationConfig) -> Any:
-        """Returns an email address the message should be sent to"""
-        return destination.settings["email_address"]
 
     @staticmethod
     def create_message_context(event: Event):
