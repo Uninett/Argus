@@ -13,6 +13,7 @@ class DestinationFormCreate(ModelForm):
         # Serializer request the request object
         self.request = kwargs.pop("request", None)
         super().__init__(*args, **kwargs)
+        self.fields["media"].queryset = Media.objects.filter(installed=True)
 
     class Meta:
         model = DestinationConfig
@@ -80,11 +81,16 @@ class DestinationFormCreate(ModelForm):
 
 class DestinationFormUpdate(DestinationFormCreate):
     def __init__(self, *args, **kwargs):
-        if instance := kwargs.get("instance"):
+        instance = kwargs.get("instance")
+        if instance:
             settings_key = _get_settings_key_for_media(instance.media)
             # Extract settings value (email address etc.) from JSONField
             instance.settings = instance.settings.get(settings_key)
         super().__init__(*args, **kwargs)
+        if instance and not instance.media.installed:
+            # Disable editing when there is no plugin to validate against
+            self.fields["label"].disabled = True
+            self.fields["settings"].disabled = True
 
     class Meta:
         model = DestinationConfig
@@ -120,9 +126,14 @@ class DestinationFormUpdate(DestinationFormCreate):
         )
 
 
-def _get_settings_key_for_media(media: Media) -> str:
+def _get_settings_key_for_media(media: Media) -> str | None:
     """Returns the required settings key for the given media,
     e.g. "email_address", "phone_number"
+
+    Returns None if the medium is not installed, since there is then no
+    plugin to ask for the schema.
     """
+    if not media.installed:
+        return None
     medium = api_safely_get_medium_object(media.slug)
     return medium.MEDIA_JSON_SCHEMA["required"][0]

@@ -11,6 +11,7 @@ __all__ = [
     "TimeRecurrenceFactory",
     "MinimalTimeRecurrenceFactory",
     "MaximalTimeRecurrenceFactory",
+    "MediaFactory",
     "DestinationConfigFactory",
     "NotificationProfileFactory",
 ]
