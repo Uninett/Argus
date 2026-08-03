@@ -70,8 +70,10 @@ class TestCreateIncidentsForDeadSources(MakeImmutableFixtures, TestCase):
         self.assertFalse(existing_incidents)
 
     def test_when_dead_sources_exist_return_list_of_created_incidents_and_an_empty_list(self):
+        self.assertFalse(Incident.objects.heartbeat_incidents().open().exists())
         zombie_source, timestamp = create_dead_source("zombie_walking")
         new_incidents, existing_incidents = _create_incidents_for_dead_sources(timestamp)
+        self.assertTrue(Incident.objects.heartbeat_incidents().open().exists())
         self.assertTrue(new_incidents)
         self.assertFalse(existing_incidents)
         tags = [tag.representation for tag in new_incidents[0].deprecated_tags]
@@ -81,6 +83,12 @@ class TestCreateIncidentsForDeadSources(MakeImmutableFixtures, TestCase):
 
 @tag("db")
 class TestCloseHeartbeatIncidents(MakeImmutableFixtures, TestCase):
+    @staticmethod
+    def _create_dead_source_and_incident():
+        zombie_source, timestamp = create_dead_source("zombie_walking")
+        new_incidents, existing_incidents = _create_incidents_for_dead_sources(timestamp)
+        return zombie_source, new_incidents, existing_incidents
+
     def test_when_no_reanimated_sources_return_empty_lists(self):
         sources, closed_incidents, remaining_incidents = _close_heartbeat_incidents(tznow())
         self.assertFalse(sources)
@@ -88,10 +96,7 @@ class TestCloseHeartbeatIncidents(MakeImmutableFixtures, TestCase):
         self.assertFalse(remaining_incidents)
 
     def test_when_a_reanimated_source_with_heartbeat_incident_exists_then_close_incident(self):
-        self.assertFalse(Incident.objects.heartbeat_incidents().open().exists())
-        zombie_source, timestamp = create_dead_source("zombie_walking")
-        new_incidents, existing_incidents = _create_incidents_for_dead_sources(timestamp)
-        self.assertTrue(Incident.objects.heartbeat_incidents().open().exists())
+        zombie_source, new_incidents, existing_incidents = self._create_dead_source_and_incident()
         self.assertFalse(existing_incidents)
 
         # reawaken source
@@ -106,9 +111,7 @@ class TestCloseHeartbeatIncidents(MakeImmutableFixtures, TestCase):
         self.assertFalse(remaining_incidents)
 
     def test_when_a_heartbeat_incident_lacks_the_sourcetag_close_it(self):
-        self.assertFalse(Incident.objects.heartbeat_incidents().open().exists())
-        zombie_source, timestamp = create_dead_source("zombie_walking")
-        new_incidents, existing_incidents = _create_incidents_for_dead_sources(timestamp)
+        zombie_source, new_incidents, _ = self._create_dead_source_and_incident()
 
         # remove source tag
         tags = Tag.objects.filter(key=SOURCE_TAG_KEY)
@@ -130,9 +133,7 @@ class TestCloseHeartbeatIncidents(MakeImmutableFixtures, TestCase):
         self.assertEqual(remaining_incidents, [])
 
     def test_when_a_heartbeat_incident_has_multiple_sourcetags_leave_it_alone(self):
-        self.assertFalse(Incident.objects.heartbeat_incidents().open().exists())
-        zombie_source, timestamp = create_dead_source("zombie_walking")
-        new_incidents, existing_incidents = _create_incidents_for_dead_sources(timestamp)
+        zombie_source, new_incidents, _ = self._create_dead_source_and_incident()
         incident = new_incidents[0]
         self.assertEqual(len(incident.deprecated_tags), 2)
 
@@ -153,9 +154,7 @@ class TestCloseHeartbeatIncidents(MakeImmutableFixtures, TestCase):
         self.assertIn(incident, remaining_incidents)
 
     def test_close_all_incidents_pointing_to_a_nonexistent_source(self):
-        self.assertFalse(Incident.objects.heartbeat_incidents().open().exists())
-        zombie_source, timestamp = create_dead_source("zombie_walking")
-        new_incidents, existing_incidents = _create_incidents_for_dead_sources(timestamp)
+        zombie_source, new_incidents, _ = self._create_dead_source_and_incident()
         incident = new_incidents[0]
         self.assertEqual(len(incident.deprecated_tags), 2)
 

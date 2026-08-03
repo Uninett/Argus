@@ -169,10 +169,10 @@ class TestSourceSystemQuerySet(TestCase):
 
 @tag("db")
 class TestIncidentQuerySetTagMethods(TestCase):
-    def test_when_no_incident_has_source_with_key_return_empty_queryset(self):
+    def test_when_no_incident_has_tag_with_key_return_empty_queryset(self):
         self.assertFalse(Incident.objects.from_tag_keys("blbl", "nonexistent").exists())
 
-    def test_when_incident_has_source_with_key_return_queryset_with_incident(self):
+    def test_when_incident_has_tag_with_key_return_queryset_with_incident(self):
         incident = create_fake_incident(tags=["blbl=foo"])
         result = Incident.objects.from_tag_keys("blbl")
         self.assertIn(incident, result)
