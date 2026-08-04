@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from abc import ABC, abstractmethod
+from abc import ABC
 from typing import TYPE_CHECKING, Any
 
 try:
@@ -13,7 +13,7 @@ from django import forms
 from django.conf import settings
 from django.db import transaction
 from django.template.loader import render_to_string
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import ValidationError as DRFValidationError
 
 from argus.notificationprofile.models import DestinationConfig
 from argus.constants import API_STABLE_VERSION
@@ -24,6 +24,7 @@ if TYPE_CHECKING:
     from collections.abc import Iterable
 
     from types import NoneType
+    from typing import Optional
 
     from django.contrib.auth import get_user_model
     from django.db.models.query import QuerySet
@@ -45,6 +46,12 @@ def modelinstance_to_dict(obj):
     return dict_
 
 
+class CommonDestinationConfigForm(forms.ModelForm):
+    class Meta:
+        model = DestinationConfig
+        fields = ["label", "media"]
+
+
 class NotificationMedium(ABC):
     """
     Must be defined by subclasses:
@@ -63,6 +70,15 @@ class NotificationMedium(ABC):
       destinations of type MEDIA_SLUG.
     """
 
+    error_messages = {
+        "readonly_media": "Media cannot be updated, only settings.",
+        "readonly_user": "User cannot be changed, only settings.",
+        "duplicate_label": "A destination with this medium and label already exists",
+        "settings_type": "Settings has to be a dictionary.",
+        "empty_settings": '"settings" cannot be empty',
+        "duplicate": "A destination with these settings already exists",
+    }
+
     class NotDeletableError(Exception):
         """
         Custom exception class that is raised when a destination cannot be
@@ -72,14 +88,91 @@ class NotificationMedium(ABC):
     def __init__(self, version: str = API_STABLE_VERSION):
         self.version = version
 
-    @classmethod
-    @abstractmethod
-    def validate(cls, instance: RequestDestinationConfigSerializer, dict: dict, user: User) -> dict:
+    def validate(
+        self, data: dict, user: User, instance: Optional[DestinationConfig] = None
+    ) -> CommonDestinationConfigForm:
         """
-        Validates the settings of destination and returns a dict with
-        validated and cleaned data
+        Validates that a destination can be created/updated with the given values
+
+        Returns a form with the cleaned data if all is valid and raises a
+        ValidationError if not
         """
-        pass
+        # Check that no readonly fields are being changed
+        if instance:
+            if data.get("media") and data.get("media").slug != instance.media.slug:
+                code = "readonly_media"
+                message = self.error_messages["readonly_media"]
+                raise DRFValidationError(detail={"media": message}, code=code)
+
+            if instance.user != user:
+                code = "readonly_user"
+                message = self.error_messages["readonly_user"]
+                raise DRFValidationError(detail={"user": message}, code=code)
+
+            form = CommonDestinationConfigForm(data, instance=instance)
+        else:
+            form = CommonDestinationConfigForm(data)
+
+        # Check that the label and medium are valid values
+        if not form.is_valid():
+            code = "invalid"
+            detail = form.errors.get_json_data()
+            raise DRFValidationError(detail=detail, code=code)
+
+        # Check that no destination with this medium and label already exists for this user
+        qs = user.destinations.filter(media_id=data.get("media"))
+        if instance:
+            qs = qs.exclude(pk=instance.pk)
+
+        if data.get("label") and qs.filter(label=data.get("label")).exists():
+            code = "duplicate_label"
+            message = self.error_messages["duplicate_label"]
+            raise DRFValidationError(detail=message, code=code)
+
+        # Check that the settings are valid
+        settings = data["settings"]
+        if not settings:
+            code = "empty_settings"
+            message = self.error_messages["empty_settings"]
+            raise DRFValidationError(detail={"settings": message}, code=code)
+        if not isinstance(settings, dict):
+            code = "settings_type"
+            message = self.error_messages["settings_type"]
+            raise DRFValidationError(detail={"settings": message}, code=code)
+
+        cleaned_settings = self.validate_settings(data["settings"], user, instance=instance)
+
+        form.cleaned_data["settings"] = cleaned_settings
+        form.cleaned_data["user"] = user
+        return form
+
+    def validate_settings(
+        self,
+        data: dict,
+        user: User,
+        instance: Optional[DestinationConfig] = None,
+    ) -> dict:
+        """
+        Validates the settings of a destination and returns a cleaned settings
+        dict and raises a ValidationError if the settings are invalid
+        """
+        form = self.Form(data=data)
+
+        if not form.is_valid():
+            code = "invalid"
+            message = form.errors.get_json_data()
+            raise DRFValidationError(detail={"settings": message}, code=code)
+
+        qs = user.destinations
+        if instance:
+            qs = qs.exclude(pk=instance.pk)
+
+        if self.has_duplicate(qs, form.cleaned_data):
+            code = "duplicate"
+            detail = self.error_messages["duplicate"]
+            raise DRFValidationError(detail=detail, code=code)
+
+        return form.cleaned_data
 
     @classmethod
     def has_duplicate(cls, queryset: QuerySet, settings: dict) -> bool:
@@ -231,11 +324,11 @@ class AppriseMedium(NotificationMedium):
         """
         form = cls.Form(apprise_dict["settings"])
         if not form.is_valid():
-            raise ValidationError(form.errors)
+            raise DRFValidationError(form.errors)
         if user.destinations.filter(
             media_id=cls.MEDIA_SLUG, settings__destination_url=form.cleaned_data["destination_url"]
         ).exists():
-            raise ValidationError({"destination_url": "Webhook already exists"})
+            raise DRFValidationError({"destination_url": "Webhook already exists"})
 
         return form.cleaned_data
 
