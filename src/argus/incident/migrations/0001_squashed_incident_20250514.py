@@ -11,8 +11,6 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    replaces = [('argus_incident', '0001_initial'), ('argus_incident', '0002_empty_source_incident_id'), ('argus_incident', '0003_incident_level'), ('argus_incident', '0004_add_ChangeEvent_proxy'), ('argus_incident', '0005_alter_event_type'), ('argus_incident', '0006_incident_search_text'), ('argus_incident', '0007_alter_event_type'), ('argus_incident', '0008_incident_metadata'), ('argus_incident', '0009_use_bigautofield_on_quickly_growing_tables')]
-
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
