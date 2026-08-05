@@ -9,8 +9,6 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    replaces = [('argus_notificationprofile', '0001_squashed_0015_remove_days_alter_days_array'), ('argus_notificationprofile', '0016_noop'), ('argus_notificationprofile', '0017_change_event_type_to_event_types'), ('argus_notificationprofile', '0018_remove_closed_and_unacked_from_filterblob')]
-
     dependencies = [
         ('argus_auth', '0001_initial'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),

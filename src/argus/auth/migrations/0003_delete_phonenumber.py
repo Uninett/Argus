@@ -18,7 +18,7 @@ def copy_destinations_to_phone_number_table(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("argus_notificationprofile", "0001_squashed_0015_remove_days_alter_days_array"),
+        ("argus_notificationprofile", "0001_squashed_notificationprofile_20250512"),
         ("argus_auth", "0002_alter_user_first_name"),
     ]
 
