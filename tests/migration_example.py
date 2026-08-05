@@ -1,8 +1,5 @@
 """
 This shows how to write a test-case for testing a data-migration!
-
-When migrations are squashed, remember to remove tests for migrations that no
-longer exist.
 """
 
 from unittest import skip
@@ -13,120 +10,76 @@ from tests.helpers import Migrator
 
 
 @skip
-class SomethingSomethingMigrationTest(TestCase):
-    base_migration = ("argus_notificationprofile", "0016_noop")
-    test_migration = ("argus_notificationprofile", "0017_change_event_type_to_event_types")
+class ExampleMigrationTest(TestCase):
+    base_migration = ("someapp", "0003_nonexistent")
+    test_migration = ("someapp", "0004_datamigration")
 
     def setUp(self):
         self.migrator = Migrator()
         self.migrator.migrate(*self.base_migration)
 
-    def test_forward_empty_changes_nothing(self):
-        # Cannot use factories :(
-        User = self.migrator.apps.get_model("argus_auth", "User")
-        Filter = self.migrator.apps.get_model("argus_notificationprofile", "Filter")
-        user = User.objects.create(username="foo", password="vbnh")
+    # testing the forwards migration
 
-        filter_ = Filter.objects.create(
-            user=user,
-            name="1",
-            filter={},
-        )
-        self.migrator.migrate(*self.test_migration)
-        result = Filter.objects.get(id=filter_.pk)
-        self.assertEqual(result.filter, {})
+    def test_forward_when_nothing_to_change_then_changes_nothing(self):
+        # datamigration where we don't find anything to change
+        MyModel = self.migrator.apps.get_model("someapp", "MyModel")
 
-    def test_forward_remove_redundant_filter(self):
-        # Cannot use factories :(
-        User = self.migrator.apps.get_model("argus_auth", "User")
-        Filter = self.migrator.apps.get_model("argus_notificationprofile", "Filter")
-        user = User.objects.create(username="foo", password="vbnh")
+        # add some data to MyModel
+        ...
 
-        filter_ = Filter.objects.create(
-            user=user,
-            name="1",
-            filter={"event_type": None},
-        )
-        self.migrator.migrate(*self.test_migration)
-        result = Filter.objects.get(id=filter_.pk)
-        self.assertEqual(result.filter, {})
+        # run the migration in test_migration
+        self.migrator.migrate(*self.test_migration)  # Note
 
-    def test_forward_change_actual_filter(self):
-        # Cannot use factories :(
-        User = self.migrator.apps.get_model("argus_auth", "User")
-        Filter = self.migrator.apps.get_model("argus_notificationprofile", "Filter")
-        user = User.objects.create(username="foo", password="vbnh")
+        # check that nothing changed
+        result = MyModel.objects.filter(something="blah")
+        self.assertFalse(result)
 
-        filter_ = Filter.objects.create(
-            user=user,
-            name="1",
-            filter={"event_type": "BAH HUMBUG"},
-        )
-        self.migrator.migrate(*self.test_migration)
-        result = Filter.objects.get(id=filter_.pk)
-        self.assertEqual(result.filter, {"event_types": ["BAH HUMBUG"]})
+    def test_forward_when_something_to_change_then_changes_something(self):
+        # datamigration where we do change existing data
+        MyModel = self.migrator.apps.get_model("someapp", "MyModel")
 
-    def test_backward_empty_changes_nothing(self):
-        # Cannot use factories :(
-        User = self.migrator.apps.get_model("argus_auth", "User")
-        Filter = self.migrator.apps.get_model("argus_notificationprofile", "Filter")
-        user = User.objects.create(username="foo", password="vbnh")
+        # add some data to MyModel
+        ...
 
-        filter_ = Filter.objects.create(
-            user=user,
-            name="1",
-            filter={},
-        )
-        self.migrator.migrate(*self.test_migration)
-        self.migrator.migrate(*self.base_migration)
-        result = Filter.objects.get(id=filter_.pk)
-        self.assertEqual(result.filter, {})
+        # run the migration in test_migration
+        self.migrator.migrate(*self.test_migration)  # Note
 
-    def test_backward_remove_redundant_filter(self):
-        # Cannot use factories :(
-        User = self.migrator.apps.get_model("argus_auth", "User")
-        Filter = self.migrator.apps.get_model("argus_notificationprofile", "Filter")
-        user = User.objects.create(username="foo", password="vbnh")
+        # check that something changed
+        result = MyModel.objects.filter(something="blah")
+        self.assertTrue(result)
 
-        filter_ = Filter.objects.create(
-            user=user,
-            name="1",
-            filter={},
-        )
-        self.migrator.migrate(*self.test_migration)
-        filter_.filter = {"event_types": []}
-        self.migrator.migrate(*self.base_migration)
-        result = Filter.objects.get(id=filter_.pk)
-        self.assertEqual(result.filter, {})
+    # testing the backwards migration
 
-    def test_backward_dont_recreate_redundant_filter(self):
-        # Cannot use factories :(
-        User = self.migrator.apps.get_model("argus_auth", "User")
-        Filter = self.migrator.apps.get_model("argus_notificationprofile", "Filter")
-        user = User.objects.create(username="foo", password="vbnh")
+    def test_backward_when_nothing_to_change_then_changes_nothing(self):
+        # datamigration where we don't find anything to change
+        MyModel = self.migrator.apps.get_model("someapp", "MyModel")
 
-        filter_ = Filter.objects.create(
-            user=user,
-            name="1",
-            filter={"event_type": None},
-        )
-        self.migrator.migrate(*self.test_migration)
-        self.migrator.migrate(*self.base_migration)
-        result = Filter.objects.get(id=filter_.pk)
-        self.assertEqual(result.filter, {})
+        # add some data to MyModel
+        ...
 
-    def test_backward_change_actual_filter(self):
-        # Cannot use factories :(
-        User = self.migrator.apps.get_model("argus_auth", "User")
-        Filter = self.migrator.apps.get_model("argus_notificationprofile", "Filter")
-        user = User.objects.create(username="foo", password="vbnh")
+        # run the migration in test_migration
+        self.migrator.migrate(*self.test_migration)  # Note 1
 
-        filter_ = Filter.objects.create(
-            user=user,
-            name="1",
-            filter={"event_type": "BAH HUMBUG"},
-        )
-        self.migrator.migrate(*self.test_migration)
-        self.migrator.migrate(*self.base_migration)
-        result = Filter.objects.get(id=filter_.pk)
-        self.assertEqual(result.filter, {"event_type": "BAH HUMBUG"})
+        # then ALSO run the migration in base_migration!
+        self.migrator.migrate(*self.base_migration)  # Note 2
+
+        # check that nothing changed
+        result = MyModel.objects.filter(something="blah")
+        self.assertFalse(result)
+
+    def test_backward_when_something_to_change_then_changes_something(self):
+        # datamigration where we don't find anything to change
+        MyModel = self.migrator.apps.get_model("someapp", "MyModel")
+
+        # add some data to MyModel
+        ...
+
+        # run the migration in test_migration
+        self.migrator.migrate(*self.test_migration)  # Note 1
+
+        # then ALSO run the migration in base_migration!
+        self.migrator.migrate(*self.base_migration)  # Note 2
+
+        # check that something changed
+        result = MyModel.objects.filter(something="blah")
+        self.assertTrue(result)
