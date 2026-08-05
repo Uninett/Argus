@@ -30,7 +30,6 @@ if TYPE_CHECKING:
     from django.db.models.query import QuerySet
 
     from argus.incident.models import Event
-    from ..serializers import RequestDestinationConfigSerializer
 
     User = get_user_model()
 
@@ -315,22 +314,6 @@ class AppriseMedium(NotificationMedium):
 
     class Form(forms.Form):
         destination_url = forms.URLField()
-
-    @classmethod
-    def validate(cls, instance: RequestDestinationConfigSerializer, apprise_dict: dict, user: User) -> dict:
-        """
-        Validates the settings of an Apprise destination and returns a dict
-        with validated and cleaned data
-        """
-        form = cls.Form(apprise_dict["settings"])
-        if not form.is_valid():
-            raise DRFValidationError(form.errors)
-        if user.destinations.filter(
-            media_id=cls.MEDIA_SLUG, settings__destination_url=form.cleaned_data["destination_url"]
-        ).exists():
-            raise DRFValidationError({"destination_url": "Webhook already exists"})
-
-        return form.cleaned_data
 
     @staticmethod
     def create_message_context(event: Event):

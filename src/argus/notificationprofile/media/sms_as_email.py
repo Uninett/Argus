@@ -13,7 +13,6 @@ from django import forms
 from django.conf import settings
 from django.core.mail import send_mail
 from phonenumber_field.formfields import PhoneNumberField
-from rest_framework.exceptions import ValidationError
 
 from ...incident.models import Event
 from .base import NotificationMedium
@@ -26,7 +25,6 @@ if TYPE_CHECKING:
     from django.contrib.auth import get_user_model
 
     from ..models import DestinationConfig
-    from ..serializers import RequestDestinationConfigSerializer
 
     User = get_user_model()
 
@@ -51,27 +49,12 @@ class SMSNotification(NotificationMedium):
         },
     }
 
-    class PhoneNumberForm(forms.Form):
+    class Form(forms.Form):
         phone_number = PhoneNumberField()
 
-    @classmethod
-    def validate(cls, instance: RequestDestinationConfigSerializer, sms_dict: dict, user: User) -> dict:
-        """
-        Validates the settings of an SMS destination and returns a dict
-        with validated and cleaned data
-        """
-        form = cls.PhoneNumberForm(sms_dict["settings"])
-        if not form.is_valid():
-            raise ValidationError(form.errors)
-
-        form.cleaned_data["phone_number"] = form.cleaned_data["phone_number"].as_e164
-
-        if user.destinations.filter(
-            media_id=cls.MEDIA_SLUG, settings__phone_number=form.cleaned_data["phone_number"]
-        ).exists():
-            raise ValidationError({"phone_number": "Phone number already exists"})
-
-        return form.cleaned_data
+        def clean_phone_number(self):
+            phone_number = self.cleaned_data["phone_number"]
+            return phone_number.as_e164
 
     @classmethod
     def send(cls, event: Event, destinations: Iterable[DestinationConfig], **_) -> bool:
