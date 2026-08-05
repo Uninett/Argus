@@ -7,8 +7,6 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    replaces = [('argus_auth', '0002_alter_user_first_name'), ('argus_auth', '0003_delete_phonenumber'), ('argus_auth', '0004_add_preferences_model')]
-
     dependencies = [
         ('argus_auth', '0001_initial'),
     ]
