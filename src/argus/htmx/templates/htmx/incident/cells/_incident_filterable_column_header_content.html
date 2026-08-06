@@ -4,18 +4,22 @@
   <div class="flex items-center gap-1">
     <span id="{{ field.name }}-label">{{ column.label }}</span>
     {% include "htmx/incident/cells/_incident_sort_button.html" %}
-    {# Filter dropdown #}
-    <div id="{{ column.name }}-dropdown" class="dropdown dropdown-end">
-      <button type="button"
-              tabindex="0"
-              aria-label="Filter by {{ column.label|lower }}"
-              aria-controls="{{ column.name }}-dropdown-content"
-              class="filter-btn btn btn-xs {% if field.value %} btn-primary {% else %} btn-ghost text-primary {% endif %} min-h-4 h-4"
-              {% if dummy_column %}disabled{% endif %}>
-        <i class="fa-solid fa-magnifying-glass"></i>
-      </button>
-      {% include "htmx/incident/cells/_incident_filter_dropdown_body.html" %}
-    </div>
+    {% if not kiosk_mode %}
+      {# Filter dropdown #}
+      <div id="{{ column.name }}-dropdown" class="dropdown dropdown-end">
+        <button type="button"
+                tabindex="0"
+                aria-label="Filter by {{ column.label|lower }}"
+                aria-controls="{{ column.name }}-dropdown-content"
+                class="filter-btn btn btn-xs {% if field.value %} btn-primary {% else %} btn-ghost text-primary {% endif %} min-h-4 h-4"
+                {% if dummy_column %}disabled{% endif %}>
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </button>
+        {% include "htmx/incident/cells/_incident_filter_dropdown_body.html" %}
+      </div>
+    {% endif %}
   </div>
 {% endwith %}
-{% include "htmx/incident/cells/_incident_filter_dropdown_script.html" %}
+{% if not kiosk_mode %}
+  {% include "htmx/incident/cells/_incident_filter_dropdown_script.html" %}
+{% endif %}

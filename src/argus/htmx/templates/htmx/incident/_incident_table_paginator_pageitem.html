@@ -5,7 +5,7 @@ page works without JavaScript, and to ensure the link is
 displayed as clickable.
 -->
 <li>
-  <a hx-get="{% url 'htmx:incident-list' %}"
+  <a hx-get="{{ incident_list_url }}"
      hx-vals='{"page": "{{ page_number }}"}'
      href="{% querystring page=page_number %}"
      hx-indicator="#incident-list .htmx-indicator"

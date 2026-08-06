@@ -6,6 +6,7 @@ from . import views, filter
 app_name = "htmx"
 urlpatterns = [
     path("", views.incident_list, name="incident-list"),
+    path("kiosk/", views.incident_list_kiosk, name="incident-list-kiosk"),
     path("<int:pk>/", views.incident_detail, name="incident-detail"),
     path("update/<str:action>/", views.incident_update, name="incident-update"),
     path("filter/", views.filter_form, name="incident-filter"),
