@@ -7,7 +7,6 @@ from django import forms
 from django.conf import settings
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
-from rest_framework.exceptions import ValidationError
 
 from argus.constants import API_STABLE_VERSION
 from argus.incident.models import Event
@@ -20,8 +19,6 @@ if TYPE_CHECKING:
     from collections.abc import Iterable
 
     from django.contrib.auth import get_user_model
-
-    from ..serializers import RequestDestinationConfigSerializer
 
     User = get_user_model()
 
@@ -68,7 +65,7 @@ class EmailNotification(NotificationMedium):
         },
     }
 
-    class FormV3(forms.Form):
+    class Form(forms.Form):
         email_address = forms.EmailField()
 
     class FormV2(forms.Form):
@@ -79,25 +76,6 @@ class EmailNotification(NotificationMedium):
         super().__init__(version)
         if version == "v2":
             self.Form = self.FormV2
-        else:
-            self.Form = self.FormV3
-
-    def validate(self, instance: RequestDestinationConfigSerializer, email_dict: dict, user: User) -> dict:
-        """
-        Validates the settings of an email destination and returns a dict
-        with validated and cleaned data
-        """
-        form = self.Form(email_dict["settings"])
-        if not form.is_valid():
-            raise ValidationError(form.errors)
-        if form.cleaned_data["email_address"] == instance.context["request"].user.email:
-            raise ValidationError("This email address is already registered in another destination.")
-        if user.destinations.filter(
-            media_id=self.MEDIA_SLUG, settings__email_address=form.cleaned_data["email_address"]
-        ).exists():
-            raise ValidationError({"email_address": "Email address already exists"})
-
-        return form.cleaned_data
 
     @staticmethod
     def create_message_context(event: Event):
