@@ -60,7 +60,7 @@ class SMSDestinationConfigSerializerTests(TestCase):
         self.assertFalse(serializer.is_valid())
         self.assertTrue(serializer.errors)
 
-    def test_email_destination_serializer_is_invalid_with_invalid_phone_number(self):
+    def test_sms_destination_serializer_is_invalid_with_invalid_phone_number(self):
         request = self.request_factory.post("/")
         request.user = self.user
         data = {
@@ -74,7 +74,7 @@ class SMSDestinationConfigSerializerTests(TestCase):
         self.assertFalse(serializer.is_valid())
         self.assertTrue(serializer.errors)
 
-    def test_email_destination_serializer_is_valid_with_additional_arguments(self):
+    def test_sms_destination_serializer_is_valid_with_additional_arguments(self):
         request = self.request_factory.post("/")
         request.user = self.user
         data = {
