@@ -13,10 +13,8 @@ from argus.incident.models import Event
 from . import IncidentBasedAPITestCaseHelper
 
 
-class EventAPIStatefulIncidentTests(APITestCase, IncidentBasedAPITestCaseHelper):
-    def setUp(self):
-        disconnect_signals()
-
+class StatefulEventBasedAPITestCaseHelper(IncidentBasedAPITestCaseHelper):
+    def init_test_objects(self):
         super().init_test_objects()
 
         self.closed_incident = StatefulIncidentFactory(
@@ -37,6 +35,13 @@ class EventAPIStatefulIncidentTests(APITestCase, IncidentBasedAPITestCaseHelper)
             source=self.source1,
         )
         self.open_incident.create_first_event()
+
+
+class EventAPIStatefulIncidentTests(APITestCase, StatefulEventBasedAPITestCaseHelper):
+    def setUp(self):
+        disconnect_signals()
+
+        self.init_test_objects()
 
         self.events_url = lambda incident: reverse("v2:incident:incident-events", args=[incident.pk])
 
@@ -226,30 +231,11 @@ class EventAPIStatelessIncidentTests(APITestCase, IncidentBasedAPITestCaseHelper
         self.assertEqual(self.stateless_incident.events.count(), event_count + 1)
 
 
-class EventAPISourceSystemUserTests(APITestCase, IncidentBasedAPITestCaseHelper):
+class EventAPISourceSystemUserTests(APITestCase, StatefulEventBasedAPITestCaseHelper):
     def setUp(self):
         disconnect_signals()
 
         super().init_test_objects()
-
-        self.closed_incident = StatefulIncidentFactory(
-            start_time=timezone.now() - timedelta(days=2),
-            end_time=timezone.now() - timedelta(days=1),
-            source=self.source1,
-        )
-        self.closed_incident.create_first_event()
-        Event.objects.create(
-            incident=self.closed_incident,
-            actor=self.user1,
-            timestamp=self.closed_incident.end_time,
-            type=Event.Type.CLOSE,
-        )
-
-        self.open_incident = StatefulIncidentFactory(
-            start_time=timezone.now() - timedelta(weeks=1),
-            source=self.source1,
-        )
-        self.open_incident.create_first_event()
 
         self.open_incident_without_start_event = StatefulIncidentFactory(
             start_time=timezone.now() - timedelta(weeks=1),
@@ -302,30 +288,11 @@ class EventAPISourceSystemUserTests(APITestCase, IncidentBasedAPITestCaseHelper)
                 self.assertEqual(self.open_incident.end_time, original_end_time)
 
 
-class EventAPIEndUserTests(APITestCase, IncidentBasedAPITestCaseHelper):
+class EventAPIEndUserTests(APITestCase, StatefulEventBasedAPITestCaseHelper):
     def setUp(self):
         disconnect_signals()
 
         super().init_test_objects()
-
-        self.closed_incident = StatefulIncidentFactory(
-            start_time=timezone.now() - timedelta(days=2),
-            end_time=timezone.now() - timedelta(days=1),
-            source=self.source1,
-        )
-        self.closed_incident.create_first_event()
-        Event.objects.create(
-            incident=self.closed_incident,
-            actor=self.user1,
-            timestamp=self.closed_incident.end_time,
-            type=Event.Type.CLOSE,
-        )
-
-        self.open_incident = StatefulIncidentFactory(
-            start_time=timezone.now() - timedelta(weeks=1),
-            source=self.source1,
-        )
-        self.open_incident.create_first_event()
 
         self.events_url = lambda incident: reverse("v2:incident:incident-events", args=[incident.pk])
 
