@@ -26,6 +26,7 @@ from argus.incident.models import (
     IncidentTagRelation,
     SourceSystem,
     Tag,
+    get_or_create_default_instances,
 )
 from argus.notificationprofile.models import Filter
 from argus.util.testing import disconnect_signals, connect_signals
@@ -150,24 +151,9 @@ class IncidentFilterByFilterPkTestCase(IncidentAPITestCase):
         self.assertFalse(response.data["results"])
 
 
-class IncidentViewSetTestCase(APITestCase):
-    def setUp(self):
-        disconnect_signals()
-        source_type = SourceSystemTypeFactory()
-        self.user = SourceUserFactory()
-        self.source = SourceSystemFactory(type=source_type, user=self.user)
-        self.admin = AdminUserFactory()
-        self.client.force_authenticate(user=self.user)
-
-    def tearDown(self):
-        connect_signals()
-
+class IncidentViewSetTestCase(IncidentAPITestCase):
     def add_open_incident_with_start_event_and_tag(self, description="incident"):
-        incident = StatefulIncidentFactory(source=self.source, description=description)
-        tag = TagFactory(key="a", value="b")
-        IncidentTagRelationFactory(incident=incident, tag=tag)
-        incident.create_first_event()
-        return incident
+        return add_open_incident_with_start_event_and_tag(self.source, description=description)
 
     def add_event(self, incident_pk, description="event", type=Event.Type.OTHER):
         return EventFactory(incident_id=incident_pk, description=description, type=type)
@@ -246,7 +232,7 @@ class IncidentViewSetTestCase(APITestCase):
             "end_time": "2021-08-04T09:13:55.908Z",
             "description": "incident",
             "level": 1,
-            "tags": [{"tag": "a=b"}],
+            "tags": ["a=b"],
         }
 
         response = self.client.post(path=API_PATH + "/", data=data, format="json")
@@ -256,7 +242,7 @@ class IncidentViewSetTestCase(APITestCase):
         self.assertTrue(Incident.objects.filter(id=response.data["pk"]).exists())
         incident = Incident.objects.get(id=response.data["pk"])
         # Check that we have made the correct Tag
-        tag = data["tags"][0]["tag"]
+        tag = data["tags"][0]
         key, value = Tag.split(tag)
         self.assertTrue(Tag.objects.filter(key=key, value=value).exists())
         tag = Tag.objects.get(key=key, value=value)
@@ -265,7 +251,7 @@ class IncidentViewSetTestCase(APITestCase):
 
     def test_can_update_incident_level(self):
         incident_pk = self.add_open_incident_with_start_event_and_tag().pk
-        incident_path = reverse("v3:incident:incident-detail", args=[incident_pk])
+        incident_path = reverse(f"{API_VERSION}:incident:incident-detail", args=[incident_pk])
         response = self.client.patch(
             path=incident_path,
             data={
@@ -280,7 +266,7 @@ class IncidentViewSetTestCase(APITestCase):
         start_metadata = {"foo": "xux"}
         incident.metadata = start_metadata
         incident.save()
-        incident_path = reverse("v3:incident:incident-detail", args=[incident.pk])
+        incident_path = reverse(f"{API_VERSION}:incident:incident-detail", args=[incident.pk])
         changed_metadata = {"bar": "gurba"}
         response = self.client.patch(
             path=incident_path,
@@ -295,7 +281,7 @@ class IncidentViewSetTestCase(APITestCase):
 
     def test_can_update_incident_description(self):
         incident_pk = self.add_open_incident_with_start_event_and_tag().pk
-        incident_path = reverse("v3:incident:incident-detail", args=[incident_pk])
+        incident_path = reverse(f"{API_VERSION}:incident:incident-detail", args=[incident_pk])
         response = self.client.patch(
             path=incident_path,
             data={
@@ -304,6 +290,109 @@ class IncidentViewSetTestCase(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(Incident.objects.get(pk=incident_pk).description, "new description")
+
+
+class IncidentViewSetTicketUrlTestCase(IncidentAPITestCase):
+    def test_can_create_ticket_url_of_incident(self):
+        incident_pk = add_open_incident_with_start_event_and_tag(self.source).pk
+        data = {
+            "ticket_url": "www.example.com",
+        }
+        response = self.client.put(path=f"{API_PATH}/{incident_pk}/ticket_url/", data=data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(Incident.objects.get(id=incident_pk).ticket_url, data["ticket_url"])
+
+
+class IncidentTagViewSetTestCase(IncidentAPITestCase):
+    def add_open_incident_with_start_event_and_tag(self, description="incident"):
+        return add_open_incident_with_start_event_and_tag(self.source, description=description)
+
+    def test_can_get_all_tags_of_incident(self):
+        incident = self.add_open_incident_with_start_event_and_tag()
+        tags = [str(relation.tag) for relation in incident.incident_tag_relations.all()]
+
+        response = self.client.get(path=f"{API_PATH}/{incident.pk}/tags/")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, tags)
+
+    def test_can_get_specific_tag_of_incident(self):
+        incident = self.add_open_incident_with_start_event_and_tag()
+        tag = incident.incident_tag_relations.first().tag
+        response = self.client.get(path=f"{API_PATH}/{incident.pk}/tags/{tag}/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data[0], str(tag))
+
+    def test_can_create_tag_of_incident(self):
+        incident = self.add_open_incident_with_start_event_and_tag()
+        data = ["c=d"]
+
+        response = self.client.post(path=f"{API_PATH}/{incident.pk}/tags/", data=data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        incident_tags = [str(relation.tag) for relation in IncidentTagRelation.objects.filter(incident=incident)]
+        self.assertIn(data[0], incident_tags)
+
+    def test_cannot_create_tag_of_incident_with_invalid_key(self):
+        incident = self.add_open_incident_with_start_event_and_tag()
+        data = ["???=d"]
+
+        response = self.client.post(path=f"{API_PATH}/{incident.pk}/tags/", data=data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        incident_tags = [str(relation.tag) for relation in IncidentTagRelation.objects.filter(incident=incident)]
+        self.assertNotIn(data[0], incident_tags)
+
+    def test_can_delete_tag_of_incident(self):
+        incident = self.add_open_incident_with_start_event_and_tag()
+        tag = incident.incident_tag_relations.first().tag
+
+        response = self.client.delete(path=f"{API_PATH}/{incident.pk}/tags/{tag}/")
+
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        # The tag should still exist..
+        self.assertTrue(Tag.objects.filter(pk=tag.pk).exists())
+        # .. but the relation should be gone
+        self.assertFalse(incident.deprecated_tags)
+
+
+class SourceLockedIncidentViewSetTestCase(IncidentAPITestCase):
+    def test_can_get_my_incidents(self):
+        incident_pk = add_open_incident_with_start_event_and_tag(self.source).pk
+        _, _, argus = get_or_create_default_instances()
+        other_incident_pk = add_open_incident_with_start_event_and_tag(argus).pk
+
+        response = self.client.get(path=f"{API_PATH}/mine/")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # Paging, so check "results"
+        response_pks = [incident["pk"] for incident in response.data["results"]]
+        self.assertIn(incident_pk, response_pks)
+        self.assertNotIn(other_incident_pk, response_pks)
+
+    def test_can_create_my_incident_with_tag(self):
+        # Minimal data to post that has tags
+        data = {
+            "start_time": "2021-08-04T09:13:55.908Z",
+            "end_time": "2021-08-04T09:13:55.908Z",
+            "description": "incident",
+            "level": 1,
+            "tags": ["c=d"],
+        }
+
+        response = self.client.post(path=f"{API_PATH}/mine/", data=data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        # Check that we have made the correct Incident
+        self.assertTrue(Incident.objects.filter(id=response.data["pk"]).exists())
+        incident = Incident.objects.get(id=response.data["pk"])
+        # Check that we have made the correct Tag
+        tag = data["tags"][0]
+        key, value = Tag.split(tag)
+        self.assertTrue(Tag.objects.filter(key=key, value=value))
+        tag = Tag.objects.get(key=key, value=value)
+        # Check that incident and tag are linked
+        self.assertTrue(IncidentTagRelation.objects.filter(incident=incident).filter(tag=tag).exists())
 
 
 class SourceSystemViewSetTestCase(IncidentAPITestCase):

@@ -150,21 +150,9 @@ See v2 for the other endpoints.
                       "description": "Netbox 11 <12345> down.",
                       "ticket_url": "https://tickettracker.com/tickets/987654/",
                       "tags": [
-                          {
-                              "added_by": 12,
-                              "added_time": "2011-11-11T11:11:11.111111+02:00",
-                              "tag": "object=Netbox 4"
-                          },
-                          {
-                              "added_by": 12,
-                              "added_time": "2011-11-11T11:11:11.111111+02:00",
-                              "tag": "problem_type=boxDown"
-                          },
-                          {
-                              "added_by": 200,
-                              "added_time": "2020-08-10T11:26:14.550951+02:00",
-                              "tag": "color=red"
-                          }
+                          "object=Netbox 4",
+                          "problem_type=boxDown",
+                          "color=red"
                       ],
                       "stateful": true,
                       "open": false,
@@ -205,8 +193,8 @@ See v2 for the other endpoints.
               "description": "Netbox 11 <12345> down.",
               "ticket_url": "https://tickettracker.com/tickets/987654/",
               "tags": [
-                  {"tag": "object=Netbox 4"},
-                  {"tag": "problem_type=boxDown"}
+                  "object=Netbox 4",
+                  "problem_type=boxDown"
               ]
           }
 
@@ -226,8 +214,8 @@ See v2 for the other endpoints.
           {
               "ticket_url": "https://tickettracker.com/tickets/987654/",
               "tags": [
-                  {"tag": "object=Netbox 4"},
-                  {"tag": "problem_type=boxDown"}
+                  "object=Netbox 4",
+                  "problem_type=boxDown"
               ]
           }
 
@@ -236,6 +224,30 @@ See v2 for the other endpoints.
       -  ``details_url``
       -  ``ticket_url``
       -  ``tags``
+
+
+-  ``/api/v3/incidents/<int:pk>/tags/``:
+
+   -  ``GET``: returns a list of all the tags for the incident given by the by
+     primary key
+
+   -  ``POST``: adds one or more tags to the incident and returns the modified list
+
+      .. code-block:: json
+        :caption: Example request body
+
+          [
+              "object=Netbox 4",
+              "problem_type=boxDown"
+          ]
+
+
+-  ``/api/v3/incidents/<int:pk>/tags/<str:tag>/``:
+
+   -  ``GET``: returns a list of the tag specified be the incident primary key
+     and the tag. Useful for checking if an incident has that specific tag.
+
+   -  ``DELETE``: removes the given tag from the incident
 
 
 -  ``/api/v3/incidents/<int:pk>/ticket_url/``:

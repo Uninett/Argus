@@ -3,6 +3,7 @@ from datetime import datetime
 from random import randint, choice
 from typing import Optional, Any
 
+from django.db import transaction
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 
@@ -22,6 +23,7 @@ from .models import (
     SourceSystemType,
     SourceSystem,
     Event,
+    ChangeEvent,
     Acknowledgement,
     get_or_create_default_instances,
 )
@@ -39,15 +41,54 @@ __all__ = [
 ]
 
 
-def update_tags(incident: Incident, *tags):
-    """Update an existing incident's tags"""
+def add_tags_to_incident(incident: Incident, *tags: str):
+    """Add tags to an incident"""
     argus_user, _, _ = get_or_create_default_instances()
     c = 0
-    for tag in tags:
-        tag = Tag.objects.create_from_tag(tag)
+    for tagstring in tags:
+        tag = Tag.objects.create_from_tag(tagstring)
         _, created = IncidentTagRelation.objects.get_or_create(tag=tag, incident=incident, added_by=argus_user)
         c += 1 if created else 0
     return c
+
+
+def remove_tags_from_incident(instance: Incident, *tags: str):
+    """Remove tags from an incident"""
+    relation_qs = instance.incident_tag_relations.prefetch_related("tag")
+    c = 0
+    for tagqs in Tag.objects.parse(*tags):
+        relations = relation_qs.filter(tag__in=tagqs)
+        result = relations.delete()
+        c += result[0]
+    return c
+
+
+@transaction.atomic
+def set_tags_on_incident(instance: Incident, *tagstrings: list[str], user=None):
+    """Set an incidents's tags to the given list of tags
+
+    Side effects:
+
+    - Creates a change event. The ``user`` argument is used for the event and
+      falls back to the argus user if not given.
+    """
+    if user is None:
+        user, _, _ = get_or_create_default_instances()
+
+    tagstrings = set(tagstrings)
+
+    existing_tag_relations = instance.incident_tag_relations.select_related("tag")
+    existing_tags = {tag_relation.tag.representation for tag_relation in existing_tag_relations}
+    remove_tags = existing_tags - tagstrings
+    add_tags = tagstrings - existing_tags
+
+    # Post change events
+    if remove_tags or add_tags:
+        description = ChangeEvent.format_description("tags", existing_tags, tagstrings)
+        ChangeEvent.objects.create(incident=instance, actor=user, timestamp=timezone.now(), description=description)
+
+    add_tags_to_incident(instance, *add_tags)
+    remove_tags_from_incident(instance, *remove_tags)
 
 
 def create_fake_incident(
@@ -245,7 +286,7 @@ def create_token_expiry_incident(token, expiry_date, level=2):
         tags=tags,
         start_time=timezone.now(),
     )
-    update_tags(incident, f"object={incident.id}")
+    add_tags_to_incident(incident, f"object={incident.id}")
     incident.source_incident_id = incident.id
     incident.save()
     return incident
