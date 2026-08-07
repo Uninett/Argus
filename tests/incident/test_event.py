@@ -9,8 +9,12 @@ from rest_framework.test import APITestCase
 from argus.util import datetime_utils
 from argus.util.testing import disconnect_signals, connect_signals
 from argus.incident.factories import StatefulIncidentFactory, StatelessIncidentFactory
-from argus.incident.models import Event
+from argus.incident.models import Event, Incident
 from . import IncidentBasedAPITestCaseHelper
+
+
+def get_events_url(incident: Incident):
+    return reverse("v2:incident:incident-events", args=[incident.pk])
 
 
 class StatefulEventBasedAPITestCaseHelper(IncidentBasedAPITestCaseHelper):
@@ -43,15 +47,13 @@ class EventAPIStatefulIncidentTests(APITestCase, StatefulEventBasedAPITestCaseHe
 
         self.init_test_objects()
 
-        self.events_url = lambda incident: reverse("v2:incident:incident-events", args=[incident.pk])
-
     def tearDown(self):
         connect_signals()
 
     def test_when_posting_close_event_for_open_incident_then_incident_gets_closed(self):
         close_event_dict = {"timestamp": timezone.now(), "type": Event.Type.CLOSE}
 
-        response = self.user1_rest_client.post(self.events_url(self.open_incident), close_event_dict)
+        response = self.user1_rest_client.post(get_events_url(self.open_incident), close_event_dict)
 
         self.assertEqual(parse_datetime(response.data["timestamp"]), close_event_dict["timestamp"])
         self.open_incident.refresh_from_db()
@@ -62,7 +64,7 @@ class EventAPIStatefulIncidentTests(APITestCase, StatefulEventBasedAPITestCaseHe
         close_event_dict = {"timestamp": timezone.now(), "type": Event.Type.CLOSE}
         original_end_time = self.closed_incident.end_time
 
-        response = self.user1_rest_client.post(self.events_url(self.closed_incident), close_event_dict)
+        response = self.user1_rest_client.post(get_events_url(self.closed_incident), close_event_dict)
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("type", response.data)
@@ -73,7 +75,7 @@ class EventAPIStatefulIncidentTests(APITestCase, StatefulEventBasedAPITestCaseHe
 
     def test_when_posting_reopen_event_for_closed_incident_then_incident_gets_reopened(self):
         reopen_event_dict = {"timestamp": timezone.now(), "type": Event.Type.REOPEN}
-        response = self.user1_rest_client.post(self.events_url(self.closed_incident), reopen_event_dict)
+        response = self.user1_rest_client.post(get_events_url(self.closed_incident), reopen_event_dict)
         self.assertEqual(parse_datetime(response.data["timestamp"]), reopen_event_dict["timestamp"])
         self.closed_incident.refresh_from_db()
         self.assertTrue(self.closed_incident.open)
@@ -83,7 +85,7 @@ class EventAPIStatefulIncidentTests(APITestCase, StatefulEventBasedAPITestCaseHe
         reopen_event_dict = {"timestamp": timezone.now(), "type": Event.Type.REOPEN}
         original_end_time = self.open_incident.end_time
 
-        response = self.user1_rest_client.post(self.events_url(self.open_incident), reopen_event_dict)
+        response = self.user1_rest_client.post(get_events_url(self.open_incident), reopen_event_dict)
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("type", response.data)
@@ -95,7 +97,7 @@ class EventAPIStatefulIncidentTests(APITestCase, StatefulEventBasedAPITestCaseHe
     def test_when_posting_end_event_for_open_incident_then_incident_gets_closed(self):
         end_event_dict = {"timestamp": timezone.now(), "type": Event.Type.INCIDENT_END}
 
-        response = self.source1_rest_client.post(self.events_url(self.open_incident), end_event_dict)
+        response = self.source1_rest_client.post(get_events_url(self.open_incident), end_event_dict)
 
         self.assertEqual(parse_datetime(response.data["timestamp"]), end_event_dict["timestamp"])
         self.open_incident.refresh_from_db()
@@ -105,7 +107,7 @@ class EventAPIStatefulIncidentTests(APITestCase, StatefulEventBasedAPITestCaseHe
     def test_when_posting_restart_event_for_closed_incident_then_incident_gets_reopened(self):
         restart_event_dict = {"timestamp": timezone.now(), "type": Event.Type.INCIDENT_RESTART}
 
-        response = self.source1_rest_client.post(self.events_url(self.closed_incident), restart_event_dict)
+        response = self.source1_rest_client.post(get_events_url(self.closed_incident), restart_event_dict)
         self.assertEqual(parse_datetime(response.data["timestamp"]), restart_event_dict["timestamp"])
         self.closed_incident.refresh_from_db()
         self.assertTrue(self.closed_incident.open)
@@ -132,7 +134,7 @@ class EventAPIStatefulIncidentTests(APITestCase, StatefulEventBasedAPITestCaseHe
 
         end_event_dict = {"timestamp": timezone.now(), "type": Event.Type.INCIDENT_END}
 
-        response = self.source1_rest_client.post(self.events_url(restarted_incident), end_event_dict)
+        response = self.source1_rest_client.post(get_events_url(restarted_incident), end_event_dict)
         self.assertEqual(parse_datetime(response.data["timestamp"]), end_event_dict["timestamp"])
         restarted_incident.refresh_from_db()
         self.assertFalse(restarted_incident.open)
@@ -147,7 +149,7 @@ class EventAPIStatefulIncidentTests(APITestCase, StatefulEventBasedAPITestCaseHe
         original_timestamp = self.closed_incident.end_time
 
         end_event_dict = {"timestamp": timezone.now(), "type": Event.Type.INCIDENT_END}
-        response = self.source1_rest_client.post(self.events_url(self.closed_incident), end_event_dict)
+        response = self.source1_rest_client.post(get_events_url(self.closed_incident), end_event_dict)
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.closed_incident.refresh_from_db()
@@ -163,7 +165,7 @@ class EventAPIStatefulIncidentTests(APITestCase, StatefulEventBasedAPITestCaseHe
         count_before = self.open_incident.events.count()
 
         restart_event_dict = {"timestamp": timezone.now(), "type": Event.Type.INCIDENT_RESTART}
-        response = self.source1_rest_client.post(self.events_url(self.open_incident), restart_event_dict)
+        response = self.source1_rest_client.post(get_events_url(self.open_incident), restart_event_dict)
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.open_incident.refresh_from_db()
@@ -181,14 +183,12 @@ class EventAPIStatelessIncidentTests(APITestCase, IncidentBasedAPITestCaseHelper
         self.stateless_incident = StatelessIncidentFactory(source=self.source1)
         self.stateless_incident.create_first_event()
 
-        self.events_url = lambda incident: reverse("v2:incident:incident-events", args=[incident.pk])
-
     def tearDown(self):
         connect_signals()
 
     def test_when_posting_close_event_then_incident_does_not_change(self):
         response = self.user1_rest_client.post(
-            self.events_url(self.stateless_incident), {"timestamp": timezone.now(), "type": Event.Type.CLOSE}
+            get_events_url(self.stateless_incident), {"timestamp": timezone.now(), "type": Event.Type.CLOSE}
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data["type"], "Cannot change the state of a stateless incident.")
@@ -198,7 +198,7 @@ class EventAPIStatelessIncidentTests(APITestCase, IncidentBasedAPITestCaseHelper
 
     def test_when_posting_reopen_event_then_incident_does_not_change(self):
         response = self.user1_rest_client.post(
-            self.events_url(self.stateless_incident), {"timestamp": timezone.now(), "type": Event.Type.REOPEN}
+            get_events_url(self.stateless_incident), {"timestamp": timezone.now(), "type": Event.Type.REOPEN}
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data["type"], "Cannot change the state of a stateless incident.")
@@ -210,7 +210,7 @@ class EventAPIStatelessIncidentTests(APITestCase, IncidentBasedAPITestCaseHelper
         event_count = self.stateless_incident.events.count()
 
         response = self.source1_rest_client.post(
-            self.events_url(self.stateless_incident), {"timestamp": timezone.now(), "type": Event.Type.INCIDENT_END}
+            get_events_url(self.stateless_incident), {"timestamp": timezone.now(), "type": Event.Type.INCIDENT_END}
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.stateless_incident.refresh_from_db()
@@ -222,7 +222,7 @@ class EventAPIStatelessIncidentTests(APITestCase, IncidentBasedAPITestCaseHelper
         event_count = self.stateless_incident.events.count()
 
         response = self.source1_rest_client.post(
-            self.events_url(self.stateless_incident), {"timestamp": timezone.now(), "type": Event.Type.INCIDENT_RESTART}
+            get_events_url(self.stateless_incident), {"timestamp": timezone.now(), "type": Event.Type.INCIDENT_RESTART}
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.stateless_incident.refresh_from_db()
@@ -242,8 +242,6 @@ class EventAPISourceSystemUserTests(APITestCase, StatefulEventBasedAPITestCaseHe
             source=self.source1,
         )
 
-        self.events_url = lambda incident: reverse("v2:incident:incident-events", args=[incident.pk])
-
     def tearDown(self):
         connect_signals()
 
@@ -259,7 +257,7 @@ class EventAPISourceSystemUserTests(APITestCase, StatefulEventBasedAPITestCaseHe
                 event_count = incident.events.count()
 
                 response = self.source1_rest_client.post(
-                    self.events_url(incident),
+                    get_events_url(incident),
                     {"timestamp": timezone.now(), "type": event_type},
                 )
                 self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -277,7 +275,7 @@ class EventAPISourceSystemUserTests(APITestCase, StatefulEventBasedAPITestCaseHe
                 event_count = self.open_incident.events.count()
 
                 response = self.source1_rest_client.post(
-                    self.events_url(self.open_incident), {"timestamp": timezone.now(), "type": event_type}
+                    get_events_url(self.open_incident), {"timestamp": timezone.now(), "type": event_type}
                 )
                 self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
                 self.assertIn("type", response.data)
@@ -294,8 +292,6 @@ class EventAPIEndUserTests(APITestCase, StatefulEventBasedAPITestCaseHelper):
 
         super().init_test_objects()
 
-        self.events_url = lambda incident: reverse("v2:incident:incident-events", args=[incident.pk])
-
     def tearDown(self):
         connect_signals()
 
@@ -310,7 +306,7 @@ class EventAPIEndUserTests(APITestCase, StatefulEventBasedAPITestCaseHelper):
                 event_count = incident.events.count()
 
                 response = self.user1_rest_client.post(
-                    self.events_url(incident),
+                    get_events_url(incident),
                     {"timestamp": timezone.now(), "type": event_type},
                 )
                 self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -328,7 +324,7 @@ class EventAPIEndUserTests(APITestCase, StatefulEventBasedAPITestCaseHelper):
                 event_count = self.open_incident.events.count()
 
                 response = self.user1_rest_client.post(
-                    self.events_url(self.open_incident), {"timestamp": timezone.now(), "type": event_type}
+                    get_events_url(self.open_incident), {"timestamp": timezone.now(), "type": event_type}
                 )
                 self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
                 self.assertIn("type", response.data)
