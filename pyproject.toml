@@ -25,7 +25,7 @@ classifiers = [
     "Topic :: System :: Monitoring",
 ]
 dependencies = [
-    "Django>=5.2.16,<6.1",
+    "Django>=5.2.16,<6.2",
     "dj-database-url>=0.5.0",
     "django-cors-headers>=3.2",
     "django-filter",
