@@ -47,7 +47,11 @@ Examples:
 * Split up test file
 * Move Bar to separate file
 
-Feel free to use a thesaurus to find a good verb.
+
+As you can see, "a" and "the" can be skipped if it still makes sense.
+
+Don't start with "Do" or "Don't", feel free to use a thesaurus to find a good
+verb.
 
 If the "Fix typo" fixes a typo introduced in the same PR, please do a fixup,
 see "Temporary commit messages" above.
