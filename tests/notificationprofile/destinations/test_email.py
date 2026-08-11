@@ -357,6 +357,28 @@ class EmailDestinationViewV2Tests(APITestCase):
         self.assertEqual(response.data["label"], "new email")
         self.assertTrue(DestinationConfig.objects.filter(label="new email").exists())
 
+    def test_given_duplicate_label_then_forbid_creating_destination(self):
+        DestinationConfigFactory(
+            user=self.user1,
+            media=Media.objects.get(slug="email"),
+            label="duplicate",
+            settings={"email_address": "a@example.com"},
+        )
+        response = self.user1_rest_client.post(
+            path=self.ENDPOINT,
+            data={
+                "media": "email",
+                "label": "duplicate",
+                "settings": {"email_address": "b@example.com"},
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("A destination with this medium and label already exists", str(response.data))
+        self.assertEqual(
+            DestinationConfig.objects.filter(media_id="email", label="duplicate").count(),
+            1,
+        )
+
     def test_given_duplicate_email_address_then_forbid_creating_destination(self):
         settings = {"email_address": "test2@example.com"}
         DestinationConfigFactory(
@@ -372,7 +394,7 @@ class EmailDestinationViewV2Tests(APITestCase):
             },
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn("Email address already exists", str(response.data["email_address"]))
+        self.assertIn("A destination with these settings already exists", str(response.data))
         self.assertEqual(
             DestinationConfig.objects.filter(
                 media_id="email", settings__email_address=settings["email_address"]
@@ -389,7 +411,7 @@ class EmailDestinationViewV2Tests(APITestCase):
             },
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn("Settings has to be a dictionary", str(response.data))
+        self.assertIn("Enter a valid JSON", str(response.data["settings"]))
 
     def test_given_invalid_email_address_then_forbid_creating_destination(self):
         response = self.user1_rest_client.post(
@@ -563,6 +585,24 @@ class EmailDestinationViewV2Tests(APITestCase):
         self.assertFalse(self.managed_email_destination.managed)
         self.assertTrue(DestinationConfig.objects.filter(managed=True, settings=old_settings).exists())
 
+    def test_given_duplicate_label_then_forbid_updating_destination(self):
+        DestinationConfigFactory(
+            user=self.user1,
+            media=Media.objects.get(slug="email"),
+            label="duplicate",
+            settings={"email_address": "a@example.com"},
+        )
+        response = self.user1_rest_client.patch(
+            path=f"{self.ENDPOINT}{self.unmanaged_email_destination.pk}/",
+            data={"label": "duplicate"},
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("A destination with this medium and label already exists", str(response.data))
+        self.assertEqual(
+            DestinationConfig.objects.filter(media_id="email", label="duplicate").count(),
+            1,
+        )
+
     def test_given_settings_not_dict_then_forbid_updating_destination(self):
         unmanaged_email_destination_address = self.unmanaged_email_destination.settings["email_address"]
         response = self.user1_rest_client.patch(
@@ -570,7 +610,7 @@ class EmailDestinationViewV2Tests(APITestCase):
             data={"settings": "not a dict"},
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn("Settings has to be a dictionary", str(response.data))
+        self.assertIn("Enter a valid JSON", str(response.data["settings"]))
         self.unmanaged_email_destination.refresh_from_db()
         self.assertEqual(
             self.unmanaged_email_destination.settings["email_address"], unmanaged_email_destination_address
@@ -734,6 +774,28 @@ class EmailDestinationViewV3Tests(APITestCase):
         self.assertEqual(response.data["label"], "new email")
         self.assertTrue(DestinationConfig.objects.filter(label="new email").exists())
 
+    def test_given_duplicate_label_then_forbid_creating_destination(self):
+        DestinationConfigFactory(
+            user=self.user1,
+            media=Media.objects.get(slug="email"),
+            label="duplicate",
+            settings={"email_address": "a@example.com"},
+        )
+        response = self.user1_rest_client.post(
+            path=self.ENDPOINT,
+            data={
+                "media": "email",
+                "label": "duplicate",
+                "settings": {"email_address": "b@example.com"},
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("A destination with this medium and label already exists", str(response.data))
+        self.assertEqual(
+            DestinationConfig.objects.filter(media_id="email", label="duplicate").count(),
+            1,
+        )
+
     def test_given_duplicate_email_address_then_forbid_creating_destination(self):
         settings = {"email_address": "test2@example.com"}
         DestinationConfigFactory(
@@ -749,7 +811,7 @@ class EmailDestinationViewV3Tests(APITestCase):
             },
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn("Email address already exists", str(response.data["email_address"]))
+        self.assertIn("A destination with these settings already exists", str(response.data))
         self.assertEqual(
             DestinationConfig.objects.filter(
                 media_id="email", settings__email_address=settings["email_address"]
@@ -766,7 +828,7 @@ class EmailDestinationViewV3Tests(APITestCase):
             },
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn("Settings has to be a dictionary", str(response.data))
+        self.assertIn("Enter a valid JSON", str(response.data["settings"]))
 
     def test_given_invalid_email_address_then_forbid_creating_destination(self):
         response = self.user1_rest_client.post(
@@ -926,6 +988,24 @@ class EmailDestinationViewV3Tests(APITestCase):
         self.assertFalse(self.managed_email_destination.managed)
         self.assertTrue(DestinationConfig.objects.filter(managed=True, settings=old_settings).exists())
 
+    def test_given_duplicate_label_then_forbid_updating_destination(self):
+        DestinationConfigFactory(
+            user=self.user1,
+            media=Media.objects.get(slug="email"),
+            label="duplicate",
+            settings={"email_address": "a@example.com"},
+        )
+        response = self.user1_rest_client.patch(
+            path=f"{self.ENDPOINT}{self.unmanaged_email_destination.pk}/",
+            data={"label": "duplicate"},
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("A destination with this medium and label already exists", str(response.data))
+        self.assertEqual(
+            DestinationConfig.objects.filter(media_id="email", label="duplicate").count(),
+            1,
+        )
+
     def test_given_settings_not_dict_then_forbid_updating_destination(self):
         unmanaged_email_destination_address = self.unmanaged_email_destination.settings["email_address"]
         response = self.user1_rest_client.patch(
@@ -933,7 +1013,7 @@ class EmailDestinationViewV3Tests(APITestCase):
             data={"settings": "not a dict"},
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn("Settings has to be a dictionary", str(response.data))
+        self.assertIn("Enter a valid JSON", str(response.data["settings"]))
         self.unmanaged_email_destination.refresh_from_db()
         self.assertEqual(
             self.unmanaged_email_destination.settings["email_address"], unmanaged_email_destination_address

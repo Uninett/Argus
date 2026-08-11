@@ -7,7 +7,6 @@ from django import forms
 from django.conf import settings
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
-from rest_framework.exceptions import ValidationError
 
 from argus.incident.models import Event
 from .base import NotificationMedium, modelinstance_to_dict
@@ -19,8 +18,6 @@ if TYPE_CHECKING:
     from collections.abc import Iterable
 
     from django.contrib.auth import get_user_model
-
-    from ..serializers import RequestDestinationConfigSerializer
 
     User = get_user_model()
 
@@ -69,23 +66,6 @@ class EmailNotification(NotificationMedium):
 
     class Form(forms.Form):
         email_address = forms.EmailField()
-
-    def validate(self, instance: RequestDestinationConfigSerializer, email_dict: dict, user: User) -> dict:
-        """
-        Validates the settings of an email destination and returns a dict
-        with validated and cleaned data
-        """
-        form = self.Form(email_dict["settings"])
-        if not form.is_valid():
-            raise ValidationError(form.errors)
-        if form.cleaned_data["email_address"] == instance.context["request"].user.email:
-            raise ValidationError("This email address is already registered in another destination.")
-        if user.destinations.filter(
-            media_id=self.MEDIA_SLUG, settings__email_address=form.cleaned_data["email_address"]
-        ).exists():
-            raise ValidationError({"email_address": "Email address already exists"})
-
-        return form.cleaned_data
 
     @staticmethod
     def create_message_context(event: Event):
