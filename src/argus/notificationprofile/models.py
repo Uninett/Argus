@@ -184,6 +184,14 @@ class Media(models.Model):
         verbose_name = "Medium"
         verbose_name_plural = "Media"
 
+    error_messages = {
+        "readonly_media": "Media cannot be updated, only settings.",
+        "readonly_user": "User cannot be changed, only settings.",
+        "duplicate_label": "A destination with this medium and label already exists",
+        "duplicate": "A destination with these settings already exists",
+        "settings_type": "Settings has to be a dictionary.",
+    }
+
     MEDIA_NAME_LENGTH = 20
     slug = models.SlugField(max_length=MEDIA_NAME_LENGTH, blank=True, primary_key=True)
     name = models.CharField(max_length=MEDIA_NAME_LENGTH)

@@ -60,6 +60,9 @@ MEDIA_SETTINGS_KEY
    required in the json schema. For example for an email plugin this would be
    "email_address" or for a SMS plugin it would be "phone_number".
 
+Form
+   The ``forms.Form`` used to validate the settings-field.
+
 Class methods for sending notifications
 ---------------------------------------
 
@@ -107,6 +110,24 @@ get_relevant_address
    MEDIA_SETTINGS_KEY is insuffcient to look up the actual configuration of the
    destinations of the type set by MEDIA_SLUG.
 
+validate
+   The function ``validate`` makes sure that a destination with the given
+   medium, label and settings can be updated or created. It uses the
+   ``validate_settings`` method to validate the settings-field, a form
+   (CommonDestinationConfigForm) to validate the media and label-fields, and an
+   optional DestinationConfig instance for checking that readonly values were
+   not changed and that no duplicates are created. The validated form is
+   returned if ok, otherwise a ``ValidationError`` should be raised. It is
+   unlikely that you will ever need to override this method.
+
+validate_settings
+   This method validates the actual contents of the settings-field using the
+   ``Form`` that is defined and an optional DestinationConfig instance for
+   the function ``has_duplicate`` that can be used here to ensure that no two
+   destinations with the same settings will be created. A ``ValidationError``
+   should be raised  if the given settings are invalid, and the validated and
+   cleaned data should be returned if not.
+
 ``raise_if_not_deletable`` should check if a given destination can be deleted.
 This is used in case some destinations are managed by an outside source and
 should not be able to be deleted by a user. If that is the case a
@@ -115,15 +136,6 @@ should not be able to be deleted by a user. If that is the case a
 The method ``update`` only has to be implemented if the regular update method
 of Django isn't sufficient. This can be the case if additional settings need to
 be updated.
-
-Finally the function ``validate`` makes sure that a destination with the given
-settings can be updated or created. The function ``has_duplicate`` can be used
-here to ensure that not two destinations with the same settings will be
-created. Additionally the settings themselves should also be validated. For
-example for SMS the given phone number will be checked. Django forms can be
-helpful for validation. A ``ValidationError`` should be raised if the given
-settings are invalid and the validated and cleaned data should be returned if
-not.
 
 Writing destination plugins using Apprise
 -----------------------------------------
