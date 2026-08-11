@@ -29,11 +29,11 @@ FilterBlobSerializer = filter_backend.FilterBlobSerializer
 
 
 class SchemaView(SchemaViewV2):
-    version = VERSION
+    pass
 
 
 class MediaViewSet(MediaViewSetV2):
-    version = VERSION
+    pass
 
 
 @extend_schema_view(
@@ -49,7 +49,6 @@ class MediaViewSet(MediaViewSetV2):
     ),
 )
 class DestinationConfigViewSet(rw_viewsets.ModelViewSet):
-    version = VERSION
     permission_classes = [*rw_viewsets.ModelViewSet.permission_classes, IsOwner]
     serializer_class = ResponseDestinationConfigSerializer
     read_serializer_class = ResponseDestinationConfigSerializer
@@ -68,7 +67,7 @@ class DestinationConfigViewSet(rw_viewsets.ModelViewSet):
         destination = get_object_or_404(self.get_queryset(), pk=pk)
 
         try:
-            medium = api_safely_get_medium_object(destination.media.slug, self.version)
+            medium = api_safely_get_medium_object(destination.media.slug)
             medium.raise_if_not_deletable(destination)
         except NotificationMedium.NotDeletableError as e:
             raise ValidationError(str(e))
@@ -79,7 +78,7 @@ class DestinationConfigViewSet(rw_viewsets.ModelViewSet):
         other_destinations = DestinationConfig.objects.filter(media=destination.media).filter(
             ~Q(user_id=destination.user.id)
         )
-        medium = api_safely_get_medium_object(destination.media_id, self.version)
+        medium = api_safely_get_medium_object(destination.media_id)
         destination_in_use = medium.has_duplicate(other_destinations, destination.settings)
         return destination_in_use
 

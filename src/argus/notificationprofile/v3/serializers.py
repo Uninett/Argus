@@ -27,7 +27,7 @@ class ResponseDestinationConfigSerializer(serializers.ModelSerializer):
         ]
 
     def get_suggested_label(self, destination: DestinationConfig) -> str:
-        medium = api_safely_get_medium_object(destination.media.slug, VERSION)
+        medium = api_safely_get_medium_object(destination.media.slug)
         return f"{destination.media.name}: {medium.get_label(destination)}"
 
 
