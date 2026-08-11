@@ -31,6 +31,22 @@ We're not so keen on:
   Argus. Argus isn't an inventory manager for instance. If you need that, build
   something on top of Argus instead, using Argus as a dependency.
 
+Non-negotiable nitpicky stuff
+=============================
+
+* Use the PR template when making PRs. We use it ourselves, it is very useful
+  for us. It helps us review the code faster, and it helps us when making a new
+  release.
+
+  * If there are visible changes to the frontend, add screenshots of before and
+    after.
+
+* What we want the commit messages to look like is not a suggestion. See `Howto: Write a good commit message (local copy) <./docs/development/howtos/commit-messages.rst>`_, `Howto: Write a good commit message (on read the docs) <https://argus-server.readthedocs.io/en/latest/development/howtos/commit-messages.html>`_
+
+  Keep crap out of the first line. We won't automatically drop your stuff if
+  the first line is slightly longer than 50 characters because that can be
+  really hard and we sometimes fail to keep it that short ourselves, but *try*.
+
 Nuts and bolts
 ==============
 
@@ -44,16 +60,9 @@ Nuts and bolts
   stuff is linted before you ask for a review.
 * Add yourself to the bottom of the CONTRIBUTORS.md-file if this is your first
   patch.
-* We use a template for the message in PRs, it's good enough that we use it
-  ourselves. It helps us review the code faster!
-
-  * If there are visible changes to the frontend, add screenshots of before and
-    after.
-
 * See the docs for
 
   * How to write a changelog, and when `(local copy) <./docs/development/howtos/changelog-entry.rst>`_, `RTD <https://argus-server.readthedocs.io/en/latest/development/howtos/changelog-entry.html>`_
-  * What we want to see in a commit message `(local copy) <./docs/development/howtos/commit-messages.rst>`_, `RTD <https://argus-server.readthedocs.io/en/latest/development/howtos/commit-messages.html>`_
 
 Contributor License Agreement
 =============================
