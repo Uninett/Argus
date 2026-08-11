@@ -91,10 +91,7 @@ class EmailDestinationConfigSerializerV2Tests(TestCase):
         self.assertTrue(serializer.is_valid())
         self.assertEqual(
             serializer.validated_data["settings"],
-            {
-                "email_address": "user@example.com",
-                "synced": False,
-            },
+            {"email_address": "user@example.com"},
         )
 
     def test_can_create_email_destination(self):

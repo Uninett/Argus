@@ -9,7 +9,6 @@ from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from rest_framework.exceptions import ValidationError
 
-from argus.constants import API_STABLE_VERSION
 from argus.incident.models import Event
 from .base import NotificationMedium, modelinstance_to_dict
 from ..models import DestinationConfig
@@ -68,19 +67,8 @@ class EmailNotification(NotificationMedium):
         },
     }
 
-    class FormV3(forms.Form):
+    class Form(forms.Form):
         email_address = forms.EmailField()
-
-    class FormV2(forms.Form):
-        synced = forms.BooleanField(disabled=True, required=False, initial=False)
-        email_address = forms.EmailField()
-
-    def __init__(self, version: str = API_STABLE_VERSION):
-        super().__init__(version)
-        if version == "v2":
-            self.Form = self.FormV2
-        else:
-            self.Form = self.FormV3
 
     def validate(self, instance: RequestDestinationConfigSerializer, email_dict: dict, user: User) -> dict:
         """

@@ -111,7 +111,6 @@ class JSONSchemaSerializer(serializers.Serializer):
 
 
 class ResponseDestinationConfigSerializer(serializers.ModelSerializer):
-    version = VERSION
     media = MediaSerializer()
     suggested_label = serializers.SerializerMethodField(method_name="get_suggested_label")
     settings = serializers.SerializerMethodField(method_name="get_settings")
@@ -127,7 +126,7 @@ class ResponseDestinationConfigSerializer(serializers.ModelSerializer):
         ]
 
     def get_suggested_label(self, destination: DestinationConfig) -> str:
-        medium = api_safely_get_medium_object(destination.media.slug, self.version)
+        medium = api_safely_get_medium_object(destination.media.slug)
         return f"{destination.media.name}: {medium.get_label(destination)}"
 
     def get_settings(self, destination: DestinationConfig) -> dict:
@@ -138,8 +137,6 @@ class ResponseDestinationConfigSerializer(serializers.ModelSerializer):
 
 
 class RequestDestinationConfigSerializer(serializers.ModelSerializer):
-    version = VERSION
-
     class Meta:
         model = DestinationConfig
         fields = [
@@ -155,15 +152,15 @@ class RequestDestinationConfigSerializer(serializers.ModelSerializer):
             if not isinstance(attrs["settings"], dict):
                 raise serializers.ValidationError("Settings has to be a dictionary.")
             if self.instance:
-                medium = api_safely_get_medium_object(self.instance.media.slug, self.version)
+                medium = api_safely_get_medium_object(self.instance.media.slug)
             else:
-                medium = api_safely_get_medium_object(attrs["media"].slug, self.version)
+                medium = api_safely_get_medium_object(attrs["media"].slug)
             attrs["settings"] = medium.validate(self, attrs, self.context["request"].user)
 
         return attrs
 
     def update(self, destination: DestinationConfig, validated_data: dict):
-        medium = api_safely_get_medium_object(destination.media.slug, self.version)
+        medium = api_safely_get_medium_object(destination.media.slug)
         updated_destination = medium.update(destination, validated_data)
 
         return updated_destination
