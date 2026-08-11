@@ -25,9 +25,7 @@ class PersonUserFactory(BaseUserFactory):
 
     first_name = factory.Faker("first_name")
     last_name = factory.Faker("last_name")
-    email = factory.LazyAttribute(
-        lambda o: "%s.%s@%s" % (o.first_name.lower(), o.last_name.lower(), factory.Faker("safe_domain_name"))
-    )
+    email = factory.LazyAttribute(lambda o: "%s.%s@example.com" % (o.first_name.lower(), o.last_name.lower()))
     username = email
     password = factory.django.Password("very SECRET P455w0rD")
 
