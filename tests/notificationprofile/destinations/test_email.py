@@ -246,7 +246,7 @@ class EmailMediumViewTests(APITestCase):
 
 
 @tag("API", "integration")
-class EmailDestinationViewTests(APITestCase):
+class EmailDestinationViewV2Tests(APITestCase):
     ENDPOINT = "/api/v2/notificationprofiles/destinations/"
 
     def setUp(self):
@@ -272,23 +272,23 @@ class EmailDestinationViewTests(APITestCase):
     def tearDown(self):
         connect_signals()
 
-    def test_should_delete_unmanaged_unused_email_destination(self):
+    def test_given_unmanaged_unused_destination_then_delete_destination(self):
         response = self.user1_rest_client.delete(path=f"{self.ENDPOINT}{self.unmanaged_email_destination.pk}/")
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT, response.data)
         self.assertFalse(DestinationConfig.objects.filter(id=self.unmanaged_email_destination.pk).exists())
 
-    def test_should_not_allow_deletion_of_managed_email_destination(self):
+    def test_given_managed_destination_then_forbid_deleting_destination(self):
         response = self.user1_rest_client.delete(path=f"{self.ENDPOINT}{self.managed_email_destination.pk}/")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST, response.data)
         self.assertTrue(DestinationConfig.objects.filter(id=self.managed_email_destination.pk).exists())
 
-    def test_should_not_allow_deletion_of_email_destination_in_use(self):
+    def test_given_destination_in_use_then_forbid_deleting_destination(self):
         self.notification_profile1.destinations.add(self.unmanaged_email_destination)
         response = self.user1_rest_client.delete(path=f"{self.ENDPOINT}{self.unmanaged_email_destination.pk}/")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST, response.data)
         self.assertTrue(DestinationConfig.objects.filter(id=self.unmanaged_email_destination.pk).exists())
 
-    def test_should_create_email_destination_with_valid_values(self):
+    def test_given_valid_values_then_create_destination(self):
         response = self.user1_rest_client.post(
             path=self.ENDPOINT,
             data={
@@ -306,7 +306,7 @@ class EmailDestinationViewTests(APITestCase):
             ).exists()
         )
 
-    def test_should_not_allow_creating_email_destination_with_duplicate_email_address(self):
+    def test_given_duplicate_email_address_then_forbid_creating_destination(self):
         settings = {"email_address": "test2@example.com"}
         DestinationConfigFactory(
             user=self.user1,
@@ -328,7 +328,7 @@ class EmailDestinationViewTests(APITestCase):
             1,
         )
 
-    def test_should_update_email_destination_with_same_medium(self):
+    def test_given_same_medium_and_settings_to_update_unmanaged_destination_then_it_should_update(self):
         email_destination = self.unmanaged_email_destination
         new_settings = {
             "email_address": "test2@example.com",
@@ -347,7 +347,7 @@ class EmailDestinationViewTests(APITestCase):
             new_settings["email_address"],
         )
 
-    def test_given_label_to_update_managed_email_destination_then_it_should_update(self):
+    def test_given_label_to_update_managed_destination_then_it_should_update(self):
         data = {"label": "new_label"}
         response = self.user1_rest_client.patch(
             path=f"{self.ENDPOINT}{self.managed_email_destination.pk}/",
@@ -361,7 +361,7 @@ class EmailDestinationViewTests(APITestCase):
         )
         self.assertTrue(self.managed_email_destination.managed)
 
-    def test_given_settings_to_update_managed_email_destination_then_it_should_update_and_create_copy_of_old_settings(
+    def test_given_settings_to_update_managed_destination_then_it_should_update_and_create_copy_of_old_settings(
         self,
     ):
         old_settings = self.managed_email_destination.settings.copy()
@@ -381,7 +381,7 @@ class EmailDestinationViewTests(APITestCase):
         self.assertFalse(self.managed_email_destination.managed)
         self.assertTrue(DestinationConfig.objects.filter(managed=True, settings=old_settings).exists())
 
-    def test_should_not_allow_updating_email_destination_with_duplicate_email_address(self):
+    def test_given_duplicate_email_address_then_forbid_updating_destination(self):
         settings = {"email_address": "test2@example.com"}
         email_destination_pk = DestinationConfigFactory(
             user=self.user1,
