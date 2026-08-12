@@ -191,7 +191,9 @@ class NotificationMedium(ABC):
 
         # update destination with known id instead of returning a new one
         destination.label = validated_data.get("label", destination.label)
-        destination.settings = validated_data.get("settings", destination.settings)
+        settings = validated_data.get("settings", destination.settings)
+        settings.pop("synced", None)
+        destination.settings = settings
         destination.managed = False
         destination.save()
 
