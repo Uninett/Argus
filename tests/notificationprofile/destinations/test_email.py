@@ -272,6 +272,39 @@ class EmailDestinationViewV2Tests(APITestCase):
     def tearDown(self):
         connect_signals()
 
+    def test_when_getting_list_of_destinations_then_return_destinations(self):
+        response = self.user1_rest_client.get(path=self.ENDPOINT)
+        self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
+        response_pks = [destination["pk"] for destination in response.data]
+        self.assertIn(self.unmanaged_email_destination.pk, response_pks)
+        self.assertIn(self.managed_email_destination.pk, response_pks)
+
+    def test_when_getting_managed_destination_then_return_destination(self):
+        response = self.user1_rest_client.get(path=f"{self.ENDPOINT}{self.managed_email_destination.pk}/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
+        self.assertEqual(response.data["pk"], self.managed_email_destination.pk)
+        self.assertEqual(response.data["media"]["slug"], self.managed_email_destination.media.slug)
+        self.assertEqual(
+            response.data["settings"],
+            {
+                "email_address": self.managed_email_destination.settings["email_address"],
+                "synced": self.managed_email_destination.managed,
+            },
+        )
+
+    def test_when_getting_unmanaged_destination_then_return_destination(self):
+        response = self.user1_rest_client.get(path=f"{self.ENDPOINT}{self.unmanaged_email_destination.pk}/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
+        self.assertEqual(response.data["pk"], self.unmanaged_email_destination.pk)
+        self.assertEqual(response.data["media"]["slug"], self.unmanaged_email_destination.media.slug)
+        self.assertEqual(
+            response.data["settings"],
+            {
+                "email_address": self.unmanaged_email_destination.settings["email_address"],
+                "synced": self.unmanaged_email_destination.managed,
+            },
+        )
+
     def test_given_unmanaged_unused_destination_then_delete_destination(self):
         response = self.user1_rest_client.delete(path=f"{self.ENDPOINT}{self.unmanaged_email_destination.pk}/")
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT, response.data)
@@ -312,6 +345,21 @@ class EmailDestinationViewV2Tests(APITestCase):
             ).exists()
         )
 
+    def test_given_valid_label_then_create_destination(self):
+        response = self.user1_rest_client.post(
+            path=self.ENDPOINT,
+            data={
+                "media": "email",
+                "label": "new email",
+                "settings": {
+                    "email_address": "test2@example.com",
+                },
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data["label"], "new email")
+        self.assertTrue(DestinationConfig.objects.filter(label="new email").exists())
+
     def test_given_duplicate_email_address_then_forbid_creating_destination(self):
         settings = {"email_address": "test2@example.com"}
         DestinationConfigFactory(
@@ -335,6 +383,50 @@ class EmailDestinationViewV2Tests(APITestCase):
             1,
         )
 
+    def test_given_settings_not_a_dict_then_forbid_creating_destination(self):
+        response = self.user1_rest_client.post(
+            path=self.ENDPOINT,
+            data={
+                "media": "email",
+                "settings": "not a dict",
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("Settings has to be a dictionary", str(response.data))
+
+    def test_given_invalid_email_address_then_forbid_creating_destination(self):
+        response = self.user1_rest_client.post(
+            path=self.ENDPOINT,
+            data={
+                "media": "email",
+                "settings": {"email_address": "invalid"},
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("Enter a valid email address", str(response.data["email_address"]))
+
+    def test_given_missing_email_address_then_forbid_creating_destination(self):
+        response = self.user1_rest_client.post(
+            path=self.ENDPOINT,
+            data={
+                "media": "email",
+                "settings": {"other": "setting"},
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("This field is required", str(response.data["email_address"]))
+
+    def test_given_empty_settings_then_forbid_creating_destination(self):
+        response = self.user1_rest_client.post(
+            path=self.ENDPOINT,
+            data={
+                "media": "email",
+                "settings": {},
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("This field is required", str(response.data["email_address"]))
+
     def test_given_same_medium_and_settings_to_update_unmanaged_destination_then_it_should_update(self):
         new_settings = {
             "email_address": "test2@example.com",
@@ -343,6 +435,31 @@ class EmailDestinationViewV2Tests(APITestCase):
             path=f"{self.ENDPOINT}{self.unmanaged_email_destination.pk}/",
             data={
                 "media": self.unmanaged_email_destination.media.slug,
+                "settings": new_settings,
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
+        self.assertEqual(response.data["media"]["slug"], self.unmanaged_email_destination.media.slug)
+        self.assertEqual(
+            response.data["settings"],
+            {
+                "email_address": new_settings["email_address"],
+                "synced": self.unmanaged_email_destination.managed,
+            },
+        )
+        self.unmanaged_email_destination.refresh_from_db()
+        self.assertEqual(
+            self.unmanaged_email_destination.settings["email_address"],
+            new_settings["email_address"],
+        )
+
+    def test_given_settings_to_update_unmanaged_destination_then_it_should_update(self):
+        new_settings = {
+            "email_address": "test2@example.com",
+        }
+        response = self.user1_rest_client.patch(
+            path=f"{self.ENDPOINT}{self.unmanaged_email_destination.pk}/",
+            data={
                 "settings": new_settings,
             },
         )
@@ -384,6 +501,52 @@ class EmailDestinationViewV2Tests(APITestCase):
         # Managed email destination is not copied
         self.assertTrue(self.managed_email_destination.managed)
 
+    def test_given_label_to_update_unmanaged_destination_then_it_should_update(self):
+        data = {"label": "new_label"}
+        response = self.user1_rest_client.patch(
+            path=f"{self.ENDPOINT}{self.unmanaged_email_destination.pk}/",
+            data=data,
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
+        self.assertEqual(response.data["label"], data["label"])
+        self.assertEqual(
+            response.data["settings"],
+            {
+                "email_address": self.unmanaged_email_destination.settings["email_address"],
+                "synced": self.unmanaged_email_destination.managed,
+            },
+        )
+        self.unmanaged_email_destination.refresh_from_db()
+        self.assertEqual(
+            self.unmanaged_email_destination.label,
+            data["label"],
+        )
+
+    def test_given_label_and_settings_to_update_unmanaged_destination_then_it_should_update(self):
+        data = {
+            "label": "new_label",
+            "settings": {"email_address": "test3@example.com"},
+        }
+        response = self.user1_rest_client.patch(
+            path=f"{self.ENDPOINT}{self.unmanaged_email_destination.pk}/",
+            data=data,
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
+        self.assertEqual(response.data["label"], data["label"])
+        self.assertEqual(
+            response.data["settings"],
+            {
+                "email_address": data["settings"]["email_address"],
+                "synced": self.unmanaged_email_destination.managed,
+            },
+        )
+        self.unmanaged_email_destination.refresh_from_db()
+        self.assertEqual(
+            self.unmanaged_email_destination.label,
+            data["label"],
+        )
+        self.assertEqual(self.unmanaged_email_destination.settings, data["settings"])
+
     def test_given_settings_to_update_managed_destination_then_it_should_update_and_create_copy_of_old_settings(
         self,
     ):
@@ -403,6 +566,19 @@ class EmailDestinationViewV2Tests(APITestCase):
         self.assertFalse(self.managed_email_destination.managed)
         self.assertTrue(DestinationConfig.objects.filter(managed=True, settings=old_settings).exists())
 
+    def test_given_settings_not_dict_then_forbid_updating_destination(self):
+        unmanaged_email_destination_address = self.unmanaged_email_destination.settings["email_address"]
+        response = self.user1_rest_client.patch(
+            path=f"{self.ENDPOINT}{self.unmanaged_email_destination.pk}/",
+            data={"settings": "not a dict"},
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("Settings has to be a dictionary", str(response.data))
+        self.unmanaged_email_destination.refresh_from_db()
+        self.assertEqual(
+            self.unmanaged_email_destination.settings["email_address"], unmanaged_email_destination_address
+        )
+
     def test_given_duplicate_email_address_then_forbid_updating_destination(self):
         settings = {"email_address": "test2@example.com"}
         email_destination = DestinationConfigFactory(
@@ -417,6 +593,32 @@ class EmailDestinationViewV2Tests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         email_destination.refresh_from_db()
         self.assertEqual(email_destination.settings["email_address"], settings["email_address"])
+
+    def test_given_invalid_email_address_then_forbid_updating_destination(self):
+        unmanaged_email_destination_address = self.unmanaged_email_destination.settings["email_address"]
+        response = self.user1_rest_client.patch(
+            path=f"{self.ENDPOINT}{self.unmanaged_email_destination.pk}/",
+            data={"settings": {"email_address": "invalid"}},
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("Enter a valid email address", str(response.data["email_address"]))
+        self.unmanaged_email_destination.refresh_from_db()
+        self.assertEqual(
+            self.unmanaged_email_destination.settings["email_address"], unmanaged_email_destination_address
+        )
+
+    def test_given_empty_settings_then_forbid_updating_destination(self):
+        unmanaged_email_destination_address = self.unmanaged_email_destination.settings["email_address"]
+        response = self.user1_rest_client.patch(
+            path=f"{self.ENDPOINT}{self.unmanaged_email_destination.pk}/",
+            data={"settings": {}},
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("This field is required", str(response.data["email_address"]))
+        self.unmanaged_email_destination.refresh_from_db()
+        self.assertEqual(
+            self.unmanaged_email_destination.settings["email_address"], unmanaged_email_destination_address
+        )
 
 
 @tag("integration")
