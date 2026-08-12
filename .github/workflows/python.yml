@@ -88,7 +88,7 @@ jobs:
         python -VV
         python -m site
         python -m pip install --upgrade pip "setuptools<46" wheel
-        python -m pip install --upgrade virtualenv "tox>=4" tox-gh-actions coverage
+        python -m pip install --upgrade virtualenv "tox>=4.22" tox-gh-actions coverage
 
     - name: Set up PostgreSQL
       uses: ankane/setup-postgres@e9cd5bc1babecb0e441a640646d782056dbb67f5 # v1 (has no specific tags)
