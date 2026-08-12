@@ -1,8 +1,8 @@
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 
+from drf_rw_serializers import viewsets as rw_viewsets
 from drf_spectacular.utils import extend_schema, extend_schema_view
-from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
@@ -18,7 +18,7 @@ from argus.notificationprofile.v2.views import (
     SchemaView as SchemaViewV2,
 )
 
-from .serializers import DestinationConfigSerializer
+from .serializers import RequestDestinationConfigSerializer, ResponseDestinationConfigSerializer
 
 VERSION = "v3"
 
@@ -38,13 +38,22 @@ class MediaViewSet(MediaViewSetV2):
 
 @extend_schema_view(
     create=extend_schema(
-        responses={201: DestinationConfigSerializer},
+        request=RequestDestinationConfigSerializer,
+        responses={201: ResponseDestinationConfigSerializer},
+    ),
+    update=extend_schema(
+        request=RequestDestinationConfigSerializer,
+    ),
+    partial_update=extend_schema(
+        request=RequestDestinationConfigSerializer,
     ),
 )
-class DestinationConfigViewSet(viewsets.ModelViewSet):
+class DestinationConfigViewSet(rw_viewsets.ModelViewSet):
     version = VERSION
-    permission_classes = [*viewsets.ModelViewSet.permission_classes, IsOwner]
-    serializer_class = DestinationConfigSerializer
+    permission_classes = [*rw_viewsets.ModelViewSet.permission_classes, IsOwner]
+    serializer_class = ResponseDestinationConfigSerializer
+    read_serializer_class = ResponseDestinationConfigSerializer
+    write_serializer_class = RequestDestinationConfigSerializer
     queryset = DestinationConfig.objects.none()
     http_method_names = ["get", "head", "post", "patch", "delete"]
 
