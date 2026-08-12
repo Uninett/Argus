@@ -1,6 +1,10 @@
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+import json
+import threading
 from unittest.mock import patch
 
-from django.test import TestCase, tag
+from django.conf import settings
+from django.test import TestCase, override_settings, tag
 from rest_framework import status
 from rest_framework.test import APIClient, APIRequestFactory, APITestCase
 
@@ -11,6 +15,9 @@ from argus.notificationprofile.media.base import AppriseMedium
 from argus.notificationprofile.models import DestinationConfig, Media
 from argus.notificationprofile.v2.serializers import RequestDestinationConfigSerializer
 from argus.util.testing import connect_signals, disconnect_signals
+
+
+# Destination configuration tests not involving Apprise itself
 
 
 @tag("integration")
@@ -236,8 +243,12 @@ class AppriseDestinationViewTests(APITestCase):
         )
 
 
+# Tests for mocked Apprise send()
+
+
 @tag("integration")
-class AppriseMediumBehaviorTests(TestCase):
+@override_settings(SEND_NOTIFICATIONS=True)
+class AppriseMediumMockedLibraryTests(TestCase):
     def setUp(self):
         disconnect_signals()
         self.user = PersonUserFactory()
@@ -253,57 +264,145 @@ class AppriseMediumBehaviorTests(TestCase):
         connect_signals()
 
     def test_given_no_destinations_should_return_false(self):
-        with self.settings(SEND_NOTIFICATIONS=True):
-            self.assertFalse(AppriseMedium.send(self.event, []))
+        self.assertFalse(AppriseMedium.send(self.event, []))
 
-    def test_given_disabled_notifications_should_return_false(self):
-        with self.settings(SEND_NOTIFICATIONS=False):
-            self.assertFalse(AppriseMedium.send(self.event, []))
-
+    @override_settings(SEND_NOTIFICATIONS=False)
     @patch("argus.notificationprofile.media.base.Apprise")
-    def test_given_single_destination_should_send_notification(self, mock_apprise):
-        instance = mock_apprise.return_value
-        instance.notify.return_value = True
-
-        with self.settings(SEND_NOTIFICATIONS=True):
-            self.assertTrue(AppriseMedium.send(self.event, [self.destination]))
-            instance.add.assert_called_once_with("https://example.com/hook")
-
-    @patch("argus.notificationprofile.media.base.Apprise")
-    def test_when_send_fails_should_return_false(self, mock_apprise):
-        instance = mock_apprise.return_value
-        instance.notify.return_value = False
-
-        with self.settings(SEND_NOTIFICATIONS=True):
-            self.assertFalse(AppriseMedium.send(self.event, [self.destination]))
-            instance.add.assert_called_once_with("https://example.com/hook")
+    def test_given_disabled_notifications_should_return_false(self, mock_apprise):
+        self.assertFalse(AppriseMedium.send(self.event, [self.destination]))
+        mock_apprise.assert_not_called()
 
     @patch("argus.notificationprofile.media.base.Apprise", None)
-    def test_when_apprise_not_installed_then_it_should_log_error_and_return_false(self):
-        with self.settings(SEND_NOTIFICATIONS=True):
-            with self.assertLogs("argus.notificationprofile.media.base", level="ERROR") as cm:
-                result = AppriseMedium.send(self.event, [self.destination])
-        self.assertFalse(result)
-        self.assertIn("not installed", cm.output[0])
+    def test_when_apprise_not_installed_should_return_false(self):
+        self.assertFalse(AppriseMedium.send(self.event, [self.destination]))
 
     @patch("argus.notificationprofile.media.base.Apprise")
     def test_given_no_notify_type_notifier_should_be_called_without_notify_type(self, mock_apprise):
-        instance = mock_apprise.return_value
-        instance.notify.return_value = True
+        mock_apprise.return_value.notify.return_value = True
 
-        with self.settings(SEND_NOTIFICATIONS=True):
-            AppriseMedium.send(self.event, [self.destination])
+        AppriseMedium.send(self.event, [self.destination])
 
-        _, call_kwargs = instance.notify.call_args
+        _, call_kwargs = mock_apprise.return_value.notify.call_args
         self.assertNotIn("notify_type", call_kwargs)
 
     @patch("argus.notificationprofile.media.base.Apprise")
     def test_given_notify_type_notifier_should_be_called_with_notify_type(self, mock_apprise):
-        instance = mock_apprise.return_value
-        instance.notify.return_value = True
+        mock_apprise.return_value.notify.return_value = True
 
-        with self.settings(SEND_NOTIFICATIONS=True):
-            AppriseMedium.send(self.event, [self.destination], notify_type="warning")
+        AppriseMedium.send(self.event, [self.destination], notify_type="warning")
 
-        _, call_kwargs = instance.notify.call_args
+        _, call_kwargs = mock_apprise.return_value.notify.call_args
         self.assertEqual(call_kwargs["notify_type"], "warning")
+
+
+# Tests using the real Apprise library, posting to a local webhook
+
+
+class _CapturingRequestHandler(BaseHTTPRequestHandler):
+    def do_POST(self):
+        length = int(self.headers.get("Content-Length", 0))
+        self.server.payloads.append(json.loads(self.rfile.read(length)))
+        self.send_response(self.server.response_status)
+        self.end_headers()
+
+    def log_message(self, *args):
+        pass
+
+
+class LocalAppriseWebhook(ThreadingHTTPServer):
+    def __init__(self, response_status=200):
+        super().__init__(("127.0.0.1", 0), _CapturingRequestHandler)
+        self.payloads = []
+        self.response_status = response_status
+        # Without a short poll interval shutdown() blocks for up to 0.5s per server
+        threading.Thread(target=self.serve_forever, kwargs={"poll_interval": 0.01}, daemon=True).start()
+
+    def stop(self):
+        self.shutdown()
+        self.server_close()
+
+    @property
+    def url(self):
+        host, port = self.server_address[:2]
+        return f"json://{host}:{port}/hook"
+
+
+@tag("integration")
+@override_settings(SEND_NOTIFICATIONS=True)
+class AppriseMediumRealLibraryTests(TestCase):
+    def setUp(self):
+        disconnect_signals()
+        self.user = PersonUserFactory()
+        self.incident = IncidentFactory()
+        self.event = EventFactory(incident=self.incident)
+
+    def tearDown(self):
+        connect_signals()
+
+    def _destination_for(self, url):
+        return DestinationConfigFactory(
+            user=self.user,
+            media=Media.objects.get(slug="apprise"),
+            settings={"destination_url": url},
+        )
+
+    def _webhook_destination(self, response_status=200):
+        webhook = LocalAppriseWebhook(response_status)
+        self.addCleanup(webhook.stop)
+        return webhook, self._destination_for(webhook.url)
+
+    def test_given_single_destination_should_post_notification_to_webhook(self):
+        webhook, destination = self._webhook_destination()
+
+        self.assertTrue(AppriseMedium.send(self.event, [destination]))
+
+        self.assertEqual(len(webhook.payloads), 1)
+        payload = webhook.payloads[0]
+        self.assertTrue(payload["title"].startswith(settings.NOTIFICATION_SUBJECT_PREFIX))
+        self.assertIn(self.incident.description, payload["title"])
+        self.assertIn(f"Status: {self.event.type}", payload["message"])  # the template uses the raw code
+        self.assertIn(f"Actor: {self.event.actor.username}", payload["message"])
+        self.assertIn(self.incident.description, payload["message"])
+
+    def test_given_notify_type_should_post_it_as_the_payload_type(self):
+        webhook, destination = self._webhook_destination()
+
+        AppriseMedium.send(self.event, [destination], notify_type="warning")
+
+        self.assertEqual(webhook.payloads[0]["type"], "warning")
+
+    def test_given_multiple_destinations_should_post_to_all_of_them(self):
+        webhook1, destination1 = self._webhook_destination()
+        webhook2, destination2 = self._webhook_destination()
+
+        self.assertTrue(AppriseMedium.send(self.event, [destination1, destination2]))
+
+        self.assertEqual(len(webhook1.payloads), 1)
+        self.assertEqual(len(webhook2.payloads), 1)
+
+    def test_when_the_destination_errors_should_return_false(self):
+        webhook, destination = self._webhook_destination(response_status=500)
+
+        self.assertFalse(AppriseMedium.send(self.event, [destination]))
+
+        self.assertEqual(len(webhook.payloads), 1)
+
+    def test_when_only_some_destinations_error_should_return_true(self):
+        good, good_destination = self._webhook_destination()
+        bad, bad_destination = self._webhook_destination(response_status=500)
+
+        self.assertTrue(AppriseMedium.send(self.event, [good_destination, bad_destination]))
+
+        self.assertEqual(len(good.payloads), 1)
+        self.assertEqual(len(bad.payloads), 1)
+
+    def test_given_a_url_apprise_cannot_route_should_return_false(self):
+        destination = self._destination_for("https://example.com/hook")
+
+        self.assertFalse(AppriseMedium.send(self.event, [destination]))
+
+    def test_when_the_destination_refuses_the_connection_should_return_false(self):
+        webhook, destination = self._webhook_destination()
+        webhook.stop()
+
+        self.assertFalse(AppriseMedium.send(self.event, [destination]))
