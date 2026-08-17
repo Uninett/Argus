@@ -128,14 +128,18 @@ validate_settings
    should be raised  if the given settings are invalid, and the validated and
    cleaned data should be returned if not.
 
-``raise_if_not_deletable`` should check if a given destination can be deleted.
-This is used in case some destinations are managed by an outside source and
-should not be able to be deleted by a user. If that is the case a
-``NotDeletableError`` should be raised. If not simply return None.
+raise_if_not_deletable
+   This method by default checks if the destination is in use by a profile, or
+   if it is **managed**, that is, outside of the control of a user. It should
+   raise ``NotDeletableError`` in either case. If the destination *may* be
+   deleted it should return ``None``. It should not be necessary to alter or
+   extend this method, but if it is, ``super()`` should be used to maintain the
+   standard functionality.
 
-The method ``update`` only has to be implemented if the regular update method
-of Django isn't sufficient. This can be the case if additional settings need to
-be updated.
+update
+   This method only has to be implemented if the regular update method is
+   insufficient. This can be the case if there is more than one key-value pair
+   in settings that need to be updated.
 
 Writing destination plugins using Apprise
 -----------------------------------------
