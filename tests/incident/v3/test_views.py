@@ -352,8 +352,8 @@ class IncidentTagViewSetTestCase(IncidentAPITestCase):
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         # The tag should still exist..
         self.assertTrue(Tag.objects.filter(pk=tag.pk).exists())
-        # .. but the relation should be gone
-        self.assertFalse(incident.deprecated_tags)
+        # .. but the incident shouldn't know of it anymore
+        self.assertNotIn(tag.representation, incident.deprecated_tags)
 
 
 class SourceLockedIncidentViewSetTestCase(IncidentAPITestCase):

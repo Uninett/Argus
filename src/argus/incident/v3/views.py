@@ -172,8 +172,8 @@ class IncidentTagViewSet(
         incident = self._get_incident()
         data = serializer.validated_data
         add_tags_to_incident(incident, *data)
-        # ChangeEvent!
+        # Future: ChangeEvent!
 
     def perform_destroy(self, instance):
         remove_tags_from_incident(self.incident, instance.representation)
-        # ChangeEvent!
+        # Future: ChangeEvent!

@@ -228,7 +228,7 @@ See v2 for the other endpoints.
 
 -  ``/api/v3/incidents/<int:pk>/tags/``:
 
-   -  ``GET``: returns a list of all the tags for the incident given by the by
+   -  ``GET``: returns a list of all the tags for the incident given by the
      primary key
 
    -  ``POST``: adds one or more tags to the incident and returns the modified list
