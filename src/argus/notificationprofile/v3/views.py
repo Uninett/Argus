@@ -9,7 +9,7 @@ from rest_framework.response import Response
 
 from argus.drf.permissions import IsOwner
 from argus.filter import get_filter_backend
-from argus.notificationprofile.media import api_safely_get_medium_object
+from argus.notificationprofile.media import safely_get_medium_object
 from argus.notificationprofile.media.base import NotificationMedium
 from argus.notificationprofile.models import DestinationConfig
 from argus.notificationprofile.v2.serializers import DuplicateDestinationSerializer
@@ -67,7 +67,7 @@ class DestinationConfigViewSet(rw_viewsets.ModelViewSet):
         destination = get_object_or_404(self.get_queryset(), pk=pk)
 
         try:
-            medium = api_safely_get_medium_object(destination.media.slug)
+            medium = safely_get_medium_object(destination.media.slug)
             medium.raise_if_not_deletable(destination)
         except NotificationMedium.NotDeletableError as e:
             raise ValidationError(str(e))
@@ -78,7 +78,7 @@ class DestinationConfigViewSet(rw_viewsets.ModelViewSet):
         other_destinations = DestinationConfig.objects.filter(media=destination.media).filter(
             ~Q(user_id=destination.user.id)
         )
-        medium = api_safely_get_medium_object(destination.media_id)
+        medium = safely_get_medium_object(destination.media_id)
         destination_in_use = medium.has_duplicate(other_destinations, destination.settings)
         return destination_in_use
 

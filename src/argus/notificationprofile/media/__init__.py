@@ -29,7 +29,7 @@ LOG = logging.getLogger(__name__)
 
 
 __all__ = [
-    "api_safely_get_medium_object",
+    "safely_get_medium_object",
     "send_notification",
     "background_send_notification",
     "find_destinations_for_event",
@@ -47,7 +47,7 @@ _media_classes = [import_class_from_dotted_path(media_plugin) for media_plugin i
 MEDIA_CLASSES_DICT = {media_class.MEDIA_SLUG: media_class for media_class in _media_classes}
 
 
-def api_safely_get_medium_object(media_slug):
+def safely_get_medium_object(media_slug):
     try:
         classobj = MEDIA_CLASSES_DICT[media_slug]
     except KeyError:

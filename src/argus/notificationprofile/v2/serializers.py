@@ -1,7 +1,7 @@
 from rest_framework import fields, serializers
 
 from argus.filter.serializers import FilterSerializer
-from argus.notificationprofile.media import EMAIL_DESTINATION_SLUG, api_safely_get_medium_object
+from argus.notificationprofile.media import EMAIL_DESTINATION_SLUG, safely_get_medium_object
 from argus.notificationprofile.models import DestinationConfig, Media, NotificationProfile, TimeRecurrence, Timeslot
 
 VERSION = "v2"
@@ -126,7 +126,7 @@ class ResponseDestinationConfigSerializer(serializers.ModelSerializer):
         ]
 
     def get_suggested_label(self, destination: DestinationConfig) -> str:
-        medium = api_safely_get_medium_object(destination.media.slug)
+        medium = safely_get_medium_object(destination.media.slug)
         return f"{destination.media.name}: {medium.get_label(destination)}"
 
     def get_settings(self, destination: DestinationConfig) -> dict:
@@ -147,13 +147,13 @@ class RequestDestinationConfigSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs: dict):
         media_slug = self.instance.media.slug if self.instance else attrs["media"].slug
-        medium = api_safely_get_medium_object(media_slug)
+        medium = safely_get_medium_object(media_slug)
         form = medium.validate(attrs, self.context["request"].user, self.instance)
 
         return form.cleaned_data
 
     def update(self, destination: DestinationConfig, validated_data: dict):
-        medium = api_safely_get_medium_object(destination.media.slug)
+        medium = safely_get_medium_object(destination.media.slug)
         updated_destination = medium.update(destination, validated_data)
 
         return updated_destination

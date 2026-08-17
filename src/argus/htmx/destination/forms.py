@@ -1,7 +1,7 @@
 from django import forms
 from django.forms import ModelForm
 
-from argus.notificationprofile.media import api_safely_get_medium_object
+from argus.notificationprofile.media import safely_get_medium_object
 from argus.notificationprofile.models import DestinationConfig, Media
 from argus.notificationprofile.v2.serializers import RequestDestinationConfigSerializer
 
@@ -124,5 +124,5 @@ def _get_settings_key_for_media(media: Media) -> str:
     """Returns the required settings key for the given media,
     e.g. "email_address", "phone_number"
     """
-    medium = api_safely_get_medium_object(media.slug)
+    medium = safely_get_medium_object(media.slug)
     return medium.MEDIA_JSON_SCHEMA["required"][0]

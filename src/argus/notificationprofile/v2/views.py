@@ -14,7 +14,7 @@ from argus.drf.permissions import IsOwner
 from argus.filter import get_filter_backend
 from argus.filter.serializers import FilterSerializer
 from argus.incident.v2.serializers import IncidentSerializer
-from argus.notificationprofile.media import api_safely_get_medium_object
+from argus.notificationprofile.media import safely_get_medium_object
 from argus.notificationprofile.media.base import NotificationMedium
 from argus.notificationprofile.models import (
     DestinationConfig,
@@ -124,7 +124,7 @@ class SchemaView(DetailView):
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
-        medium = api_safely_get_medium_object(self.object.slug)
+        medium = safely_get_medium_object(self.object.slug)
         kwargs["schema_info"] = medium.MEDIA_JSON_SCHEMA
         return kwargs
 
@@ -141,7 +141,7 @@ class MediaViewSet(viewsets.ModelViewSet):
     @action(methods=["get"], detail=True)
     def json_schema(self, request, pk, *args, **kwargs):
         try:
-            medium = api_safely_get_medium_object(pk)
+            medium = safely_get_medium_object(pk)
             schema = medium.MEDIA_JSON_SCHEMA
             schema["$id"] = reverse(
                 "json-schema",
@@ -186,7 +186,7 @@ class DestinationConfigViewSet(rw_viewsets.ModelViewSet):
         destination = get_object_or_404(self.get_queryset(), pk=pk)
 
         try:
-            medium = api_safely_get_medium_object(destination.media.slug)
+            medium = safely_get_medium_object(destination.media.slug)
             medium.raise_if_not_deletable(destination)
         except NotificationMedium.NotDeletableError as e:
             raise ValidationError(str(e))
@@ -197,7 +197,7 @@ class DestinationConfigViewSet(rw_viewsets.ModelViewSet):
         other_destinations = DestinationConfig.objects.filter(media=destination.media).filter(
             ~Q(user_id=destination.user.id)
         )
-        medium = api_safely_get_medium_object(destination.media_id)
+        medium = safely_get_medium_object(destination.media_id)
         destination_in_use = medium.has_duplicate(other_destinations, destination.settings)
         return destination_in_use
 
