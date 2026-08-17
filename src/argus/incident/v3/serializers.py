@@ -5,7 +5,7 @@ from django.db import models
 
 from rest_framework import serializers
 
-from argus.incident.factories import set_tags_on_incident, add_tags_to_incident
+from argus.incident.factories import add_tags_to_incident, set_tags_on_incident
 from argus.incident.models import (
     Incident,
     SourceSystem,

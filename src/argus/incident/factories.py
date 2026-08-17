@@ -113,7 +113,7 @@ def remove_tags_from_incident(instance: Incident, *tags: str):
 
 @transaction.atomic
 def set_tags_on_incident(instance: Incident, *tagstrings: list[str], user=None):
-    """Set an incidents's tags to the given list of tags
+    """Set an incident's tags to the given list of tags
 
     Side effects:
 
