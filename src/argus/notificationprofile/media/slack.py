@@ -4,7 +4,6 @@ import logging
 from typing import TYPE_CHECKING
 
 from django import forms
-from rest_framework.exceptions import ValidationError
 
 from .base import AppriseMedium
 
@@ -37,10 +36,8 @@ class SlackNotification(AppriseMedium):
         def clean_destination_url(self):
             destination_url = self.cleaned_data["destination_url"]
             if not destination_url.startswith(("https://hooks.slack.com/", "slack://")):
-                raise ValidationError(
-                    {
-                        "destination_url": "Not a valid Slack destination URL. Use a Slack incoming webhook (https://hooks.slack.com/...) or an Apprise Slack URL (slack://...)."
-                    }
+                raise forms.ValidationError(
+                    "Not a valid Slack destination URL. Use a Slack incoming webhook (https://hooks.slack.com/...) or an Apprise Slack URL (slack://...)."
                 )
 
             return destination_url
