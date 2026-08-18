@@ -4,6 +4,7 @@ from django.urls import reverse
 from argus.auth.factories import PersonUserFactory
 from argus.notificationprofile.factories import (
     DestinationConfigFactory,
+    MediaFactory,
     NotificationProfileFactory,
     TimeslotFactory,
 )
@@ -97,6 +98,19 @@ class TestDestinationListView(DestinationViewTestCase):
         form = self._get_form_for(response, destination)
         self.assertTrue(form.delete_disabled)
         self.assertIn("defined by an outside source", form.delete_tooltip)
+
+    def test_given_uninstalled_medium_it_should_still_have_delete_enabled(self):
+        uninstalled_media = MediaFactory(installed=False)
+        destination = DestinationConfigFactory(
+            user=self.user,
+            media=uninstalled_media,
+            settings={"test_key": "test_val"},
+        )
+
+        response = self.client.get(self.url)
+
+        form = self._get_form_for(response, destination)
+        self.assertFalse(form.delete_disabled)
 
     def test_it_should_only_show_own_destinations(self):
         other_user = PersonUserFactory()
@@ -271,3 +285,17 @@ class TestDestinationDeleteView(DestinationViewTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("error_msg", response.context)
         self.assertTrue(DestinationConfig.objects.filter(pk=self.destination.pk).exists())
+
+    def test_given_uninstalled_medium_it_should_still_be_deletable(self):
+        uninstalled_media = MediaFactory(installed=False)
+        destination = DestinationConfigFactory(
+            user=self.user,
+            media=uninstalled_media,
+            settings={"test_key": "test_val"},
+        )
+        url = reverse("htmx:destination-delete", kwargs={"pk": destination.pk})
+
+        response = self.client.post(url)
+
+        self.assertRedirects(response, reverse("htmx:destination-list"), fetch_redirect_response=False)
+        self.assertFalse(DestinationConfig.objects.filter(pk=destination.pk).exists())
