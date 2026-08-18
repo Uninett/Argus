@@ -14,6 +14,7 @@ from argus.util.utils import import_class_from_dotted_path
 from ..models import DestinationConfig, Media, NotificationProfile
 from ..filterwrapper import NotificationProfileFilterWrapper
 from ..utils import are_notifications_enabled
+from .base import NotificationMedium
 
 filter_backend = get_filter_backend()
 FallbackFilterWrapper = filter_backend.FallbackFilterWrapper
@@ -47,10 +48,13 @@ _media_classes = [import_class_from_dotted_path(media_plugin) for media_plugin i
 MEDIA_CLASSES_DICT = {media_class.MEDIA_SLUG: media_class for media_class in _media_classes}
 
 
-def safely_get_medium_object(media_slug):
+def safely_get_medium_object(media_slug, strict: bool = True):
+    "Returns the medium object for the given slug, or a base medium if strict=False and it's not installed"
     try:
         classobj = MEDIA_CLASSES_DICT[media_slug]
     except KeyError:
+        if not strict:
+            return NotificationMedium
         raise ValidationError(f'Medium "{media_slug}" is not installed.')
     obj = classobj()
     return obj

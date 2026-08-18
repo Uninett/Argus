@@ -23,8 +23,8 @@ def _attach_delete_state(form, make_modal):
     to a plain string, so we fetch a fresh copy from DB for the deletability check.
     """
     destination = DestinationConfig.objects.get(pk=form.instance.pk)
+    medium = safely_get_medium_object(destination.media.slug, strict=False)
     try:
-        medium = safely_get_medium_object(destination.media.slug)
         medium.raise_if_not_deletable(destination)
     except NotificationMedium.NotDeletableError as e:
         form.delete_disabled = True
@@ -166,8 +166,8 @@ class DestinationUpdateView(DestinationMixin, UpdateView):
 class DestinationDeleteView(DestinationMixin, DeleteView):
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
+        medium = safely_get_medium_object(self.object.media.slug, strict=False)
         try:
-            medium = safely_get_medium_object(self.object.media.slug)
             medium.raise_if_not_deletable(self.object)
         except NotificationMedium.NotDeletableError as e:
             update_forms = _get_update_forms(request.user)

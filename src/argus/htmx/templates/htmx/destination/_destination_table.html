@@ -36,10 +36,18 @@
           <tr id="destination-create"></tr>
           {% for form in update_forms %}
             <tr class="align-top">
-              <td>
+              <td class="whitespace-nowrap">
                 {% csrf_token %}
                 {% for hidden_field in form.hidden_fields %}{{ hidden_field }}{% endfor %}
-                <span class="badge badge-outline mt-1.5">{{ form.instance.media.name }}</span>
+                <span class="inline-flex items-center gap-1 mt-1.5">
+                  <span class="badge badge-outline">{{ form.instance.media.name }}</span>
+                  {% if not form.instance.media.installed %}
+                    <span class="text-warning text-lg w-5"
+                          title="This medium is not installed. No notifications will be sent to this destination.">
+                      <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+                    </span>
+                  {% endif %}
+                </span>
               </td>
               <td>
                 {% render_field form.label class+="input input-bordered input-sm w-full" %}
@@ -51,12 +59,14 @@
               </td>
               <td>
                 <div class="flex gap-1 items-center">
-                  <button type="button"
-                          hx-post="{% url 'htmx:destination-update' pk=form.instance.pk %}"
-                          hx-include="closest tr"
-                          hx-target="#destination-table"
-                          hx-swap="outerHTML"
-                          class="btn btn-primary btn-sm">Save</button>
+                  {% if form.instance.media.installed %}
+                    <button type="button"
+                            hx-post="{% url 'htmx:destination-update' pk=form.instance.pk %}"
+                            hx-include="closest tr"
+                            hx-target="#destination-table"
+                            hx-swap="outerHTML"
+                            class="btn btn-primary btn-sm">Save</button>
+                  {% endif %}
                   {% if form.delete_disabled %}
                     <span class="tooltip tooltip-left tooltip-warning cursor-not-allowed"
                           data-tip="{{ form.delete_tooltip }}">
