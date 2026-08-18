@@ -28,9 +28,13 @@ class NoColonMixin:
 class DestinationFieldMixin:
     def _get_destination_choices(self, user):
         choices = []
-        for dc in DestinationConfig.objects.filter(user=user).order_by("media", "pk"):
-            MediaPlugin = MEDIA_CLASSES_DICT[dc.media.slug]
-            label = dc.label if dc.label else MediaPlugin.get_label(dc)
+        for dc in DestinationConfig.objects.filter(user=user).select_related("media").order_by("media", "pk"):
+            if not dc.media.installed:
+                label = "Medium not installed"
+            elif dc.label:
+                label = dc.label
+            else:
+                label = MEDIA_CLASSES_DICT[dc.media.slug].get_label(dc)
             choices.append((dc.id, f"{dc.media.name}: {label}"))
         return choices
 
