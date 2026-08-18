@@ -6,7 +6,7 @@ displayed as clickable.
 -->
 <li>
   <a hx-get="{% url 'htmx:incident-list' %}"
-     hx-vals='{"page": "{{ page_number }}"}'
+     hx-vals='{"page": "{{ page_number }}", "sort": "{{ current_sort }}", "sort_order": "{{ current_sort_order }}"}'
      href="{% querystring page=page_number %}"
      hx-indicator="#incident-list .htmx-indicator"
      hx-include=".incident-list-param"

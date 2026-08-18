@@ -2,7 +2,7 @@
 {% with preferences.argus_htmx.update_interval as update_interval %}
   {% if update_interval != 'never' %}
     hx-get="{% url 'htmx:incident-list' %}"
-    hx-vals='{"page": "{{ page.number }}"}'
+    hx-vals='{"page": "{{ page.number }}", "sort": "{{ current_sort }}", "sort_order": "{{ current_sort_order }}"}'
     hx-target="this"
     hx-swap="outerHTML"
     hx-trigger="every {{ update_interval }}s"
