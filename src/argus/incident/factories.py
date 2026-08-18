@@ -124,11 +124,16 @@ def set_tags_on_incident(instance: Incident, *tagstrings: list[str], user=None):
         user, _, _ = get_or_create_default_instances()
 
     tagstrings = set(tagstrings)
-
     existing_tag_relations = instance.incident_tag_relations.select_related("tag")
     existing_tags = {tag_relation.tag.representation for tag_relation in existing_tag_relations}
-    remove_tags = existing_tags - tagstrings
-    add_tags = tagstrings - existing_tags
+
+    add_tags = set()
+    remove_tags = set()
+    if tagstrings:
+        remove_tags = existing_tags - tagstrings
+        add_tags = tagstrings - existing_tags
+    else:
+        remove_tags = existing_tags
 
     # Post change events
     if remove_tags or add_tags:

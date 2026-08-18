@@ -291,6 +291,32 @@ class IncidentViewSetTestCase(IncidentAPITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(Incident.objects.get(pk=incident_pk).description, "new description")
 
+    def test_can_replace_incident_tags(self):
+        incident_pk = self.add_open_incident_with_start_event_and_tag().pk
+        incident_path = reverse(f"{API_VERSION}:incident:incident-detail", args=[incident_pk])
+        tags = ["foo=bar"]
+        response = self.client.patch(
+            path=incident_path,
+            data={
+                "tags": tags,
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        resulting_tags = Incident.objects.get(pk=incident_pk).deprecated_tags
+        self.assertEqual([tag.representation for tag in resulting_tags], tags)
+
+    def test_can_remove_incident_tags(self):
+        incident_pk = self.add_open_incident_with_start_event_and_tag().pk
+        incident_path = reverse(f"{API_VERSION}:incident:incident-detail", args=[incident_pk])
+        response = self.client.patch(
+            path=incident_path,
+            data={
+                "tags": [],
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(Incident.objects.get(pk=incident_pk).deprecated_tags, [])
+
 
 class IncidentViewSetTicketUrlTestCase(IncidentAPITestCase):
     def test_can_create_ticket_url_of_incident(self):

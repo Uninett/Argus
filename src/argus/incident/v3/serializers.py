@@ -123,11 +123,10 @@ class IncidentPureDeserializer(IncidentPureDeserializerV2):
     def update(self, instance: Incident, validated_data: dict):
         assert "user" in validated_data
         user: User = validated_data["user"]
-        tagstrings = validated_data.pop("tags", [])
 
-        if tagstrings:
+        if "tags" in validated_data:
+            tagstrings = validated_data.pop("tags", [])
             set_tags_on_incident(instance, user=user, *tagstrings)
-
         if self.EDITABLE_FIELDS.intersection(validated_data):
             self.post_change_events(instance, user, validated_data)
 
