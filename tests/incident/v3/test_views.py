@@ -303,6 +303,7 @@ class IncidentViewSetTicketUrlTestCase(IncidentAPITestCase):
         self.assertEqual(Incident.objects.get(id=incident_pk).ticket_url, data["ticket_url"])
 
 
+@tag("integration", "api", "db")
 class IncidentTagViewSetTestCase(IncidentAPITestCase):
     def add_open_incident_with_start_event_and_tag(self, description="incident"):
         return add_open_incident_with_start_event_and_tag(self.source, description=description)
@@ -322,6 +323,20 @@ class IncidentTagViewSetTestCase(IncidentAPITestCase):
         response = self.client.get(path=f"{API_PATH}/{incident.pk}/tags/{tag}/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data[0], str(tag))
+
+    def test_cannot_get_tag_unknown_to_specific_incident(self):
+        incident_pk = self.add_open_incident_with_start_event_and_tag().pk
+        response = self.client.get(path=f"{API_PATH}/{incident_pk}/tags/nonenxistent=tag/")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertIn("detail", response.data)
+        self.assertEqual(response.data["detail"].code, "not_found")
+
+    def test_cannot_get_invalid_tag(self):
+        incident_pk = self.add_open_incident_with_start_event_and_tag().pk
+        response = self.client.get(path=f"{API_PATH}/{incident_pk}/tags/foo/")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        error = response.data[0]
+        self.assertEqual(error.code, "invalid")
 
     def test_can_create_tag_of_incident(self):
         incident = self.add_open_incident_with_start_event_and_tag()

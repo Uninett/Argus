@@ -2,6 +2,7 @@ import logging
 from itertools import chain
 
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError as DjangoValidationError
 from django.shortcuts import get_object_or_404
 
 from django_filters import rest_framework as filters
@@ -136,7 +137,10 @@ class IncidentTagViewSet(
             "attribute on the view correctly." % (self.__class__.__name__, lookup_url_kwarg)
         )
         tagstring = self.kwargs[lookup_url_kwarg]
-        validate_tagstring(tagstring)
+        try:
+            validate_tagstring(tagstring)
+        except DjangoValidationError as e:
+            raise ValidationError(e) from e
 
         key, value = Tag.split(self.kwargs[lookup_url_kwarg])
 
