@@ -3,7 +3,12 @@ from django.test import tag, TestCase
 from argus.auth.factories import PersonUserFactory
 from argus.filter.factories import FilterFactory
 from argus.htmx.notificationprofile.views import NotificationProfileForm
-from argus.notificationprofile.factories import NotificationProfileFactory, TimeslotFactory
+from argus.notificationprofile.factories import (
+    DestinationConfigFactory,
+    MediaFactory,
+    NotificationProfileFactory,
+    TimeslotFactory,
+)
 from argus.util.testing import connect_signals, disconnect_signals
 
 
@@ -98,3 +103,14 @@ class NotificationProfileFormTests(TestCase):
         )
 
         self.assertTrue(form.is_valid())
+
+    def test_given_destination_with_uninstalled_medium_it_should_flag_choice_instead_of_crashing(self):
+        uninstalled_media = MediaFactory(installed=False)
+        destination = DestinationConfigFactory(
+            user=self.user, media=uninstalled_media, settings={"test_key": "test_val"}
+        )
+
+        form = NotificationProfileForm(user=self.user)
+
+        choice_labels = dict(form.fields["destinations"].choices)
+        self.assertIn("not installed", choice_labels[destination.id])

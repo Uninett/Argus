@@ -1,15 +1,18 @@
 import logging
 
 from django.test import TestCase, override_settings
+from rest_framework.exceptions import ValidationError
 
 from argus.auth.factories import PersonUserFactory
 from argus.filter.factories import FilterFactory
 from argus.incident.factories import EventFactory, create_fake_incident
 from argus.incident.models import get_or_create_default_instances, Event
 from argus.notificationprofile import factories
+from argus.notificationprofile.media import safely_get_medium_object
 from argus.notificationprofile.media import find_destinations_for_event
 from argus.notificationprofile.media import find_destinations_for_many_events
 from argus.notificationprofile.media import get_notification_media
+from argus.notificationprofile.media.base import NotificationMedium
 from argus.notificationprofile.media.email import modelinstance_to_dict
 from argus.notificationprofile.models import Media
 from argus.util.testing import disconnect_signals, connect_signals
@@ -209,3 +212,19 @@ class GetNotificationMediaTests(TestCase):
 
         self.not_installed_medium.refresh_from_db()
         self.assertTrue(self.not_installed_medium.installed)
+
+
+class ApiSafelyGetMediumObjectTests(TestCase):
+    def test_given_installed_medium_it_should_return_the_medium_object(self):
+        medium = safely_get_medium_object("email")
+
+        self.assertNotEqual(medium, NotificationMedium)
+
+    def test_given_unknown_slug_and_strict_it_should_raise_validation_error(self):
+        with self.assertRaises(ValidationError):
+            safely_get_medium_object("missing")
+
+    def test_given_unknown_slug_and_not_strict_it_should_return_base_medium(self):
+        medium = safely_get_medium_object("missing", strict=False)
+
+        self.assertEqual(medium, NotificationMedium)
