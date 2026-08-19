@@ -187,6 +187,15 @@ Change how often the incidents table gets refreshed
 
 3. Select how often you want the incidents to be updated.
 
+Use kiosk mode
+--------------
+
+Kiosk mode is a read-only view of the incidents table intended for display
+screens such as NOC monitors, which frees up more vertical space by simplifying the interface.
+It can be accessed via the ``Kiosk`` button in the filter toolbar, or directly at **/incidents/kiosk/**.
+
+To exit kiosk mode, you can press the ``Exit kiosk`` button in the filter toolbar.
+
 Decide which incidents are shown in the table
 ---------------------------------------------
 
