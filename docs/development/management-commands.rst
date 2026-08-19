@@ -532,8 +532,9 @@ To also save the latest version in the database, use the `--save` flag:
 
         $ python manage.py check_version --save
 
-This will currently not do anything, but in the future you will be able to get
-a notification in the frontend if there is a new release registered in the database that you haven't seen yet.
+If a newer version than the currently deployed version is found, then a badge
+will be shown in the user dropdown informing you that there is a new version.
+Only visible to staff accounts.
 
 Handling source heartbeats
 ==========================

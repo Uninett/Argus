@@ -30,16 +30,22 @@
     <div class="divider divider-secondary my-0"></div>
   </li>
   <li aria-hidden="true" class="pointer-events-none h-0 p-0 m-0"></li>
-  <div class="text-xs grid grid-cols-[1fr_auto] gap-2 px-3 py-1.5">
-    <div class="space-y-2 text-left overflow-hidden select-text">
-      <span>Argus version:</span>
-      <span class="block truncate">{{ short_version }}</span>
+  <div class="text-xs px-3 py-1.5 space-y-1">
+    <div class="grid grid-cols-[1fr_auto] gap-2">
+      <div class="space-y-2 text-left overflow-hidden select-text">
+        <span>Argus version:</span>
+        <span class="block truncate">{{ short_version }}</span>
+      </div>
+      <button class="btn btn-ghost btn-xs pointer-events-auto"
+              aria-label="Copy Argus version to clipboard"
+              title="Copy version to clipboard"
+              onclick="navigator.clipboard.writeText('{{ version }}')">
+        <i class="fa-solid fa-copy"></i>
+      </button>
     </div>
-    <button class="btn btn-ghost btn-xs pointer-events-auto"
-            aria-label="Copy Argus version to clipboard"
-            title="Copy version to clipboard"
-            onclick="navigator.clipboard.writeText('{{ version }}')">
-      <i class="fa-solid fa-copy"></i>
-    </button>
+    {% if update_available %}
+      <span class="badge badge-warning badge-sm"
+            aria-label="New Argus version {{ latest_seen_version }} is available">Update available</span>
+    {% endif %}
   </div>
 </ul>
