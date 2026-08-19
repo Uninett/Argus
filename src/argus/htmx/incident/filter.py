@@ -343,6 +343,28 @@ def incident_list_filter(request, qs, use_empty_filter=False):
     return form, qs
 
 
+def get_kiosk_filter_display(request, filter_form):
+    """
+    Determines what to show in the header Filter field when kiosk mode is activated.
+    Importantly needs to check if the are unsaved changes to the currently selected filter.
+    """
+    selected_filter_id = request.session.get("selected_filter")
+    if selected_filter_id:
+        filter_obj = Filter.objects.filter(id=selected_filter_id).first()
+        if filter_obj is not None:
+            stored_filterblob = IncidentFilterForm(_convert_filterblob(filter_obj.filter.copy())).to_filterblob()
+            if filter_form.is_valid() and filter_form.to_filterblob() != stored_filterblob:
+                return "Unsaved"
+            return filter_obj.name
+
+    default_filterblob = IncidentFilterForm(IncidentFilterForm.DEFAULT_VALUES).to_filterblob()
+
+    if filter_form.is_valid() and filter_form.to_filterblob() != default_filterblob:
+        return "Unsaved"
+
+    return "Unset"
+
+
 def _get_filter_preference(request):
     """Get the stored filter preference for the user."""
     return get_preference(request, INCIDENT_FILTER_PREFERENCE_NAMESPACE, INCIDENT_FILTER_PREFERENCE_NAME) or {}
