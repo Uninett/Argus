@@ -1,16 +1,19 @@
 {% load widget_tweaks %}
 <form id="incident-filter-box"
-      class="incident-list-param"
-      hx-get="{% url 'htmx:incident-list' %}"
-      hx-include=".incident-list-param"
-      {% block filter_trigger_control %}
+  class="incident-list-param"
+  {# Ensure this form is not interactive in kiosk mode #}
+  {% if not kiosk_mode %}
+    hx-get="{% url 'htmx:incident-list' %}"
+    hx-include=".incident-list-param"
+    {% block filter_trigger_control %}
       hx-trigger="keydown[keyCode==13], change delay:100ms, load once"
-      {% endblock filter_trigger_control %}
-      hx-target="#table"
-      hx-swap="outerHTML"
-      hx-push-url="true"
-      hx-indicator="#incident-list .htmx-indicator"
-      onkeydown="if (event.keyCode === 13) event.preventDefault();">
+    {% endblock filter_trigger_control %}
+    hx-target="#table"
+    hx-swap="outerHTML"
+    hx-push-url="true"
+    hx-indicator="#incident-list .htmx-indicator"
+    onkeydown="if (event.keyCode === 13) event.preventDefault();"
+  {% endif %}>
   {# Hidden inputs to preserve sort state across filter submissions #}
   <input type="hidden" name="sort" value="{{ current_sort }}">
   <input type="hidden" name="sort_order" value="{{ current_sort_order }}">

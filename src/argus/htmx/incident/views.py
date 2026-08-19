@@ -18,6 +18,7 @@ from django.http import (
     QueryDict,
 )
 from django.shortcuts import render, get_object_or_404
+from django.urls import reverse
 from django.utils.timezone import now as tznow
 from django.views.decorators.http import require_POST, require_GET
 
@@ -32,6 +33,8 @@ from argus.util.datetime_utils import make_aware
 from ..request import HtmxHttpRequest
 
 from .columns import get_incident_table_columns
+from .constants import KIOSK_PAGE_SIZE
+from .filter import get_kiosk_filter_display
 from .utils import get_filter_function
 from .forms.incident_filters import IncidentListForm, SortForm, SORT_DEFAULT
 from .forms.incident_actions import AckForm, DescriptionOptionalForm, EditTicketUrlForm, AddTicketUrlForm
@@ -46,6 +49,7 @@ from ..utils import (
 
 User = get_user_model()
 LOG = logging.getLogger(__name__)
+KIOSK_URL_NAME = "htmx:incident-list-kiosk"
 
 
 # Map request trigger to parameters for incidents update
@@ -266,7 +270,7 @@ def search_tags(request):
 
 
 @require_GET
-def incident_list(request: HtmxHttpRequest) -> HttpResponse:
+def incident_list(request: HtmxHttpRequest, kiosk_mode: bool = False) -> HttpResponse:
     LOG = logging.getLogger(__name__ + ".incident_list")
     LOG.debug("GET at start: %s", request.GET)
     request.GET = dedupe_querydict(request.GET)
@@ -275,6 +279,8 @@ def incident_list(request: HtmxHttpRequest) -> HttpResponse:
     preferences = request.user.get_preferences_context()
     column_layout_name = preferences["argus_htmx"]["incidents_table_column_name"]
     columns = get_incident_table_columns(column_layout_name)
+    if kiosk_mode:
+        columns = [c for c in columns if c.name != "row_select"]
 
     # Handle sorting
     sort_form = SortForm(request.GET)
@@ -294,6 +300,10 @@ def incident_list(request: HtmxHttpRequest) -> HttpResponse:
 
     incident_list_filter = get_filter_function()
     filter_form, qs = incident_list_filter(request, qs)
+
+    kiosk_filter_display = None
+    if kiosk_mode and not request.htmx:
+        kiosk_filter_display = get_kiosk_filter_display(request, filter_form)
 
     GET_params = {}
     if filter_form.is_valid():
@@ -322,7 +332,7 @@ def incident_list(request: HtmxHttpRequest) -> HttpResponse:
     filtered_count = qs.count()
 
     # Standard Django pagination
-    page_size = GET_params["page_size"]
+    page_size = KIOSK_PAGE_SIZE if kiosk_mode else GET_params["page_size"]
     paginator = Paginator(object_list=qs, per_page=page_size)
     page = paginator.get_page(GET_params.get("page", 1))
     last_page_num = page.paginator.num_pages
@@ -345,6 +355,8 @@ def incident_list(request: HtmxHttpRequest) -> HttpResponse:
     else:
         base_template = "htmx/incident/_base.html"
 
+    incident_list_url = reverse(KIOSK_URL_NAME if kiosk_mode else "htmx:incident-list")
+
     LOG.debug("GET at end: %s", request.GET)
     context = {
         "columns": columns,
@@ -358,5 +370,13 @@ def incident_list(request: HtmxHttpRequest) -> HttpResponse:
         "page": page,
         "last_page_num": last_page_num,
         "second_to_last_page": last_page_num - 1,
+        "kiosk_mode": kiosk_mode,
+        "kiosk_filter_display": kiosk_filter_display,
+        "incident_list_url": incident_list_url,
     }
     return render(request, "htmx/incident/incident_list.html", context=context)
+
+
+@require_GET
+def incident_list_kiosk(request: HtmxHttpRequest) -> HttpResponse:
+    return incident_list(request, kiosk_mode=True)

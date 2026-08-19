@@ -49,4 +49,10 @@
     <i class="fa-solid fa-chevron-up fa-xs filter-collapse-icon"
        aria-hidden="true"></i>
   </button>
+  <a href="{% url 'htmx:incident-list-kiosk' %}"
+     onclick="this.href='{% url 'htmx:incident-list-kiosk' %}' + window.location.search"
+     class="link btn btn-sm btn-ghost">
+    <i class="fa-solid fa-display fa-xs" aria-hidden="true"></i>
+    <span class="link">Kiosk</span>
+  </a>
 </div>
