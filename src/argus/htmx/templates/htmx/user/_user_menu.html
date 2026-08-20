@@ -31,6 +31,7 @@
   </li>
   <li aria-hidden="true" class="pointer-events-none h-0 p-0 m-0"></li>
   <div class="text-xs grid grid-cols-[1fr_auto] gap-2 px-3 py-1.5">
+    {% if outdated %}!{% endif %}
     <div class="space-y-2 text-left overflow-hidden select-text">
       <span>Argus version:</span>
       <span class="block truncate">{{ short_version }}</span>

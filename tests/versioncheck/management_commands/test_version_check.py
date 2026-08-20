@@ -15,14 +15,14 @@ class TestTaskRegisterLatestVersion(TestCase):
     def tearDown(self):
         connect_signals()
 
-    @patch("argus.versioncheck.tasks.get_latest_version")
+    @patch("argus.versioncheck.utils.get_latest_version")
     def test_when_new_version_is_not_already_registered_then_register_new_version(self, get_latest_version):
         get_latest_version.return_value = "1.2.3"
         assert not LastSeenVersion.objects.filter(version="1.2.3").exists()
         call_command("check_version", "--save")
         assert LastSeenVersion.objects.filter(version="1.2.3").exists()
 
-    @patch("argus.versioncheck.tasks.get_latest_version")
+    @patch("argus.versioncheck.utils.get_latest_version")
     def test_when_new_version_is_already_registered_then_do_not_register_it_again(self, get_latest_version):
         get_latest_version.return_value = "1.2.3"
         LastSeenVersion.objects.create(version="1.2.3")
@@ -31,7 +31,7 @@ class TestTaskRegisterLatestVersion(TestCase):
         # Still only one instance of this version in the database
         assert LastSeenVersion.objects.filter(version="1.2.3").count() == 1
 
-    @patch("argus.versioncheck.tasks.get_latest_version")
+    @patch("argus.versioncheck.utils.get_latest_version")
     def test_when_save_flag_is_not_set_then_do_not_register_new_version(self, get_latest_version):
         get_latest_version.return_value = "1.2.3"
         assert not LastSeenVersion.objects.filter(version="1.2.3").exists()

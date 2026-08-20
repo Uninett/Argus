@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 
 from argus.versioncheck.models import LastSeenVersion
-from argus.versioncheck.tasks import get_latest_version
+from argus.versioncheck.utils import get_latest_version
 
 
 class Command(BaseCommand):
