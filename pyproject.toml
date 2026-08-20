@@ -35,7 +35,8 @@ dependencies = [
     "drf-rw-serializers>=1.1",
     "drf-spectacular>=0.17",
     "factory_boy",
-    "django-psycopg-infinity",
+    # Pinned: 0.1.1 changed tz-aware infinity semantics, breaking round-trip equality
+    "django-psycopg-infinity==0.1.0",
     "psycopg[c]",
     "python-dataporten-auth",
     "social-auth-core>=4.1",

@@ -64,7 +64,7 @@ django-htmx==1.29.0
     # via argus-server (pyproject.toml)
 django-phonenumber-field[phonenumberslite]==8.5.0
     # via argus-server (pyproject.toml)
-django-psycopg-infinity==0.1.1
+django-psycopg-infinity==0.1.0
     # via argus-server (pyproject.toml)
 django-rest-knox==5.1.0
     # via argus-server (pyproject.toml)
