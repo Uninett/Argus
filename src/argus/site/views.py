@@ -24,6 +24,23 @@ from .serializers import MetadataSerializer
 LOG = logging.getLogger(__name__)
 
 
+def get_version():
+    try:
+        from argus.version import __version__
+
+        return __version__
+    except (ModuleNotFoundError, ImportError):
+        pass
+    try:
+        return version("argus-server")
+    except PackageNotFoundError as e:
+        return str(e)
+    return "version not found"
+
+
+# HTML
+
+
 # fmt: off
 def index(request):
     context = {
@@ -39,19 +56,6 @@ index.login_required = False
 def health_check(request):
     return HttpResponseNoContent()
 health_check.login_required = False
-# fmt: on
-
-
-# fmt: off
-@api_view(["GET", "HEAD", "POST"])
-@permission_classes([permissions.AllowAny])
-def api_gone(request, message: str = "Gone"):
-    data = {
-        "status_code": drf_status.HTTP_410_GONE,
-        "status": message,
-    }
-    return Response(data, status=drf_status.HTTP_410_GONE)
-api_gone.login_required = False
 # fmt: on
 
 
@@ -85,18 +89,20 @@ def error(request):
 # fmt: on
 
 
-def get_version():
-    try:
-        from argus.version import __version__
+# JSON
 
-        return __version__
-    except (ModuleNotFoundError, ImportError):
-        pass
-    try:
-        return version("argus-server")
-    except PackageNotFoundError as e:
-        return str(e)
-    return "version not found"
+
+# fmt: off
+@api_view(["GET", "HEAD", "POST"])
+@permission_classes([permissions.AllowAny])
+def api_gone(request, message: str = "Gone"):
+    data = {
+        "status_code": drf_status.HTTP_410_GONE,
+        "status": message,
+    }
+    return Response(data, status=drf_status.HTTP_410_GONE)
+api_gone.login_required = False
+# fmt: on
 
 
 @extend_schema_view(get=extend_schema(responses=MetadataSerializer))
