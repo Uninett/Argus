@@ -89,6 +89,18 @@ def error(request):
 # fmt: on
 
 
+# fmt: off
+@require_GET
+def about(request):
+    template_name = "htmx/about.html"
+    context = {
+        "page_title": "About",
+    }
+    return render(request, template_name, context=context)
+about.login_required = False
+# fmt: on
+
+
 # JSON
 
 
