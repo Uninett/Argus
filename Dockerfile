@@ -23,4 +23,4 @@ ENV PORT=8000
 EXPOSE 8000
 
 ENTRYPOINT ["/usr/bin/tini", "-v", "--"]
-CMD ["/argus/docker-entrypoint.sh"]
+CMD ["/argus/docker-entrypoint-argus.sh"]
