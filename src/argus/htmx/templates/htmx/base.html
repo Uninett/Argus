@@ -44,8 +44,11 @@
             {% include "htmx/user/_user_menu.html" %}
           </details>
         {% else %}
-          <a class="btn" href="{% url 'htmx:login' %}">Log in</a>
-        {% endif %}
+          <div class="flex flex-row gap-4">
+            <a class="link" href="{% url "about" %}">About</a>
+            <a class="link" href="{% url 'htmx:login' %}">Log in</a>
+          {% endif %}
+        </div>
       {% endblock userlink %}
     </div>
   </nav>
