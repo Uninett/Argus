@@ -1,5 +1,5 @@
 from django.http import Http404
-from django.test import RequestFactory, TestCase
+from django.test import RequestFactory, TestCase, tag
 from django.urls import reverse
 
 from rest_framework import status
@@ -13,6 +13,13 @@ class TestAPIV1GoneView(TestCase):
         for path in ("/api/v1/", "/api/v1/gurglefoomimi"):
             response = self.client.get(path)
             self.assertEqual(response.status_code, status.HTTP_410_GONE)
+
+
+@tag("integration")
+class TestAboutView(TestCase):
+    def test_it_should_always_return_200(self):
+        response = self.client.get(reverse("about"))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
 
 class TestHealthCheckView(TestCase):
