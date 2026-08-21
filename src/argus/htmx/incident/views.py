@@ -332,9 +332,11 @@ def incident_list(request: HtmxHttpRequest, kiosk_mode: bool = False) -> HttpRes
     filtered_count = qs.count()
 
     # Standard Django pagination
+    # Kiosk mode has no page navigation, and has its own page size, so it always shows page 1
+    page_number = 1 if kiosk_mode else GET_params.get("page", 1)
     page_size = KIOSK_PAGE_SIZE if kiosk_mode else GET_params["page_size"]
     paginator = Paginator(object_list=qs, per_page=page_size)
-    page = paginator.get_page(GET_params.get("page", 1))
+    page = paginator.get_page(page_number)
     last_page_num = page.paginator.num_pages
 
     qd = QueryDict(urlencode(GET_params, doseq=True))
