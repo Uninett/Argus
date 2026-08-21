@@ -131,8 +131,8 @@ class IncidentFilterForm(forms.Form):
     ]
 
     DEFAULT_VALUES = {
-        "open": None,
-        "acked": None,
+        "open": OpenStatus.BOTH.value,
+        "acked": AckedStatus.BOTH.value,
         "sourceSystemIds": [],
         "source_types": [],
         "tags": [],
