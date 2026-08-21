@@ -1,5 +1,6 @@
 from datetime import timedelta
 from types import SimpleNamespace
+from unittest.mock import patch
 
 from django import forms, test
 from django.test.client import RequestFactory
@@ -226,6 +227,21 @@ class KioskModeTests(test.TestCase):
         self.assertContains(response, 'class="incident-list-param flex-1 peer"')
         self.assertContains(response, 'value="42"')
         self.assertNotContains(response, 'id="search_id-dropdown"')
+
+    def test_given_kiosk_mode_with_a_page_number_above_1_it_should_reset_to_page_1(self):
+        def unfiltered_incident_list_filter(request, qs):
+            return forms.Form(), qs
+
+        StatelessIncidentFactory.create_batch(6)
+        # Patch so that 3 is a valid page size
+        with patch("argus.htmx.incident.views.KIOSK_PAGE_SIZE", 2):
+            with test.override_settings(ARGUS_HTMX_FILTER_FUNCTION=unfiltered_incident_list_filter):
+                request = RequestFactory().get("/incidents/kiosk/", {"page": "3"})
+                request.session = {}
+                request.user = self.user
+                request.htmx = False
+                response = incident_list(request, kiosk_mode=True)
+        self.assertContains(response, 'hx-vals=\'{"page": "1"')
 
     def test_given_kiosk_mode_with_default_stored_preference_it_should_display_unset(self):
         preferences = ArgusHtmxPreferences.objects.get(user=self.user, namespace="argus_htmx")
