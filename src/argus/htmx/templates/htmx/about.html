@@ -1,0 +1,36 @@
+{% extends "htmx/base.html" %}
+{% load static %}
+{% block main %}
+  <div class="flex justify-center p-4">
+    <section class="flex flex-col gap-4 max-w-4xl w-full">
+      <h1 class="text-3xl font-semibold text-center mt-3 mb-4">Argus v{{ short_version }}</h1>
+      <h2 class="text-2xl">Documentation</h2>
+      <p><a href="https://argus-server.readthedocs.io/en/v{{ short_version }}/"
+   class="link">Argus @ Read the Docs</a></p>
+      <h2 class="text-2xl">Bug tracker</h2>
+      <p><a href="https://github.com/Uninett/Argus/issues" class="link">Argus Issues @ Github</a></p>
+      <h2 class="text-2xl">Home page at Géant</h2>
+      <p><a href="https://network.geant.org/argus/" class="link">Argus Info @ Géant</a></p>
+      <p>This has an overview of where Argus has been presented, the official mailing list address, and other contact info.</p>
+      <h2 class="text-2xl">Funded by</h2>
+      <section id="funder-logos" class="flex gap-8 items-end">
+        <div class="w-1/3">
+          <a href="https://sikt.no">
+            <img alt="Sikt" src="{% static "about/Sikt-Primærlogo-Mørk_0.png" %}">
+          </a>
+        </div>
+        <div class="w-1/3 mr-4">
+          <a href="https://geant.org">
+            <img alt="Géant" src="{% static "about/GEANT-logo-blue.png" %}">
+          </a>
+        </div>
+        <div class="w-1/3 mr-4">
+          <a href="https://nordu.net/">
+            <img alt="NORDUnet"
+                 src="{% static "about/NORDUnet-logo-blue-bigger.png" %}">
+          </a>
+        </div>
+      </section>
+    </section>
+  </div>
+{% endblock main %}
