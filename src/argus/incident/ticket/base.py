@@ -5,6 +5,8 @@ from abc import ABC, abstractmethod
 from django.conf import settings
 from django.template.loader import render_to_string
 
+from ..models import Incident
+
 __all__ = [
     "TicketClientException",
     "TicketCreationException",
@@ -92,3 +94,13 @@ class TicketPlugin(ABC):
         Raises a TicketCreationException in case of any errors
         """
         return None
+
+    @staticmethod
+    def get_ticket_identifier(incident: Incident):
+        """
+        Returns an identifier (e.g. id, number, hash) for the associated ticket
+        of an incident
+
+        This can be used to easier identify a ticket in the incident list
+        """
+        return incident.ticket_url
