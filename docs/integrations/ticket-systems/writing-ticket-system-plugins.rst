@@ -34,3 +34,8 @@ page should be returned.
 
 The method ``create_ticket`` is called within Argus when a user wants to create
 a ticket.
+
+If the ticket system has some kind of identifier that is within the url then
+the method ``get_ticket_identifier`` should return that identifier (id, hash,
+etc.). This identifier will be used in the incident to easier identify a
+ticket.
