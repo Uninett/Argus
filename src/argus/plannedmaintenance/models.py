@@ -119,13 +119,13 @@ class PlannedMaintenanceTask(models.Model):
         self.save()
 
     def connect_covered_incidents(self):
-        """Adds all incidents that are covered by the task to the incidents field"""
+        """Set the incidents field to all incidents that are covered by the task"""
 
         from .utils import incidents_covered_by_planned_maintenance_task
 
-        queryset = Incident.objects.exclude(planned_maintenance_tasks__pk=self.pk)
-
-        covered_incidents = incidents_covered_by_planned_maintenance_task(queryset=queryset, pm_task=self)
+        # Find all incidents covered by PM, calculate this anew in case a filter was added/removed from the PM
+        covered_incidents = incidents_covered_by_planned_maintenance_task(queryset=Incident.objects.all(), pm_task=self)
+        # Set replaces the currently connected incidents with the newly calculated ones
         self.incidents.set(covered_incidents)
 
     def clean(self):
