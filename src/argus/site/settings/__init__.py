@@ -91,6 +91,24 @@ def validate_app_setting(jsonblob):
     return app_setting.root
 
 
+# other helpers
+
+
+def prefix_relative_url(urlpath, suburl: str = ""):
+    if not suburl:
+        return urlpath
+
+    SLASH = "/"
+    end = SLASH if urlpath.endswith(SLASH) else ""
+    suburl = suburl.lstrip(SLASH)
+    urlpath = urlpath.lstrip(SLASH)
+    if urlpath.startswith(suburl):
+        return urlpath
+
+    combined_url = Path(suburl) / Path(urlpath)
+    return str(combined_url).rstrip(SLASH) + end
+
+
 # fixes
 
 

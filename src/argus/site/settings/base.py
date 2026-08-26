@@ -15,7 +15,15 @@ import dj_database_url
 from argus.constants import API_STABLE_VERSION
 
 # Import some helpers
-from . import get_bool_env, get_str_env, get_int_env, setup_logging, get_json_env, validate_app_setting
+from . import (
+    get_bool_env,
+    get_str_env,
+    get_int_env,
+    setup_logging,
+    get_json_env,
+    validate_app_setting,
+    prefix_relative_url,
+)
 from ..utils import update_settings
 
 # Quick-start development settings - unsuitable for production
@@ -168,11 +176,14 @@ USE_TZ = True
 
 TIME_ZONE = get_str_env("TIME_ZONE", "Europe/Oslo")
 
+# Argus not running on root
+
+FRONTEND_SUBURL = get_str_env("ARGUS_FRONTEND_SUBURL", "")
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = get_str_env("STATIC_URL", "/static/")
+STATIC_URL = prefix_relative_url(get_str_env("STATIC_URL", "/static/"), FRONTEND_SUBURL)
 STORAGES = {
     "default": {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
@@ -204,6 +215,9 @@ DEFAULT_FROM_EMAIL = get_str_env("DEFAULT_FROM_EMAIL", "argus@localhost")
 
 # For permalinks to incidents in argus dashboard
 FRONTEND_URL = get_str_env("ARGUS_FRONTEND_URL")
+
+if FRONTEND_SUBURL and not FRONTEND_URL.endswith(FRONTEND_SUBURL):
+    FRONTEND_URL = f"{FRONTEND_URL}/{FRONTEND_SUBURL}/"
 
 # django-rest-framework
 
@@ -308,7 +322,7 @@ SOCIAL_AUTH_PIPELINE = (
 # fmt: on
 
 SOCIAL_AUTH_ADMIN_USER_SEARCH_FIELDS = ["username", "first_name", "email"]
-SOCIAL_AUTH_LOGIN_REDIRECT_URL = "/"
+SOCIAL_AUTH_LOGIN_REDIRECT_URL = prefix_relative_url("/", FRONTEND_SUBURL)
 SOCIAL_AUTH_NEW_USER_REDIRECT_URL = SOCIAL_AUTH_LOGIN_REDIRECT_URL
 
 # Set these somewhere

@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.urls import include, path
 
 from argus.site.utils import get_urlpatterns
@@ -8,3 +9,6 @@ urlpatterns = get_urlpatterns(APP_SETTINGS)
 urlpatterns += [
     path("oidc/", include("social_django.urls", namespace="social")),
 ]
+
+if settings.FRONTEND_SUBURL:
+    urlpatterns = [path(settings.FRONTEND_SUBURL, include(urlpatterns))]

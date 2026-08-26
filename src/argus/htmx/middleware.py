@@ -3,12 +3,13 @@ import logging
 from django.conf import settings
 from django.contrib.auth.views import redirect_to_login
 from django.http import HttpResponse
+from django.shortcuts import resolve_url
 from django.template import loader
 from django.utils.deprecation import MiddlewareMixin
-from django.utils.encoding import force_str
 from django_htmx.http import HttpResponseClientRedirect
 from django.contrib import messages
 
+from argus.site.settings import prefix_relative_url
 from .request import HtmxHttpRequest
 
 LOG = logging.getLogger(__name__)
@@ -16,13 +17,22 @@ LOG = logging.getLogger(__name__)
 
 class LoginRequiredMiddleware:
     def __init__(self, get_response):
-        self.public_urls = getattr(settings, "PUBLIC_URLS", ())
-        self.login_url = force_str(settings.LOGIN_URL)
         self.get_response = get_response
+        self._init_public_urls()
 
     def __call__(self, request):
         response = self.get_response(request)
         return response
+
+    def _init_public_urls(self):
+        urls = getattr(settings, "PUBLIC_URLS", ())
+        suburl = getattr(settings, "FRONTEND_SUBURL", "")
+
+        public_urls = []
+        for url in urls:
+            url = resolve_url(url)
+            public_urls.append(prefix_relative_url(url, suburl))
+        self.public_urls = tuple(public_urls)
 
     def process_view(self, request, view_func, _view_args, _view_kwargs):
         assert hasattr(request, "user"), (
@@ -51,7 +61,7 @@ class LoginRequiredMiddleware:
             return None
 
         # Redirect unauthenticated users to login page
-        response = redirect_to_login(request.get_full_path(), self.login_url, "next")
+        response = redirect_to_login(request.get_full_path(), redirect_field_name="next")
         if getattr(request, "htmx", False):
             response = HttpResponseClientRedirect(response.url)
 

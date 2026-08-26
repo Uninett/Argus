@@ -30,14 +30,7 @@ from argus.site.views import about, index, MetadataView, api_gone, error, health
 
 api_v1_gone = partial(api_gone, message="API v1 has been removed")
 
-
-urlpatterns = [
-    path("favicon.ico", RedirectView.as_view(url="/static/favicon.svg", permanent=True)),
-    path(".error/", error, name="error"),
-    path(".still-alive/", health_check),  # doesn't need a name
-    path("about/", about, name="about"),
-    path("about/", include("argus.versioncheck.urls")),
-    path("admin/", admin.site.urls),
+api_urls = [
     path(
         "api/schema/",
         SpectacularAPIView.as_view(api_version=API_STABLE_VERSION),
@@ -56,6 +49,26 @@ urlpatterns = [
     path("json-schema/<slug:slug>", SchemaView.as_view(), name="json-schema"),
     path("", index, name="api-home"),
 ]
+
+frontend_urls = [
+    path(".error/", error, name="error"),
+    path(".still-alive/", health_check),  # doesn't need a name
+    path("about/", about, name="about"),
+    path("about/", include("argus.versioncheck.urls")),
+    path("admin/", admin.site.urls),
+]
+
+if settings.FRONTEND_SUBURL:
+    frontend_urls = [path(settings.FRONTEND_SUBURL, include(frontend_urls))]
+    api_urls = [path(settings.FRONTEND_SUBURL, include(api_urls))]
+
+urlpatterns = (
+    [
+        path("favicon.ico", RedirectView.as_view(url="/static/favicon.svg", permanent=True)),
+    ]
+    + api_urls
+    + frontend_urls
+)
 
 # Extra/overriding apps
 
