@@ -36,6 +36,7 @@ urlpatterns = [
     path(".error/", error, name="error"),
     path(".still-alive/", health_check),  # doesn't need a name
     path("about/", about, name="about"),
+    path("about/", include("argus.versioncheck.urls")),
     path("admin/", admin.site.urls),
     path(
         "api/schema/",

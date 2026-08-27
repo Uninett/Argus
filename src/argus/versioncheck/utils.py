@@ -5,6 +5,7 @@ from urllib.parse import urljoin
 import requests
 
 from django.conf import settings
+from django.db import transaction
 
 from argus.versioncheck.models import PyPIVersion
 from argus.site.views import get_version
@@ -94,6 +95,7 @@ def register_and_return_latest_version(suppress_errors: bool = True) -> Tuple[Op
     return register_version(latest_version, upload_time)
 
 
+@transaction.atomic
 def register_version(latest_version, upload_time) -> Tuple[PyPIVersion, bool]:
     """Save a new version"""
     qs = PyPIVersion.objects.select_for_update()

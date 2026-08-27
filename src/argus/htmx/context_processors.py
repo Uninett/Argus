@@ -12,6 +12,7 @@ from packaging.version import InvalidVersion, Version
 
 from . import defaults
 from argus.site.views import get_version
+from argus.versioncheck.utils import get_latest_registered_version
 
 
 def static_paths(request):
@@ -31,8 +32,27 @@ def banner_message(request):
 
 def metadata(request):
     full_version = get_version()
+    latest_version = None
+    latest_version_change = None
+    support_release_watching = False
+
+    try:
+        versionobj = get_latest_registered_version()
+        support_release_watching = True
+        if versionobj:
+            latest_version = versionobj.version
+            latest_version_change = versionobj.upload_time
+    except Exception:
+        pass
+
     try:
         short_version = str(Version(full_version).base_version)
     except (InvalidVersion, TypeError):
         short_version = full_version or ""
-    return {"version": full_version, "short_version": short_version}
+    return {
+        "version": full_version,
+        "short_version": short_version,
+        "latest_version": latest_version,
+        "latest_version_change": latest_version_change,
+        "support_release_watching": support_release_watching,
+    }
