@@ -1,9 +1,14 @@
 from unittest import TestCase
+from unittest.mock import patch
 from datetime import timedelta
 
-from django.test import tag
+from django.test import TestCase as DjangoTestCase, override_settings, tag
 
-from argus.htmx.templatetags.argus_htmx import dictvalue, pretty_timedelta
+from argus.htmx.templatetags.argus_htmx import dictvalue, pretty_timedelta, ticket_identifier
+from argus.incident.factories import StatefulIncidentFactory
+from argus.incident.ticket.dummy import DummyPlugin
+from argus.incident.ticket.utils import SETTING_NAME
+from argus.util.testing import connect_signals, disconnect_signals
 
 
 @tag("unit")
@@ -46,3 +51,27 @@ class PrettyTimedeltaTest(TestCase):
         self.assertEqual(result, "0\xa0minutes")
         result = pretty_timedelta(timedelta(seconds=-100000))
         self.assertEqual(result, "0\xa0minutes")
+
+
+@tag("unit")
+class TicketIdentifierTests(DjangoTestCase):
+    def setUp(self):
+        disconnect_signals()
+
+    def tearDown(self):
+        connect_signals()
+
+    def test_when_incident_has_no_ticket_url_returns_empty_string(self):
+        incident = StatefulIncidentFactory(ticket_url="")
+        self.assertEqual(ticket_identifier(incident), "")
+
+    @override_settings(**{SETTING_NAME: None})
+    def test_when_no_ticket_plugin_is_configured_falls_back_to_ticket_url(self):
+        incident = StatefulIncidentFactory(ticket_url="https://example.com/ticket/123")
+        self.assertEqual(ticket_identifier(incident), incident.ticket_url)
+
+    @override_settings(**{SETTING_NAME: "argus.incident.ticket.dummy.DummyPlugin"})
+    def test_when_ticket_plugin_is_configured_uses_its_get_ticket_identifier(self):
+        incident = StatefulIncidentFactory(ticket_url="https://example.com/ticket/123")
+        with patch.object(DummyPlugin, "get_ticket_identifier", return_value="TICKET-1"):
+            self.assertEqual(ticket_identifier(incident), "TICKET-1")
