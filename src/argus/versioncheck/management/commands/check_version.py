@@ -1,7 +1,6 @@
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 
-from argus.versioncheck.models import LastSeenVersion
-from argus.versioncheck.tasks import get_latest_version
+from argus.versioncheck.utils import VersionCheckError, fetch_latest_version_and_upload_time, register_version
 
 
 class Command(BaseCommand):
@@ -11,10 +10,15 @@ class Command(BaseCommand):
         parser.add_argument("-s", "--save", action="store_true", help="Save the new version to the database")
 
     def handle(self, *args, **options):
-        latest_version = get_latest_version()
-        self.stdout.write(f"Latest version of Argus is: {latest_version}")
+        try:
+            latest_version, upload_time = fetch_latest_version_and_upload_time()
+        except VersionCheckError as e:
+            self.stderr.write(e)
+            raise CommandError from e
+
+        self.stdout.write(f"Latest version of Argus is: {latest_version}, uploaded {upload_time}")
         if options["save"]:
-            _, created = LastSeenVersion.objects.get_or_create(version=latest_version)
+            versionobj, created = register_version(latest_version, upload_time)
             if created:
                 self.stdout.write("Saved to database.")
             else:
