@@ -9,6 +9,9 @@ from django.core.validators import URLValidator
 from django.utils.timesince import timesince, timeuntil
 from django.utils.timezone import now as tznow
 
+from argus.incident.ticket.base import TicketPluginException
+from argus.incident.ticket.utils import get_autocreate_ticket_plugin
+
 from .. import defaults
 
 register = template.Library()
@@ -92,6 +95,22 @@ def update_interval_string(value: int | Literal["never"]):
     if value == "never":
         return "Never"
     return f"{value}s"
+
+
+@register.filter
+def ticket_identifier(incident) -> str:
+    """Return a short display identifier for an incident's ticket
+
+    Falls back to the raw ticket_url if no ticket plugin is configured
+    or resolving/calling it fails for any reason.
+    """
+    if not incident or not incident.ticket_url:
+        return ""
+    try:
+        plugin = get_autocreate_ticket_plugin()
+        return plugin.get_ticket_identifier(incident)
+    except TicketPluginException:
+        return incident.ticket_url
 
 
 @register.filter
