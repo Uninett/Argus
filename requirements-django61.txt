@@ -137,7 +137,7 @@ pydantic-core==2.46.4
     # via pydantic
 pyjwt[crypto]==2.13.0
     # via
-    #   pyjwt
+    #   -r constraints.txt
     #   social-auth-core
 python-dataporten-auth==2.0.0
     # via argus-server (pyproject.toml)
@@ -168,8 +168,10 @@ social-auth-core==5.1.0
     #   argus-server (pyproject.toml)
     #   python-dataporten-auth
     #   social-auth-app-django
-sqlparse==0.5.5
-    # via django
+sqlparse==0.6.0
+    # via
+    #   -r constraints.txt
+    #   django
 typing-extensions==4.16.0
     # via
     #   anyio
