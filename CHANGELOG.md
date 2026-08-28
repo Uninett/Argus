@@ -8,6 +8,160 @@ This project uses [*towncrier*](https://towncrier.readthedocs.io/) and the chang
 
 <!-- towncrier release notes start -->
 
+## [2.10.0] - 2026-08-28
+
+This release is the first to suport Django 6.1, and no longer supports Django
+6.0.
+
+Remember to migrate, and this time there is a manual step to clean up some
+migration cruft as well, see NOTES.
+
+### Big new features, in brief
+
+* Heartbeat functionality
+* Kiosk mode, see the new link in the filter box
+* About-page, with a button that can check for a for new release
+
+See the copious NOTES.
+
+### Removed
+
+- Removed outdated migrations files. See NOTES!
+  ([#2022](https://github.com/Uninett/Argus/issues/2022))
+- Removed support for testing on Django 6.0, as that version is EOL-ed.
+  ([#2025](https://github.com/Uninett/Argus/issues/2025))
+
+### Added
+
+- Added warnings to be shown for destinations and notification profiles where
+  the medium is not installed
+  ([#1453](https://github.com/Uninett/Argus/issues/1453))
+- Added `INCIDENT_RESTART` event type to allow source systems to reopen incidents
+  ([#1502](https://github.com/Uninett/Argus/issues/1502))
+- Add maintenance API endpoints
+  ([#1774](https://github.com/Uninett/Argus/issues/1774))
+- Implemented detailed Slack URL validator
+  ([#1919](https://github.com/Uninett/Argus/issues/1919))
+- Add docs for using the base apprise plugin directly
+  ([#1921](https://github.com/Uninett/Argus/issues/1921))
+- Added a kiosk mode to the main view, providing a minimal version of the
+  incident list suitable for passive Argus usage.
+  ([#1938](https://github.com/Uninett/Argus/issues/1938))
+- Added new API endpoint to explicitly update the `last_seen` field for
+  a source system. ([#1939](https://github.com/Uninett/Argus/issues/1939))
+- Added a way to to store expected heartbeat frequency (as a Postgres interval,
+  minimum 60 seconds) to a source system, and made the new field visible in the
+  admin. ([#1941](https://github.com/Uninett/Argus/issues/1941))
+- Added management command suitable to run as a cronjob that looks for dead
+  incidents (as per heartbeat frequency and last seen heartbeat). Dead sources
+  are reported as incidents, formerly dead sources get their respective
+  incidents auto-closed.
+  ([#1954](https://github.com/Uninett/Argus/issues/1954))
+- Show `last_seen` and `heartbeat_frequency` in the source list and allow
+  altering `heartbeat_frequency`.
+  ([#1962](https://github.com/Uninett/Argus/issues/1962))
+- The time zone is now configurable via the `TIME_ZONE` environment variable
+  (default `Europe/Oslo`, unchanged). The `TIME_ZONE` variable already shipped
+  in `docker-compose.yml` previously had no effect.
+  ([#1963](https://github.com/Uninett/Argus/issues/1963))
+- Added reference documentation for Argus's own incidents.
+  ([#1964](https://github.com/Uninett/Argus/issues/1964))
+- Added the boilerplate for API v3 for incidents, with an altered SourceSystem
+  serializer showing the `last_seen` field as read only to serve as an example.
+  ([#2010](https://github.com/Uninett/Argus/issues/2010))
+- Added support for testing on Django 6.1.
+  ([#2025](https://github.com/Uninett/Argus/issues/2025))
+- Add an "about"-page ([#2042](https://github.com/Uninett/Argus/issues/2042))
+- Added function to return a ticket identifier for an incident to the base
+  ticket class ([#2047](https://github.com/Uninett/Argus/issues/2047))
+- Added button to about page to trigger a check for new versions. Staff only!
+  ([#2052](https://github.com/Uninett/Argus/issues/2052))
+- A new endpoint dedicated to health checks was added, on "/.still-alive/".
+  This is to make it easier to filter out in access logs.
+- Added `zabbix-argus-glue` to documented list of known glue services
+- Added a new log level: TRACE, for stuff even less important than DEBUG. In
+  the process, moved logging helpers to a dedicated home in anticipation of
+  supporting better logging in production.
+
+  This new level is really not a good match for use in production, expect a lot
+  of noise. See NOTES.
+- The Docker image publishing workflow can now be triggered manually to
+  (re)build any past release, and tags the newest release as `latest`.
+
+### Changed
+
+- Changed API to allow for an incident to have multiple `INCIDENT_END` events
+  ([#1502](https://github.com/Uninett/Argus/issues/1502))
+- Represent tickets using a per-plugin identifier.
+  ([#1710](https://github.com/Uninett/Argus/issues/1710))
+- Made Apprise an optional dependency
+  ([#1920](https://github.com/Uninett/Argus/issues/1920))
+- Collected the validation functionality of the media plugins in the base
+  class, removed the ability to version a media plugin, and changed the plugins
+  that are shipped with Argus to use new validation functionality.
+
+  This will break existing 3rd party media plugins. See NOTES.
+  ([#2023](https://github.com/Uninett/Argus/issues/2023))
+- Updated CONTRIBUTING file to be more naggy, we *really* want everyone to
+  use the PR template and to write proper commit messages!
+  ([#2026](https://github.com/Uninett/Argus/issues/2026))
+- Changed versioncheck to use the PyPI upload time instead of Argus' visit time
+  to register new versions.
+  ([#2051](https://github.com/Uninett/Argus/issues/2051))
+- Whether a destination medium is marked as installed or not is now visible and
+  filterable in the admin.
+
+### Fixed
+
+- Simplified the tags API (in version 3) so that the internal structure of tags
+  is properly hidden. This will make altering the actual structure a smaller
+  task. ([#136](https://github.com/Uninett/Argus/issues/136))
+- Slimmed down the production Docker image with a multi-stage build, so the
+  build toolchain and the full source tree (including its git history) are no
+  longer baked into the published image.
+  ([#923](https://github.com/Uninett/Argus/issues/923))
+- Added check for whether notifications are globally enabled before sending
+  email and SMS notifications
+  ([#1918](https://github.com/Uninett/Argus/issues/1918))
+- Fixed incident list not reacting to filtering changes when a saved filter is
+  selected ([#1940](https://github.com/Uninett/Argus/issues/1940))
+- Fixed planned maintenance filter selection freezing the drop-down
+  ([#1958](https://github.com/Uninett/Argus/issues/1958))
+- Added check on startup for if an Apprise-derived medium is activated without
+  the Apprise package itself being installed.
+  ([#1965](https://github.com/Uninett/Argus/issues/1965))
+- Fixed searching by description being case sensitive
+  ([#1978](https://github.com/Uninett/Argus/issues/1978))
+- Fixed state- and ack-field being empty after selecting and deselecting
+  filters ([#2000](https://github.com/Uninett/Argus/issues/2000))
+- Fixed filter tag dropdown closing when unselecting last item
+  ([#2005](https://github.com/Uninett/Argus/issues/2005))
+- Sorted the destination dropdown by media when adding/updating a notification
+  profile ([#2017](https://github.com/Uninett/Argus/issues/2017))
+- Show the destination label set by the user in the dropdown when
+  adding/updating a notification profile
+  ([#2018](https://github.com/Uninett/Argus/issues/2018))
+- Correct the input format of v3 of the destination API
+  ([#2029](https://github.com/Uninett/Argus/issues/2029))
+- Fixed incident table becoming unresponsive when a bulk action dialog box was
+  open during a table refresh.
+  ([#2030](https://github.com/Uninett/Argus/issues/2030))
+- Fixed the incident list sorting configuration not being preserved after a
+  refresh and after changing the page
+  ([#2036](https://github.com/Uninett/Argus/issues/2036))
+- Ensured that kiosk mode always resets to page 1 to avoid strange behaviour
+  ([#2044](https://github.com/Uninett/Argus/issues/2044))
+- Fixed connecting ongoing planned maintenance tasks with incidents that are
+  being covered by them ([#2049](https://github.com/Uninett/Argus/issues/2049))
+- Pinned `django-psycopg-infinity` to 0.1.0. Version 0.1.1 changed infinity
+  timestamps loaded from `timestamp with time zone` columns from local time to
+  UTC. Since infinity is represented as a wall-clock sentinel rather than
+  a true instant, the two are not equal, so an incident's `end_time` no longer
+  compared equal to the infinity constant after being reloaded from the
+  database. Among other things this made notifications for open incidents
+  render an explicit far-future timestamp instead of "Still open".
+
+
 ## [2.9.1] - 2026-05-27
 
 The purpose for this release is primarily to aid in creating a Helm chart for

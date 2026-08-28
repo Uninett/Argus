@@ -3,14 +3,116 @@
 This file documents changes to Argus that are relevant for operations,
 customizers and end-users.
 
+## [2.10.0] - 2026-08-28
+
+This release is the first to suport Django 6.1, and no longer supports Django
+6.0.
+
+### Maintenance!
+
+Old no longer used migrations files have been removed!
+
+After checkout/install, then migrate, run
+
+```
+python manage.py migrate --prune argus_notificationprofile
+python manage.py migrate --prune argus_incident
+python manage.py migrate --prune argus_auth
+```
+to clean Django's hidden migrations table.
+
+### Heart beat functionality
+
+The big new feature this time around is supports for tracking the
+liveness of glue services. Every time a glue service contacts the
+Argus server, it's heart beat timestamp is updated. There is also
+an explicit API endpoint that a glue service can use to force-
+update the timestamp. See the API docs.
+
+There's a management command for checking glue service heart
+beats, suitable for running from cron. If a source has
+a `heartbeat_frequency` registered, and the last contact was more
+than the set number of seconds ago, an incident will be created,
+with `argus` as the source. If the source later talks again the
+incident will be closed automatically.
+
+### Kiosk mode
+
+This is a simplified view of the incidents list that is meant for
+dashboards: the filterbox, footer, and the rightmost column for
+selecting incidents for bulk operations, will be hidden. Some info
+from the footer move into the header.
+
+The kiosk mode ignores page size and paging, always showing the
+100 newest incidents.
+
+### About-page with version-checker
+
+There's a new publically accessible "about" page. Staff has
+available to them a button that will check for new releases of
+Argus. The about page can be replaced as usual by replacing
+a template, see the customization-docs.
+
+The version can also be checked with a managment command,
+`check_version`.
+
+### API v3 is in progress
+
+The API for working with tags have been greatly simplified in
+version 3. Take a look!
+
+### Incidents can now be restarted
+
+A source can now restart (reopen) an incident that were closed by
+a human. This necessitated allowing more than one `INCIDENT_END`
+event per incident.
+
+### The media plugin system has been reworked and cleaned up
+
+Please update 3rd party plugins!
+
+The function signature of the `validate` function has changed as
+is not as tightly coupled with the API anymore, please have a look
+at the updated media plugin docs.
+
+### New log level: TRACE
+
+`TRACE` is for even more detailed debugging.
+
+`TRACE` is not a common level to have, but it *is* in use by
+others than us. If you set the root logger to `TRACE` you might
+get a lot of noise from dependencies. We therefore recommend that
+you never set the root logger to `TRACE` but instead set it on
+specific subloggers when you need higher detail. Currently we only
+use `TRACE` in the `argus.htmx` app, to debug incident filters.
+
+If treating Argus as a library, you will need to make sure that
+`argus.logging.utils.setup_logging` has been run for this new
+level to work. `argus.settings.base` does this automatically.
+
+If you get the exception
+
+> AttributeError: 'Logger' object has no attribute 'trace'
+
+this is caused by `setup_logging()` never having been run.
+`setup_logging()` with no parameters is idempotent and thus safe
+to run multiple times.
+
+### Liveness probe
+
+There's a new path `/.still-alive` that an extermal monitoring
+system can use to check if the argus server is up and running. See
+docs.
+
 ## [2.9.0] - 2026-04-29
 
-There are both new dependencies and table changes this time around, so
-remember to install the new dependencies (e.g. via `pip install -r
-requirements.txt`) and to migrate.
+There are both new dependencies and table changes this time
+around, so remember to install the new dependencies (e.g. via `pip
+install -r requirements.txt`) and to migrate.
 
-While we have added support for running on Python 3.14, there has been some
-trouble in practice, so hold off on upgrading Python for now.
+While we have added support for running on Python 3.14, there has
+been some trouble in practice, so hold off on upgrading Python for
+now.
 
 ### PostgreSQL driver: psycopg2 replaced with psycopg 3
 
