@@ -83,6 +83,9 @@ class TestRegisterAndReturnLatestVersion(TestCase):
         version = "1.2.3"
         fetch.return_value = (version, timestamp)
         result, created = register_and_return_latest_version()
+        self.assertTrue(created)
+        self.assertEqual(result.version, version)
+        self.assertEqual(result.upload_time, timestamp)
 
     @patch("argus.versioncheck.utils.fetch_info_from_pypi")
     def test_when_error_and_suppress_error_return_None_None(self, fetch):
@@ -140,7 +143,7 @@ class TestPyPIParserHelpers(TestCase):
         result = _get_latest_upload_time_for_version_from_pypi_dump(dummy_pypi_response, version)
         self.assertEqual(timestamp, result)
 
-    def test_when_dump_bad_then__get_latest_upload_time_for_version_from_pypi_dump_raises_KeyError(self):
+    def test_when_dump_bad_then_get_latest_upload_time_for_version_from_pypi_dump_raises_KeyError(self):
         dummy_pypi_response = {}
         with self.assertRaises(KeyError):
             _get_latest_upload_time_for_version_from_pypi_dump(dummy_pypi_response, "blbl")
