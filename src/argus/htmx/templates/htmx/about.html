@@ -4,6 +4,27 @@
   <div class="flex justify-center p-4">
     <section class="flex flex-col gap-4 max-w-4xl w-full">
       <h1 class="text-3xl font-semibold text-center mt-3 mb-4">Argus v{{ short_version }}</h1>
+      {% if support_release_watching %}
+        {% if latest_version %}
+          <h2 class="text-2xl">Latest release: {{ latest_version }}</h2>
+          <ul>
+            <li>Uploaded {{ latest_version_change }}</li>
+            <li><a class="link"
+   href="https://pypi.org/project/argus-server/{{ latest_version }}/">PyPI: argus-server {{ latest_version }}</a></li>
+            <li><a class="link"
+   href="https://github.com/Uninett/Argus/releases/tag/v{{ latest_version }}">Changelog and tarballs on Github</a></li>
+          </ul>
+        {% else %}
+          <h2 class="text-2xl">Latest release: none fetched</h2>
+        {% endif %}
+        {% if request.user.is_authenticated and request.user.is_staff %}
+          <form method="post"
+                action="{% url "check-for-new-version" %}{% querystring next=request.path %}">
+            {% csrf_token %}
+            <input type="submit" class="btn btn-primary" value="Check for new releases">
+          </form>
+        {% endif %}
+      {% endif %}
       <h2 class="text-2xl">Contact info, mailing lists etc.</h2>
       <p><a href="https://network.geant.org/argus/" class="link">Official Argus landing page @ GÉANT</a></p>
       <h2 class="text-2xl">Documentation</h2>
