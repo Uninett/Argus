@@ -37,42 +37,42 @@ class TestIncidentFilterForm(TestCase):
 
     def test_if_form_is_valid_then_filterblob_should_contain_correct_open_value(self):
         filterblob = self.valid_form.to_filterblob()
-        assert filterblob["open"] is True
+        self.assertTrue(filterblob["open"])
 
     def test_if_form_is_valid_then_filterblob_should_contain_correct_acked_value(self):
         filterblob = self.valid_form.to_filterblob()
-        assert filterblob["acked"] is True
+        self.assertTrue(filterblob["acked"])
 
     def test_if_form_is_valid_then_filterblob_should_contain_correct_sourcesystemids_value(self):
         filterblob = self.valid_form.to_filterblob()
-        assert len(filterblob["sourceSystemIds"]) == 1
+        self.assertEqual(len(filterblob["sourceSystemIds"]), 1)
         # sourceSystemIds seem to be represented as a list of strings sometimes
-        assert int(filterblob["sourceSystemIds"][0]) == int(self.valid_field_values["sourceSystemIds"][0])
+        self.assertEqual(int(filterblob["sourceSystemIds"][0]), int(self.valid_field_values["sourceSystemIds"][0]))
 
     def test_if_form_is_valid_then_filterblob_should_contain_correct_sourcesystem_types_value(self):
         filterblob = self.valid_form.to_filterblob()
-        assert len(filterblob["source_types"]) == 1
+        self.assertEqual(len(filterblob["source_types"]), 1)
 
     def test_if_form_is_valid_then_filterblob_should_contain_correct_tags_value(self):
         filterblob = self.valid_form.to_filterblob()
-        assert filterblob["tags"] == self.valid_field_values["tags"]
+        self.assertEqual(filterblob["tags"], self.valid_field_values["tags"])
 
     def test_if_form_is_not_valid_then_to_filterblob_should_return_an_empty_dict(self):
         form = IncidentFilterForm({"tags": "invalidtags"})
         filterblob = form.to_filterblob()
-        assert filterblob == {}
+        self.assertEqual(filterblob, {})
 
     def test_lack_of_tags_should_not_cause_an_error(self):
         """Tests clean_tags via is_valid"""
         form = IncidentFilterForm({})
-        assert form.is_valid()
-        assert "tags" not in form.errors
+        self.assertTrue(form.is_valid())
+        self.assertNotIn("tags", form.errors)
 
     def test_if_tags_have_wrong_format_then_it_should_create_an_error(self):
         """Tests clean_tags via is_valid"""
         form = IncidentFilterForm({"tags": "invalidtags"})
-        assert not form.is_valid()
-        assert "tags" in form.errors
+        self.assertFalse(form.is_valid())
+        self.assertIn("tags", form.errors)
 
 
 class TestIncidentListFilter(TestCase):
@@ -113,30 +113,30 @@ class TestIncidentListFilter(TestCase):
     def test_valid_request_should_return_filtered_queryset(self):
         self.request.session["selected_filter"] = self.valid_filter.pk
         _, qs = incident_list_filter(self.request, self.qs)
-        assert self.incident in self.qs
-        assert self.incident not in qs
+        self.assertIn(self.incident, self.qs)
+        self.assertNotIn(self.incident, qs)
 
     def test_invalid_request_should_return_unfiltered_queryset(self):
         self.request.session["selected_filter"] = self.invalid_filter.pk
         _, qs = incident_list_filter(self.request, self.qs)
-        assert qs == self.qs
+        self.assertEqual(qs, self.qs)
 
     def test_valid_request_should_return_form_with_correct_values(self):
         self.request.session["selected_filter"] = self.valid_filter.pk
         form, _ = incident_list_filter(self.request, self.qs)
-        assert form.to_filterblob()["maxlevel"] == self.valid_filter.filter["maxlevel"]
+        self.assertEqual(form.to_filterblob()["maxlevel"], self.valid_filter.filter["maxlevel"])
 
     def test_invalid_request_should_return_form_with_errors(self):
         self.request.session["selected_filter"] = self.invalid_filter.pk
         form, _ = incident_list_filter(self.request, self.qs)
-        assert form.errors
+        self.assertTrue(form.errors)
 
     def test_get_request_without_selected_filter_should_use_get_parameters_as_form_data(self):
         maxlevel = 3
         self.request.session["selected_filter"] = None
         self.request.GET = QueryDict(f"tags=&maxlevel={maxlevel}")
         form, _ = incident_list_filter(self.request, self.qs)
-        assert form.to_filterblob()["maxlevel"] == maxlevel
+        self.assertEqual(form.to_filterblob()["maxlevel"], maxlevel)
 
     def test_when_saved_filter_is_selected_and_request_has_form_params_then_it_should_use_the_form_params(self):
         # The saved filter (maxlevel=1) would exclude the level-5 incident. Form params
@@ -145,9 +145,12 @@ class TestIncidentListFilter(TestCase):
         self.request.session["selected_filter"] = self.valid_filter.pk
         self.request.GET = QueryDict("maxlevel=5&tags=")
         form, qs = incident_list_filter(self.request, self.qs)
-        assert form.is_valid()  # guard against the wrong-reason pass: an invalid form filters nothing
-        assert form.to_filterblob()["maxlevel"] == 5  # form param won over saved maxlevel=1
-        assert self.incident in qs  # ...and the override actually reaches the queryset
+        # guard against the wrong-reason pass: an invalid form filters nothing
+        self.assertTrue(form.is_valid())
+        # form param won over saved maxlevel=1
+        self.assertEqual(form.to_filterblob()["maxlevel"], 5)
+        # ...and the override actually reaches the queryset
+        self.assertIn(self.incident, qs)
 
     def test_when_saved_filter_is_selected_and_request_has_no_form_params_then_it_should_use_the_saved_filter(self):
         # sort/sort_order are always present as hidden inputs but are not form params,
@@ -155,8 +158,8 @@ class TestIncidentListFilter(TestCase):
         self.request.session["selected_filter"] = self.valid_filter.pk
         self.request.GET = QueryDict("sort=start_time&sort_order=desc")
         form, qs = incident_list_filter(self.request, self.qs)
-        assert form.to_filterblob()["maxlevel"] == 1  # saved filter value, not overridden
-        assert self.incident not in qs  # saved filter still filters the queryset
+        self.assertEqual(form.to_filterblob()["maxlevel"], 1)  # saved filter value, not overridden
+        self.assertNotIn(self.incident, qs)  # saved filter still filters the queryset
 
     def test_post_request_without_selected_filter_should_use_post_parameters_as_form_data(self):
         maxlevel = 3
@@ -165,7 +168,7 @@ class TestIncidentListFilter(TestCase):
         SessionMiddleware(lambda x: x).process_request(request)
         MessageMiddleware(lambda x: x).process_request(request)
         form, _ = incident_list_filter(request, self.qs)
-        assert form.to_filterblob()["maxlevel"] == maxlevel
+        self.assertEqual(form.to_filterblob()["maxlevel"], maxlevel)
 
 
 class TestCreateNamedFilter(TestCase):
@@ -184,17 +187,17 @@ class TestCreateNamedFilter(TestCase):
     def test_if_input_is_valid_it_should_return_a_filter(self):
         filter_name = "myfilter"
         _, filter_obj = create_named_filter(self.request, filter_name, self.filterblob)
-        assert isinstance(filter_obj, Filter)
+        self.assertTrue(isinstance(filter_obj, Filter))
 
     def test_if_input_is_invalid_it_should_not_return_a_filter(self):
         invalid_name = ""
         _, filter_obj = create_named_filter(self.request, invalid_name, self.filterblob)
-        assert not filter_obj
+        self.assertFalse(filter_obj)
 
     def test_should_return_a_named_filter_form(self):
         filter_name = "myfilter"
         form, _ = create_named_filter(self.request, filter_name, self.filterblob)
-        assert isinstance(form, NamedFilterForm)
+        self.assertTrue(isinstance(form, NamedFilterForm))
 
 
 class TestFilterPreference(TestCase):
@@ -221,9 +224,9 @@ class TestFilterPreference(TestCase):
 
         form, _ = incident_list_filter(request, self.qs, use_empty_filter=True)
 
-        assert form.is_valid()
+        self.assertTrue(form.is_valid())
         filterblob = form.to_filterblob()
-        assert filterblob.get("maxlevel") == IncidentFilterForm.DEFAULT_VALUES["maxlevel"]
+        self.assertEqual(filterblob.get("maxlevel"), IncidentFilterForm.DEFAULT_VALUES["maxlevel"])
 
     def test_stored_preference_is_loaded_when_no_url_params(self):
         """When no URL filter params, stored preference should be loaded"""
@@ -236,7 +239,7 @@ class TestFilterPreference(TestCase):
 
         form, _ = incident_list_filter(request, self.qs)
 
-        assert form.to_filterblob().get("maxlevel") == 2
+        self.assertEqual(form.to_filterblob().get("maxlevel"), 2)
 
     def test_empty_form_when_no_preference_and_no_url_params(self):
         """When no stored preference and no URL params, unbound empty form is used"""
@@ -250,7 +253,7 @@ class TestFilterPreference(TestCase):
         form, _ = incident_list_filter(request, self.qs)
 
         # An unbound form (None passed to constructor) is not bound
-        assert not form.is_bound
+        self.assertFalse(form.is_bound)
 
     def test_invalid_form_with_get_params_shows_error_messages(self):
         """Invalid filter with GET params should add error messages"""
@@ -259,8 +262,8 @@ class TestFilterPreference(TestCase):
 
         form, _ = incident_list_filter(request, self.qs)
 
-        assert not form.is_valid()
-        assert "tags" in form.errors
+        self.assertFalse(form.is_valid())
+        self.assertIn("tags", form.errors)
 
 
 class TestCreateFilterView(TestCase):
@@ -409,9 +412,9 @@ class TestSearchTagsFilter(TestCase):
         request = self.factory.get("/search-tags/")
         response = search_tags(request)
 
-        assert response.status_code == 200
+        self.assertEqual(response.status_code, 200)
         data = json.loads(response.content)
-        assert data == {"results": []}
+        self.assertEqual(data, {"results": []})
 
     def test_search_tags_with_key_value_query_filters_by_key_and_value(self):
         # Create test tags
@@ -423,11 +426,11 @@ class TestSearchTagsFilter(TestCase):
         request = self.factory.get("/search-tags/", {"q": query})
         response = search_tags(request)
 
-        assert response.status_code == 200
+        self.assertEqual(response.status_code, 200)
         data = json.loads(response.content)
-        assert len(data["results"]) == 1
-        assert data["results"][0]["id"] == str(tag1)
-        assert data["results"][0]["text"] == str(tag1)
+        self.assertEqual(len(data["results"]), 1)
+        self.assertEqual(data["results"][0]["id"], str(tag1))
+        self.assertEqual(data["results"][0]["text"], str(tag1))
 
     def test_search_tags_with_key_only_query_filters_by_key(self):
         from argus.incident.models import Tag
@@ -440,12 +443,12 @@ class TestSearchTagsFilter(TestCase):
         request = self.factory.get("/search-tags/", {"q": "env"})
         response = search_tags(request)
 
-        assert response.status_code == 200
+        self.assertEqual(response.status_code, 200)
         data = json.loads(response.content)
-        assert len(data["results"]) == 2
+        self.assertEqual(len(data["results"]), 2)
         tag_ids = [result["id"] for result in data["results"]]
-        assert str(tag1) in tag_ids
-        assert str(tag2) in tag_ids
+        self.assertIn(str(tag1), tag_ids)
+        self.assertIn(str(tag2), tag_ids)
 
     def test_search_tags_limits_results_to_20(self):
         from argus.incident.models import Tag
@@ -457,9 +460,9 @@ class TestSearchTagsFilter(TestCase):
         request = self.factory.get("/search-tags/", {"q": "test"})
         response = search_tags(request)
 
-        assert response.status_code == 200
+        self.assertEqual(response.status_code, 200)
         data = json.loads(response.content)
-        assert len(data["results"]) == 20
+        self.assertEqual(len(data["results"]), 20)
 
     def test_search_tags_returns_correct_json_format(self):
         from argus.incident.models import Tag
@@ -468,12 +471,12 @@ class TestSearchTagsFilter(TestCase):
         request = self.factory.get("/search-tags/", {"q": "service"})
         response = search_tags(request)
 
-        assert response.status_code == 200
+        self.assertEqual(response.status_code, 200)
         data = json.loads(response.content)
-        assert "results" in data
-        assert len(data["results"]) == 1
+        self.assertIn("results", data)
+        self.assertEqual(len(data["results"]), 1)
         result = data["results"][0]
-        assert "id" in result
-        assert "text" in result
-        assert result["id"] == str(tag)
-        assert result["text"] == str(tag)
+        self.assertIn("id", result)
+        self.assertIn("text", result)
+        self.assertEqual(result["id"], str(tag))
+        self.assertEqual(result["text"], str(tag))
