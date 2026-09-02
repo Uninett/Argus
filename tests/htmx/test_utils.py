@@ -36,22 +36,22 @@ class TestGetQSForIncidentIDs(test.TestCase):
         created_incidents = [StatelessIncidentFactory(source=self.source) for _ in range(5)]
         created_ids = [incident.id for incident in created_incidents]
         queryset, missing_ids = get_qs_for_incident_ids(created_ids)
-        assert set(created_incidents) == set(queryset)
-        assert len(missing_ids) == 0
+        self.assertEqual(set(created_incidents), set(queryset))
+        self.assertEqual(len(missing_ids), 0)
 
     def test_when_given_ids_that_exist_in_specified_queryset_it_should_return_all_matching_incidents(self):
         created_incidents = [StatelessIncidentFactory(source=self.source) for _ in range(5)]
         created_ids = [incident.id for incident in created_incidents]
         queryset, missing_ids = get_qs_for_incident_ids(created_ids, Incident.objects.filter(source=self.source))
-        assert set(created_incidents) == set(queryset)
-        assert len(missing_ids) == 0
+        self.assertEqual(set(created_incidents), set(queryset))
+        self.assertEqual(len(missing_ids), 0)
 
     def test_when_given_ids_that_does_not_exist_in_queryset_it_should_include_them_in_missing_ids(self):
         created_incidents = [StatelessIncidentFactory(source=self.source) for _ in range(5)]
         created_ids = [incident.id for incident in created_incidents]
         queryset, missing_ids = get_qs_for_incident_ids(created_ids, Incident.objects.none())
-        assert len(queryset) == 0
-        assert set(created_ids) == missing_ids
+        self.assertEqual(len(queryset), 0)
+        self.assertEqual(set(created_ids), missing_ids)
 
 
 class TestBulkAckQueryset(test.TestCase):
@@ -70,10 +70,10 @@ class TestBulkAckQueryset(test.TestCase):
         now = timezone.now()
         expiration = now + timedelta(hours=1)
         queryset = Incident.objects.filter(source=self.source)
-        assert set(queryset.not_acked()) == set(created_incidents)
+        self.assertEqual(set(queryset.not_acked()), set(created_incidents))
         data = {"timestamp": now, "description": "test description", "expiration": expiration}
         bulk_ack_queryset(self.request, queryset, data)
-        assert set(queryset.acked()) == set(created_incidents)
+        self.assertEqual(set(queryset.acked()), set(created_incidents))
 
     def test_should_return_acked_incidents(self):
         created_incidents = [StatefulIncidentFactory(source=self.source) for _ in range(5)]
@@ -82,7 +82,7 @@ class TestBulkAckQueryset(test.TestCase):
         queryset = Incident.objects.filter(source=self.source)
         data = {"timestamp": now, "description": "test description", "expiration": expiration}
         acked_incidents = bulk_ack_queryset(self.request, queryset, data)
-        assert set(acked_incidents) == set(created_incidents)
+        self.assertEqual(set(acked_incidents), set(created_incidents))
 
 
 class TestBulkCloseQueryset(test.TestCase):
@@ -100,10 +100,10 @@ class TestBulkCloseQueryset(test.TestCase):
         created_incidents = [StatefulIncidentFactory(source=self.source) for _ in range(5)]
         now = timezone.now()
         queryset = Incident.objects.filter(source=self.source)
-        assert set(queryset.open()) == set(created_incidents)
+        self.assertEqual(set(queryset.open()), set(created_incidents))
         data = {"timestamp": now, "description": "test description"}
         bulk_close_queryset(self.request, queryset, data)
-        assert set(queryset.closed()) == set(created_incidents)
+        self.assertEqual(set(queryset.closed()), set(created_incidents))
 
     def test_should_return_closed_incidents(self):
         created_incidents = [StatefulIncidentFactory(source=self.source) for _ in range(5)]
@@ -111,7 +111,7 @@ class TestBulkCloseQueryset(test.TestCase):
         queryset = Incident.objects.filter(source=self.source)
         data = {"timestamp": now, "description": "test description"}
         closed_incidents = bulk_close_queryset(self.request, queryset, data)
-        assert set(closed_incidents) == set(created_incidents)
+        self.assertEqual(set(closed_incidents), set(created_incidents))
 
 
 class TestBulkReopenQueryset(test.TestCase):
@@ -129,10 +129,10 @@ class TestBulkReopenQueryset(test.TestCase):
         now = timezone.now()
         created_incidents = [StatefulIncidentFactory(source=self.source, end_time=now) for _ in range(5)]
         queryset = Incident.objects.filter(source=self.source)
-        assert set(queryset.closed()) == set(created_incidents)
+        self.assertEqual(set(queryset.closed()), set(created_incidents))
         data = {"timestamp": now, "description": "test description"}
         bulk_reopen_queryset(self.request, queryset, data)
-        assert set(queryset.open()) == set(created_incidents)
+        self.assertEqual(set(queryset.open()), set(created_incidents))
 
     def test_should_return_reopened_incidents(self):
         now = timezone.now()
@@ -140,7 +140,7 @@ class TestBulkReopenQueryset(test.TestCase):
         queryset = Incident.objects.filter(source=self.source)
         data = {"timestamp": now, "description": "test description"}
         reopened_incidents = bulk_reopen_queryset(self.request, queryset, data)
-        assert set(reopened_incidents) == set(created_incidents)
+        self.assertEqual(set(reopened_incidents), set(created_incidents))
 
 
 class TestBulkChangeTicketUrlQueryset(test.TestCase):
@@ -163,7 +163,7 @@ class TestBulkChangeTicketUrlQueryset(test.TestCase):
         data = {"timestamp": now, "ticket_url": new_ticket_url}
         bulk_change_ticket_url_queryset(self.request, queryset, data)
         for incident in queryset:
-            assert incident.ticket_url == new_ticket_url
+            self.assertEqual(incident.ticket_url, new_ticket_url)
 
     def test_should_return_incidents_in_queryset(self):
         now = timezone.now()
@@ -175,7 +175,7 @@ class TestBulkChangeTicketUrlQueryset(test.TestCase):
         queryset = Incident.objects.filter(source=self.source)
         data = {"timestamp": now, "ticket_url": new_ticket_url}
         returned_incidents = bulk_change_ticket_url_queryset(self.request, queryset, data)
-        assert set(returned_incidents) == set(created_incidents)
+        self.assertEqual(set(returned_incidents), set(created_incidents))
 
 
 class TestSingleAutocreateTicketUrlQueryset(test.TestCase):
@@ -199,7 +199,7 @@ class TestSingleAutocreateTicketUrlQueryset(test.TestCase):
         mock_plugin.create_ticket.return_value = mocked_url
         with patch("argus.incident.ticket.utils.get_autocreate_ticket_plugin", return_value=mock_plugin):
             incident = single_autocreate_ticket_url_queryset(self.request, queryset, data)
-            assert incident.ticket_url == initial_url
+            self.assertEqual(incident.ticket_url, initial_url)
 
     def test_should_not_update_url_if_incident_already_has_a_ticket_url(self):
         StatefulIncidentFactory(source=self.source, ticket_url="")
@@ -210,7 +210,7 @@ class TestSingleAutocreateTicketUrlQueryset(test.TestCase):
         mock_plugin.create_ticket.return_value = mocked_url
         with patch("argus.incident.ticket.utils.get_autocreate_ticket_plugin", return_value=mock_plugin):
             incident = single_autocreate_ticket_url_queryset(self.request, queryset, data)
-            assert incident.ticket_url == mocked_url
+            self.assertEqual(incident.ticket_url, mocked_url)
 
     def test_should_raise_exception_if_queryset_contains_more_than_one_result(self):
         [StatefulIncidentFactory(source=self.source) for _ in range(5)]
