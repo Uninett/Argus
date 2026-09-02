@@ -73,8 +73,8 @@ django-stubs-ext==6.0.9
     #   django-tasks
     #   django-tasks-db
 django-tasks==0.12.0
-    # via django-tasks-db
-django-tasks-db==0.12.0
+    # via argus-server (pyproject.toml)
+django-tasks-db==0.13.0
     # via argus-server (pyproject.toml)
 django-widget-tweaks==1.5.0
     # via argus-server (pyproject.toml)
