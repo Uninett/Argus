@@ -7,12 +7,12 @@ __all__ = ["APP_SETTINGS"]
 _app_settings = [
     {
         "settings": {
-            "LOGIN_URL": "/accounts/login/",
-            "LOGOUT_URL": "/accounts/logout/",
-            "LOGIN_REDIRECT_URL": "/incidents/",
-            "LOGOUT_REDIRECT_URL": "/incidents/",
+            "LOGIN_URL": "htmx:login",
+            "LOGOUT_URL": "htmx:logout",
+            "LOGIN_REDIRECT_URL": "htmx:incident-list",
+            "LOGOUT_REDIRECT_URL": "htmx:incident-list",
             "PUBLIC_URLS": [
-                "/accounts/login/",
+                "htmx:login",
                 "/api/",
                 "/oidc/",
             ],
