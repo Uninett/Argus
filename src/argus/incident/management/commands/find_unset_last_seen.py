@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 
-from argus.incident.models import SourceSystem, Event
+from argus.incident.models import Event, SourceSystem
 
 
 def find_latest_event_by_heartbeatless_source():
