@@ -26,6 +26,8 @@ LOG = logging.getLogger(__name__)
 INCIDENT_FILTER_PREFERENCE_NAMESPACE = "argus_htmx"
 INCIDENT_FILTER_PREFERENCE_NAME = "incident_filter"
 
+MAX_LEVEL = max(Level).value
+
 
 class RangeInput(forms.NumberInput):
     template_name = "django/forms/widgets/range.html"
@@ -104,9 +106,9 @@ class IncidentFilterForm(forms.Form):
         help_text='Press "Enter" after each completed tag',
     )
     maxlevel = forms.IntegerField(
-        widget=RangeInput(attrs={"step": "1", "min": min(Level).value, "max": max(Level).value}),
+        widget=RangeInput(attrs={"step": "1", "min": min(Level).value, "max": MAX_LEVEL}),
         label="Level <=",
-        initial=max(Level).value,
+        initial=MAX_LEVEL,
         required=False,
     )
     event_types = forms.MultipleChoiceField(
@@ -136,7 +138,7 @@ class IncidentFilterForm(forms.Form):
         "sourceSystemIds": [],
         "source_types": [],
         "tags": [],
-        "maxlevel": max(Level).value,
+        "maxlevel": MAX_LEVEL,
         "event_types": [],
         "special_filters": [],
     }
@@ -260,11 +262,28 @@ class IncidentFilterForm(forms.Form):
 
         return filterblob
 
+    def to_minimal_filterblob(self):
+        """Strip away lookups to be ignored"""
+        filterblob = self.to_filterblob()
+
+        for lookup in ("open", "acked"):
+            if lookup in filterblob and filterblob[lookup] is None:
+                del filterblob[lookup]
+
+        for lookup in ("sourceSystemIds", "source_types", "tags", "event_types"):
+            if lookup in filterblob and not filterblob[lookup]:
+                del filterblob[lookup]
+
+        if "maxlevel" in filterblob and filterblob["maxlevel"] == MAX_LEVEL:
+            del filterblob["maxlevel"]
+
+        return filterblob
+
 
 class NamedFilterForm(forms.ModelForm):
     class Meta:
         model = Filter
-        fields = ["name", "filter"]
+        fields = ["name"]
 
 
 class FilterListView(ListView):
@@ -446,11 +465,9 @@ def _split_tag(tag: str) -> list[str]:
 
 
 def create_named_filter(request, filter_name: str, filterblob: dict):
-    form = NamedFilterForm({"name": filter_name, "filter": filterblob})
+    form = NamedFilterForm({"name": filter_name})
     filter_obj = None
 
     if form.is_valid():
-        filter_obj = Filter.objects.create(
-            user=request.user, name=form.cleaned_data["name"], filter=form.cleaned_data["filter"]
-        )
+        filter_obj = Filter.objects.create(user=request.user, name=form.cleaned_data["name"], filter=filterblob)
     return form, filter_obj
