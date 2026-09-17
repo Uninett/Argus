@@ -2,7 +2,7 @@ import unittest
 
 from django.urls.resolvers import URLResolver
 
-from argus.site.settings import normalize_url, _add_missing_scheme_to_url
+from argus.site.settings import normalize_url, normalize_suburl, prefix_relative_url, _add_missing_scheme_to_url
 from argus.site.settings._serializers import AppSetting
 from argus.site.utils import get_urlpatterns, update_context_processors_list
 
@@ -40,6 +40,72 @@ class NormalizeUrlTests(unittest.TestCase):
         test_url_unknown_port = "http://localhost:5431/fgh/ghj/?ghj=gh#fghj"
         fixed_url = normalize_url(test_url_unknown_port)
         self.assertEqual(fixed_url, test_url_unknown_port)
+
+
+class NormalizeSuburlTests(unittest.TestCase):
+    def test_given_any_spelling_of_a_suburl_it_should_normalize_to_the_path_form(self):
+        # django.urls.path() only ever matches this one form: no leading
+        # slash, exactly one trailing slash
+        for spelling in ("argus", "/argus", "argus/", "/argus/"):
+            with self.subTest(spelling=spelling):
+                self.assertEqual(normalize_suburl(spelling), "argus/")
+
+    def test_given_a_suburl_with_surrounding_whitespace_it_should_be_stripped(self):
+        self.assertEqual(normalize_suburl("  /argus/  "), "argus/")
+
+    def test_given_a_multi_segment_suburl_it_should_keep_every_segment(self):
+        self.assertEqual(normalize_suburl("/tools/argus"), "tools/argus/")
+
+    def test_given_repeated_slashes_it_should_collapse_them(self):
+        # path() would otherwise demand a literal "//" in the url to match
+        self.assertEqual(normalize_suburl("//tools//argus//"), "tools/argus/")
+
+    def test_given_an_empty_suburl_it_should_stay_empty(self):
+        # an empty suburl means "serve from the domain root"
+        for spelling in ("", "/", "  ", "///"):
+            with self.subTest(spelling=spelling):
+                self.assertEqual(normalize_suburl(spelling), "")
+
+
+class PrefixRelativeUrlTests(unittest.TestCase):
+    def test_given_no_suburl_it_should_return_the_url_unchanged(self):
+        self.assertEqual(prefix_relative_url("/api/", ""), "/api/")
+
+    def test_given_a_root_relative_url_it_should_prefix_it_and_stay_root_relative(self):
+        # these urls are compared against request.path and handed to browsers
+        # as redirect targets, so losing the leading slash silently breaks both
+        self.assertEqual(prefix_relative_url("/api/", "argus/"), "/argus/api/")
+
+    def test_given_the_root_url_it_should_become_the_suburl_root(self):
+        self.assertEqual(prefix_relative_url("/", "argus/"), "/argus/")
+
+    def test_given_an_already_prefixed_url_it_should_not_prefix_it_twice(self):
+        self.assertEqual(prefix_relative_url("/argus/api/", "argus/"), "/argus/api/")
+
+    def test_given_a_url_that_merely_starts_with_the_same_letters_it_should_still_prefix(self):
+        self.assertEqual(prefix_relative_url("/argusly/", "argus/"), "/argus/argusly/")
+
+    def test_given_the_bare_prefix_it_should_gain_the_trailing_slash(self):
+        # anything else would leak the one output that cannot be compared
+        # against request.path safely: "/argus" also prefix-matches "/argusly/"
+        self.assertEqual(prefix_relative_url("/argus", "argus/"), "/argus/")
+
+    def test_given_an_absolute_url_it_should_be_left_alone(self):
+        # STATIC_URL may well point at a CDN, which is nobody's sub-site
+        self.assertEqual(prefix_relative_url("https://cdn.example.org/", "argus/"), "https://cdn.example.org/")
+
+    def test_given_a_protocol_relative_url_it_should_be_left_alone(self):
+        # "//host/path" starts with a slash but addresses another host, and is
+        # the canonical way to write a scheme-agnostic CDN url
+        self.assertEqual(prefix_relative_url("//cdn.example.org/static/", "argus/"), "//cdn.example.org/static/")
+
+    def test_given_a_genuinely_relative_url_it_should_be_left_alone(self):
+        self.assertEqual(prefix_relative_url("api/", "argus/"), "api/")
+
+    def test_given_an_unnormalized_suburl_it_should_prefix_as_if_it_were_normalized(self):
+        for spelling in ("argus", "/argus", "argus/", "/argus/"):
+            with self.subTest(spelling=spelling):
+                self.assertEqual(prefix_relative_url("/api/", spelling), "/argus/api/")
 
 
 class GetUrlPatternsFromSettingsTest(unittest.TestCase):
