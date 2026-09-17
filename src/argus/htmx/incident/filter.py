@@ -21,12 +21,13 @@ from argus.notificationprofile.utils import annotate_public_filters_with_usernam
 
 filter_backend = get_filter_backend()
 QuerySetFilter = filter_backend.QuerySetFilter
-LOG = logging.getLogger(__name__)
+minimalize_filterblob = filter_backend.minimalize_filterblob
+MAX_LEVEL = filter_backend.MAX_LEVEL
 
 INCIDENT_FILTER_PREFERENCE_NAMESPACE = "argus_htmx"
 INCIDENT_FILTER_PREFERENCE_NAME = "incident_filter"
 
-MAX_LEVEL = max(Level).value
+LOG = logging.getLogger(__name__)
 
 
 class RangeInput(forms.NumberInput):
@@ -265,19 +266,7 @@ class IncidentFilterForm(forms.Form):
     def to_minimal_filterblob(self):
         """Strip away lookups to be ignored"""
         filterblob = self.to_filterblob()
-
-        for lookup in ("open", "acked"):
-            if lookup in filterblob and filterblob[lookup] is None:
-                del filterblob[lookup]
-
-        for lookup in ("sourceSystemIds", "source_types", "tags", "event_types"):
-            if lookup in filterblob and not filterblob[lookup]:
-                del filterblob[lookup]
-
-        if "maxlevel" in filterblob and filterblob["maxlevel"] == MAX_LEVEL:
-            del filterblob["maxlevel"]
-
-        return filterblob
+        return minimalize_filterblob(filterblob)
 
 
 class NamedFilterForm(forms.ModelForm):
