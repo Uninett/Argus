@@ -22,6 +22,7 @@ from . import (
     setup_logging,
     get_json_env,
     validate_app_setting,
+    normalize_suburl,
     prefix_relative_url,
 )
 from ..utils import update_settings
@@ -176,14 +177,16 @@ USE_TZ = True
 
 TIME_ZONE = get_str_env("TIME_ZONE", "Europe/Oslo")
 
-# Argus not running on root
+# Argus can be served from a sub-path of a domain rather than from its root,
+# e.g. https://example.org/argus/. One prefix covers the entire site: the
+# frontend, the API below it and the admin.
 
-FRONTEND_SUBURL = get_str_env("ARGUS_FRONTEND_SUBURL", "")
+SITE_SUBURL = normalize_suburl(get_str_env("ARGUS_FRONTEND_SUBURL", ""))
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = prefix_relative_url(get_str_env("STATIC_URL", "/static/"), FRONTEND_SUBURL)
+STATIC_URL = prefix_relative_url(get_str_env("STATIC_URL", "/static/"), SITE_SUBURL)
 STORAGES = {
     "default": {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
@@ -216,8 +219,8 @@ DEFAULT_FROM_EMAIL = get_str_env("DEFAULT_FROM_EMAIL", "argus@localhost")
 # For permalinks to incidents in argus dashboard
 FRONTEND_URL = get_str_env("ARGUS_FRONTEND_URL")
 
-if FRONTEND_SUBURL and not FRONTEND_URL.endswith(FRONTEND_SUBURL):
-    FRONTEND_URL = f"{FRONTEND_URL}/{FRONTEND_SUBURL}/"
+if SITE_SUBURL and not FRONTEND_URL.endswith(SITE_SUBURL):
+    FRONTEND_URL = f"{FRONTEND_URL}/{SITE_SUBURL}/"
 
 # django-rest-framework
 
@@ -322,7 +325,7 @@ SOCIAL_AUTH_PIPELINE = (
 # fmt: on
 
 SOCIAL_AUTH_ADMIN_USER_SEARCH_FIELDS = ["username", "first_name", "email"]
-SOCIAL_AUTH_LOGIN_REDIRECT_URL = prefix_relative_url("/", FRONTEND_SUBURL)
+SOCIAL_AUTH_LOGIN_REDIRECT_URL = prefix_relative_url("/", SITE_SUBURL)
 SOCIAL_AUTH_NEW_USER_REDIRECT_URL = SOCIAL_AUTH_LOGIN_REDIRECT_URL
 
 # Set these somewhere

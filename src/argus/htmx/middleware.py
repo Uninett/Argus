@@ -26,7 +26,7 @@ class LoginRequiredMiddleware:
 
     def _init_public_urls(self):
         urls = getattr(settings, "PUBLIC_URLS", ())
-        suburl = getattr(settings, "FRONTEND_SUBURL", "")
+        suburl = getattr(settings, "SITE_SUBURL", "")
 
         public_urls = []
         for url in urls:

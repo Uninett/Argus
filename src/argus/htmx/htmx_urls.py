@@ -10,5 +10,5 @@ urlpatterns += [
     path("oidc/", include("social_django.urls", namespace="social")),
 ]
 
-if settings.FRONTEND_SUBURL:
-    urlpatterns = [path(settings.FRONTEND_SUBURL, include(urlpatterns))]
+if settings.SITE_SUBURL:
+    urlpatterns = [path(settings.SITE_SUBURL, include(urlpatterns))]

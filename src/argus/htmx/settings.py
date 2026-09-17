@@ -2,10 +2,12 @@ from argus.site.settings.base import *
 
 ROOT_URLCONF = "argus.htmx.root_urls"
 
+# Url names are reversed and plain paths are prefixed by LoginRequiredMiddleware,
+# so both follow SITE_SUBURL without being spelled out here
 PUBLIC_URLS = [
     "htmx:login",
-    prefix_relative_url("/api/", API_SUBURL),
-    prefix_relative_url("/oidc/", FRONTEND_SUBURL),
+    "/api/",
+    "/oidc/",
 ]
 
 LOGIN_URL = "htmx:login"

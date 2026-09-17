@@ -58,9 +58,9 @@ frontend_urls = [
     path("admin/", admin.site.urls),
 ]
 
-if settings.FRONTEND_SUBURL:
-    frontend_urls = [path(settings.FRONTEND_SUBURL, include(frontend_urls))]
-    api_urls = [path(settings.FRONTEND_SUBURL, include(api_urls))]
+if settings.SITE_SUBURL:
+    frontend_urls = [path(settings.SITE_SUBURL, include(frontend_urls))]
+    api_urls = [path(settings.SITE_SUBURL, include(api_urls))]
 
 urlpatterns = (
     [

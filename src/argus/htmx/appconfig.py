@@ -11,6 +11,9 @@ _app_settings = [
             "LOGOUT_URL": "htmx:logout",
             "LOGIN_REDIRECT_URL": "htmx:incident-list",
             "LOGOUT_REDIRECT_URL": "htmx:incident-list",
+            # Kept in sync with argus.htmx.settings. Url names and plain
+            # paths both: LoginRequiredMiddleware reverses and prefixes these,
+            # so neither spells out the sub-path Argus may be served from
             "PUBLIC_URLS": [
                 "htmx:login",
                 "/api/",
