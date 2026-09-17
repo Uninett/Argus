@@ -15,6 +15,7 @@ Including another URLconf
 """
 
 from functools import partial
+from urllib.parse import urljoin
 
 from django.conf import settings
 from django.contrib import admin
@@ -52,29 +53,55 @@ api_urls = [
 
 frontend_urls = [
     path(".error/", error, name="error"),
-    path(".still-alive/", health_check),  # doesn't need a name
+    # named so that deployments serving Argus from a sub-path can reverse it
+    path(".still-alive/", health_check, name="health-check"),
     path("about/", about, name="about"),
     path("about/", include("argus.versioncheck.urls")),
     path("admin/", admin.site.urls),
 ]
 
-frontend_urls = prefix_urlpatterns(frontend_urls, settings.SITE_SUBURL)
-api_urls = prefix_urlpatterns(api_urls, settings.SITE_SUBURL)
 
-urlpatterns = (
-    [
-        path("favicon.ico", RedirectView.as_view(url="/static/favicon.svg", permanent=True)),
+def build_favicon_urls() -> list:
+    """The bare /favicon.ico a browser asks for when a page names no icon
+
+    STATIC_URL follows the sub-path, so the target is joined rather than
+    written out, and joined here rather than at module import so that it
+    tracks the setting the same way the rest of the urlconf does.
+
+    Not staticfiles_storage.url(): under the manifest storage used in
+    production that raises at import until collectstatic has run, trading a
+    wrong url for a dead site. Temporary rather than permanent, because the
+    target moves whenever STATIC_URL or the sub-path does and a permanent
+    redirect would stay pinned in browsers long after.
+    """
+    return [
+        path(
+            "favicon.ico",
+            RedirectView.as_view(url=urljoin(settings.STATIC_URL, "favicon.svg"), permanent=False),
+        ),
     ]
-    + api_urls
-    + frontend_urls
-)
 
-# Extra/overriding apps
 
-prefixed_urlpatterns = get_urlpatterns(settings.OVERRIDING_APPS)
-if prefixed_urlpatterns:
-    urlpatterns = prefixed_urlpatterns + urlpatterns
+def build_urlpatterns(suburl: str) -> list:
+    """Compose this site's urlconf below the sub-path ``suburl``
 
-postfixed_urlpatterns = get_urlpatterns(settings.EXTRA_APPS)
-if postfixed_urlpatterns:
-    urlpatterns += postfixed_urlpatterns
+    Callable so that tests can build the urlconf under a prefix without
+    reloading modules: django reads urlpatterns once, at import, so the
+    module-level binding below cannot follow a later change to SITE_SUBURL.
+
+    Everything goes inside the wrap, extra and overriding apps included. Those
+    exist to extend or replace Argus's own urls, so an Argus that lives below a
+    sub-path is where they belong too; leaving them outside would produce a
+    site that half-follows the prefix, which fails silently rather than loudly.
+    """
+    return prefix_urlpatterns(
+        get_urlpatterns(settings.OVERRIDING_APPS)
+        + build_favicon_urls()
+        + api_urls
+        + frontend_urls
+        + get_urlpatterns(settings.EXTRA_APPS),
+        suburl,
+    )
+
+
+urlpatterns = build_urlpatterns(settings.SITE_SUBURL)
