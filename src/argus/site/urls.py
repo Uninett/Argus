@@ -25,7 +25,7 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 from argus.constants import API_STABLE_VERSION, API_STABLE_SCHEMA_VIEWNAME
 from argus.notificationprofile.v2.views import SchemaView
-from argus.site.utils import get_urlpatterns
+from argus.site.utils import get_urlpatterns, prefix_urlpatterns
 from argus.site.views import about, index, MetadataView, api_gone, error, health_check
 
 api_v1_gone = partial(api_gone, message="API v1 has been removed")
@@ -58,9 +58,8 @@ frontend_urls = [
     path("admin/", admin.site.urls),
 ]
 
-if settings.SITE_SUBURL:
-    frontend_urls = [path(settings.SITE_SUBURL, include(frontend_urls))]
-    api_urls = [path(settings.SITE_SUBURL, include(api_urls))]
+frontend_urls = prefix_urlpatterns(frontend_urls, settings.SITE_SUBURL)
+api_urls = prefix_urlpatterns(api_urls, settings.SITE_SUBURL)
 
 urlpatterns = (
     [
