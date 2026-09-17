@@ -5,6 +5,7 @@ from django.contrib.auth.views import redirect_to_login
 from django.http import HttpResponse
 from django.shortcuts import resolve_url
 from django.template import loader
+from django.urls import NoReverseMatch
 from django.utils.deprecation import MiddlewareMixin
 from django_htmx.http import HttpResponseClientRedirect
 from django.contrib import messages
@@ -18,21 +19,10 @@ LOG = logging.getLogger(__name__)
 class LoginRequiredMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
-        self._init_public_urls()
 
     def __call__(self, request):
         response = self.get_response(request)
         return response
-
-    def _init_public_urls(self):
-        urls = getattr(settings, "PUBLIC_URLS", ())
-        suburl = getattr(settings, "SITE_SUBURL", "")
-
-        public_urls = []
-        for url in urls:
-            url = resolve_url(url)
-            public_urls.append(prefix_relative_url(url, suburl))
-        self.public_urls = tuple(public_urls)
 
     def process_view(self, request, view_func, _view_args, _view_kwargs):
         assert hasattr(request, "user"), (
@@ -66,6 +56,63 @@ class LoginRequiredMiddleware:
             response = HttpResponseClientRedirect(response.url)
 
         return response
+
+    @property
+    def public_urls(self) -> tuple[str, ...]:
+        """Paths that may be visited without logging in, as seen from outside
+
+        Rebuilt on every access, deliberately. Do not move this back into
+        __init__, and do not turn it into a cached_property: django builds the
+        middleware chain once per process, before the first request, so
+        anything computed or cached there stays frozen for the life of the
+        process.
+
+        Frozen is wrong here for two reasons. This value is derived from
+        PUBLIC_URLS, SITE_SUBURL and the urlconf, and a test that overrides any
+        of them against a frozen copy sees the stale value, passes, and asserts
+        nothing; the tests that exercise Argus under a url sub-path are exactly
+        that shape. Resolving during chain construction also requires a urlconf
+        that is already loaded, which is not guaranteed that early.
+
+        Rebuilding costs tens of microseconds for the three entries Argus
+        ships, against a request measured in milliseconds. That is the whole
+        price, and it buys correctness under every ordering.
+
+        An entry that cannot be resolved is skipped rather than raised.
+        Resolution happens per request, so raising would take down every url
+        on every request, including the ones this list exists to open up. That
+        makes the logged warning the only signal a misconfigured entry gives,
+        which a startup check would improve on.
+        """
+        urls = getattr(settings, "PUBLIC_URLS", ())
+        suburl = getattr(settings, "SITE_SUBURL", "")
+
+        public_urls = []
+        for url in urls:
+            try:
+                resolved = resolve_url(url)
+            except NoReverseMatch:
+                _warn_once_about_unresolvable(url)
+                continue
+            public_urls.append(prefix_relative_url(resolved, suburl))
+        return tuple(public_urls)
+
+
+def _warn_once_about_unresolvable(url: str) -> None:
+    """Complain about a PUBLIC_URLS entry, but only the first time
+
+    Public urls are resolved per request, so an entry that stays unresolvable
+    would otherwise log once per request for the life of the process, which is
+    how an access log fills a disk. The set is bounded by the number of
+    distinct bad entries, which is a handful at worst.
+    """
+    if url in _UNRESOLVABLE_PUBLIC_URLS:
+        return
+    _UNRESOLVABLE_PUBLIC_URLS.add(url)
+    LOG.warning("Ignoring PUBLIC_URLS entry that this site cannot resolve: %r", url)
+
+
+_UNRESOLVABLE_PUBLIC_URLS = set()
 
 
 class HtmxMessageMiddleware(MiddlewareMixin):
