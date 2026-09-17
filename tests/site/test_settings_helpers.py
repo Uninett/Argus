@@ -1,8 +1,15 @@
 import unittest
+from urllib.parse import urljoin
 
 from django.urls.resolvers import URLResolver
 
-from argus.site.settings import normalize_url, normalize_suburl, prefix_relative_url, _add_missing_scheme_to_url
+from argus.site.settings import (
+    append_suburl,
+    normalize_url,
+    normalize_suburl,
+    prefix_relative_url,
+    _add_missing_scheme_to_url,
+)
 from argus.site.settings._serializers import AppSetting
 from argus.site.utils import get_urlpatterns, update_context_processors_list
 
@@ -106,6 +113,38 @@ class PrefixRelativeUrlTests(unittest.TestCase):
         for spelling in ("argus", "/argus", "argus/", "/argus/"):
             with self.subTest(spelling=spelling):
                 self.assertEqual(prefix_relative_url("/api/", spelling), "/argus/api/")
+
+
+class AppendSuburlTests(unittest.TestCase):
+    def test_given_no_suburl_it_should_return_the_url_unchanged(self):
+        self.assertEqual(append_suburl("https://example.org", ""), "https://example.org")
+
+    def test_given_an_empty_url_it_should_stay_empty(self):
+        # permalinks are simply not configured; do not invent a host for them
+        self.assertEqual(append_suburl("", "argus/"), "")
+
+    def test_given_a_url_it_should_gain_the_suburl_and_a_trailing_slash(self):
+        for url in ("https://example.org", "https://example.org/"):
+            with self.subTest(url=url):
+                self.assertEqual(append_suburl(url, "argus/"), "https://example.org/argus/")
+
+    def test_given_a_url_that_already_ends_in_the_suburl_it_should_not_repeat_it(self):
+        for url in ("https://example.org/argus", "https://example.org/argus/", "https://example.org/argus//"):
+            with self.subTest(url=url):
+                self.assertEqual(append_suburl(url, "argus/"), "https://example.org/argus/")
+
+    def test_given_a_url_whose_last_segment_merely_ends_in_the_suburl_it_should_append(self):
+        # "myfoo" is not "/foo", however much it looks like it from the right
+        self.assertEqual(append_suburl("https://example.org/myfoo", "foo/"), "https://example.org/myfoo/foo/")
+
+    def test_given_a_host_named_after_the_suburl_it_should_still_append(self):
+        self.assertEqual(append_suburl("https://argus.example.org", "argus/"), "https://argus.example.org/argus/")
+
+    def test_given_a_suffixed_url_then_joining_a_relative_path_should_keep_the_suburl(self):
+        # the trailing slash exists for this: urljoin drops the last segment
+        # of a base without one, and permalinks are built this way
+        frontend_url = append_suburl("https://example.org", "argus/")
+        self.assertEqual(urljoin(frontend_url, "incidents/5"), "https://example.org/argus/incidents/5")
 
 
 class GetUrlPatternsFromSettingsTest(unittest.TestCase):

@@ -24,6 +24,7 @@ __all__ = [
     "normalize_url",
     "normalize_suburl",
     "prefix_relative_url",
+    "append_suburl",
 ]
 
 
@@ -137,6 +138,25 @@ def prefix_relative_url(urlpath: str, suburl: str = "") -> str:
     if urlpath.startswith(prefix):
         return urlpath
     return prefix + urlpath.lstrip("/")
+
+
+def append_suburl(url: str, suburl: str = "") -> str:
+    """Move a full url, such as the one permalinks are built from, into ``suburl``
+
+    The result always ends in a slash, which is load-bearing rather than
+    cosmetic: these urls are urljoin()ed with relative paths, and urljoin drops
+    the last segment of a base that does not end in one. Appending is
+    idempotent, and an empty url stays empty.
+    """
+    suburl = normalize_suburl(suburl)
+    if not suburl or not url:
+        return url
+
+    tail = f"/{suburl.rstrip('/')}"
+    url = url.rstrip("/")
+    if not url.endswith(tail):
+        url += tail
+    return f"{url}/"
 
 
 def _is_root_relative(urlpath: str) -> bool:

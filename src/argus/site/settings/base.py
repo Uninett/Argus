@@ -24,6 +24,7 @@ from . import (
     validate_app_setting,
     normalize_suburl,
     prefix_relative_url,
+    append_suburl,
 )
 from ..utils import update_settings
 
@@ -217,10 +218,7 @@ EMAIL_HOST_PASSWORD = get_str_env("EMAIL_HOST_PASSWORD")
 DEFAULT_FROM_EMAIL = get_str_env("DEFAULT_FROM_EMAIL", "argus@localhost")
 
 # For permalinks to incidents in argus dashboard
-FRONTEND_URL = get_str_env("ARGUS_FRONTEND_URL")
-
-if SITE_SUBURL and not FRONTEND_URL.endswith(SITE_SUBURL):
-    FRONTEND_URL = f"{FRONTEND_URL}/{SITE_SUBURL}/"
+FRONTEND_URL = append_suburl(get_str_env("ARGUS_FRONTEND_URL"), SITE_SUBURL)
 
 # django-rest-framework
 
