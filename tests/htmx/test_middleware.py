@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.contrib.messages.middleware import MessageMiddleware
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseNotFound, HttpResponseRedirect
+from django.conf import settings
 from django.test.client import RequestFactory
 from django_htmx.http import (
     HttpResponseClientRedirect,
@@ -12,6 +13,7 @@ from django_htmx.http import (
     HttpResponseLocation,
 )
 
+from argus.htmx import middleware as middleware_module
 from argus.htmx.middleware import HtmxMessageMiddleware, LoginRequiredMiddleware
 
 
@@ -56,6 +58,66 @@ class TestLoginRequiredMiddleware(test.TestCase):
         result = LoginRequiredMiddleware(lambda x: x).process_view(self.request, view_func, None, {})
         self.assertIsNotNone(result)
         self.assertIsInstance(result, HttpResponseRedirect)
+
+    @test.override_settings(PUBLIC_URLS=["/api/"], SITE_SUBURL="argus/")
+    def test_given_a_sub_path_then_public_urls_should_be_prefixed(self):
+        middleware = LoginRequiredMiddleware(lambda x: x)
+        self.assertEqual(middleware.public_urls, ("/argus/api/",))
+
+    @test.override_settings(PUBLIC_URLS=["htmx:login"], SITE_SUBURL="argus/")
+    def test_given_a_public_url_name_then_it_should_be_resolved_and_prefixed(self):
+        middleware = LoginRequiredMiddleware(lambda x: x)
+        self.assertEqual(middleware.public_urls, ("/argus/accounts/login/",))
+
+    @test.override_settings(PUBLIC_URLS=["/api/"], SITE_SUBURL="")
+    def test_given_no_sub_path_then_public_urls_should_be_left_alone(self):
+        middleware = LoginRequiredMiddleware(lambda x: x)
+        self.assertEqual(middleware.public_urls, ("/api/",))
+
+    def test_given_no_public_urls_setting_then_there_should_be_none(self):
+        middleware = LoginRequiredMiddleware(lambda x: x)
+        with test.override_settings():
+            del settings.PUBLIC_URLS  # override_settings cannot unset, only override
+            self.assertEqual(middleware.public_urls, ())
+
+    @test.override_settings(PUBLIC_URLS=["htmx:no-such-view", "/api/"])
+    def test_given_an_unresolvable_entry_then_it_should_be_skipped(self):
+        # this middleware is installed even where the htmx urls are not, and
+        # raising here would take down every url rather than just this one
+        self.forget_unresolvable_warnings()
+        middleware = LoginRequiredMiddleware(lambda x: x)
+        with self.assertLogs("argus.htmx.middleware", level="WARNING"):
+            self.assertEqual(middleware.public_urls, ("/api/",))
+
+    @test.override_settings(PUBLIC_URLS=["htmx:no-such-view"])
+    def test_given_an_unresolvable_entry_then_it_should_be_complained_about_once(self):
+        # the list is rebuilt per request, so warning every time would fill an
+        # access log for as long as the misconfiguration lasts
+        self.forget_unresolvable_warnings()
+        middleware = LoginRequiredMiddleware(lambda x: x)
+        with self.assertLogs("argus.htmx.middleware", level="WARNING") as logged:
+            middleware.public_urls
+            middleware.public_urls
+        self.assertEqual(len(logged.records), 1)
+
+    def test_when_settings_change_after_construction_then_public_urls_should_follow(self):
+        # the middleware chain is built once, before the first request, so
+        # anything resolved and kept at that point is frozen out of reach
+        middleware = LoginRequiredMiddleware(lambda x: x)
+        with test.override_settings(PUBLIC_URLS=["/api/"], SITE_SUBURL="argus/"):
+            self.assertEqual(middleware.public_urls, ("/argus/api/",))
+
+    def test_when_settings_change_after_first_access_then_public_urls_should_follow(self):
+        # nothing is cached, so even a value already read keeps up
+        middleware = LoginRequiredMiddleware(lambda x: x)
+        self.assertNotIn("/argus/api/", middleware.public_urls)
+        with test.override_settings(PUBLIC_URLS=["/api/"], SITE_SUBURL="argus/"):
+            self.assertEqual(middleware.public_urls, ("/argus/api/",))
+
+    def forget_unresolvable_warnings(self):
+        """Reset the warn-once cache, which otherwise outlives a single test"""
+        middleware_module._UNRESOLVABLE_PUBLIC_URLS.clear()
+        self.addCleanup(middleware_module._UNRESOLVABLE_PUBLIC_URLS.clear)
 
 
 class TestHtmxMessageMiddleware(test.TestCase):

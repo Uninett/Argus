@@ -54,6 +54,24 @@ Django-specific settings
   alter existing data — it only changes the time zone the values are rendered
   in.
 
+.. setting:: ARGUS_FRONTEND_SUBURL
+
+* ``ARGUS_FRONTEND_SUBURL`` (optional) serves Argus from a sub-path of a domain
+  instead of from its root, for instance ``https://example.org/argus/``. It is
+  written as a path fragment, and any of ``argus``, ``/argus`` or ``/argus/``
+  will do. Unset or empty means serve from the root, which is the default.
+
+  One prefix covers the whole site. Setting it to ``argus`` moves the frontend
+  to ``/argus/``, the API to ``/argus/api/``, the admin to ``/argus/admin/``
+  and the health check to ``/argus/.still-alive/``.
+
+  Note that the environment variable is named after the frontend for backwards
+  compatibility, while the Django setting it populates is called
+  ``SITE_SUBURL``, because it is not limited to the frontend.
+
+  See :ref:`running-argus-below-a-sub-path` for what the reverse proxy in front
+  of Argus has to do.
+
 .. _site-specific-settings-additional-apps:
 
 Settings for adding additional Django apps
