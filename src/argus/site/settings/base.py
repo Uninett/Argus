@@ -15,7 +15,16 @@ import dj_database_url
 from argus.constants import API_STABLE_VERSION
 
 # Import some helpers
-from . import get_bool_env, get_str_env, get_int_env, setup_logging, get_json_env, validate_app_setting
+from . import (
+    get_bool_env,
+    get_str_env,
+    get_int_env,
+    setup_logging,
+    get_json_env,
+    validate_app_setting,
+    normalize_suburl,
+    prefix_relative_url,
+)
 from ..utils import update_settings
 
 # Quick-start development settings - unsuitable for production
@@ -168,11 +177,16 @@ USE_TZ = True
 
 TIME_ZONE = get_str_env("TIME_ZONE", "Europe/Oslo")
 
+# Argus can be served from a sub-path of a domain rather than from its root,
+# e.g. https://example.org/argus/. One prefix covers the entire site: the
+# frontend, the API below it and the admin.
+
+SITE_SUBURL = normalize_suburl(get_str_env("ARGUS_FRONTEND_SUBURL", ""))
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = get_str_env("STATIC_URL", "/static/")
+STATIC_URL = prefix_relative_url(get_str_env("STATIC_URL", "/static/"), SITE_SUBURL)
 STORAGES = {
     "default": {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
@@ -308,7 +322,7 @@ SOCIAL_AUTH_PIPELINE = (
 # fmt: on
 
 SOCIAL_AUTH_ADMIN_USER_SEARCH_FIELDS = ["username", "first_name", "email"]
-SOCIAL_AUTH_LOGIN_REDIRECT_URL = "/"
+SOCIAL_AUTH_LOGIN_REDIRECT_URL = prefix_relative_url("/", SITE_SUBURL)
 SOCIAL_AUTH_NEW_USER_REDIRECT_URL = SOCIAL_AUTH_LOGIN_REDIRECT_URL
 
 # Set these somewhere
