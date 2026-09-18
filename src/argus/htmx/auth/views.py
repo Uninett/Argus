@@ -28,10 +28,6 @@ def get_htmx_authentication_backend_name_and_type():
 
     if has_remote_user_backend(backends):
         remote_user_data = {
-            # Clicking this accomplishes nothing: whatever sets REMOTE_USER
-            # has already authenticated the user by the time this page can be
-            # reached. Send them to the site root, which at least stays inside
-            # Argus when it is served from a sub-path
             "url": prefix_relative_url("/", settings.SITE_SUBURL),
             "display_name": REMOTE_USER_METHOD_NAME,
         }
