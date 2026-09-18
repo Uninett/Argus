@@ -107,7 +107,7 @@ class TestIncidentListFilter(TestCase):
     def test_nonexistent_filter_should_return_unfiltered_queryset_and_repair_session(self):
         self.request.session["selected_filter"] = -1
         _, qs = incident_list_filter(self.request, self.qs)
-        self.assertEqual(qs, self.qs)
+        self.assertQuerySetEqual(qs, self.qs)
         self.assertNotIn("selected_filter", self.request.session)
 
     def test_valid_request_should_return_filtered_queryset(self):
@@ -252,8 +252,10 @@ class TestFilterPreference(TestCase):
 
         form, _ = incident_list_filter(request, self.qs)
 
-        # An unbound form (None passed to constructor) is not bound
-        self.assertFalse(form.is_bound)
+        # In order to work around a problem in maxlevel caused by a quirk in
+        # the HTML inpout type range, maxlevel is set to 5 if missing from
+        # input. This means the form is never unbound.
+        self.assertTrue(form.is_bound)
 
     def test_invalid_form_with_get_params_shows_error_messages(self):
         """Invalid filter with GET params should add error messages"""
