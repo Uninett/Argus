@@ -78,7 +78,7 @@ django-tasks-db==0.13.0
     # via argus-server (pyproject.toml)
 django-widget-tweaks==1.5.0
     # via argus-server (pyproject.toml)
-djangorestframework==3.18.0
+djangorestframework==3.17.2
     # via
     #   argus-server (pyproject.toml)
     #   django-rest-knox
