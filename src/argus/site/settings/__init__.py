@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 from os import getenv
 from pathlib import Path
 from urllib.parse import urlsplit, urlunsplit
@@ -21,6 +22,9 @@ __all__ = [
     "setup_logging",
     "update_loglevels",
     "normalize_url",
+    "normalize_suburl",
+    "prefix_relative_url",
+    "append_suburl",
 ]
 
 
@@ -89,6 +93,77 @@ def validate_app_setting(jsonblob):
         return []
     app_setting = ListAppSetting.model_validate(jsonblob)
     return app_setting.root
+
+
+# other helpers
+
+
+def normalize_suburl(suburl: str) -> str:
+    """Normalize a sub-path prefix to the only form ``django.urls.path()`` accepts
+
+    That form has no leading slash and exactly one trailing slash. Both
+    "/argus/" and "argus" are natural things to put in an environment
+    variable, and both misroute: a route starting with a slash never matches
+    anything, while a route without a trailing slash matches greedily, so
+    "argus" would serve the incident list at "/argusincidents/". Accept every
+    spelling and settle on "argus/".
+
+    An empty suburl means "serve from the domain root" and stays empty.
+    """
+    suburl = re.sub(r"/+", "/", suburl.strip()).strip("/")
+    if not suburl:
+        return ""
+    return f"{suburl}/"
+
+
+def prefix_relative_url(urlpath: str, suburl: str = "") -> str:
+    """Move a root-relative url path into the sub-site at ``suburl``
+
+    "/api/" becomes "/argus/api/". Absolute-ness is part of the meaning of
+    these paths: they are compared against ``request.path`` and handed to
+    browsers as redirect targets, so the leading slash is preserved.
+
+    Anything that does not address this site is left alone, which covers both
+    the full "https://cdn.example.org/" and the protocol-relative
+    "//cdn.example.org/" spelling of a CDN url, as well as genuinely relative
+    paths. Prefixing is idempotent.
+    """
+    suburl = normalize_suburl(suburl)
+    if not suburl or not _is_root_relative(urlpath):
+        return urlpath
+
+    prefix = f"/{suburl}"
+    if urlpath == prefix.rstrip("/"):
+        return prefix
+    if urlpath.startswith(prefix):
+        return urlpath
+    return prefix + urlpath.lstrip("/")
+
+
+def append_suburl(url: str, suburl: str = "") -> str:
+    """Move a full url, such as the one permalinks are built from, into ``suburl``
+
+    The result always ends in a slash, which is load-bearing rather than
+    cosmetic: these urls are urljoin()ed with relative paths, and urljoin drops
+    the last segment of a base that does not end in one. Appending is
+    idempotent, and an empty url stays empty.
+    """
+    suburl = normalize_suburl(suburl)
+    if not suburl or not url:
+        return url
+
+    tail = f"/{suburl.rstrip('/')}"
+    url = url.rstrip("/")
+    if not url.endswith(tail):
+        url += tail
+    return f"{url}/"
+
+
+def _is_root_relative(urlpath: str) -> bool:
+    parsed = urlsplit(urlpath)
+    if parsed.scheme or parsed.netloc:
+        return False
+    return urlpath.startswith("/")
 
 
 # fixes
