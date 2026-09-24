@@ -1,5 +1,7 @@
 import logging
-from importlib.metadata import version, PackageNotFoundError
+from importlib.metadata import PackageNotFoundError, version as import_version
+
+from packaging.version import InvalidVersion, parse as parse_version
 
 from django.conf import settings
 from django.http import (
@@ -25,6 +27,14 @@ LOG = logging.getLogger(__name__)
 
 
 def get_version():
+    version = _get_version()
+    try:
+        return str(parse_version(version))
+    except InvalidVersion:
+        return "unknown"
+
+
+def _get_version():
     try:
         from argus.version import __version__
 
@@ -32,10 +42,10 @@ def get_version():
     except (ModuleNotFoundError, ImportError):
         pass
     try:
-        return version("argus-server")
-    except PackageNotFoundError as e:
-        return str(e)
-    return "version not found"
+        return import_version("argus-server")
+    except PackageNotFoundError:
+        pass
+    return "unknown"
 
 
 # HTML
