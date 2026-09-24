@@ -163,7 +163,7 @@ rpds-py==2026.6.3
     #   referencing
 social-auth-app-django==6.0.1
     # via argus-server (pyproject.toml)
-social-auth-core==5.1.0
+social-auth-core==5.0.0
     # via
     #   argus-server (pyproject.toml)
     #   python-dataporten-auth
