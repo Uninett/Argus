@@ -3,6 +3,21 @@ from copy import deepcopy
 
 from django.urls import include, path
 
+from argus.site.settings import normalize_suburl
+
+
+def prefix_urlpatterns(urlpatterns: list, suburl: str) -> list:
+    """Move an entire urlconf under the sub-path ``suburl``
+
+    Normalizes on the way in, because the setting can be written by hand in a
+    localsettings module rather than come from the environment, and an
+    unnormalized prefix misroutes silently rather than loudly.
+    """
+    suburl = normalize_suburl(suburl)
+    if not suburl:
+        return urlpatterns
+    return [path(suburl, include(urlpatterns))]
+
 
 def get_app_names(app_settings):
     return [app.app_name for app in app_settings if app.app_name]

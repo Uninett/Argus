@@ -8,6 +8,7 @@ from argus.auth.utils import (
     get_psa_authentication_backends,
     get_authentication_backend_classes,
 )
+from argus.site.settings import prefix_relative_url
 
 
 REMOTE_USER_METHOD_NAME = getattr(settings, "ARGUS_REMOTE_USER_METHOD_NAME", "REMOTE_USER")
@@ -27,7 +28,7 @@ def get_htmx_authentication_backend_name_and_type():
 
     if has_remote_user_backend(backends):
         remote_user_data = {
-            "url": "/",  # Should probably also be a setting
+            "url": prefix_relative_url("/", settings.SITE_SUBURL),
             "display_name": REMOTE_USER_METHOD_NAME,
         }
         data.setdefault("external", []).append(remote_user_data)
