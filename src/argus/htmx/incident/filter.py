@@ -3,6 +3,7 @@ import logging
 from django import forms
 from django.contrib import messages
 from django.urls import reverse
+from django.utils.datastructures import MultiValueDict
 from django.views.generic import ListView
 
 from argus.auth.utils import get_preference, get_preference_obj
@@ -141,13 +142,20 @@ class IncidentFilterForm(forms.Form):
         "special_filters": [],
     }
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, data=None, **kwargs):
+        if not data:
+            data = MultiValueDict()
+        if "maxlevel" not in data:
+            good_data = data.copy()
+            good_data["maxlevel"] = self.DEFAULT_VALUES["maxlevel"]
+            data = good_data
+        super().__init__(data, **kwargs)
+
         # mollify tests
         partial_get = reverse("htmx:incident-filter")
 
         self._init_source_field(partial_get)
-        self._init_tag_field(partial_get, *args, **kwargs)
+        self._init_tag_field(partial_get, data)
 
         self.fields["source_types"].widget.partial_get = partial_get
         source_type_choices = SourceSystemType.objects.order_by("name").values_list("name", "name")
@@ -160,13 +168,13 @@ class IncidentFilterForm(forms.Form):
         self.fields["special_filters"].widget.partial_get = partial_get
         self.fields["special_filters"].choices = self.SPECIAL_FILTER_CHOICES
 
-    def _init_tag_field(self, partial_get, *args, **kwargs):
+    def _init_tag_field(self, partial_get, data=None):
         """
         Initializes the 'tags' field widget and choices as key=value strings, and dynamically adds submitted tags.
         """
         self.fields["tags"].widget.partial_get = partial_get
         self.fields["tags"].widget.extra["search_url"] = reverse("htmx:search-tags")
-        query_dict = args[0] if args else None
+        query_dict = data
         if not query_dict:
             self.fields["tags"].choices = []
             return
