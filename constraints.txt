@@ -6,5 +6,5 @@ urllib3>=2.7
 psycopg>=3.1
 packaging>=25.0  # fix for setuptools "License-Files" shenanigans
 idna>=3.16
-pyjwt>=2.13.0
+pyjwt>=2.15.0
 sqlparse>=0.6.0
