@@ -133,7 +133,7 @@ pydantic==2.13.3
     # via argus-server (pyproject.toml)
 pydantic-core==2.46.3
     # via pydantic
-pyjwt[crypto]==2.13.0
+pyjwt[crypto]==2.15.0
     # via
     #   -r constraints.txt
     #   social-auth-core
