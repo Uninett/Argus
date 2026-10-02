@@ -259,6 +259,12 @@ To add a custom source system type, instead of the default `argus`, add the
 
         $ python manage.py create_source -t "Custom type"
 
+To add a base_url add the `-u` flag to the command as such:
+
+    .. code:: console
+
+        $ python manage.py create_source -u "https://example.com"
+
 
 .. _check-token-expiry:
 
