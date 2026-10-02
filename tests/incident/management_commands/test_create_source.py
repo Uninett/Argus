@@ -43,6 +43,13 @@ class CreateSourceTests(TestCase):
 
         self.assertTrue(SourceSystem.objects.exclude(id__in=previous_source_pks).filter(base_url=base_url).exists())
 
+    def test_create_source_will_create_source_with_base_url_empty_string_if_not_set(self):
+        previous_source_pks = [source.id for source in SourceSystem.objects.all()]
+        source_name = "source name"
+        call_command("create_source", source_name)
+
+        self.assertTrue(SourceSystem.objects.exclude(id__in=previous_source_pks).filter(base_url="").exists())
+
     def test_create_source_will_use_already_existing_source_system_type(self):
         previous_source_pks = [source.id for source in SourceSystem.objects.all()]
         source_name = "source name"

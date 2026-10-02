@@ -19,12 +19,10 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         source = options["source"]
         source_type = options.get("source_type") or "argus"
+        base_url = options.get("base_url") or ""
         if SourceSystem.objects.filter(name=source, type__name=source_type).exists():
             return
         with transaction.atomic():
             user = SourceUserFactory(username=source)
             sst = SourceSystemTypeFactory(name=source_type.lower())
-            ss = SourceSystemFactory(user=user, name=source, type=sst)
-            if base_url := options.get("base_url"):
-                ss.base_url = base_url
-                ss.save()
+            SourceSystemFactory(user=user, name=source, type=sst, base_url=base_url)
