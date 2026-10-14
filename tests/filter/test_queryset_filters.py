@@ -1,6 +1,7 @@
 from django.test import TestCase, tag
 
 from argus.auth.factories import AdminUserFactory, SourceUserFactory
+from argus.filter.factories import FilterFactory
 from argus.incident.factories import (
     EventFactory,
     IncidentTagRelationFactory,
@@ -20,6 +21,8 @@ from argus.filter.queryset_filters import (
     _incidents_with_source_systems,
     _incidents_with_tags,
 )
+from argus.notificationprofile.factories import NotificationProfileFactory
+from argus.notificationprofile.filterwrapper import NotificationProfileFilterWrapper
 from argus.util.testing import disconnect_signals, connect_signals
 
 
@@ -173,3 +176,42 @@ class FilteredIncidentsTests(TestCase):
             set(QuerySetFilter.filtered_incidents({"sourceSystemIds": [self.source1.pk], "tags": [str(self.tag1)]})),
             {self.incident1},
         )
+
+
+@tag("database", "queryset-filter")
+class IncidentsByNotificationProfileTests(TestCase):
+    def setUp(self):
+        disconnect_signals()
+        user = AdminUserFactory(username="user1")
+        source1 = SourceSystemFactory(name="System 1")
+        source2 = SourceSystemFactory(name="System 2")
+        oslo = TagFactory(key="location", value="Oslo")
+
+        self.incident_fitting_both_filters = StatelessIncidentFactory(source=source1)
+        IncidentTagRelationFactory(tag=oslo, incident=self.incident_fitting_both_filters, added_by=user)
+        self.incident_fitting_only_source_filter = StatelessIncidentFactory(source=source1)
+        self.incident_fitting_only_tag_filter = StatelessIncidentFactory(source=source2)
+        IncidentTagRelationFactory(tag=oslo, incident=self.incident_fitting_only_tag_filter, added_by=user)
+
+        self.profile = NotificationProfileFactory(active=True)
+        self.profile.filters.add(
+            FilterFactory(user=self.profile.user, filter={"sourceSystemIds": [source1.pk]}),
+            FilterFactory(user=self.profile.user, filter={"tags": [str(oslo)]}),
+        )
+
+    def tearDown(self):
+        connect_signals()
+
+    def test_given_profile_with_two_filters_then_it_should_list_incident_fitting_both(self):
+        listed = QuerySetFilter.incidents_by_notificationprofile(None, self.profile)
+
+        self.assertIn(self.incident_fitting_both_filters, listed)
+
+    def test_given_profile_with_two_filters_then_it_should_list_only_incidents_that_would_notify(self):
+        all_incidents = Incident.objects.all()
+        notifying = NotificationProfileFilterWrapper(self.profile)
+
+        listed = set(QuerySetFilter.incidents_by_notificationprofile(None, self.profile))
+        would_notify = {incident for incident in all_incidents if notifying.incident_fits(incident)}
+
+        self.assertEqual(listed, would_notify)
