@@ -187,8 +187,8 @@ class Media(models.Model):
     error_messages = {
         "readonly_media": "Media cannot be updated, only settings.",
         "readonly_user": "User cannot be changed, only settings.",
-        "duplicate_label": "A destination with this medium and label already exists",
-        "duplicate": "A destination with these settings already exists",
+        "duplicate_label": "Destination config with this User, Media and Label already exists.",
+        "duplicate": "Destination config with this User and Settings already exists.",
         "settings_type": "Settings has to be a dictionary.",
     }
 
