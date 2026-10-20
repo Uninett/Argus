@@ -39,7 +39,7 @@ class Command(BaseCommand):
                 self.stdout.write(f"{source}: {last_seen}")
             if options["save"]:
                 source.last_seen = last_seen
-                source.save()
+                source.save(update_fields=["last_seen"])
 
         if never_seen and options["verbosity"] > 0:
             if changes:
