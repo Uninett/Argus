@@ -4,7 +4,8 @@ from argus.incident.models import Event, SourceSystem
 
 
 def find_latest_event_by_heartbeatless_source():
-    qs = SourceSystem.objects
+    # Exclude "argus", it's magic
+    qs = SourceSystem.objects.exclude(name="argus")
     changes = []
     never_seen = []
     for source in qs.filter(last_seen__isnull=True).order_by("name"):
