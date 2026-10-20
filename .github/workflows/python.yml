@@ -88,7 +88,7 @@ jobs:
         python -VV
         python -m site
         python -m pip install --upgrade pip "setuptools<46" wheel
-        python -m pip install --upgrade virtualenv "tox>=4" tox-gh-actions coverage
+        python -m pip install --upgrade virtualenv "tox>=4.22" tox-gh-actions coverage
 
     - name: Set up PostgreSQL
       uses: ankane/setup-postgres@e9cd5bc1babecb0e441a640646d782056dbb67f5 # v1 (has no specific tags)
@@ -112,7 +112,7 @@ jobs:
 
     - name: Upload test reports (${{ matrix.python-version }})
       if: always()
-      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
       with:
         name: test-reports-${{ matrix.python-version }}
         path: |
@@ -120,7 +120,7 @@ jobs:
 
     - name: Upload coverage reports to Codecov
       if: github.repository_owner == 'Uninett'
-      uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+      uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
       with:
         fail_ci_if_error: true
         token: ${{ secrets.CODECOV_TOKEN }}

@@ -14,13 +14,15 @@ class Command(BaseCommand):
         parser.add_argument(
             "-t", "--source-type", type=str, help="Create/use the source type <source-type> instead of argus"
         )
+        parser.add_argument("-u", "--base-url", type=str, help="Add this base-url to the created source")
 
     def handle(self, *args, **options):
         source = options["source"]
         source_type = options.get("source_type") or "argus"
+        base_url = options.get("base_url") or ""
         if SourceSystem.objects.filter(name=source, type__name=source_type).exists():
             return
         with transaction.atomic():
             user = SourceUserFactory(username=source)
             sst = SourceSystemTypeFactory(name=source_type.lower())
-            SourceSystemFactory(user=user, name=source, type=sst)
+            SourceSystemFactory(user=user, name=source, type=sst, base_url=base_url)

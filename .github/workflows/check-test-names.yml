@@ -11,11 +11,19 @@ jobs:
     runs-on: ubuntu-latest
     name: Check test naming convention
     steps:
+    # This job runs on pull_request_target, so it has a write token and access
+    # to secrets even when the pull request comes from a fork. Nothing from the
+    # pull request may be checked out or executed here: no build, no install,
+    # no running its tests or scripts. Leaving this checkout bare keeps us on
+    # the default branch, and that is the only reason it is safe to run
+    # check_test_names.py below. Adding a ref: pointing at the pull request
+    # head would hand its author our credentials.
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
         fetch-depth: 0
         persist-credentials: false
 
+    # Fetch only. The head is read as data by git diff, never checked out.
     - name: Fetch PR head
       run: git fetch origin "+refs/pull/${PR_NUMBER}/head:refs/remotes/pull/head"
       env:
@@ -23,8 +31,11 @@ jobs:
 
     - name: Check new test names
       id: check
+      env:
+        BASE_REF: ${{ github.event.pull_request.base.ref }}
       run: |
-        merge_base=$(git merge-base HEAD refs/remotes/pull/head)
+        # Name the base branch explicitly; HEAD is not it
+        merge_base=$(git merge-base "origin/$BASE_REF" refs/remotes/pull/head)
         output=$(git diff "$merge_base" refs/remotes/pull/head --unified=0 | python3 checks/check_test_names.py --stdin --format markdown 2>&1) && has_violations=false || has_violations=true
         echo "$output"
         {

@@ -59,7 +59,7 @@ dynamic = ["version"]
 "Homepage" = "https://github.com/Uninett/Argus"
 
 [project.optional-dependencies]
-apprise = ["apprise>=1.9.6"] # When updating version requirement also update it in dependency group "all-plugins"
+apprise = ["apprise>=1.9.6"] # When updating version requirement also update it in the dependency groups "all-plugins" and "test"
 htmx = []  # for outdated install procedures
 docs = ["sphinx>=2.2.0"]
 dev = [
@@ -73,7 +73,7 @@ dev = [
     "python-dotenv",
     "towncrier",
     "werkzeug",
-    "tox>=4",
+    "tox>=4.22",
     "build",  # for debugging builds/installs
 ]
 jsonlogging = ["python-json-logger"]
@@ -82,6 +82,11 @@ jsonlogging = ["python-json-logger"]
 all-plugins = [
     "argus-ticket-github", "argus-ticket-gitlab", "argus-ticket-jira",
     "argus-ticket-rt", "argus-notification-msteams", "apprise>=1.9.6"
+]
+test = [
+    "coverage",
+    "unittest-xml-reporting",
+    "apprise>=1.9.6",
 ]
 
 [tool.hatch.version]
