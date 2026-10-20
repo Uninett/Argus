@@ -31,9 +31,8 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         changes, never_seen = find_latest_event_by_heartbeatless_source()
 
-        if changes:
-            if options["verbosity"]:
-                self.stdout.write("Possibly dead sources:\n")
+        if changes and options["verbosity"]:
+            self.stdout.write("Possibly dead sources:\n")
         for source, last_seen in changes:
             if options["verbosity"]:
                 self.stdout.write(f"{source}: {last_seen}")
