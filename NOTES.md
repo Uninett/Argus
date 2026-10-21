@@ -3,6 +3,19 @@
 This file documents changes to Argus that are relevant for operations,
 customizers and end-users.
 
+## [2.10.1] - 2026-10-21
+
+Security release!
+
+This release is flagged here in NOTES even if it is a patch release to ensure
+that any new installations of Argus use a sufficiently new version of the
+sub-dependency.
+
+If you install Argus and its dependencies *without* using the requirements.txt
+file (for instance with `pip install argus-server`) you can manually update
+"certifi" directly. If you *did* use the requirements.txt to install locked
+versions of the dependencies you should install this upgrade.
+
 ## [2.10.0] - 2026-08-28
 
 This release is the first to suport Django 6.1, and no longer supports Django

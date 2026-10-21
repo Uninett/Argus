@@ -8,6 +8,23 @@ This project uses [*towncrier*](https://towncrier.readthedocs.io/) and the chang
 
 <!-- towncrier release notes start -->
 
+## [2.10.1] - 2026-10-21
+
+Security release! Install this version *after* having made sure that the OS
+Argus will run on and the package manager you will use to install Argus with
+have already been updated to a safe version. See also (brief) NOTES.
+
+https://discuss.python.org/t/information-for-python-users-regarding-emudhra-emsign-ca-certificate-security-incident/109576/4
+
+Do the same for systems running glue services, and ticket systems and
+notification systems under your own control.
+
+### Changed
+
+- Upgraded the sub-dependency "certifi" which bundles TLS root certificates.
+- Upgraded to newest patch-release of Django.
+
+
 ## [2.10.0] - 2026-08-28
 
 This release is the first to suport Django 6.1, and no longer supports Django
