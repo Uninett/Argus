@@ -8,6 +8,46 @@ This project uses [*towncrier*](https://towncrier.readthedocs.io/) and the chang
 
 <!-- towncrier release notes start -->
 
+## [2.10.2] - 2026-10-22
+
+Mini-release. The most important bit is fixing a dependency problem
+that affects the task queue. The most visible bit is "Level" in the
+filter box should no longer magically flip to the middle position for
+no reason.
+
+Do upgrade if:
+
+- using Argus to send notifications
+- using the planned maintenance subsystem
+
+### Added
+
+- Added options to set base url for source created with management
+  command `create_source`
+  ([#2081](https://github.com/Uninett/Argus/issues/2081))
+
+### Changed
+
+- Altered helper function `get_version()` so that it either returns
+  a valid version string for Argus, or "unknown", and nothing else.
+  ([#2061](https://github.com/Uninett/Argus/issues/2061))
+- We now explicitly depend on "django-tasks" since how "django-tasks-db"
+  depends on "django-tasks" has changed. We cannot do it the new way, by
+  depending on "django-tasks-db[compat]", since that conflicts with
+  Django 6.1, which we still want to be able to test on.
+
+### Fixed
+
+- Fixed a problem with `maxlevel` in the filter box caused by the
+  default of an HTML range-input defaulting to the middle value if no
+  value is given. It now defaults to the maximum level, "5", as it
+  should. This should cut down on maxlevel suddenly flipping to "3" for
+  apparently no reason.
+  ([#2072](https://github.com/Uninett/Argus/issues/2072))
+- Fixed a dependency issue with the most recent "django-tasks-db", by
+  always depending directly on "django-tasks".
+
+
 ## [2.10.1] - 2026-10-21
 
 Security release! Install this version *after* having made sure that the OS
