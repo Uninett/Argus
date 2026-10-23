@@ -66,7 +66,7 @@ dev = [
     "django-debug-toolbar",
     "coverage",
     "django-extensions",
-    "ruff",
+    "ruff==0.17.2",
     "djlint",
     "ipython",
     "pre-commit",
