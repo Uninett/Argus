@@ -48,12 +48,13 @@ def modelinstance_to_dict(obj):
 class CommonDestinationConfigForm(forms.ModelForm):
     class Meta:
         model = DestinationConfig
-        fields = ["label", "media", "settings"]
+        fields = ["label", "media", "settings", "user"]
 
     # Settings is being set as not required for the field required errors from the plugin forms to bubble up
     def __init__(self, *args, **kwargs):
         super(CommonDestinationConfigForm, self).__init__(*args, **kwargs)
         self.fields["settings"].required = False
+        self.fields["user"].required = False
 
 
 class NotificationMedium(ABC):
@@ -90,64 +91,61 @@ class NotificationMedium(ABC):
         """
         Validates that a destination can be created/updated with the given values
 
-        Returns a form with the cleaned data if all is valid and raises a
-        ValidationError if not
+        Returns a form with the cleaned data if all is valid or errors if not
         """
+        data["user"] = user
         if instance:
-            cls.validate_instance(data, user, instance)
-
             # Copy attributes of the destination to avoid field required errors
             for field in CommonDestinationConfigForm.Meta.fields:
                 if field not in data and getattr(instance, field):
                     data[field] = getattr(instance, field)
 
-        form = CommonDestinationConfigForm(data)
+            form = CommonDestinationConfigForm(data, instance=instance)
+
+            errors = cls.validate_instance(data, user, instance)
+
+            for field, error_message in errors.items():
+                form.add_error(field, error_message)
+
+        else:
+            form = CommonDestinationConfigForm(data)
 
         # Check that the label and medium are valid values
         if not form.is_valid():
-            code = "invalid"
-            detail = form.errors.get_json_data()
-            raise forms.ValidationError(message=detail, code=code)
-
-        # Check that no destination with this medium and label already exists for this user
-        qs = user.destinations.filter(media_id=data.get("media"))
-        if instance:
-            qs = qs.exclude(pk=instance.pk)
-
-        if data.get("label") and qs.filter(label=data.get("label")).exists():
-            code = "duplicate_label"
-            message = Media.error_messages["duplicate_label"]
-            raise forms.ValidationError(message={"label": message}, code=code)
+            return form
 
         # Check that the settings are valid
         settings = data.get("settings", {})
         if not isinstance(settings, dict):
-            code = "settings_type"
-            message = Media.error_messages["settings_type"]
-            raise forms.ValidationError(message={"settings": message}, code=code)
+            form.add_error("settings", Media.error_messages["settings_type"])
+            return form
 
-        cleaned_settings = cls.validate_settings(settings, user, instance=instance)
-        form.cleaned_data["settings"] = cleaned_settings
+        settings_form = cls.validate_settings(settings, user, instance=instance)
+        for error in settings_form.errors.items():
+            form.add_error("settings", error)
+
+        form.cleaned_data["settings"] = settings_form.cleaned_data
         form.cleaned_data["user"] = user
         return form
 
     @classmethod
-    def validate_instance(cls, data: dict, user: User, instance: DestinationConfig):
+    def validate_instance(cls, data: dict, user: User, instance: DestinationConfig) -> dict:
         """
         Validates that none of the readonly fields of an instance are being
         changed
 
-        Raises a ValidationError if they are
+        Returns a list of field names and error messages if they are and an empty dict
+        if not
         """
+        errors = {}
+
         if data.get("media") and data.get("media").slug != instance.media.slug:
-            code = "readonly_media"
-            message = Media.error_messages["readonly_media"]
-            raise forms.ValidationError(message={"media": [message]}, code=code)
+            errors["media"] = Media.error_messages["readonly_media"]
 
         if instance.user != user:
-            code = "readonly_user"
-            message = Media.error_messages["readonly_user"]
-            raise forms.ValidationError(message={"user": [message]}, code=code)
+            errors["user"] = Media.error_messages["readonly_user"]
+
+        return errors
 
     @classmethod
     def validate_settings(
@@ -155,28 +153,24 @@ class NotificationMedium(ABC):
         data: dict,
         user: User,
         instance: Optional[DestinationConfig] = None,
-    ) -> dict:
+    ) -> forms.Form:
         """
-        Validates the settings of a destination and returns a cleaned settings
-        dict and raises a ValidationError if the settings are invalid
+        Validates the settings of a destination and returns a form with the cleaned
+        data if all is valid or errors if not
         """
         form = cls.Form(data=data)
 
         if not form.is_valid():
-            code = "invalid"
-            message = form.errors.get_json_data()
-            raise forms.ValidationError(message=message, code=code)
+            return form
 
         qs = user.destinations
         if instance:
             qs = qs.exclude(pk=instance.pk)
 
         if cls.has_duplicate(qs, form.cleaned_data):
-            code = "duplicate"
-            detail = Media.error_messages["duplicate"]
-            raise forms.ValidationError(message=detail, code=code)
+            form.add_error(None, Media.error_messages["duplicate"])
 
-        return form.cleaned_data
+        return form
 
     @classmethod
     def has_duplicate(cls, queryset: QuerySet, settings: dict) -> bool:

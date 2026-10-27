@@ -20,27 +20,26 @@ class ValidateSettingsTests(TestCase):
     def setUp(self):
         self.user = PersonUserFactory()
 
-    def test_given_valid_settings_then_return_cleaned_data(self):
+    def test_given_valid_settings_then_return_form_with_cleaned_data(self):
         data = {"foo": 1}
-        cleaned_data = DummyNotification.validate_settings(data, self.user)
+        form = DummyNotification.validate_settings(data, self.user)
 
-        self.assertEqual(cleaned_data, data)
+        self.assertFalse(form.errors)
+        self.assertEqual(form.cleaned_data, data)
 
-    def test_given_settings_with_missing_key_then_raise_validation_error(self):
+    def test_given_settings_with_missing_key_then_return_form_with_errors(self):
         data = {"bar": False}
-        with self.assertRaises(forms.ValidationError) as e:
-            DummyNotification.validate_settings(data, self.user)
+        form = DummyNotification.validate_settings(data, self.user)
 
-        self.assertIn("This field is required", str(e.exception))
+        self.assertIn("This field is required", str(form.errors))
 
-    def test_given_settings_with_wrong_type_then_raise_validation_error(self):
+    def test_given_settings_with_wrong_type_then_return_form_with_errors(self):
         data = {"foo": False}
-        with self.assertRaises(forms.ValidationError) as e:
-            DummyNotification.validate_settings(data, self.user)
+        form = DummyNotification.validate_settings(data, self.user)
 
-        self.assertIn("whole number", str(e.exception))
+        self.assertIn("whole number", str(form.errors))
 
-    def test_given_duplicate_settings_then_raise_validation_error(self):
+    def test_given_duplicate_settings_then_return_form_with_errors(self):
         settings = {"foo": 1}
         dummy_medium = Media.objects.create(slug=DummyNotification.MEDIA_SLUG, name=DummyNotification.MEDIA_NAME)
         DestinationConfigFactory(
@@ -50,12 +49,11 @@ class ValidateSettingsTests(TestCase):
             managed=False,
         )
 
-        with self.assertRaises(forms.ValidationError) as e:
-            DummyNotification.validate_settings(settings, self.user)
+        form = DummyNotification.validate_settings(settings, self.user)
 
-        self.assertIn(Media.error_messages["duplicate"], str(e.exception))
+        self.assertIn(Media.error_messages["duplicate"], str(form.errors))
 
-    def test_given_duplicate_settings_for_same_destination_then_do_not_raise_validation_error(self):
+    def test_given_duplicate_settings_for_same_destination_return_form_without_errors(self):
         settings = {"foo": 1}
         dummy_medium = Media.objects.create(slug=DummyNotification.MEDIA_SLUG, name=DummyNotification.MEDIA_NAME)
         destination = DestinationConfigFactory(
@@ -65,9 +63,10 @@ class ValidateSettingsTests(TestCase):
             managed=False,
         )
 
-        cleaned_data = DummyNotification.validate_settings(settings, self.user, destination)
+        form = DummyNotification.validate_settings(settings, self.user, destination)
 
-        self.assertEqual(cleaned_data, settings)
+        self.assertFalse(form.errors)
+        self.assertEqual(form.cleaned_data, settings)
 
 
 class ValidateTests(TestCase):
@@ -81,7 +80,7 @@ class ValidateTests(TestCase):
             managed=False,
         )
 
-    def test_given_valid_data_for_new_destination_then_return_form(self):
+    def test_given_valid_data_for_new_destination_then_return_form_without_errors(self):
         data = {
             "media": self.dummy_medium,
             "label": "Dummy destination",
@@ -89,10 +88,11 @@ class ValidateTests(TestCase):
         }
         form = DummyNotification.validate(data, self.user)
 
+        self.assertFalse(form.errors)
         self.assertEqual(form.cleaned_data["label"], data["label"])
         self.assertEqual(form.cleaned_data["settings"], data["settings"])
 
-    def test_given_valid_data_for_existing_destination_then_return_form(self):
+    def test_given_valid_data_for_existing_destination_then_return_form_without_errors(self):
         data = {
             "media": self.dummy_medium,
             "label": "Dummy destination",
@@ -100,42 +100,44 @@ class ValidateTests(TestCase):
         }
         form = DummyNotification.validate(data, self.user, self.destination)
 
+        self.assertFalse(form.errors)
         self.assertEqual(form.cleaned_data["label"], data["label"])
         self.assertEqual(form.cleaned_data["settings"], data["settings"])
 
-    def test_given_changed_media_then_raise_validation_error(self):
+    def test_given_changed_media_then_return_form_with_errors(self):
         different_medium = Media.objects.create(slug="different", name="Different medium")
         data = {
             "media": different_medium,
             "settings": {"foo": 1},
         }
-        with self.assertRaises(forms.ValidationError) as e:
-            DummyNotification.validate(data, self.user, self.destination)
 
-        self.assertIn(Media.error_messages["readonly_media"], str(e.exception))
+        form = DummyNotification.validate(data, self.user, self.destination)
 
-    def test_given_changed_user_then_raise_validation_error(self):
+        self.assertTrue(form.errors)
+        self.assertIn(Media.error_messages["readonly_media"], str(form.errors))
+
+    def test_given_changed_user_then_return_form_with_errors(self):
         other_user = PersonUserFactory()
         data = {
             "media": self.dummy_medium,
             "settings": {"foo": 1},
         }
-        with self.assertRaises(forms.ValidationError) as e:
-            DummyNotification.validate(data, other_user, self.destination)
+        form = DummyNotification.validate(data, other_user, self.destination)
 
-        self.assertIn(Media.error_messages["readonly_user"], str(e.exception))
+        self.assertTrue(form.errors)
+        self.assertIn(Media.error_messages["readonly_user"], str(form.errors))
 
-    def test_given_invalid_medium_for_new_destination_then_raise_validation_error(self):
+    def test_given_invalid_medium_for_new_destination_then_return_form_with_errors(self):
         data = {
             "media": "invalid",
             "settings": {"foo": 1},
         }
-        with self.assertRaises(forms.ValidationError) as e:
-            DummyNotification.validate(data, self.user)
+        form = DummyNotification.validate(data, self.user)
 
-        self.assertIn("Select a valid choice.", str(e.exception))
+        self.assertTrue(form.errors)
+        self.assertIn("Select a valid choice.", str(form.errors))
 
-    def test_given_duplicate_label_then_raise_validation_error(self):
+    def test_given_duplicate_label_then_return_form_with_errors(self):
         self.destination.label = "Duplicate label"
         self.destination.save()
         data = {
@@ -143,12 +145,12 @@ class ValidateTests(TestCase):
             "label": "Duplicate label",
             "settings": {"foo": 1},
         }
-        with self.assertRaises(forms.ValidationError) as e:
-            DummyNotification.validate(data, self.user)
+        form = DummyNotification.validate(data, self.user)
 
-        self.assertIn(Media.error_messages["duplicate_label"], str(e.exception))
+        self.assertTrue(form.errors)
+        self.assertIn("Destination config with this User, Media and Label already exists.", str(form.errors))
 
-    def test_given_same_label_for_given_destination_then_do_not_raise_validation_error(self):
+    def test_given_same_label_for_given_destination_then_return_form_without_errors(self):
         self.destination.label = "Duplicate label"
         self.destination.save()
         data = {
@@ -158,42 +160,44 @@ class ValidateTests(TestCase):
         }
         form = DummyNotification.validate(data, self.user, self.destination)
 
+        self.assertFalse(form.errors)
         self.assertEqual(form.cleaned_data["label"], "Duplicate label")
 
-    def test_given_missing_settings_then_raise_validation_error(self):
+    def test_given_missing_settings_then_return_form_with_errors(self):
         data = {
             "media": self.dummy_medium,
         }
-        with self.assertRaises(forms.ValidationError) as e:
-            DummyNotification.validate(data, self.user)
-        self.assertIn("This field is required", str(e.exception))
+        form = DummyNotification.validate(data, self.user)
 
-    def test_given_non_dict_settings_then_raise_validation_error(self):
+        self.assertTrue(form.errors)
+        self.assertIn("This field is required", str(form.errors))
+
+    def test_given_non_dict_settings_then_return_form_with_errors(self):
         data = {
             "media": self.dummy_medium,
             "settings": 100,
         }
-        with self.assertRaises(forms.ValidationError) as e:
-            DummyNotification.validate(data, self.user)
+        form = DummyNotification.validate(data, self.user)
 
-        self.assertIn(Media.error_messages["settings_type"], str(e.exception))
+        self.assertTrue(form.errors)
+        self.assertIn(Media.error_messages["settings_type"], str(form.errors))
 
-    def test_given_empty_settings_then_raise_validation_error(self):
+    def test_given_empty_settings_then_return_form_with_errors(self):
         data = {
             "media": self.dummy_medium,
             "settings": {},
         }
-        with self.assertRaises(forms.ValidationError) as e:
-            DummyNotification.validate(data, self.user)
+        form = DummyNotification.validate(data, self.user)
 
-        self.assertIn("This field is required", str(e.exception))
+        self.assertTrue(form.errors)
+        self.assertIn("This field is required", str(form.errors))
 
-    def test_given_invalid_settings_then_raise_validation_error(self):
+    def test_given_invalid_settings_then_return_form_with_errors(self):
         data = {
             "media": self.dummy_medium,
             "settings": {"bar": "wrong"},
         }
-        with self.assertRaises(forms.ValidationError) as e:
-            DummyNotification.validate(data, self.user)
+        form = DummyNotification.validate(data, self.user)
 
-        self.assertIn("This field is required", str(e.exception))
+        self.assertTrue(form.errors)
+        self.assertIn("This field is required", str(form.errors))

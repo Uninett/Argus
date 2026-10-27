@@ -150,6 +150,9 @@ class RequestDestinationConfigSerializer(serializers.ModelSerializer):
         medium = safely_get_medium_object(media_slug)
         form = medium.validate(attrs, self.context["request"].user, self.instance)
 
+        if form.errors:
+            raise serializers.ValidationError(form.errors.get_json_data())
+
         return form.cleaned_data
 
     def update(self, destination: DestinationConfig, validated_data: dict):
