@@ -266,6 +266,32 @@ To add a base_url add the `-u` flag to the command as such:
         $ python manage.py create_source -u "https://example.com"
 
 
+.. _find-unset-last-seen:
+
+Find unset last seen
+--------------------
+
+For sources that do not have ``last_seen`` set, it finds when
+the latest event was received from each source.
+
+    .. code:: console
+
+        $ python manage.py find_unset_last_seen
+
+The ``-s``-flag saves the latest received timestamp into the ``last_seen``
+field:
+
+    .. code:: console
+
+        $ python manage.py find_unset_last_seen -s
+
+The output can be hidden by setting verbosity to 0:
+
+    .. code:: console
+
+        $ python manage.py find_unset_last_seen -v 0
+
+
 .. _check-token-expiry:
 
 Check for token expiry
