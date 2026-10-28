@@ -48,7 +48,7 @@ class TimeslotAdmin(admin.ModelAdmin):
 
 
 class FilterAdmin(admin.ModelAdmin):
-    list_display = ("name", "user", "filter")
+    list_display = ("name", "user", "filter", "public")
     search_fields = (
         "name",
         "filter",
@@ -56,6 +56,7 @@ class FilterAdmin(admin.ModelAdmin):
         "user__last_name",
         "user__username",
     )
+    list_filter = ("public",)
     list_select_related = ("user",)
 
     raw_id_fields = ("user",)
