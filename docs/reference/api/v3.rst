@@ -17,77 +17,77 @@ Incident endpoints
 
 See v2 for the other endpoints.
 
--  ``/api/v3/incidents/``:
+- ``/api/v3/incidents/``:
 
-   -  ``GET``: returns all incidents - both open and historic
+   - ``GET``: returns all incidents - both open and historic
 
-      **Query parameters**: All query parameters are optional. If a query
-      parameter is not included or empty, for instance ``acked=``, then
-      the rows returned are not affected by that filter and shows rows
-      of all kinds of that value, for instance both “acked” and
-      “unacked” in the case of ``acked=``.
+     **Query parameters**: All query parameters are optional. If a query
+     parameter is not included or empty, for instance ``acked=``, then
+     the rows returned are not affected by that filter and shows rows
+     of all kinds of that value, for instance both “acked” and
+     “unacked” in the case of ``acked=``.
 
-      **Filtering parameters**:
+     **Filtering parameters**:
 
-      ``acked=true|false``
+     ``acked=true|false``
         Fetch only acked (``true``) or unacked (``false``) incidents.
 
-      ``duration__gte=number``
+     ``duration__gte=number``
         Fetch only incidents that are or have been open for equal to or
         more than (``number``) minutes.
 
-      ``end_time__gte=end-time``
+     ``end_time__gte=end-time``
         Fetch only incidents that ended on or later than (``end-time``).
 
-      ``end_time__isnull=true|false``
+     ``end_time__isnull=true|false``
         Fetch only stateless (``true``) or stateful (``false``) incidents.
 
-      ``end_time__lte=end-time``
+     ``end_time__lte=end-time``
         Fetch only incidents that ended on or earlier than (``end-time``).
 
-      ``level__lte=1|2|3|4|5``
+     ``level__lte=1|2|3|4|5``
         Fetch only incidents that have a level less or equal than (``level``).
 
-      ``open=true|false``
+     ``open=true|false``
         Fetch only open (``true``) or closed (``false``) incidents.
 
-      ``stateful=true|false``
+     ``stateful=true|false``
         Fetch only stateful (``true``) or stateless (``false``) incidents.
 
-      ``source__id__in=ID1[,ID2,..]``
+     ``source__id__in=ID1[,ID2,..]``
         Fetch only incidents with a source with numeric id ``ID1`` or ``ID2`` or..
 
-      ``source__name__in=NAME1[,NAME2,..]``
+     ``source__name__in=NAME1[,NAME2,..]``
         Fetch only incidents with a source with name ``NAME1`` or ``NAME2`` or..
 
-      ``source__type__in=NAME1[,NAME2,..]``
+     ``source__type__in=NAME1[,NAME2,..]``
         Fetch only incidents with a source of a type with numeric id
         ``ID1`` or ``ID2`` or..
 
-      ``source_incident_id=ID``
+     ``source_incident_id=ID``
         Fetch only incidents with ``source_incident_id`` set to ``ID``.
 
-      ``start_time__gte=start-time``
+     ``start_time__gte=start-time``
         Fetch only incidents that started on or later than (``start-time``).
 
-      ``start_time__lte=start-time``
+     ``start_time__lte=start-time``
         Fetch only incidents that started on or earlier than (``start-time``).
 
-      ``stateful=true|false``
+     ``stateful=true|false``
         Fetch only stateful (``true``) or stateless (``false``) incidents.
 
-      ``ticket=true|false``
+     ``ticket=true|false``
         Fetch only incidents with a ticket url (``true``) or without (``false``).
 
-      ``tags=key1=value1,key1=value2,key2=value``
+     ``tags=key1=value1,key1=value2,key2=value``
         Fetch only incidents with one or more of the tags. Tag-format is
         “``key=value``”. If there are multiple tags with the same key, only
         one of the tags needs to match. If there are multiple keys, one of
         each key must match.
 
-      So:
+     So:
 
-      .. code-block::
+     .. code-block::
         :caption: URL reformatted for readability
 
           /api/v3/incidents/?acked=false\
@@ -99,32 +99,32 @@ See v2 for the other endpoints.
                             location=understairs,\
                             problem=onfire
 
-      will fetch incidents that are all of “open”, “unacked”,
-      “stateful”, from source number 1, with “location” either being
-      “broomcloset” or “understairs”, and that is on fire.
+     will fetch incidents that are all of “open”, “unacked”,
+     “stateful”, from source number 1, with “location” either being
+     “broomcloset” or “understairs”, and that is on fire.
 
-      .. note::
+     .. note::
         If the boolean parameters are not given a value
         or are left out, that is interpreted as not filtering at all on
         that parameter, showing both true and false entries.
 
-      **Paginating parameters**:
+     **Paginating parameters**:
 
-      ``cursor=LONG RANDOM STRING|null``
+     ``cursor=LONG RANDOM STRING|null``
         Go to the page of that cursor. The cursor string for next and
         previous page is part of the response body.
 
-      ``page_size=INTEGER``
+     ``page_size=INTEGER``
         The number of rows to return. Default is 100.
 
-      So:
-      ``api/v3/incidents/?cursor=cD0yMDIw&page_size=10``
-      will go to the page indicated by
-      ``cD0yMDIw`` and
-      show the next 10 rows from that point onward. Do not attempt to
-      guess the cursor string. ``null`` means there is no more to fetch.
+     So:
+     ``api/v3/incidents/?cursor=cD0yMDIw&page_size=10``
+     will go to the page indicated by
+     ``cD0yMDIw`` and
+     show the next 10 rows from that point onward. Do not attempt to
+     guess the cursor string. ``null`` means there is no more to fetch.
 
-      .. code-block:: json
+     .. code-block:: json
         :caption: Example response body
 
           {
@@ -161,27 +161,27 @@ See v2 for the other endpoints.
               ]
           }
 
-      Pagination-support:
+     Pagination-support:
 
-      ``next``
+     ``next``
         The link to the next page, according to the cursor, or ``null`` if
         on the last page.
 
-      ``previous``
+     ``previous``
         The link to the previous page, according to the cursor, or
         ``null`` if on the first page.
 
-      ``results``
+     ``results``
         An array of the resulting subset of rows, or an empty array if there are no
         results.
 
-      Refer to the section :ref:`explanation-of-terms` for an
-      explanation of the other fields.
+     Refer to the section :ref:`explanation-of-terms` for an
+     explanation of the other fields.
 
 
-   -  ``POST``: creates and returns an incident
+   - ``POST``: creates and returns an incident
 
-      .. code-block:: json
+     .. code-block:: json
         :caption: Example request body
 
           {
@@ -198,17 +198,17 @@ See v2 for the other endpoints.
               ]
           }
 
-      Refer to the section :ref:`explanation-of-terms` for an
-      explanation of the fields.
+     Refer to the section :ref:`explanation-of-terms` for an
+     explanation of the fields.
 
 
--  ``/api/v3/incidents/<int:pk>/``:
+- ``/api/v3/incidents/<int:pk>/``:
 
-   -  ``GET``: returns an incident by primary key
+   - ``GET``: returns an incident by primary key
 
-   -  ``PATCH``: modifies parts of an incident and returns it
+   - ``PATCH``: modifies parts of an incident and returns it
 
-      .. code-block:: json
+     .. code-block:: json
         :caption: Example request body
 
           {
@@ -219,21 +219,21 @@ See v2 for the other endpoints.
               ]
           }
 
-      The fields allowed to be modified are:
+     The fields allowed to be modified are:
 
-      -  ``details_url``
-      -  ``ticket_url``
-      -  ``tags``
+     - ``details_url``
+     - ``ticket_url``
+     - ``tags``
 
 
--  ``/api/v3/incidents/<int:pk>/tags/``:
+- ``/api/v3/incidents/<int:pk>/tags/``:
 
-   -  ``GET``: returns a list of all the tags for the incident given by the
+   - ``GET``: returns a list of all the tags for the incident given by the
      primary key
 
-   -  ``POST``: adds one or more tags to the incident and returns the modified list
+   - ``POST``: adds one or more tags to the incident and returns the modified list
 
-      .. code-block:: json
+     .. code-block:: json
         :caption: Example request body
 
           [
@@ -242,33 +242,33 @@ See v2 for the other endpoints.
           ]
 
 
--  ``/api/v3/incidents/<int:pk>/tags/<str:tag>/``:
+- ``/api/v3/incidents/<int:pk>/tags/<str:tag>/``:
 
-   -  ``GET``: returns a list of the tag specified be the incident primary key
+   - ``GET``: returns a list of the tag specified be the incident primary key
      and the tag. Useful for checking if an incident has that specific tag.
 
-   -  ``DELETE``: removes the given tag from the incident
+   - ``DELETE``: removes the given tag from the incident
 
 
--  ``/api/v3/incidents/<int:pk>/ticket_url/``:
+- ``/api/v3/incidents/<int:pk>/ticket_url/``:
 
-   -  ``PUT``: modifies just the ticket url of an incident and returns
+   - ``PUT``: modifies just the ticket url of an incident and returns
       it
 
-      .. code-block:: json
+     .. code-block:: json
         :caption: Example request body
 
           {
               "ticket_url": "https://tickettracker.com/tickets/987654/",
           }
 
-      Only ``ticket_url`` may be modified.
+     Only ``ticket_url`` may be modified.
 
--  ``/api/v3/incidents/sources/``:
+- ``/api/v3/incidents/sources/``:
 
-   -  ``GET``: Returns a list of all sources
+   - ``GET``: Returns a list of all sources
 
-      .. code-block:: json
+     .. code-block:: json
         :caption: Example response body
 
         [
@@ -285,7 +285,7 @@ See v2 for the other endpoints.
         ]
 
 
--  ``GET`` to ``/api/v3/incidents/mine/``: behaves similar to
+- ``GET`` to ``/api/v3/incidents/mine/``: behaves similar to
    ``/api/v3/incidents/``, but will only show the incidents added by the
    logged in user, and no filtering on source or source type is
    possible.
@@ -295,11 +295,11 @@ Notification profile endpoints
 
 See v2 for the other endpoints.
 
--  ``/api/v3/notificationprofiles/destinations/``:
+- ``/api/v3/notificationprofiles/destinations/``:
 
-   -  ``GET``: returns the logged in user’s destination-configs
+   - ``GET``: returns the logged in user’s destination-configs
 
-      .. code-block:: json
+     .. code-block:: json
         :caption: Example response body
 
           [
@@ -332,10 +332,10 @@ See v2 for the other endpoints.
             }
           ]
 
-   -  ``POST``: creates and returns a destination-config, which is then
+   - ``POST``: creates and returns a destination-config, which is then
       connected to the logged in user
 
-      .. code-block:: json
+     .. code-block:: json
         :caption: Example request body for email
 
           {
@@ -346,7 +346,7 @@ See v2 for the other endpoints.
               }
           }
 
-      .. code-block:: json
+     .. code-block:: json
         :caption: Example request body for sms
 
           {
@@ -356,30 +356,30 @@ See v2 for the other endpoints.
                     "phone_number":"+4747474747"
               }
           }
--  ``/api/v3/notificationprofiles/destinations/<int:pk>/``:
+- ``/api/v3/notificationprofiles/destinations/<int:pk>/``:
 
-   -  ``GET``: returns one of the logged in user’s destination-configs
+   - ``GET``: returns one of the logged in user’s destination-configs
       by primary key
 
-   -  ``PUT``: updates and returns one of the logged in user’s
+   - ``PUT``: updates and returns one of the logged in user’s
       destination-configs by primary key
 
-      -  Example request body: same as ``POST`` to
+      - Example request body: same as ``POST`` to
          ``/api/v3/notificationprofiles/destinations/``
 
-   -  ``DELETE``: deletes one of the logged in user’s destination-configs by primary key
+   - ``DELETE``: deletes one of the logged in user’s destination-configs by primary key
 
--  ``/api/v3/notificationprofiles/destinations/<int:pk>/duplicate/``:
+- ``/api/v3/notificationprofiles/destinations/<int:pk>/duplicate/``:
 
-   -  ``GET``: returns True if another user has a destination with the same
+   - ``GET``: returns True if another user has a destination with the same
       medium and settings as the destination with the given primary key
 
 
--  ``/api/v3/notificationprofiles/media/``:
+- ``/api/v3/notificationprofiles/media/``:
 
-   -  ``GET``: returns media
+   - ``GET``: returns media
 
-      .. code-block:: json
+     .. code-block:: json
         :caption: Example response body
 
           [
@@ -395,15 +395,15 @@ See v2 for the other endpoints.
             }
           ]
 
--  ``/api/v3/notificationprofiles/media/<slug:slug>/``:
+- ``/api/v3/notificationprofiles/media/<slug:slug>/``:
 
-   -  ``GET``: returns one of the media by it's slug
+   - ``GET``: returns one of the media by it's slug
 
--  ``/api/v3/notificationprofiles/media/<slug:slug>/json_schema/``:
+- ``/api/v3/notificationprofiles/media/<slug:slug>/json_schema/``:
 
-   -  ``GET``: returns the json schema of the media by it's slug
+   - ``GET``: returns the json schema of the media by it's slug
 
-      .. code-block:: json
+     .. code-block:: json
         :caption: Example response body
 
           {

@@ -76,8 +76,8 @@ Other storage backends
 Many of these are very recent, search for "django-tasks" on PyPi for more.
 
 * `Django Task Backend for AWS and Azure <https://pypi.org/project/django-tasks-cloud/>`_
-* `https://pypi.org/project/django-tasks-concurrent/`_
-* `https://pypi.org/project/django-tasks-redis/`_
+* `Concurrent async worker and cron scheduler for Django tasks <https://pypi.org/project/django-tasks-concurrent/>`_
+* `A Redis/Valkey-backed task queue backend for Django tasks <https://pypi.org/project/django-tasks-redis/>`_
 
 Scheduling tasks
 ================
