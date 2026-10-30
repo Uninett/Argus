@@ -114,7 +114,7 @@ Change it to::
     }
 
 
-The some message is logged multiple times in different formats
+The same message is logged multiple times in different formats
 --------------------------------------------------------------
 
 It's caused by having multiple handlers sending to the same place.
