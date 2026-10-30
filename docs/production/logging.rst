@@ -2,7 +2,7 @@
 Logging in production
 =====================
 
-In production, there are at least three different configurable sources of logs:
+In production there are at least three different configurable sources of logs:
 
 1. The webserver, load balancer or proxy: First line of defense.
 2. The WSGI or ASGI server that talks WSGI or ASGI with Argus. Translates
