@@ -72,7 +72,7 @@ Troubleshooting
 
 .. _duplicate_logs:
 
-The some message is logged multiple times
+The same message is logged multiple times
 -----------------------------------------
 
 This happens if a handler is set on a sublogger in addition to the root
