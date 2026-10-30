@@ -2,7 +2,7 @@
 Logging in production
 =====================
 
-In production, there are at least three different configurable sources of logs:
+In production there are at least three different configurable sources of logs:
 
 1. The webserver, load balancer or proxy: First line of defense.
 2. The WSGI or ASGI server that talks WSGI or ASGI with Argus. Translates
@@ -61,7 +61,7 @@ Gunicorn as layer 2
 ===================
 
 Use a configuration file, and in the configuration, set up logging for gunicorn
-itself. If both gunicorn and Argus is set to use ``logging.StreamHandler`` then
+itself. If both gunicorn and Argus are set to use ``logging.StreamHandler`` then
 the gunicorn logs and Argus logs should end up on standard out.
 
 See :download:`example gunicorn configuration <gunicorn.conf.py>` or :download:`example
@@ -72,7 +72,7 @@ Troubleshooting
 
 .. _duplicate_logs:
 
-The some message is logged multiple times
+The same message is logged multiple times
 -----------------------------------------
 
 This happens if a handler is set on a sublogger in addition to the root
@@ -114,7 +114,7 @@ Change it to::
     }
 
 
-The some message is logged multiple times in different formats
+The same message is logged multiple times in different formats
 --------------------------------------------------------------
 
 It's caused by having multiple handlers sending to the same place.
