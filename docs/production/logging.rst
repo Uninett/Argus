@@ -61,7 +61,7 @@ Gunicorn as layer 2
 ===================
 
 Use a configuration file, and in the configuration, set up logging for gunicorn
-itself. If both gunicorn and Argus is set to use ``logging.StreamHandler`` then
+itself. If both gunicorn and Argus are set to use ``logging.StreamHandler`` then
 the gunicorn logs and Argus logs should end up on standard out.
 
 See :download:`example gunicorn configuration <gunicorn.conf.py>` or :download:`example
