@@ -2,7 +2,7 @@
 PyYAML>=5.4
 attrs # needed by twisted
 cryptography>=50.0.0
-urllib3>=2.7
+urllib3>=2.8.0
 psycopg>=3.1
 packaging>=25.0  # fix for setuptools "License-Files" shenanigans
 idna>=3.16
