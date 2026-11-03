@@ -7,7 +7,7 @@ In production there are at least three different configurable sources of logs:
 1. The webserver, load balancer or proxy: First line of defense.
 2. The WSGI or ASGI server that talks WSGI or ASGI with Argus. Translates
    between 1 and 3.
-3. Argus itself
+3. Argus itself.
 
 Both point 1 and 2 will have access logs, unless you turn it off. Both 1 and
 2 will have error logs for that layer only. Only layer 3 will produce error
@@ -17,9 +17,8 @@ For development, Django (and thus Argus) ships with the development command
 "runserver", which combines both 1 and 2. But in production, it is better to
 have layer 1 and 2 separate, and layer 2 should never be just "runserver".
 
-Because both layer 1 and 2 are outside of the control of the source code of
-Argus we cannot ship a working logging configuration for those layers together
-with the code, but we can document what's wise.
+Layers 1 and 2 are outside Argus' control, so we cannot ship a logging
+configuration for them. This page documents what we recommend.
 
 Structured logging with JSON
 ============================
@@ -49,7 +48,7 @@ a logging formatter like this:
         },
     },
 
-... the logs produced by argus will be in JSON format.
+… the logs produced by argus will be in JSON format.
 
 See `Python logging LogRecord attributes
 <https://docs.python.org/3/library/logging.html#logrecord-attributes>`_ for
@@ -78,7 +77,7 @@ The same message is logged multiple times
 This happens if a handler is set on a sublogger in addition to the root
 logger without setting ``propagate`` to ``False`` in the sublogger.
 
-With a dictionary based config, elided lines marked with `..`. If you have::
+With a dictionary based config, elided lines marked with ``..``. If you have::
 
     {
         ..
@@ -124,7 +123,7 @@ It's one of:
 1. Multiple handlers, and the subloggers do not have ``propagate`` set to
    False, see :ref:`duplicate_logs`.
 2. Multiple entries in the handlers-list that send to the same place. Example
-   with a dictionary based config, elided lines marked with `..`. If you have:
+   with a dictionary based config, elided lines marked with ``..``. If you have:
 
    ::
 
@@ -152,5 +151,5 @@ It's one of:
        }
 
 
-    .. this will lead to everything logged under argus being sent twice to the
-    same place.
+   … this will lead to everything logged under argus being sent twice to the
+   same place.
