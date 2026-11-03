@@ -90,14 +90,14 @@ See v2 for the other endpoints.
      .. code-block::
         :caption: URL reformatted for readability
 
-          /api/v3/incidents/?acked=false\
-                          &open=true\
-                          &stateful=true\
-                          &source__id__in=1\
-                          &tags=\
-                            location=broomcloset,\
-                            location=understairs,\
-                            problem=onfire
+        /api/v3/incidents/?acked=false\
+                        &open=true\
+                        &stateful=true\
+                        &source__id__in=1\
+                        &tags=\
+                          location=broomcloset,\
+                          location=understairs,\
+                          problem=onfire
 
      will fetch incidents that are all of “open”, “unacked”,
      “stateful”, from source number 1, with “location” either being
@@ -127,41 +127,41 @@ See v2 for the other endpoints.
      .. code-block:: json
         :caption: Example response body
 
-          {
-              "next": "http://localhost:8000/api/v3/incidents/?cursor=cD0yMDIwLTA5LTIzKzEzJTNBMDIlM0ExNi40NTU4MzIlMkIwMCUzQTAw&page_size=10",
-              "previous": null,
-              "results": [
-                  {
-                      "pk": 10101,
-                      "start_time": "2011-11-11T11:11:11+02:00",
-                      "end_time": "2011-11-11T11:11:12+02:00",
-                      "source": {
-                          "pk": 11,
-                          "name": "Uninett GW 3",
-                          "type": {
-                              "name": "nav"
-                          },
-                          "user": 12,
-                          "base_url": "https://somenav.somewhere.com",
-                          "last_seen": "2011-11-11T11:11:12+02:00"
-                      },
-                      "source_incident_id": "12345",
-                      "details_url": "https://uninett.no/api/alerts/12345/",
-                      "description": "Netbox 11 <12345> down.",
-                      "ticket_url": "https://tickettracker.com/tickets/987654/",
-                      "tags": [
-                          "object=Netbox 4",
-                          "problem_type=boxDown",
-                          "color=red"
-                      ],
-                      "stateful": true,
-                      "open": false,
-                      "acked": false
-                  }
-              ]
-          }
+        {
+            "next": "http://localhost:8000/api/v3/incidents/?cursor=cD0yMDIwLTA5LTIzKzEzJTNBMDIlM0ExNi40NTU4MzIlMkIwMCUzQTAw&page_size=10",
+            "previous": null,
+            "results": [
+                {
+                    "pk": 10101,
+                    "start_time": "2011-11-11T11:11:11+02:00",
+                    "end_time": "2011-11-11T11:11:12+02:00",
+                    "source": {
+                        "pk": 11,
+                        "name": "Uninett GW 3",
+                        "type": {
+                            "name": "nav"
+                        },
+                        "user": 12,
+                        "base_url": "https://somenav.somewhere.com",
+                        "last_seen": "2011-11-11T11:11:12+02:00"
+                    },
+                    "source_incident_id": "12345",
+                    "details_url": "https://uninett.no/api/alerts/12345/",
+                    "description": "Netbox 11 <12345> down.",
+                    "ticket_url": "https://tickettracker.com/tickets/987654/",
+                    "tags": [
+                        "object=Netbox 4",
+                        "problem_type=boxDown",
+                        "color=red"
+                    ],
+                    "stateful": true,
+                    "open": false,
+                    "acked": false
+                }
+            ]
+        }
 
-     Pagination-support:
+     Pagation-support:
 
      ``next``
         The link to the next page, according to the cursor, or ``null`` if
@@ -184,19 +184,19 @@ See v2 for the other endpoints.
      .. code-block:: json
         :caption: Example request body
 
-          {
-              "source": 11,
-              "start_time": "2011-11-11 11:11:11.11111",
-              "end_time": null,
-              "source_incident_id": "12345",
-              "details_url": "https://uninett.no/api/alerts/12345/",
-              "description": "Netbox 11 <12345> down.",
-              "ticket_url": "https://tickettracker.com/tickets/987654/",
-              "tags": [
-                  "object=Netbox 4",
-                  "problem_type=boxDown"
-              ]
-          }
+        {
+            "source": 11,
+            "start_time": "2011-11-11 11:11:11.11111",
+            "end_time": null,
+            "source_incident_id": "12345",
+            "details_url": "https://uninett.no/api/alerts/12345/",
+            "description": "Netbox 11 <12345> down.",
+            "ticket_url": "https://tickettracker.com/tickets/987654/",
+            "tags": [
+                "object=Netbox 4",
+                "problem_type=boxDown"
+            ]
+        }
 
      Refer to the section :ref:`explanation-of-terms` for an
      explanation of the fields.
@@ -204,91 +204,91 @@ See v2 for the other endpoints.
 
 - ``/api/v3/incidents/<int:pk>/``:
 
-   - ``GET``: returns an incident by primary key
+  - ``GET``: returns an incident by primary key
 
-   - ``PATCH``: modifies parts of an incident and returns it
+  - ``PATCH``: modifies parts of an incident and returns it
 
-     .. code-block:: json
-        :caption: Example request body
+    .. code-block:: json
+       :caption: Example request body
 
-          {
-              "ticket_url": "https://tickettracker.com/tickets/987654/",
-              "tags": [
-                  "object=Netbox 4",
-                  "problem_type=boxDown"
-              ]
-          }
+       {
+           "ticket_url": "https://tickettracker.com/tickets/987654/",
+           "tags": [
+               "object=Netbox 4",
+               "problem_type=boxDown"
+           ]
+       }
 
-     The fields allowed to be modified are:
+    The fields allowed to be modified are:
 
-     - ``details_url``
-     - ``ticket_url``
-     - ``tags``
+    - ``details_url``
+    - ``ticket_url``
+    - ``tags``
 
 
 - ``/api/v3/incidents/<int:pk>/tags/``:
 
-   - ``GET``: returns a list of all the tags for the incident given by the
-     primary key
+  - ``GET``: returns a list of all the tags for the incident given by the
+    primary key
 
-   - ``POST``: adds one or more tags to the incident and returns the modified list
+  - ``POST``: adds one or more tags to the incident and returns the modified list
 
-     .. code-block:: json
-        :caption: Example request body
+    .. code-block:: json
+       :caption: Example request body
 
-          [
-              "object=Netbox 4",
-              "problem_type=boxDown"
-          ]
+       [
+           "object=Netbox 4",
+           "problem_type=boxDown"
+       ]
 
 
 - ``/api/v3/incidents/<int:pk>/tags/<str:tag>/``:
 
-   - ``GET``: returns a list of the tag specified be the incident primary key
-     and the tag. Useful for checking if an incident has that specific tag.
+  - ``GET``: returns a list of the tag specified be the incident primary key
+    and the tag. Useful for checking if an incident has that specific tag.
 
-   - ``DELETE``: removes the given tag from the incident
+  - ``DELETE``: removes the given tag from the incident
 
 
 - ``/api/v3/incidents/<int:pk>/ticket_url/``:
 
-   - ``PUT``: modifies just the ticket url of an incident and returns
-      it
+  - ``PUT``: modifies just the ticket url of an incident and returns
+    it
 
-     .. code-block:: json
-        :caption: Example request body
+    .. code-block:: json
+       :caption: Example request body
 
-          {
-              "ticket_url": "https://tickettracker.com/tickets/987654/",
-          }
+       {
+           "ticket_url": "https://tickettracker.com/tickets/987654/",
+       }
 
-     Only ``ticket_url`` may be modified.
+    Only ``ticket_url`` may be modified.
 
 - ``/api/v3/incidents/sources/``:
 
-   - ``GET``: Returns a list of all sources
+  - ``GET``: Returns a list of all sources
 
-     .. code-block:: json
-        :caption: Example response body
+    .. code-block:: json
+       :caption: Example response body
 
-        [
-          {
-            "pk": 1,
-            "name": "argus",
-            "type": {
-              "name": "argus"
-              },
-            "user": 1,
-            "base_url": "",
-            "last_seen": "2026-07-31T08:58:05.806388+02:00"
-          }
-        ]
+       [
+           {
+               "pk": 1,
+               "name": "argus",
+               "type": {
+                   "name": "argus"
+               },
+               "user": 1,
+               "base_url": "",
+               "last_seen": "2026-07-31T08:58:05.806388+02:00"
+           }
+       ]
 
 
 - ``GET`` to ``/api/v3/incidents/mine/``: behaves similar to
-   ``/api/v3/incidents/``, but will only show the incidents added by the
-   logged in user, and no filtering on source or source type is
-   possible.
+  ``/api/v3/incidents/``, but will only show the incidents added by the
+  logged in user, and no filtering on source or source type is
+  possible.
 
 Notification profile endpoints
 ------------------------------
@@ -302,77 +302,78 @@ See v2 for the other endpoints.
      .. code-block:: json
         :caption: Example response body
 
-          [
+        [
             {
-              "pk": 2,
-              "media": {
-                "slug": "email",
-                "name": "Email",
-                "installed": true
-              },
-              "label": "work",
-              "suggested_label": "Email: work@example.com",
-              "settings": {
-                "synced": false,
-                "email_address": "work@example.com"
-              }
+                "pk": 2,
+                "media": {
+                    "slug": "email",
+                    "name": "Email",
+                    "installed": true
+                },
+                "label": "work",
+                "suggested_label": "Email: work@example.com",
+                "settings": {
+                    "synced": false,
+                    "email_address": "work@example.com"
+                }
             },
             {
-              "pk": 3,
-              "media": {
-                "slug": "sms",
-                "name": "SMS",
-                "installed": true
-              },
-              "label": "work",
-              "suggested_label": "SMS: +4747474747",
-              "settings": {
-                "phone_number": "+4747474747"
-              }
+                "pk": 3,
+                "media": {
+                    "slug": "sms",
+                    "name": "SMS",
+                    "installed": true
+                },
+                "label": "work",
+                "suggested_label": "SMS: +4747474747",
+                "settings": {
+                    "phone_number": "+4747474747"
+                }
             }
-          ]
+        ]
 
    - ``POST``: creates and returns a destination-config, which is then
-      connected to the logged in user
+     connected to the logged in user
 
      .. code-block:: json
         :caption: Example request body for email
 
-          {
-              "media": "email",
-              "label": "Work email",
-              "settings": {
-                    "email_address":"work@email.com"
-              }
-          }
+        {
+            "media": "email",
+            "label": "Work email",
+            "settings": {
+                "email_address":"work@email.com"
+            }
+        }
 
      .. code-block:: json
         :caption: Example request body for sms
 
-          {
-              "media": "sms",
-              "label": "Work phone",
-              "settings": {
-                    "phone_number":"+4747474747"
-              }
-          }
+        {
+            "media": "sms",
+            "label": "Work phone",
+            "settings": {
+                "phone_number": "+4747474747"
+            }
+        }
+
 - ``/api/v3/notificationprofiles/destinations/<int:pk>/``:
 
    - ``GET``: returns one of the logged in user’s destination-configs
-      by primary key
+     by primary key
 
    - ``PUT``: updates and returns one of the logged in user’s
-      destination-configs by primary key
+     destination-configs by primary key
 
-      - Example request body: same as ``POST`` to
-         ``/api/v3/notificationprofiles/destinations/``
+     - Example request body: same as ``POST`` to
+       ``/api/v3/notificationprofiles/destinations/``
 
    - ``DELETE``: deletes one of the logged in user’s destination-configs by primary key
 
 - ``/api/v3/notificationprofiles/destinations/<int:pk>/duplicate/``:
 
    - ``GET``: returns True if another user has a destination with the same
-      medium and settings as the destination with the given primary key
+     medium and settings as the destination with the given primary key
 
 
 - ``/api/v3/notificationprofiles/media/``:
@@ -382,18 +383,18 @@ See v2 for the other endpoints.
      .. code-block:: json
         :caption: Example response body
 
-          [
+        [
             {
-              "slug": "email",
-              "name": "Email",
-              "installed": true
+                "slug": "email",
+                "name": "Email",
+                "installed": true
             },
             {
-              "slug": "sms",
-              "name": "SMS",
-              "installed": true
+                "slug": "sms",
+                "name": "SMS",
+                "installed": true
             }
-          ]
+        ]
 
 - ``/api/v3/notificationprofiles/media/<slug:slug>/``:
 
@@ -406,20 +407,20 @@ See v2 for the other endpoints.
      .. code-block:: json
         :caption: Example response body
 
-          {
+        {
             "json_schema": {
-              "title": "Email Settings",
-              "description": "Settings for a DestinationConfig using email.",
-              "type": "object",
-              "required": [
-                "email_address"
-              ],
-              "properties": {
-                "email_address": {
-                  "type": "string",
-                  "title": "Email address"
-                }
-              },
-              "$id": "http://localhost:8000/json-schema/email"
+                "title": "Email Settings",
+                "description": "Settings for a DestinationConfig using email.",
+                "type": "object",
+                "required": [
+                    "email_address"
+                ],
+                "properties": {
+                    "email_address": {
+                        "type": "string",
+                        "title": "Email address"
+                    }
+                },
+                "$id": "http://localhost:8000/json-schema/email"
             }
-          }
+        }
