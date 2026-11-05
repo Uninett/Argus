@@ -29,8 +29,10 @@ Auth endpoints
 
       The ``admin_url`` parameter is the link to the Django admin.
 
--  ``GET`` to ``/api/v2/auth/users/<int:pk>/``: returns a user by primary key
+-  ``GET`` to ``/api/v2/auth/users/<int:pk>/``: Admins only: returns a user by primary key
    (``pk``)
+
+   .. warning:: Deprecated
 
 -  ``POST`` to ``/api/v2/token-auth/``: returns an auth token for the
    posted user
