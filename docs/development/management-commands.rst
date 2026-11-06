@@ -477,11 +477,9 @@ Planned maintenance handling
 Connect new planned maintenance tasks with their covered incidents
 ------------------------------------------------------------------
 
-There is a command ``check_started_maintenance``. It takes an argument ``--minutes``
-(default 5 min) and will find all planned maintenance tasks that have started within
-the last x minutes. For each of these tasks it finds all open incidents that are
-covered by it and adds them to the ``incidents`` list of that task if it isn't already
-there.
+There is a command ``check_started_maintenance``. It will find all ongoing planned
+maintenance tasks. For each of these tasks it finds all open incidents that are covered
+by it and adds them to the ``incidents`` list of that task if it isn't already there.
 
 This field will be used to show in the dashboard which incidents are covered by an
 ongoing planned maintenance task.
@@ -489,13 +487,67 @@ ongoing planned maintenance task.
 Remove covered incidents from recently closed planned maintenance tasks
 -----------------------------------------------------------------------
 
-There is a command ``check_ended_maintenance``. It takes an argument ``--minutes``
-(default 5 min) and will find all planned maintenance tasks that have ended within the
-last x minutes. For each of these tasks it clears the ``incidents`` field of that task.
+There is a command ``check_ended_maintenance``. It will find all planned maintenance
+tasks that have ended. For each of these tasks it clears the ``incidents`` field of
+that task.
 
 This field is be used to show in the dashboard which incidents are covered by an
 ongoing planned maintenance task. Since the task has ended these incidents are not
 covered by it anymore.
+
+Create new planned maintenance tasks
+------------------------------------
+
+To create a new planned maintenance task you can use the command
+``create_maintenance``.
+
+See the inbuilt help for flags and toggles:
+
+    .. code:: console
+
+        $ python manage.py create_maintenance --help
+
+To set who created the task use the `--create_by` flag, default is `argus`:
+
+    .. code:: console
+
+        $ python manage.py create_maintenance --created_by admin
+
+To set the start time one can use the `--start_time` flag, otherwise it will be set to
+now:
+
+    .. code:: console
+
+        $ python manage.py create_maintenance --start_time 2026-11-05 12:52:22.349734+00:00
+
+To set the end time one can use the `--end_time` flag, other it will be set to
+infinity:
+
+    .. code:: console
+
+        $ python manage.py create_maintenance --end_time 2026-11-08 12:52:22.349734+00:00
+
+To add a custom description add the `-d` flag to the command as such:
+
+    .. code:: console
+
+        $ python manage.py create_maintenance -d "Custom description"
+
+To connect filters to the created task there are two options:
+
+First use the flag `--filter_ids` and a list of existing filter ids as such:
+
+    .. code:: console
+
+        $ python manage.py create_maintenance --filter_ids 1 2 3
+
+Or to create a new filter you can use the `--filter_blob` flag and give a filter_blob
+that contains the filter arguments and the name of the new filter in JSON format as
+such:
+
+    .. code:: console
+
+        $ python manage.py create_maintenance --filter_blob '{"maxlevel": 3, "name": "New filter"}'
 
 Task queue workers
 ==================
