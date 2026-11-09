@@ -1,11 +1,10 @@
 from __future__ import annotations
 
 import logging
+from enum import StrEnum
 from typing import TYPE_CHECKING, Optional, Any
 
 from django.conf import settings
-
-from argus.compat import StrEnum
 
 
 if TYPE_CHECKING:
