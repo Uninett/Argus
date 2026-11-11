@@ -70,7 +70,7 @@ Gunicorn as layer 2
 
 Use a configuration file, and in the configuration, set up logging for gunicorn
 itself. If both gunicorn and Argus are set to use ``logging.StreamHandler``
-then the gunicorn logs and Argus logs end up the same place. Gunicorn uses
+then the gunicorn logs and Argus logs end up in the same place. Gunicorn uses
 ``logging.StreamHandler`` by default.
 
 See :download:`example gunicorn configuration with plaintext logs
