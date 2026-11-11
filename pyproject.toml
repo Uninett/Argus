@@ -7,7 +7,7 @@ name = "argus-server"
 description = "Argus is an alert aggregator for monitoring systems"
 authors = [{name="Uninett Opensource", email="opensource@uninett.no"}]
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 license = {text = "GPL-3.0-or-later"}
 classifiers = [
     "Framework :: Django",
@@ -17,7 +17,6 @@ classifiers = [
     "Intended Audience :: System Administrators",
     "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
@@ -66,7 +65,7 @@ dev = [
     "django-debug-toolbar",
     "coverage",
     "django-extensions",
-    "ruff",
+    "ruff==0.17.2",
     "djlint",
     "ipython",
     "pre-commit",

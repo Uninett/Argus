@@ -29,8 +29,10 @@ Auth endpoints
 
       The ``admin_url`` parameter is the link to the Django admin.
 
--  ``GET`` to ``/api/v2/auth/users/<int:pk>/``: returns a user by primary key
+-  ``GET`` to ``/api/v2/auth/users/<int:pk>/``: Admins only: returns a user by primary key
    (``pk``)
+
+   .. warning:: Deprecated
 
 -  ``POST`` to ``/api/v2/token-auth/``: returns an auth token for the
    posted user
@@ -512,6 +514,25 @@ Incident endpoints
           }
         ]
 
+-  ``/api/v2/incidents/sources/me/``:
+
+   -  ``GET``: Returns just the info on the source that is connecting
+
+      .. code-block:: json
+        :caption: Example response body
+
+        {
+          "pk": 1,
+          "name": "argus",
+          "type": {
+            "name": "argus"
+            },
+          "user": 1,
+          "base_url": ""
+        }
+
+   -  ``HEAD``: Can be used to check if the token for a source is valid.
+     Returns no JSON.
 
 -  ``GET`` to ``/api/v2/incidents/mine/``: behaves similar to
    ``/api/v2/incidents/``, but will only show the incidents added by the
