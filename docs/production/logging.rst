@@ -79,7 +79,7 @@ See :download:`example gunicorn configuration with plaintext logs
 
 .. Note::
    ``logconfig_dict`` overrides ``accesslog``, ``errorlog`` and
-   ``loglevel``, don't mix them. ``access_log_format`` is always honored.
+   ``loglevel``, so don't mix them. ``access_log_format`` is always honored.
 
 .. Warning::
    When using ``logconfig_dict`` for *Gunicorn*, always set
