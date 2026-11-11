@@ -24,7 +24,7 @@ class TestAboutView(TestCase):
 
 class TestHealthCheckView(TestCase):
     def test_it_should_always_return_204(self):
-        response = self.client.get("/.still-alive/")
+        response = self.client.get(reverse("health-check"))
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
 

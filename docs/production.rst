@@ -7,3 +7,4 @@ Running in production
    production/task-queue
    production/logging
    production/health-check
+   production/sub-path

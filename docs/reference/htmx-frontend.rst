@@ -104,6 +104,12 @@ share the same :setting:`ARGUS_FRONTEND_URL`.
 Depending on how Argus is deployed this is the only surefire way to get hold
 of the externally visible hostname in the code in all cases.
 
+If :setting:`ARGUS_FRONTEND_SUBURL` is set, its value is appended to this url.
+Any path already present is kept. Setting the sub-path to ``foo`` while this is
+``https://myhost.example.org/bar`` gives permalinks below
+``https://myhost.example.org/bar/foo/``. Naming the sub-path here as well is
+harmless. It is not appended twice.
+
 OAuth2
 ------
 
