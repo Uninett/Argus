@@ -305,6 +305,29 @@ class UpdateLastSeenView(views.APIView):
         return Response(status=status.HTTP_403_FORBIDDEN)
 
 
+class SourceLockedSourceSystemView(
+    views.APIView,
+):
+    http_method_names = ["get", "head", "options", "trace"]
+
+    @extend_schema(
+        summary="Get info about connecting source",
+        responses={
+            "200": SourceSystemSerializer,
+            "401": Unauthorized401Serializer,
+            "403": Forbidden403Serializer,
+        },
+    )
+    def get(self, request, *args, **kwargs):
+        user = self.request.user
+        try:
+            obj = user.source_system
+        except AttributeError:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        serializer = SourceSystemSerializer(obj)
+        return Response(serializer.data)
+
+
 @extend_schema_view(
     update=extend_schema(
         request=EmptySerializer,

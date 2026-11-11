@@ -42,4 +42,5 @@ urlpatterns = [
     path("<int:incident_pk>/tags/<str:tag>/", tag_detail, name="incident-tag"),
     path("<int:incident_pk>/automatic-ticket/", ticket_plugin_detail, name="incident-ticket-plugin"),
     path("sources/heartbeat/", views.UpdateLastSeenView.as_view(), name="source-heartbeat"),
+    path("sources/me/", views.SourceLockedSourceSystemView.as_view(), name="source-me"),
 ] + router.urls

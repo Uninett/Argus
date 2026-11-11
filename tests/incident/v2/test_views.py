@@ -1077,3 +1077,23 @@ class BulkTicketUrlViewSetTestCase(APITestCase):
 
         incident_1.refresh_from_db()
         self.assertEqual(incident_1.ticket_url, data["ticket_url"])
+
+
+class SourceLockedSourceSystemTestCase(APITestCase):
+    def setUp(self):
+        source_type = SourceSystemTypeFactory()
+        self.source_user = SourceUserFactory()
+        self.human_user = PersonUserFactory()
+        self.source = SourceSystemFactory(type=source_type, user=self.source_user)
+
+    def test_when_connecting_source_uses_then_return_info_about_that_source(self):
+        self.client.force_authenticate(user=self.source_user)
+        response = self.client.get(path=f"{API_PATH}/sources/me/", format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["user"], self.source_user.id)
+        self.assertEqual(response.data["name"], self.source.name)
+
+    def test_when_non_source_uses_then_return_nothing(self):
+        self.client.force_authenticate(user=self.human_user)
+        response = self.client.get(path=f"{API_PATH}/sources/me/", format="json")
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
