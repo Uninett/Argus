@@ -185,5 +185,5 @@ Argus by default so you might wish to add them to the list of loggers and
 choose a level and formatter for them.
 
 Argus itself has an additional log level, ``TRACE``, numeric value ``5``, for
-even more noise than ``DEBUG``. Some 3rd party libraries uses this level too.
-We don't recommend this in production.
+even more noise than ``DEBUG``. Some 3rd party libraries use this level too.
+We don't recommend ``TRACE`` in production.
