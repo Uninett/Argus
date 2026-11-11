@@ -61,7 +61,7 @@ Gunicorn as layer 2
 
 Use a configuration file, and in the configuration, set up logging for gunicorn
 itself. If both gunicorn and Argus are set to use ``logging.StreamHandler`` then
-the gunicorn logs and Argus logs end up the same place.
+the gunicorn logs and Argus logs end up in the same place.
 
 See :download:`example gunicorn configuration <gunicorn.conf.py>` or :download:`example
 gunicorn configuration with JSON logs <gunicorn-json.conf.py>`.
@@ -77,7 +77,7 @@ The same message is logged multiple times
 This happens if a handler is set on a sublogger in addition to the root
 logger without setting ``propagate`` to ``False`` in the sublogger.
 
-With a dictionary based config, elided lines marked with ``..``. If you have::
+With a dictionary based config, elided lines are marked with ``..``. If you have::
 
     {
         ..
@@ -123,7 +123,7 @@ It's one of:
 1. Multiple handlers, and the subloggers do not have ``propagate`` set to
    False, see :ref:`duplicate_logs`.
 2. Multiple entries in the handlers-list that send to the same place. Example
-   with a dictionary based config, elided lines marked with ``..``. If you have:
+   with a dictionary based config, elided lines are marked with ``..``. If you have:
 
    ::
 
