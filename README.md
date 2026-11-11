@@ -36,7 +36,7 @@ There are several ways to install Argus.
 
 #### Requirements
 
-* Python 3.10+
+* Python 3.11+
 * Django 5.2
 * pip
 * PostgreSQL 14+
