@@ -82,9 +82,11 @@ See :download:`example gunicorn configuration with plaintext logs
    ``loglevel``, so don't mix them. ``access_log_format`` is always honored.
 
 .. Warning::
-   When using ``logconfig_dict`` for *Gunicorn*, always set
-   ``disable_existing_loggers`` to False as it adds magic for
-   ``access_log_format`` to work.
+   Argus' logging configuration is applied after gunicorn's, in the same
+   process. If it sets ``disable_existing_loggers`` to ``True`` (the default
+   if the key is left out), gunicorn's own loggers (``gunicorn.error`` and
+   ``gunicorn.access``) are disabled, and the access log silently disappears.
+   Set it to ``False``, or list both gunicorn loggers in Argus' configuration.
 
 Troubleshooting
 ===============
