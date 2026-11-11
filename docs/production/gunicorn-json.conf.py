@@ -35,11 +35,7 @@ class AccessJsonFormatter(JsonFormatter):
 
 # logging
 
-accesslog = "-"
-errorlog = "-"
-
 access_log_format = '"%(r)s" %(s)s %(b)s "%(f)s" "%(a)s"'
-loglevel = "info"  # gunicorn error log, hide noise
 
 logconfig_dict = {
     "version": 1,
@@ -55,9 +51,6 @@ logconfig_dict = {
         },
     },
     "handlers": {
-        "null": {
-            "class": "logging.NullHandler",
-        },
         "json": {
             "class": "logging.StreamHandler",
             "formatter": "json",
@@ -67,7 +60,7 @@ logconfig_dict = {
             "formatter": "json_access_log",
         },
     },
-    # Gunicorn weirdness, dict config won't work without this
+    # Replace gunicorn's default root, which uses a "console" handler
     "root": ROOT_LOGGER,
     "loggers": {
         "": ROOT_LOGGER,

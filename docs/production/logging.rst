@@ -28,18 +28,17 @@ format.
 
 By installing ``python-json-logger`` (for instance via ``pip install
 python-json-logger`` or ``pip install ".[jsonlogging]"``) and setting up
-a logging formatter like this:
+a logging formatter like this. Elided lines are marked with ``..``:
 
 ::
 
+    ..
     "formatters": {
-        ..
         "json": {
             "()": "pythonjsonlogger.json.JsonFormatter",
             "format": "asctime,levelname,name,message",
             "style": ",",
         },
-        ..
     },
     "handlers": {
         "json": {
@@ -47,8 +46,18 @@ a logging formatter like this:
             "formatter": "json",
         },
     },
+    "loggers": {
+        ..
+        "argus": {
+            ..
+            "handlers": ["json"],
+            "propagate": False,
+        },
+        ..
+    },
+    ..
 
-… the logs produced by argus will be in JSON format.
+… the logs produced by Argus will be in JSON format.
 
 See `Python logging LogRecord attributes
 <https://docs.python.org/3/library/logging.html#logrecord-attributes>`_ for
@@ -60,11 +69,22 @@ Gunicorn as layer 2
 ===================
 
 Use a configuration file, and in the configuration, set up logging for gunicorn
-itself. If both gunicorn and Argus are set to use ``logging.StreamHandler`` then
-the gunicorn logs and Argus logs end up in the same place.
+itself. If both gunicorn and Argus are set to use ``logging.StreamHandler``
+then the gunicorn logs and Argus logs end up the same place. Gunicorn uses
+``logging.StreamHandler`` by default.
 
-See :download:`example gunicorn configuration <gunicorn.conf.py>` or :download:`example
-gunicorn configuration with JSON logs <gunicorn-json.conf.py>`.
+See :download:`example gunicorn configuration with plaintext logs
+<gunicorn.conf.py>` or :download:`example gunicorn configuration with JSON logs
+<gunicorn-json.conf.py>`.
+
+.. Note::
+   ``logconfig_dict`` overrides ``accesslog``, ``errorlog`` and
+   ``loglevel``, don't mix them. ``access_log_format`` is always honored.
+
+.. Warning::
+   When using ``logconfig_dict`` for *Gunicorn*, always set
+   ``disable_existing_loggers`` to False as it adds magic for
+   ``access_log_format`` to work.
 
 Troubleshooting
 ===============
@@ -121,7 +141,7 @@ It's caused by having multiple handlers sending to the same place.
 It's one of:
 
 1. Multiple handlers, and the subloggers do not have ``propagate`` set to
-   False, see :ref:`duplicate_logs`.
+   ``False``, see :ref:`duplicate_logs`.
 2. Multiple entries in the handlers-list that send to the same place. Example
    with a dictionary based config, elided lines are marked with ``..``. If you have:
 
@@ -152,4 +172,16 @@ It's one of:
 
 
    … this will lead to everything logged under argus being sent twice to the
-   same place.
+   same place, in two different formats.
+
+Not enough detail
+-----------------
+
+If you suspect that 3rd party libraries have interesting things to log, set
+``disable_existing_loggers`` to ``False``. They won't follow the format set for
+Argus by default so you might wish to add them to the list of loggers and
+choose a level and formatter for them.
+
+Argus itself has an additional log level, ``TRACE``, numeric value ``5``, for
+even more noise than ``DEBUG``. Some 3rd party libraries uses this level too.
+We don't recommend this in production.
