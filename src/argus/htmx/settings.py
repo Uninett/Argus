@@ -4,7 +4,6 @@ ROOT_URLCONF = "argus.htmx.root_urls"
 
 PUBLIC_URLS = [
     "/api/",
-    "/oidc/",
 ]
 
 LOGIN_URL = "/accounts/login/"

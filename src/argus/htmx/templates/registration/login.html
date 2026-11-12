@@ -17,7 +17,10 @@
         {% if backends.external %}
           <h3>Login with</h3>
           {% for backend in backends.external %}
-            <a class="btn btn-primary" href="{{ backend.url }}">{{ backend.display_name }}</a>
+            <form method="post" action="{{ backend.url }}">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-primary">{{ backend.display_name }}</button>
+            </form>
           {% endfor %}
         {% endif %}
       </section>
