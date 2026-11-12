@@ -14,8 +14,6 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
-from functools import partial
-
 from django.conf import settings
 from django.contrib import admin
 from django.urls import include, path, re_path
@@ -26,9 +24,9 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from argus.constants import API_STABLE_VERSION, API_STABLE_SCHEMA_VIEWNAME
 from argus.notificationprofile.v2.views import SchemaView
 from argus.site.utils import get_urlpatterns
-from argus.site.views import about, index, MetadataView, api_gone, error, health_check
+from argus.site.views import about, index, MetadataView, error, health_check, API410GoneView
 
-api_v1_gone = partial(api_gone, message="API v1 has been removed")
+api_v1_gone = API410GoneView.as_view(message="API v1 has been removed")
 
 
 urlpatterns = [

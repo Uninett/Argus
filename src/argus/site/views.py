@@ -12,7 +12,6 @@ from django.shortcuts import render, reverse
 from django.views.decorators.http import require_GET
 from django.utils.html import escape
 
-from rest_framework.decorators import api_view, permission_classes
 from rest_framework.views import APIView
 from rest_framework import permissions
 from rest_framework import status as drf_status
@@ -114,17 +113,23 @@ about.login_required = False
 # JSON
 
 
-# fmt: off
-@api_view(["GET", "HEAD", "POST"])
-@permission_classes([permissions.AllowAny])
-def api_gone(request, message: str = "Gone"):
-    data = {
-        "status_code": drf_status.HTTP_410_GONE,
-        "status": message,
-    }
-    return Response(data, status=drf_status.HTTP_410_GONE)
-api_gone.login_required = False
-# fmt: on
+class API410GoneView(APIView):
+    permission_classes = [permissions.AllowAny]
+    message = "Gone"  # Override in .as_view()
+
+    def get(self, request, *_, **__):
+        data = {
+            "status_code": drf_status.HTTP_410_GONE,
+            "status": self.message,
+        }
+        return Response(data, status=drf_status.HTTP_410_GONE)
+
+    # suport all http verbs
+    post = get
+    head = get
+    put = get
+    patch = get
+    delete = get
 
 
 @extend_schema_view(get=extend_schema(responses=MetadataSerializer))
