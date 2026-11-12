@@ -39,10 +39,10 @@ We therefore recommend keeping your ``settings.py`` files in the same directory 
 Settings can be tested in ``localsettings.py`` and moved to the other settings
 files later.
 
-.. note:: **Tip**: If you copy the entire logging-setup from "argus.site.settings.dev"
-        to ``localsettings.py`` remember to set ``disable_existing_loggers`` to
-        ``True``.
-        Otherwise, logentries will appear twice.
+.. tip:: To customize logging in development, copy ``argus.site.logging`` into
+   a module you control, for instance,`mylogging`. Then set the
+   :envvar:`DJANGO_LOGGING_MODULE` environment variable to the dotted path of
+   your copy (e.g. ``mylogging.DEV``).
 
-.. warning:: Do not check your ``cmd.sh`` or ``settings.py`` files into version control,
-        since they contain passwords and sensitive data.
+.. warning:: Do not check your ``cmd.sh`` or ``settings.py`` files into version
+   control, since they contain passwords and sensitive data.
