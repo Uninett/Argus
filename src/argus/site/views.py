@@ -117,6 +117,7 @@ class API410GoneView(APIView):
     permission_classes = [permissions.AllowAny]
     message = "Gone"  # Override in .as_view()
 
+    @extend_schema(exclude=True)
     def get(self, request, *_, **__):
         data = {
             "status_code": drf_status.HTTP_410_GONE,
