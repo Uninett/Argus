@@ -513,19 +513,19 @@ To set who created the task use the `--create_by` flag, default is `argus`:
 
         $ python manage.py create_maintenance --created_by admin
 
-To set the start time one can use the `--start_time` flag, otherwise it will be set to
-now:
+To set a start time in the future one can use the `--start_time` flag, otherwise it
+will be set to start at once:
 
     .. code:: console
 
-        $ python manage.py create_maintenance --start_time 2026-11-05 12:52:22.349734+00:00
+        $ python manage.py create_maintenance --start_time "2026-11-05 12:52:22.349734+00:00"
 
-To set the end time one can use the `--end_time` flag, other it will be set to
-infinity:
+To set the end time one can use the `--end_time` flag, which if unset will be
+considered as end time not known yet:
 
     .. code:: console
 
-        $ python manage.py create_maintenance --end_time 2026-11-08 12:52:22.349734+00:00
+        $ python manage.py create_maintenance --end_time "2026-11-08 12:52:22.349734+00:00"
 
 To add a custom description add the `-d` flag to the command as such:
 
