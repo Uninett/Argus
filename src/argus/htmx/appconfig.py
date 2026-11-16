@@ -12,7 +12,6 @@ _app_settings = [
             "LOGIN_REDIRECT_URL": "/incidents/",
             "LOGOUT_REDIRECT_URL": "/incidents/",
             "PUBLIC_URLS": [
-                "/accounts/login/",
                 "/api/",
                 "/oidc/",
             ],

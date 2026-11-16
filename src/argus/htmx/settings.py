@@ -3,7 +3,6 @@ from argus.site.settings.base import *
 ROOT_URLCONF = "argus.htmx.root_urls"
 
 PUBLIC_URLS = [
-    "/accounts/login/",
     "/api/",
     "/oidc/",
 ]
