@@ -26,11 +26,12 @@ class Command(BaseCommand):
             "--start_time",
             type=str,
             help="Start time of the PM, example for format: 2026-11-05 12:52:22.349734+00:00, default: now",
+            default=timezone.now().isoformat(),
         )
         parser.add_argument(
             "--end_time",
             type=str,
-            help="End time of the PM, default: none",
+            help="End time of the PM, if known",
         )
         parser.add_argument(
             "-d", "--description", type=str, help="A description of what the PM covers or why it exists"
@@ -54,7 +55,7 @@ class Command(BaseCommand):
         except User.DoesNotExist as e:
             self.stderr.write(self.style.ERROR("created_by: " + str(e)))
             return
-        content["start_time"] = options.get("start_time") or timezone.now()
+        content["start_time"] = options.get["start_time"]
         if end_time := options.get("end_time"):
             content["end_time"] = end_time
         content["description"] = options.get("description") or ""
