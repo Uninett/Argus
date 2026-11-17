@@ -28,7 +28,7 @@ format.
 
 By installing ``python-json-logger`` (for instance via ``pip install
 python-json-logger`` or ``pip install ".[jsonlogging]"``) and setting up
-a logging formatter like this (elided lines are marked with ``..``):
+logging like this (elided lines are marked with ``..``):
 
 ::
 
