@@ -11,7 +11,7 @@ from argus.incident.factories import (
     SourceUserFactory,
     StatefulIncidentFactory,
 )
-from argus.incident.management.commands.find_unset_last_seen import find_latest_event_by_heartbeatless_source
+from argus.incident.management.commands.find_unset_last_seen import find_latest_event_per_never_seen_source
 from argus.incident.models import Event
 from argus.util.testing import connect_signals, disconnect_signals
 
@@ -29,7 +29,7 @@ class FindLatestEventByHeartbeatlessSourceTests(TestCase):
         sst = SourceSystemTypeFactory(name=name)
         SourceSystemFactory(user=user, name=name, type=sst, last_seen=timezone.now())
 
-        changes, never_seen = find_latest_event_by_heartbeatless_source()
+        changes, never_seen = find_latest_event_per_never_seen_source()
         self.assertEqual(changes, [])
         self.assertEqual(never_seen, [])
 
@@ -49,7 +49,7 @@ class FindLatestEventByHeartbeatlessSourceTests(TestCase):
             description="",
         )
 
-        changes, never_seen = find_latest_event_by_heartbeatless_source()
+        changes, never_seen = find_latest_event_per_never_seen_source()
         self.assertIn((source, now), changes)
         self.assertEqual(never_seen, [])
 
@@ -59,7 +59,7 @@ class FindLatestEventByHeartbeatlessSourceTests(TestCase):
         sst = SourceSystemTypeFactory(name=name)
         source = SourceSystemFactory(user=user, name=name, type=sst)
 
-        changes, never_seen = find_latest_event_by_heartbeatless_source()
+        changes, never_seen = find_latest_event_per_never_seen_source()
         self.assertEqual(changes, [])
         self.assertIn(source, never_seen)
 

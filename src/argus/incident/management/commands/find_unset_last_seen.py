@@ -3,7 +3,7 @@ from django.core.management.base import BaseCommand
 from argus.incident.models import Event, SourceSystem
 
 
-def find_latest_event_by_heartbeatless_source():
+def find_latest_event_per_never_seen_source():
     # Exclude "argus", it's magic
     qs = SourceSystem.objects.exclude(name="argus")
     changes = []
@@ -30,7 +30,7 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        changes, never_seen = find_latest_event_by_heartbeatless_source()
+        changes, never_seen = find_latest_event_per_never_seen_source()
 
         if changes and options["verbosity"]:
             self.stdout.write("Possibly dead sources:\n")
