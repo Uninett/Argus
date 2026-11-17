@@ -193,5 +193,35 @@ Too much noise
 
 Since any import of a Python module can alter the existing logging
 configuration, misbehaving 3rd party libraries can add unwanted noise at any
-time. This is how the Python standard library logging module is designed. Some
-even consider it a feature.
+time. To quiet one down, add its logger to ``"loggers"`` with a higher
+level::
+
+        ..
+        "loggers": {
+            ..
+            "noisylib": {
+                "level": WARNING",
+            },
+        },
+
+This does not help if the library sets its own level when it is imported.
+
+You can turn off a subsystem's log with::
+
+        ..
+        "handlers": {
+            "null": {
+                "class": "logging.NullHandler",
+            },
+        },
+        "loggers": {
+            ..
+            "really_annoying_lib": {
+                "level": NOTSET",
+                "propagate": False,
+                "handlers": ["null"],
+            },
+        },
+
+… with the same caveat that the library itself may alter the logging
+configuration.
