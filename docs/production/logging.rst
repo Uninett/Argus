@@ -146,8 +146,8 @@ It's one of:
 
 1. Multiple handlers, and the subloggers do not have ``propagate`` set to
    ``False``, see :ref:`duplicate_logs`.
-2. Multiple entries in the handlers-list that send to the same place. For example
-   with a dictionary based config (elided lines are marked with ``..``), If you have:
+2. Multiple entries in the handlers-list that send to the same place. For example,
+   with a dictionary based config (elided lines are marked with ``..``). If you have:
 
    ::
 
