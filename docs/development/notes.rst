@@ -40,7 +40,7 @@ Settings can be tested in ``localsettings.py`` and moved to the other settings
 files later.
 
 .. tip:: To customize logging in development, copy ``argus.site.logging`` into
-   a module you control, for instance,`mylogging`. Then set the
+   a module you control, for instance, ``mylogging``. Then set the
    :envvar:`DJANGO_LOGGING_MODULE` environment variable to the dotted path of
    your copy (e.g. ``mylogging.DEV``).
 
