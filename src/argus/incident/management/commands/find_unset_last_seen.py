@@ -26,7 +26,7 @@ class Command(BaseCommand):
             "-s",
             "--save",
             action="store_true",
-            help="Update last_seen with latest change",
+            help="Update last_seen with latest change. If heartbeat checking is turned on, heartbeat frequency is set for the source, and the latest change is too long ago, this will trigger an incident reporting a missing heartbeat.",
         )
 
     def handle(self, *args, **options):
