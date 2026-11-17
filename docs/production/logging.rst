@@ -9,13 +9,13 @@ In production there are at least three layers that each produce their own logs:
    between 1 and 3.
 3. Argus itself.
 
-Both point 1 and 2 will have access logs, unless you turn it off. Both 1 and
-2 will have error logs for that layer only. Only layer 3 will produce error
-logs for errors in Argus itself.
+Layer 1 usually has an access log by default. Layer 2 may not: gunicorn, for
+instance, only has one if you turn it on. Both layers have error logs for their
+own layer only. Only layer 3 produces error logs for errors in Argus itself.
 
 For development, Django (and thus Argus) ships with the development command
 "runserver", which combines both 1 and 2. But in production, it is better to
-have layer 1 and 2 separate, and layer 2 should never be just "runserver".
+have layers 1 and 2 separate, and layer 2 should never be just "runserver".
 
 Layers 1 and 2 are outside Argus' control, so we cannot ship a logging
 configuration for them. This page documents what we recommend.
