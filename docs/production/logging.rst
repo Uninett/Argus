@@ -186,7 +186,7 @@ even more noise than ``DEBUG``. Some 3rd party libraries know of and use this
 level too. We don't recommend using ``TRACE`` in production.
 
 
-.. _too-much-logging-noise:
+.. _too-much-logging_noise:
 
 Too much noise
 --------------
