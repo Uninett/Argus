@@ -9,7 +9,7 @@ from typing import Optional
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator, URLValidator
-from django.db import models
+from django.db import DatabaseError, models, transaction
 from django.db.models import F, Q
 from django.utils import timezone
 from django.utils.timesince import timesince
@@ -324,10 +324,15 @@ class IncidentQuerySet(models.QuerySet):
         return current_acks.values_list("event__incident", flat=True).distinct()
 
     def create_acks(self, actor: User, timestamp=None, description="", expiration=None):
-        events = self.create_events(actor, Event.Type.ACKNOWLEDGE, timestamp, description)
-        ack_objs = [Acknowledgement(event=event, expiration=expiration) for event in events]
-        Acknowledgement.objects.bulk_create(ack_objs)
-        qs = Acknowledgement.objects.filter(event__in=events)
+        try:
+            with transaction.atomic():
+                events = self.create_events(actor, Event.Type.ACKNOWLEDGE, timestamp, description)
+                ack_objs = [Acknowledgement(event=event, expiration=expiration) for event in events]
+                Acknowledgement.objects.bulk_create(ack_objs)
+            qs = Acknowledgement.objects.filter(event__in=events)
+        except DatabaseError as e:
+            LOG.warning("Failed to create acks: %s", str(e))
+            qs = Acknowledgement.objects.none()
         return qs
 
     def create_events(self, actor: User, event_type: Event.Type, timestamp=None, description=""):
@@ -339,47 +344,68 @@ class IncidentQuerySet(models.QuerySet):
         an expiration time for an ack.
         """
         timestamp = timestamp if timestamp else timezone.now()
-        for incident in self:
-            Event.objects.create(
-                incident=incident,
-                actor=actor,
-                timestamp=timestamp,
-                type=event_type,
-                description=description,
-            )
-        qs = Event.objects.filter(
-            incident__in=self,
-            actor=actor,
-            timestamp=timestamp,
-            type=event_type,
-            description=description,
-        )
+        try:
+            with transaction.atomic():
+                for incident in self:
+                    Event.objects.create(
+                        incident=incident,
+                        actor=actor,
+                        timestamp=timestamp,
+                        type=event_type,
+                        description=description,
+                    )
+                qs = Event.objects.filter(
+                    incident__in=self,
+                    actor=actor,
+                    timestamp=timestamp,
+                    type=event_type,
+                    description=description,
+                )
+        except DatabaseError as e:
+            LOG.warning("Failed to create events: %s", str(e))
+            qs = Event.objects.none()
         return qs
 
     def close(self, actor: User, timestamp=None, description=""):
         "Close incidents correctly and create the needed events"
         qs = self.open()
-        qs.update(end_time=timestamp or timezone.now())
-        qs = self.all()  # Reload changes from database
-        event_type = Event.Type.CLOSE
-        events = qs.create_events(actor, event_type, timestamp, description)
+        try:
+            with transaction.atomic():
+                qs.update(end_time=timestamp or timezone.now())
+                qs = self.all()  # Reload changes from database
+                event_type = Event.Type.CLOSE
+                events = qs.create_events(actor, event_type, timestamp, description)
+        except DatabaseError as e:
+            LOG.warning("Failed to close incidents: %s", str(e))
+            qs = Event.objects.none()
         return events
 
     def reopen(self, actor: User, timestamp=None, description=""):
         "Reopen incidents correctly and create the needed events"
         qs = self.closed()
-        qs.update(end_time=INFINITY_REPR)
-        qs = self.all()  # Reload changes from database
-        event_type = Event.Type.REOPEN
-        events = qs.create_events(actor, event_type, timestamp, description)
+        try:
+            with transaction.atomic():
+                qs.update(end_time=INFINITY_REPR)
+                qs = self.all()  # Reload changes from database
+                event_type = Event.Type.REOPEN
+                events = qs.create_events(actor, event_type, timestamp, description)
+        except DatabaseError as e:
+            LOG.warning("Failed to reopen incidents: %s", str(e))
+            qs = Event.objects.none()
         return events
 
     def update_ticket_url(self, actor: User, url: str, timestamp=None):
         events = set()
-        for incident in self:
-            event = incident.change_ticket_url(actor, url, timestamp)
-            events.add(event.pk)
-        return self.all()
+        try:
+            with transaction.atomic():
+                for incident in self:
+                    event = incident.change_ticket_url(actor, url, timestamp)
+                    events.add(event.pk)
+                qs = self.all()
+        except DatabaseError as e:
+            LOG.warning("Failed to update ticket url on incidents: %s", str(e))
+            qs = self.none()
+        return qs
 
 
 # TODO: review whether fields should be nullable, and on_delete modes
@@ -546,6 +572,7 @@ class Incident(models.Model):
     def is_acked_by(self, group: str) -> bool:
         return group in self.acks.active().group_names()
 
+    @transaction.atomic
     def create_first_event(self):
         """Create the correct type of first event for an incident
 
@@ -564,7 +591,7 @@ class Incident(models.Model):
             description=self.description,
         )
 
-    # @transaction.atomic
+    @transaction.atomic
     def set_open(self, actor: User, timestamp: datetime = None, description=""):
         "Repoen incident as a human user"
         if not self.stateful:
@@ -582,7 +609,7 @@ class Incident(models.Model):
             description=description,
         )
 
-    # @transaction.atomic
+    @transaction.atomic
     def set_closed(self, actor: User, timestamp: datetime = None, description=""):
         "Closes incident as a human user"
 
@@ -601,7 +628,7 @@ class Incident(models.Model):
             description=description,
         )
 
-    # @transaction.atomic
+    @transaction.atomic
     def set_end(self, actor: User, timestamp: datetime = None, description: str = ""):
         "Ends incident as a machine source"
         if not self.stateful:
@@ -619,7 +646,7 @@ class Incident(models.Model):
             description=description,
         )
 
-    # @transaction.atomic
+    @transaction.atomic
     def create_ack(self, actor: User, timestamp=None, description="", expiration=None):
         timestamp = timestamp if timestamp else timezone.now()
         event = Event.objects.create(
@@ -628,7 +655,7 @@ class Incident(models.Model):
         ack = Acknowledgement.objects.create(event=event, expiration=expiration)
         return ack
 
-    # @transaction.atomic
+    @transaction.atomic
     def change_level(self, actor, new_level, timestamp=None):
         old_level = self.level
         self.level = new_level
@@ -636,7 +663,7 @@ class Incident(models.Model):
         event = ChangeEvent.change_level(self, actor, old_level, new_level, timestamp)
         return event
 
-    # @transaction.atomic
+    @transaction.atomic
     def change_ticket_url(self, actor, url="", timestamp=None):
         old_ticket_url = self.ticket_url
         self.ticket_url = url
