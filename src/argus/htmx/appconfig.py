@@ -13,7 +13,6 @@ _app_settings = [
             "LOGOUT_REDIRECT_URL": "/incidents/",
             "PUBLIC_URLS": [
                 "/api/",
-                "/oidc/",
             ],
         },
     },
