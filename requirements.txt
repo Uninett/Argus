@@ -15,6 +15,7 @@ asgiref==3.11.1
     #   django
     #   django-cors-headers
     #   django-htmx
+    #   social-auth-app-django
 attrs==25.4.0
     # via
     #   -r constraints.txt
@@ -34,6 +35,7 @@ cryptography==50.0.1
     # via
     #   -r constraints.txt
     #   pyjwt
+    #   social-auth-core
 defusedxml==0.7.1
     # via
     #   python3-openid
@@ -153,7 +155,7 @@ referencing==0.37.0
     # via
     #   jsonschema
     #   jsonschema-specifications
-requests==2.33.1
+requests==2.34.2
     # via
     #   requests-oauthlib
     #   social-auth-core
@@ -163,9 +165,9 @@ rpds-py==0.30.0
     # via
     #   jsonschema
     #   referencing
-social-auth-app-django==5.7.0
+social-auth-app-django==8.1.0
     # via argus-server (pyproject.toml)
-social-auth-core==4.8.5
+social-auth-core==7.2.0
     # via
     #   argus-server (pyproject.toml)
     #   python-dataporten-auth
