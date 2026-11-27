@@ -373,7 +373,7 @@ class EmailDestinationViewV2Tests(APITestCase):
             },
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn("A destination with this medium and label already exists", str(response.data))
+        self.assertIn(Media.error_messages["duplicate_label"], str(response.data))
         self.assertEqual(
             DestinationConfig.objects.filter(media_id="email", label="duplicate").count(),
             1,
@@ -394,7 +394,7 @@ class EmailDestinationViewV2Tests(APITestCase):
             },
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn("A destination with these settings already exists", str(response.data))
+        self.assertIn(Media.error_messages["duplicate"], str(response.data))
         self.assertEqual(
             DestinationConfig.objects.filter(
                 media_id="email", settings__email_address=settings["email_address"]
@@ -422,7 +422,7 @@ class EmailDestinationViewV2Tests(APITestCase):
             },
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn("Enter a valid email address", str(response.data["email_address"]))
+        self.assertIn("Enter a valid email address", str(response.data["settings"]))
 
     def test_given_missing_email_address_then_forbid_creating_destination(self):
         response = self.user1_rest_client.post(
@@ -433,7 +433,7 @@ class EmailDestinationViewV2Tests(APITestCase):
             },
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn("This field is required", str(response.data["email_address"]))
+        self.assertIn("This field is required", str(response.data["settings"]))
 
     def test_given_empty_settings_then_forbid_creating_destination(self):
         response = self.user1_rest_client.post(
@@ -444,7 +444,7 @@ class EmailDestinationViewV2Tests(APITestCase):
             },
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn("This field is required", str(response.data["email_address"]))
+        self.assertIn("This field is required", str(response.data["settings"]))
 
     def test_given_same_medium_and_settings_to_update_unmanaged_destination_then_it_should_update(self):
         new_settings = {
@@ -597,7 +597,7 @@ class EmailDestinationViewV2Tests(APITestCase):
             data={"label": "duplicate"},
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn("A destination with this medium and label already exists", str(response.data))
+        self.assertIn(Media.error_messages["duplicate_label"], str(response.data))
         self.assertEqual(
             DestinationConfig.objects.filter(media_id="email", label="duplicate").count(),
             1,
@@ -638,7 +638,7 @@ class EmailDestinationViewV2Tests(APITestCase):
             data={"settings": {"email_address": "invalid"}},
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn("Enter a valid email address", str(response.data["email_address"]))
+        self.assertIn("Enter a valid email address", str(response.data["settings"]))
         self.unmanaged_email_destination.refresh_from_db()
         self.assertEqual(
             self.unmanaged_email_destination.settings["email_address"], unmanaged_email_destination_address
@@ -651,7 +651,7 @@ class EmailDestinationViewV2Tests(APITestCase):
             data={"settings": {}},
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn("This field is required", str(response.data["email_address"]))
+        self.assertIn("This field is required", str(response.data["settings"]))
         self.unmanaged_email_destination.refresh_from_db()
         self.assertEqual(
             self.unmanaged_email_destination.settings["email_address"], unmanaged_email_destination_address
@@ -790,7 +790,7 @@ class EmailDestinationViewV3Tests(APITestCase):
             },
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn("A destination with this medium and label already exists", str(response.data))
+        self.assertIn(Media.error_messages["duplicate_label"], str(response.data))
         self.assertEqual(
             DestinationConfig.objects.filter(media_id="email", label="duplicate").count(),
             1,
@@ -811,7 +811,7 @@ class EmailDestinationViewV3Tests(APITestCase):
             },
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn("A destination with these settings already exists", str(response.data))
+        self.assertIn(Media.error_messages["duplicate"], str(response.data))
         self.assertEqual(
             DestinationConfig.objects.filter(
                 media_id="email", settings__email_address=settings["email_address"]
@@ -839,7 +839,7 @@ class EmailDestinationViewV3Tests(APITestCase):
             },
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn("Enter a valid email address", str(response.data["email_address"]))
+        self.assertIn("Enter a valid email address", str(response.data["settings"]))
 
     def test_given_missing_email_address_then_forbid_creating_destination(self):
         response = self.user1_rest_client.post(
@@ -850,7 +850,7 @@ class EmailDestinationViewV3Tests(APITestCase):
             },
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn("This field is required", str(response.data["email_address"]))
+        self.assertIn("This field is required", str(response.data["settings"]))
 
     def test_given_empty_settings_then_forbid_creating_destination(self):
         response = self.user1_rest_client.post(
@@ -861,7 +861,7 @@ class EmailDestinationViewV3Tests(APITestCase):
             },
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn("This field is required", str(response.data["email_address"]))
+        self.assertIn("This field is required", str(response.data["settings"]))
 
     def test_given_same_medium_and_settings_to_update_unmanaged_destination_then_it_should_update(self):
         new_settings = {
@@ -1000,7 +1000,7 @@ class EmailDestinationViewV3Tests(APITestCase):
             data={"label": "duplicate"},
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn("A destination with this medium and label already exists", str(response.data))
+        self.assertIn(Media.error_messages["duplicate_label"], str(response.data))
         self.assertEqual(
             DestinationConfig.objects.filter(media_id="email", label="duplicate").count(),
             1,
@@ -1041,7 +1041,7 @@ class EmailDestinationViewV3Tests(APITestCase):
             data={"settings": {"email_address": "invalid"}},
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn("Enter a valid email address", str(response.data["email_address"]))
+        self.assertIn("Enter a valid email address", str(response.data["settings"]))
         self.unmanaged_email_destination.refresh_from_db()
         self.assertEqual(
             self.unmanaged_email_destination.settings["email_address"], unmanaged_email_destination_address
@@ -1054,7 +1054,7 @@ class EmailDestinationViewV3Tests(APITestCase):
             data={"settings": {}},
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn("This field is required", str(response.data["email_address"]))
+        self.assertIn("This field is required", str(response.data["settings"]))
         self.unmanaged_email_destination.refresh_from_db()
         self.assertEqual(
             self.unmanaged_email_destination.settings["email_address"], unmanaged_email_destination_address
