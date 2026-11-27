@@ -147,7 +147,7 @@ def create_filter(request: HtmxHttpRequest):
     if selected:
         request.session["selected_filter"] = selected
     if filter_name and filter_form.is_valid():
-        filterblob = filter_form.to_filterblob()
+        filterblob = filter_form.to_minimal_filterblob()
         _, filter_obj = create_named_filter(request, filter_name, filterblob)
         if filter_obj:
             request.session["selected_filter"] = str(filter_obj.id)
@@ -168,7 +168,7 @@ def update_filter(request: HtmxHttpRequest, pk: int):
     if selected:
         request.session["selected_filter"] = selected
     if filter_form.is_valid():
-        filterblob = filter_form.to_filterblob()
+        filterblob = filter_form.to_minimal_filterblob()
         filter_obj.filter = filterblob
         filter_obj.save()
 
