@@ -146,6 +146,10 @@ class BaseIncidentViewSet(
     queryset = Incident.objects.prefetch_default_related()
     search_fields = ["description", "search_text"]
 
+    def raise_uncaught_exception(self, exc):
+        LOG.warning("Failed posting incident:  %s", exc)
+        return super().raise_uncaught_exception(exc)
+
     def get_serializer_class(self):
         if self.request.method in {"PUT", "PATCH"}:
             return IncidentPureDeserializer
@@ -162,20 +166,24 @@ class BaseIncidentViewSet(
         user = self.request.user
 
         if "source" in serializer.initial_data:
+            source_pk = serializer.initial_data["source"]
+
             if not user.is_superuser:
+                LOG.warning("Failed posting incident: non-super user source %i specified source-field", source_pk)
                 raise serializers.ValidationError(
                     "You must be a superuser to be allowed to specify the 'source' field."
                 )
 
-            source_pk = serializer.initial_data["source"]
             try:
                 source = SourceSystem.objects.get(pk=source_pk)
             except SourceSystem.DoesNotExist:
+                LOG.warning("Failed posting incident: source %i does not exist", source_pk)
                 raise ValidationError(f"SourceSystem with pk={source_pk} does not exist.")
         else:
             try:
                 source = user.source_system
             except SourceSystem.DoesNotExist:
+                LOG.warning("Failed posting incident: invalid source, user_id  %i", user.pk)
                 raise ValidationError("The requesting user must have a connected source system.")
 
         # TODO: send notifications to users
@@ -183,6 +191,7 @@ class BaseIncidentViewSet(
             serializer.save(user=user, source=source)
         except IntegrityError as e:
             # TODO: this should be replaced by more verbose feedback, that also doesn't reference database tables
+            LOG.warning("Failed posting incident: %s", e)
             raise serializers.ValidationError(e)
 
     def perform_update(self, serializer):
