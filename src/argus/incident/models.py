@@ -9,7 +9,7 @@ from typing import Optional
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator, URLValidator
-from django.db import models
+from django.db import models, transaction
 from django.db.models import F, Q
 from django.utils import timezone
 from django.utils.timesince import timesince
@@ -323,6 +323,7 @@ class IncidentQuerySet(models.QuerySet):
         current_acks = Acknowledgement.objects.active().prefetch_related("event__incident")
         return current_acks.values_list("event__incident", flat=True).distinct()
 
+    @transaction.atomic
     def create_acks(self, actor: User, timestamp=None, description="", expiration=None):
         events = self.create_events(actor, Event.Type.ACKNOWLEDGE, timestamp, description)
         ack_objs = [Acknowledgement(event=event, expiration=expiration) for event in events]
@@ -330,6 +331,7 @@ class IncidentQuerySet(models.QuerySet):
         qs = Acknowledgement.objects.filter(event__in=events)
         return qs
 
+    @transaction.atomic
     def create_events(self, actor: User, event_type: Event.Type, timestamp=None, description=""):
         """
         Create events of type ``event_type``, does not change dependent objects
@@ -356,6 +358,7 @@ class IncidentQuerySet(models.QuerySet):
         )
         return qs
 
+    @transaction.atomic
     def close(self, actor: User, timestamp=None, description=""):
         "Close incidents correctly and create the needed events"
         qs = self.open()
@@ -365,6 +368,7 @@ class IncidentQuerySet(models.QuerySet):
         events = qs.create_events(actor, event_type, timestamp, description)
         return events
 
+    @transaction.atomic
     def reopen(self, actor: User, timestamp=None, description=""):
         "Reopen incidents correctly and create the needed events"
         qs = self.closed()
@@ -374,6 +378,7 @@ class IncidentQuerySet(models.QuerySet):
         events = qs.create_events(actor, event_type, timestamp, description)
         return events
 
+    @transaction.atomic
     def update_ticket_url(self, actor: User, url: str, timestamp=None):
         events = set()
         for incident in self:
@@ -546,6 +551,7 @@ class Incident(models.Model):
     def is_acked_by(self, group: str) -> bool:
         return group in self.acks.active().group_names()
 
+    @transaction.atomic
     def create_first_event(self):
         """Create the correct type of first event for an incident
 
@@ -564,7 +570,7 @@ class Incident(models.Model):
             description=self.description,
         )
 
-    # @transaction.atomic
+    @transaction.atomic
     def set_open(self, actor: User, timestamp: datetime = None, description=""):
         "Repoen incident as a human user"
         if not self.stateful:
@@ -582,7 +588,7 @@ class Incident(models.Model):
             description=description,
         )
 
-    # @transaction.atomic
+    @transaction.atomic
     def set_closed(self, actor: User, timestamp: datetime = None, description=""):
         "Closes incident as a human user"
 
@@ -601,7 +607,7 @@ class Incident(models.Model):
             description=description,
         )
 
-    # @transaction.atomic
+    @transaction.atomic
     def set_end(self, actor: User, timestamp: datetime = None, description: str = ""):
         "Ends incident as a machine source"
         if not self.stateful:
@@ -619,7 +625,7 @@ class Incident(models.Model):
             description=description,
         )
 
-    # @transaction.atomic
+    @transaction.atomic
     def create_ack(self, actor: User, timestamp=None, description="", expiration=None):
         timestamp = timestamp if timestamp else timezone.now()
         event = Event.objects.create(
@@ -628,7 +634,7 @@ class Incident(models.Model):
         ack = Acknowledgement.objects.create(event=event, expiration=expiration)
         return ack
 
-    # @transaction.atomic
+    @transaction.atomic
     def change_level(self, actor, new_level, timestamp=None):
         old_level = self.level
         self.level = new_level
@@ -636,7 +642,7 @@ class Incident(models.Model):
         event = ChangeEvent.change_level(self, actor, old_level, new_level, timestamp)
         return event
 
-    # @transaction.atomic
+    @transaction.atomic
     def change_ticket_url(self, actor, url="", timestamp=None):
         old_ticket_url = self.ticket_url
         self.ticket_url = url
